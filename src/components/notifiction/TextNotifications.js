@@ -543,7 +543,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
             style={styles.appointments}
             accessible={true}
             accessibilityRole="text"
-            accessibilityLabel={`${title} for text notifications`}
+            accessibilityLabel={`${title} for text notifications ${description}`}
           >
             {title}
           </Text>

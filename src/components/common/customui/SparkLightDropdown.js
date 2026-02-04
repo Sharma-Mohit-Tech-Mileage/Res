@@ -8,7 +8,8 @@ import {
   SafeAreaView, 
   Pressable, 
   findNodeHandle, 
-  AccessibilityInfo 
+  AccessibilityInfo,
+  Platform
 } from 'react-native';
 import { Box } from 'native-base';
 import { Padding, Color, FontFamily, FontSize } from "../../../../GlobalStyles"; 
@@ -79,12 +80,10 @@ const SparkLightDropdown = ({
         style={[styles.dropdown, dropDownStyle]}
         onPress={openPicker}
         accessible={true}
-        accessibilityRole="button"
+        accessibilityRole={Platform.OS === 'android' ? undefined : 'button'}
         accessibilityLabel={getAccessibilityLabel()}
-        accessibilityHint={`Double tap to open ${accessibilityItemName} options`}
-        accessibilityState={{
-          expanded: visible
-        }}
+        accessibilityHint={`Open ${accessibilityItemName} options`}
+        accessibilityState={Platform.OS === 'android' ? undefined : { expanded: visible }}
       >
         <Text style={styles.dropdownText} accessible={false}>
           {selectedValue || placeholder}
@@ -147,12 +146,10 @@ const SparkLightDropdown = ({
                   ]}
                   onPress={() => handleSelect(item)}
                   accessible={true}
-                  accessibilityRole="button"
+                  accessibilityRole={Platform.OS === 'android' ? undefined : 'button'}
                   accessibilityLabel={`${item}, ${index+1} of ${validItems.length} ${selectedValue === item ? ', selected' : ''}`}
-                  accessibilityHint={`Double tap to select this ${accessibilityItemName}`}
-                  accessibilityState={{ 
-                    selected: selectedValue === item
-                  }}
+                  accessibilityHint={Platform.OS === 'android' ? undefined : `Double tap to select this ${accessibilityItemName}`}
+                  accessibilityState={Platform.OS === 'android' ? undefined : { selected: selectedValue === item }}
                 >
                   <Text 
                     style={[
