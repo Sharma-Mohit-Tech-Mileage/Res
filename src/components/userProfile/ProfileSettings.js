@@ -39,6 +39,28 @@ const ProfileSettings = () => {
     (state) => state.user.userData.userInfo
   );
 
+
+
+const numberToWordsForAccessibility = (numStr) => {
+  if (!numStr) return "";
+  const digitsMap = {
+    0: "zero",
+    1: "one",
+    2: "two",
+    3: "three",
+    4: "four",
+    5: "five",
+    6: "six",
+    7: "seven",
+    8: "eight",
+    9: "nine",
+  };
+  return numStr
+    .split("")
+    .map((digit) => digitsMap[digit] || digit)
+    .join(" ");
+};
+
   const showReconnectMessage = userInfo
     ? isAccountDisconnected(
         userInfo.acctStatus,
@@ -104,7 +126,7 @@ const ProfileSettings = () => {
                   </Text>
                 </View>
 
-                <View style={styles.firstNameParent} accessible={true}>
+                <View style={styles.firstNameParent} accessible={true} accessibilityLabel={`Account number ${numberToWordsForAccessibility(profileDetails.accountNumber)}`} accessibilityRole="text">
                   <Text style={styles.firstName}>Account Number</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {profileDetails.accountNumber}

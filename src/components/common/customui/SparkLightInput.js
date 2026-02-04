@@ -129,6 +129,37 @@ const SparkLightInput = React.forwardRef(({
     return "default";
   };
 
+
+  /**
+ * Formats input US number:
+ * "+19876543210" → "+1 (987) 654-3210"
+ * "9876543210"   → "(987) 654-3210"
+ */
+function formatUsPhone(input) {
+  if (!input) return "";
+
+  let digits = String(input).replace(/\D/g, ""); // keep numbers only
+  let hasCountryCode = false;
+
+  // Handle +1 or 1 prefix
+  if (digits.length === 11 && digits.startsWith("1")) {
+    hasCountryCode = true;
+    digits = digits.slice(1); // remove country code
+  }
+
+  // Must be exactly 10 digits now
+  if (digits.length !== 10) return input;
+
+  const area = digits.substring(0, 3);
+  const middle = digits.substring(3, 6);
+  const last = digits.substring(6, 10);
+
+  const formatted = `(${area}) ${middle}-${last}`;
+
+  return hasCountryCode ? `+1 ${formatted}` : formatted;
+}
+
+
   const getAccessibilityLabel = () => {
     if (
       Platform.OS === "android" &&
@@ -197,7 +228,7 @@ const SparkLightInput = React.forwardRef(({
 
         <TextInput
           placeholder={placeholder}
-          value={value}
+          value={formatUsPhone(value)}
           ref={inputRef}
           onChangeText={handleInputChange}
           onFocus={() => setIsFocused(true)}
