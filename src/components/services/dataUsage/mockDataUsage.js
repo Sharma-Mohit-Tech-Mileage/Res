@@ -1,172 +1,180 @@
 /**
- * Mock Data for Data Usage Feature
+ * mockDataUsage.js - API-COMPATIBLE STRUCTURE
  * Path: src/components/services/dataUsage/mockDataUsage.js
- * 
- * WITH UPLOAD/DOWNLOAD SPLIT for historical usage
  */
 
-export const MOCK_DATA_USAGE = {
-  accountNumber: "123456789",
+export const MOCK_CURRENT_USAGE = {
+  beginDate: "2026-01-15T00:00:00",
+  endDate: "2026-07-14T00:00:00",
+  accountType: "usagebased",
+  dataPlanGB: 1500,
+  usedDataGB: 237.75,
+  dataRemaining: 1262.25,
+  uploadTotalGB: 15.89,
+  downloadTotalGB: 222.69,
+  dataUsedPercent: 15.85,
+  remainingDays: 16,
   
-  // Billing cycle information
-  billingCycle: {
-    startDate: "2025-02-01",
-    endDate: "2025-02-28",
-    daysElapsed: 15,
-    daysRemaining: 13,
-    totalDays: 28
+};
+
+export const MOCK_MONTHLY_USAGE = [
+  {
+    monthLabel: "Jan 2026",
+    usageStartDate: "2026-01-01",
+    usageEndDate: "2026-01-31",
+    uploadGB: 32.17,
+    downloadGB: 406.2,
+    totalGB: 438.37
   },
-  
-  // Current data plan details
-  dataPlan: {
-    name: "Internet 300 Mbps",
-    totalGB: 700,
-    usedGB: 113,
-    remainingGB: 587,
-    percentageUsed: 16,
-    downloadSpeed: 300,
-    uploadSpeed: 30
+  {
+    monthLabel: "Dec 2025",
+    usageStartDate: "2025-12-01",
+    usageEndDate: "2025-12-31",
+    uploadGB: 84.85,
+    downloadGB: 461.66,
+    totalGB: 546.51
   },
-  
-  // Historical usage - WITH UPLOAD/DOWNLOAD SPLIT
-  historicalUsage: {
-    // Monthly usage data
-    monthly: [
-      { 
-        month: "Feb", 
-        year: "2025", 
-        download: 95, 
-        upload: 18,
-        total: 113,
-        date: "2025-02", 
-        isCurrentMonth: true 
-      },
-      { 
-        month: "Jan", 
-        year: "2025", 
-        download: 380, 
-        upload: 70,
-        total: 450,
-        date: "2025-01", 
-        isCurrentMonth: false 
-      },
-      { 
-        month: "Dec", 
-        year: "2024", 
-        download: 440, 
-        upload: 80,
-        total: 520,
-        date: "2024-12", 
-        isCurrentMonth: false 
-      },
-      { 
-        month: "Nov", 
-        year: "2024", 
-        download: 320, 
-        upload: 60,
-        total: 380,
-        date: "2024-11", 
-        isCurrentMonth: false 
-      },
-      { 
-        month: "Oct", 
-        year: "2024", 
-        download: 410, 
-        upload: 80,
-        total: 490,
-        date: "2024-10", 
-        isCurrentMonth: false 
-      },
-      { 
-        month: "Sep", 
-        year: "2024", 
-        download: 340, 
-        upload: 70,
-        total: 410,
-        date: "2024-09", 
-        isCurrentMonth: false 
-      }
-    ],
-    
-    // Daily usage data
-    daily: [
-      { date: "2025-02-15", download: 4.4, upload: 0.8, total: 5.2, dayOfWeek: "Sat", dayLabel: "15" },
-      { date: "2025-02-14", download: 10.8, upload: 2.0, total: 12.8, dayOfWeek: "Fri", dayLabel: "14" },
-      { date: "2025-02-13", download: 7.2, upload: 1.3, total: 8.5, dayOfWeek: "Thu", dayLabel: "13" },
-      { date: "2025-02-12", download: 5.2, upload: 0.9, total: 6.1, dayOfWeek: "Wed", dayLabel: "12" },
-      { date: "2025-02-11", download: 7.8, upload: 1.5, total: 9.3, dayOfWeek: "Tue", dayLabel: "11" },
-      { date: "2025-02-10", download: 9.4, upload: 1.8, total: 11.2, dayOfWeek: "Mon", dayLabel: "10" },
-      { date: "2025-02-09", download: 6.6, upload: 1.2, total: 7.8, dayOfWeek: "Sun", dayLabel: "9" },
-      { date: "2025-02-08", download: 8.8, upload: 1.7, total: 10.5, dayOfWeek: "Sat", dayLabel: "8" },
-      { date: "2025-02-07", download: 5.8, upload: 1.1, total: 6.9, dayOfWeek: "Fri", dayLabel: "7" },
-      { date: "2025-02-06", download: 6.9, upload: 1.3, total: 8.2, dayOfWeek: "Thu", dayLabel: "6" },
-      { date: "2025-02-05", download: 4.7, upload: 0.9, total: 5.6, dayOfWeek: "Wed", dayLabel: "5" },
-      { date: "2025-02-04", download: 6.0, upload: 1.1, total: 7.1, dayOfWeek: "Tue", dayLabel: "4" },
-      { date: "2025-02-03", download: 8.2, upload: 1.6, total: 9.8, dayOfWeek: "Mon", dayLabel: "3" },
-      { date: "2025-02-02", download: 3.5, upload: 0.7, total: 4.2, dayOfWeek: "Sun", dayLabel: "2" },
-      { date: "2025-02-01", download: 5.5, upload: 1.0, total: 6.5, dayOfWeek: "Sat", dayLabel: "1" }
-    ]
+  {
+    monthLabel: "Nov 2025",
+    usageStartDate: "2025-11-01",
+    usageEndDate: "2025-11-30",
+    uploadGB: 103.41,
+    downloadGB: 658.06,
+    totalGB: 761.47
   },
-  
-  // Equipment list - WITH USEFUL INFO (not just status)
-  equipment: [
-    {
-      id: "1",
-      name: "Sparklight Modem",
-      type: "modem",
-      model: "C3000Z",
-      macId: "00:1A:2B:3C:4D:5E",
-      connectionType: "Wired",
-      location: "Living Room",
-      connectedDevices: 8,
-      icon: "router-wireless"
-    },
-    {
-      id: "2",
-      name: "eero Pro 6e",
-      type: "router",
-      model: "J010001",
-      macId: "00:1A:2B:3C:4D:5F",
-      connectionType: "Wireless",
-      location: "Main Floor",
-      connectedDevices: 12,
-      icon: "wifi"
-    }
-  ],
-  
-  // eero app promotion
-  eeroPromo: {
-    show: true,
-    appName: "eero",
-    tagline: "eero app simplifies connectivity",
-    iosUrl: "https://apps.apple.com/app/eero/id1068944930",
-    androidUrl: "https://play.google.com/store/apps/details?id=com.eero.android"
+  {
+    monthLabel: "Oct 2025",
+    usageStartDate: "2025-10-01",
+    usageEndDate: "2025-10-31",
+    uploadGB: 95.23,
+    downloadGB: 512.34,
+    totalGB: 607.57
+  },
+  {
+    monthLabel: "Sep 2025",
+    usageStartDate: "2025-09-01",
+    usageEndDate: "2025-09-30",
+    uploadGB: 78.91,
+    downloadGB: 445.32,
+    totalGB: 524.23
+  },
+  {
+    monthLabel: "Aug 2025",
+    usageStartDate: "2025-08-01",
+    usageEndDate: "2025-08-31",
+    uploadGB: 88.45,
+    downloadGB: 523.18,
+    totalGB: 611.63
   }
-};
+  
+];
+
+export const MOCK_DAILY_USAGE = [
+  { usageDay: "2026-01-15", uploadGB: 0.8, downloadGB: 12.4, totalGB: 13.2 },
+  { usageDay: "2026-01-14", uploadGB: 2.1, downloadGB: 24.8, totalGB: 26.9 },
+  { usageDay: "2026-01-13", uploadGB: 1.5, downloadGB: 18.3, totalGB: 19.8 },
+  { usageDay: "2026-01-12", uploadGB: 0.9, downloadGB: 14.2, totalGB: 15.1 },
+  { usageDay: "2026-01-11", uploadGB: 1.7, downloadGB: 21.5, totalGB: 23.2 },
+  { usageDay: "2026-01-10", uploadGB: 2.3, downloadGB: 28.7, totalGB: 31.0 },
+  { usageDay: "2026-01-09", uploadGB: 1.2, downloadGB: 16.9, totalGB: 18.1 },
+  { usageDay: "2026-01-08", uploadGB: 1.9, downloadGB: 23.4, totalGB: 25.3 },
+  { usageDay: "2026-01-07", uploadGB: 1.1, downloadGB: 15.8, totalGB: 16.9 },
+  { usageDay: "2026-01-06", uploadGB: 1.4, downloadGB: 19.2, totalGB: 20.6 },
+  { usageDay: "2026-01-05", uploadGB: 0.7, downloadGB: 13.1, totalGB: 13.8 },
+  { usageDay: "2026-01-04", uploadGB: 1.3, downloadGB: 17.5, totalGB: 18.8 },
+  { usageDay: "2026-01-03", uploadGB: 2.0, downloadGB: 25.2, totalGB: 27.2 },
+  { usageDay: "2026-01-02", uploadGB: 0.6, downloadGB: 11.3, totalGB: 11.9 },
+  { usageDay: "2026-01-01", uploadGB: 1.0, downloadGB: 15.6, totalGB: 16.6 }
+];
+
+export const MOCK_USAGE_PERIODS = [
+  { usageStartDate: "2025-06-15", usageEndDate: "2025-07-14" },
+  { usageStartDate: "2025-07-15", usageEndDate: "2025-08-14" },
+  { usageStartDate: "2025-08-15", usageEndDate: "2025-09-14" },
+  { usageStartDate: "2025-09-15", usageEndDate: "2025-10-14" },
+  { usageStartDate: "2025-10-15", usageEndDate: "2025-11-14" },
+  { usageStartDate: "2025-11-15", usageEndDate: "2025-12-14" },
+  { usageStartDate: "2025-12-15", usageEndDate: "2026-01-14" }
+];
 
 /**
- * Get usage data by period
- * @param {string} period - 'daily' or 'monthly'
- * @returns {Array} Usage data array
+ * Calculate comparison stats between current and previous period
  */
-export const getUsageByPeriod = (period = 'monthly') => {
-  if (period === 'daily') return MOCK_DATA_USAGE.historicalUsage.daily;
-  return MOCK_DATA_USAGE.historicalUsage.monthly;
-};
-
-/**
- * Calculate usage statistics
- * These are computed metrics (not from API)
- * @returns {Object} Calculated stats
- */
-export const getUsageStats = () => {
-  const { dataPlan, billingCycle } = MOCK_DATA_USAGE;
+export const calculateComparison = (current, previous) => {
+  const totalChange = ((current.totalGB - previous.totalGB) / previous.totalGB) * 100;
+  const uploadChange = ((current.uploadGB - previous.uploadGB) / previous.uploadGB) * 100;
+  const downloadChange = ((current.downloadGB - previous.downloadGB) / previous.downloadGB) * 100;
   
   return {
-    percentageUsed: Math.round((dataPlan.usedGB / dataPlan.totalGB) * 100),
-    averageDaily: (dataPlan.usedGB / billingCycle.daysElapsed).toFixed(1),
-    daysRemaining: billingCycle.daysRemaining,
+    totalChange: totalChange.toFixed(1),
+    uploadChange: uploadChange.toFixed(1),
+    downloadChange: downloadChange.toFixed(1),
+    isIncrease: totalChange > 0
   };
 };
 
-export default MOCK_DATA_USAGE;
+/**
+ * Get peak usage day
+ */
+export const getPeakDay = (dailyData) => {
+  if (!dailyData || dailyData.length === 0) return null;
+  
+  return dailyData.reduce((peak, current) => 
+    current.totalGB > peak.totalGB ? current : peak
+  );
+};
+
+export const calculatePace = (currentUsage) => {
+  if (!currentUsage) {
+    return {
+      pace: 0,
+      isOnTrack: true,
+      expected: 0,
+    };
+  }
+  
+  // FIXED: Added endDate and beginDate
+  const { usedDataGB, dataPlanGB, remainingDays, endDate, beginDate } = currentUsage;
+  
+  const totalDays = Math.ceil(
+    (new Date(endDate) - new Date(beginDate)) / (1000 * 60 * 60 * 24)
+  );
+  
+  const daysElapsed = totalDays - remainingDays;
+  const expectedUsage = (dataPlanGB / totalDays) * daysElapsed;
+  const pace = Math.round((usedDataGB / expectedUsage) * 100);
+  
+  return {
+    pace,
+    isOnTrack: pace <= 100,
+    expected: expectedUsage.toFixed(2),
+  };
+};
+
+/**
+ * Forecast end-of-period usage
+ */
+export const forecastUsage = (currentUsage) => {
+  const { usedDataGB, dataPlanGB, remainingDays, beginDate, endDate } = currentUsage;
+  
+  const totalDays = Math.ceil(
+    (new Date(endDate) - new Date(beginDate)) / (1000 * 60 * 60 * 24)
+  );
+  const daysElapsed = totalDays - remainingDays;
+  const dailyAverage = usedDataGB / daysElapsed;
+  const projected = usedDataGB + (dailyAverage * remainingDays);
+  const projectedPercent = (projected / dataPlanGB) * 100;
+  
+  return {
+    projected: projected.toFixed(1),
+    projectedPercent: projectedPercent.toFixed(0),
+    willExceed: projected > dataPlanGB
+  };
+};
+
+export default {
+  MOCK_CURRENT_USAGE,
+  MOCK_MONTHLY_USAGE,
+  MOCK_DAILY_USAGE,
+  MOCK_USAGE_PERIODS
+};

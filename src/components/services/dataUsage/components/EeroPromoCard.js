@@ -1,82 +1,116 @@
-/**
- * EeroPromoCard Component
- * Path: src/components/services/dataUsage/components/EeroPromoCard.js
- *
- * Displays eero app promo with:
- * - Deep linking to iOS/Android app stores
- * - Phone mockup illustration (CSS-only)
- * - Dark card design
- */
-
-import React from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Linking,
-  Alert,
-  Platform,
-} from "react-native";
+import React, { memo, useCallback, useMemo } from "react";
+import { View, Text, Pressable, StyleSheet, Linking, Alert, Platform } from "react-native";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 
+const isValidUrl = (url) => {
+  if (!url || typeof url !== "string") return false;
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  return /^https?:\/\//i.test(trimmed) || /^[a-z]+:\/\//i.test(trimmed);
+};
+
 const EeroPromoCard = ({ promoData }) => {
-  if (!promoData || !promoData.show) return null;
+  const show = !!promoData?.show;
+  if (!show) return null;
 
-  const handleDownload = async () => {
+  const storeUrl = useMemo(() => {
+    const ios = promoData?.iosUrl?.trim();
+    const android = promoData?.androidUrl?.trim();
+    const fallback = promoData?.fallbackUrl?.trim(); // optional
+    const url = Platform.OS === "ios" ? ios : android;
+    return isValidUrl(url) ? url : isValidUrl(fallback) ? fallback : "";
+  }, [promoData]);
+
+  const tagline = useMemo(
+    () => (promoData?.tagline?.trim() ? promoData.tagline.trim() : "Download the eero app to set up and manage your equipment."),
+    [promoData]
+  );
+
+  const a11yLabel = useMemo(
+    () => `Download eero app. ${tagline}`,
+    [tagline]
+  );
+
+  const handleDownload = useCallback(async () => {
     try {
-      // Determine URL based on platform
-      const url =
-        Platform.OS === "ios" ? promoData.iosUrl : promoData.androidUrl;
-
-      const supported = await Linking.canOpenURL(url);
-
-      if (supported) {
-        await Linking.openURL(url);
-      } else {
-        Alert.alert(
-          "Unable to Open",
-          "Cannot open the app store. Please try again later.",
-        );
+      if (!storeUrl) {
+        Alert.alert("Link unavailable", "We can’t open the download link right now.");
+        return;
       }
+
+      const supported = await Linking.canOpenURL(storeUrl);
+      if (!supported) {
+        Alert.alert("Unable to Open", "Cannot open the app store. Please try again later.");
+        return;
+      }
+
+      await Linking.openURL(storeUrl);
     } catch (error) {
       console.error("Error opening eero app link:", error);
-      Alert.alert(
-        "Error",
-        "Unable to open the download link. Please try again.",
-      );
+      Alert.alert("Error", "Unable to open the download link. Please try again.");
     }
-  };
+  }, [storeUrl]);
 
   return (
     <View style={styles.container}>
       <Pressable
-        style={({ pressed }) => [styles.card, pressed && { opacity: 0.95 }]}
+        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
         onPress={handleDownload}
-        accessible={true}
+        accessible
         accessibilityRole="button"
-        accessibilityLabel="eero app simplifies connectivity. Download Now."
-        accessibilityHint="Double tap to download the eero app from your device's app store"
+        accessibilityLabel={a11yLabel}
+        accessibilityHint="Double tap to open the app store and download the eero app."
+        android_ripple={{ color: `${theme.colors.white}18`, borderless: false }}
       >
-        {/* Background Pattern */}
         <View style={styles.backgroundPattern} accessible={false} />
 
         <View style={styles.content}>
-          {/* Left Content */}
           <View style={styles.textContent}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>eero</Text>
+            <View style={styles.topRow}>
+              <View style={styles.logoPill} accessible={false}>
+                <Text style={styles.logoText}>eero</Text>
+              </View>
+
+              <View
+                style={styles.actionPill}
+                accessible={false}
+                importantForAccessibility="no-hide-descendants"
+              >
+                <Text style={styles.actionText}>Download</Text>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={18}
+                  color={theme.colors.primaryDark}
+                  style={{ marginLeft: 2 }}
+                  accessible={false}
+                />
+              </View>
             </View>
 
-            <Text style={styles.tagline}>{promoData.tagline}</Text>
+            <Text style={styles.tagline} numberOfLines={3} ellipsizeMode="tail">
+              {tagline}
+            </Text>
 
-            <View style={styles.downloadButton}>
-              <Text style={styles.downloadText}>Download Now</Text>
+            <View
+              style={styles.ctaRow}
+              accessible={false}
+              importantForAccessibility="no-hide-descendants"
+            >
+              <MaterialCommunityIcons
+                name="open-in-new"
+                size={14}
+                color={`${theme.colors.white}CC`}
+                style={{ marginRight: 6 }}
+                accessible={false}
+              />
+              <Text style={styles.ctaSubText}>
+                Opens {Platform.OS === "ios" ? "App Store" : "Google Play"}
+              </Text>
             </View>
           </View>
 
-          {/* Right Image - Phone Mockup (CSS-only) */}
           <View style={styles.imageContainer} accessible={false}>
             <View style={styles.phoneMockup}>
               <View style={styles.phoneScreen}>
@@ -104,6 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.base,
     marginHorizontal: theme.spacing.base,
   },
+
   card: {
     ...card.base,
     backgroundColor: theme.colors.primaryDark,
@@ -111,16 +146,16 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
   },
+  pressed: { opacity: 0.96 },
 
-  // Background Pattern
   backgroundPattern: {
     position: "absolute",
-    top: -50,
-    right: -50,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: `${theme.colors.primary}20`,
+    top: -52,
+    right: -52,
+    width: 210,
+    height: 210,
+    borderRadius: 105,
+    backgroundColor: `${theme.colors.primary}22`,
   },
 
   content: {
@@ -131,56 +166,80 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
 
-  // Left Content
   textContent: {
     flex: 1,
     paddingRight: theme.spacing.base,
   },
-  logoContainer: {
+
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: theme.spacing.xs,
   },
+
+  logoPill: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: `${theme.colors.white}14`,
+  },
   logoText: {
-    fontSize: 28,
+    fontSize: 22,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
     color: theme.colors.white,
-    letterSpacing: -0.5,
+    letterSpacing: -0.4,
   },
+
+  actionPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: theme.colors.white,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  actionText: {
+    fontSize: theme.typography.size.sm,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "700",
+    color: theme.colors.primaryDark,
+  },
+
   tagline: {
     fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.white,
-    opacity: 0.9,
+    opacity: 0.92,
     marginBottom: theme.spacing.sm,
     lineHeight: 20,
   },
-  downloadButton: {
-    alignSelf: "flex-start",
-    backgroundColor: theme.colors.white,
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.xs,
-    borderRadius: theme.radius.xs,
-    marginTop: theme.spacing.xs,
+
+  ctaRow: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  downloadText: {
-    fontSize: theme.typography.size.sm,
+  ctaSubText: {
+    fontSize: theme.typography.size.xs,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
-    color: theme.colors.primaryDark,
+    color: `${theme.colors.white}CC`,
   },
 
-  // Right Image - Phone Mockup (CSS-only, no images)
   imageContainer: {
-    width: 80,
-    height: 100,
+    width: 84,
+    height: 104,
     alignItems: "center",
     justifyContent: "center",
   },
+
   phoneMockup: {
-    width: 70,
-    height: 90,
+    width: 72,
+    height: 92,
     backgroundColor: theme.colors.white,
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 3,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -191,7 +250,7 @@ const styles = StyleSheet.create({
   phoneScreen: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    borderRadius: 5,
+    borderRadius: 7,
     padding: 6,
     overflow: "hidden",
   },
@@ -201,9 +260,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   eeroIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
+    width: 26,
+    height: 26,
+    borderRadius: 7,
     backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
@@ -226,4 +285,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EeroPromoCard;
+export default memo(EeroPromoCard);

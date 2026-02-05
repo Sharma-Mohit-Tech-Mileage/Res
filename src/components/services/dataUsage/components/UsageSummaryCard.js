@@ -1,143 +1,147 @@
 /**
- * UsageSummaryCard Component
- * Path: src/components/services/dataUsage/components/UsageSummaryCard.js
- * 
- * Displays current data usage with:
- * - Horizontal progress bar (not circular)
- * - Clean stats WITHOUT icons
- * - Status color coding
+ * UsageSummaryCard.js - CLEAN GB LABELS ONLY
  */
 
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
-import { dataUsageSummary } from "../../../../styles/compositions";
+import { card } from "../../../../styles/utilities";
 
-const UsageSummaryCard = ({ dataPlan, billingCycle }) => {
-  // Calculate percentage and average
-  const percentageUsed = Math.round((dataPlan.usedGB / dataPlan.totalGB) * 100);
-  const averageDaily = (dataPlan.usedGB / billingCycle.daysElapsed).toFixed(1);
+const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB, size = 140 }) => {
+  const strokeWidth = 20;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const center = size / 2;
   
-  // Determine status color based on usage
-  const getStatusColor = () => {
-    if (percentageUsed >= 90) return theme.colors.status.error;
-    if (percentageUsed >= 75) return theme.colors.status.warning;
-    return theme.colors.status.success;
+  const usedArc = (circumference * usedPercent) / 100;
+  const remainingArc = (circumference * remainingPercent) / 100;
+
+  const usedMidAngle = 135 + (usedPercent / 100) * 180;
+  const remainingMidAngle = 135 + (usedPercent / 100) * 360 + (remainingPercent / 100) * 180;
+  
+  const getPoint = (angle) => {
+    const rad = (angle * Math.PI) / 180;
+    return {
+      x: center + radius * Math.cos(rad),
+      y: center + radius * Math.sin(rad),
+    };
   };
 
-  const statusColor = getStatusColor();
+  const usedAnchor = getPoint(usedMidAngle);
+  const remainingAnchor = getPoint(remainingMidAngle);
+
+  const leftLineX = -25;
+  const rightLineX = size + 25;
+
+  return (
+    <View style={{ height: size + 60, width: '100%', alignItems: 'center' }}>
+      <Svg width={size + 100} height={size + 60}>
+        <Defs>
+          <LinearGradient id="used" x1="0%" y1="0%" x2="100%" y2="100%">
+            <Stop offset="0%" stopColor={theme.colors.primary} />
+            <Stop offset="100%" stopColor={theme.colors.primaryDark} />
+          </LinearGradient>
+          
+          <LinearGradient id="remaining" x1="0%" y1="0%" x2="100%" y2="100%">
+            <Stop offset="0%" stopColor="#2ECC71" />
+            <Stop offset="100%" stopColor={theme.colors.status.success} />
+          </LinearGradient>
+        </Defs>
+
+        <G transform={`translate(45, 20)`}>
+          <Circle cx={center} cy={center + 2} r={radius} stroke="#00000008" strokeWidth={strokeWidth} fill="none" />
+          <Circle cx={center} cy={center} r={radius} stroke="#F5F5F5" strokeWidth={strokeWidth} fill="none" />
+          
+          <Circle
+            cx={center} cy={center} r={radius}
+            stroke="url(#used)" strokeWidth={strokeWidth} fill="none"
+            strokeDasharray={`${usedArc} ${circumference - usedArc}`}
+            strokeLinecap="butt"
+            rotation="135" origin={`${center}, ${center}`}
+          />
+          
+          <Circle
+            cx={center} cy={center} r={radius}
+            stroke="url(#remaining)" strokeWidth={strokeWidth} fill="none"
+            strokeDasharray={`${remainingArc} ${circumference - remainingArc}`}
+            strokeDashoffset={-usedArc}
+            strokeLinecap="butt"
+            rotation="135" origin={`${center}, ${center}`}
+          />
+
+          <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y} 
+                stroke={theme.colors.primary} strokeWidth="2.5" />
+          <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primary} />
+
+          <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y} 
+                stroke={theme.colors.status.success} strokeWidth="2.5" />
+          <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.status.success} />
+        </G>
+      </Svg>
+
+      {/* Text labels */}
+      <View style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0 }]}>
+        <Text style={[styles.labelText, { color: theme.colors.primary }]}>
+          {usedGB} 
+        </Text>
+        <Text style={styles.labelSubtext}> GB Used</Text>
+      </View>
+      
+      <View style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end' }]}>
+        <Text style={[styles.labelText, { color: theme.colors.status.success }]}>
+          {remainingGB} 
+        </Text>
+        <Text style={styles.labelSubtext}>GB Left</Text>
+      </View>
+    </View>
+  );
+};
+
+const UsageSummaryCard = ({ currentUsage, dailyData }) => {
+  const startDate = new Date(currentUsage.beginDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const endDate = new Date(currentUsage.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const remainingPercent = 100 - currentUsage.dataUsedPercent;
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {/* Header with Icon */}
         <View style={styles.header}>
-          <View
-            style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            accessibilityElementsHidden={true}
-          >
-            <MaterialCommunityIcons
-              name="chart-box-outline"
-              size={18}
-              color={theme.colors.primary}
-              accessible={false}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.label}>DATA USAGE</Text>
-            <Text style={styles.planName}>{dataPlan.name}</Text>
-          </View>
+          <MaterialCommunityIcons name="chart-donut" size={18} color={theme.colors.primary} />
+          <Text style={styles.headerTitle}>DATA USAGE</Text>
         </View>
 
-        {/* Usage Display - HORIZONTAL BAR */}
-        <View
-          style={styles.usageSection}
-          accessible={true}
-          accessibilityRole="progressbar"
-          accessibilityLabel={`You have used ${dataPlan.usedGB} gigabytes out of ${dataPlan.totalGB} gigabytes. ${percentageUsed} percent used. ${dataPlan.remainingGB} gigabytes remaining.`}
-          accessibilityValue={{
-            min: 0,
-            max: dataPlan.totalGB,
-            now: dataPlan.usedGB,
-          }}
-        >
-          {/* Usage Numbers */}
-          <View style={styles.usageNumbers}>
-            <Text style={styles.usageValue}>{dataPlan.usedGB}</Text>
-            <Text style={styles.usageUnit}> GB</Text>
-            <Text style={styles.separator}> of </Text>
-            <Text style={[styles.usageUnit, { color: theme.colors.text.tertiary }]}>
-              {dataPlan.totalGB} GB
-            </Text>
-          </View>
+        <DonutWithCallouts 
+          usedPercent={currentUsage.dataUsedPercent}
+          remainingPercent={remainingPercent}
+          usedGB={currentUsage.usedDataGB}
+          remainingGB={currentUsage.dataRemaining.toFixed(1)}
+        />
 
-          {/* Horizontal Progress Bar */}
-          <View style={styles.progressBar}>
-            <View
-              style={[
-                styles.progressFill,
-                {
-                  width: `${Math.min(percentageUsed, 100)}%`,
-                  backgroundColor: statusColor
-                }
-              ]}
-            />
-          </View>
+        {/* <View style={styles.summaryBar}>
+          <Text style={styles.summaryText}>
+            {currentUsage.dataUsedPercent}% of {currentUsage.dataPlanGB} GB plan
+          </Text>
+        </View> */}
 
-          {/* Progress Labels */}
-          <View style={styles.progressLabels}>
-            <Text style={[styles.progressText, { color: statusColor }]}>
-              {percentageUsed}% used
-            </Text>
-            <Text style={styles.progressText}>
-              {dataPlan.remainingGB} GB left
-            </Text>
-          </View>
-        </View>
-
-        {/* Stats - NO ICONS (Simplified) */}
-        <View style={styles.statsContainer}>
-          {/* Billing Period */}
-          <View style={styles.statItem}>
+        <View style={styles.stats}>
+          <View style={styles.statBox}>
+            <MaterialCommunityIcons name="calendar-range" size={20} color={theme.colors.primary} />
+            <Text style={styles.statValue}>{startDate} - {endDate}</Text>
             <Text style={styles.statLabel}>Billing Period</Text>
-            <Text
-              style={styles.statValue}
-              accessible={true}
-              accessibilityLabel={`Billing period from ${formatDateAccessible(billingCycle.startDate)} to ${formatDateAccessible(billingCycle.endDate)}`}
-            >
-              {formatDate(billingCycle.startDate)} - {formatDate(billingCycle.endDate)}
-            </Text>
           </View>
-
-          <View style={styles.statDivider} />
-
-          {/* Average Daily */}
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Avg Daily</Text>
-            <Text
-              style={styles.statValue}
-              accessible={true}
-              accessibilityLabel={`Average daily usage ${averageDaily} gigabytes per day`}
-            >
-              {averageDaily} GB/day
-            </Text>
+          
+          <View style={styles.statBox}>
+            <MaterialCommunityIcons name="calendar-clock" size={20} color={theme.colors.primary} />
+            <Text style={styles.statValue}>{currentUsage.remainingDays} days</Text>
+            <Text style={styles.statLabel}>Remaining</Text>
           </View>
-
-          <View style={styles.statDivider} />
-
-          {/* Days Left */}
-          <View style={styles.statItem}>
-            <Text style={styles.statLabel}>Days Left</Text>
-            <Text
-              style={styles.statValue}
-              accessible={true}
-              accessibilityLabel={`${billingCycle.daysRemaining} days remaining in billing period`}
-            >
-              {billingCycle.daysRemaining} days
-            </Text>
+          
+          <View style={styles.statBox}>
+            <MaterialCommunityIcons name="chart-pie" size={20} color={theme.colors.primary} />
+            <Text style={styles.statValue}>{currentUsage.dataUsedPercent}%</Text>
+            <Text style={styles.statLabel}>Used</Text>
           </View>
         </View>
       </View>
@@ -145,95 +149,80 @@ const UsageSummaryCard = ({ dataPlan, billingCycle }) => {
   );
 };
 
-// Helper: Format date for display
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-};
-
-// Helper: Format date for accessibility
-const formatDateAccessible = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-};
-
 const styles = StyleSheet.create({
-  container: dataUsageSummary.container,
-  card: dataUsageSummary.card,
-  header: dataUsageSummary.header,
-  iconWrapper: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: `${theme.colors.primary}12`,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: theme.spacing.sm,
+  container: {
+    marginHorizontal: theme.spacing.base,
+    marginBottom: theme.spacing.base,
   },
-  label: dataUsageSummary.label,
-  planName: dataUsageSummary.planName,
-  
-  // Usage Section
-  usageSection: {
-    marginBottom: theme.spacing.lg,
+  card: {
+    ...card.base,
+    padding: theme.spacing.base,
   },
-  usageNumbers: dataUsageSummary.usageNumbers,
-  usageValue: {
-    fontSize: 36,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "700",
-    color: theme.colors.text.primary,
-  },
-  usageUnit: dataUsageSummary.usageUnit,
-  separator: {
-    fontSize: theme.typography.size.sm,
-    color: theme.colors.text.tertiary,
-    marginHorizontal: 4,
-  },
-  
-  // Progress Bar
-  progressBar: dataUsageSummary.progressBar,
-  progressFill: dataUsageSummary.progressFill,
-  progressLabels: {
+  header: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: theme.spacing.xs,
+    alignItems: "center",
+    gap: theme.spacing.xs,
+    marginBottom: theme.spacing.base,
   },
-  progressText: {
+  headerTitle: {
     fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
+    color: theme.colors.text.secondary,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
-  
-  // Stats Container - Horizontal, NO ICONS
-  statsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingTop: theme.spacing.base,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
+  textLabel: {
+    alignItems: 'flex-start',
   },
-  statItem: {
-    flex: 1,
-    alignItems: "center",
+  labelText: {
+    fontSize: 14,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: '700',
   },
-  statDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: theme.colors.border,
-  },
-  statLabel: {
-    fontSize: theme.typography.size.xs,
+  labelSubtext: {
+    fontSize: 11,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
-    marginBottom: 4,
-    textAlign: "center",
+    marginTop: 1,
   },
-  statValue: {
+  summaryBar: {
+    alignItems: "center",
+    paddingVertical: theme.spacing.xs,
+    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: theme.radius.xs,
+    marginBottom: theme.spacing.base,
+  },
+  summaryText: {
     fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.text.primary,
+  },
+  stats: {
+    flexDirection: "row",
+    gap: theme.spacing.xs,
+  },
+  statBox: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing["2xs"],
+    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: theme.radius.xs,
+  },
+  statValue: {
+    fontSize: 12,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.text.primary,
+    textAlign: "center",
+    marginVertical: 2,
+  },
+  statLabel: {
+    fontSize: 10,
+    fontFamily: theme.typography.family.regular,
+    color: theme.colors.text.secondary,
     textAlign: "center",
   },
 });

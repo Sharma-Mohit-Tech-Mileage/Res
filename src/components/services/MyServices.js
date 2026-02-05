@@ -92,16 +92,11 @@ const MyServicesContent = ({ route }) => {
     downloadSpeed={data?.internet.downloadSpeed}
     uploadSpeed={data?.internet.uploadSpeed}
     loading={loading}
-    // NEW: Pass data usage snapshot
-    dataPlan={
-      data?.internet.planName
-        ? {
-            usedGB: MOCK_DATA_USAGE.dataPlan.usedGB,
-            totalGB: MOCK_DATA_USAGE.dataPlan.totalGB,
-            percentageUsed: MOCK_DATA_USAGE.dataPlan.percentageUsed,
-          }
-        : null
-    }
+   dataPlan={{
+  usedGB: 237.75,
+  totalGB: 1500,
+  percentageUsed: 15.85,
+}}
   />
 )}
 

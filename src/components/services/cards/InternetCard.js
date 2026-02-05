@@ -1,40 +1,27 @@
-/**
- * InternetCard Component - WITH DATA USAGE SNAPSHOT
- * Path: src/components/services/cards/InternetCard.js
- * 
- * Displays internet service details with:
- * - Plan name
- * - Download/Upload speeds
- * - Quick data usage snapshot (NEW!)
- * - Navigation to full data usage screen
- */
-
 import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../../styles/theme";
 import { serviceCard, internetSpeed, skeletonLoader } from "../../../styles/compositions";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import SecondaryButton from "../../common/customui/PrimaryButton";
 
 const InternetCard = ({
   planName,
   downloadSpeed,
   uploadSpeed,
   loading = false,
-  // NEW: Data usage props
-  dataPlan = null, // { usedGB, totalGB, percentageUsed }
+  dataPlan = null,
 }) => {
   const navigation = useNavigation();
 
-  // Get status color for data usage
   const getDataUsageColor = (percentage) => {
     if (percentage >= 90) return theme.colors.status.error;
     if (percentage >= 75) return theme.colors.status.warning;
     return theme.colors.status.success;
   };
 
-  // Handle navigation to full data usage screen
   const handleViewDataUsage = () => {
     navigation.navigate("DataUsage", {
       planName,
@@ -43,7 +30,6 @@ const InternetCard = ({
     });
   };
 
-  // Loading state
   if (loading) {
     return (
       <View style={styles.container}>
@@ -70,7 +56,7 @@ const InternetCard = ({
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {/* Service Header */}
+        {/* Header */}
         <View style={styles.serviceHeader}>
           <View
             style={styles.iconWrapper}
@@ -83,6 +69,7 @@ const InternetCard = ({
               size={16}
               color={theme.colors.primary}
               accessible={false}
+              importantForAccessibility="no"
             />
           </View>
           <Text
@@ -109,11 +96,10 @@ const InternetCard = ({
 
         {/* Speed Display */}
         <View style={styles.speedContainer}>
-          {/* Download Speed */}
           <View
             style={styles.speedItem}
             accessible={true}
-            accessibilityLabel={`Download Speed: ${downloadSpeed} Megabits per second`}
+            accessibilityLabel={`Download Speed: ${downloadSpeed} Mbps`}
           >
             <View
               style={styles.speedIcon}
@@ -131,11 +117,10 @@ const InternetCard = ({
             </View>
           </View>
 
-          {/* Upload Speed */}
           <View
             style={styles.speedItem}
             accessible={true}
-            accessibilityLabel={`Upload Speed: ${uploadSpeed} Megabits per second`}
+            accessibilityLabel={`Upload Speed: ${uploadSpeed} Mbps`}
           >
             <View
               style={styles.speedIcon}
@@ -154,25 +139,14 @@ const InternetCard = ({
           </View>
         </View>
 
-        {/* DATA USAGE SNAPSHOT - NEW! */}
+        {/* DATA USAGE SNAPSHOT */}
         {dataPlan && (
           <View style={styles.dataUsageSnapshot}>
             <View style={styles.snapshotHeader}>
               <Text style={styles.snapshotLabel}>Data Usage</Text>
-              <Pressable
-                onPress={handleViewDataUsage}
-                accessible={true}
-                accessibilityRole="link"
-                accessibilityLabel="View detailed data usage"
-                accessibilityHint="Double tap to navigate to data usage details page"
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Text style={styles.viewDetails}>View Details</Text>
-              </Pressable>
             </View>
 
             <View style={styles.snapshotProgress}>
-              {/* Progress Bar */}
               <View style={styles.snapshotBar}>
                 <View
                   style={[
@@ -182,19 +156,25 @@ const InternetCard = ({
                       backgroundColor: getDataUsageColor(dataPlan.percentageUsed),
                     },
                   ]}
-                  accessible={false}
                 />
               </View>
 
-              {/* Usage Text */}
-              <Text
-                style={styles.snapshotText}
-                accessible={true}
-                accessibilityLabel={`Data usage: ${dataPlan.usedGB} gigabytes used out of ${dataPlan.totalGB} gigabytes. ${dataPlan.percentageUsed} percent used.`}
-              >
-                {dataPlan.usedGB} / {dataPlan.totalGB} GB ({dataPlan.percentageUsed}%)
-              </Text>
+              <View style={styles.snapshotFooter}>
+                <Text style={styles.snapshotText}>
+                  {dataPlan.usedGB} / {dataPlan.totalGB} GB ({dataPlan.percentageUsed}%)
+                </Text>
+              </View>
             </View>
+
+            {/* CTA BUTTON - Now matches Phone and Video cards */}
+            <SecondaryButton
+              title="View Data Usage"
+              buttonType="submit"
+              onPress={handleViewDataUsage}
+              style={styles.bottomButton}
+              accessibilityLabel="View Data Usage details"
+              accessibilityRole="button"
+            />
           </View>
         )}
       </View>
@@ -203,20 +183,14 @@ const InternetCard = ({
 };
 
 const styles = StyleSheet.create({
-  // Container & Card
   container: serviceCard.container,
   card: serviceCard.card,
-
-  // Service Header
+  bottomButton: serviceCard.bottomButton,
   serviceHeader: serviceCard.serviceHeader,
   iconWrapper: serviceCard.iconWrapper,
   serviceType: serviceCard.serviceType,
-
-  // Content
   content: serviceCard.content,
   planName: serviceCard.planName,
-
-  // Speed Display
   speedContainer: internetSpeed.container,
   speedItem: internetSpeed.speedItem,
   speedIcon: internetSpeed.speedIcon,
@@ -226,8 +200,6 @@ const styles = StyleSheet.create({
   speedValueRow: internetSpeed.speedValueRow,
   speedValue: internetSpeed.speedValue,
   speedUnit: internetSpeed.speedUnit,
-
-  // Skeleton Loader
   skeleton: skeletonLoader.skeleton,
   skeletonHeader: skeletonLoader.skeletonHeader,
   skeletonTitle: skeletonLoader.skeletonTitle,
@@ -235,9 +207,7 @@ const styles = StyleSheet.create({
   skeletonSpeedRight: skeletonLoader.skeletonSpeedRight,
   skeletonSpeedLeft: skeletonLoader.skeletonSpeedLeft,
 
-  // ==========================================
-  // DATA USAGE SNAPSHOT - NEW STYLES
-  // ==========================================
+  // Data Usage Snapshot
   dataUsageSnapshot: {
     marginTop: theme.spacing.base,
     paddingTop: theme.spacing.sm,
@@ -245,9 +215,6 @@ const styles = StyleSheet.create({
     borderTopColor: theme.colors.border,
   },
   snapshotHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     marginBottom: theme.spacing.xs,
   },
   snapshotLabel: {
@@ -257,12 +224,6 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     textTransform: "uppercase",
     letterSpacing: 0.5,
-  },
-  viewDetails: {
-    fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.primary,
   },
   snapshotProgress: {
     gap: 4,
@@ -276,6 +237,11 @@ const styles = StyleSheet.create({
   snapshotFill: {
     height: "100%",
     borderRadius: 3,
+  },
+  snapshotFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   snapshotText: {
     fontSize: theme.typography.size.xs,

@@ -1,28 +1,16 @@
-/**
- * DataUsageScreen - Main Screen
- * Path: src/components/services/dataUsage/DataUsageScreen.js
- * 
- * Main data usage screen with:
- * - Usage summary (horizontal bar)
- * - Historical usage chart (with tabs)
- * - Equipment management
- * - eero promo
- * - Pull to refresh
- */
 
-import React, { useState, useCallback } from "react";
-import { 
-  View, 
-  ScrollView, 
-  StyleSheet, 
-  RefreshControl, 
-  StatusBar 
+import React, { useState, useCallback, useEffect } from "react";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  RefreshControl,
+  StatusBar,
 } from "react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import LinearGradient from "react-native-linear-gradient";
 import { theme } from "../../../styles/theme";
 import { container } from "../../../styles/utilities";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -30,56 +18,62 @@ import UsageSummaryCard from "./components/UsageSummaryCard";
 import UsageChart from "./components/UsageChart";
 import ManageEquipmentCard from "./components/ManageEquipmentCard";
 import EeroPromoCard from "./components/EeroPromoCard";
-import MOCK_DATA_USAGE, { getUsageByPeriod } from "./mockDataUsage";
+import {
+  MOCK_CURRENT_USAGE,
+  MOCK_MONTHLY_USAGE,
+  MOCK_DAILY_USAGE,
+  MOCK_USAGE_PERIODS,
+} from "./mockDataUsage";
 
 const DataUsageContent = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState("monthly");
   const [refreshing, setRefreshing] = useState(false);
   const [selectedBar, setSelectedBar] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState(MOCK_USAGE_PERIODS[0]);
+  const [showRing, setShowRing] = useState(true);
 
-  // Get route params (from InternetCard navigation)
-  const { planName, downloadSpeed, uploadSpeed } = route?.params || {};
+  // Simulate loading different period data
+  const [currentUsage, setCurrentUsage] = useState(MOCK_CURRENT_USAGE);
+  const [monthlyData] = useState(MOCK_MONTHLY_USAGE);
+  const [dailyData] = useState(MOCK_DAILY_USAGE);
 
-  // Get usage data based on active tab
-  const usageData = getUsageByPeriod(activeTab);
+  const usageData = activeTab === "monthly" ? monthlyData : dailyData;
 
-  // Handle tab change
   const handleTabChange = useCallback((tabId) => {
     setActiveTab(tabId);
-    setSelectedBar(null); // Reset selection on tab change
+    setSelectedBar(null);
   }, []);
 
-  // Handle bar selection
   const handleBarPress = useCallback((item) => {
     setSelectedBar(item);
   }, []);
 
-  // Handle pull to refresh
+  const handlePeriodChange = useCallback((period) => {
+    setSelectedPeriod(period);
+    // In real app: fetch new data for this period
+    console.log("Selected period:", period);
+  }, []);
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     setRefreshing(false);
   }, []);
 
-  // Handle back navigation
   const handleBack = () => {
     navigation.goBack();
   };
 
   return (
     <View style={styles.safeArea}>
-      {/* Header with Back Button */}
-      <View >
-        <ProfileSettingsHeader
-          title="Data Usage"
-          onPressBack={handleBack}
-          accessibleLable="Data Usage. Double tap back button to return to services"
-        />
-      </View>
-
-      {/* Scrollable Content */}
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+      <ProfileSettingsHeader title="Data Usage" onPressBack={handleBack} />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -90,19 +84,32 @@ const DataUsageContent = ({ navigation, route }) => {
             onRefresh={onRefresh}
             tintColor={theme.colors.primary}
             colors={[theme.colors.primary]}
-            progressViewOffset={20}
           />
         }
-        accessible={false}
-        importantForAccessibility="no-hide-descendants"
       >
-        {/* 1. Usage Summary Card */}
+        {/* Period Selector */}
+        {/* <View style={styles.selectorContainer}>
+          <PeriodSelector
+            periods={MOCK_USAGE_PERIODS}
+            selectedPeriod={selectedPeriod}
+            onPeriodChange={handlePeriodChange}
+          />
+        </View> */}
+
+        {/* Usage Summary with Ring */}
         <UsageSummaryCard
-          dataPlan={MOCK_DATA_USAGE.dataPlan}
-          billingCycle={MOCK_DATA_USAGE.billingCycle}
+          currentUsage={currentUsage}
+          dailyData={dailyData}
+          showRing={showRing}
         />
 
-        {/* 2. Historical Usage Chart (with tabs attached) */}
+        {/* <UsageInsightsCard
+          currentUsage={currentUsage}
+          currentMonth={monthlyData[0]}
+          previousMonth={monthlyData[1]}
+        /> */}
+
+        {/* Historical Usage Chart */}
         <UsageChart
           data={usageData}
           type={activeTab}
@@ -112,20 +119,52 @@ const DataUsageContent = ({ navigation, route }) => {
           onTabChange={handleTabChange}
         />
 
-        {/* 3. Manage Equipment Card */}
-        <ManageEquipmentCard equipment={MOCK_DATA_USAGE.equipment} />
+        {/* Equipment */}
+        <ManageEquipmentCard
+          equipment={[
+            {
+              id: "1",
+              name: "Sparklight Modem",
+              type: "modem",
+              model: "C3000Z",
+              macId: "00:1A:2B:3C:4D:5E",
+              connectionType: "Wired",
+              location: "Living Room",
+              connectedDevices: 8,
+              icon: "router-wireless",
+            },
+            {
+              id: "2",
+              name: "eero Pro 6e",
+              type: "router",
+              model: "J010001",
+              macId: "00:1A:2B:3C:4D:5F",
+              connectionType: "Wireless",
+              location: "Main Floor",
+              connectedDevices: 12,
+              icon: "wifi",
+            },
+          ]}
+        />
 
-        {/* 4. eero Promo Card */}
-        <EeroPromoCard promoData={MOCK_DATA_USAGE.eeroPromo} />
+        {/* eero Promo */}
+        <EeroPromoCard
+          promoData={{
+            show: true,
+            appName: "eero",
+            tagline: "eero app simplifies connectivity",
+            iosUrl: "https://apps.apple.com/app/eero/id1068944930",
+            androidUrl:
+              "https://play.google.com/store/apps/details?id=com.eero.android",
+          }}
+        />
 
-        {/* Bottom Safe Area Spacing */}
         <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
       </ScrollView>
     </View>
   );
 };
 
-// Wrap with SafeAreaProvider
 const DataUsageScreen = (props) => (
   <SafeAreaProvider>
     <DataUsageContent {...props} />
@@ -142,13 +181,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    zIndex: 0,
   },
-  scrollView: {
-    ...container.page,
-  },
+  scrollView: container.page,
   scrollContent: {
     paddingTop: theme.spacing.md,
+  },
+  selectorContainer: {
+    marginHorizontal: theme.spacing.base,
+    marginBottom: theme.spacing.base,
+  },
+  paceContainer: {
+    marginHorizontal: theme.spacing.base,
   },
 });
 

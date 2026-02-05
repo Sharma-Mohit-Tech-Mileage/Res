@@ -1,276 +1,300 @@
-/**
- * UsageChart Component
- * Path: src/components/services/dataUsage/components/UsageChart.js
- * 
- * Displays historical usage with:
- * - Skinnier chart (160px height)
- * - Upload/Download split (dual bars)
- * - Tabs attached to card
- * - Horizontal scrolling
- * - Full accessibility
- */
-
-import React from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import React, { useMemo, useState, useCallback } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from "react-native";
+import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
+import { G, Rect, Text as SvgText, Path } from "react-native-svg";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
-import { dataUsageChart, dataUsageTabs } from "../../../../styles/compositions";
+import { card } from "../../../../styles/utilities";
+import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 
-const UsageChart = ({ 
-  data, 
-  type = "monthly", 
-  onBarPress, 
-  selectedBar, 
-  activeTab, 
-  onTabChange 
+const SCREEN_WIDTH = Dimensions.get("window").width;
+
+const CHART_HEIGHT = 205;        // bar drawing area height
+const X_LABEL_HEIGHT = 34;       // space reserved for x-axis labels
+const CHART_TOTAL_HEIGHT = CHART_HEIGHT + X_LABEL_HEIGHT;
+
+const BAR_WIDTH = 10;
+const TOOLTIP_WIDTH = 120;
+const TOOLTIP_HEIGHT = 46;
+const MIN_SPACING = 2;
+
+const UsageChart = ({
+  data,
+  type = "monthly",
+  onBarPress,
+  activeTab,
+  onTabChange,
 }) => {
-  if (!data || data.length === 0) return null;
+  const [selectedRange, setSelectedRange] = useState("Feb 2025 - Jan2026");
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Chart dimensions
-  const maxUsage = Math.max(...data.map(item => item.total), 1);
-  const chartHeight = 160; // SKINNIER!
-  const barWidth = 18;
-  const barSpacing = 4;
-  const groupSpacing = 12;
-  const groupWidth = (barWidth * 2) + barSpacing + groupSpacing;
-  const totalWidth = groupWidth * data.length;
-  
-  // Y-axis points
-  const yAxisPoints = [
-    Math.ceil(maxUsage),
-    Math.ceil(maxUsage * 0.75),
-    Math.ceil(maxUsage * 0.5),
-    Math.ceil(maxUsage * 0.25),
-    0
-  ];
+  const dateRanges = useMemo(
+    () => ["Feb 2025 - Jan2026", "Jan 2025 - Dec 2025", "Dec 2024 - Nov 2025"],
+    []
+  );
 
-  const handleBarPress = (item) => {
-    if (onBarPress) onBarPress(item);
+  const tabs = useMemo(
+    () => [
+      { id: "daily", label: "Daily Usage" },
+      { id: "monthly", label: "Monthly Usage" },
+    ],
+    []
+  );
+
+  const chartData = useMemo(() => {
+    if (!data?.length) return [];
+    return data.map((item) => {
+      const download = Number(item.downloadGB ?? item.download ?? 0);
+      const upload = Number(item.uploadGB ?? item.upload ?? 0);
+      return {
+        download,
+        upload,
+        total: download + upload,
+        label: type === "monthly" ? item.monthLabel : item.usageDay,
+        raw: item,
+      };
+    });
+  }, [data, type]);
+
+  const maxValue = useMemo(() => {
+    if (!chartData.length) return 1;
+    return Math.max(1, Math.max(...chartData.map((d) => d.total)) * 1.12);
+  }, [chartData]);
+
+  const { contentWidth, dynamicSpacing } = useMemo(() => {
+    const availableWidth = SCREEN_WIDTH - 80;
+    const totalBarsWidth = chartData.length * BAR_WIDTH;
+    const totalSpacingNeeded = (chartData.length + 1) * MIN_SPACING;
+    const minWidth = totalBarsWidth + totalSpacingNeeded;
+
+    const finalWidth = Math.max(minWidth, availableWidth);
+    const spacing = (finalWidth - totalBarsWidth) / (chartData.length + 1);
+
+    return { contentWidth: finalWidth, dynamicSpacing: spacing };
+  }, [chartData.length]);
+
+  /**
+   * ✅ UPDATED LABEL RULES (as requested)
+   * - Daily: show only day numbers => "1, 2, 3, 4, 5..."
+   * - Monthly: show only month names => "Jan, Feb, Mar..." (no year)
+   */
+  const formatLabels = useCallback(
+    (item) => {
+      if (!item?.label) return { line1: "", line2: "" };
+
+      if (type === "monthly") {
+        // monthLabel example: "Feb 2025" OR "Feb 2025 - something"
+        // We only want month.
+        const month = String(item.label || "").split(" ")[0] || "";
+        return { line1: month, line2: "" };
+      }
+
+      // daily: usageDay example: "2026-02-04"
+      const date = new Date(item.label);
+      if (Number.isNaN(date.getTime())) return { line1: "", line2: "" };
+
+      const day = String(date.getDate()); // 1..31
+      return { line1: day, line2: "" };
+    },
+    [type]
+  );
+
+  const handlePressBar = useCallback(
+    (item, index) => {
+      setSelectedIndex(index);
+      onBarPress?.(item.raw);
+    },
+    [onBarPress]
+  );
+
+  if (!chartData.length) return null;
+
+  const Tooltip = ({ x, y, bandwidth }) => {
+    const item = chartData[selectedIndex];
+    if (!item) return null;
+
+    const bx = x(selectedIndex);
+
+    const barTopY = Math.min(y(item.total), CHART_HEIGHT - 26);
+    const tooltipX = Math.max(
+      8,
+      Math.min(bx + bandwidth / 2 - TOOLTIP_WIDTH / 2, contentWidth - TOOLTIP_WIDTH - 8)
+    );
+    const tooltipY = Math.max(6, barTopY - TOOLTIP_HEIGHT - 10);
+    const caretX = bx + bandwidth / 2;
+
+    return (
+      <G>
+        <Rect
+          x={tooltipX}
+          y={tooltipY}
+          rx={10}
+          width={TOOLTIP_WIDTH}
+          height={TOOLTIP_HEIGHT}
+          fill={theme.colors.white}
+          stroke={theme.colors.border}
+          strokeWidth={1}
+        />
+        <Path
+          d={`M ${caretX - 5} ${tooltipY + TOOLTIP_HEIGHT} L ${caretX} ${tooltipY + TOOLTIP_HEIGHT + 6} L ${
+            caretX + 5
+          } ${tooltipY + TOOLTIP_HEIGHT} Z`}
+          fill={theme.colors.white}
+        />
+        <SvgText
+          x={tooltipX + 10}
+          y={tooltipY + 18}
+          fontSize="13"
+          fontWeight="700"
+          fill={theme.colors.text.primary}
+        >
+          {item.total.toFixed(1)} GB
+        </SvgText>
+        <SvgText
+          x={tooltipX + 10}
+          y={tooltipY + 34}
+          fontSize="11"
+          fontWeight="600"
+          fill={theme.colors.primary}
+        >
+          DL {item.download.toFixed(1)}
+        </SvgText>
+        <SvgText
+          x={tooltipX + 60}
+          y={tooltipY + 34}
+          fontSize="11"
+          fill={theme.colors.text.tertiary}
+        >
+          •
+        </SvgText>
+        <SvgText
+          x={tooltipX + 70}
+          y={tooltipY + 34}
+          fontSize="11"
+          fontWeight="600"
+          fill={theme.colors.status.warning}
+        >
+          UL {item.upload.toFixed(1)}
+        </SvgText>
+      </G>
+    );
   };
 
-  const tabs = [
-    { id: "daily", label: "Daily" },
-    { id: "monthly", label: "Monthly" }
-  ];
+  const TouchOverlay = ({ x, y, bandwidth }) => (
+    <G>
+      {chartData.map((item, index) => {
+        const isActive = index === selectedIndex;
+        const bx = x(index);
+        const labels = formatLabels(item);
+
+        const labelY1 = CHART_HEIGHT + 18;
+
+        return (
+          <G key={index}>
+            <Rect
+              x={bx - dynamicSpacing / 2}
+              y={0}
+              width={bandwidth + dynamicSpacing}
+              height={CHART_HEIGHT}
+              fill="transparent"
+              onPress={() => handlePressBar(item, index)}
+            />
+            <SvgText
+              x={bx + bandwidth / 2}
+              y={labelY1}
+              fontSize="11"
+              fontWeight={isActive ? "700" : "600"}
+              fill={isActive ? theme.colors.primary : theme.colors.text.primary}
+              textAnchor="middle"
+            >
+              {labels.line1}
+            </SvgText>
+          </G>
+        );
+      })}
+    </G>
+  );
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {/* Header */}
-        <View style={styles.chartHeaderRow}>
+        <View style={styles.header}>
+          <View style={styles.iconWrapper}>
+            <MaterialCommunityIcons name="chart-bar" size={20} color={theme.colors.primary} />
+          </View>
           <Text style={styles.chartTitle}>Historical Usage</Text>
         </View>
 
-        {/* Tabs - ATTACHED TO CARD */}
-        <View
-          style={styles.tabsContainer}
-          accessible={false}
-          importantForAccessibility="no-hide-descendants"
-        >
+        <View style={styles.tabsContainer}>
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
-            
             return (
               <Pressable
                 key={tab.id}
-                style={({ pressed }) => [
-                  styles.tab,
-                  isActive && styles.activeTab,
-                  pressed && { opacity: 0.7 }
-                ]}
-                onPress={() => onTabChange(tab.id)}
-                accessible={true}
+                style={[styles.tab, isActive && styles.activeTab]}
+                onPress={() => onTabChange?.(tab.id)}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isActive }}
-                accessibilityLabel={tab.label}
-                accessibilityHint={
-                  isActive 
-                    ? `Selected. Showing ${tab.label.toLowerCase()} usage data` 
-                    : `Double tap to view ${tab.label.toLowerCase()} usage data`
-                }
               >
-                <Text
-                  style={[
-                    styles.tabText,
-                    isActive && styles.activeTabText
-                  ]}
-                  accessible={false}
-                >
-                  {tab.label}
-                </Text>
+                <Text style={[styles.tabText, isActive && styles.activeTabText]}>{tab.label}</Text>
               </Pressable>
             );
           })}
         </View>
 
-        {/* Chart Area */}
+        <View style={styles.dropdownContainer}>
+          <SparkLightDropdown
+            items={dateRanges}
+            selectedValue={selectedRange}
+            onValueChange={setSelectedRange}
+            dropDownStyle={styles.dropdown}
+          />
+        </View>
+
         <View style={styles.chartRow}>
-          {/* Y-axis Labels */}
-          <View
+          <YAxis
             style={styles.yAxis}
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-          >
-            {yAxisPoints.map((value, index) => (
-              <Text key={index} style={styles.yAxisLabel}>
-                {value}
-              </Text>
-            ))}
-          </View>
+            data={[0, maxValue]}
+            numberOfTicks={5}
+            contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
+            svg={{
+              fill: theme.colors.text.tertiary,
+              fontSize: 10.5,
+              fontWeight: "600",
+            }}
+            formatLabel={(v) => Math.round(v).toString()}
+          />
 
-          {/* Scrollable Chart - DUAL BARS */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={true}
-            style={styles.chartArea}
-            contentContainerStyle={[
-              styles.scrollContainer,
-              { minWidth: totalWidth }
-            ]}
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-          >
-            {/* Grid Lines */}
-            <View style={styles.gridLines} accessible={false}>
-              {yAxisPoints.map((_, index) => (
-                <View key={index} style={styles.gridLine} />
-              ))}
-            </View>
-
-            {/* Bars Container */}
-            <View style={styles.barsContainer}>
-              {data.map((item, index) => {
-                const downloadHeight = Math.max(
-                  (item.download / maxUsage) * (chartHeight - 40), 
-                  4
-                );
-                const uploadHeight = Math.max(
-                  (item.upload / maxUsage) * (chartHeight - 40), 
-                  4
-                );
-                const isSelected = selectedBar?.date === item.date;
-                const isCurrentMonth = item.isCurrentMonth;
-                
-                return (
-                  <Pressable
-                    key={index}
-                    style={[styles.barGroup, { width: groupWidth }]}
-                    onPress={() => handleBarPress(item)}
-                    accessible={true}
-                    accessibilityRole="button"
-                    accessibilityLabel={
-                      type === "monthly"
-                        ? `${item.month} ${item.year}. Download ${item.download} gigabytes, Upload ${item.upload} gigabytes${isCurrentMonth ? ', current month' : ''}`
-                        : `${item.dayOfWeek}, ${item.dayLabel}. Download ${item.download} gigabytes, Upload ${item.upload} gigabytes`
-                    }
-                    accessibilityHint="Double tap to select and view details"
-                    accessibilityState={{ selected: isSelected }}
-                  >
-                    {/* Dual Bars */}
-                    <View style={styles.dualBars}>
-                      {/* Download Bar (Purple) */}
-                      <View
-                        style={[
-                          styles.bar,
-                          {
-                            width: barWidth,
-                            height: downloadHeight,
-                            backgroundColor: isSelected
-                              ? theme.colors.primary
-                              : isCurrentMonth
-                              ? theme.colors.primaryLight
-                              : `${theme.colors.primary}80`,
-                            opacity: isSelected ? 1 : 0.85
-                          }
-                        ]}
-                        accessible={false}
-                      />
-                      
-                      {/* Upload Bar (Orange) */}
-                      <View
-                        style={[
-                          styles.bar,
-                          {
-                            width: barWidth,
-                            height: uploadHeight,
-                            backgroundColor: isSelected
-                              ? theme.colors.status.warning
-                              : isCurrentMonth
-                              ? `${theme.colors.status.warning}60`
-                              : `${theme.colors.status.warning}40`,
-                            opacity: isSelected ? 1 : 0.85,
-                            marginLeft: barSpacing
-                          }
-                        ]}
-                        accessible={false}
-                      />
-                    </View>
-
-                    {/* Selection Indicator */}
-                    {isSelected && (
-                      <View style={styles.selectionDot} accessible={false} />
-                    )}
-
-                    {/* X-axis Label */}
-                    <Text 
-                      style={[
-                        styles.xAxisLabel,
-                        isSelected && styles.xAxisLabelSelected
-                      ]}
-                      accessible={false}
-                      numberOfLines={1}
-                    >
-                      {type === "monthly" ? item.month : item.dayLabel}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={{ width: contentWidth }}>
+              <StackedBarChart
+                style={{ height: CHART_TOTAL_HEIGHT }}
+                data={chartData}
+                keys={["download", "upload"]}
+                colors={[theme.colors.primary, theme.colors.status.warning]}
+                contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
+                gridMin={0}
+                gridMax={maxValue}
+                spacingInner={(contentWidth - chartData.length * BAR_WIDTH) / contentWidth}
+                spacingOuter={dynamicSpacing / contentWidth}
+              >
+                <Grid svg={{ strokeOpacity: 0.16 }} />
+                <Tooltip />
+                <TouchOverlay />
+              </StackedBarChart>
             </View>
           </ScrollView>
         </View>
 
-        {/* Legend - Upload/Download + Past/Current */}
-        <View
-          style={styles.legend}
-          accessible={true}
-          accessibilityLabel="Chart legend showing download in purple, upload in orange, with past months and current month indicators"
-        >
-          {/* Row 1: Download/Upload */}
-          <View style={styles.legendRow}>
-            <View style={styles.legendItem}>
-              <View style={[
-                styles.legendDot, 
-                { backgroundColor: theme.colors.primary }
-              ]} />
-              <Text style={styles.legendText}>Download</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[
-                styles.legendDot, 
-                { backgroundColor: theme.colors.status.warning }
-              ]} />
-              <Text style={styles.legendText}>Upload</Text>
-            </View>
+        <View style={styles.legend}>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: theme.colors.primary }]} />
+            <Text style={styles.legendText}>Download</Text>
           </View>
-          
-          {/* Row 2: Past/Current (only for monthly) */}
-          {type === "monthly" && (
-            <View style={styles.legendRow}>
-              <View style={styles.legendItem}>
-                <View style={[
-                  styles.legendDot, 
-                  { backgroundColor: `${theme.colors.primary}80` }
-                ]} />
-                <Text style={styles.legendText}>Past months</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View style={[
-                  styles.legendDot, 
-                  { backgroundColor: theme.colors.primaryLight }
-                ]} />
-                <Text style={styles.legendText}>Current month</Text>
-              </View>
-            </View>
-          )}
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: theme.colors.status.warning }]} />
+            <Text style={styles.legendText}>Upload</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -278,124 +302,74 @@ const UsageChart = ({
 };
 
 const styles = StyleSheet.create({
-  container: dataUsageChart.container,
-  card: dataUsageChart.card,
-  
-  chartHeaderRow: {
-    marginBottom: theme.spacing.sm,
+  container: { marginHorizontal: theme.spacing.base, marginBottom: theme.spacing.base },
+  card: { ...card.base, padding: theme.spacing.base },
+  header: { flexDirection: "row", alignItems: "center", marginBottom: theme.spacing.md },
+  iconWrapper: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: `${theme.colors.primary}12`,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: theme.spacing.sm,
   },
   chartTitle: {
-    fontSize: theme.typography.size.lg,
+    fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
-    color: theme.colors.text.primary,
+    color: theme.colors.text.secondary,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
-  
-  // Tabs
+
   tabsContainer: {
-    ...dataUsageTabs.tabsContainer,
-    marginBottom: theme.spacing.base,
-  },
-  tab: dataUsageTabs.tab,
-  activeTab: dataUsageTabs.activeTab,
-  tabText: dataUsageTabs.tabText,
-  activeTabText: dataUsageTabs.activeTabText,
-  
-  // Chart
-  chartRow: {
     flexDirection: "row",
-    height: 160, // SKINNIER
+    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: theme.radius.sm,
+    padding: 3,
+    marginBottom: theme.spacing.sm,
   },
-  yAxis: {
-    width: 36,
-    justifyContent: "space-between",
-    paddingRight: theme.spacing.xs,
-  },
-  yAxisLabel: dataUsageChart.yAxisLabel,
-  
-  chartArea: dataUsageChart.chartArea,
-  scrollContainer: {
-    paddingRight: theme.spacing.base,
-  },
-  gridLines: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 36,
-    justifyContent: "space-between",
-  },
-  gridLine: dataUsageChart.gridLine,
-  
-  barsContainer: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    paddingBottom: 36,
-    minWidth: "100%",
-  },
-  barGroup: {
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
     alignItems: "center",
-    justifyContent: "flex-end",
-    minHeight: 44, // Accessibility
+    borderRadius: theme.radius.xs,
+    minHeight: 42,
+    justifyContent: "center",
   },
-  dualBars: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-  },
-  bar: {
-    borderTopLeftRadius: 2,
-    borderTopRightRadius: 2,
-  },
-  selectionDot: {
-    position: "absolute",
-    bottom: -6,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: theme.colors.primary,
-  },
-  
-  xAxisLabel: {
-    fontSize: theme.typography.size.xs,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.tertiary,
-    marginTop: theme.spacing.xs,
-    textAlign: "center",
-  },
-  xAxisLabelSelected: {
+  activeTab: { backgroundColor: theme.colors.white, ...theme.shadows.sm },
+  tabText: {
+    fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.primary,
+    fontWeight: "700",
+    color: theme.colors.text.secondary,
   },
-  
-  // Legend
+  activeTabText: { color: theme.colors.primary },
+
+  dropdownContainer: { marginBottom: theme.spacing.sm },
+  dropdown: {
+    backgroundColor: theme.colors.surfaceVariant,
+    borderColor: theme.colors.borderLight,
+    borderRadius: theme.radius.xs,
+    minHeight: 42,
+  },
+
+  chartRow: { flexDirection: "row", alignItems: "flex-start", marginTop: 2 },
+  yAxis: { height: CHART_TOTAL_HEIGHT, width: 36, marginRight: 8 },
+
   legend: {
-    marginTop: theme.spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    marginTop: theme.spacing.sm,
     paddingTop: theme.spacing.sm,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
-    gap: theme.spacing.xs,
   },
-  legendRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.base,
-  },
-  legendItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 6,
-  },
-  legendText: {
-    fontSize: theme.typography.size.xs,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.secondary,
-  },
+  legendItem: { flexDirection: "row", alignItems: "center" },
+  legendDot: { width: 10, height: 10, borderRadius: 5, marginRight: 6 },
+  legendText: { fontSize: theme.typography.size.xs, color: theme.colors.text.secondary },
 });
 
 export default UsageChart;
