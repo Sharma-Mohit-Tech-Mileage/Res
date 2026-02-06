@@ -104,7 +104,9 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={styles.header}>
-          <MaterialCommunityIcons name="chart-donut" size={18} color={theme.colors.primary} />
+          <View style={styles.iconWrapper}>
+          <MaterialCommunityIcons name="chart-donut" size={20} color={theme.colors.primary} />
+          </View>
           <Text style={styles.headerTitle}>DATA USAGE</Text>
         </View>
 
@@ -215,6 +217,15 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     textAlign: "center",
+  },
+  iconWrapper: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: `${theme.colors.primaryDark}12`,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: theme.spacing.sm,
   },
 });
 

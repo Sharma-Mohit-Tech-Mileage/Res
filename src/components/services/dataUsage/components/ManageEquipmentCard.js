@@ -123,7 +123,7 @@ const ManageEquipmentCard = ({ equipment }) => {
           >
             <MaterialCommunityIcons
               name="router-wireless"
-              size={16}
+              size={18}
               color={theme.colors.primary}
             />
           </View>
@@ -158,10 +158,10 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.base,
   },
   iconWrapper: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: `${theme.colors.primary}12`,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: `${theme.colors.primaryDark}12`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: theme.spacing.sm,
@@ -209,13 +209,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   detailText: {
+    fontWeight:'700',
     fontSize: theme.typography.size.xs,
     color: theme.colors.text.secondary,
   },
   detailValue: {
     fontSize: theme.typography.size.xs,
-    fontWeight: "600",
-    color: theme.colors.text.primary,
+    fontWeight: "400",
+    color: theme.colors.text.secondary,
   },
   detailDot: {
     marginHorizontal: 6,
