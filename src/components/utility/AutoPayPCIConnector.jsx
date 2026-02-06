@@ -151,6 +151,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             
             const script = `(function() {
                 try {
+                    // Set cookies for portal identification
                     var domain = document.location.hostname; 
                     var expirationDate = new Date();
                     expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
@@ -158,48 +159,16 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     document.cookie = "Source=MobileApp; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                     document.cookie = "CustomerType=Residential; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                     
+                    // Set tokens in localStorage
                     localStorage.setItem('jwt_token', '${currentUser.token || ""}');
                     localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo || {}).replace(/'/g, "\\'")}');
                     localStorage.setItem('upgrades_token', '${upgradeToken?.access_token || ""}');
                     
-                    window.saveFormState = function() {
-                        const formData = {};
-                        document.querySelectorAll('input, select, textarea').forEach((el, i) => {
-                            if (el.type !== 'password' && el.value) {
-                                formData['field_' + i] = el.value;
-                            }
-                        });
-                        localStorage.setItem('formState', JSON.stringify(formData));
-                        localStorage.setItem('scrollPosition', window.scrollY);
-                    };
-                    
-                    window.restoreFormState = function() {
-                        const saved = localStorage.getItem('formState');
-                        if (saved) {
-                            try {
-                                const formData = JSON.parse(saved);
-                                document.querySelectorAll('input, select, textarea').forEach((el, i) => {
-                                    if (formData['field_' + i] && el.type !== 'password') {
-                                        el.value = formData['field_' + i];
-                                    }
-                                });
-                                const scrollPos = localStorage.getItem('scrollPosition');
-                                if (scrollPos) window.scrollTo(0, parseInt(scrollPos));
-                            } catch(e) {}
-                        }
-                    };
-                    
-                    setInterval(window.saveFormState, 5000);
-                    
-                    if (document.readyState === 'complete') {
-                        window.restoreFormState();
-                    } else {
-                        window.addEventListener('load', window.restoreFormState);
-                    }
-                    
+                    console.log('PCI cookies and tokens set successfully');
                     return true;
                 } catch(e) {
-                    return true;
+                    console.error('Cookie injection error:', e);
+                    return false;
                 }
             })();`;
 
@@ -233,10 +202,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     }, []);
 
     const recreateWebView = useCallback(() => {
-        webViewRef.current?.injectJavaScript(`
-            if (window.saveFormState) window.saveFormState();
-            true;
-        `);
         setTimeout(() => {
             setWebViewKey(Date.now());
             setContentLoaded(false);
@@ -304,8 +269,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 
     const onShouldStartLoadWithRequest = useCallback((request) => {
         if (request.url.includes('/postlogout') || request.url.includes(Env.SSO_LOGIN)) {
+            console.log('PCI session expired, going back');
             showToastMessage();
-            navigation.navigate('Billing');
+            navigation.goBack();
             return false;
         }
         return true;
@@ -324,10 +290,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         const handleAppStateChange = async (nextAppState) => {
             if (nextAppState === 'background') {
                 backgroundTimestamp.current = Date.now();
-                webViewRef.current?.injectJavaScript(`
-                    if (window.saveFormState) window.saveFormState();
-                    true;
-                `);
             } else if (nextAppState === 'active' && backgroundTimestamp.current > 0) {
                 const backgroundDuration = Date.now() - backgroundTimestamp.current;
                 
