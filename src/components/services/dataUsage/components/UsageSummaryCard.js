@@ -1,7 +1,3 @@
-/**
- * UsageSummaryCard.js - CLEAN GB LABELS ONLY
- */
-
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
@@ -40,13 +36,13 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
       <Svg width={size + 100} height={size + 60}>
         <Defs>
           <LinearGradient id="used" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%" stopColor={theme.colors.primary} />
+            <Stop offset="0%" stopColor={theme.colors.primaryDark} />
             <Stop offset="100%" stopColor={theme.colors.primaryDark} />
           </LinearGradient>
           
           <LinearGradient id="remaining" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%" stopColor="#2ECC71" />
-            <Stop offset="100%" stopColor={theme.colors.status.success} />
+            <Stop offset="0%" stopColor={theme.colors.freedatabackground} />
+            <Stop offset="100%" stopColor={theme.colors.freedatabackground} />
           </LinearGradient>
         </Defs>
 
@@ -72,18 +68,18 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
           />
 
           <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y} 
-                stroke={theme.colors.primary} strokeWidth="2.5" />
-          <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primary} />
+                stroke={theme.colors.primaryDark} strokeWidth="2.5" />
+          <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} />
 
           <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y} 
-                stroke={theme.colors.status.success} strokeWidth="2.5" />
-          <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.status.success} />
+                stroke={theme.colors.freedatabackground} strokeWidth="2.5" />
+          <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} />
         </G>
       </Svg>
 
       {/* Text labels */}
       <View style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0 }]}>
-        <Text style={[styles.labelText, { color: theme.colors.primary }]}>
+        <Text style={[styles.labelText, { color: theme.colors.primaryDark }]}>
           {usedGB} 
         </Text>
         <Text style={styles.labelSubtext}> GB Used</Text>
@@ -119,11 +115,6 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
           remainingGB={currentUsage.dataRemaining.toFixed(1)}
         />
 
-        {/* <View style={styles.summaryBar}>
-          <Text style={styles.summaryText}>
-            {currentUsage.dataUsedPercent}% of {currentUsage.dataPlanGB} GB plan
-          </Text>
-        </View> */}
 
         <View style={styles.stats}>
           <View style={styles.statBox}>
@@ -220,7 +211,7 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   statLabel: {
-    fontSize: 10,
+    fontSize: 12,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     textAlign: "center",

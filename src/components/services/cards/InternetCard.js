@@ -19,7 +19,7 @@ const InternetCard = ({
   const getDataUsageColor = (percentage) => {
     if (percentage >= 90) return theme.colors.status.error;
     if (percentage >= 75) return theme.colors.status.warning;
-    return theme.colors.status.success;
+    return theme.colors.primaryDark;
   };
 
   const handleViewDataUsage = () => {
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   },
   snapshotBar: {
     height: 6,
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.freedatabackground,
     borderRadius: 3,
     overflow: "hidden",
   },

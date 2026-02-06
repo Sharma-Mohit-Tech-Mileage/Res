@@ -3,15 +3,6 @@ import { View, Text, StyleSheet } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
-
-/**
- * ManageEquipmentCard
- * Optimized for ISP-provided equipment (router / modem / gateway)
- * - No personal device implication
- * - No device count number
- * - Only MAC ID (preferred) or IP address shown
- */
-
 const safeText = (v, fallback = "—") =>
   v === null || v === undefined || String(v).trim() === "" ? fallback : String(v);
 
@@ -23,7 +14,7 @@ const getEquipmentIcon = (item) => {
   if (blob.includes("extender") || blob.includes("mesh")) return "wifi-plus";
   if (blob.includes("modem")) return "access-point-network";
   if (blob.includes("gateway")) return "router-network";
-  return "router-wireless"; // default ISP gateway
+  return "router-wireless"; 
 };
 
 const getIdentifier = (item) => {
@@ -63,27 +54,20 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
       accessibilityRole="text"
       accessibilityLabel={a11yLabel}
     >
-      {/* ISP Equipment Icon */}
       <View
         style={styles.equipmentIconWrapper}
         accessible={false}
         importantForAccessibility="no-hide-descendants"
       >
-        <MaterialCommunityIcons
-          name={icon}
-          size={20}
-          color={theme.colors.primary}
-        />
+       
       </View>
 
-      {/* Equipment Info */}
       <View style={styles.equipmentInfo}>
         <Text style={styles.equipmentName} numberOfLines={1}>
           {safeText(item?.name, "Provider Equipment")}
         </Text>
 
         <View style={styles.equipmentDetails}>
-          {/* Model */}
           <View style={styles.detailRow}>
             <Text style={styles.detailText}>Model: </Text>
             <Text style={styles.detailValue} numberOfLines={1}>
@@ -91,7 +75,6 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
             </Text>
           </View>
 
-          {/* MAC / IP only */}
           {identifier && (
             <View style={styles.detailRow}>
               <MaterialCommunityIcons
@@ -106,29 +89,6 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
               </Text>
             </View>
           )}
-
-          {/* Connection + Location */}
-          <View style={styles.detailRow}>
-            <MaterialCommunityIcons
-              name={connectionIcon}
-              size={12}
-              color={theme.colors.text.secondary}
-              style={styles.inlineIcon}
-            />
-            <Text style={styles.detailValue}>{safeText(item?.connectionType)}</Text>
-
-            <Text style={styles.detailDot}>•</Text>
-
-            <MaterialCommunityIcons
-              name="map-marker"
-              size={12}
-              color={theme.colors.text.secondary}
-              style={styles.inlineIcon}
-            />
-            <Text style={styles.detailValue} numberOfLines={1}>
-              {safeText(item?.location)}
-            </Text>
-          </View>
         </View>
       </View>
     </View>
@@ -155,7 +115,6 @@ const ManageEquipmentCard = ({ equipment }) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {/* Header */}
         <View style={styles.header} accessibilityRole="header">
           <View
             style={styles.iconWrapper}
@@ -225,13 +184,12 @@ const styles = StyleSheet.create({
   lastItem: { borderBottomWidth: 0 },
 
   equipmentIconWrapper: {
-    width: 40,
-    height: 40,
+   
     borderRadius: 20,
     backgroundColor: theme.colors.surfaceVariant,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: theme.spacing.sm,
+    marginRight: 25,
   },
 
   equipmentInfo: {

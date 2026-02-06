@@ -9,9 +9,10 @@ import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
-const CHART_HEIGHT = 205;        // bar drawing area height
-const X_LABEL_HEIGHT = 34;       // space reserved for x-axis labels
+const CHART_HEIGHT = 205;
+const X_LABEL_HEIGHT = 34;
 const CHART_TOTAL_HEIGHT = CHART_HEIGHT + X_LABEL_HEIGHT;
+const LIST_VIEW_HEIGHT = 280;
 
 const BAR_WIDTH = 10;
 const TOOLTIP_WIDTH = 120;
@@ -27,6 +28,7 @@ const UsageChart = ({
 }) => {
   const [selectedRange, setSelectedRange] = useState("Feb 2025 - Jan2026");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [showList, setShowList] = useState(false);
 
   const dateRanges = useMemo(
     () => ["Feb 2025 - Jan2026", "Jan 2025 - Dec 2025", "Dec 2024 - Nov 2025"],
@@ -73,31 +75,31 @@ const UsageChart = ({
     return { contentWidth: finalWidth, dynamicSpacing: spacing };
   }, [chartData.length]);
 
-  /**
-   * ✅ UPDATED LABEL RULES (as requested)
-   * - Daily: show only day numbers => "1, 2, 3, 4, 5..."
-   * - Monthly: show only month names => "Jan, Feb, Mar..." (no year)
-   */
   const formatLabels = useCallback(
     (item) => {
       if (!item?.label) return { line1: "", line2: "" };
 
       if (type === "monthly") {
-        // monthLabel example: "Feb 2025" OR "Feb 2025 - something"
-        // We only want month.
         const month = String(item.label || "").split(" ")[0] || "";
         return { line1: month, line2: "" };
       }
 
-      // daily: usageDay example: "2026-02-04"
       const date = new Date(item.label);
       if (Number.isNaN(date.getTime())) return { line1: "", line2: "" };
 
-      const day = String(date.getDate()); // 1..31
+      const day = String(date.getDate());
       return { line1: day, line2: "" };
     },
     [type]
   );
+
+  const formatPeriodLabel = useCallback((item) => {
+    if (type === "monthly") {
+      return item.label;
+    }
+    const date = new Date(item.label);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }, [type]);
 
   const handlePressBar = useCallback(
     (item, index) => {
@@ -114,7 +116,6 @@ const UsageChart = ({
     if (!item) return null;
 
     const bx = x(selectedIndex);
-
     const barTopY = Math.min(y(item.total), CHART_HEIGHT - 26);
     const tooltipX = Math.max(
       8,
@@ -146,7 +147,7 @@ const UsageChart = ({
           y={tooltipY + 18}
           fontSize="13"
           fontWeight="700"
-          fill={theme.colors.text.primary}
+          fill={theme.colors.text.primaryDark}
         >
           {item.total.toFixed(1)} GB
         </SvgText>
@@ -155,7 +156,7 @@ const UsageChart = ({
           y={tooltipY + 34}
           fontSize="11"
           fontWeight="600"
-          fill={theme.colors.primary}
+          fill={theme.colors.primaryDark}
         >
           DL {item.download.toFixed(1)}
         </SvgText>
@@ -172,7 +173,7 @@ const UsageChart = ({
           y={tooltipY + 34}
           fontSize="11"
           fontWeight="600"
-          fill={theme.colors.status.warning}
+          fill={theme.colors.upload}
         >
           UL {item.upload.toFixed(1)}
         </SvgText>
@@ -186,7 +187,6 @@ const UsageChart = ({
         const isActive = index === selectedIndex;
         const bx = x(index);
         const labels = formatLabels(item);
-
         const labelY1 = CHART_HEIGHT + 18;
 
         return (
@@ -204,7 +204,7 @@ const UsageChart = ({
               y={labelY1}
               fontSize="11"
               fontWeight={isActive ? "700" : "600"}
-              fill={isActive ? theme.colors.primary : theme.colors.text.primary}
+              fill={isActive ? theme.colors.primaryDark : theme.colors.text.primary}
               textAnchor="middle"
             >
               {labels.line1}
@@ -242,60 +242,111 @@ const UsageChart = ({
           })}
         </View>
 
-        <View style={styles.dropdownContainer}>
-          <SparkLightDropdown
-            items={dateRanges}
-            selectedValue={selectedRange}
-            onValueChange={setSelectedRange}
-            dropDownStyle={styles.dropdown}
-          />
+        <View style={styles.controlsRow}>
+          <View style={styles.dropdownWrapper}>
+            <SparkLightDropdown
+              items={dateRanges}
+              selectedValue={selectedRange}
+              onValueChange={setSelectedRange}
+              dropDownStyle={styles.dropdown}
+            />
+          </View>
+
+          <Pressable
+            style={styles.listToggle}
+            onPress={() => setShowList(!showList)}
+            accessibilityRole="button"
+            accessibilityLabel={showList ? "Show chart view" : "Show list view"}
+          >
+            <MaterialCommunityIcons
+              name={showList ? "chart-bar" : "format-list-bulleted"}
+              size={20}
+              color={theme.colors.primary}
+            />
+          </Pressable>
         </View>
 
-        <View style={styles.chartRow}>
-          <YAxis
-            style={styles.yAxis}
-            data={[0, maxValue]}
-            numberOfTicks={5}
-            contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
-            svg={{
-              fill: theme.colors.text.tertiary,
-              fontSize: 10.5,
-              fontWeight: "600",
-            }}
-            formatLabel={(v) => Math.round(v).toString()}
-          />
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={{ width: contentWidth }}>
-              <StackedBarChart
-                style={{ height: CHART_TOTAL_HEIGHT }}
-                data={chartData}
-                keys={["download", "upload"]}
-                colors={[theme.colors.primary, theme.colors.status.warning]}
+        {!showList ? (
+          <>
+            <View style={styles.chartRow}>
+              <YAxis
+                style={styles.yAxis}
+                data={[0, maxValue]}
+                numberOfTicks={5}
                 contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
-                gridMin={0}
-                gridMax={maxValue}
-                spacingInner={(contentWidth - chartData.length * BAR_WIDTH) / contentWidth}
-                spacingOuter={dynamicSpacing / contentWidth}
-              >
-                <Grid svg={{ strokeOpacity: 0.16 }} />
-                <Tooltip />
-                <TouchOverlay />
-              </StackedBarChart>
-            </View>
-          </ScrollView>
-        </View>
+                svg={{
+                  fill: theme.colors.text.tertiary,
+                  fontSize: 10.5,
+                  fontWeight: "600",
+                }}
+                formatLabel={(v) => Math.round(v).toString()}
+              />
 
-        <View style={styles.legend}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: theme.colors.primary }]} />
-            <Text style={styles.legendText}>Download</Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: theme.colors.status.warning }]} />
-            <Text style={styles.legendText}>Upload</Text>
-          </View>
-        </View>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={true}
+                style={styles.chartScroll}
+              >
+                <View style={{ width: contentWidth }}>
+                  <StackedBarChart
+                    style={{ height: CHART_TOTAL_HEIGHT }}
+                    data={chartData}
+                    keys={["download", "upload"]}
+                    colors={[theme.colors.primaryDark, theme.colors.upload]}
+                    contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
+                    gridMin={0}
+                    gridMax={maxValue}
+                    spacingInner={(contentWidth - chartData.length * BAR_WIDTH) / contentWidth}
+                    spacingOuter={dynamicSpacing / contentWidth}
+                  >
+                    <Grid svg={{ strokeOpacity: 0.16 }} />
+                    <Tooltip />
+                    <TouchOverlay />
+                  </StackedBarChart>
+                </View>
+              </ScrollView>
+            </View>
+
+            <View style={styles.legend}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: theme.colors.primaryDark }]} />
+                <Text style={styles.legendText}>Download</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: theme.colors.upload }]} />
+                <Text style={styles.legendText}>Upload</Text>
+              </View>
+            </View>
+          </>
+        ) : (
+          <ScrollView 
+            style={styles.listScrollContainer}
+            showsVerticalScrollIndicator={true}
+          >
+            {chartData.map((item, index) => (
+              <View key={index} style={[styles.listItem, index === chartData.length - 1 && styles.lastListItem]}>
+                <View style={styles.listItemHeader}>
+                  <Text style={styles.periodLabel}>{formatPeriodLabel(item)}</Text>
+                  <Text style={styles.totalLabel}>{item.total.toFixed(4)} GB</Text>
+                </View>
+                <View style={styles.listItemRow}>
+                  <View style={styles.detailItem}>
+                    <View style={[styles.detailDot, { backgroundColor: theme.colors.primaryDark }]} />
+                    <Text style={styles.detailLabel}>Download (GB)</Text>
+                    <Text style={styles.detailValue}>{item.download.toFixed(4)}</Text>
+                  </View>
+                </View>
+                <View style={styles.listItemRow}>
+                  <View style={styles.detailItem}>
+                    <View style={[styles.detailDot, { backgroundColor: theme.colors.upload }]} />
+                    <Text style={styles.detailLabel}>Upload (GB)</Text>
+                    <Text style={styles.detailValue}>{item.upload.toFixed(4)}</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        )}
       </View>
     </View>
   );
@@ -309,7 +360,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: `${theme.colors.primary}12`,
+    backgroundColor: `${theme.colors.primaryDark}12`,
     alignItems: "center",
     justifyContent: "center",
     marginRight: theme.spacing.sm,
@@ -345,22 +396,43 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: theme.colors.text.secondary,
   },
-  activeTabText: { color: theme.colors.primary },
+  activeTabText: { color: theme.colors.primaryDark },
 
-  dropdownContainer: { marginBottom: theme.spacing.sm },
+  controlsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+  },
+  dropdownWrapper: { flex: 1 },
   dropdown: {
     backgroundColor: theme.colors.surfaceVariant,
     borderColor: theme.colors.borderLight,
     borderRadius: theme.radius.xs,
-    minHeight: 42,
+    minHeight: 44,
+    height: 44,
+  },
+  listToggle: {
+    width: 44,
+    height: 44,
+    borderRadius: theme.radius.xs,
+    backgroundColor: theme.colors.surfaceVariant,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
+  chartScroll: {
+    marginBottom: theme.spacing.xs,
+  },
   chartRow: { flexDirection: "row", alignItems: "flex-start", marginTop: 2 },
   yAxis: { height: CHART_TOTAL_HEIGHT, width: 36, marginRight: 8 },
 
   legend: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 14,
     marginTop: theme.spacing.sm,
     paddingTop: theme.spacing.sm,
@@ -370,6 +442,68 @@ const styles = StyleSheet.create({
   legendItem: { flexDirection: "row", alignItems: "center" },
   legendDot: { width: 10, height: 10, borderRadius: 5, marginRight: 6 },
   legendText: { fontSize: theme.typography.size.xs, color: theme.colors.text.secondary },
+
+  // List View
+  listScrollContainer: {
+    maxHeight: LIST_VIEW_HEIGHT,
+    marginTop: theme.spacing.xs,
+  },
+  listItem: {
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
+    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: theme.radius.xs,
+    marginBottom: theme.spacing.sm,
+  },
+  lastListItem: {
+    marginBottom: 0,
+  },
+  listItemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: theme.spacing.sm,
+    paddingBottom: theme.spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.borderLight,
+  },
+  periodLabel: {
+    fontSize: theme.typography.size.sm,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.text.secondary,
+  },
+  totalLabel: {
+    fontSize: theme.typography.size.base,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "700",
+    color: theme.colors.text.primaryDark,
+  },
+  listItemRow: {
+    marginBottom: 4,
+  },
+  detailItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  detailDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  detailLabel: {
+    fontSize: theme.typography.size.xs,
+    fontFamily: theme.typography.family.regular,
+    color: theme.colors.text.secondary,
+    flex: 1,
+  },
+  detailValue: {
+    fontSize: theme.typography.size.xs,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.text.primaryDark,
+  },
 });
 
 export default UsageChart;

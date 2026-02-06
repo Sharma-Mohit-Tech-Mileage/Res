@@ -87,14 +87,7 @@ const DataUsageContent = ({ navigation, route }) => {
           />
         }
       >
-        {/* Period Selector */}
-        {/* <View style={styles.selectorContainer}>
-          <PeriodSelector
-            periods={MOCK_USAGE_PERIODS}
-            selectedPeriod={selectedPeriod}
-            onPeriodChange={handlePeriodChange}
-          />
-        </View> */}
+       
 
         {/* Usage Summary with Ring */}
         <UsageSummaryCard
@@ -103,11 +96,6 @@ const DataUsageContent = ({ navigation, route }) => {
           showRing={showRing}
         />
 
-        {/* <UsageInsightsCard
-          currentUsage={currentUsage}
-          currentMonth={monthlyData[0]}
-          previousMonth={monthlyData[1]}
-        /> */}
 
         {/* Historical Usage Chart */}
         <UsageChart
