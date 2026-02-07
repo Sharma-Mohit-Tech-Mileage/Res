@@ -10,6 +10,7 @@ import {
   AppState,
   Linking,
   Alert,
+  AccessibilityInfo,
 } from "react-native";
 import {
   Color,
@@ -30,6 +31,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
 import { PostApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
+import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 
 import {
   getFcmToken,
@@ -53,7 +55,33 @@ const InAppNotifications = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [isNotificationRquired, setIsNotificationRequired] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [messageRef, setMessageFocus] = useAccessibilityFocus();
   const formatedData = route.params?.additionalData || {};
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+
+  useEffect(() => {
+      AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+    }, []);
+  
+  
+  
+    useEffect(() => {
+      if (notification && screenReaderEnabled) {
+        // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
+        const t = setTimeout(() => {
+          try {
+            setMessageFocus();
+            AccessibilityInfo.announceForAccessibility(notification.message);
+          } catch (e) {
+            console.log("Accessibility focus error:", e);
+          }
+        }, 600);
+  
+        return () => clearTimeout(t);
+        
+      }
+    }, [notification, screenReaderEnabled]);
+  
 
   const translateY = animatedValue;
   const animateNotification = useCallback(() => {
@@ -300,9 +328,9 @@ const InAppNotifications = ({ navigation }) => {
                     transform: [{ translateY }],
                     paddingHorizontal: Padding.p_5xl,
                   }}
-                  accessible={true}
+                  accessible={false}
                 >
-                  <View style={styles.spaceBottom}>
+                  <View style={styles.spaceBottom} ref={messageRef}>
                     <NotificationAlert
                       type={notification.type}
                       title={

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   Keyboard,
+  AccessibilityInfo
 } from "react-native";
 import {
   FontFamily,
@@ -19,6 +20,7 @@ import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
+import useAccessibilityFocus from "../../../hooks/useAccessibilityFocus";
 
 const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
@@ -65,6 +67,35 @@ const SparkLightInput = React.forwardRef(({
   const inputRef = React.useRef(null);
   const errorRef = React.useRef(null);
   const [keyboardHidden, setKeyboardHidden] = useState(true);
+  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+  const [errorFocus, setErrorFocus] = useAccessibilityFocus();
+
+  useEffect(() => {
+    const checkScreenReader = async () => {
+      const enabled = await AccessibilityInfo.isScreenReaderEnabled();
+      setIsScreenReaderEnabled(enabled);
+    };
+    checkScreenReader();
+  }, []);
+
+
+  useEffect(() => {
+      if (error && isScreenReaderEnabled) {
+        // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
+        const t = setTimeout(() => {
+          try {
+            setErrorFocus();
+            AccessibilityInfo.announceForAccessibility(error);
+          } catch (e) {
+            console.log("Accessibility focus error:", e);
+          }
+        }, 600);
+  
+        return () => clearTimeout(t);
+        
+      }
+    }, [error, isScreenReaderEnabled]);
+  
 
   React.useImperativeHandle(ref, () => ({
     focus: () => {
@@ -97,13 +128,13 @@ const SparkLightInput = React.forwardRef(({
   }, [keyboardHidden]);
 
   // Auto-focus input when error appears (for accessibility)
-  useEffect(() => {
-    if (error && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 150);
-    }
-  }, [error]);
+  // useEffect(() => {
+  //   if (error && inputRef.current) {
+  //     setTimeout(() => {
+  //       inputRef.current?.focus();
+  //     }, 150);
+  //   }
+  // }, [error]);
 
   const handleInputChange = (text) => {
     if (onChangeText) {
@@ -284,6 +315,7 @@ function formatUsPhone(input) {
           <Text
             style={styles.errorText}
             accessible={true}
+            ref={errorFocus}
             accessibilityLabel={error}
             accessibilityRole="text"
             accessibilityHint="Please enter valid password"

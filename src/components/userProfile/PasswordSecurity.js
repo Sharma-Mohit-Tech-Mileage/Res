@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, Pressable, View } from "react-native";
+import { StyleSheet, Text, Pressable, View,AccessibilityInfo } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Color,
@@ -12,6 +12,7 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
+import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 const PasswordSecurity = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
@@ -19,6 +20,32 @@ const PasswordSecurity = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
+  const [messageRef, setMessageFocus] = useAccessibilityFocus();
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
+
+      useEffect(() => {
+        if (showSuccessAlert && screenReaderEnabled) {
+          // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
+          const t = setTimeout(() => {
+            try {
+              setMessageFocus();
+              AccessibilityInfo.announceForAccessibility("Password and Security details updated successfully.");
+            } catch (e) {
+              console.log("Accessibility focus error:", e);
+            }
+          }, 600);
+    
+          return () => clearTimeout(t);
+          
+        }
+      }, [showSuccessAlert, screenReaderEnabled]);
+  
+  
+  
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -41,7 +68,7 @@ const PasswordSecurity = () => {
       />
       <View style={[styles.passwordSecurityInner, styles.securitySpaceBlock]}>
         <View style={[styles.frameParent, styles.navigationBorder]}>
-          <View style={styles.infoWrapper}>
+          <View style={styles.infoWrapper} ref={messageRef}>
             <NotificationAlert
               type="success"
               title="Success"
