@@ -96,7 +96,7 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode 384
+        versionCode 386
         versionName "25.0.1"
     }
 
@@ -148,7 +148,8 @@ dependencies {
 //    }
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation 'zendesk.messaging:messaging-android:2.36.1'
+    api group: 'com.zendesk', name: 'chat', version: '3.4.0'
+    api group: 'com.zendesk', name: 'messaging', version: '5.4.0'
 
    // debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
     if (hermesEnabled.toBoolean()) {
