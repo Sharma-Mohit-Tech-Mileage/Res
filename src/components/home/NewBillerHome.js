@@ -35,18 +35,14 @@ import {
   requestUserPermission,
 } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
-import ChatIcon from "../../res/svgIcons/ChatIcon";
 import VersionCheck from "react-native-version-check";
 import DeviceInfo from "react-native-device-info";
+import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
-import {
-  startChatWithConfig,
-  initChat,
-  startChat,
-  logoutZendesk,
-  loginWithJWT,
-  setConversationalFields,
-} from "../utility/RNZendeskChat";
+
+
+
+
 
 const NewBillerHome = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
@@ -88,6 +84,8 @@ const NewBillerHome = ({ navigation }) => {
         userInfo.daysSinceDisconnectDate
       )
     : false;
+
+  
 
   /* Function to check outage status */
   const checOutagStatus = () => {
@@ -356,17 +354,7 @@ const NewBillerHome = ({ navigation }) => {
         <Logo width={120} height={33.32} />
       </View>
 
-      {true && <TouchableOpacity
-        onPress={() => {
-          if (Platform.OS === "ios") {
-            startChat();
-          } else {
-            startChatWithConfig();
-          }
-        }}
-      >
-        <ChatIcon />
-      </TouchableOpacity>}
+      <ZendeskChatIcon />
     </View>
   );
 
