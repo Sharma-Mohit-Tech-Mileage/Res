@@ -87,18 +87,18 @@ const MyServicesContent = ({ route }) => {
       >
         <View style={styles.servicesContainer}>
           {showInternet && (
-  <InternetCard
-    planName={data?.internet.planName}
-    downloadSpeed={data?.internet.downloadSpeed}
-    uploadSpeed={data?.internet.uploadSpeed}
-    loading={loading}
-   dataPlan={{
-  usedGB: 237.75,
-  totalGB: 1500,
-  percentageUsed: 15.85,
-}}
-  />
-)}
+            <InternetCard
+              planName={data?.internet.planName}
+              downloadSpeed={data?.internet.downloadSpeed}
+              uploadSpeed={data?.internet.uploadSpeed}
+              loading={loading}
+              dataPlan={{
+                usedGB: 237.75,
+                totalGB: 1500,
+                percentageUsed: 15.85,
+              }}
+            />
+          )}
 
           {showVideo && (
             <VideoCard

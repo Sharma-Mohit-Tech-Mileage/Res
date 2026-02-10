@@ -86,7 +86,7 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
       </View>
       
       <View style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end' }]}>
-        <Text style={[styles.labelText, { color: theme.colors.status.success }]}>
+        <Text style={[styles.labelText, { color: theme.colors.upload, }]}>
           {remainingGB} 
         </Text>
         <Text style={styles.labelSubtext}>GB Left</Text>
