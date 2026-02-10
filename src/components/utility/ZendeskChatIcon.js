@@ -37,7 +37,7 @@ const ZendeskChatIcon = () => {
         source={animationSource}
         autoPlay
         loop
-        style={{ width: 60, height: 40 }}
+        style={{ width: 40, height: 30 }}
       />
     </Pressable>
   );

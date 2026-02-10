@@ -42,6 +42,7 @@ import moment from "moment";
 import analytics from "@react-native-firebase/analytics";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
 import {
@@ -220,6 +221,9 @@ const AccountOverview = () => {
         useAngle={true}
         angle={90}
       />
+      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+      <ZendeskChatIcon />
+      </View>
       <View style={[styles.frameParent]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>

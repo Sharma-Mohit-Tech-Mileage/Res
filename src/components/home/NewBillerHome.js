@@ -354,7 +354,7 @@ const NewBillerHome = ({ navigation }) => {
         <Logo width={120} height={33.32} />
       </View>
 
-      <ZendeskChatIcon />
+      
     </View>
   );
 
@@ -428,6 +428,9 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
+      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+      <ZendeskChatIcon />
+      </View>
       <View style={{ flex: 1 }}>
         <SafeAreaView
           style={{ flex: 1 }}

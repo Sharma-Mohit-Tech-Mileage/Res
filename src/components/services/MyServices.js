@@ -16,6 +16,7 @@ import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector } from "react-redux";
 import { extractZipCode } from "../utility/constant";
+import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 const MyServicesContent = ({ route }) => {
   const insets = useSafeAreaInsets();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
@@ -66,6 +67,9 @@ const MyServicesContent = ({ route }) => {
         useAngle={true}
         angle={90}
       />
+      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+      <ZendeskChatIcon />
+      </View>
 
       <View style={{ paddingTop: insets.top + 27 }}>
         <ServiceHeader />

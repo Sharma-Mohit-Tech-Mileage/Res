@@ -27,6 +27,7 @@ import AppStyles from "../utility/AppStyles";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 import RighIcon from "../../../assets/svgs/Chevonright";
 import Searchmd from "../../../assets/svgs/Searchmd";
+import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -216,6 +217,9 @@ const Support = ({ route }) => {
           useAngle={true}
           angle={90}
         />
+        <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+      <ZendeskChatIcon />
+      </View>
         <View style={[styles.mainContainer]}>
           <View style={[styles.header, { paddingTop: insets.top + 35 }]}>
             <View style={styles.featuredIcon}>
