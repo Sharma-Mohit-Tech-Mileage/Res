@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
@@ -141,9 +140,9 @@ const DataUsageContent = ({ navigation, route }) => {
             show: true,
             appName: "eero",
             tagline: "eero app simplifies connectivity",
-            iosUrl: "https://apps.apple.com/app/eero/id1068944930",
+            iosUrl: "https://apps.apple.com/us/app/eero-wifi-system/id1023499075",
             androidUrl:
-              "https://play.google.com/store/apps/details?id=com.eero.android",
+              "https://play.google.com/store/apps/details?id=com.eero.android&pcampaignid=web_share",
           }}
         />
 

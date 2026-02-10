@@ -1,10 +1,11 @@
-import React, { useMemo, useState, useCallback } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from "react-native";
+import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions, Animated, Easing } from "react-native";
 import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
 import { G, Rect, Text as SvgText, Path } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
+import { cardHeader } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -26,12 +27,32 @@ const UsageChart = ({
   activeTab,
   onTabChange,
 }) => {
-  const [selectedRange, setSelectedRange] = useState("Feb 2025 - Jan2026");
+  const [selectedRange, setSelectedRange] = useState("Feb 2025 - Jan 2026");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showList, setShowList] = useState(false);
 
+  // ── Bar grow-up animation ──
+  const barAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    barAnim.setValue(0);
+    Animated.timing(barAnim, {
+      toValue: 1,
+      duration: 800,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [activeTab]);
+
+  const barScale = barAnim;
+  const barTranslateY = barAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [CHART_TOTAL_HEIGHT / 2, 0],
+  });
+  const legendOpacity = barAnim;
+
   const dateRanges = useMemo(
-    () => ["Feb 2025 - Jan2026", "Jan 2025 - Dec 2025", "Dec 2024 - Nov 2025"],
+    () => ["Feb 2025 - Jan 2026", "Jan 2025 - Dec 2025", "Dec 2024 - Nov 2025"],
     []
   );
 
@@ -166,7 +187,7 @@ const UsageChart = ({
           fontSize="11"
           fill={theme.colors.text.tertiary}
         >
-          •
+          â€¢
         </SvgText>
         <SvgText
           x={tooltipX + 70}
@@ -249,6 +270,7 @@ const UsageChart = ({
               selectedValue={selectedRange}
               onValueChange={setSelectedRange}
               dropDownStyle={styles.dropdown}
+              dropdownTitle={"Select Date Range"}
             />
           </View>
 
@@ -268,55 +290,67 @@ const UsageChart = ({
 
         {!showList ? (
           <>
-            <View style={styles.chartRow}>
-              <YAxis
-                style={styles.yAxis}
-                data={[0, maxValue]}
-                numberOfTicks={5}
-                contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
-                svg={{
-                  fill: theme.colors.text.tertiary,
-                  fontSize: 10.5,
-                  fontWeight: "600",
-                }}
-                formatLabel={(v) => Math.round(v).toString()}
-              />
+            <Animated.View
+              style={{
+                transform: [
+                  { scaleY: barScale },
+                  { translateY: barTranslateY },
+                ],
+                opacity: barAnim,
+              }}
+            >
+              <View style={styles.chartRow}>
+                <YAxis
+                  style={styles.yAxis}
+                  data={[0, maxValue]}
+                  numberOfTicks={5}
+                  contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
+                  svg={{
+                    fill: theme.colors.text.tertiary,
+                    fontSize: 10.5,
+                    fontWeight: "600",
+                  }}
+                  formatLabel={(v) => Math.round(v).toString()}
+                />
 
-              <ScrollView 
-                horizontal 
-                showsHorizontalScrollIndicator={true}
-                style={styles.chartScroll}
-              >
-                <View style={{ width: contentWidth }}>
-                  <StackedBarChart
-                    style={{ height: CHART_TOTAL_HEIGHT }}
-                    data={chartData}
-                    keys={["download", "upload"]}
-                    colors={[theme.colors.primaryDark, theme.colors.upload]}
-                    contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
-                    gridMin={0}
-                    gridMax={maxValue}
-                    spacingInner={(contentWidth - chartData.length * BAR_WIDTH) / contentWidth}
-                    spacingOuter={dynamicSpacing / contentWidth}
-                  >
-                    <Grid svg={{ strokeOpacity: 0.16 }} />
-                    <Tooltip />
-                    <TouchOverlay />
-                  </StackedBarChart>
+                <ScrollView 
+                  horizontal 
+                  showsHorizontalScrollIndicator={true}
+                  style={styles.chartScroll}
+                >
+                  <View style={{ width: contentWidth }}>
+                    <StackedBarChart
+                      style={{ height: CHART_TOTAL_HEIGHT }}
+                      data={chartData}
+                      keys={["download", "upload"]}
+                      colors={[theme.colors.primaryDark, theme.colors.upload]}
+                      contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
+                      gridMin={0}
+                      gridMax={maxValue}
+                      spacingInner={(contentWidth - chartData.length * BAR_WIDTH) / contentWidth}
+                      spacingOuter={dynamicSpacing / contentWidth}
+                    >
+                      <Grid svg={{ strokeOpacity: 0.16 }} />
+                      <Tooltip />
+                      <TouchOverlay />
+                    </StackedBarChart>
+                  </View>
+                </ScrollView>
+              </View>
+            </Animated.View>
+
+            <Animated.View style={{ opacity: legendOpacity }}>
+              <View style={styles.legend}>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: theme.colors.primaryDark }]} />
+                  <Text style={styles.legendText}>Download</Text>
                 </View>
-              </ScrollView>
-            </View>
-
-            <View style={styles.legend}>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: theme.colors.primaryDark }]} />
-                <Text style={styles.legendText}>Download</Text>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: theme.colors.upload }]} />
+                  <Text style={styles.legendText}>Upload</Text>
+                </View>
               </View>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: theme.colors.upload }]} />
-                <Text style={styles.legendText}>Upload</Text>
-              </View>
-            </View>
+            </Animated.View>
           </>
         ) : (
           <ScrollView 
@@ -355,24 +389,9 @@ const UsageChart = ({
 const styles = StyleSheet.create({
   container: { marginHorizontal: theme.spacing.base, marginBottom: theme.spacing.base },
   card: { ...card.base, padding: theme.spacing.base },
-  header: { flexDirection: "row", alignItems: "center", marginBottom: theme.spacing.md },
-  iconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: `${theme.colors.primaryDark}12`,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: theme.spacing.sm,
-  },
-  chartTitle: {
-    fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.text.secondary,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
+  header: cardHeader.container,
+  iconWrapper: cardHeader.iconWrapper,
+  chartTitle: cardHeader.title,
 
   tabsContainer: {
     flexDirection: "row",
@@ -391,7 +410,7 @@ const styles = StyleSheet.create({
   },
   activeTab: { backgroundColor: theme.colors.white, ...theme.shadows.sm },
   tabText: {
-    fontSize: theme.typography.size.sm,
+    fontSize: theme.typography.size.base,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
     color: theme.colors.text.secondary,
@@ -400,7 +419,7 @@ const styles = StyleSheet.create({
 
   controlsRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     gap: theme.spacing.sm,
     marginBottom: theme.spacing.sm,
   },
@@ -441,7 +460,7 @@ const styles = StyleSheet.create({
   },
   legendItem: { flexDirection: "row", alignItems: "center" },
   legendDot: { width: 10, height: 10, borderRadius: 5, marginRight: 6 },
-  legendText: { fontSize: theme.typography.size.xs, color: theme.colors.text.secondary },
+  legendText: { fontSize: theme.typography.size.sm, color: theme.colors.text.secondary },
 
   // List View
   listScrollContainer: {

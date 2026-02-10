@@ -1,18 +1,45 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
+import { View, Text, StyleSheet, Animated, Easing } from "react-native";
 import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
+import { cardHeader } from "../../../../styles/compositions";
 
 const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB, size = 140 }) => {
   const strokeWidth = 20;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
-  
-  const usedArc = (circumference * usedPercent) / 100;
-  const remainingArc = (circumference * remainingPercent) / 100;
+
+  // ── Animation ──
+  const animValue = useRef(new Animated.Value(0)).current;
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    animValue.setValue(0);
+    setProgress(0);
+    const id = animValue.addListener(({ value }) => setProgress(value));
+    Animated.timing(animValue, {
+      toValue: 1,
+      duration: 1200,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+    return () => animValue.removeListener(id);
+  }, [usedPercent, remainingPercent]);
+
+  // Animated arcs grow from 0 → target
+  const usedArc = (circumference * usedPercent * progress) / 100;
+  const remainingArc = (circumference * remainingPercent * progress) / 100;
+
+  // Callout lines + labels fade in during the last 40% of ring animation
+  const calloutOpacity = progress > 0.6 ? Math.min(1, (progress - 0.6) / 0.4) : 0;
+  const labelOpacity = animValue.interpolate({
+    inputRange: [0.6, 1],
+    outputRange: [0, 1],
+    extrapolate: "clamp",
+  });
 
   const usedMidAngle = 135 + (usedPercent / 100) * 180;
   const remainingMidAngle = 135 + (usedPercent / 100) * 360 + (remainingPercent / 100) * 180;
@@ -47,9 +74,11 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
         </Defs>
 
         <G transform={`translate(45, 20)`}>
+          {/* Shadow + background track */}
           <Circle cx={center} cy={center + 2} r={radius} stroke="#00000008" strokeWidth={strokeWidth} fill="none" />
           <Circle cx={center} cy={center} r={radius} stroke="#F5F5F5" strokeWidth={strokeWidth} fill="none" />
           
+          {/* Used arc — animates from 0 to target */}
           <Circle
             cx={center} cy={center} r={radius}
             stroke="url(#used)" strokeWidth={strokeWidth} fill="none"
@@ -58,6 +87,7 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
             rotation="135" origin={`${center}, ${center}`}
           />
           
+          {/* Remaining arc — animates from 0 to target, offset by used */}
           <Circle
             cx={center} cy={center} r={radius}
             stroke="url(#remaining)" strokeWidth={strokeWidth} fill="none"
@@ -67,30 +97,31 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
             rotation="135" origin={`${center}, ${center}`}
           />
 
+          {/* Callout lines + dots fade in after ring is mostly filled */}
           <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y} 
-                stroke={theme.colors.primaryDark} strokeWidth="2.5" />
-          <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} />
+                stroke={theme.colors.primaryDark} strokeWidth="2.5" opacity={calloutOpacity} />
+          <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} opacity={calloutOpacity} />
 
           <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y} 
-                stroke={theme.colors.freedatabackground} strokeWidth="2.5" />
-          <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} />
+                stroke={theme.colors.freedatabackground} strokeWidth="2.5" opacity={calloutOpacity} />
+          <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} opacity={calloutOpacity} />
         </G>
       </Svg>
 
-      {/* Text labels */}
-      <View style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0 }]}>
+      {/* Text labels — fade in with Animated.View */}
+      <Animated.View style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0, opacity: labelOpacity }]}>
         <Text style={[styles.labelText, { color: theme.colors.primaryDark }]}>
           {usedGB} 
         </Text>
         <Text style={styles.labelSubtext}> GB Used</Text>
-      </View>
+      </Animated.View>
       
-      <View style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end' }]}>
-        <Text style={[styles.labelText, { color: theme.colors.upload, }]}>
+      <Animated.View style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end', opacity: labelOpacity }]}>
+        <Text style={[styles.labelText, { color: theme.colors.upload }]}>
           {remainingGB} 
         </Text>
         <Text style={styles.labelSubtext}>GB Left</Text>
-      </View>
+      </Animated.View>
     </View>
   );
 };
@@ -151,20 +182,8 @@ const styles = StyleSheet.create({
     ...card.base,
     padding: theme.spacing.base,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.xs,
-    marginBottom: theme.spacing.base,
-  },
-  headerTitle: {
-    fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.text.secondary,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
+  header: cardHeader.container,
+  headerTitle: cardHeader.title,
   textLabel: {
     alignItems: 'flex-start',
   },
@@ -218,15 +237,7 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     textAlign: "center",
   },
-  iconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: `${theme.colors.primaryDark}12`,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: theme.spacing.sm,
-  },
+  iconWrapper: cardHeader.iconWrapper,
 });
 
 export default UsageSummaryCard;

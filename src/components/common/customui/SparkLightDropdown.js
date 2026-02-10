@@ -1,15 +1,5 @@
 import React, { useRef } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  TouchableOpacity, 
-  Text, 
-  Modal, 
-  SafeAreaView, 
-  Pressable, 
-  findNodeHandle, 
-  AccessibilityInfo 
-} from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, Modal, SafeAreaView, Pressable, findNodeHandle, AccessibilityInfo } from 'react-native';
 import { Box } from 'native-base';
 import { Padding, Color, FontFamily, FontSize } from "../../../../GlobalStyles"; 
 import DownArrow from '../../../res/svgIcons/DownArrow';    
@@ -20,9 +10,9 @@ const SparkLightDropdown = ({
   style,
   dropDownStyle,
   isDropDownOpen = () => {},
-  dropdownTitle = "Select Security Question", // Modal header title (customizable)
-  accessibilityItemName = "security question", // Used in accessibility announcements
-  placeholder = "Select an option" // Placeholder text when no option is selected
+  dropdownTitle = "Select Security Question",
+  accessibilityItemName = "security question",
+  placeholder = "Select an option"
 }) => {
   const validItems = Array.isArray(items) ? items : [];
   const [visible, setVisible] = React.useState(false);

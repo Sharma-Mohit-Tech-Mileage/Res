@@ -3,7 +3,8 @@ import { View, Text, StyleSheet } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
-const safeText = (v, fallback = "—") =>
+import { cardHeader } from "../../../../styles/compositions";
+const safeText = (v, fallback = "â€”") =>
   v === null || v === undefined || String(v).trim() === "" ? fallback : String(v);
 
 const normalize = (v) => String(v ?? "").trim();
@@ -152,27 +153,9 @@ const styles = StyleSheet.create({
     padding: theme.spacing.base,
   },
 
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: theme.spacing.base,
-  },
-  iconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: `${theme.colors.primaryDark}12`,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: theme.spacing.sm,
-  },
-  headerTitle: {
-    fontSize: theme.typography.size.sm,
-    fontWeight: "600",
-    color: theme.colors.text.secondary,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
+  header: cardHeader.container,
+  iconWrapper: cardHeader.iconWrapper,
+  headerTitle: cardHeader.title,
 
   equipmentItem: {
     flexDirection: "row",
@@ -210,17 +193,17 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontWeight:'700',
-    fontSize: theme.typography.size.xs,
+    fontSize: theme.typography.size.sm,
     color: theme.colors.text.secondary,
   },
   detailValue: {
-    fontSize: theme.typography.size.xs,
+    fontSize: theme.typography.size.sm,
     fontWeight: "400",
     color: theme.colors.text.secondary,
   },
   detailDot: {
     marginHorizontal: 6,
-    fontSize: theme.typography.size.xs,
+    fontSize: theme.typography.size.sm,
     color: theme.colors.text.tertiary,
   },
   inlineIcon: { marginRight: 4 },

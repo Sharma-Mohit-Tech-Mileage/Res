@@ -218,6 +218,35 @@ export const gradientHeader = {
 };
 
 // ==========================================
+// SHARED CARD HEADER (reused by data usage components)
+// ==========================================
+
+export const cardHeader = {
+  container: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: theme.spacing.md,
+  },
+  iconWrapper: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: `${theme.colors.primary}12`,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: theme.spacing.sm,
+  },
+  title: {
+    fontSize: theme.typography.size.sm,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.text.secondary,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+};
+
+// ==========================================
 // DATA USAGE COMPOSITIONS
 // ==========================================
 
@@ -330,9 +359,6 @@ export const dataUsageTabs = {
   },
 };
 
-// ==========================================
-// UPDATE DEFAULT EXPORT
-// ==========================================
 
 export default {
   serviceCard,
@@ -341,7 +367,8 @@ export default {
   header,
   skeletonLoader,
   gradientHeader,
-  dataUsageSummary,    // ADD THIS
-  dataUsageChart,      // ADD THIS
-  dataUsageTabs,       // ADD THIS
+  cardHeader,
+  dataUsageSummary,
+  dataUsageChart,
+  dataUsageTabs,
 };

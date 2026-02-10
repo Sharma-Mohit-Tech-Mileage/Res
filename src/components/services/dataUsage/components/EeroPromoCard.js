@@ -17,8 +17,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const EeroPromoCard = () => {
   const handleDownload = async () => {
     const url = Platform.OS === "ios"
-      ? "https://apps.apple.com/app/eero-home-wifi-system/id1023499969"
-      : "https://play.google.com/store/apps/details?id=com.eero.android";
+      ? "https://apps.apple.com/us/app/eero-wifi-system/id1023499075"
+      : "https://play.google.com/store/apps/details?id=com.eero.android&pcampaignid=web_share";
 
     try {
       const canOpen = await Linking.canOpenURL(url);
