@@ -29,11 +29,9 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
     return () => animValue.removeListener(id);
   }, [usedPercent, remainingPercent]);
 
-  // Animated arcs grow from 0 → target
   const usedArc = (circumference * usedPercent * progress) / 100;
   const remainingArc = (circumference * remainingPercent * progress) / 100;
 
-  // Callout lines + labels fade in during the last 40% of ring animation
   const calloutOpacity = progress > 0.6 ? Math.min(1, (progress - 0.6) / 0.4) : 0;
   const labelOpacity = animValue.interpolate({
     inputRange: [0.6, 1],
@@ -74,11 +72,9 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
         </Defs>
 
         <G transform={`translate(45, 20)`}>
-          {/* Shadow + background track */}
           <Circle cx={center} cy={center + 2} r={radius} stroke="#00000008" strokeWidth={strokeWidth} fill="none" />
           <Circle cx={center} cy={center} r={radius} stroke="#F5F5F5" strokeWidth={strokeWidth} fill="none" />
           
-          {/* Used arc — animates from 0 to target */}
           <Circle
             cx={center} cy={center} r={radius}
             stroke="url(#used)" strokeWidth={strokeWidth} fill="none"
@@ -87,7 +83,6 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
             rotation="135" origin={`${center}, ${center}`}
           />
           
-          {/* Remaining arc — animates from 0 to target, offset by used */}
           <Circle
             cx={center} cy={center} r={radius}
             stroke="url(#remaining)" strokeWidth={strokeWidth} fill="none"
@@ -97,7 +92,6 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
             rotation="135" origin={`${center}, ${center}`}
           />
 
-          {/* Callout lines + dots fade in after ring is mostly filled */}
           <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y} 
                 stroke={theme.colors.primaryDark} strokeWidth="2.5" opacity={calloutOpacity} />
           <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} opacity={calloutOpacity} />
@@ -108,16 +102,15 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
         </G>
       </Svg>
 
-      {/* Text labels — fade in with Animated.View */}
       <Animated.View style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0, opacity: labelOpacity }]}>
-        <Text style={[styles.labelText, { color: theme.colors.primaryDark }]}>
+        <Text style={[styles.labelText]}>
           {usedGB} 
         </Text>
         <Text style={styles.labelSubtext}> GB Used</Text>
       </Animated.View>
       
       <Animated.View style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end', opacity: labelOpacity }]}>
-        <Text style={[styles.labelText, { color: theme.colors.upload }]}>
+        <Text style={[styles.labelText]}>
           {remainingGB} 
         </Text>
         <Text style={styles.labelSubtext}>GB Left</Text>
@@ -148,9 +141,8 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
           remainingGB={currentUsage.dataRemaining.toFixed(1)}
         />
 
-
         <View style={styles.stats}>
-          <View style={styles.statBox}>
+          <View style={[styles.statBox, styles.statBoxWide]}>
             <MaterialCommunityIcons name="calendar-range" size={20} color={theme.colors.primary} />
             <Text style={styles.statValue}>{startDate} - {endDate}</Text>
             <Text style={styles.statLabel}>Billing Period</Text>
@@ -162,7 +154,7 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
             <Text style={styles.statLabel}>Remaining</Text>
           </View>
           
-          <View style={styles.statBox}>
+          <View style={[styles.statBox, styles.statBoxNarrow]}>
             <MaterialCommunityIcons name="chart-pie" size={20} color={theme.colors.primary} />
             <Text style={styles.statValue}>{currentUsage.dataUsedPercent}%</Text>
             <Text style={styles.statLabel}>Used</Text>
@@ -188,12 +180,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   labelText: {
-    fontSize: 14,
-    fontFamily: theme.typography.family.semiBold,
+    fontSize: 16,
+    fontFamily: theme.typography.family.regular,
+    color: theme.colors.text.secondary,
     fontWeight: '700',
   },
   labelSubtext: {
-    fontSize: 11,
+    fontSize: 14,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     marginTop: 1,
@@ -223,8 +216,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceVariant,
     borderRadius: theme.radius.xs,
   },
+  statBoxWide: {
+    flex: 1.4,
+  },
+  statBoxNarrow: {
+    flex: 0.7,
+  },
   statValue: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.text.primary,
@@ -232,7 +231,7 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     textAlign: "center",

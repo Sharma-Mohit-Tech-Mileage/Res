@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions, Animated, Easing } from "react-native";
 import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
-import { G, Rect, Text as SvgText, Path } from "react-native-svg";
+import { G, Rect, Text as SvgText, Path, Line } from "react-native-svg";
+import LinearGradient from "react-native-linear-gradient";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
@@ -20,6 +21,96 @@ const TOOLTIP_WIDTH = 120;
 const TOOLTIP_HEIGHT = 46;
 const MIN_SPACING = 2;
 
+// ── Custom scroll-indicator constants ──
+const TRACK_THICKNESS = 3.5;
+const THUMB_MIN = 28;
+const TRACK_COLOR = "rgba(0,0,0,0.07)";
+const THUMB_COLOR = "rgba(0,0,0,0.22)";
+const FADE_SIZE = 24;
+
+// ─────────────────────────────────────────────
+// Reusable horizontal scroll indicator bar
+// ─────────────────────────────────────────────
+const HScrollIndicator = ({ scrollX, contentW, viewportW }) => {
+  const ratio = viewportW / contentW;
+  const thumbW = Math.max(THUMB_MIN, ratio * viewportW);
+  const trackUsable = viewportW - thumbW;
+
+  const translateX = scrollX.interpolate({
+    inputRange: [0, Math.max(1, contentW - viewportW)],
+    outputRange: [0, trackUsable],
+    extrapolate: "clamp",
+  });
+
+  if (ratio >= 1) return null;
+
+  return (
+    <View style={hStyles.track}>
+      <Animated.View
+        style={[hStyles.thumb, { width: thumbW, transform: [{ translateX }] }]}
+      />
+    </View>
+  );
+};
+
+const hStyles = StyleSheet.create({
+  track: {
+    height: TRACK_THICKNESS,
+    borderRadius: TRACK_THICKNESS / 2,
+    backgroundColor: TRACK_COLOR,
+    marginTop: 6,
+    overflow: "hidden",
+  },
+  thumb: {
+    height: TRACK_THICKNESS,
+    borderRadius: TRACK_THICKNESS / 2,
+    backgroundColor: THUMB_COLOR,
+  },
+});
+
+// ─────────────────────────────────────────────
+// Reusable vertical scroll indicator bar
+// ─────────────────────────────────────────────
+const VScrollIndicator = ({ scrollY, contentH, viewportH }) => {
+  const ratio = viewportH / contentH;
+  const thumbH = Math.max(THUMB_MIN, ratio * viewportH);
+  const trackUsable = viewportH - thumbH;
+
+  const translateY = scrollY.interpolate({
+    inputRange: [0, Math.max(1, contentH - viewportH)],
+    outputRange: [0, trackUsable],
+    extrapolate: "clamp",
+  });
+
+  if (ratio >= 1) return null;
+
+  return (
+    <View style={[vStyles.track, { height: viewportH }]}>
+      <Animated.View
+        style={[vStyles.thumb, { height: thumbH, transform: [{ translateY }] }]}
+      />
+    </View>
+  );
+};
+
+const vStyles = StyleSheet.create({
+  track: {
+    width: TRACK_THICKNESS,
+    borderRadius: TRACK_THICKNESS / 2,
+    backgroundColor: TRACK_COLOR,
+    marginLeft: 8,
+    overflow: "hidden",
+  },
+  thumb: {
+    width: TRACK_THICKNESS,
+    borderRadius: TRACK_THICKNESS / 2,
+    backgroundColor: THUMB_COLOR,
+  },
+});
+
+// ─────────────────────────────────────────────
+// Main component
+// ─────────────────────────────────────────────
 const UsageChart = ({
   data,
   type = "monthly",
@@ -30,6 +121,27 @@ const UsageChart = ({
   const [selectedRange, setSelectedRange] = useState("Feb 2025 - Jan 2026");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showList, setShowList] = useState(false);
+
+  // ── Chart horizontal scroll state ──
+  const chartScrollX = useRef(new Animated.Value(0)).current;
+  const [chartViewportW, setChartViewportW] = useState(0);
+
+  // ── List vertical scroll state ──
+  const listScrollY = useRef(new Animated.Value(0)).current;
+  const [listContentH, setListContentH] = useState(0);
+  const [listViewportH, setListViewportH] = useState(LIST_VIEW_HEIGHT);
+
+  // ── Fade-edge hint animation (pulse once on mount / tab switch) ──
+  const fadeHintAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    fadeHintAnim.setValue(1);
+    Animated.sequence([
+      Animated.timing(fadeHintAnim, { toValue: 0.35, duration: 600, useNativeDriver: true }),
+      Animated.timing(fadeHintAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+      Animated.timing(fadeHintAnim, { toValue: 0.35, duration: 500, useNativeDriver: true }),
+      Animated.timing(fadeHintAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
+    ]).start();
+  }, [activeTab, showList]);
 
   // ── Bar grow-up animation ──
   const barAnim = useRef(new Animated.Value(0)).current;
@@ -114,13 +226,16 @@ const UsageChart = ({
     [type]
   );
 
-  const formatPeriodLabel = useCallback((item) => {
-    if (type === "monthly") {
-      return item.label;
-    }
-    const date = new Date(item.label);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  }, [type]);
+  const formatPeriodLabel = useCallback(
+    (item) => {
+      if (type === "monthly") {
+        return item.label;
+      }
+      const date = new Date(item.label);
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    },
+    [type]
+  );
 
   const handlePressBar = useCallback(
     (item, index) => {
@@ -132,21 +247,56 @@ const UsageChart = ({
 
   if (!chartData.length) return null;
 
+  // ── Chart needs horizontal scroll? ──
+  const chartScrollable = contentWidth > chartViewportW && chartViewportW > 0;
+
   const Tooltip = ({ x, y, bandwidth }) => {
     const item = chartData[selectedIndex];
     if (!item) return null;
 
     const bx = x(selectedIndex);
-    const barTopY = Math.min(y(item.total), CHART_HEIGHT - 26);
+    const barCenterX = bx + bandwidth / 2;
+    const barTopY = y(item.total);
+
     const tooltipX = Math.max(
       8,
-      Math.min(bx + bandwidth / 2 - TOOLTIP_WIDTH / 2, contentWidth - TOOLTIP_WIDTH - 8)
+      Math.min(barCenterX - TOOLTIP_WIDTH / 2, contentWidth - TOOLTIP_WIDTH - 8)
     );
-    const tooltipY = Math.max(6, barTopY - TOOLTIP_HEIGHT - 10);
-    const caretX = bx + bandwidth / 2;
+    const tooltipGap = 12;
+    const tooltipY = Math.max(6, barTopY - TOOLTIP_HEIGHT - tooltipGap);
+    const caretX = barCenterX;
+
+    const caretTipY = tooltipY + TOOLTIP_HEIGHT + 6;
+    const showLeader = barTopY - caretTipY > 4;
 
     return (
       <G>
+        {/* Highlight overlay on selected bar */}
+        <Rect
+          x={bx - 3}
+          y={barTopY}
+          rx={3}
+          width={bandwidth + 6}
+          height={CHART_HEIGHT - barTopY}
+          fill={theme.colors.primaryDark}
+          fillOpacity={0.1}
+        />
+
+        {/* Dashed leader line */}
+        {showLeader && (
+          <Line
+            x1={caretX}
+            y1={caretTipY}
+            x2={caretX}
+            y2={barTopY}
+            stroke={theme.colors.primaryDark}
+            strokeWidth={1.2}
+            strokeDasharray="3,3"
+            strokeOpacity={0.5}
+          />
+        )}
+
+        {/* Tooltip bubble */}
         <Rect
           x={tooltipX}
           y={tooltipY}
@@ -154,48 +304,34 @@ const UsageChart = ({
           width={TOOLTIP_WIDTH}
           height={TOOLTIP_HEIGHT}
           fill={theme.colors.white}
-          stroke={theme.colors.border}
+          stroke={theme.colors.primaryDark}
           strokeWidth={1}
+          strokeOpacity={0.35}
         />
         <Path
           d={`M ${caretX - 5} ${tooltipY + TOOLTIP_HEIGHT} L ${caretX} ${tooltipY + TOOLTIP_HEIGHT + 6} L ${
             caretX + 5
           } ${tooltipY + TOOLTIP_HEIGHT} Z`}
           fill={theme.colors.white}
+          stroke={theme.colors.primaryDark}
+          strokeWidth={1}
+          strokeOpacity={0.35}
         />
-        <SvgText
-          x={tooltipX + 10}
-          y={tooltipY + 18}
-          fontSize="13"
-          fontWeight="700"
-          fill={theme.colors.text.primaryDark}
-        >
+        <Rect
+          x={caretX - 6}
+          y={tooltipY + TOOLTIP_HEIGHT - 1}
+          width={12}
+          height={2}
+          fill={theme.colors.white}
+        />
+
+        <SvgText x={tooltipX + 10} y={tooltipY + 18} fontSize="13" fontWeight="700" fill={theme.colors.text.primaryDark}>
           {item.total.toFixed(1)} GB
         </SvgText>
-        <SvgText
-          x={tooltipX + 10}
-          y={tooltipY + 34}
-          fontSize="11"
-          fontWeight="600"
-          fill={theme.colors.primaryDark}
-        >
+        <SvgText x={tooltipX + 10} y={tooltipY + 34} fontSize="11" fontWeight="600" fill={theme.colors.primaryDark}>
           DL {item.download.toFixed(1)}
         </SvgText>
-        <SvgText
-          x={tooltipX + 60}
-          y={tooltipY + 34}
-          fontSize="11"
-          fill={theme.colors.text.tertiary}
-        >
-          â€¢
-        </SvgText>
-        <SvgText
-          x={tooltipX + 70}
-          y={tooltipY + 34}
-          fontSize="11"
-          fontWeight="600"
-          fill={theme.colors.upload}
-        >
+        <SvgText x={tooltipX + 70} y={tooltipY + 34} fontSize="11" fontWeight="600" fill={theme.colors.upload}>
           UL {item.upload.toFixed(1)}
         </SvgText>
       </G>
@@ -220,21 +356,83 @@ const UsageChart = ({
               fill="transparent"
               onPress={() => handlePressBar(item, index)}
             />
-            <SvgText
-              x={bx + bandwidth / 2}
-              y={labelY1}
-              fontSize="11"
-              fontWeight={isActive ? "700" : "600"}
-              fill={isActive ? theme.colors.primaryDark : theme.colors.text.primary}
-              textAnchor="middle"
-            >
-              {labels.line1}
-            </SvgText>
+
+            {isActive && (
+              <G>
+                <SvgText
+                  x={bx + bandwidth / 2}
+                  y={labelY1}
+                  fontSize="11"
+                  fontWeight="700"
+                  fill={theme.colors.primaryDark}
+                  textAnchor="middle"
+                >
+                  {labels.line1}
+                </SvgText>
+                <Rect
+                  x={bx + bandwidth / 2 - 2}
+                  y={labelY1 + 4}
+                  width={4}
+                  height={4}
+                  rx={2}
+                  fill={theme.colors.primaryDark}
+                />
+              </G>
+            )}
+
+            {!isActive && (
+              <SvgText
+                x={bx + bandwidth / 2}
+                y={labelY1}
+                fontSize="11"
+                fontWeight="600"
+                fill={theme.colors.text.primary}
+                textAnchor="middle"
+              >
+                {labels.line1}
+              </SvgText>
+            )}
           </G>
         );
       })}
     </G>
   );
+
+  // ── Fade edge helper ──
+  const FadeEdge = ({ side, horizontal = true }) => {
+    const isStart = side === "left" || side === "top";
+    const colors = isStart
+      ? ["rgba(255,255,255,0.95)", "rgba(255,255,255,0)"]
+      : ["rgba(255,255,255,0)", "rgba(255,255,255,0.95)"];
+
+    if (horizontal) {
+      return (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            fadeStyles.hFade,
+            isStart ? fadeStyles.hLeft : fadeStyles.hRight,
+            { opacity: fadeHintAnim },
+          ]}
+        >
+          <LinearGradient colors={colors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
+        </Animated.View>
+      );
+    }
+
+    return (
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          fadeStyles.vFade,
+          isStart ? fadeStyles.vTop : fadeStyles.vBottom,
+          { opacity: fadeHintAnim },
+        ]}
+      >
+        <LinearGradient colors={colors} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={StyleSheet.absoluteFill} />
+      </Animated.View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -288,14 +486,12 @@ const UsageChart = ({
           </Pressable>
         </View>
 
+        {/* ═══════════ CHART VIEW ═══════════ */}
         {!showList ? (
           <>
             <Animated.View
               style={{
-                transform: [
-                  { scaleY: barScale },
-                  { translateY: barTranslateY },
-                ],
+                transform: [{ scaleY: barScale }, { translateY: barTranslateY }],
                 opacity: barAnim,
               }}
             >
@@ -313,29 +509,49 @@ const UsageChart = ({
                   formatLabel={(v) => Math.round(v).toString()}
                 />
 
-                <ScrollView 
-                  horizontal 
-                  showsHorizontalScrollIndicator={true}
-                  style={styles.chartScroll}
-                >
-                  <View style={{ width: contentWidth }}>
-                    <StackedBarChart
-                      style={{ height: CHART_TOTAL_HEIGHT }}
-                      data={chartData}
-                      keys={["download", "upload"]}
-                      colors={[theme.colors.primaryDark, theme.colors.upload]}
-                      contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
-                      gridMin={0}
-                      gridMax={maxValue}
-                      spacingInner={(contentWidth - chartData.length * BAR_WIDTH) / contentWidth}
-                      spacingOuter={dynamicSpacing / contentWidth}
-                    >
-                      <Grid svg={{ strokeOpacity: 0.16 }} />
-                      <Tooltip />
-                      <TouchOverlay />
-                    </StackedBarChart>
-                  </View>
-                </ScrollView>
+                <View style={styles.chartScrollWrapper}>
+                  {/* Right fade edge hint */}
+                  {chartScrollable && <FadeEdge side="right" horizontal />}
+
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    scrollEventThrottle={16}
+                    onScroll={Animated.event(
+                      [{ nativeEvent: { contentOffset: { x: chartScrollX } } }],
+                      { useNativeDriver: false }
+                    )}
+                    onLayout={(e) => setChartViewportW(e.nativeEvent.layout.width)}
+                    style={styles.chartScroll}
+                  >
+                    <View style={{ width: contentWidth }}>
+                      <StackedBarChart
+                        style={{ height: CHART_TOTAL_HEIGHT }}
+                        data={chartData}
+                        keys={["download", "upload"]}
+                        colors={[theme.colors.primaryDark, theme.colors.upload]}
+                        contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
+                        gridMin={0}
+                        gridMax={maxValue}
+                        spacingInner={(contentWidth - chartData.length * BAR_WIDTH) / contentWidth}
+                        spacingOuter={dynamicSpacing / contentWidth}
+                      >
+                        <Grid svg={{ strokeOpacity: 0.16 }} />
+                        <Tooltip />
+                        <TouchOverlay />
+                      </StackedBarChart>
+                    </View>
+                  </ScrollView>
+
+                  {/* Always-visible horizontal scroll track */}
+                  {chartScrollable && (
+                    <HScrollIndicator
+                      scrollX={chartScrollX}
+                      contentW={contentWidth}
+                      viewportW={chartViewportW}
+                    />
+                  )}
+                </View>
               </View>
             </Animated.View>
 
@@ -353,39 +569,93 @@ const UsageChart = ({
             </Animated.View>
           </>
         ) : (
-          <ScrollView 
-            style={styles.listScrollContainer}
-            showsVerticalScrollIndicator={true}
-          >
-            {chartData.map((item, index) => (
-              <View key={index} style={[styles.listItem, index === chartData.length - 1 && styles.lastListItem]}>
-                <View style={styles.listItemHeader}>
-                  <Text style={styles.periodLabel}>{formatPeriodLabel(item)}</Text>
-                  <Text style={styles.totalLabel}>{item.total.toFixed(4)} GB</Text>
-                </View>
-                <View style={styles.listItemRow}>
-                  <View style={styles.detailItem}>
-                    <View style={[styles.detailDot, { backgroundColor: theme.colors.primaryDark }]} />
-                    <Text style={styles.detailLabel}>Download (GB)</Text>
-                    <Text style={styles.detailValue}>{item.download.toFixed(4)}</Text>
+          /* ═══════════ LIST VIEW ═══════════ */
+          <View style={styles.listOuterWrapper}>
+            <View style={styles.listScrollRow}>
+              {/* Bottom fade edge hint */}
+              {listContentH > listViewportH && <FadeEdge side="bottom" horizontal={false} />}
+
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                scrollEventThrottle={16}
+                onScroll={Animated.event(
+                  [{ nativeEvent: { contentOffset: { y: listScrollY } } }],
+                  { useNativeDriver: false }
+                )}
+                onContentSizeChange={(_w, h) => setListContentH(h)}
+                onLayout={(e) => setListViewportH(e.nativeEvent.layout.height)}
+                style={styles.listScrollContainer}
+              >
+                {chartData.map((item, index) => (
+                  <View
+                    key={index}
+                    style={[styles.listItem, index === chartData.length - 1 && styles.lastListItem]}
+                  >
+                    <View style={styles.listItemHeader}>
+                      <Text style={styles.periodLabel}>{formatPeriodLabel(item)}</Text>
+                      <Text style={styles.totalLabel}>{item.total.toFixed(4)} GB</Text>
+                    </View>
+                    <View style={styles.listItemRow}>
+                      <View style={styles.detailItem}>
+                        <View style={[styles.detailDot, { backgroundColor: theme.colors.primaryDark }]} />
+                        <Text style={styles.detailLabel}>Download (GB)</Text>
+                        <Text style={styles.detailValue}>{item.download.toFixed(4)}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.listItemRow}>
+                      <View style={styles.detailItem}>
+                        <View style={[styles.detailDot, { backgroundColor: theme.colors.upload }]} />
+                        <Text style={styles.detailLabel}>Upload (GB)</Text>
+                        <Text style={styles.detailValue}>{item.upload.toFixed(4)}</Text>
+                      </View>
+                    </View>
                   </View>
-                </View>
-                <View style={styles.listItemRow}>
-                  <View style={styles.detailItem}>
-                    <View style={[styles.detailDot, { backgroundColor: theme.colors.upload }]} />
-                    <Text style={styles.detailLabel}>Upload (GB)</Text>
-                    <Text style={styles.detailValue}>{item.upload.toFixed(4)}</Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
+                ))}
+              </ScrollView>
+
+              {/* Always-visible vertical scroll track */}
+              {listContentH > listViewportH && (
+                <VScrollIndicator
+                  scrollY={listScrollY}
+                  contentH={listContentH}
+                  viewportH={listViewportH}
+                />
+              )}
+            </View>
+          </View>
         )}
       </View>
     </View>
   );
 };
 
+// ─────────────────────────────────────────────
+// Fade edge styles
+// ─────────────────────────────────────────────
+const fadeStyles = StyleSheet.create({
+  hFade: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: FADE_SIZE,
+    zIndex: 5,
+  },
+  hLeft: { left: 0 },
+  hRight: { right: 0 },
+  vFade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    height: FADE_SIZE,
+    zIndex: 5,
+  },
+  vTop: { top: 0 },
+  vBottom: { bottom: 0 },
+});
+
+// ─────────────────────────────────────────────
+// Main styles
+// ─────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { marginHorizontal: theme.spacing.base, marginBottom: theme.spacing.base },
   card: { ...card.base, padding: theme.spacing.base },
@@ -442,9 +712,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  chartScroll: {
-    marginBottom: theme.spacing.xs,
+  // Chart
+  chartScrollWrapper: {
+    flex: 1,
   },
+  chartScroll: {},
   chartRow: { flexDirection: "row", alignItems: "flex-start", marginTop: 2 },
   yAxis: { height: CHART_TOTAL_HEIGHT, width: 36, marginRight: 8 },
 
@@ -463,9 +735,15 @@ const styles = StyleSheet.create({
   legendText: { fontSize: theme.typography.size.sm, color: theme.colors.text.secondary },
 
   // List View
+  listOuterWrapper: {
+    marginTop: theme.spacing.xs,
+  },
+  listScrollRow: {
+    flexDirection: "row",
+  },
   listScrollContainer: {
     maxHeight: LIST_VIEW_HEIGHT,
-    marginTop: theme.spacing.xs,
+    flex: 1,
   },
   listItem: {
     paddingVertical: theme.spacing.sm,
@@ -512,13 +790,13 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   detailLabel: {
-    fontSize: theme.typography.size.xs,
+    fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     flex: 1,
   },
   detailValue: {
-    fontSize: theme.typography.size.xs,
+    fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.text.primaryDark,

@@ -78,12 +78,6 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
 
           {identifier && (
             <View style={styles.detailRow}>
-              <MaterialCommunityIcons
-                name="identifier"
-                size={12}
-                color={theme.colors.text.secondary}
-                style={styles.inlineIcon}
-              />
               <Text style={styles.detailText}>{identifier.label}: </Text>
               <Text style={styles.detailValue} numberOfLines={1}>
                 {identifier.value}
@@ -193,27 +187,15 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontWeight:'700',
-    fontSize: theme.typography.size.sm,
+    fontSize: theme.typography.size.base,
     color: theme.colors.text.secondary,
   },
   detailValue: {
-    fontSize: theme.typography.size.sm,
+    fontSize: theme.typography.size.base,
     fontWeight: "400",
     color: theme.colors.text.secondary,
   },
-  detailDot: {
-    marginHorizontal: 6,
-    fontSize: theme.typography.size.sm,
-    color: theme.colors.text.tertiary,
-  },
-  inlineIcon: { marginRight: 4 },
 
-  homeBadge: {
-    marginLeft: theme.spacing.sm,
-    padding: 6,
-    borderRadius: theme.radius.xs,
-    backgroundColor: theme.colors.surfaceVariant,
-  },
 });
 
 export default memo(ManageEquipmentCard);

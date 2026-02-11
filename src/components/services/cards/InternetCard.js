@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xs,
   },
   snapshotLabel: {
-    fontSize: theme.typography.size.xs,
+    fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.text.secondary,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   snapshotText: {
-    fontSize: theme.typography.size.xs,
+    fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
   },
