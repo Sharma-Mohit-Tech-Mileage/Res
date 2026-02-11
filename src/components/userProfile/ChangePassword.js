@@ -51,6 +51,7 @@ const ChangePassword = () => {
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
+  const inputRef = useRef(null);
   const [accessibilityLabelInput, setAccessibilityLabelInput] = useState(undefined);
 
   const handleSavePass = (formData) => {
@@ -109,6 +110,7 @@ const ChangePassword = () => {
       const body = { newPassword };
 
       setLoading(true);
+      inputRef.current?.focus();
 
       // Call the PUT API request
       PutApiRequest(
@@ -257,9 +259,11 @@ const ChangePassword = () => {
               >
                 <View
                   style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
+                  ref={inputRef}
                 >
                   <Controller
                     control={control}
+                    
                     name="newPassword"
                     render={({
                       field: { onChange, onBlur, value },

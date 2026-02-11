@@ -99,7 +99,9 @@ const SparkLightInput = React.forwardRef(({
 
   React.useImperativeHandle(ref, () => ({
     focus: () => {
-      inputRef.current?.focus();
+      if(inputRef.current){
+        inputRef.current?.focus();
+      }
     }
   }));
 
@@ -118,11 +120,11 @@ const SparkLightInput = React.forwardRef(({
   }, []);
 
   useEffect(() => {
-    if (!keyboardHidden) {
+    if (!keyboardHidden && inputRef.current) {
       inputRef.current?.focus();
     }else{
-      if(error){
-        errorRef.current?.focus();
+      if(error && inputRef.current){
+        inputRef.current?.focus();
       }
     }
   }, [keyboardHidden]);
