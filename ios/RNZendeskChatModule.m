@@ -3,53 +3,45 @@
 #import <ZendeskSDKLogger/ZendeskSDKLogger.h>
 #import <ZendeskSDK/ZendeskSDK.h>
 
-#import <ZendeskSDK/ZendeskSDK.h>
-
 
 @implementation RNZendeskChatModule
+
+static const BOOL ISUAT = NO; // Set to YES for UAT, NO for Production
 
 RCT_EXPORT_MODULE(RNZendeskChatModule);
 
 
 
 + (void) init {
-  
-  
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [Zendesk initializeWithChannelKey:@"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOTk0WUpERVpLMVdCWjlFVDdCRURYLmpzb24ifQ=="
-         
-         
-         
-                         messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]
-                        completionHandler:^(Zendesk * _Nullable zendesk, NSError * _Nullable error) {
-          ZDKLogger.enabled = YES;
-          ZDKLogger.level = ZDKLogLevelDefault;
-                if (error != nil) {
-                    NSLog(@"Zendesk did not initialize.\nError: %@", error.localizedDescription);
-                }else{
-                  // Get your Zendesk instance:
-                  Zendesk *instance = [Zendesk instance];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    // Select channel key based on static environment flag
+    static NSString * const UATChannelKey = @"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTczNDcxNTE4Mi56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUtGRkJKN0RDNTJSREZNWVhRM0c1U1laMC5qc29uIn0=";
+    static NSString * const PRODChannelKey = @"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTczNDcxNTE4Mi56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUtGRkJKN0RDNTJSREZNWVhRM0c1U1laMC5qc29uIn0=";
+    static NSString * const channelKey = ISUAT ? UATChannelKey : PRODChannelKey;
 
-                  // To add an event observer to your Zendesk instance:
-                  [instance addEventObserver:self :^(enum ZDKZendeskEvent event, id _Nullable value) {
-                      switch (event) {
-                      case ZDKZendeskEventUnreadMessageCountChanged:
-                          // Your custom action...
-                      case ZDKZendeskEventAuthenticationFailed:
-                          // Your custom action...
-                          NSLog(@"Zendesk ZDKZendeskEventAuthenticationFailed");
-                        
-                      default:
-                          break;
+    [Zendesk initializeWithChannelKey:channelKey
+                     messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]
+                    completionHandler:^(Zendesk * _Nullable initializedZendesk, NSError * _Nullable initError) {
+                      ZDKLogger.enabled = YES;
+                      ZDKLogger.level = ZDKLogLevelDefault;
+                      if (initError != nil) {
+                        NSLog(@"Zendesk did not initialize.\nError: %@", initError.localizedDescription);
+                      } else {
+                        Zendesk *sdkInstance = [Zendesk instance];
+                        [sdkInstance addEventObserver:self :^(enum ZDKZendeskEvent zendeskEvent, id _Nullable value) {
+                          switch (zendeskEvent) {
+                            case ZDKZendeskEventUnreadMessageCountChanged:
+                              break;
+                            case ZDKZendeskEventAuthenticationFailed:
+                              NSLog(@"Zendesk ZDKZendeskEventAuthenticationFailed");
+                              break;
+                            default:
+                              break;
+                          }
+                        }];
                       }
-                  }];
-
-                }
-            }];
-      });
-          
-    
-  
+                    }];
+  });
 }
 
 
@@ -140,12 +132,40 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
   @try {
-    
-    NSLog(@"Zendesk login: %@", metadata[@"userAgent"]);
-    
-    
+    // Read isUAT flag from metadata (default to NO if not present)
+    BOOL isUAT = NO;
+    id isUATValue = metadata[@"isUAT"];
+    if ([isUATValue isKindOfClass:[NSNumber class]]) {
+      isUAT = [((NSNumber *)isUATValue) boolValue];
+    } else if ([isUATValue isKindOfClass:[NSString class]]) {
+      // Accept common string forms like "true"/"1"
+      NSString *lower = [((NSString *)isUATValue) lowercaseString];
+      isUAT = [lower isEqualToString:@"true"] || [lower isEqualToString:@"1"];
+    }
+
+    NSLog(@"Zendesk setConversationTags invoked. isUAT=%@", isUAT ? @"YES" : @"NO");
+
     NSMutableDictionary *fields = [NSMutableDictionary dictionary];
 
+    if (isUAT) {
+      if (metadata[@"userAgent"])       { fields[@"29230353527575"] = metadata[@"userAgent"]; }
+      if (metadata[@"appVersion"])      { fields[@"29230349707159"] = metadata[@"appVersion"]; }
+      if (metadata[@"timezoneOffsetId"]){ fields[@"29230359134487"] = metadata[@"timezoneOffsetId"]; }
+      if (metadata[@"platform"])        { fields[@"29230381416087"] = metadata[@"platform"]; }
+      if (metadata[@"locationHrefId"])  { fields[@"29230394216983"] = metadata[@"locationHrefId"]; }
+      if (metadata[@"ipAddress"])       { fields[@"29230409854743"] = metadata[@"ipAddress"]; }
+      if (metadata[@"firstName"])       { fields[@"28685404062615"] = metadata[@"firstName"]; }
+      if (metadata[@"lastName"])        { fields[@"28685434553111"] = metadata[@"lastName"]; }
+      if (metadata[@"name"])            { fields[@"28685420915607"] = metadata[@"name"]; }
+      if (metadata[@"phone"])           { fields[@"28685420643991"] = metadata[@"phone"]; }
+      if (metadata[@"accountNumber"])   { fields[@"28685413035543"] = metadata[@"accountNumber"]; }
+      if (metadata[@"userName"])        { fields[@"29450503100695"] = metadata[@"userName"]; }
+      if (metadata[@"customerType"])    { fields[@"28685435072023"] = metadata[@"customerType"]; }
+      if (metadata[@"authLevel"])       { fields[@"29230167813271"] = metadata[@"authLevel"]; }
+      if (metadata[@"mobileApp"])       { fields[@"29542765557655"] = metadata[@"mobileApp"]; }
+      if (metadata[@"jwtId"])           { fields[@"29230180962071"] = metadata[@"jwtId"]; }
+    } else {
+      // Prod mapping (existing behavior)
       if (metadata[@"userAgent"]) {
         fields[@"29542407930903"] = metadata[@"userAgent"];
       }
@@ -191,18 +211,19 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
       if (metadata[@"mobileApp"]) {
         fields[@"29542765557655"] = metadata[@"mobileApp"];
       }
-       
+      
       if (metadata[@"jwtId"]) {
         fields[@"29542045878167"] = metadata[@"jwtId"];
       }
-
-      [[Zendesk instance].messaging setConversationFields:fields];
-  
-    // Simulate success
+    }
+    [[Zendesk instance].messaging setConversationFields:fields];
+    NSError *jsonError = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:fields options:0 error:&jsonError];
+    NSString *jsonString = jsonData ? [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] : [NSString stringWithFormat:@"<serialization error: %@>", jsonError.localizedDescription];
+    NSLog(@"Zendesk metadata: %@", jsonString);
     resolve(@(YES));
   }
   @catch (NSException *exception) {
-    //NSLog(@"Exception: %@, Reason: %@, User Info: %@", exception.name, exception.reason, exception.userInfo);
     NSLog(@"Zendesk metadata.\nError: %@", exception.reason);
     reject(@"set_tags_error", @"Failed to set conversation tags", nil);
   }
@@ -210,5 +231,9 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
 
 
 
-
 @end
+
+
+
+
+

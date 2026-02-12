@@ -133,6 +133,10 @@ export const PostAuthApiRequest = async (
     delete requestBody.idTokenGuid;
     delete requestBody.refreshToken;
 
+    if (endpoint === "api/mobile/gettoken") {
+      console.log("Calling api/mobile/gettoken with payload:", JSON.stringify(requestBody));
+    }
+
     const res = await axios.post(`${API_ACP_BASEURL}${endpoint}`, requestBody, {
       headers: {
         Accept: "application/json",
@@ -156,6 +160,10 @@ export const PostAuthApiRequest = async (
     const responseData = { ...res.data };
     if (idTokenGuid) responseData.idTokenGuid = idTokenGuid;
     if (refreshToken) responseData.refreshToken = refreshToken;
+
+    if (endpoint === "api/mobile/gettoken") {
+      console.log("Received response from api/mobile/gettoken:", JSON.stringify(responseData));
+    }
 
     onSuccess(responseData);
   } catch (err) {
@@ -208,6 +216,45 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     });
   }
 };
+
+
+export const PostApiReqZendeskToken = async (endpoint, body, onSuccess, onError) => {
+  try {
+    const user = await getUser();
+    console.log("Bearer Token for API request:", user.token);
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify(body),
+    };
+
+    const response = await fetchWithTokenRefresh(
+      fetch,
+      `https://customer.uat.cableone.net/apiWrapper/${endpoint}`,
+      options,
+      onSuccess,
+      onError
+    );
+
+    await handleFetchResponse(
+      response,
+      `https://customer.uat.cableone.net/apiWrapper/${endpoint}`,
+      onSuccess,
+      onError
+    );
+  } catch (error) {
+    console.error("[PostApiRequest] Error:", error);
+    onError({
+      status: 0,
+      message: error.message || "Request failed",
+      endpoint,
+    });
+  }
+};
+
 
 export const UploadMultipartData = async (
   endpoint,

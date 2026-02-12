@@ -16,8 +16,10 @@ import { useDispatch } from "react-redux";
 import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuite";
 import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
+import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
+import { useFocusEffect } from "@react-navigation/native";
 
 const TYPE_CONFIG = {
   info: {
@@ -26,7 +28,7 @@ const TYPE_CONFIG = {
     iconColor: "#0060AE",
     textColor: "#000000",
     titleColor: "#000000",
-    closeButtonColor: "#0060AE",
+    closeButtonColor: "#000000",
     IconComponent: InfoIcon,
     iconLabel: "Information icon",
     labelPrefix: "Information: ",
@@ -37,7 +39,7 @@ const TYPE_CONFIG = {
     iconColor: Color.sparkLightRed,
     textColor: "#000000",
     titleColor: "#000000",
-    closeButtonColor: "#B92A1C",
+    closeButtonColor: "#000000",
     IconComponent: InfoIcon,
     iconLabel: "Error icon",
     labelPrefix: "Error: ",
@@ -48,7 +50,7 @@ const TYPE_CONFIG = {
     iconColor: Color.sparklightGreen,
     textColor: "#000000",
     titleColor: "#000000",
-    closeButtonColor: "#1D7832",
+    closeButtonColor: "#000000",
     IconComponent: SuccessIcon,
     iconLabel: "Success icon",
     labelPrefix: "Success: ",
@@ -59,7 +61,7 @@ const TYPE_CONFIG = {
     iconColor: Color.sparkLightInfo,
     textColor: "#000000",
     titleColor: "#000000",
-    closeButtonColor: "#DD6D02",
+    closeButtonColor: "#000000",
     IconComponent: WarningIcon,
     iconLabel: "Warning icon",
     labelPrefix: "Warning: ",
@@ -227,6 +229,7 @@ const NotificationAlert = ({
   showCloseIcon = true,
   isVisible = true,
   resentemail = false,
+  autoFocusTitle = false,
   splitKey = "",
 }) => {
   const dispatch = useDispatch();
@@ -237,7 +240,7 @@ const NotificationAlert = ({
   const closeRef = useRef(null);
   const resendRef = useRef(null);
   const blockRefs = useRef([]);
-
+  
   const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
   const IconComponent = config.IconComponent;
 
@@ -247,6 +250,9 @@ const NotificationAlert = ({
     [message, normalizedKeys]
   );
   const blocks = useMemo(() => groupSegmentsByLineBreaks(segments), [segments]);
+
+
+  // Accessibility focus is now handled in the useEffect below
 
   // Initialize block refs array
   useEffect(() => {
@@ -258,10 +264,18 @@ const NotificationAlert = ({
     if (!isVisible) return;
 
     const timeout = setTimeout(() => {
-      // Set initial focus
-      const titleNode = findNodeHandle(titleRef.current);
-      if (titleNode) {
-        AccessibilityInfo.setAccessibilityFocus(titleNode);
+      // Set initial focus - prefer autoFocusTitle if enabled, otherwise use title
+      let focusTarget = null;
+      if (autoFocusTitle && titleRef.current) {
+        focusTarget = findNodeHandle(titleRef.current);
+      } else if (titleRef.current) {
+        focusTarget = findNodeHandle(titleRef.current);
+      } else if (containerRef.current) {
+        focusTarget = findNodeHandle(containerRef.current);
+      }
+      
+      if (focusTarget) {
+        AccessibilityInfo.setAccessibilityFocus(focusTarget);
       }
 
       AccessibilityInfo.announceForAccessibility(
@@ -310,10 +324,10 @@ const NotificationAlert = ({
           }
         }
       }
-    }, 100);
+    }, 300);
 
     return () => clearTimeout(timeout);
-  }, [isVisible, title, config.labelPrefix, blocks.length, resentemail, showCloseIcon]);
+  }, [isVisible, title, config.labelPrefix, blocks.length, resentemail, showCloseIcon, autoFocusTitle]);
 
   const executeAction = useCallback(
     (actionConfig) => {
@@ -512,7 +526,7 @@ const NotificationAlert = ({
         <View
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
           accessible={true}
-          accessibilityRole="image"
+          accessibilityRole="text"
           accessibilityLabel={config.iconLabel}
         >
           <IconComponent width={24} height={24} color={config.iconColor} />
@@ -562,27 +576,34 @@ const NotificationAlert = ({
           )}
         </View>
 
-        
-      </View>
-      {showCloseIcon && (
-          <A11y.Index index={5} style={styles.closeBtn}>
-          <Pressable
-            ref={closeRef}
-            onPress={onClose}
-            
-            accessible={true}
-            accessibilityLabel="Close notification"
-            accessibilityRole="button"
-            accessibilityHint="Double tap to dismiss"
-          >
-            <Text
-              style={[styles.closeBtnText, { color: config.closeButtonColor }]}
+        {showCloseIcon && (
+          <A11y.Index index={4}>
+            <Pressable
+              ref={closeRef}
+              onPress={onClose}
+              style={styles.closeBtn}
+              accessible={true}
+              accessibilityLabel="Close notification"
+              accessibilityRole="button"
+              accessibilityHint="Double tap to dismiss"
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              ✕
-            </Text>
-          </Pressable>
+
+              {Platform.OS === "ios" ? (
+                <CloseIcon
+                  width={16}
+                  height={16}
+                  color={config.closeButtonColor}
+                />
+              ) : (
+                <Text style={[styles.closeBtnText, { color: config.closeButtonColor }]}>
+                  ✕
+                </Text>
+              )}
+            </Pressable>
           </A11y.Index>
         )}
+      </View>
       </A11y.Order>
     </View>
   );
@@ -637,13 +658,10 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   closeBtn: {
-    alignContent: "center",
-    justifyContent: "center",
-    position: "absolute",
-    top: 12,
-    right: 8,
-    width: 24,
-    height: 24,
+    alignSelf: "flex-start",
+    padding: 8,
+    marginTop: 4,
+    marginRight: 4,
   },
   closeBtnText: {
     fontSize: 16,

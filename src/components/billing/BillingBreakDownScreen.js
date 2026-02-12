@@ -369,6 +369,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
                 message={userMsg}
                 showCloseIcon={false}
                 isVisible={true}
+                autoFocusTitle={true}
                 accessibilityLabel={userMsg}
                 accessibilityLiveRegion="polite"
                 accessibilityRole="alert"

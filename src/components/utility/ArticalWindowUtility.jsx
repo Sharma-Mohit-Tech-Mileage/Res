@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, Platform, AppState, Alert } from 'react-native';
+import { View, Text, StyleSheet, Platform, AppState, Alert, AccessibilityInfo } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -10,6 +10,8 @@ import { navigationRef } from '../../navigations/UserNavigations';
 import analytics from '@react-native-firebase/analytics';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import LoadingSpinner from './LoadingSpinner';
+import useAccessibilityFocus from '../../hooks/useAccessibilityFocus';
+
 
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
@@ -27,7 +29,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [forceWebViewRecreation, setForceWebViewRecreation] = useState(false);
     const [appBackgroundTime, setAppBackgroundTime] = useState(0);
     const user = useSelector(state => state.user.userData);
+    const [loading, setLoading] = useState(true);
     const webViewRef = useRef();
+    const [mainViewRef, setFocus] = useAccessibilityFocus();
+
+    useEffect(() => {
+    // Set focus when the component mounts (screen appears)
+    setFocus();
+  }, [setFocus]);
 
     // FIXED: Simplified and more compatible script
     const enhancedScript = `
@@ -166,21 +175,26 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         setProgress(0.1);
         setIsError(false);
         setErrorMessage('');
-        
+        setLoading(true);
         console.log('WebView load started:', syntheticEvent.nativeEvent.url);
     }, []);
 
     const onLoadProgress = useCallback(({ nativeEvent }) => {
         setProgress(nativeEvent.progress);
+        
     }, []);
 
     const onLoadEnd = useCallback((syntheticEvent) => {
         const endTime = Date.now();
         const loadTime = endTime - loadStartTime;
-        setProgress(1);
-        setContentLoaded(true);
         
+        setContentLoaded(true);
+        setLoading(false);
+        setTimeout(() => setProgress(1), 300);
         console.log(`Page loaded in: ${loadTime}ms (${(loadTime/1000).toFixed(2)}s)`);
+        
+        // Announce content loaded for accessibility
+        AccessibilityInfo.announceForAccessibility("Content loaded");
     }, [loadStartTime]);
 
     const onError = useCallback((syntheticEvent) => {
@@ -264,7 +278,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 }, [contentLoaded, appBackgroundTime]);
 
     const LoadingComponent = useCallback(() => (
-        <View style={styles.loadingContainer}>
+        <View style={styles.loadingContainer} accessibilityRole='text' accessible={true} accessibilityLabel="Loading content" accessibilityHint="Content is loading, please wait">
             {name === 'Billing Details' ? (
                 <LoadingSpinner />
             ) : (
@@ -280,7 +294,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     ), []);
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container} 
+        >
             <ProfileSettingsHeader 
                 onPressBack={() => {
                     console.log('Back button pressed');
@@ -302,16 +317,32 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 title={name} 
             />
             
-            {progress < 1 && (
-                <View style={styles.progressBar}>
+            {progress < 1 ? (
+                <View style={styles.progressBar} ref={mainViewRef}
+         accessible={true}
+                    accessibilityLabel={loading ? `${name} content loading` : `${name} content loaded`}
+                    accessibilityLiveRegion="polite"
+                    accessibilityRole="text">
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
-            )}
+            ): (
+                <View style={[styles.progressBar,{ backgroundColor: '#8D3B90', width: '100%' }]} 
+                    accessible={true}
+                    accessibilityLabel={ `${name} content loaded`}
+                    accessibilityRole='text'
+                    accessibilityLiveRegion="polite"
+                    >
+                
+                </View>
+            )
+            }
             
             {modalOpen && !isTokenRefreshing && !forceWebViewRecreation && (
                 <WebView
                     key={forceWebViewRecreation ? Date.now() : undefined}
                     ref={webViewRef}
+                   
+                    style={styles.webView}
                     source={{ uri: url }}
                     // Event handlers
                     onLoadStart={onLoadStart}

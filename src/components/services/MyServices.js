@@ -16,10 +16,12 @@ import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector } from "react-redux";
 import { extractZipCode } from "../utility/constant";
+import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 const MyServicesContent = ({ route }) => {
   const insets = useSafeAreaInsets();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
-
+  const profileDetails =
+    useSelector((state) => state.profile?.profileDetails) || {};
   const flagsReady = accountDetails?.services != null;
 
   const showInternet =
@@ -28,10 +30,10 @@ const MyServicesContent = ({ route }) => {
     loading || (!flagsReady ? true : accountDetails?.services?.video === true);
   const showPhone =
     loading || (!flagsReady ? true : accountDetails?.services?.phone === true);
-
+  const accountNumber = profileDetails.accountNumber || "1234567890";
   const legacySPA = accountDetails?.legacy_brand_by_spa;
-  const accountNumber =  "123456789";
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
+  console.log("Service Details Error:", legacySPA, error);
   const { outageData, checking, checkStatus, clearOutageData } =
     useOutageStatus();
   const [refreshing, setRefreshing] = useState(false);
@@ -65,6 +67,9 @@ const MyServicesContent = ({ route }) => {
         useAngle={true}
         angle={90}
       />
+      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+      <ZendeskChatIcon />
+      </View>
 
       <View style={{ paddingTop: insets.top + 27 }}>
         <ServiceHeader />
@@ -105,7 +110,7 @@ const MyServicesContent = ({ route }) => {
           {showPhone && (
             <PhoneCard
               planName={data?.phone.planName}
-              legacyBrand={data?.phone.legacyBrand}
+              legacyBrand={legacySPA}
               loading={loading}
             />
           )}

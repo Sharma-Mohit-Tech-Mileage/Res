@@ -40,7 +40,7 @@ const StatusIcon = ({ status }) => (
   </View>
 );
 
-const EditButton = ({ onPress, isLoading }) => (
+const EditButton = ({ onPress, isLoading, accessibilityLabel }) => (
   <Pressable
     style={({ pressed }) => [
       styles.editButton,
@@ -50,7 +50,7 @@ const EditButton = ({ onPress, isLoading }) => (
     accessible={true}
     disabled={isLoading}
     accessibilityRole="button"
-    accessibilityLabel="Edit notifications"
+    accessibilityLabel={accessibilityLabel || "Edit Notifications"}
     onPress={onPress}
   >
     <Text style={styles.editButtonText}>Edit</Text>
@@ -182,6 +182,25 @@ const NotificationSection = ({
   onEdit,
   phoneNumber,
 }) => {
+  // Compute accessibility label for the Edit button based on section
+  const editAccessibilityLabel = (() => {
+    const t = title || "";
+    const idLower = (id || "").toString().toLowerCase();
+    const titleLower = t.toLowerCase();
+
+    if (idLower === "text" || titleLower.includes("text")) return "Edit Text Notifications";
+    if (idLower === "email" || titleLower.includes("email")) return "Edit Email Notifications";
+    if (
+      idLower.includes("app") ||
+      titleLower.includes("in-app") ||
+      titleLower.includes("in app") ||
+      idLower.includes("inapp")
+    )
+      return "Edit In-app Notifications";
+
+    return t ? `Edit ${t} Notifications` : "Edit Notifications";
+  })();
+
   return (
     <View style={styles.sectionContainer}>
       <View style={styles.header}>
@@ -189,7 +208,7 @@ const NotificationSection = ({
         {isComingSoon ? (
           <ComingSoonBadge />
         ) : (
-          !isAdmin && <EditButton onPress={onEdit} isLoading={isLoading} />
+          !isAdmin && <EditButton onPress={onEdit} isLoading={isLoading} accessibilityLabel={editAccessibilityLabel} />
         )}
       </View>
 

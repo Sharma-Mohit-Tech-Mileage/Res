@@ -51,6 +51,7 @@ const ChangePassword = () => {
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
+  const inputRef = useRef(null);
   const [accessibilityLabelInput, setAccessibilityLabelInput] = useState(undefined);
 
   const handleSavePass = (formData) => {
@@ -109,6 +110,7 @@ const ChangePassword = () => {
       const body = { newPassword };
 
       setLoading(true);
+      inputRef.current?.focus();
 
       // Call the PUT API request
       PutApiRequest(
@@ -168,19 +170,19 @@ const ChangePassword = () => {
     getSecurityQuestions();
   }, []);
 
-  useEffect(() => {
-    if (newPassword && newPassword.length > 1) {
-      const validations = validatePassword(newPassword, profileDetails.userName);
-      const firstInvalidIndex = validations.findIndex(isValid => !isValid);
-      if (firstInvalidIndex !== -1) {
-        setAccessibilityLabelInput(`${passwordTerms[firstInvalidIndex]}`);
-      } else {
-        setAccessibilityLabelInput("");
-      }
-    } else {
-      setAccessibilityLabelInput("");
-    }
-  }, [newPassword]);
+  // useEffect(() => {
+  //   if (newPassword && newPassword.length > 1) {
+  //     const validations = validatePassword(newPassword, profileDetails.userName);
+  //     const firstInvalidIndex = validations.findIndex(isValid => !isValid);
+  //     if (firstInvalidIndex !== -1) {
+  //       setAccessibilityLabelInput(`${passwordTerms[firstInvalidIndex]}`);
+  //     } else {
+  //       setAccessibilityLabelInput("");
+  //     }
+  //   } else {
+  //     setAccessibilityLabelInput("");
+  //   }
+  // }, [newPassword]);
 
   useEffect(() => {
     if (route.params?.updateFailed) {
@@ -215,6 +217,7 @@ const ChangePassword = () => {
                   message="Password and security update failed."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowErrorAlert(false)}
                 />
                 <NotificationAlert
@@ -223,6 +226,7 @@ const ChangePassword = () => {
                   message="Please enter valid information to continue."
                   showCloseIcon={true}
                   isVisible={showValidationAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowValidationAlert(false)}
                 />
               </View>
@@ -255,9 +259,11 @@ const ChangePassword = () => {
               >
                 <View
                   style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
+                  ref={inputRef}
                 >
                   <Controller
                     control={control}
+                    
                     name="newPassword"
                     render={({
                       field: { onChange, onBlur, value },
@@ -273,7 +279,7 @@ const ChangePassword = () => {
                           onChangeText={onChange}
                           value={value}
                           secure={true}
-                          error={accessibilityLabelInput ? accessibilityLabelInput : error?.message}
+                          error={error?.message}
                         />
                         <View
                           accessibilityElementsHidden={isDropDownOpen}

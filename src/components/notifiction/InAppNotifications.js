@@ -10,6 +10,7 @@ import {
   AppState,
   Linking,
   Alert,
+  AccessibilityInfo,
 } from "react-native";
 import {
   Color,
@@ -30,6 +31,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
 import { PostApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
+import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 
 import {
   getFcmToken,
@@ -41,7 +43,7 @@ import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 const InAppNotifications = ({ navigation }) => {
   const route = useRoute();
   const [initialize, setInitializeSettings] = useState(
-    route.params?.additionalData
+    route.params?.additionalData,
   );
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const additionalData = route.params?.additionalData;
@@ -53,8 +55,34 @@ const InAppNotifications = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [isNotificationRquired, setIsNotificationRequired] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [messageRef, setMessageFocus] = useAccessibilityFocus();
   const formatedData = route.params?.additionalData || {};
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+
+  useEffect(() => {
+      AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+    }, []);
   
+  
+  
+    useEffect(() => {
+      if (notification && screenReaderEnabled) {
+        // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
+        const t = setTimeout(() => {
+          try {
+            setMessageFocus();
+            AccessibilityInfo.announceForAccessibility(notification.message);
+          } catch (e) {
+            console.log("Accessibility focus error:", e);
+          }
+        }, 600);
+  
+        return () => clearTimeout(t);
+        
+      }
+    }, [notification, screenReaderEnabled]);
+  
+
   const translateY = animatedValue;
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -72,15 +100,15 @@ const InAppNotifications = ({ navigation }) => {
       useNativeDriver: true,
     }).start(() => {
       // Only auto-dismiss if notification is NOT an error type
-      if (notification && notification.type !== "error") {
-        timeoutRef.current = setTimeout(() => {
-          Animated.timing(animatedValue, {
-            toValue: -100,
-            duration: 500,
-            useNativeDriver: true,
-          }).start(() => setNotification(null));
-        }, 2000);
-      }
+      // if (notification && notification.type !== "error") {
+      //   timeoutRef.current = setTimeout(() => {
+      //     Animated.timing(animatedValue, {
+      //       toValue: -100,
+      //       duration: 500,
+      //       useNativeDriver: true,
+      //     }).start(() => setNotification(null));
+      //   }, 2000);
+      // }
     });
   }, [animatedValue, notification]);
 
@@ -184,7 +212,7 @@ const InAppNotifications = ({ navigation }) => {
                   setIsNotificationRequired(false);
                 },
               },
-            ]
+            ],
           );
         }
       }
@@ -219,30 +247,33 @@ const InAppNotifications = ({ navigation }) => {
   };
 
   const postRequestInAppNotification = async () => {
-    if(formatedData.optOut || formatedData.outageOptOut || formatedData.billingOptOutStatus){
-    checkNofif(true);
-  }
+    if (
+      formatedData.optOut ||
+      formatedData.outageOptOut ||
+      formatedData.billingOptOutStatus
+    ) {
+      checkNofif(true);
+    }
     const token = await getFcmToken();
     let user = await getUser();
     let deviceId = await getDeviceUniqueId();
     const accountNumber = user.userInfo?.accountNumber || null;
     const userName = user.userInfo?.userName || null;
 
-    
     setIsLoading(true);
     const requestData = {
-        accountNumber: accountNumber,
-        deviceToken: token || deviceId,
-        DeviceId: deviceId,
-        deviceTokenTimestamp: moment().format(),
-        isAndroid: Platform.OS === "android",
-        optOut: !formatedData.optOut,
-        outageOptOut: !formatedData.outageOptOut,
-        userName: userName,
-        billingOptOutStatus: !formatedData.billingOptOutStatus,
-        customerType: "Residential",
-      };
-      console.log("postRequestInAppNotification requestData", requestData);
+      accountNumber: accountNumber,
+      deviceToken: token || deviceId,
+      DeviceId: deviceId,
+      deviceTokenTimestamp: moment().format(),
+      isAndroid: Platform.OS === "android",
+      optOut: !formatedData.optOut,
+      outageOptOut: !formatedData.outageOptOut,
+      userName: userName,
+      billingOptOutStatus: !formatedData.billingOptOutStatus,
+      customerType: "Residential",
+    };
+    console.log("postRequestInAppNotification requestData", requestData);
     const requestUrl = `api/mobilenotificationpreferences/${userName}/mobilepreferences`;
     PostApiRequest(
       requestUrl,
@@ -268,7 +299,7 @@ const InAppNotifications = ({ navigation }) => {
         });
         //setShowErrorAlert(true);
         //navigation.navigate("Notifications", { updateFailed: true, failureMessage: "In-App Notifications update failed." });
-      }
+      },
     );
   };
 
@@ -297,20 +328,22 @@ const InAppNotifications = ({ navigation }) => {
                     transform: [{ translateY }],
                     paddingHorizontal: Padding.p_5xl,
                   }}
-                  accessible={true}
+                  accessible={false}
                 >
-                  <View style={styles.spaceBottom}>
+                  <View style={styles.spaceBottom} ref={messageRef}>
                     <NotificationAlert
                       type={notification.type}
                       title={
                         notification.type === "error" ? "Error" : "Success"
                       }
                       message={notification.message}
-                      showCloseIcon={false}
+                      showCloseIcon={true}
                       onClose={() => setNotification(null)}
                       accessibilityLiveRegion="assertive"
                       accessibilityRole="alert"
                       accessibilityLabel={notification.message}
+                      isVisible={true}
+                      autoFocusTitle={true}
                     />
                   </View>
                 </Animated.View>
@@ -323,6 +356,7 @@ const InAppNotifications = ({ navigation }) => {
                   message="Notifications updated failed."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowErrorAlert(false)}
                 />
               </View>
@@ -397,20 +431,19 @@ const InAppNotifications = ({ navigation }) => {
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
   <Pressable
     style={[styles.frameContainer, styles.frameBorder]}
-    accessible={true}
-    accessibilityRole="switch"
-    accessibilityState={{ checked: value }}
-    accessibilityLabel={`In-App Notifications for ${title}: ${value ? 'enabled' : 'disabled'}. ${description}`}
-    accessibilityHint="Double tap to toggle"
-    onPress={() => onChange({ target: { name, value: !value, type: 'toggle' } })}
+    accessible={false}
+    onPress={() =>
+      onChange({ target: { name, value: !value, type: "toggle" } })
+    }
   >
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
         <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
-          <Text 
-            style={styles.appointments} 
+          <Text
+            style={styles.appointments}
             accessible={true}
             accessibilityRole="text"
+            accessibilityLabel={`${title} for In-app notifications. ${description}`}
           >
             {title}
           </Text>
@@ -420,6 +453,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
               styles.receiveTypo,
               { marginTop: 8 },
             ]}
+            accessible={false}
           >
             {description}
           </Text>
@@ -430,10 +464,10 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
             name={name}
             initialValue={value}
             label={title}
+            description={description}
             onToggle={(e) => {
-              onChange({ target: { name, value: !value, type: 'toggle' } });
+              onChange({ target: { name, value: !value, type: "toggle" } });
             }}
-            accessible={false}
             section="inAppNotif"
           />
         </View>

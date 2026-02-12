@@ -50,7 +50,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
     const fulfillmentType = userData?.fulfillment_type?.toLowerCase();
 
     if (fulfillmentType === "professional install") {
-      const appointmentDate = moment(userData?.scheduled_date).format(DEFAULT_DATE_FORMAT);
+      const appointmentDate = moment(userData?.date_scheduled).format(DEFAULT_DATE_FORMAT);
       const timeSlot = getTimeSlotText(userData?.time_slot);
       return renderProfessionalInstall(appointmentDate, timeSlot);
     } else if (fulfillmentType === "self-install (shipped)") {

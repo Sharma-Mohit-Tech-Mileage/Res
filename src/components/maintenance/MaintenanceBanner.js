@@ -18,20 +18,20 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
         return {
           indicatorColor: Color.sparkLightRed,
           iconTint: Color.sparkLightRed,
-          titleStyle: { color: Color.sparkLightRed }
+          titleStyle: { color: Color.colorGray_200 }
         };
       case "warning":
         return {
           indicatorColor: Color.sparkLightInfo,
           iconTint: Color.sparkLightInfo,
-          titleStyle: { color: Color.sparkLightInfo }
+          titleStyle: { color: Color.colorGray_200 }
         };
       case "info":
       default:
         return {
           indicatorColor: "#0060AE", // Deep purple/blue color
           iconTint: "#0060AE", // Deep purple/blue color
-          titleStyle: { color: "#0060AE" } // Deep purple/blue color
+          titleStyle: { color: Color.colorGray_200 } // Deep purple/blue color
         };
     }
   };
@@ -72,7 +72,7 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
             </View>
             <Text 
               style={[styles.alertTitle, severityStyles.titleStyle]}
-              accessibilityRole='Header' accessibilityLevel={2} accessibilityHint="Header"
+              accessibilityRole='Header' accessibilityLevel={2} //accessibilityHint="Header"
               accessible={true}
             >
               {title}
@@ -122,7 +122,7 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
             accessibilityHint="Double tap to close this message"
             accessible={true}
           >
-            <CloseIcon color="#0060AE" />
+            <CloseIcon color="#000000" />
           </TouchableOpacity>
         </A11y.Index>
         )}

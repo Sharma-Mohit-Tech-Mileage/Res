@@ -219,6 +219,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
               message="Failed to load payment history. Please try again."
               onClose={handleCloseFetchError}
               isVisible={true}
+              autoFocusTitle={true}
             />
           )}
           
@@ -229,6 +230,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
               message="Failed to download receipt. Please try again."
               onClose={handleCloseDownloadError}
               isVisible={true}
+              autoFocusTitle={true}
             />
           )}
         </View>

@@ -32,6 +32,7 @@ import AppStyles from "../utility/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import RightIcon from "../../../assets/svgs/Chevonright";
+import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -126,6 +127,9 @@ const BillingScreen = ({ navigation }) => {
         iconAlignment="right"
         showIcon={false}
       />
+      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+      <ZendeskChatIcon />
+      </View>
       <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
@@ -144,7 +148,12 @@ const BillingScreen = ({ navigation }) => {
             <BillingIconWhite isSelected={false} />
           </View>
           <Text style={styles.melissaSmith}
-          accessibilityLabel="Billing Services screen"accessibilityRole='Header' accessibilityLevel={1} accessibilityHint="Header">Billing Services</Text>
+          accessibilityLabel="Billing Services" accessibilityRole='Header'
+           accessibilityLevel={1} 
+           nativeID="Billing Services-header"
+           //accessibilityHint="Header"
+           >
+          Billing Services</Text>
         </View>
 
         <ScrollView

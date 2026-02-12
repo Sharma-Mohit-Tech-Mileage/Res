@@ -17,12 +17,12 @@ import { Color, Padding } from "../../../GlobalStyles";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
-import { Env } from "../../network/apis/account/Constants";
+import { Env ,ISUAT} from "../../network/apis/account/Constants";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
-import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PostApiRequest,PostApiReqZendeskToken } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
@@ -35,19 +35,14 @@ import {
   requestUserPermission,
 } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
-import sign from "jwt-encode"; // npm method for signing JWT
-import ChatIcon from "../../res/svgIcons/ChatIcon";
 import VersionCheck from "react-native-version-check";
 import DeviceInfo from "react-native-device-info";
+import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
-import {
-  startChatWithConfig,
-  initChat,
-  startChat,
-  logoutZendesk,
-  loginWithJWT,
-  setConversationalFields,
-} from "../utility/RNZendeskChat";
+
+
+
+
 
 const NewBillerHome = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
@@ -89,6 +84,8 @@ const NewBillerHome = ({ navigation }) => {
         userInfo.daysSinceDisconnectDate
       )
     : false;
+
+  
 
   /* Function to check outage status */
   const checOutagStatus = () => {
@@ -267,6 +264,7 @@ const NewBillerHome = ({ navigation }) => {
       }
 
       const data = await response.json();
+      console.log("IP Address:", data.ip);
       return data.ip; // The IP address
     } catch (error) {
       console.error("Error fetching IP address:", error);
@@ -278,37 +276,15 @@ const NewBillerHome = ({ navigation }) => {
 
   const loginWithToken = async (userAgent, firstName, lastName) => {
     const user = await getUser();
-    //   const secret ="0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84"
-    //   // const secret =
-    //   //   (Platform.OS=='ios')?"JQ8sVOU9Hl3fnUf1gyt9xfRn9XVMZ44ilfSo5e3SnrutkSCXDmMVSdTOCVQMduayJwptKtfPrMNaUDz3LfzLxQ":"Rcmym7uJfKq-hqjXyhlC9y09AyPyw0K6Pt6cvqvBmR335YCChrSBS6rnSdEUT-9-YIIkSYS_AYU36ETkuCxnYA"
-    //   //data payload
-    //   const data = {
-    //     scope: "user",
-    //     external_id: user?.userInfo.accountNumber,
-    //     //email: defaultPaymentDetails.email || "",
-    //     //name: `${firstName} ${lastName}` || "",
-    //     //email_verified: true, // optional
-    //     // exp: new Date().getTime() + 3600 * 1000,
-    //   };
-    //   // header ID
-    //   const options = {
-    //     alg: "HS256",
-    //     typ: "JWT",
-    //     //kid: (Platform.OS=='ios')? "app_683930d35c8351994c5bff40":"app_683933455c8351994c6542b3",
-    //   };
-    //   const jwttoken = sign(data, secret, options);
-    //   console.log("request data for jwt", data);
-    //   console.log("request options for jwt", options);
-    //   console.log("Loggin jwt", jwttoken);
-    //  // loginWithJWT(jwttoken);
-    //   //loginWithJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA")
-
     let requestData = {
       accountNumber: user?.userInfo.accountNumber,
       userName: user?.userInfo.userName,
     };
 
-    PostApiRequest(
+    const IPAddress = await getIPAddress();
+
+    console.log("request data for zendesk jwt1", requestData);
+    PostApiReqZendeskToken(
       `api/Zendesk/TokenAuth`,
       requestData,
       (response) => {
@@ -317,18 +293,19 @@ const NewBillerHome = ({ navigation }) => {
           let jwtToken = response.jwt;
 
           const fields = {
+            isUAT: ISUAT,
             userAgent: userAgent,
             appVersion: VersionCheck.getCurrentVersion(),
             timezoneOffsetId: new Date().getTimezoneOffset().toString(),
             platform: Platform.OS,
             locationHrefId: Env.URL,
-            ipAddress: getIPAddress(),
+            ipAddress: IPAddress || "",
             accountNumber: user?.userInfo.accountNumber,
             email: defaultPaymentDetails.email || "",
             firstName: firstName || "",
             lastName: lastName || "",
-            name: `${firstName} ${lastName}` || "",
-            phone: "3",
+            name: '',
+            phone: "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
@@ -336,7 +313,7 @@ const NewBillerHome = ({ navigation }) => {
             mobileApp: "mobileApp",
             jwtId: jwtToken,
           };
-
+        
           loginWithJWT(jwtToken)
             .then(() => {
               console.log("Logged in to Zendesk Chat with JWT");
@@ -344,6 +321,7 @@ const NewBillerHome = ({ navigation }) => {
               setConversationalFields(fields);
             })
             .catch((error) => {
+              setConversationalFields(fields);
               console.error("Error logging in to Zendesk Chat:", error);
             });
         }
@@ -376,17 +354,7 @@ const NewBillerHome = ({ navigation }) => {
         <Logo width={120} height={33.32} />
       </View>
 
-      {true && <TouchableOpacity
-        onPress={() => {
-          if (Platform.OS === "ios") {
-            startChat();
-          } else {
-            startChatWithConfig({});
-          }
-        }}
-      >
-        <ChatIcon />
-      </TouchableOpacity>}
+      
     </View>
   );
 
@@ -460,6 +428,9 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
+      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+      <ZendeskChatIcon />
+      </View>
       <View style={{ flex: 1 }}>
         <SafeAreaView
           style={{ flex: 1 }}
@@ -468,7 +439,7 @@ const NewBillerHome = ({ navigation }) => {
           }
           accessibilityElementsHidden={isWalkthroughActive}
         >
-          {renderHeader()} 
+           {renderHeader()}  
            {/* <View
             accessibilityLabel="SparkLight"
             style={styles.headerContainer}
@@ -478,7 +449,7 @@ const NewBillerHome = ({ navigation }) => {
             accessibilityElementsHidden={isWalkthroughActive}
           >
             <Logo width={120} height={33.32} />
-          </View>  */}
+          </View>   */}
           <ScrollView style={styles.scrollContainer}>
             <View
               style={styles.mainContentContainer}

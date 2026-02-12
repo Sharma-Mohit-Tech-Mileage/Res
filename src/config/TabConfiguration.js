@@ -67,14 +67,9 @@ export const TABS = [
     },
 
     isVisible: (userInfo, featureFlags) => {
-      // if (!featureFlags?.enableServices) {
-      //   return false;
-      // }
-
-      // // Only show for active accounts
-      // if (userInfo?.acctStatus !== 'ACTIVE') {
-      //   return false;
-      // }
+      if (userInfo?.pending_activation === true) {
+        return false;
+      }
 
       return true;
     },
@@ -82,7 +77,7 @@ export const TABS = [
     walkthrough: {
       title: "Your services hub",
       description:
-        "Manage your internet plans, explore upgrades, and view all available services tailored to your needs.",
+        "Manage your internet plan and view all available services tailored to your needs.",
       iconName: "wifi",
     },
   },

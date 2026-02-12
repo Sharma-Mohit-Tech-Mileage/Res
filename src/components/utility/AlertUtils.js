@@ -31,24 +31,24 @@ export const AlertComponent = ({
       return {
         backgroundColor: "#FFFAEB",
         borderColor: "#DD6D02",
-        closeButtonColor: "#DD6D02",
-        titleColor: Color.colorGray_100
+        closeButtonColor: "#000000",
+        titleColor: Color.colorGray_200
       };
     } else if (indicatorColor === Color.sparklightGreen) {
       // App Update -> Info style (following user's specification)
       return {
         backgroundColor: "#F0F8FF",
         borderColor: "#0060AE",
-        closeButtonColor: "#0060AE",
-        titleColor: Color.colorGray_100
+        closeButtonColor: "#000000",
+        titleColor: Color.colorGray_200
       };
     } else {
       // Default to info colors for any other cases
       return {
         backgroundColor: "#F0F8FF",
         borderColor: "#0060AE",
-        closeButtonColor: "#0060AE",
-        titleColor: Color.colorGray_100
+        closeButtonColor: "#000000",
+        titleColor: Color.colorGray_200
       };
     }
   };
