@@ -409,7 +409,7 @@ const AccountOverview = () => {
           headerContainerStyle={{ backgroundColor: 'transparent' }}
           headerContentContainerStyle={{ backgroundColor: 'transparent' }}
           titleStyle={{ color: Color.sparklightWhite, fontSize: 20, fontWeight: '600' }}
-          
+          renderHeader={renderHeader()}
           parallaxHeight={180}
         >
           <View style={{ flex: 2 }}>
