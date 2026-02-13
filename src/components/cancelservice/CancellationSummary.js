@@ -884,6 +884,7 @@ const CancellationSummary = ({ navigation, route }) => {
                       : "#D0D5DD",
                 }}
                 accessible={false}
+                importantForAccessibility="no"
               />
               <Text
                 style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}

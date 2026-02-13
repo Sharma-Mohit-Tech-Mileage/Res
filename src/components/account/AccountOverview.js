@@ -329,7 +329,7 @@ const AccountOverview = () => {
                   </Text>
                 </Pressable>
 
-                <Text style={styles.linkStyle} accessible={false}> | </Text>
+                <Text style={styles.linkStyle} accessible={false} importantForAccessibility="no"> | </Text>
 
                 <Pressable
                   accessible={true}

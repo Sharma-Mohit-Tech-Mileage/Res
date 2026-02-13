@@ -249,6 +249,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
               onChangeText={handleSearchChange}
               placeholderTextColor={Color.sparklightGray1}
               accessible={false}
+              importantForAccessibility="no"
             />
             </View>
           </View>

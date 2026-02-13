@@ -194,7 +194,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         console.log(`Page loaded in: ${loadTime}ms (${(loadTime/1000).toFixed(2)}s)`);
         
         // Announce content loaded for accessibility
-        AccessibilityInfo.announceForAccessibility("Content loaded");
+        //AccessibilityInfo.announceForAccessibility("Content loaded");
     }, [loadStartTime]);
 
     const onError = useCallback((syntheticEvent) => {
@@ -320,7 +320,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             {progress < 1 ? (
                 <View style={styles.progressBar} ref={mainViewRef}
          accessible={true}
-                    accessibilityLabel={loading ? `${name} content loading` : `${name} content loaded`}
+                    accessibilityLabel={`${name} content loading` }
                     accessibilityLiveRegion="polite"
                     accessibilityRole="text">
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />

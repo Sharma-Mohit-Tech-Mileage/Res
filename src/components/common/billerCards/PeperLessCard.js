@@ -20,6 +20,7 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
       onPress={handleCardPress}
       activeOpacity={0.8}
       accessible={false}
+      importantForAccessibility="no"
       
     >
       <View

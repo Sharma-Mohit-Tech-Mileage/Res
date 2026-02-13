@@ -69,7 +69,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
         accessibilityLabel={`Your appointment is scheduled for ${scheduledDate} from ${timeSlot}. `}
         accessibilityRole="text"
       >
-        <Text style={styles.subText} accessible={false}>
+        <Text style={styles.subText} accessible={false} importantForAccessibility="no">
           {`Your appointment is scheduled for ${scheduledDate} from ${timeSlot}. `}
         </Text>
       </View>
@@ -88,7 +88,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
           >
             877-692-2253
           </Text>
-          <Text style={styles.subText} accessible={false}>
+          <Text style={styles.subText} accessible={false} importantForAccessibility="no">
             .
           </Text>
         </Text>
@@ -136,7 +136,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
         >
           877-692-2253
         </Text>
-        <Text style={styles.subText} accessible={false}>
+        <Text style={styles.subText} accessible={false} importantForAccessibility="no">
           .
         </Text>
       </View>
@@ -167,7 +167,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
         >
           877-692-2253
         </Text>
-        <Text style={styles.subText} accessible={false}>
+        <Text style={styles.subText} accessible={false} importantForAccessibility="no">
           .
         </Text>
       </View>

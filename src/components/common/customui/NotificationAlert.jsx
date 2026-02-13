@@ -514,6 +514,7 @@ const NotificationAlert = ({
       <View
         ref={containerRef}
         accessible={false}
+          importantForAccessibility="no"
         style={[
           styles.container,
           {

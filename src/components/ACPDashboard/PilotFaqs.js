@@ -16,7 +16,7 @@ const PilotFaqs = () => {
         accessible={true}
         accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
       >
-        <Text style={styles.title} accessible={false}>
+        <Text style={styles.title} accessible={false} importantForAccessibility="no">
           Service Activation
         </Text>
       </View>

@@ -86,6 +86,9 @@ const SparkLightInput = React.forwardRef(({
           try {
             setErrorFocus();
             AccessibilityInfo.announceForAccessibility(error);
+            //if (inputRef.current) {
+              inputRef.current?.focus();
+            //}
           } catch (e) {
             console.log("Accessibility focus error:", e);
           }
@@ -181,11 +184,10 @@ function formatUsPhone(input) {
   }
 
   // Must be exactly 10 digits now
-  if (digits.length !== 10) return input;
-
+  if (digits.length !== 11) return input;
   const area = digits.substring(0, 3);
   const middle = digits.substring(3, 6);
-  const last = digits.substring(6, 10);
+  const last = digits.substring(6, 11);
 
   const formatted = `(${area}) ${middle}-${last}`;
 

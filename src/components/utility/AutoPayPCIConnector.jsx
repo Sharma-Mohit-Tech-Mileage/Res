@@ -393,7 +393,7 @@ const navigationChange = async (navState) => {
          accessible={true}
                     accessibilityLabel={loading ? `${name} content loading` : `${name} content loaded`}
                     accessibilityLiveRegion="polite"
-                    accessibilityRole="main" >
+                    accessibilityRole="text" >
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
             )}

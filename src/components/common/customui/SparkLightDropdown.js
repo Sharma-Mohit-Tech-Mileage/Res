@@ -85,7 +85,7 @@ const SparkLightDropdown = ({
         accessibilityHint={`Open ${accessibilityItemName} options`}
         accessibilityState={Platform.OS === 'android' ? undefined : { expanded: visible }}
       >
-        <Text style={styles.dropdownText} accessible={false}>
+        <Text style={styles.dropdownText} accessible={false} importantForAccessibility="no">
           {selectedValue || placeholder}
         </Text>
         <DownArrow/>
@@ -113,7 +113,7 @@ const SparkLightDropdown = ({
             importantForAccessibility="yes"
           >
             <View style={styles.header}>
-              <View style={styles.grabber} accessible={false} />
+              <View style={styles.grabber} accessible={false} importantForAccessibility="no" />
               <View style={styles.headerContent}>
                 <Text 
                   style={styles.headerTitle}
@@ -130,7 +130,7 @@ const SparkLightDropdown = ({
                   accessibilityRole="button"
                   accessibilityLabel="Close dropdown"
                 >
-                  <Text style={styles.closeButtonText} accessible={false}>✕</Text>
+                  <Text style={styles.closeButtonText} accessible={false} importantForAccessibility="no">✕</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -161,7 +161,7 @@ const SparkLightDropdown = ({
                     {item}
                   </Text>
                   {selectedValue === item && (
-                    <Text style={styles.checkmark} accessible={false}>✓</Text>
+                    <Text style={styles.checkmark} accessible={false} importantForAccessibility="no">✓</Text>
                   )}
                 </TouchableOpacity>
               ))}

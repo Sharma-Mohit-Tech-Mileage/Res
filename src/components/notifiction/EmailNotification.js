@@ -289,6 +289,7 @@ const AddNotificationScreen = () => {
                   paddingHorizontal: Padding.p_5xl,
                 }}
                 accessible={false}
+                importantForAccessibility="no"
               >
                 <View style={styles.spaceBottom} ref={messageRef} >
                   <NotificationAlert
@@ -380,7 +381,7 @@ const AddNotificationScreen = () => {
                   Critical Notifications
                 </Text>
                 <View style={[styles.iconContainer, { flex: 0.14 }]}>
-                  <View style={styles.icon} accessible={false}>
+                  <View style={styles.icon} accessible={false} importantForAccessibility="no">
                     {primaryEmail ? (
                       <SuccessIcon />
                     ) : (
@@ -388,12 +389,12 @@ const AddNotificationScreen = () => {
                     )}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
-                  <Text style={styles.toggleStatus} accessible={false}>
+                  <Text style={styles.toggleStatus} accessible={false} importantForAccessibility="no">
                     {primaryEmail ? "On" : "Off"}
                   </Text>
                 </View>
               </View>
-              <Text style={styles.toggleDescription} accessible={false}>
+              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
                 Receive critical information, account changes, and service
                 updates.
               </Text>
@@ -416,7 +417,7 @@ const AddNotificationScreen = () => {
                   Paperless Billing
                 </Text>
                 </A11y.Index>
-                <View style={{ flex: 0.1 }} accessible={false}>
+                <View style={{ flex: 0.1 }} accessible={false} importantForAccessibility="no">
                   <A11y.Index index={1}>
                   <Toggle
                     name="paperlessBilling"
@@ -429,7 +430,7 @@ const AddNotificationScreen = () => {
                   </A11y.Index>
                 </View>
               </View>
-              <Text style={styles.toggleDescription} accessible={false}>
+              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
                 Opt for email statements and say goodbye to paper clutter. It's
                 convenient, eco-friendly, and keeps your information at your
                 fingertips.
@@ -458,6 +459,7 @@ const AddNotificationScreen = () => {
                         false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
                       }}
                       accessible={false}
+                      importantForAccessibility="no"
                     />
                     <Text
                       style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}

@@ -110,8 +110,7 @@ const ChangePassword = () => {
       const body = { newPassword };
 
       setLoading(true);
-      inputRef.current?.focus();
-
+  
       // Call the PUT API request
       PutApiRequest(
         request,

@@ -72,7 +72,7 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
                     >
                       
                       <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
-                          accessible={false}>
+                          accessible={false} importantForAccessibility="no">
                          <Xclose/>
                       </View>
                     </Pressable>
@@ -90,7 +90,7 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
                     >
                         
                         <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
-                          accessible={false}>
+                          accessible={false} importantForAccessibility="no">
                          <Share color={'#FFF'}/>
                       </View>
                     </Pressable>                 

@@ -58,6 +58,7 @@ const ThumbsUp = () => {
               entering={BounceIn.delay(300).springify()}
               style={styles.containerImage}
               accessible={false}
+              importantForAccessibility="no"
             >
               <ThumbsupIcon />
             </Animated.View>
