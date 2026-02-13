@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { AccessibilityInfo } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
@@ -223,39 +224,38 @@ const Feedback = () => {
             <Controller
               control={control}
               name="feedbackText"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <>
-                  <SparkLightInput
-                    label="Additional Feedback *"
-                    textAlignVertical="top"
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    value={value}
-                    multiline={true}
-                    maxLength={500}
-                    height={130}
-                    error={errors.feedbackText?.message}
-                    accessibilityLabel="Additional Feedback required"
-                  />
-                  {/* Visually hidden live region for screen reader announcements */}
-                  <Text
-                    style={{position: 'absolute', left: -10000, width: 1, height: 1}}
-                    accessibilityRole="text"
-                    accessibilityLiveRegion="polite"
-                    accessibilityLabel={`You have ${500 - (value?.length || 0)} characters available`}
-                  >
-                    {`You have ${500 - (value?.length || 0)} characters available`}
-                  </Text>
-                  <Text
-                    style={styles.charCount}
-                    accessibilityRole="text"
-                    accessibilityLiveRegion="polite"
-                    accessibilityLabel={`You have ${500 - (value?.length || 0)} characters available`}
-                  >
-                    {`${value?.length || 0}/500`}
-                  </Text>
-                </>
-              )}
+              render={({ field: { onChange, onBlur, value } }) => {
+                const handleChange = (text) => {
+                  onChange(text);
+                  AccessibilityInfo.announceForAccessibility(
+                    `You have ${500 - (text.length || 0)} characters available`
+                  );
+                };
+                return (
+                  <>
+                    <SparkLightInput
+                      label="Additional Feedback *"
+                      textAlignVertical="top"
+                      onChangeText={handleChange}
+                      onBlur={onBlur}
+                      value={value}
+                      multiline={true}
+                      maxLength={500}
+                      height={130}
+                      error={errors.feedbackText?.message}
+                      accessibilityLabel="Additional Feedback required"
+                    />
+                    <Text
+                      style={styles.charCount}
+                      accessibilityRole="text"
+                      accessibilityLiveRegion="polite"
+                      accessibilityLabel={`You have ${500 - (value?.length || 0)} characters available`}
+                    >
+                      {`${value?.length || 0}/500`}
+                    </Text>
+                  </>
+                );
+              }}
             />
           </Animated.View>
 
