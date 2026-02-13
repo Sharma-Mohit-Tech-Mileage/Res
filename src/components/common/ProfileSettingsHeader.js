@@ -4,9 +4,7 @@ import {
   Text,
   StatusBar,
   Pressable,
-  Image,
   StyleSheet,
-  AccessibilityInfo,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
@@ -22,10 +20,16 @@ const ProfileSettingsHeader = ({
   showIcon = true,
 }) => {
   const [iconPressed, setIconPressed] = useState(false);
+  const IconComponent = iconSource || LeftIcon;
+
+  const handleBackPress = () => {
+    if (typeof onPressBack === "function") {
+      onPressBack();
+    }
+  };
 
   const handlePressIn = () => {
     setIconPressed(true);
-    AccessibilityInfo.announceForAccessibility("Back button pressed");
   };
 
   const handlePressOut = () => {
@@ -52,11 +56,20 @@ const ProfileSettingsHeader = ({
               <View style={[styles.buttonContainer, { flex: 1 }]}>
                 <Pressable
                   style={[styles.pressable]}
-                  onPress={onPressBack}
+                  onPress={handleBackPress}
+                  onAccessibilityTap={handleBackPress}
+                  onAccessibilityAction={({ nativeEvent }) => {
+                    if (nativeEvent.actionName === "activate") {
+                      handleBackPress();
+                    }
+                  }}
                   accessible={true}
+                  focusable={true}
                   accessibilityLabel="Back"
                   accessibilityHint="Returns to the previous screen"
                   accessibilityRole="button"
+                  accessibilityActions={[{ name: "activate", label: "Go back" }]}
+                  accessibilityState={{ disabled: typeof onPressBack !== "function" }}
                   hitSlop={{ top: 60, bottom: 60, left: 60, right: 60 }}
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
@@ -67,8 +80,11 @@ const ProfileSettingsHeader = ({
                       styles.icon,
                       iconPressed ? styles.iconPressed : null,
                     ]}
+                    accessible={false}
+                    accessibilityElementsHidden={true}
+                    importantForAccessibility="no-hide-descendants"
                   >
-                    <LeftIcon />
+                    <IconComponent accessible={false} />
                   </View>
                 </Pressable>
               </View>

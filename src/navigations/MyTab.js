@@ -73,7 +73,7 @@ const getIconComponent = (tabId, focused) => {
   const home = useSelector((state) => state.home);
   
   // Hardcode walkthrough as active for testing
-  const [showWalkthrough, setShowWalkthrough] = useState(true);
+  const [showWalkthrough, setShowWalkthrough] = useState(false);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
 
@@ -83,7 +83,7 @@ const getIconComponent = (tabId, focused) => {
   );
 
   // Hardcode walkthrough as active for testing
-  const isWalkthroughActive = true;
+  const isWalkthroughActive = false;
 
   const isTabAccessible = useCallback(
     (tabIndex) => {
