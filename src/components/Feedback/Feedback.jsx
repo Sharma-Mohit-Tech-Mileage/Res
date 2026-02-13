@@ -237,12 +237,20 @@ const Feedback = () => {
                     error={errors.feedbackText?.message}
                     accessibilityLabel="Additional Feedback required"
                   />
+                  {/* Visually hidden live region for screen reader announcements */}
+                  <Text
+                    style={{position: 'absolute', left: -10000, width: 1, height: 1}}
+                    accessibilityRole="text"
+                    accessibilityLiveRegion="polite"
+                    accessibilityLabel={`You have ${500 - (value?.length || 0)} characters available`}
+                  >
+                    {`You have ${500 - (value?.length || 0)} characters available`}
+                  </Text>
                   <Text
                     style={styles.charCount}
                     accessibilityRole="text"
-                    accessibilityLabel={`Character count: ${
-                      value?.length || 0
-                    } out of 500`}
+                    accessibilityLiveRegion="polite"
+                    accessibilityLabel={`You have ${500 - (value?.length || 0)} characters available`}
                   >
                     {`${value?.length || 0}/500`}
                   </Text>
