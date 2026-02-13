@@ -6,7 +6,7 @@
 
 @implementation RNZendeskChatModule
 
-static const BOOL ISUAT = NO; // Set to YES for UAT, NO for Production
+static const BOOL ISUAT = YES; // Set to YES for UAT, NO for Production
 
 RCT_EXPORT_MODULE(RNZendeskChatModule);
 

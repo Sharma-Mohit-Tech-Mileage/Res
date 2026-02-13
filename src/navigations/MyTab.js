@@ -72,7 +72,8 @@ const getIconComponent = (tabId, focused) => {
   const visibleTabs = useVisibleTabs();
   const home = useSelector((state) => state.home);
   
-  const [showWalkthrough, setShowWalkthrough] = useState(false);
+  // Hardcode walkthrough as active for testing
+  const [showWalkthrough, setShowWalkthrough] = useState(true);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
 
@@ -81,12 +82,8 @@ const getIconComponent = (tabId, focused) => {
     [insets.bottom]
   );
 
-  const isWalkthroughActive = useMemo(
-    () => showWalkthrough && 
-           home.walkThroughStep !== null && 
-           home.walkThroughStep !== undefined,
-    [showWalkthrough, home.walkThroughStep]
-  );
+  // Hardcode walkthrough as active for testing
+  const isWalkthroughActive = true;
 
   const isTabAccessible = useCallback(
     (tabIndex) => {
@@ -260,25 +257,32 @@ const createTabBarButton = useCallback(
         />
       )}
 
-      <Tab.Navigator
-        initialRouteName="Home"
-        screenOptions={screenOptions}
+      <View
+        accessible={isWalkthroughActive}
+        accessibilityElementsHidden={isWalkthroughActive}
+        //importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "yes"}
+        style={{ flex: 1 }}
       >
-        {visibleTabs.map((tab,index) => (
-          <Tab.Screen
-            key={tab.id}
-            name={tab.screenName}
-            component={getComponent(tab.component)}
-            initialParams={{ data: route }}
-            options={{
-              tabBarLabel: tab.name,
-              tabBarAccessibilityLabel: `${tab.name} tab, step ${index + 1} of ${visibleTabs.length}`,
-              tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
-            }}
-            listeners={createTabListeners(tab)}
-          />
-        ))}
-      </Tab.Navigator>
+        <Tab.Navigator
+          initialRouteName="Home"
+          screenOptions={screenOptions}
+        >
+          {visibleTabs.map((tab,index) => (
+            <Tab.Screen
+              key={tab.id}
+              name={tab.screenName}
+              component={getComponent(tab.component)}
+              initialParams={{ data: route }}
+              options={{      
+                tabBarLabel: tab.name,
+                tabBarAccessibilityLabel: `${tab.name} tab, step ${index + 1} of ${visibleTabs.length}`,
+                tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
+              }}
+              listeners={createTabListeners(tab)}
+            />
+          ))}
+        </Tab.Navigator>
+      </View>
     </>
   );
 };
