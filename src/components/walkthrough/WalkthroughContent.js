@@ -59,15 +59,16 @@ const WalkthroughContent = ({
   const isLastStep = currentStep === totalSteps - 1;
 
   return (
-    <View style={styles.bubble}>
+    <View style={styles.bubble} accessible={false}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.stepInfo}>
+      <View style={styles.header} accessible={false}>
+        <View style={styles.stepInfo} accessible={false}>
           <Animated.View
             style={[styles.iconCircle, { transform: [{ scale: pulseAnim }] }]}
             accessible={true}
             accessibilityLabel={`${tab.name} tab icon`}
-             ref={titleRef}
+            accessibilityRole="text"
+            ref={titleRef}
           >
             <LinearGradient
               colors={["#edf1f4", "#edf1f4"]}
@@ -78,7 +79,12 @@ const WalkthroughContent = ({
               <Icon name={walkthrough.iconName} size={25} color="#FFFFFF" />
             </LinearGradient>
           </Animated.View>
-          <Text style={styles.stepText}>
+          <Text
+            style={styles.stepText}
+            accessible={true}
+            accessibilityRole="text"
+            accessibilityLabel={`Step ${currentStep + 1} of ${totalSteps}`}
+          >
             {" "}
             Step {currentStep + 1} of {totalSteps}{" "}
           </Text>
@@ -95,7 +101,7 @@ const WalkthroughContent = ({
       </View>
 
       {/* Content */}
-      <View style={styles.content}>
+      <View style={styles.content} accessible={false}>
         <Text
           style={styles.title}
           accessible={true}
@@ -113,13 +119,13 @@ const WalkthroughContent = ({
       </View>
 
       {/* Footer */}
-      <View style={styles.footer}>
+      <View style={styles.footer} accessible={false}>
         <WalkthroughProgress
           totalSteps={totalSteps}
           currentStep={currentStep}
         />
 
-        <View style={styles.actions}>
+        <View style={styles.actions} accessible={false}>
           <LinearGradient
             colors={["#353091", "#353091"]}
             start={{ x: 0, y: 0 }}

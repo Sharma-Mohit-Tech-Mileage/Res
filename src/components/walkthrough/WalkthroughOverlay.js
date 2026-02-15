@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, Animated, Easing, Dimensions } from "react-native";
+import { StyleSheet, Animated, Easing, Dimensions, Platform } from "react-native";
 import { useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import WalkthroughContent from "./WalkthroughContent";
@@ -232,7 +232,8 @@ const WalkthroughOverlay = ({
             transform: [{ translateY: bubbleSlide }],
           },
         ]}
-        accessibilityViewIsModal={Platform.OS === "android"}
+        accessibilityViewIsModal={true}
+        accessible={false}
         importantForAccessibility="yes"
       >
         <WalkthroughContent

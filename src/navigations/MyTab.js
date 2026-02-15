@@ -26,6 +26,12 @@ const TAB_BAR_HEIGHT = {
   ANDROID_MIN: 55,
   ANDROID_PADDING: 60,
 };
+
+// Hardcoded walkthrough mode for testing.
+// Set to false to restore normal Redux-driven behavior.
+const HARD_CODE_WALKTHROUGH_FOR_TESTING = true;
+const HARD_CODE_WALKTHROUGH_STEP_FOR_TESTING = 0;
+
 const calculateTabBarHeight = (insets) => {
   return Platform.OS === "ios"
     ? TAB_BAR_HEIGHT.IOS
@@ -72,8 +78,9 @@ const getIconComponent = (tabId, focused) => {
   const visibleTabs = useVisibleTabs();
   const home = useSelector((state) => state.home);
   
-  // Hardcode walkthrough as active for testing
-  const [showWalkthrough, setShowWalkthrough] = useState(false);
+  const [showWalkthrough, setShowWalkthrough] = useState(
+    HARD_CODE_WALKTHROUGH_FOR_TESTING
+  );
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
 
@@ -82,18 +89,29 @@ const getIconComponent = (tabId, focused) => {
     [insets.bottom]
   );
 
-  // Hardcode walkthrough as active for testing
-  const isWalkthroughActive = false;
+  const walkthroughStep = useMemo(() => {
+    if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
+      return home.walkThroughStep;
+    }
+
+    if (HARD_CODE_WALKTHROUGH_FOR_TESTING) {
+      return HARD_CODE_WALKTHROUGH_STEP_FOR_TESTING;
+    }
+
+    return null;
+  }, [home.walkThroughStep]);
+
+  const isWalkthroughActive =
+    showWalkthrough &&
+    walkthroughStep !== null &&
+    walkthroughStep !== undefined;
 
   const isTabAccessible = useCallback(
     (tabIndex) => {
-      if (!showWalkthrough) return true;
-      if (home.walkThroughStep === null || home.walkThroughStep === undefined) {
-        return true;
-      }
-      return home.walkThroughStep === tabIndex;
+      if (!isWalkthroughActive) return true;
+      return walkthroughStep === tabIndex;
     },
-    [showWalkthrough, home.walkThroughStep]
+    [isWalkthroughActive, walkthroughStep]
   );
 
  
@@ -112,60 +130,51 @@ const getIconComponent = (tabId, focused) => {
   );
 
 const createTabBarButton = useCallback(
-  (props) => {
-    const tab = visibleTabs.find(
-      (t) => t.screenName === props.to?.split("/").pop()
-    );
-    
+  (props, tab) => {
     if (!tab) {
       return <Pressable {...props} />;
     }
-    
+
     const isAccessible = isTabAccessible(tab.index);
-    const shouldPreventPress = !isAccessible && 
-      (isScreenReaderEnabled || isWalkthroughActive);
+    const hideFromAccessibility =
+      isScreenReaderEnabled && isWalkthroughActive && !isAccessible;
+    const shouldPreventPress = isWalkthroughActive && !isAccessible;
 
     return (
       <Pressable
         {...props}
-        accessible={isAccessible && !isWalkthroughActive}
-        importantForAccessibility={
-          !isAccessible || isWalkthroughActive 
-            ? "no-hide-descendants" 
-            : "yes"
-        }
-        accessibilityElementsHidden={!isAccessible || isWalkthroughActive}
+        accessible={!hideFromAccessibility}
+        importantForAccessibility={hideFromAccessibility ? "no-hide-descendants" : "yes"}
+        accessibilityElementsHidden={hideFromAccessibility}
         accessibilityLabel={`${tab.name} tab`}
         accessibilityRole="tab"
         accessibilityState={{
-          disabled: !isAccessible,
+          ...props.accessibilityState,
+          disabled: shouldPreventPress || props.accessibilityState?.disabled,
         }}
         style={[
           props.style,
-          !isAccessible && styles.disabledTab,
+          shouldPreventPress && styles.disabledTab,
         ]}
-        pointerEvents={!isAccessible && isWalkthroughActive ? "none" : "auto"}
+        pointerEvents={shouldPreventPress ? "none" : "auto"}
         onPress={(e) => {
-          if (isWalkthroughActive || shouldPreventPress) {
+          if (shouldPreventPress) {
             e.preventDefault();
             return;
           }
-          props.onPress(e);
+          props.onPress?.(e);
         }}
       />
     );
   },
-  [visibleTabs, isTabAccessible, isScreenReaderEnabled, isWalkthroughActive]
+  [isTabAccessible, isScreenReaderEnabled, isWalkthroughActive]
 );
 
 
   const createTabListeners = useCallback(
     (tab) => ({ navigation }) => ({
       tabPress: (e) => {
-        if (
-          !isTabAccessible(tab.index) &&
-          (isScreenReaderEnabled || isWalkthroughActive)
-        ) {
+        if (isWalkthroughActive && !isTabAccessible(tab.index)) {
           e.preventDefault();
           return;
         }
@@ -179,18 +188,18 @@ const createTabBarButton = useCallback(
         }
       },
     }),
-    [isTabAccessible, isScreenReaderEnabled, isWalkthroughActive]
+    [isTabAccessible, isWalkthroughActive]
   );
 
 
   useEffect(() => {
-    const initWalkthrough = async () => {
-      if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
-        setShowWalkthrough(true);
-      }
-    };
-    
-    initWalkthrough();
+    if (HARD_CODE_WALKTHROUGH_FOR_TESTING) {
+      return;
+    }
+
+    setShowWalkthrough(
+      home.walkThroughStep !== null && home.walkThroughStep !== undefined
+    );
   }, [home.walkThroughStep]);
 
  
@@ -239,10 +248,10 @@ const createTabBarButton = useCallback(
       },
       headerShown: false,
       swipeEnabled: false,
-      tabBarButton: createTabBarButton,
-      tabBarAccessibilityLabel: isWalkthroughActive ? undefined : "Navigation tabs",
+      tabBarAccessibilityLabel:
+        isWalkthroughActive && isScreenReaderEnabled ? undefined : "Navigation tabs",
     }),
-    [tabBarHeight, createTabBarButton, isWalkthroughActive]
+    [tabBarHeight, isWalkthroughActive, isScreenReaderEnabled]
   );
 
 
@@ -257,15 +266,7 @@ const createTabBarButton = useCallback(
         />
       )}
 
-
-     { (isScreenReaderEnabled && showWalkthrough )? (
-      <View
-        accessible={isWalkthroughActive}
-        accessibilityElementsHidden={isWalkthroughActive}
-        importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "yes"}
-        style={{ flex: 1 }}
-      >
-        <Tab.Navigator
+      <Tab.Navigator
           initialRouteName="Home"
           screenOptions={screenOptions}
         >
@@ -279,33 +280,12 @@ const createTabBarButton = useCallback(
                 tabBarLabel: tab.name,
                 tabBarAccessibilityLabel: `${tab.name} tab, step ${index + 1} of ${visibleTabs.length}`,
                 tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
+                tabBarButton: (props) => createTabBarButton(props, tab),
               }}
               listeners={createTabListeners(tab)}
             />
           ))}
         </Tab.Navigator>
-      </View>
-      ):(
-          <Tab.Navigator
-          initialRouteName="Home"
-          screenOptions={screenOptions}
-        >
-          {visibleTabs.map((tab,index) => (
-            <Tab.Screen
-              key={tab.id}
-              name={tab.screenName}
-              component={getComponent(tab.component)}
-              initialParams={{ data: route }}
-              options={{      
-                tabBarLabel: tab.name,
-                tabBarAccessibilityLabel: `${tab.name} tab, step ${index + 1} of ${visibleTabs.length}`,
-                tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
-              }}
-              listeners={createTabListeners(tab)}
-            />
-          ))}
-        </Tab.Navigator>
-      )}
     </>
   );
 };
