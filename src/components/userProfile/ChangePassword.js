@@ -86,27 +86,7 @@ const ChangePassword = () => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
   }, []);
 
-  // Focus on error icon when error alert is shown
-  useEffect(() => {
-    if (showErrorAlert && screenReaderEnabled) {
-      const t = setTimeout(() => {
-        try {
-          if (errorIconRef.current) {
-            const handle = findNodeHandle(errorIconRef.current);
-            if (handle) {
-              AccessibilityInfo.setAccessibilityFocus(handle);
-              AccessibilityInfo.announceForAccessibility("Error icon");
-            }
-          }
-        } catch (e) {
-          console.log("Accessibility focus error:", e);
-        }
-      }, 300);
-
-      return () => clearTimeout(t);
-    }
-  }, [showErrorAlert, screenReaderEnabled]);
-
+  
   // Focus on validation icon when validation alert is shown
   useEffect(() => {
     if (showValidationAlert && screenReaderEnabled) {

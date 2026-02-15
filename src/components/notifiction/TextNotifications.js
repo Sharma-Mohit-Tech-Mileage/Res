@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   Platform,
   AccessibilityInfo,
-  findNodeHandle,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -102,7 +101,6 @@ const TextNotifications = ({ navigation }) => {
 
   const [errorRef, setErrorFocus] = useAccessibilityFocus();
   const [successRef, setSuccessFocus] = useAccessibilityFocus();
-  const iconRef = useRef(null);
   useEffect(() => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
   }, []);
@@ -246,29 +244,6 @@ const TextNotifications = ({ navigation }) => {
     }
   }, [notification, animateNotification]);
 
-  // Set focus on icon when notification appears
-  useEffect(() => {
-    if (notification && screenReaderEnabled) {
-      const t = setTimeout(() => {
-        try {
-          if (iconRef.current) {
-            const handle = findNodeHandle(iconRef.current);
-            if (handle) {
-              AccessibilityInfo.setAccessibilityFocus(handle);
-              // Announce only the icon label
-              const iconLabel = notification.type === "error" ? "Error icon" : "Success icon";
-              AccessibilityInfo.announceForAccessibility(iconLabel);
-            }
-          }
-        } catch (e) {
-          console.log("Accessibility focus error:", e);
-        }
-      }, 600);
-
-      return () => clearTimeout(t);
-    }
-  }, [notification, screenReaderEnabled]);
-
   const onSubmit = () => {
     formatedData["phoneNumber"] = getValues("phoneNumber");
     Keyboard.dismiss();
@@ -367,7 +342,6 @@ const TextNotifications = ({ navigation }) => {
                   paddingHorizontal: Padding.p_5xl,
                 }}
                 accessible={false}
-                importantForAccessibility="no"
               >
                 <View style={styles.spaceBottom} ref={notification.type === "error" ? errorRef : successRef}>
                   <NotificationAlert
@@ -381,7 +355,6 @@ const TextNotifications = ({ navigation }) => {
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"
                     accessibilityLabel={notification.message}
-                    iconRef={iconRef}
                   />
                 </View>
               </Animated.View>
@@ -530,7 +503,6 @@ const TextNotifications = ({ navigation }) => {
                           false: isTermRequired? "#EF4E3E": "#D0D5DD",
                         }}
                         accessible={false}
-                        importantForAccessibility="no"
                       />
                       <Text
                         style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
@@ -636,8 +608,6 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
               { marginTop: 8 },
             ]}
             accessible={false}
-            importantForAccessibility="no"
-            accessibilityLabel={description}
           >
             {description}
           </Text>

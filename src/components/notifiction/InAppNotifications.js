@@ -11,7 +11,6 @@ import {
   Linking,
   Alert,
   AccessibilityInfo,
-  findNodeHandle,
 } from "react-native";
 import {
   Color,
@@ -57,7 +56,6 @@ const InAppNotifications = ({ navigation }) => {
   const [isNotificationRquired, setIsNotificationRequired] = useState(false);
   const [notification, setNotification] = useState(null);
   const [messageRef, setMessageFocus] = useAccessibilityFocus();
-  const iconRef = useRef(null);
   const formatedData = route.params?.additionalData || {};
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
 
@@ -69,18 +67,11 @@ const InAppNotifications = ({ navigation }) => {
   
     useEffect(() => {
       if (notification && screenReaderEnabled) {
-        // After the animation, set focus on the icon and announce only the icon
+        // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
         const t = setTimeout(() => {
           try {
-            if (iconRef.current) {
-              const handle = findNodeHandle(iconRef.current);
-              if (handle) {
-                AccessibilityInfo.setAccessibilityFocus(handle);
-                // Announce only the icon label
-                const iconLabel = notification.type === "error" ? "Error icon" : "Success icon";
-                AccessibilityInfo.announceForAccessibility(iconLabel);
-              }
-            }
+            setMessageFocus();
+            AccessibilityInfo.announceForAccessibility(notification.message);
           } catch (e) {
             console.log("Accessibility focus error:", e);
           }
@@ -338,7 +329,6 @@ const InAppNotifications = ({ navigation }) => {
                     paddingHorizontal: Padding.p_5xl,
                   }}
                   accessible={false}
-                  importantForAccessibility="no"
                 >
                   <View style={styles.spaceBottom} ref={messageRef}>
                     <NotificationAlert
@@ -354,7 +344,6 @@ const InAppNotifications = ({ navigation }) => {
                       accessibilityLabel={notification.message}
                       isVisible={true}
                       autoFocusTitle={true}
-                      iconRef={iconRef}
                     />
                   </View>
                 </Animated.View>
@@ -443,7 +432,6 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
   <Pressable
     style={[styles.frameContainer, styles.frameBorder]}
     accessible={false}
-    importantForAccessibility="no"
     onPress={() =>
       onChange({ target: { name, value: !value, type: "toggle" } })
     }
@@ -466,7 +454,6 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
               { marginTop: 8 },
             ]}
             accessible={false}
-            importantForAccessibility="no"
           >
             {description}
           </Text>
