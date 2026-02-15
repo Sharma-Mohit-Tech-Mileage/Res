@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StyleSheet, Text, Pressable, View, ScrollView, AccessibilityInfo } from "react-native";
+import { StyleSheet, Text, Pressable, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import { securityQuestions } from "../utility/constant";
@@ -34,6 +34,8 @@ const PasswordSecurityEdit = () => {
   const [loadingTxt, setLoadingTxt] = useState("Please wait...");
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const [dropdownFocused, setDropdownFocused] = useState(false);
+  const errorIconRef = useRef(null);
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const [securityQuestionsNew, setSecurityQuestionsNew] = useState(securityQuestions);
 
   const profile = useSelector(state => state.profile || {});
@@ -53,6 +55,32 @@ const PasswordSecurityEdit = () => {
       "Security question dropdown closed."
     );
   };
+
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
+
+  // Focus on error icon when error alert is shown
+  useEffect(() => {
+    if (showErrorAlert && screenReaderEnabled) {
+      const t = setTimeout(() => {
+        try {
+          if (errorIconRef.current) {
+            const handle = findNodeHandle(errorIconRef.current);
+            if (handle) {
+              AccessibilityInfo.setAccessibilityFocus(handle);
+            }
+          }
+          AccessibilityInfo.announceForAccessibility("Password and security question update failed.");
+        } catch (e) {
+          console.log("Accessibility focus error:", e);
+        }
+      }, 300);
+
+      return () => clearTimeout(t);
+    }
+  }, [showErrorAlert, screenReaderEnabled]);
+
   const handleSecurityQuestionChange = (itemValue) => {
     setLocalProfile({
       ...profileDetails,
@@ -167,6 +195,7 @@ const PasswordSecurityEdit = () => {
                   isVisible={showErrorAlert}
                   onClose={() => setShowErrorAlert(false)}
                   accessible={!dropdownFocused}
+                  iconRef={errorIconRef}
                 />
               </View>
               <View style={styles.frameParent1}>

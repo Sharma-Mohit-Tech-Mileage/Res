@@ -9,6 +9,7 @@ import {
   ScrollView,
   Platform,
   AccessibilityInfo,
+  findNodeHandle,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -43,6 +44,9 @@ const ChangePassword = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
+  const errorIconRef = useRef(null);
+  const validationIconRef = useRef(null);
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const [securityQuestionsNew, setSecurityQuestionsNew] =
     useState(securityQuestions);
   const route = useRoute();
@@ -77,6 +81,52 @@ const ChangePassword = () => {
     control,
     name: "newPassword",
   });
+
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
+
+  // Focus on error icon when error alert is shown
+  useEffect(() => {
+    if (showErrorAlert && screenReaderEnabled) {
+      const t = setTimeout(() => {
+        try {
+          if (errorIconRef.current) {
+            const handle = findNodeHandle(errorIconRef.current);
+            if (handle) {
+              AccessibilityInfo.setAccessibilityFocus(handle);
+            }
+          }
+          AccessibilityInfo.announceForAccessibility("Password and security update failed.");
+        } catch (e) {
+          console.log("Accessibility focus error:", e);
+        }
+      }, 300);
+
+      return () => clearTimeout(t);
+    }
+  }, [showErrorAlert, screenReaderEnabled]);
+
+  // Focus on validation icon when validation alert is shown
+  useEffect(() => {
+    if (showValidationAlert && screenReaderEnabled) {
+      const t = setTimeout(() => {
+        try {
+          if (validationIconRef.current) {
+            const handle = findNodeHandle(validationIconRef.current);
+            if (handle) {
+              AccessibilityInfo.setAccessibilityFocus(handle);
+            }
+          }
+          AccessibilityInfo.announceForAccessibility("Please enter valid information to continue.");
+        } catch (e) {
+          console.log("Accessibility focus error:", e);
+        }
+      }, 300);
+
+      return () => clearTimeout(t);
+    }
+  }, [showValidationAlert, screenReaderEnabled]);
 
   const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
@@ -218,6 +268,7 @@ const ChangePassword = () => {
                   isVisible={showErrorAlert}
                   autoFocusTitle={true}
                   onClose={() => setShowErrorAlert(false)}
+                  iconRef={errorIconRef}
                 />
                 <NotificationAlert
                   type="error"
@@ -227,6 +278,7 @@ const ChangePassword = () => {
                   isVisible={showValidationAlert}
                   autoFocusTitle={true}
                   onClose={() => setShowValidationAlert(false)}
+                  iconRef={validationIconRef}
                 />
               </View>
               <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>

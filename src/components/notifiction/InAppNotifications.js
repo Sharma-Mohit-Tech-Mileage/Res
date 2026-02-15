@@ -11,6 +11,7 @@ import {
   Linking,
   Alert,
   AccessibilityInfo,
+  findNodeHandle,
 } from "react-native";
 import {
   Color,
@@ -56,6 +57,7 @@ const InAppNotifications = ({ navigation }) => {
   const [isNotificationRquired, setIsNotificationRequired] = useState(false);
   const [notification, setNotification] = useState(null);
   const [messageRef, setMessageFocus] = useAccessibilityFocus();
+  const iconRef = useRef(null);
   const formatedData = route.params?.additionalData || {};
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
 
@@ -67,10 +69,15 @@ const InAppNotifications = ({ navigation }) => {
   
     useEffect(() => {
       if (notification && screenReaderEnabled) {
-        // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
+        // After the animation, set focus on the icon and re-announce for reliability (especially on Android)
         const t = setTimeout(() => {
           try {
-            setMessageFocus();
+            if (iconRef.current) {
+              const handle = findNodeHandle(iconRef.current);
+              if (handle) {
+                AccessibilityInfo.setAccessibilityFocus(handle);
+              }
+            }
             AccessibilityInfo.announceForAccessibility(notification.message);
           } catch (e) {
             console.log("Accessibility focus error:", e);
@@ -345,6 +352,7 @@ const InAppNotifications = ({ navigation }) => {
                       accessibilityLabel={notification.message}
                       isVisible={true}
                       autoFocusTitle={true}
+                      iconRef={iconRef}
                     />
                   </View>
                 </Animated.View>

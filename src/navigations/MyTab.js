@@ -257,10 +257,12 @@ const createTabBarButton = useCallback(
         />
       )}
 
+
+     { (isScreenReaderEnabled && showWalkthrough )? (
       <View
         accessible={isWalkthroughActive}
         accessibilityElementsHidden={isWalkthroughActive}
-        //importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "yes"}
+        importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "yes"}
         style={{ flex: 1 }}
       >
         <Tab.Navigator
@@ -283,6 +285,27 @@ const createTabBarButton = useCallback(
           ))}
         </Tab.Navigator>
       </View>
+      ):(
+          <Tab.Navigator
+          initialRouteName="Home"
+          screenOptions={screenOptions}
+        >
+          {visibleTabs.map((tab,index) => (
+            <Tab.Screen
+              key={tab.id}
+              name={tab.screenName}
+              component={getComponent(tab.component)}
+              initialParams={{ data: route }}
+              options={{      
+                tabBarLabel: tab.name,
+                tabBarAccessibilityLabel: `${tab.name} tab, step ${index + 1} of ${visibleTabs.length}`,
+                tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
+              }}
+              listeners={createTabListeners(tab)}
+            />
+          ))}
+        </Tab.Navigator>
+      )}
     </>
   );
 };

@@ -35,6 +35,7 @@ const AddNotificationScreen = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
   const [successRef, setSuccessFocus] = useAccessibilityFocus();
+  const iconRef = useRef(null);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [isTermRequired, setIsTermRequired] = useState(false);
@@ -89,20 +90,25 @@ const AddNotificationScreen = () => {
 
   useEffect(() => {
     if (notification && screenReaderEnabled) {
-      // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
-      const t = setTimeout(() => {
-        try {
-          setMessageFocus();
-          AccessibilityInfo.announceForAccessibility(notification.message);
-        } catch (e) {
-          console.log("Accessibility focus error:", e);
-        }
-      }, 600);
+        // After the animation, set focus on the icon and re-announce for reliability (especially on Android)
+        const t = setTimeout(() => {
+          try {
+            if (iconRef.current) {
+              const handle = findNodeHandle(iconRef.current);
+              if (handle) {
+                AccessibilityInfo.setAccessibilityFocus(handle);
+              }
+            }
+            AccessibilityInfo.announceForAccessibility(notification.message);
+          } catch (e) {
+            console.log("Accessibility focus error:", e);
+          }
+        }, 600);
 
-      return () => clearTimeout(t);
-      
-    }
-  }, [notification, screenReaderEnabled]);
+        return () => clearTimeout(t);
+        
+      }
+    }, [notification, screenReaderEnabled]);
 
   useEffect(() => {
     setIsCheckboxVisible(!paperlessStatusAcp);
@@ -300,6 +306,7 @@ const AddNotificationScreen = () => {
                     onClose={() => setNotification(null)}
                     isVisible={true}
                     autoFocusTitle={true}
+                    iconRef={iconRef}
                   />
                 </View>
               </Animated.View>

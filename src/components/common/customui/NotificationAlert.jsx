@@ -231,6 +231,7 @@ const NotificationAlert = ({
   resentemail = false,
   autoFocusTitle = false,
   splitKey = "",
+  iconRef = null,
 }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -240,6 +241,7 @@ const NotificationAlert = ({
   const closeRef = useRef(null);
   const resendRef = useRef(null);
   const blockRefs = useRef([]);
+  const internalIconRef = useRef(null);
   
   const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
   const IconComponent = config.IconComponent;
@@ -252,7 +254,16 @@ const NotificationAlert = ({
   const blocks = useMemo(() => groupSegmentsByLineBreaks(segments), [segments]);
 
 
-  // Accessibility focus is now handled in the useEffect below
+  // Expose the icon ref to parent if callback provided
+  useEffect(() => {
+    if (iconRef && internalIconRef.current) {
+      if (typeof iconRef === 'function') {
+        iconRef(internalIconRef.current);
+      } else {
+        iconRef.current = internalIconRef.current;
+      }
+    }
+  }, [iconRef]);
 
   // Initialize block refs array
   useEffect(() => {
@@ -525,6 +536,7 @@ const NotificationAlert = ({
       >
         <A11y.Index index={0}>
         <View
+          ref={internalIconRef}
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
           accessible={true}
           accessibilityRole="text"
