@@ -69,16 +69,18 @@ const InAppNotifications = ({ navigation }) => {
   
     useEffect(() => {
       if (notification && screenReaderEnabled) {
-        // After the animation, set focus on the icon and re-announce for reliability (especially on Android)
+        // After the animation, set focus on the icon and announce only the icon
         const t = setTimeout(() => {
           try {
             if (iconRef.current) {
               const handle = findNodeHandle(iconRef.current);
               if (handle) {
                 AccessibilityInfo.setAccessibilityFocus(handle);
+                // Announce only the icon label
+                const iconLabel = notification.type === "error" ? "Error icon" : "Success icon";
+                AccessibilityInfo.announceForAccessibility(iconLabel);
               }
             }
-            AccessibilityInfo.announceForAccessibility(notification.message);
           } catch (e) {
             console.log("Accessibility focus error:", e);
           }

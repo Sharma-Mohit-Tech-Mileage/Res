@@ -289,9 +289,7 @@ const NotificationAlert = ({
         AccessibilityInfo.setAccessibilityFocus(focusTarget);
       }
 
-      AccessibilityInfo.announceForAccessibility(
-        `${config.labelPrefix}${title || "Notification"}`
-      );
+      // Do NOT announce here - let parent component handle announcements to avoid duplication
 
       // Force correct accessibility order on iOS
       if (Platform.OS === "ios" && containerRef.current) {

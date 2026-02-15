@@ -95,9 +95,9 @@ const ChangePassword = () => {
             const handle = findNodeHandle(errorIconRef.current);
             if (handle) {
               AccessibilityInfo.setAccessibilityFocus(handle);
+              AccessibilityInfo.announceForAccessibility("Error icon");
             }
           }
-          AccessibilityInfo.announceForAccessibility("Password and security update failed.");
         } catch (e) {
           console.log("Accessibility focus error:", e);
         }
@@ -116,9 +116,9 @@ const ChangePassword = () => {
             const handle = findNodeHandle(validationIconRef.current);
             if (handle) {
               AccessibilityInfo.setAccessibilityFocus(handle);
+              AccessibilityInfo.announceForAccessibility("Error icon");
             }
           }
-          AccessibilityInfo.announceForAccessibility("Please enter valid information to continue.");
         } catch (e) {
           console.log("Accessibility focus error:", e);
         }

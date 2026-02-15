@@ -69,9 +69,9 @@ const PasswordSecurityEdit = () => {
             const handle = findNodeHandle(errorIconRef.current);
             if (handle) {
               AccessibilityInfo.setAccessibilityFocus(handle);
+              AccessibilityInfo.announceForAccessibility("Error icon");
             }
           }
-          AccessibilityInfo.announceForAccessibility("Password and security question update failed.");
         } catch (e) {
           console.log("Accessibility focus error:", e);
         }

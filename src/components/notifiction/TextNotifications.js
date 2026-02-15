@@ -255,9 +255,11 @@ const TextNotifications = ({ navigation }) => {
             const handle = findNodeHandle(iconRef.current);
             if (handle) {
               AccessibilityInfo.setAccessibilityFocus(handle);
+              // Announce only the icon label
+              const iconLabel = notification.type === "error" ? "Error icon" : "Success icon";
+              AccessibilityInfo.announceForAccessibility(iconLabel);
             }
           }
-          AccessibilityInfo.announceForAccessibility(notification.message);
         } catch (e) {
           console.log("Accessibility focus error:", e);
         }
