@@ -211,10 +211,19 @@ const BreakDownItem = memo(({ item }) => {
  * Footer component showing the total balance due
  */
 const TotalBalanceFooter = memo(({ totalAmount }) => (
+  <>
   <View style={[styles.detailRow, styles.footerContainer]}>
     <Text style={styles.totalBalanceLabel} accessible={true} accessibilityLabel="Total Balance Due">Total Balance Due</Text>
     <Text style={styles.totalBalanceValue} accessible={true} accessibilityLabel={`${totalAmount.toFixed(2)}`}>${totalAmount.toFixed(2)}</Text>
+    <View style={[styles.detailItemBorder]}/>
   </View>
+    <View style={[{flexDirection:'column',alignItems:'center', padding: Padding.p_xs}, styles.footerContainer,{borderColor: Color.sparklightGray, borderTopWidth: 1.5, marginTop: 8}]}>
+    <Text style={[styles.detailLabelNormal]}>Still have questions about your bill?</Text>
+   
+    <Text style={[styles.detailLabelNormal]}> 
+       Try our new <Text style={[styles.detailLabelNormal,{color: Color.sparklightBrightPurple,fontWeight: 'bold'}]}> Bill Explainer!</Text></Text>
+    </View>
+  </>
 ));
 
 /**
