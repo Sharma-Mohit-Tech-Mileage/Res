@@ -116,10 +116,7 @@ const DetailItem = memo(({ detail }) => {
   const textStyle = isDiscount ? { color: styles.colorGreen } : {};
 
   return (
-    <View
-      style={[styles.detailRow, styles.detailItemBorder]}
-      
-    >
+    <View style={[styles.detailRow, styles.detailItemBorder]}>
       <View style={styles.detailLabelContainer80}>
         <Text
           style={[styles.detailLabelNormal, textStyle]}
@@ -133,7 +130,13 @@ const DetailItem = memo(({ detail }) => {
         {hasExpiryDate && (
           <View style={styles.discountExpiryContainer}>
             <InfoIcon size="xs" color={Color.colorGray_200} />
-            <Text style={styles.discountExpiryText} accessible={true} accessibilityLabel={`Discount expires on ${moment(detail.endDate).format(DEFAULT_DATE_FORMAT)}`}>
+            <Text
+              style={styles.discountExpiryText}
+              accessible={true}
+              accessibilityLabel={`Discount expires on ${moment(
+                detail.endDate,
+              ).format(DEFAULT_DATE_FORMAT)}`}
+            >
               Discount expires on{" "}
               {moment(detail.endDate).format(DEFAULT_DATE_FORMAT)}
             </Text>
@@ -145,7 +148,7 @@ const DetailItem = memo(({ detail }) => {
           style={[styles.detailValueNormal, textStyle]}
           numberOfLines={2}
           ellipsizeMode="tail"
-           accessible={true}
+          accessible={true}
           accessibilityLabel={`${parseFloat(detail.amount).toFixed(2)}`}
         >
           ${parseFloat(detail.amount).toFixed(2)}
@@ -163,7 +166,7 @@ const BreakDownItem = memo(({ item }) => {
   if (!item || !item.header) return null;
 
   return (
-    <View style={styles.paymentRow} >
+    <View style={styles.paymentRow}>
       {/* Header section */}
       <View style={styles.paymentDetails}>
         <View style={styles.detailRow}>
@@ -173,7 +176,8 @@ const BreakDownItem = memo(({ item }) => {
               numberOfLines={2}
               ellipsizeMode="tail"
               accessible={true}
-              accessibilityRole="header" accessibilityLevel={2} 
+              accessibilityRole="header"
+              accessibilityLevel={2}
             >
               {item.header.description}
             </Text>
@@ -212,19 +216,56 @@ const BreakDownItem = memo(({ item }) => {
  */
 const TotalBalanceFooter = memo(({ totalAmount }) => (
   <>
-  <View style={[styles.detailRow, styles.footerContainer]}>
-    <Text style={styles.totalBalanceLabel} accessible={true} accessibilityLabel="Total Balance Due">Total Balance Due</Text>
-    <Text style={styles.totalBalanceValue} accessible={true} accessibilityLabel={`${totalAmount.toFixed(2)}`}>${totalAmount.toFixed(2)}</Text>
-    <View style={[styles.detailItemBorder]}/>
-  </View>
-    <View style={[{flexDirection:'column',alignItems:'center', padding: Padding.p_xs}, styles.footerContainer,{borderColor: Color.sparklightGray, borderTopWidth: 1.5, marginTop: 8}]}>
-    <Text style={[styles.detailLabelNormal]}>Still have questions about your bill?</Text>
-   
-    <Text style={[styles.detailLabelNormal]}> 
-       Try our new <Text style={[styles.detailLabelNormal,{color: Color.sparklightBrightPurple,fontWeight: 'bold'}]}> Bill Explainer!</Text></Text>
+    <View style={[styles.detailRow, styles.footerContainer]}>
+      <Text
+        style={styles.totalBalanceLabel}
+        accessible={true}
+        accessibilityLabel="Total Balance Due"
+      >
+        Total Balance Due
+      </Text>
+      <Text
+        style={styles.totalBalanceValue}
+        accessible={true}
+        accessibilityLabel={`${totalAmount.toFixed(2)}`}
+      >
+        ${totalAmount.toFixed(2)}
+      </Text>
+      <View style={[styles.detailItemBorder]} />
     </View>
+    <View style={styles.billPlanermainContainer}>
+      <Text style={[styles.detailLabelNormal, { fontSize: 18 }]} >
+        Still have questions about your bill?
+      </Text>
+
+      <Text style={[styles.detailLabelNormal, { fontSize: 18 }]}>
+        Try our new{" "}
+        <Text
+          style={[
+            styles.detailLabelNormal,
+            {
+              color: Color.sparklightBrightPurple,
+              fontWeight: "700",
+              fontSize: 18,
+            },
+          ]}
+          onPress={renderBillExplainerLink}
+        >
+          {" "}
+          Bill Explainer!
+        </Text>
+      </Text>
+    </View>
+    <View style={[styles.detailItemBorder]} />
   </>
 ));
+
+/**
+ * Handler for Bill Explainer link press
+ */
+const renderBillExplainerLink = () => {
+  navigation.navigate("BillExplainer");
+};
 
 /**
  * Empty state component when no billing data is available
@@ -302,7 +343,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
       return () => {
         // Cleanup if needed
       };
-    }, [dispatch])
+    }, [dispatch]),
   );
   useEffect(() => {
     console.log("Error:123", errorCode);
@@ -321,7 +362,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
   // Memoized key extractor for FlatList
   const keyExtractor = useCallback(
     (item, index) => `billing-item-${index}`,
-    []
+    [],
   );
 
   // Render content based on state
@@ -562,6 +603,8 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
     fontWeight: "700",
+    flex: 3,
+    textAlign: "right",
   },
   warningAlert: {
     borderLeftWidth: 4,
@@ -599,6 +642,16 @@ const styles = StyleSheet.create({
     marginTop: Padding.p_base,
     alignSelf: "stretch",
   },
+  billPlanermainContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+    padding: Padding.p_xs,
+    borderColor: Color.sparklightGray,
+    borderTopWidth: 0.5,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+
   colorGreen: "#0C8306",
 });
 
