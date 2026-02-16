@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -28,6 +28,8 @@ const SparkLightDropdown = ({
   const validItems = Array.isArray(items) ? items : [];
   const [visible, setVisible] = React.useState(false);
   const dropdownRef = useRef(null);
+  const optionsListRef = useRef(null);
+  const firstOptionRef = useRef(null);
 
   const getAccessibilityLabel = () => {
     return selectedValue 
@@ -38,7 +40,21 @@ const SparkLightDropdown = ({
   const openPicker = () => {
     setVisible(true);
     isDropDownOpen(true);
-    AccessibilityInfo.announceForAccessibility(`${accessibilityItemName} dropdown opened`);
+    // Announce dropdown opened with instruction
+    if (Platform.OS === 'android') {
+      AccessibilityInfo.announceForAccessibility(`${accessibilityItemName} dropdown opened, select a question`);
+      // Set focus to first option on Android
+      setTimeout(() => {
+        if (firstOptionRef.current) {
+          const handle = findNodeHandle(firstOptionRef.current);
+          if (handle) {
+            AccessibilityInfo.setAccessibilityFocus(handle);
+          }
+        }
+      }, 300);
+    } else {
+      AccessibilityInfo.announceForAccessibility(`${accessibilityItemName} dropdown opened, select a question`);
+    }
   };
 
   const closePicker = () => {
@@ -103,9 +119,8 @@ const SparkLightDropdown = ({
           <Pressable 
             style={styles.backdrop} 
             onPress={closePicker}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="Close dropdown"
+            accessible={false}
+            importantForAccessibility="no"
           />
           <View 
             style={styles.pickerContainer}
@@ -115,7 +130,7 @@ const SparkLightDropdown = ({
             <View style={styles.header}>
               <View style={styles.grabber} accessible={false} importantForAccessibility="no" />
               <View style={styles.headerContent}>
-                <Text 
+                <Text ref={optionsListRef}
                   style={styles.headerTitle}
                   accessible={true}
                   accessibilityRole="text"
@@ -128,15 +143,21 @@ const SparkLightDropdown = ({
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="Close dropdown"
+                  accessibilityLabel="Close dropdown, button"
+                  accessibilityHint="Double-tap to activate"
                 >
                   <Text style={styles.closeButtonText} accessible={false} importantForAccessibility="no">✕</Text>
                 </TouchableOpacity>
               </View>
             </View>
-            <SafeAreaView style={styles.optionsList}>
+            <SafeAreaView 
+              
+              style={styles.optionsList}
+              accessible={false}
+            >
               {validItems.map((item, index) => (
                 <TouchableOpacity
+                  ref={index === 0 ? firstOptionRef : null}
                   key={index}
                   style={[
                     styles.option,
@@ -146,10 +167,10 @@ const SparkLightDropdown = ({
                   ]}
                   onPress={() => handleSelect(item)}
                   accessible={true}
-                  accessibilityRole={Platform.OS === 'android' ? undefined : 'button'}
-                  accessibilityLabel={`${item}, ${index+1} of ${validItems.length} ${selectedValue === item ? ', selected' : ''}`}
-                  accessibilityHint={Platform.OS === 'android' ? undefined : `Double tap to select this ${accessibilityItemName}`}
-                  accessibilityState={Platform.OS === 'android' ? undefined : { selected: selectedValue === item }}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${item}${selectedValue === item ? ', selected' : ''}`}
+                  accessibilityHint={`${index+1} of ${validItems.length}. Double tap to select`}
+                  accessibilityState={{ selected: selectedValue === item }}
                 >
                   <Text 
                     style={[
@@ -157,6 +178,7 @@ const SparkLightDropdown = ({
                       selectedValue === item && styles.selectedOptionText
                     ]} 
                     accessible={false}
+                    importantForAccessibility="no"
                   >
                     {item}
                   </Text>

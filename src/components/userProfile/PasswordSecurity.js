@@ -22,6 +22,7 @@ const PasswordSecurity = () => {
   const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [messageRef, setMessageFocus] = useAccessibilityFocus();
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+  const message =(route.params?.isPassword)?"Your password has been updated successfully.":"Your security question has been updated successfully."
 
   useEffect(() => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
@@ -33,7 +34,7 @@ const PasswordSecurity = () => {
           const t = setTimeout(() => {
             try {
               setMessageFocus();
-              AccessibilityInfo.announceForAccessibility("Password and Security details updated successfully.");
+              //AccessibilityInfo.announceForAccessibility(message);
             } catch (e) {
               console.log("Accessibility focus error:", e);
             }
@@ -72,7 +73,7 @@ const PasswordSecurity = () => {
             <NotificationAlert
               type="success"
               title="Success"
-              message={(route.params?.isPassword)?"Your password has been updated successfully.":"Your security question has been updated successfully."}
+              message={message}
               showCloseIcon={true}
               isVisible={showSuccessAlert}
               onClose={() => setShowSuccessAlert(false)}
