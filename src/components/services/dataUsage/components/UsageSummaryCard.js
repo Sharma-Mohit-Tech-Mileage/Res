@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { View, Text, StyleSheet, Animated, Easing } from "react-native";
+import { View, Text, StyleSheet, Animated, Easing, Platform } from "react-native";
 import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
@@ -12,7 +12,6 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
-  // ── Animation ──
   const animValue = useRef(new Animated.Value(0)).current;
   const [progress, setProgress] = useState(0);
 
@@ -56,9 +55,25 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
   const leftLineX = -25;
   const rightLineX = size + 25;
 
+  const gaugeA11yLabel =
+    `You have used ${usedGB} gigabytes of data, which is ${usedPercent.toFixed(2)} percent of your total allowance. ` +
+    `You have ${remainingGB} gigabytes remaining.`;
+
   return (
-    <View style={{ height: size + 60, width: '100%', alignItems: 'center' }}>
-      <Svg width={size + 100} height={size + 60}>
+    <View
+      style={{ height: size + 60, width: '100%', alignItems: 'center' }}
+      accessible={true}
+      accessibilityLabel={gaugeA11yLabel}
+    >
+      <Svg
+        width={size + 100}
+        height={size + 60}
+        accessible={false}
+        {...Platform.select({
+          ios: { accessibilityElementsHidden: true },
+          android: { importantForAccessibility: "no-hide-descendants" },
+        })}
+      >
         <Defs>
           <LinearGradient id="used" x1="0%" y1="0%" x2="100%" y2="100%">
             <Stop offset="0%" stopColor={theme.colors.primaryDark} />
@@ -102,14 +117,26 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
         </G>
       </Svg>
 
-      <Animated.View style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0, opacity: labelOpacity }]}>
+      {/* ---------- A11Y FIX #1b: Hide visual callout labels from screen readers ---------- */}
+      {/* These are purely visual; the parent's accessibilityLabel covers the data. */}
+      <Animated.View
+        style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0, opacity: labelOpacity }]}
+        accessible={false}
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no-hide-descendants"
+      >
         <Text style={[styles.labelText]}>
           {usedGB} 
         </Text>
         <Text style={styles.labelSubtext}> GB Used</Text>
       </Animated.View>
       
-      <Animated.View style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end', opacity: labelOpacity }]}>
+      <Animated.View
+        style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end', opacity: labelOpacity }]}
+        accessible={false}
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no-hide-descendants"
+      >
         <Text style={[styles.labelText]}>
           {remainingGB} 
         </Text>
@@ -127,11 +154,17 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
+        {/* Header — icon already decorative */}
         <View style={styles.header}>
-          <View style={styles.iconWrapper}>
-          <MaterialCommunityIcons name="chart-donut" size={20} color={theme.colors.primary} />
+          <View
+            style={styles.iconWrapper}
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+            accessibilityElementsHidden={true}
+          >
+            <MaterialCommunityIcons name="chart-donut" size={20} color={theme.colors.primary} />
           </View>
-          <Text style={styles.headerTitle}>DATA USAGE</Text>
+          <Text style={styles.headerTitle} accessibilityRole="header">DATA USAGE</Text>
         </View>
 
         <DonutWithCallouts 
@@ -142,20 +175,50 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
         />
 
         <View style={styles.stats}>
-          <View style={[styles.statBox, styles.statBoxWide]}>
-            <MaterialCommunityIcons name="calendar-range" size={20} color={theme.colors.primary} />
+          <View
+            style={[styles.statBox, styles.statBoxWide]}
+            accessible={true}
+            accessibilityLabel={`Billing Period: ${startDate} through ${endDate}`}
+          >
+            <View
+              accessible={false}
+              importantForAccessibility="no-hide-descendants"
+              accessibilityElementsHidden={true}
+            >
+              <MaterialCommunityIcons name="calendar-range" size={20} color={theme.colors.primary} />
+            </View>
             <Text style={styles.statValue}>{startDate} - {endDate}</Text>
             <Text style={styles.statLabel}>Billing Period</Text>
           </View>
           
-          <View style={styles.statBox}>
-            <MaterialCommunityIcons name="calendar-clock" size={20} color={theme.colors.primary} />
+          <View
+            style={styles.statBox}
+            accessible={true}
+            accessibilityLabel={`${currentUsage.remainingDays} days remaining in this billing period`}
+          >
+            <View
+              accessible={false}
+              importantForAccessibility="no-hide-descendants"
+              accessibilityElementsHidden={true}
+            >
+              <MaterialCommunityIcons name="calendar-clock" size={20} color={theme.colors.primary} />
+            </View>
             <Text style={styles.statValue}>{currentUsage.remainingDays} days</Text>
             <Text style={styles.statLabel}>Remaining</Text>
           </View>
           
-          <View style={[styles.statBox, styles.statBoxNarrow]}>
-            <MaterialCommunityIcons name="chart-pie" size={20} color={theme.colors.primary} />
+          <View
+            style={[styles.statBox, styles.statBoxNarrow]}
+            accessible={true}
+            accessibilityLabel={`${currentUsage.dataUsedPercent} percent used`}
+          >
+            <View
+              accessible={false}
+              importantForAccessibility="no-hide-descendants"
+              accessibilityElementsHidden={true}
+            >
+              <MaterialCommunityIcons name="chart-pie" size={20} color={theme.colors.primary} />
+            </View>
             <Text style={styles.statValue}>{currentUsage.dataUsedPercent}%</Text>
             <Text style={styles.statLabel}>Used</Text>
           </View>

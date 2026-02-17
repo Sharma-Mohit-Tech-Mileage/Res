@@ -34,7 +34,12 @@ const EeroPromoCard = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      accessible={false}
+      importantForAccessibility="no"
+      accessibilityElementsHidden={false}
+    >
       <Pressable
         style={({ pressed }) => [
           styles.card,
@@ -50,6 +55,9 @@ const EeroPromoCard = () => {
           source={require("../../../../../assets/eero-promo-banner.jpg")}
           style={styles.promoImage}
           resizeMode="cover"
+          accessible={false}
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
         />
       </Pressable>
     </View>

@@ -4,7 +4,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
-const safeText = (v, fallback = "â€”") =>
+const safeText = (v, fallback = "\u2014") =>
   v === null || v === undefined || String(v).trim() === "" ? fallback : String(v);
 
 const normalize = (v) => String(v ?? "").trim();
@@ -19,8 +19,8 @@ const getEquipmentIcon = (item) => {
 };
 
 const getIdentifier = (item) => {
-  if (normalize(item?.macAddress || item?.mac)) {
-    return { label: "MAC ID", value: safeText(item?.macAddress || item?.mac) };
+  if (normalize(item?.macAddress || item?.mac || item?.macId)) {
+    return { label: "MAC ID", value: safeText(item?.macAddress || item?.mac || item?.macId) };
   }
   if (normalize(item?.ipAddress || item?.ip)) {
     return { label: "IP Address", value: safeText(item?.ipAddress || item?.ip) };
@@ -29,15 +29,17 @@ const getIdentifier = (item) => {
 };
 
 const buildA11yLabel = (item) => {
-  const name = safeText(item?.name, "Provider equipment");
-  const model = safeText(item?.model);
-  const connection = safeText(item?.connectionType);
-  const location = safeText(item?.location);
+  const parts = [];
+  const name = normalize(item?.name);
+  parts.push(name || "Provider equipment");
+  
+  const model = normalize(item?.model);
+  if (model) parts.push(`Model ${model}`);
 
   const identifier = getIdentifier(item);
-  const idText = identifier ? ` ${identifier.label} ${identifier.value}.` : "";
+  if (identifier) parts.push(`${identifier.label} ${identifier.value}`);
 
-  return `${name}. Model ${model}. ${connection} connection. Located in ${location}.${idText}`;
+  return parts.join(". ") + ".";
 };
 
 const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
@@ -51,7 +53,7 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
   return (
     <View
       style={[styles.equipmentItem, isLast && styles.lastItem]}
-      accessible
+      accessible={true}
       accessibilityRole="text"
       accessibilityLabel={a11yLabel}
     >
@@ -59,11 +61,16 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
         style={styles.equipmentIconWrapper}
         accessible={false}
         importantForAccessibility="no-hide-descendants"
+        accessibilityElementsHidden={true}
       >
        
       </View>
 
-      <View style={styles.equipmentInfo}>
+      <View
+        style={styles.equipmentInfo}
+        importantForAccessibility="no-hide-descendants"
+        accessibilityElementsHidden={true}
+      >
         <Text style={styles.equipmentName} numberOfLines={1}>
           {safeText(item?.name, "Provider Equipment")}
         </Text>
@@ -115,6 +122,7 @@ const ManageEquipmentCard = ({ equipment }) => {
             style={styles.iconWrapper}
             accessible={false}
             importantForAccessibility="no-hide-descendants"
+            accessibilityElementsHidden={true}
           >
             <MaterialCommunityIcons
               name="router-wireless"

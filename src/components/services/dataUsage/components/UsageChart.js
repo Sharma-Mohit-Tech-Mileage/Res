@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions, Animated, Easing } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
 import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
 import { G, Rect, Text as SvgText, Path, Line } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
@@ -21,16 +21,13 @@ const TOOLTIP_WIDTH = 120;
 const TOOLTIP_HEIGHT = 46;
 const MIN_SPACING = 2;
 
-// ── Custom scroll-indicator constants ──
 const TRACK_THICKNESS = 3.5;
 const THUMB_MIN = 28;
 const TRACK_COLOR = "rgba(0,0,0,0.07)";
 const THUMB_COLOR = "rgba(0,0,0,0.22)";
 const FADE_SIZE = 24;
 
-// ─────────────────────────────────────────────
-// Reusable horizontal scroll indicator bar
-// ─────────────────────────────────────────────
+
 const HScrollIndicator = ({ scrollX, contentW, viewportW }) => {
   const ratio = viewportW / contentW;
   const thumbW = Math.max(THUMB_MIN, ratio * viewportW);
@@ -68,9 +65,7 @@ const hStyles = StyleSheet.create({
   },
 });
 
-// ─────────────────────────────────────────────
-// Reusable vertical scroll indicator bar
-// ─────────────────────────────────────────────
+
 const VScrollIndicator = ({ scrollY, contentH, viewportH }) => {
   const ratio = viewportH / contentH;
   const thumbH = Math.max(THUMB_MIN, ratio * viewportH);
@@ -108,9 +103,7 @@ const vStyles = StyleSheet.create({
   },
 });
 
-// ─────────────────────────────────────────────
-// Main component
-// ─────────────────────────────────────────────
+
 const UsageChart = ({
   data,
   type = "monthly",
@@ -121,17 +114,49 @@ const UsageChart = ({
   const [selectedRange, setSelectedRange] = useState("Feb 2025 - Jan 2026");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showList, setShowList] = useState(false);
+  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
-  // ── Chart horizontal scroll state ──
+  const handleToggleView = useCallback(() => {
+    const nextView = !showList;
+    setShowList(nextView);
+    if (isScreenReaderEnabled) {
+      const message = nextView ? "View Mode changed to List view" : "View Mode changed to Graph view";
+      AccessibilityInfo.announceForAccessibility(message);
+    }
+  }, [showList, isScreenReaderEnabled]);
+
+  const handleSkipChartData = useCallback(() => {
+    const node = findNodeHandle(skipTargetRef.current);
+    if (node) {
+      AccessibilityInfo.setAccessibilityFocus(node);
+    }
+    return true;
+  }, []);
+
+  useEffect(() => {
+    const checkScreenReader = async () => {
+      const enabled = await AccessibilityInfo.isScreenReaderEnabled();
+      setIsScreenReaderEnabled(enabled);
+    };
+    checkScreenReader();
+
+    const subscription = AccessibilityInfo.addEventListener(
+      "screenReaderChanged",
+      setIsScreenReaderEnabled
+    );
+    return () => {
+      subscription?.remove?.();
+    };
+  }, []);
+
   const chartScrollX = useRef(new Animated.Value(0)).current;
   const [chartViewportW, setChartViewportW] = useState(0);
+  const skipTargetRef = useRef(null);
 
-  // ── List vertical scroll state ──
   const listScrollY = useRef(new Animated.Value(0)).current;
   const [listContentH, setListContentH] = useState(0);
   const [listViewportH, setListViewportH] = useState(LIST_VIEW_HEIGHT);
 
-  // ── Fade-edge hint animation (pulse once on mount / tab switch) ──
   const fadeHintAnim = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     fadeHintAnim.setValue(1);
@@ -143,7 +168,6 @@ const UsageChart = ({
     ]).start();
   }, [activeTab, showList]);
 
-  // ── Bar grow-up animation ──
   const barAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -247,7 +271,7 @@ const UsageChart = ({
 
   if (!chartData.length) return null;
 
-  // ── Chart needs horizontal scroll? ──
+  // — Chart needs horizontal scroll? —
   const chartScrollable = contentWidth > chartViewportW && chartViewportW > 0;
 
   const Tooltip = ({ x, y, bandwidth }) => {
@@ -271,7 +295,6 @@ const UsageChart = ({
 
     return (
       <G>
-        {/* Highlight overlay on selected bar */}
         <Rect
           x={bx - 3}
           y={barTopY}
@@ -282,7 +305,6 @@ const UsageChart = ({
           fillOpacity={0.1}
         />
 
-        {/* Dashed leader line */}
         {showLeader && (
           <Line
             x1={caretX}
@@ -296,7 +318,6 @@ const UsageChart = ({
           />
         )}
 
-        {/* Tooltip bubble */}
         <Rect
           x={tooltipX}
           y={tooltipY}
@@ -309,9 +330,8 @@ const UsageChart = ({
           strokeOpacity={0.35}
         />
         <Path
-          d={`M ${caretX - 5} ${tooltipY + TOOLTIP_HEIGHT} L ${caretX} ${tooltipY + TOOLTIP_HEIGHT + 6} L ${
-            caretX + 5
-          } ${tooltipY + TOOLTIP_HEIGHT} Z`}
+          d={`M ${caretX - 5} ${tooltipY + TOOLTIP_HEIGHT} L ${caretX} ${tooltipY + TOOLTIP_HEIGHT + 6} L ${caretX + 5
+            } ${tooltipY + TOOLTIP_HEIGHT} Z`}
           fill={theme.colors.white}
           stroke={theme.colors.primaryDark}
           strokeWidth={1}
@@ -398,7 +418,6 @@ const UsageChart = ({
     </G>
   );
 
-  // ── Fade edge helper ──
   const FadeEdge = ({ side, horizontal = true }) => {
     const isStart = side === "left" || side === "top";
     const colors = isStart
@@ -434,17 +453,41 @@ const UsageChart = ({
     );
   };
 
+  const buildBarA11yLabel = (item, index) => {
+    const periodLabel = formatPeriodLabel(item);
+    const positionLabel = type === "daily"
+      ? `Day ${index + 1} of ${chartData.length}`
+      : `Month ${index + 1} of ${chartData.length}`;
+    return `${positionLabel}. ${periodLabel}. Download: ${item.download.toFixed(2)} GB, Upload: ${item.upload.toFixed(2)} GB. Total: ${item.total.toFixed(2)} GB.`;
+  };
+
+  const barA11yHint = Platform.select({
+    ios: "Two-finger double tap to skip chart",
+    android: "Swipe to next heading to skip chart",
+  });
+
+  const graphSummaryLabel = `${type === "daily" ? "Daily" : "Monthly"} Stats. Graph shows ${chartData.length} ${type === "daily" ? "days" : "months"} of activity. Swipe left or right to view each ${type === "daily" ? "day" : "month"}.`;
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
+        {/* Header icon — decorative */}
         <View style={styles.header}>
-          <View style={styles.iconWrapper}>
+          <View
+            style={styles.iconWrapper}
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+            accessibilityElementsHidden={true}
+          >
             <MaterialCommunityIcons name="chart-bar" size={20} color={theme.colors.primary} />
           </View>
-          <Text style={styles.chartTitle}>Historical Usage</Text>
+          <Text style={styles.chartTitle} accessibilityRole="header">Historical Usage</Text>
         </View>
 
-        <View style={styles.tabsContainer}>
+        {/* accessibilityState={{ selected }} already announces "selected" on iOS VoiceOver. */}
+        {/* On Android TalkBack, accessibilityRole="tab" + selected state also works. */}
+        {/* Removed manual ", selected" from accessibilityLabel to prevent double announcement. */}
+        <View style={styles.tabsContainer} accessibilityRole="tablist">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -454,6 +497,12 @@ const UsageChart = ({
                 onPress={() => onTabChange?.(tab.id)}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isActive }}
+                accessibilityLabel={tab.label}
+                accessibilityHint={
+                  isActive
+                    ? undefined
+                    : `Double tap to switch to ${tab.label}`
+                }
               >
                 <Text style={[styles.tabText, isActive && styles.activeTabText]}>{tab.label}</Text>
               </Pressable>
@@ -462,33 +511,52 @@ const UsageChart = ({
         </View>
 
         <View style={styles.controlsRow}>
-          <View style={styles.dropdownWrapper}>
-            <SparkLightDropdown
-              items={dateRanges}
-              selectedValue={selectedRange}
-              onValueChange={setSelectedRange}
-              dropDownStyle={styles.dropdown}
-              dropdownTitle={"Select Date Range"}
-            />
-          </View>
+          {/* Dropdown only shows for Daily Usage — Monthly has no date range picker */}
+          {activeTab === "daily" && (
+            <View style={styles.dropdownWrapper}>
+              <SparkLightDropdown
+                items={dateRanges}
+                selectedValue={selectedRange}
+                onValueChange={setSelectedRange}
+                dropDownStyle={styles.dropdown}
+                dropdownTitle={"Select Date Range"}
+              />
+            </View>
+          )}
+
+          {/* Spacer when dropdown is hidden to push toggle to the right */}
+          {activeTab !== "daily" && <View style={{ flex: 1 }} />}
 
           <Pressable
             style={styles.listToggle}
-            onPress={() => setShowList(!showList)}
+            onPress={handleToggleView}
             accessibilityRole="button"
-            accessibilityLabel={showList ? "Show chart view" : "Show list view"}
+            accessibilityLabel="View Mode switch"
+            accessibilityValue={{ text: showList ? "List view" : "Graph view" }}
+            accessibilityHint={
+              showList
+                ? "Double tap to change to Graph view"
+                : "Double tap to change to List view"
+            }
           >
             <MaterialCommunityIcons
               name={showList ? "chart-bar" : "format-list-bulleted"}
               size={20}
               color={theme.colors.primary}
+              accessible={false}
+              importantForAccessibility="no"
             />
           </Pressable>
         </View>
 
-        {/* ═══════════ CHART VIEW ═══════════ */}
         {!showList ? (
           <>
+            <View
+              accessible={true}
+              accessibilityRole="summary"
+              accessibilityLabel={`${type === "daily" ? "Daily" : "Monthly"} usage bar chart, showing ${chartData.length} ${type === "daily" ? "days" : "months"} of download and upload data`}
+              style={styles.srSummary}
+            />
             <Animated.View
               style={{
                 transform: [{ scaleY: barScale }, { translateY: barTranslateY }],
@@ -507,10 +575,11 @@ const UsageChart = ({
                     fontWeight: "600",
                   }}
                   formatLabel={(v) => Math.round(v).toString()}
+                  accessibilityElementsHidden={true}
+                  importantForAccessibility="no-hide-descendants"
                 />
 
                 <View style={styles.chartScrollWrapper}>
-                  {/* Right fade edge hint */}
                   {chartScrollable && <FadeEdge side="right" horizontal />}
 
                   <ScrollView
@@ -524,26 +593,61 @@ const UsageChart = ({
                     onLayout={(e) => setChartViewportW(e.nativeEvent.layout.width)}
                     style={styles.chartScroll}
                   >
-                    <View style={{ width: contentWidth }}>
-                      <StackedBarChart
-                        style={{ height: CHART_TOTAL_HEIGHT }}
-                        data={chartData}
-                        keys={["download", "upload"]}
-                        colors={[theme.colors.primaryDark, theme.colors.upload]}
-                        contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
-                        gridMin={0}
-                        gridMax={maxValue}
-                        spacingInner={(contentWidth - chartData.length * BAR_WIDTH) / contentWidth}
-                        spacingOuter={dynamicSpacing / contentWidth}
+                    <View style={{ width: contentWidth, position: "relative" }}>
+                      <View
+                        accessibilityElementsHidden={true}
+                        importantForAccessibility="no-hide-descendants"
                       >
-                        <Grid svg={{ strokeOpacity: 0.16 }} />
-                        <Tooltip />
-                        <TouchOverlay />
-                      </StackedBarChart>
+                        <StackedBarChart
+                          style={{ height: CHART_TOTAL_HEIGHT }}
+                          data={chartData}
+                          keys={["download", "upload"]}
+                          colors={[theme.colors.primaryDark, theme.colors.upload]}
+                          contentInset={{ top: 16, bottom: 0 + X_LABEL_HEIGHT }}
+                          gridMin={0}
+                          gridMax={maxValue}
+                          spacingInner={(contentWidth - chartData.length * BAR_WIDTH) / contentWidth}
+                          spacingOuter={dynamicSpacing / contentWidth}
+                        >
+                          <Grid svg={{ strokeOpacity: 0.16 }} />
+                          <Tooltip />
+                          <TouchOverlay />
+                        </StackedBarChart>
+                      </View>
+
+                      <View
+                        style={[styles.srGraphOverlay, { height: CHART_HEIGHT }]}
+                        accessible={false}
+                        onAccessibilityEscape={handleSkipChartData}
+                        onMagicTap={handleSkipChartData}
+                      >
+                        {chartData.map((item, index) => {
+                          const n = chartData.length;
+                          const slotWidth = contentWidth / n;
+                          return (
+                            <Pressable
+                              key={index}
+                              accessible={true}
+                              accessibilityRole="button"
+                              accessibilityLabel={buildBarA11yLabel(item, index)}
+                              accessibilityHint={barA11yHint}
+                              onAccessibilityEscape={handleSkipChartData}
+                              onMagicTap={handleSkipChartData}
+                              style={{
+                                position: "absolute",
+                                left: index * slotWidth,
+                                top: 0,
+                                width: slotWidth,
+                                height: CHART_HEIGHT,
+                              }}
+                              onPress={() => handlePressBar(item, index)}
+                            />
+                          );
+                        })}
+                      </View>
                     </View>
                   </ScrollView>
 
-                  {/* Always-visible horizontal scroll track */}
                   {chartScrollable && (
                     <HScrollIndicator
                       scrollX={chartScrollX}
@@ -556,7 +660,13 @@ const UsageChart = ({
             </Animated.View>
 
             <Animated.View style={{ opacity: legendOpacity }}>
-              <View style={styles.legend}>
+              <View
+                ref={skipTargetRef}
+                accessible={true}
+                accessibilityRole="header"
+                accessibilityLabel="Legend: Dark blue represents Download, Light blue represents Upload"
+                style={styles.legend}
+              >
                 <View style={styles.legendItem}>
                   <View style={[styles.legendDot, { backgroundColor: theme.colors.primaryDark }]} />
                   <Text style={styles.legendText}>Download</Text>
@@ -569,10 +679,15 @@ const UsageChart = ({
             </Animated.View>
           </>
         ) : (
-          /* ═══════════ LIST VIEW ═══════════ */
-          <View style={styles.listOuterWrapper}>
+          <>
+            <View
+              accessible={true}
+              accessibilityRole="summary"
+              accessibilityLabel={`${type === "daily" ? "Daily" : "Monthly"} usage list, ${chartData.length} items`}
+              style={styles.srSummary}
+            />
+            <View style={styles.listOuterWrapper}>
             <View style={styles.listScrollRow}>
-              {/* Bottom fade edge hint */}
               {listContentH > listViewportH && <FadeEdge side="bottom" horizontal={false} />}
 
               <ScrollView
@@ -590,19 +705,34 @@ const UsageChart = ({
                   <View
                     key={index}
                     style={[styles.listItem, index === chartData.length - 1 && styles.lastListItem]}
+                    accessible={true}
+                    accessibilityLabel={`${formatPeriodLabel(item)}. Total: ${item.total.toFixed(2)} GB. Download: ${item.download.toFixed(2)} GB. Upload: ${item.upload.toFixed(2)} GB.`}
                   >
-                    <View style={styles.listItemHeader}>
+                    {/* Hide children from screen reader — parent label covers everything */}
+                    <View
+                      style={styles.listItemHeader}
+                      importantForAccessibility="no-hide-descendants"
+                      accessibilityElementsHidden={true}
+                    >
                       <Text style={styles.periodLabel}>{formatPeriodLabel(item)}</Text>
                       <Text style={styles.totalLabel}>{item.total.toFixed(4)} GB</Text>
                     </View>
-                    <View style={styles.listItemRow}>
+                    <View
+                      style={styles.listItemRow}
+                      importantForAccessibility="no-hide-descendants"
+                      accessibilityElementsHidden={true}
+                    >
                       <View style={styles.detailItem}>
                         <View style={[styles.detailDot, { backgroundColor: theme.colors.primaryDark }]} />
                         <Text style={styles.detailLabel}>Download (GB)</Text>
                         <Text style={styles.detailValue}>{item.download.toFixed(4)}</Text>
                       </View>
                     </View>
-                    <View style={styles.listItemRow}>
+                    <View
+                      style={styles.listItemRow}
+                      importantForAccessibility="no-hide-descendants"
+                      accessibilityElementsHidden={true}
+                    >
                       <View style={styles.detailItem}>
                         <View style={[styles.detailDot, { backgroundColor: theme.colors.upload }]} />
                         <Text style={styles.detailLabel}>Upload (GB)</Text>
@@ -613,7 +743,6 @@ const UsageChart = ({
                 ))}
               </ScrollView>
 
-              {/* Always-visible vertical scroll track */}
               {listContentH > listViewportH && (
                 <VScrollIndicator
                   scrollY={listScrollY}
@@ -623,15 +752,13 @@ const UsageChart = ({
               )}
             </View>
           </View>
+          </>
         )}
       </View>
     </View>
   );
 };
 
-// ─────────────────────────────────────────────
-// Fade edge styles
-// ─────────────────────────────────────────────
 const fadeStyles = StyleSheet.create({
   hFade: {
     position: "absolute",
@@ -653,9 +780,6 @@ const fadeStyles = StyleSheet.create({
   vBottom: { bottom: 0 },
 });
 
-// ─────────────────────────────────────────────
-// Main styles
-// ─────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: { marginHorizontal: theme.spacing.base, marginBottom: theme.spacing.base },
   card: { ...card.base, padding: theme.spacing.base },
@@ -712,7 +836,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  // Chart
   chartScrollWrapper: {
     flex: 1,
   },
@@ -734,7 +857,6 @@ const styles = StyleSheet.create({
   legendDot: { width: 10, height: 10, borderRadius: 5, marginRight: 6 },
   legendText: { fontSize: theme.typography.size.sm, color: theme.colors.text.secondary },
 
-  // List View
   listOuterWrapper: {
     marginTop: theme.spacing.xs,
   },
@@ -800,6 +922,17 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.text.primaryDark,
+  },
+
+  srSummary: {
+    height: 1,
+    overflow: "hidden",
+  },
+  srGraphOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
   },
 });
 

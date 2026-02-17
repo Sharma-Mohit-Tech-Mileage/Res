@@ -26,13 +26,13 @@ import {
 
 const DataUsageContent = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState("monthly");
+  const [activeTab, setActiveTab] = useState("daily");
   const [refreshing, setRefreshing] = useState(false);
   const [selectedBar, setSelectedBar] = useState(null);
   const [selectedPeriod, setSelectedPeriod] = useState(MOCK_USAGE_PERIODS[0]);
   const [showRing, setShowRing] = useState(true);
 
-  // Simulate loading different period data
+
   const [currentUsage, setCurrentUsage] = useState(MOCK_CURRENT_USAGE);
   const [monthlyData] = useState(MOCK_MONTHLY_USAGE);
   const [dailyData] = useState(MOCK_DAILY_USAGE);
@@ -50,13 +50,11 @@ const DataUsageContent = ({ navigation, route }) => {
 
   const handlePeriodChange = useCallback((period) => {
     setSelectedPeriod(period);
-    // In real app: fetch new data for this period
     console.log("Selected period:", period);
   }, []);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setRefreshing(false);
   }, []);
