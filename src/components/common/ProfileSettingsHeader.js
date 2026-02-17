@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
     left: 8, // Align to the left
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 10,
   },
   titleContainer: {
     justifyContent: "center",
@@ -140,8 +141,10 @@ const styles = StyleSheet.create({
   pressable: {
     justifyContent: "center",
     alignItems: "center",
-    height: 24,
-    width: 24,
+    minHeight: 44,
+    minWidth: 44,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   title: {
     fontSize: FontSize.size_lg,
@@ -152,8 +155,8 @@ const styles = StyleSheet.create({
   icon: {
     height: 24,
     width: 24,
-    marginLeft: 10,
-    marginTop: 12,
+    justifyContent: "center",
+    alignItems: "center",
   },
   iconPressed: {
     opacity: 0.5,
