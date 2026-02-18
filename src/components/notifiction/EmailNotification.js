@@ -90,32 +90,30 @@ const AddNotificationScreen = () => {
 
   useEffect(() => {
     if (notification && screenReaderEnabled) {
-      // Focus only (no extra announcements). Retry once to improve reliability on Android
-      const t1 = setTimeout(() => {
-        try {
-          if (notification.type === "success" && successIconRef.current) {
-            const handle = findNodeHandle(successIconRef.current);
-            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-          } else {
+      // Focus only (no extra announcements).
+      // On iOS, focus can be stolen by the header/back during the notification animation,
+      // so we delay slightly longer and retry once.
+      const delays = Platform.OS === "ios" ? [900, 1600] : [600, 1200];
+
+      const timers = delays.map((ms) =>
+        setTimeout(() => {
+          try {
+            if (notification.type === "success" && successIconRef.current) {
+              const handle = findNodeHandle(successIconRef.current);
+              if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+              return;
+            }
+
             setMessageFocus();
+          } catch (e) {
+            console.log("Accessibility focus error:", e);
           }
-        } catch (e) {
-          console.log("Accessibility focus error:", e);
-        }
-      }, 600);
+        }, ms)
+      );
 
-      const t2 = setTimeout(() => {
-        try {
-          if (notification.type === "success" && successIconRef.current) {
-            const handle = findNodeHandle(successIconRef.current);
-            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-          }
-        } catch (e) {
-          console.log("Accessibility focus retry error:", e);
-        }
-      }, 1200);
-
-      return () => { clearTimeout(t1); clearTimeout(t2); };
+      return () => {
+        timers.forEach(clearTimeout);
+      };
     }
   }, [notification, screenReaderEnabled]);
 
