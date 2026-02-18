@@ -275,10 +275,10 @@ const NotificationAlert = ({
     if (!isVisible) return;
 
     const timeout = setTimeout(() => {
-      // Set initial focus - prefer autoFocusTitle if enabled, otherwise use title
+      // Set initial focus
       let focusTarget = null;
-      // On Android success alerts, prefer focusing the icon for better TalkBack reliability
-      if (Platform.OS === "android" && type === "success" && internalIconRef.current) {
+      // For success alerts (iOS + Android), prefer focusing the icon so screen readers land on "Success icon".
+      if (type === "success" && internalIconRef.current) {
         focusTarget = findNodeHandle(internalIconRef.current);
       } else if (autoFocusTitle && titleRef.current) {
         focusTarget = findNodeHandle(titleRef.current);
@@ -328,11 +328,23 @@ const NotificationAlert = ({
         if (elements.length > 0) {
           const containerHandle = findNodeHandle(containerRef.current);
           if (containerHandle) {
-            AccessibilityInfo.setAccessibilityFocus(containerHandle);
             // This forces iOS to respect our ordering
             containerRef.current.setNativeProps({
               accessibilityElements: elements,
             });
+
+            // Avoid stealing focus away from the success icon.
+            if (type !== "success") {
+              AccessibilityInfo.setAccessibilityFocus(containerHandle);
+            } else if (internalIconRef.current) {
+              // Some iOS versions reset focus after setNativeProps; re-focus the icon.
+              const iconHandle = findNodeHandle(internalIconRef.current);
+              if (iconHandle) {
+                setTimeout(() => {
+                  AccessibilityInfo.setAccessibilityFocus(iconHandle);
+                }, 50);
+              }
+            }
           }
         }
       }

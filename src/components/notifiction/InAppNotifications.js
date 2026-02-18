@@ -351,7 +351,6 @@ const InAppNotifications = ({ navigation }) => {
                   }}
                   accessible={false}
                   importantForAccessibility="yes"
-                  accessibilityViewIsModal={isAndroidA11yModalActive}
                 >
                   <View
                     style={styles.spaceBottom}
