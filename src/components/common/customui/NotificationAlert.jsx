@@ -277,7 +277,10 @@ const NotificationAlert = ({
     const timeout = setTimeout(() => {
       // Set initial focus - prefer autoFocusTitle if enabled, otherwise use title
       let focusTarget = null;
-      if (autoFocusTitle && titleRef.current) {
+      // On Android success alerts, prefer focusing the icon for better TalkBack reliability
+      if (Platform.OS === "android" && type === "success" && internalIconRef.current) {
+        focusTarget = findNodeHandle(internalIconRef.current);
+      } else if (autoFocusTitle && titleRef.current) {
         focusTarget = findNodeHandle(titleRef.current);
       } else if (titleRef.current) {
         focusTarget = findNodeHandle(titleRef.current);
@@ -537,8 +540,10 @@ const NotificationAlert = ({
           ref={internalIconRef}
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
           accessible={true}
-          accessibilityRole="text"
+          importantForAccessibility="yes"
+          accessibilityRole={Platform.OS === "android" ? "text" : "image"}
           accessibilityLabel={config.iconLabel}
+          focusable={Platform.OS === "android" ? true : undefined}
         >
           <IconComponent width={24} height={24} color={config.iconColor} />
         </View>

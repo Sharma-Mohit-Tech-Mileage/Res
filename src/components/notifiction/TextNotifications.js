@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Platform,
   AccessibilityInfo,
+  findNodeHandle,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -57,6 +58,7 @@ const TextNotifications = ({ navigation }) => {
   const animatedValue = useRef(new Animated.Value(-100)).current;
   const timeoutRef = useRef(null);
   const [notification, setNotification] = useState(null);
+  const successIconRef = useRef(null);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [errorText, setErrorText] = useState(false);
@@ -128,17 +130,31 @@ const TextNotifications = ({ navigation }) => {
   // Announce error message if screen reader is enabled
   useEffect(() => {
     if (showSuccessAlert && screenReaderEnabled) {
-     
-      const t = setTimeout(() => {
+      const t1 = setTimeout(() => {
         try {
-          setSuccessFocus();
-          AccessibilityInfo.announceForAccessibility('Your text notification preferences have been updated successfully.');
+          if (successIconRef.current) {
+            const handle = findNodeHandle(successIconRef.current);
+            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+          } else {
+            setSuccessFocus();
+          }
         } catch (e) {
           console.log("Accessibility focus error:", e);
         }
       }, 600);
 
-      return () => clearTimeout(t);
+      const t2 = setTimeout(() => {
+        try {
+          if (successIconRef.current) {
+            const handle = findNodeHandle(successIconRef.current);
+            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+          }
+        } catch (e) {
+          console.log("Accessibility focus retry error:", e);
+        }
+      }, 1200);
+
+      return () => { clearTimeout(t1); clearTimeout(t2); };
     }
   }, [showSuccessAlert, screenReaderEnabled]);
 
@@ -352,10 +368,11 @@ const TextNotifications = ({ navigation }) => {
                     message={notification.message}
                     showCloseIcon={true}
                     onClose={() => setNotification(null)}
-                    autoFocusTitle={true}
+                    autoFocusTitle={false}
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"
                     accessibilityLabel={notification.message}
+                    iconRef={notification.type === "success" ? successIconRef : null}
                   />
                 </View>
               </Animated.View>

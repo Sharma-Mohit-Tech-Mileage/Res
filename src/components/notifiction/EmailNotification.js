@@ -34,6 +34,7 @@ const AddNotificationScreen = () => {
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
+  const successIconRef = useRef(null);
   const [successRef, setSuccessFocus] = useAccessibilityFocus();
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -89,18 +90,32 @@ const AddNotificationScreen = () => {
 
   useEffect(() => {
     if (notification && screenReaderEnabled) {
-      // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
-      const t = setTimeout(() => {
+      // Focus only (no extra announcements). Retry once to improve reliability on Android
+      const t1 = setTimeout(() => {
         try {
-          setMessageFocus();
-          AccessibilityInfo.announceForAccessibility(notification.message);
+          if (notification.type === "success" && successIconRef.current) {
+            const handle = findNodeHandle(successIconRef.current);
+            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+          } else {
+            setMessageFocus();
+          }
         } catch (e) {
           console.log("Accessibility focus error:", e);
         }
       }, 600);
 
-      return () => clearTimeout(t);
-      
+      const t2 = setTimeout(() => {
+        try {
+          if (notification.type === "success" && successIconRef.current) {
+            const handle = findNodeHandle(successIconRef.current);
+            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+          }
+        } catch (e) {
+          console.log("Accessibility focus retry error:", e);
+        }
+      }, 1200);
+
+      return () => { clearTimeout(t1); clearTimeout(t2); };
     }
   }, [notification, screenReaderEnabled]);
 
@@ -298,7 +313,8 @@ const AddNotificationScreen = () => {
                     showCloseIcon={true}
                     onClose={() => setNotification(null)}
                     isVisible={true}
-                    autoFocusTitle={true}
+                    autoFocusTitle={false}
+                    iconRef={successIconRef}
                   />
                 </View>
               </Animated.View>

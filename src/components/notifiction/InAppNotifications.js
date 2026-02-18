@@ -11,6 +11,7 @@ import {
   Linking,
   Alert,
   AccessibilityInfo,
+  findNodeHandle,
 } from "react-native";
 import {
   Color,
@@ -55,9 +56,13 @@ const InAppNotifications = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [isNotificationRquired, setIsNotificationRequired] = useState(false);
   const [notification, setNotification] = useState(null);
-  const [messageRef, setMessageFocus] = useAccessibilityFocus();
+  const [errorRef, setErrorFocus] = useAccessibilityFocus();
+  const [successRef, setSuccessFocus] = useAccessibilityFocus();
+  const successIconRef = useRef(null);
   const formatedData = route.params?.additionalData || {};
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+  const isAndroidA11yModalActive =
+    Platform.OS === "android" && screenReaderEnabled && !!notification;
 
   useEffect(() => {
       AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
@@ -67,20 +72,36 @@ const InAppNotifications = ({ navigation }) => {
   
     useEffect(() => {
       if (notification && screenReaderEnabled) {
-        // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
-        const t = setTimeout(() => {
+        // Focus-only, mirror Text Notifications: prefer success icon; fallback to container refs. Retry once.
+        const t1 = setTimeout(() => {
           try {
-            setMessageFocus();
-            AccessibilityInfo.announceForAccessibility(notification.message);
+            if (notification.type === "success" && successIconRef.current) {
+              const handle = findNodeHandle(successIconRef.current);
+              if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+            } else if (notification.type === "success") {
+              setSuccessFocus();
+            } else {
+              setErrorFocus();
+            }
           } catch (e) {
             console.log("Accessibility focus error:", e);
           }
         }, 600);
-  
-        return () => clearTimeout(t);
-        
+
+        const t2 = setTimeout(() => {
+          try {
+            if (notification.type === "success" && successIconRef.current) {
+              const handle = findNodeHandle(successIconRef.current);
+              if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+            }
+          } catch (e) {
+            console.log("Accessibility focus retry error:", e);
+          }
+        }, 1200);
+
+        return () => { clearTimeout(t1); clearTimeout(t2); };
       }
-    }, [notification, screenReaderEnabled]);
+    }, [notification, screenReaderEnabled, setSuccessFocus, setErrorFocus]);
   
 
   const translateY = animatedValue;
@@ -329,9 +350,13 @@ const InAppNotifications = ({ navigation }) => {
                     paddingHorizontal: Padding.p_5xl,
                   }}
                   accessible={false}
-                  importantForAccessibility="no"
+                  importantForAccessibility="yes"
+                  accessibilityViewIsModal={isAndroidA11yModalActive}
                 >
-                  <View style={styles.spaceBottom} ref={messageRef}>
+                  <View
+                    style={styles.spaceBottom}
+                    ref={notification.type === "error" ? errorRef : successRef}
+                  >
                     <NotificationAlert
                       type={notification.type}
                       title={
@@ -344,83 +369,92 @@ const InAppNotifications = ({ navigation }) => {
                       accessibilityRole="alert"
                       accessibilityLabel={notification.message}
                       isVisible={true}
-                      autoFocusTitle={true}
+                      autoFocusTitle={false}
+                      iconRef={successIconRef}
                     />
                   </View>
                 </Animated.View>
               )}
 
-              <View style={styles.infoWrapper}>
-                <NotificationAlert
-                  type="error"
-                  title="Error"
-                  message="Notifications updated failed."
-                  showCloseIcon={true}
-                  isVisible={showErrorAlert}
-                  autoFocusTitle={true}
-                  onClose={() => setShowErrorAlert(false)}
+              {/* Hide background controls from TalkBack while the notification is visible */}
+              <View
+                importantForAccessibility={
+                  isAndroidA11yModalActive ? "no-hide-descendants" : "auto"
+                }
+                accessibilityElementsHidden={isAndroidA11yModalActive}
+              >
+                <View style={styles.infoWrapper}>
+                  <NotificationAlert
+                    type="error"
+                    title="Error"
+                    message="Notifications updated failed."
+                    showCloseIcon={true}
+                    isVisible={showErrorAlert}
+                    autoFocusTitle={true}
+                    onClose={() => setShowErrorAlert(false)}
+                  />
+                </View>
+                <NotificationSetting
+                  title="Appointments"
+                  name="optOut"
+                  value={formatedData.optOut}
+                  description="Receive app notifications when your appointments have updates."
+                  onChange={handleToggleChange}
                 />
-              </View>
-              <NotificationSetting
-                title="Appointments"
-                name="optOut"
-                value={formatedData.optOut}
-                description="Receive app notifications when your appointments have updates."
-                onChange={handleToggleChange}
-              />
-              <NotificationSetting
-                title="Outage Alerts"
-                name="outageOptOut"
-                value={formatedData.outageOptOut}
-                description="Receive app notifications when outage occur."
-                onChange={handleToggleChange}
-              />
-              <NotificationSetting
-                title="Billing"
-                name="billingOptOutStatus"
-                value={formatedData.billingOptOutStatus}
-                description="Receive app notifications for billing."
-                onChange={handleToggleChange}
-              />
-            </View>
+                <NotificationSetting
+                  title="Outage Alerts"
+                  name="outageOptOut"
+                  value={formatedData.outageOptOut}
+                  description="Receive app notifications when outage occur."
+                  onChange={handleToggleChange}
+                />
+                <NotificationSetting
+                  title="Billing"
+                  name="billingOptOutStatus"
+                  value={formatedData.billingOptOutStatus}
+                  description="Receive app notifications for billing."
+                  onChange={handleToggleChange}
+                />
 
-            <View style={styles.buttonsParent}>
-              <Pressable
-                accessible={true}
-                accessibilityLabel="Save"
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  {
-                    backgroundColor: Color.colorMidnightblue,
-                    opacity: pressed ? 0.7 : 1.0,
-                  }, // Changes opacity based on press state
-                  styles.buttonsLayout,
-                ]}
-                onPress={handleSave}
-              >
-                <Text
-                  style={[{ color: Color.sparklightWhite }, styles.makeTypo]}
-                >
-                  Save
-                </Text>
-              </Pressable>
-              <Pressable
-                accessible={true}
-                accessibilityLabel="Cancel"
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  styles.buttons1,
-                  styles.buttonsLayout,
-                  { opacity: pressed ? 0.7 : 1.0 },
-                ]}
-                onPress={() => navigation.navigate("Notifications")}
-              >
-                <Text
-                  style={[{ color: Color.colorMidnightblue }, styles.makeTypo]}
-                >
-                  Cancel
-                </Text>
-              </Pressable>
+                <View style={styles.buttonsParent}>
+                  <Pressable
+                    accessible={true}
+                    accessibilityLabel="Save"
+                    accessibilityRole="button"
+                    style={({ pressed }) => [
+                      {
+                        backgroundColor: Color.colorMidnightblue,
+                        opacity: pressed ? 0.7 : 1.0,
+                      }, // Changes opacity based on press state
+                      styles.buttonsLayout,
+                    ]}
+                    onPress={handleSave}
+                  >
+                    <Text
+                      style={[{ color: Color.sparklightWhite }, styles.makeTypo]}
+                    >
+                      Save
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    accessible={true}
+                    accessibilityLabel="Cancel"
+                    accessibilityRole="button"
+                    style={({ pressed }) => [
+                      styles.buttons1,
+                      styles.buttonsLayout,
+                      { opacity: pressed ? 0.7 : 1.0 },
+                    ]}
+                    onPress={() => navigation.navigate("Notifications")}
+                  >
+                    <Text
+                      style={[{ color: Color.colorMidnightblue }, styles.makeTypo]}
+                    >
+                      Cancel
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
             </View>
           </View>
         </View>
