@@ -329,6 +329,7 @@ const InAppNotifications = ({ navigation }) => {
                     paddingHorizontal: Padding.p_5xl,
                   }}
                   accessible={false}
+                  importantForAccessibility="no"
                 >
                   <View style={styles.spaceBottom} ref={messageRef}>
                     <NotificationAlert
@@ -432,6 +433,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
   <Pressable
     style={[styles.frameContainer, styles.frameBorder]}
     accessible={false}
+    importantForAccessibility="no"
     onPress={() =>
       onChange({ target: { name, value: !value, type: "toggle" } })
     }
@@ -454,6 +456,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
               { marginTop: 8 },
             ]}
             accessible={false}
+            importantForAccessibility="no"
           >
             {description}
           </Text>

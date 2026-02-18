@@ -39,7 +39,10 @@ import VersionCheck from "react-native-version-check";
 import DeviceInfo from "react-native-device-info";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
-
+import {
+  loginWithJWT,
+  setConversationalFields,
+} from "../utility/RNZendeskChat";
 
 
 

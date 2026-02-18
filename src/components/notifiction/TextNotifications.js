@@ -342,6 +342,7 @@ const TextNotifications = ({ navigation }) => {
                   paddingHorizontal: Padding.p_5xl,
                 }}
                 accessible={false}
+                importantForAccessibility="no"
               >
                 <View style={styles.spaceBottom} ref={notification.type === "error" ? errorRef : successRef}>
                   <NotificationAlert
@@ -503,6 +504,7 @@ const TextNotifications = ({ navigation }) => {
                           false: isTermRequired? "#EF4E3E": "#D0D5DD",
                         }}
                         accessible={false}
+                        importantForAccessibility="no"
                       />
                       <Text
                         style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
@@ -608,6 +610,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
               { marginTop: 8 },
             ]}
             accessible={false}
+            importantForAccessibility="no"
           >
             {description}
           </Text>

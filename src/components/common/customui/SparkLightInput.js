@@ -179,7 +179,7 @@ function formatUsPhone(input) {
   }
 
   // Must be exactly 10 digits now
-  if (digits.length !== 10) return input;
+  if (digits.length !== 11) return input;
 
   const area = digits.substring(0, 3);
   const middle = digits.substring(3, 6);

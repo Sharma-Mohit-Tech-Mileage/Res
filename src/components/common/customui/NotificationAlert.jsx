@@ -19,7 +19,7 @@ import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
-import { useFocusEffect } from "@react-navigation/native";
+
 
 const TYPE_CONFIG = {
   info: {
@@ -553,8 +553,8 @@ const NotificationAlert = ({
 
           {title && (
             <A11y.Index index={1}>
-            <View ref={titleRef} accessible={true} accessibilityRole="header">
-              <Text
+            <View accessible={true} accessibilityRole="header">
+              <Text ref={titleRef} 
               style={[styles.title, { color: config.titleColor }]}
               accessible={true}
               accessibilityRole="header" accessibilityLevel={2}
