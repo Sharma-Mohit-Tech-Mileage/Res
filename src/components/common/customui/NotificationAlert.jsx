@@ -553,11 +553,16 @@ const NotificationAlert = ({
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
           accessible={true}
           importantForAccessibility="yes"
-          accessibilityRole={Platform.OS === "android" ? "text" : "image"}
+          accessibilityRole="text"
           accessibilityLabel={config.iconLabel}
           focusable={Platform.OS === "android" ? true : undefined}
         >
-          <IconComponent width={24} height={24} color={config.iconColor} />
+          <IconComponent
+            width={24}
+            height={24}
+            color={config.iconColor}
+            accessible={false}
+          />
         </View>
     </A11y.Index>
        
