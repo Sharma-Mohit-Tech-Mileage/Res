@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
   Pressable,
   View,
+  AccessibilityInfo,
+  InteractionManager,
+  Platform,
+  findNodeHandle,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -26,10 +30,50 @@ const PasswordSecurity = () => {
   const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [messageRef] = useAccessibilityFocus();
+  const successIconRef = useRef(null);
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const message =(route.params?.isPassword)?"Your password has been updated successfully.":"Your security question has been updated successfully."
 
-      // No extra programmatic focus here.
-      // `NotificationAlert` handles focusing the success icon on Android.
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
+
+  useEffect(() => {
+    // On iOS, focus can land on the header/back when navigating back here.
+    // Move focus to the success icon after the banner is rendered.
+    if (!showSuccessAlert || !screenReaderEnabled) return;
+
+    const focusSuccessIcon = () => {
+      try {
+        if (successIconRef.current) {
+          const handle = findNodeHandle(successIconRef.current);
+          if (handle) {
+            AccessibilityInfo.setAccessibilityFocus(handle);
+          }
+        }
+      } catch (e) {
+        console.log("Accessibility focus error:", e);
+      }
+    };
+
+    const delays = Platform.OS === "ios" ? [900, 1600] : [250, 700, 1200];
+    const timers = [];
+
+    const interaction = InteractionManager.runAfterInteractions(() => {
+      timers.push(setTimeout(focusSuccessIcon, Platform.OS === "ios" ? 0 : 150));
+    });
+
+    delays.forEach((ms) => {
+      timers.push(setTimeout(focusSuccessIcon, ms));
+    });
+
+    return () => {
+      if (interaction && typeof interaction.cancel === "function") {
+        interaction.cancel();
+      }
+      timers.forEach(clearTimeout);
+    };
+  }, [showSuccessAlert, screenReaderEnabled]);
   
   
   
@@ -68,6 +112,7 @@ const PasswordSecurity = () => {
               isVisible={showSuccessAlert}
               onClose={() => setShowSuccessAlert(false)}
               autoFocusTitle={false}
+              iconRef={successIconRef}
             />
           </View>
           {/* Keep main content accessible even when success banner is visible.
