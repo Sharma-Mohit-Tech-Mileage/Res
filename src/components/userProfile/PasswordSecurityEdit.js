@@ -50,10 +50,6 @@ const PasswordSecurityEdit = () => {
   const handleDropdownStateChange = (isOpen) => {
     setIsDropDownOpen(isOpen);
     setDropdownFocused(isOpen);
-    announceForAccessibility(isOpen ?
-      "Security question dropdown opened. Select a question." :
-      "Security question dropdown closed."
-    );
   };
 
   useEffect(() => {
@@ -90,7 +86,6 @@ const PasswordSecurityEdit = () => {
     setIsDropDownOpen(false);
     setDropdownFocused(false);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
-    announceForAccessibility(`Selected security question: ${itemValue}`);
     if (mainContentRef.current) {
       mainContentRef.current.setNativeProps({
         accessibilityElementsHidden: false,

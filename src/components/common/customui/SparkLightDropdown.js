@@ -27,9 +27,14 @@ const SparkLightDropdown = ({
 }) => {
   const validItems = Array.isArray(items) ? items : [];
   const [visible, setVisible] = React.useState(false);
+  const visibleRef = useRef(false);
   const dropdownRef = useRef(null);
   const optionsListRef = useRef(null);
   const firstOptionRef = useRef(null);
+
+  useEffect(() => {
+    visibleRef.current = visible;
+  }, [visible]);
 
   const getAccessibilityLabel = () => {
     return selectedValue 
@@ -40,24 +45,12 @@ const SparkLightDropdown = ({
   const openPicker = () => {
     setVisible(true);
     isDropDownOpen(true);
-    // Announce dropdown opened with instruction
-    if (Platform.OS === 'android') {
-      AccessibilityInfo.announceForAccessibility(`${accessibilityItemName} dropdown opened, select a question`);
-      // Set focus to first option on Android
-      setTimeout(() => {
-        if (firstOptionRef.current) {
-          const handle = findNodeHandle(firstOptionRef.current);
-          if (handle) {
-            AccessibilityInfo.setAccessibilityFocus(handle);
-          }
-        }
-      }, 300);
-    } else {
-      AccessibilityInfo.announceForAccessibility(`${accessibilityItemName} dropdown opened, select a question`);
-    }
   };
 
   const closePicker = () => {
+    // Guard: Modal callbacks (e.g., onDismiss + onRequestClose) can fire close twice.
+    if (!visibleRef.current) return;
+
     setVisible(false);
     isDropDownOpen(false);
 
@@ -67,7 +60,6 @@ const SparkLightDropdown = ({
         const handle = findNodeHandle(dropdownRef.current);
         if (handle) {
           AccessibilityInfo.setAccessibilityFocus(handle);
-          AccessibilityInfo.announceForAccessibility(`${accessibilityItemName} dropdown closed`);
         }
       }
     }, 100);
@@ -76,16 +68,9 @@ const SparkLightDropdown = ({
   const handleSelect = (value) => {
     onValueChange(value);
 
-    // Delay closing modal slightly to allow announcement
+    // Delay closing modal slightly to avoid TalkBack double-speaking
     setTimeout(() => {
       closePicker();
-      if (dropdownRef.current) {
-        const handle = findNodeHandle(dropdownRef.current);
-        if (handle) {
-          AccessibilityInfo.setAccessibilityFocus(handle);
-          AccessibilityInfo.announceForAccessibility(`Selected ${value}`);
-        }
-      }
     }, 50);
   };
 
@@ -104,7 +89,7 @@ const SparkLightDropdown = ({
         <Text style={styles.dropdownText} accessible={false} importantForAccessibility="no">
           {selectedValue || placeholder}
         </Text>
-        <DownArrow/>
+        <DownArrow accessible={false} />
         
       </TouchableOpacity>
 
@@ -113,7 +98,6 @@ const SparkLightDropdown = ({
         transparent={true}
         animationType="slide"
         onRequestClose={closePicker}
-        onDismiss={closePicker}
       >
         <View style={styles.modalContainer}>
           <Pressable 
@@ -143,8 +127,7 @@ const SparkLightDropdown = ({
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="Close dropdown, button"
-                  accessibilityHint="Double-tap to activate"
+                  accessibilityLabel="Close dropdown"
                 >
                   <Text style={styles.closeButtonText} accessible={false} importantForAccessibility="no">✕</Text>
                 </TouchableOpacity>
