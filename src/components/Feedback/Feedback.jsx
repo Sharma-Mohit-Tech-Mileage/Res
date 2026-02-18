@@ -48,6 +48,7 @@ const Feedback = () => {
     "Please enter valid information to continue."
   );
   const scrollViewRef = useRef(null);
+  const feedbackRemainingRef = useRef(500);
 
   const {
     control,
@@ -227,9 +228,31 @@ const Feedback = () => {
               render={({ field: { onChange, onBlur, value } }) => {
                 const handleChange = (text) => {
                   onChange(text);
-                  AccessibilityInfo.announceForAccessibility(
-                    `You have ${500 - (text.length || 0)} characters available`
-                  );
+                  const remaining = 500 - (text?.length || 0);
+                  const previousRemaining = feedbackRemainingRef.current;
+                  feedbackRemainingRef.current = remaining;
+
+                  const thresholds = [320, 160, 80, 40, 20, 10];
+
+                  let thresholdToAnnounce = null;
+
+                  if (thresholds.includes(remaining)) {
+                    thresholdToAnnounce = remaining;
+                  } else {
+                    const crossed = thresholds.find(
+                      (t) => remaining < t && previousRemaining >= t
+                    );
+
+                    if (crossed != null) {
+                      thresholdToAnnounce = crossed;
+                    }
+                  }
+
+                  if (thresholdToAnnounce != null) {
+                    AccessibilityInfo.announceForAccessibility(
+                      `You have ${thresholdToAnnounce} characters available`
+                    );
+                  }
                 };
                 return (
                   <>
@@ -248,8 +271,7 @@ const Feedback = () => {
                     <Text
                       style={styles.charCount}
                       accessibilityRole="text"
-                      accessibilityLiveRegion="polite"
-                      accessibilityLabel={`You have ${500 - (value?.length || 0)} characters available`}
+                      accessibilityLabel={`Character count ${value?.length || 0} of 500`}
                     >
                       {`${value?.length || 0}/500`}
                     </Text>
