@@ -99,13 +99,20 @@ class AnnouncementPersistence {
     }
   }
 
-  static async hasAppVersionChanged() {
+  static async hasAppVersionChanged(mobileTCAcceptanceFlag = false) {
     try {
       const lastVersion = await AsyncStorage.getItem(VERSION_KEY);
       const currentVersion = DeviceInfo.getVersion();
 
       if (!lastVersion) {
         await AsyncStorage.setItem(VERSION_KEY, currentVersion);
+
+        if (mobileTCAcceptanceFlag) {
+          console.log(`[AnnouncementPersistence] No stored version but TC accepted — treating as upgrade`);
+          return true;
+        }
+
+        console.log(`[AnnouncementPersistence] No stored version, new user — not an upgrade`);
         return false;
       }
 

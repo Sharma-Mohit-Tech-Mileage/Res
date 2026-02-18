@@ -39,7 +39,7 @@ class AnnouncementManager {
     });
   }
 
-  static async shouldShowCampaign(campaign) {
+  static async shouldShowCampaign(campaign, userInfo = {}) {
     const campaignId = campaign.id;
     const completed = await AnnouncementPersistence.hasBeenCompleted(campaignId);
     if (completed) {
@@ -64,7 +64,8 @@ class AnnouncementManager {
 
     if (campaign.trigger?.type === 'app_launch' && 
         campaign.trigger?.showAfterUpgrade) {
-      const versionChanged = await AnnouncementPersistence.hasAppVersionChanged();
+      const mobileTCAcceptanceFlag = userInfo?.mobileTCAcceptanceFlag || false;
+      const versionChanged = await AnnouncementPersistence.hasAppVersionChanged(mobileTCAcceptanceFlag);
       if (!versionChanged) {
         console.log(`[AnnouncementManager] Campaign ${campaignId} requires version change`);
         return false;
@@ -108,7 +109,7 @@ class AnnouncementManager {
           continue;
         }
 
-        if (!(await this.shouldShowCampaign(campaign))) {
+        if (!(await this.shouldShowCampaign(campaign, userInfo))) {
           console.log(`[AnnouncementManager] Campaign ${campaign.id} not eligible (persistence)`);
           continue;
         }

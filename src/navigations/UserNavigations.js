@@ -13,17 +13,13 @@ import MyTabs from "./MyTab";
 import { AxiosInterceptorProvider } from "../network/RestApiClient";
 import MaintenanceWrapper from "../components/maintenance/MaintenanceWrapper";
 import { AnnouncementProvider } from "../contexts/AnnouncementContext";
-import { useAnnouncement } from "../hooks/useAnnouncement";
+
 const Stack = createNativeStackNavigator();
 export const navigationRef = React.createRef();
 
 const UserNavigations = (props) => {
   const routeNameRef = useRef();
-  const { triggerOnAppLaunch } = useAnnouncement();
 
-  useEffect(() => {
-    triggerOnAppLaunch();
-  }, [triggerOnAppLaunch]);
   const onReady = () => {
     if (navigationRef.current) {
       const currentRoute = navigationRef.current.getCurrentRoute();
