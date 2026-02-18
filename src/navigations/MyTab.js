@@ -257,6 +257,41 @@ const createTabBarButton = useCallback(
 
   return (
     <>
+      <View
+        style={{ flex: 1 }}
+        // When walkthrough is active, keep background out of the SR tree.
+        // Walkthrough overlay renders outside this wrapper, so it stays accessible.
+        accessibilityElementsHidden={isWalkthroughActive && isScreenReaderEnabled}
+        importantForAccessibility={
+          isWalkthroughActive && isScreenReaderEnabled
+            ? "no-hide-descendants"
+            : "auto"
+        }
+        pointerEvents={isWalkthroughActive ? "none" : "auto"}
+      >
+        <Tab.Navigator
+            initialRouteName="Home"
+            screenOptions={screenOptions}
+          >
+            {visibleTabs.map((tab,index) => (
+              <Tab.Screen
+                key={tab.id}
+                name={tab.screenName}
+                component={getComponent(tab.component)}
+                initialParams={{ data: route }}
+                options={{      
+                  tabBarLabel: tab.name,
+                  tabBarAccessibilityLabel: `${tab.name}, ${index + 1} of ${visibleTabs.length}, tab`,
+                  tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
+                  tabBarButton: (props) =>
+                    createTabBarButton(props, tab, index + 1, visibleTabs.length),
+                }}
+                listeners={createTabListeners(tab)}
+              />
+            ))}
+          </Tab.Navigator>
+      </View>
+
       {showWalkthrough && (
         <WalkthroughOverlay
           visibleTabs={visibleTabs}
@@ -265,28 +300,6 @@ const createTabBarButton = useCallback(
           tabBarHeight={tabBarHeight}
         />
       )}
-
-      <Tab.Navigator
-          initialRouteName="Home"
-          screenOptions={screenOptions}
-        >
-          {visibleTabs.map((tab,index) => (
-            <Tab.Screen
-              key={tab.id}
-              name={tab.screenName}
-              component={getComponent(tab.component)}
-              initialParams={{ data: route }}
-              options={{      
-                tabBarLabel: tab.name,
-                tabBarAccessibilityLabel: `${tab.name}, ${index + 1} of ${visibleTabs.length}, tab`,
-                tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
-                tabBarButton: (props) =>
-                  createTabBarButton(props, tab, index + 1, visibleTabs.length),
-              }}
-              listeners={createTabListeners(tab)}
-            />
-          ))}
-        </Tab.Navigator>
     </>
   );
 };
