@@ -342,7 +342,6 @@ const ChangePassword = () => {
                                 </View>
                                 <Text
                                   style={styles.bulletPoiint}
-                                  accessibilityLiveRegion="polite"
                                 >
                                   {passwordTerms[index]}
                                 </Text>

@@ -130,7 +130,7 @@ const getIconComponent = (tabId, focused) => {
   );
 
 const createTabBarButton = useCallback(
-  (props, tab) => {
+  (props, tab, tabPosition, tabCount) => {
     if (!tab) {
       return <Pressable {...props} />;
     }
@@ -146,7 +146,7 @@ const createTabBarButton = useCallback(
         accessible={!hideFromAccessibility}
         importantForAccessibility={hideFromAccessibility ? "no-hide-descendants" : "yes"}
         accessibilityElementsHidden={hideFromAccessibility}
-        accessibilityLabel={`${tab.name} tab`}
+        accessibilityLabel={`${tab.name}, ${tabPosition} of ${tabCount}, tab`}
         accessibilityRole="tab"
         accessibilityState={{
           ...props.accessibilityState,
@@ -278,9 +278,10 @@ const createTabBarButton = useCallback(
               initialParams={{ data: route }}
               options={{      
                 tabBarLabel: tab.name,
-                tabBarAccessibilityLabel: `${tab.name} tab, step ${index + 1} of ${visibleTabs.length}`,
+                tabBarAccessibilityLabel: `${tab.name}, ${index + 1} of ${visibleTabs.length}, tab`,
                 tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
-                tabBarButton: (props) => createTabBarButton(props, tab),
+                tabBarButton: (props) =>
+                  createTabBarButton(props, tab, index + 1, visibleTabs.length),
               }}
               listeners={createTabListeners(tab)}
             />
