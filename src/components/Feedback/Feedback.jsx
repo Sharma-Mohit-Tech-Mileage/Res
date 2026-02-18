@@ -232,7 +232,7 @@ const Feedback = () => {
                   const previousRemaining = feedbackRemainingRef.current;
                   feedbackRemainingRef.current = remaining;
 
-                  const thresholds = [320, 160, 80, 40, 20, 10];
+                  const thresholds = [320, 160, 80, 40, 20, 10, 0];
 
                   let thresholdToAnnounce = null;
 
