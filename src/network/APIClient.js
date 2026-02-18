@@ -1,10 +1,10 @@
 import { getUser } from "../redux/utils/LocalStorage";
 import { Env } from "./apis/account/Constants";
 import axios from "axios";
+import Config from "react-native-config";
 import { RefreshToken } from "../components/user/Session";
 import { navigationRef } from "../navigations/UserNavigations";
-
-const API_ACP_BASEURL = Env.API_ACP_BASEURL;
+const API_ACP_BASEURL = Config.API_ACP_BASEURL;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
 
 export let UserAuthorized = false;

@@ -100,7 +100,29 @@ android {
         versionName "25.0.1"
     }
 
-    
+
+    flavorDimensions "env"
+    productFlavors {
+        development {
+            dimension "env"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+            resValue "string", "build_config_package", "com.sparklight"
+        }
+        staging {
+            dimension "env"
+            applicationIdSuffix ".staging"
+            versionNameSuffix "-stg"
+            resValue "string", "build_config_package", "com.sparklight"
+        }
+        production {
+            dimension "env"
+            resValue "string", "build_config_package", "com.sparklight"
+        }
+    }
+
+
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
