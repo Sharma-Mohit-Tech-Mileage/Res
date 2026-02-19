@@ -34,6 +34,7 @@ const AddNotificationScreen = () => {
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
+  const successIconRef = useRef(null);
   const [successRef, setSuccessFocus] = useAccessibilityFocus();
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -89,18 +90,30 @@ const AddNotificationScreen = () => {
 
   useEffect(() => {
     if (notification && screenReaderEnabled) {
-      // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
-      const t = setTimeout(() => {
-        try {
-          setMessageFocus();
-          AccessibilityInfo.announceForAccessibility(notification.message);
-        } catch (e) {
-          console.log("Accessibility focus error:", e);
-        }
-      }, 600);
+      // Focus only (no extra announcements).
+      // On iOS, focus can be stolen by the header/back during the notification animation,
+      // so we delay slightly longer and retry once.
+      const delays = Platform.OS === "ios" ? [900, 1600] : [600, 1200];
 
-      return () => clearTimeout(t);
-      
+      const timers = delays.map((ms) =>
+        setTimeout(() => {
+          try {
+            if (notification.type === "success" && successIconRef.current) {
+              const handle = findNodeHandle(successIconRef.current);
+              if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+              return;
+            }
+
+            setMessageFocus();
+          } catch (e) {
+            console.log("Accessibility focus error:", e);
+          }
+        }, ms)
+      );
+
+      return () => {
+        timers.forEach(clearTimeout);
+      };
     }
   }, [notification, screenReaderEnabled]);
 
@@ -298,7 +311,8 @@ const AddNotificationScreen = () => {
                     showCloseIcon={true}
                     onClose={() => setNotification(null)}
                     isVisible={true}
-                    autoFocusTitle={true}
+                    autoFocusTitle={false}
+                    iconRef={successIconRef}
                   />
                 </View>
               </Animated.View>
@@ -388,12 +402,12 @@ const AddNotificationScreen = () => {
                     )}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
-                  <Text style={styles.toggleStatus} accessible={false}>
+                  <Text style={styles.toggleStatus} accessible={false} importantForAccessibility="no">
                     {primaryEmail ? "On" : "Off"}
                   </Text>
                 </View>
               </View>
-              <Text style={styles.toggleDescription} accessible={false}>
+              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
                 Receive critical information, account changes, and service
                 updates.
               </Text>
@@ -416,7 +430,7 @@ const AddNotificationScreen = () => {
                   Paperless Billing
                 </Text>
                 </A11y.Index>
-                <View style={{ flex: 0.1 }} accessible={false}>
+                <View style={{ flex: 0.1 }} accessible={false} importantForAccessibility="no">
                   <A11y.Index index={1}>
                   <Toggle
                     name="paperlessBilling"
@@ -429,7 +443,7 @@ const AddNotificationScreen = () => {
                   </A11y.Index>
                 </View>
               </View>
-              <Text style={styles.toggleDescription} accessible={false}>
+              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
                 Opt for email statements and say goodbye to paper clutter. It's
                 convenient, eco-friendly, and keeps your information at your
                 fingertips.
@@ -458,6 +472,7 @@ const AddNotificationScreen = () => {
                         false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
                       }}
                       accessible={false}
+                      importantForAccessibility="no"
                     />
                     <Text
                       style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}

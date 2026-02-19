@@ -1,5 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, Pressable, View,AccessibilityInfo } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  Pressable,
+  View,
+  AccessibilityInfo,
+  InteractionManager,
+  Platform,
+  findNodeHandle,
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Color,
@@ -20,7 +29,8 @@ const PasswordSecurity = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
-  const [messageRef, setMessageFocus] = useAccessibilityFocus();
+  const [messageRef] = useAccessibilityFocus();
+  const successIconRef = useRef(null);
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const message =(route.params?.isPassword)?"Your password has been updated successfully.":"Your security question has been updated successfully."
 
@@ -28,22 +38,42 @@ const PasswordSecurity = () => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
   }, []);
 
-      useEffect(() => {
-        if (showSuccessAlert && screenReaderEnabled) {
-          // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
-          const t = setTimeout(() => {
-            try {
-              setMessageFocus();
-              //AccessibilityInfo.announceForAccessibility(message);
-            } catch (e) {
-              console.log("Accessibility focus error:", e);
-            }
-          }, 600);
-    
-          return () => clearTimeout(t);
-          
+  useEffect(() => {
+    // On iOS, focus can land on the header/back when navigating back here.
+    // Move focus to the success icon after the banner is rendered.
+    if (!showSuccessAlert || !screenReaderEnabled) return;
+
+    const focusSuccessIcon = () => {
+      try {
+        if (successIconRef.current) {
+          const handle = findNodeHandle(successIconRef.current);
+          if (handle) {
+            AccessibilityInfo.setAccessibilityFocus(handle);
+          }
         }
-      }, [showSuccessAlert, screenReaderEnabled]);
+      } catch (e) {
+        console.log("Accessibility focus error:", e);
+      }
+    };
+
+    const delays = Platform.OS === "ios" ? [900, 1600] : [250, 700, 1200];
+    const timers = [];
+
+    const interaction = InteractionManager.runAfterInteractions(() => {
+      timers.push(setTimeout(focusSuccessIcon, Platform.OS === "ios" ? 0 : 150));
+    });
+
+    delays.forEach((ms) => {
+      timers.push(setTimeout(focusSuccessIcon, ms));
+    });
+
+    return () => {
+      if (interaction && typeof interaction.cancel === "function") {
+        interaction.cancel();
+      }
+      timers.forEach(clearTimeout);
+    };
+  }, [showSuccessAlert, screenReaderEnabled]);
   
   
   
@@ -69,7 +99,11 @@ const PasswordSecurity = () => {
       />
       <View style={[styles.passwordSecurityInner, styles.securitySpaceBlock]}>
         <View style={[styles.frameParent, styles.navigationBorder]}>
-          <View style={styles.infoWrapper} ref={messageRef}>
+          <View
+            style={styles.infoWrapper}
+            ref={messageRef}
+            importantForAccessibility="yes"
+          >
             <NotificationAlert
               type="success"
               title="Success"
@@ -77,68 +111,84 @@ const PasswordSecurity = () => {
               showCloseIcon={true}
               isVisible={showSuccessAlert}
               onClose={() => setShowSuccessAlert(false)}
+              autoFocusTitle={false}
+              iconRef={successIconRef}
             />
           </View>
-          <View style={[styles.passwordParent, styles.tabsFlexBox]}>
-            <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header" accessibilityLevel={2}>
-              Password
-            </Text>
-            <Pressable
-              accessible={true}
-              accessibilityLabel="Edit Password"
-              accessibilityRole="button"
-              accessibilityHint="Double click to open edit password screen"
-              style={[styles.buttons, styles.buttonsBg]}
-              onPress={() => navigation.navigate("PasswordEdit")}
-            >
-              <Text style={[styles.makePayment, styles.titleFlexBox]}>
-                Edit
-              </Text>
-            </Pressable>
-          </View>
-          <View style={styles.frameGroup}>
-            <View style={styles.passwordGroup}>
-              <Text style={[styles.passwordFlexBox]}>Password</Text>
+          {/* Keep main content accessible even when success banner is visible.
+              Only the header/back is hidden during the banner to prevent focus snapping there. */}
+          <View>
+            <View style={[styles.passwordParent, styles.tabsFlexBox]}>
               <Text
-                style={[styles.text, styles.passwordFlexBox]}
-                accessibilityRole="text"
-                accessibilityLabel="Password: hidden."
+                style={[styles.password, styles.passwordFlexBox]}
+                accessibilityRole="header"
+                accessibilityLevel={2}
               >
-                **********
+                Password
               </Text>
-            </View>
-            <View
-              style={[styles.rectangleWrapper, styles.frameContainerSpaceBlock]}
-            >
-              <View style={styles.frameChild} />
-            </View>
-            <View style={styles.frameContainerSpaceBlock}>
-              <View
-                style={[styles.securityQuestionWrapper, styles.tabsFlexBox]}
+              <Pressable
+                accessible={true}
+                accessibilityLabel="Edit Password"
+                accessibilityRole="button"
+                accessibilityHint="Double click to open edit password screen"
+                style={[styles.buttons, styles.buttonsBg]}
+                onPress={() => navigation.navigate("PasswordEdit")}
               >
-                <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header" accessibilityLevel={2} >
-                  Security Question
-                </Text>
-                <Pressable
-                  accessible={true}
-                  accessibilityLabel="Edit Security Question"
-                  accessibilityRole="button"
-                  style={[styles.buttons, styles.buttonsBg]}
-                  onPress={() => navigation.navigate("PasswordSecurityEdit")}
-                >
-                  <Text style={[styles.makePayment, styles.titleFlexBox]}>
-                    Edit
-                  </Text>
-                </Pressable>
-              </View>
+                <Text style={[styles.makePayment, styles.titleFlexBox]}>Edit</Text>
+              </Pressable>
+            </View>
+            <View style={styles.frameGroup}>
               <View style={styles.passwordGroup}>
-                <View style={styles.nameOfYourFirstPetParent}>
-                  <Text style={[styles.passwordFlexBox]}>
-                    {profileDetails.securityQuestion}
+                <Text style={[styles.passwordFlexBox]}>Password</Text>
+                <Text
+                  style={[styles.text, styles.passwordFlexBox]}
+                  accessibilityRole="text"
+                  accessibilityLabel="Password: hidden."
+                >
+                  **********
+                </Text>
+              </View>
+              <View
+                style={[styles.rectangleWrapper, styles.frameContainerSpaceBlock]}
+              >
+                <View style={styles.frameChild} />
+              </View>
+              <View style={styles.frameContainerSpaceBlock}>
+                <View
+                  style={[styles.securityQuestionWrapper, styles.tabsFlexBox]}
+                >
+                  <Text
+                    style={[styles.password, styles.passwordFlexBox]}
+                    accessibilityRole="header"
+                    accessibilityLevel={2}
+                  >
+                    Security Question
                   </Text>
-                  <Text style={[styles.text, styles.passwordFlexBox]} accessibilityRole="text" accessibilityLabel="Security Answer: hidden.">
-                    ******
-                  </Text>
+                  <Pressable
+                    accessible={true}
+                    accessibilityLabel="Edit Security Question"
+                    accessibilityRole="button"
+                    style={[styles.buttons, styles.buttonsBg]}
+                    onPress={() => navigation.navigate("PasswordSecurityEdit")}
+                  >
+                    <Text style={[styles.makePayment, styles.titleFlexBox]}>
+                      Edit
+                    </Text>
+                  </Pressable>
+                </View>
+                <View style={styles.passwordGroup}>
+                  <View style={styles.nameOfYourFirstPetParent}>
+                    <Text style={[styles.passwordFlexBox]}>
+                      {profileDetails.securityQuestion}
+                    </Text>
+                    <Text
+                      style={[styles.text, styles.passwordFlexBox]}
+                      accessibilityRole="text"
+                      accessibilityLabel="Security Answer: hidden."
+                    >
+                      ******
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>

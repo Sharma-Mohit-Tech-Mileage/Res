@@ -52,43 +52,6 @@ const ProfileSettingsHeader = ({
       >
         <>
           <View style={[styles.navBar]}>
-            {showIcon && (
-              <View style={[styles.buttonContainer, { flex: 1 }]}>
-                <Pressable
-                  style={[styles.pressable]}
-                  onPress={handleBackPress}
-                  onAccessibilityTap={handleBackPress}
-                  onAccessibilityAction={({ nativeEvent }) => {
-                    if (nativeEvent.actionName === "activate") {
-                      handleBackPress();
-                    }
-                  }}
-                  accessible={true}
-                  focusable={true}
-                  accessibilityLabel="Back"
-                  accessibilityHint="Returns to the previous screen"
-                  accessibilityRole="button"
-                  accessibilityActions={[{ name: "activate", label: "Go back" }]}
-                  accessibilityState={{ disabled: typeof onPressBack !== "function" }}
-                  hitSlop={{ top: 60, bottom: 60, left: 60, right: 60 }}
-                  onPressIn={handlePressIn}
-                  onPressOut={handlePressOut}
-                >
-                  
-                  <View
-                    style={[
-                      styles.icon,
-                      iconPressed ? styles.iconPressed : null,
-                    ]}
-                    accessible={false}
-                    accessibilityElementsHidden={true}
-                    importantForAccessibility="no-hide-descendants"
-                  >
-                    <IconComponent accessible={false} />
-                  </View>
-                </Pressable>
-              </View>
-            )}
             <View style={[styles.titleContainer, { flex: 1 }]}>
               <Text
                 style={styles.title}
@@ -103,6 +66,40 @@ const ProfileSettingsHeader = ({
             <View style={{ justifyContent: "flex-end" }}>
               <ZendeskChatIcon />
             </View>
+
+            {showIcon && (
+              <View style={styles.buttonContainer} pointerEvents="box-none">
+                <Pressable
+                  style={styles.pressable}
+                  onPress={handleBackPress}
+                  onAccessibilityTap={handleBackPress}
+                  onAccessibilityAction={({ nativeEvent }) => {
+                    if (nativeEvent.actionName === "activate") {
+                      handleBackPress();
+                    }
+                  }}
+                  accessible={true}
+                  focusable={true}
+                  accessibilityLabel="Back"
+                  accessibilityHint="Returns to the previous screen"
+                  accessibilityRole="button"
+                  accessibilityActions={[{ name: "activate", label: "Go back" }]}
+                  accessibilityState={{ disabled: typeof onPressBack !== "function" }}
+                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                >
+                  <View
+                    style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+                    accessible={false}
+                    accessibilityElementsHidden={true}
+                    importantForAccessibility="no-hide-descendants"
+                  >
+                    <IconComponent accessible={false} />
+                  </View>
+                </Pressable>
+              </View>
+            )}
           </View>
         </>
       </LinearGradient>
@@ -128,8 +125,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   buttonContainer: {
-    position: "absolute", // Position the button absolutely
-    left: 8, // Align to the left
+    position: "absolute",
+    left: 8,
+    top: 0,
+    bottom: 0,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 10,

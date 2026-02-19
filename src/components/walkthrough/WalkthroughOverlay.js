@@ -149,6 +149,8 @@ const WalkthroughOverlay = ({
             }),
           },
         ]}
+        pointerEvents="box-only"
+        onStartShouldSetResponder={() => true}
         importantForAccessibility="no-hide-descendants"
         accessibilityElementsHidden={true}
         accessible={false}
@@ -170,6 +172,8 @@ const WalkthroughOverlay = ({
               }),
             },
           ]}
+          pointerEvents="box-only"
+          onStartShouldSetResponder={() => true}
           importantForAccessibility="no-hide-descendants"
           accessibilityElementsHidden={true}
           accessible={false}
@@ -194,6 +198,8 @@ const WalkthroughOverlay = ({
               }),
             },
           ]}
+          pointerEvents="box-only"
+          onStartShouldSetResponder={() => true}
           importantForAccessibility="no-hide-descendants"
           accessibilityElementsHidden={true}
           accessible={false}
@@ -215,6 +221,8 @@ const WalkthroughOverlay = ({
             }),
           },
         ]}
+        // Do not block the highlighted tab press.
+        pointerEvents="none"
         importantForAccessibility="no-hide-descendants"
         accessibilityElementsHidden={true}
         accessible={false}

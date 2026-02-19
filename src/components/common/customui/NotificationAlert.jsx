@@ -19,7 +19,7 @@ import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
-import { useFocusEffect } from "@react-navigation/native";
+
 
 const TYPE_CONFIG = {
   info: {
@@ -275,9 +275,12 @@ const NotificationAlert = ({
     if (!isVisible) return;
 
     const timeout = setTimeout(() => {
-      // Set initial focus - prefer autoFocusTitle if enabled, otherwise use title
+      // Set initial focus
       let focusTarget = null;
-      if (autoFocusTitle && titleRef.current) {
+      // For success alerts (iOS + Android), prefer focusing the icon so screen readers land on "Success icon".
+      if (type === "success" && internalIconRef.current) {
+        focusTarget = findNodeHandle(internalIconRef.current);
+      } else if (autoFocusTitle && titleRef.current) {
         focusTarget = findNodeHandle(titleRef.current);
       } else if (titleRef.current) {
         focusTarget = findNodeHandle(titleRef.current);
@@ -325,11 +328,23 @@ const NotificationAlert = ({
         if (elements.length > 0) {
           const containerHandle = findNodeHandle(containerRef.current);
           if (containerHandle) {
-            AccessibilityInfo.setAccessibilityFocus(containerHandle);
             // This forces iOS to respect our ordering
             containerRef.current.setNativeProps({
               accessibilityElements: elements,
             });
+
+            // Avoid stealing focus away from the success icon.
+            if (type !== "success") {
+              AccessibilityInfo.setAccessibilityFocus(containerHandle);
+            } else if (internalIconRef.current) {
+              // Some iOS versions reset focus after setNativeProps; re-focus the icon.
+              const iconHandle = findNodeHandle(internalIconRef.current);
+              if (iconHandle) {
+                setTimeout(() => {
+                  AccessibilityInfo.setAccessibilityFocus(iconHandle);
+                }, 50);
+              }
+            }
           }
         }
       }
@@ -537,10 +552,17 @@ const NotificationAlert = ({
           ref={internalIconRef}
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
           accessible={true}
+          importantForAccessibility="yes"
           accessibilityRole="text"
           accessibilityLabel={config.iconLabel}
+          focusable={Platform.OS === "android" ? true : undefined}
         >
-          <IconComponent width={24} height={24} color={config.iconColor} />
+          <IconComponent
+            width={24}
+            height={24}
+            color={config.iconColor}
+            accessible={false}
+          />
         </View>
     </A11y.Index>
        
@@ -553,8 +575,8 @@ const NotificationAlert = ({
 
           {title && (
             <A11y.Index index={1}>
-            <View ref={titleRef} accessible={true} accessibilityRole="header">
-              <Text
+            <View accessible={true} accessibilityRole="header">
+              <Text ref={titleRef} 
               style={[styles.title, { color: config.titleColor }]}
               accessible={true}
               accessibilityRole="header" accessibilityLevel={2}
