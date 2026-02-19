@@ -34,52 +34,39 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
         };
 
         onToggle && onToggle(event);
-            // Announce immediate state change for screen readers
+
+        // Announce/focus handling for screen readers
         const stateWord = nextState ? 'On' : 'Off';
-        const opposite = nextState ? 'Off' : 'On';
-        const statusWord = nextState ? 'enabled' : 'disabled';
         const sectionLabelText = {
             textNotif: `${label || 'Appointment'} for text notifications`,
             inAppNotif: `${label || 'Appointment'} for In-app notifications`,
             paperless: `${label || 'Paperless Billing'} for email notifications`,
         }[section] || (label || name || 'Notification');
 
-        // For In-app notifications use the specific phrasing requested by accessibility team
-        if (section === 'inAppNotif' || section === 'textNotif') {
-            const defaultPrefix = section === 'inAppNotif' ? 'In App Notification' : 'Text Notification';
-            const prefix = a11yCategory || defaultPrefix;
-            const itemName = a11yName || (label ? label.replace(/s$/i, '') : 'Appointment');
-            const announce = `${prefix} ${statusWord} for ${itemName}. Toggle setting, Double tap to turn ${opposite}.`;
-            // Step 1: announce the sentence after a short delay
-            // Increase delays for Android to improve TalkBack reliability
-            // Increase delays for both Android and iOS to improve reliability
-            const announceDelay = Platform.OS === 'android' ? 500 : 300;
-            const focusDelay = Platform.OS === 'android' ? 400 : 200;
-            setTimeout(() => {
-                try {
-                    AccessibilityInfo.announceForAccessibility(announce);
-                } catch (e) {
-                    console.log('announce error', e);
-                }
-
-                // Step 2: after a short delay, move accessibility focus to the toggle
-                setTimeout(() => {
-                    try {
-                        const tag = findNodeHandle(containerRef.current);
-                        if (tag) {
-                            if (Platform.OS === 'android') {
-                                AccessibilityInfo.sendAccessibilityEvent(tag, 'focus');
-                            } else {
-                                AccessibilityInfo.setAccessibilityFocus(tag);
-                            }
-                        }
-                    } catch (e) {
-                        console.log('focus error', e);
+        const focusToggle = () => {
+            try {
+                const tag = findNodeHandle(containerRef.current);
+                if (tag) {
+                    if (Platform.OS === 'android') {
+                        AccessibilityInfo.sendAccessibilityEvent(tag, 'focus');
+                    } else {
+                        AccessibilityInfo.setAccessibilityFocus(tag);
                     }
-                }, focusDelay);
-            }, announceDelay);
+                }
+            } catch (e) {
+                console.log('focus error', e);
+            }
+        };
+
+        // For In-app and Text notifications, rely on the control's
+        // accessibilityLabel (which already includes state + instructions)
+        // and only move focus so we don't get duplicate spoken output.
+        if (section === 'inAppNotif' || section === 'textNotif') {
+            const focusDelay = Platform.OS === 'android' ? 400 : 200;
+            setTimeout(focusToggle, focusDelay);
         } else {
-            // Delay slightly and announce state only (omit actionable phrase to avoid duplication with accessibilityHint)
+            // For other sections, keep a concise explicit announcement
+            // followed by moving focus to the toggle.
             const announce = `${sectionLabelText}. Toggle button, ${stateWord}.`;
             const announceDelay = Platform.OS === 'android' ? 300 : 80;
             const focusDelay = Platform.OS === 'android' ? 220 : 60;
@@ -90,20 +77,7 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
                     console.log('announce error', e);
                 }
 
-                setTimeout(() => {
-                    try {
-                        const tag = findNodeHandle(containerRef.current);
-                        if (tag) {
-                            if (Platform.OS === 'android') {
-                                AccessibilityInfo.sendAccessibilityEvent(tag, 'focus');
-                            } else {
-                                AccessibilityInfo.setAccessibilityFocus(tag);
-                            }
-                        }
-                    } catch (e) {
-                        console.log('focus error', e);
-                    }
-                }, focusDelay);
+                setTimeout(focusToggle, focusDelay);
             }, announceDelay);
         }
 

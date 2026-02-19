@@ -56,11 +56,15 @@ const PasswordSecurity = () => {
       }
     };
 
-    const delays = Platform.OS === "ios" ? [900, 1600] : [250, 700, 1200];
+    // More aggressive retries to override navigation focus stealing
+    // Android needs longer delays as TalkBack takes more time after navigation
+    const delays = Platform.OS === "ios" 
+      ? [100, 300, 600, 1000, 1500, 2000] 
+      : [10, 50, 150, 300, 500, 800, 1200, 1800, 2500];
     const timers = [];
 
     const interaction = InteractionManager.runAfterInteractions(() => {
-      timers.push(setTimeout(focusSuccessIcon, Platform.OS === "ios" ? 0 : 150));
+      timers.push(setTimeout(focusSuccessIcon, Platform.OS === "ios" ? 50 : 0));
     });
 
     delays.forEach((ms) => {
