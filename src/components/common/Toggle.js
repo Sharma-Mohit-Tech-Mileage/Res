@@ -131,7 +131,7 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
             onPress={handleToggle}
             accessible={true}
             accessibilityLabel={getAccessibilityLabel()}
-            accessibilityRole="button"
+            //accessibilityRole="button"
             accessibilityHint={disabled ? '' : (section === 'inAppNotif' || section === 'textNotif' ? '' : (isActive ? 'Double tap to turn off' : 'Double tap to turn on'))}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >

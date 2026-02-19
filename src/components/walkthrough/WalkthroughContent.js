@@ -58,6 +58,23 @@ const WalkthroughContent = ({
   const { walkthrough } = tab;
   const isLastStep = currentStep === totalSteps - 1;
 
+  const walkthroughA11yLabel = (() => {
+    switch (tab?.id) {
+      case "home":
+        return "Home Dashboard Tab";
+      case "billing":
+        return "Billing & Payments Tab";
+      case "services":
+        return "Service Tab";
+      case "support":
+        return "Support Center Tab";
+      case "account":
+        return "Account Settings Tab";
+      default:
+        return `${tab?.name || ""} Tab`.trim();
+    }
+  })();
+
   return (
     <View style={styles.bubble} accessible={false}>
       {/* Header */}
@@ -66,7 +83,7 @@ const WalkthroughContent = ({
           <Animated.View
             style={[styles.iconCircle, { transform: [{ scale: pulseAnim }] }]}
             accessible={true}
-            accessibilityLabel={`${tab.name} tab icon`}
+            accessibilityLabel={walkthroughA11yLabel}
             accessibilityRole="text"
             ref={titleRef}
           >

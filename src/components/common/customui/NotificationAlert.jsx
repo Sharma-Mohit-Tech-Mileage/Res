@@ -555,7 +555,7 @@ const NotificationAlert = ({
           importantForAccessibility="yes"
           accessibilityRole="text"
           accessibilityLabel={config.iconLabel}
-          focusable={Platform.OS === "android" ? true : undefined}
+          //focusable={Platform.OS === "android"} // Android needs focusable for accessibility focus to work on non-interactive elements
         >
           <IconComponent
             width={24}
