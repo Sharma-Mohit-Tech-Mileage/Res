@@ -2,7 +2,8 @@ import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from "axios";
 import moment from "moment";
-import { Env } from "./Constants";
+//import { Env } from "./Constants";
+import Config from "react-native-config";
 import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
 import { getDeviceMetadata } from "../../../components/utility/DeviceInfo";
 import base64 from "react-native-base64";
@@ -391,11 +392,11 @@ const unsubscribPaperLess = async () => {
 };
 
 const handleSubmitFeedback = async (obj) => {
-  const zendeskRequestApiUrl = Env.ZENDESK_FEEDBACK.Url;
+  const zendeskRequestApiUrl = Config.ZENDESK_FEEDBACK_Url;
   const user = await getUser();
   const deviceMetadata = await getDeviceMetadata();
   const fullName = user.userInfo?.fullName;
-  const authToken = `${Env.ZENDESK_AUTH.email}/token:${Env.ZENDESK_AUTH.api_token}`;
+  const authToken = `${Config.ZENDESK_AUTH_email}/token:${Config.ZENDESK_AUTH_api_token}`;
 
   const base64Auth = base64.encode(authToken);
 
@@ -416,41 +417,41 @@ const handleSubmitFeedback = async (obj) => {
 
   const payload = {
     request: {
-      ticket_form_id: Env.ZENDESK_FEEDBACK.ticket_form_id,
+      ticket_form_id: Config.ZENDESK_FEEDBACK_ticket_form_id,
       requester: {
         name: fullName,
         email: obj.feedbackEmail,
       },
-      recipient: Env.ZENDESK_FEEDBACK.recipient,
-      assignee_id: Env.ZENDESK_FEEDBACK.assignee_id,
-      group_id: Env.ZENDESK_FEEDBACK.group_id,
+      recipient: Config.ZENDESK_FEEDBACK_recipient,
+      assignee_id: Config.ZENDESK_FEEDBACK_assignee_id,
+      group_id: Config.ZENDESK_FEEDBACK_group_id,
       type: null,
       custom_fields: [
-        { id: Env.ZENDESK_FEEDBACK.category_id, value: obj.category },
-        { id: Env.ZENDESK_FEEDBACK.feedbackValue_id, value: obj.feedbackValue },
-        { id: Env.ZENDESK_FEEDBACK.email_id, value: obj.feedbackEmail },
+        { id: Config.ZENDESK_FEEDBACK_category_id, value: obj.category },
+        { id: Config.ZENDESK_FEEDBACK_feedbackValue_id, value: obj.feedbackValue },
+        { id: Config.ZENDESK_FEEDBACK_email_id, value: obj.feedbackEmail },
         {
-          id: Env.ZENDESK_FEEDBACK.app_version_id,
+          id: Config.ZENDESK_FEEDBACK_app_version_id,
           value: deviceMetadata.appVersion,
         },
         {
-          id: Env.ZENDESK_FEEDBACK.platform_id,
+          id: Config.ZENDESK_FEEDBACK_platform_id,
           value: deviceMetadata.platform,
         },
         {
-          id: Env.ZENDESK_FEEDBACK.os_version_id,
+          id: Config.ZENDESK_FEEDBACK_os_version_id,
           value: deviceMetadata.osVersion,
         },
         {
-          id: Env.ZENDESK_FEEDBACK.device_model_id,
+          id: Config.ZENDESK_FEEDBACK_device_model_id,
           value: deviceMetadata.deviceModel,
         },
         {
-          id: Env.ZENDESK_FEEDBACK.account_no,
+          id: Config.ZENDESK_FEEDBACK_account_no,
           value: user?.userInfo?.accountNumber,
         },
         {
-          id: Env.ZENDESK_FEEDBACK.area_of_concern_id,
+          id: Config.ZENDESK_FEEDBACK_area_of_concern_id,
           value: concernLabels.map((label) =>
             label
               .toLowerCase()
@@ -511,7 +512,10 @@ const logInfo = async (infoData) => {
     const response = await _axios.post("api/log/info", infoData);
     console.log("Info logged successfully");
   } catch (logErr) {
+    console.error("Requested BASE URL:", Config.BASE_URL);
     console.error("Failed to log info:", logErr);
+
+
   }
 };
 

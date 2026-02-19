@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
-import { Env } from "./apis/account/Constants";
+//import { Env } from "./apis/account/Constants";
+import Config from "react-native-config";
 import { getUser } from "../redux/utils/LocalStorage";
 import { RefreshToken } from '../components/user/Session';
 import { useAuthInterceptor } from '../network/useAuthInterceptor';
 
-const API_ACP_BASEURL = Env.API_ACP_BASEURL;
+const API_ACP_BASEURL = Config.API_ACP_BASEURL;
 
 const _axios = axios.create({
     baseURL: API_ACP_BASEURL,

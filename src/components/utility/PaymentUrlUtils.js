@@ -1,4 +1,5 @@
-import { Env } from '../../network/apis/account/Constants';
+//import { Env } from '../../network/apis/account/Constants';
+import Config from 'react-native-config';
 
 
 /**
@@ -19,12 +20,12 @@ export const getReferralUrl = (version, type, customReferUrl = null) => {
   const versionKey = version === 'V3' ? 'V3' : 'V2';
   const urlMap = {
     'V2': {
-      'SETUP': Env.URL_EASYPAY_SETUP_V2,
-      'MANAGE': Env.URL_EASYPAY_MANAGE_V2
+      'SETUP': Config.URL_EASYPAY_SETUP_V2,
+      'MANAGE': Config.URL_EASYPAY_MANAGE_V2
     },
     'V3': {
-      'SETUP': Env.URL_EASYPAY_SETUP_V3,
-      'MANAGE': Env.URL_EASYPAY_MANAGE_V3
+      'SETUP': Config.URL_EASYPAY_SETUP_V3,
+      'MANAGE': Config.URL_EASYPAY_MANAGE_V3
     }
   };
   
@@ -39,5 +40,5 @@ export const getReferralUrl = (version, type, customReferUrl = null) => {
  */
 export const getPaymentUrl = (version) => {
   // Always use the predefined controller URLs based on version
-  return version === 'V3' ? Env.PAYMENTURL_V3 : Env.PAYMENTURL_V2;
+  return version === 'V3' ? Config.PAYMENTURL_V3 : Config.PAYMENTURL_V2;
 };

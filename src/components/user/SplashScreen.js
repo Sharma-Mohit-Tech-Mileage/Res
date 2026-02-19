@@ -33,6 +33,7 @@ import strings from "../../res/Strings";
 import { Color, FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
+import Config from "react-native-config";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import RenderText from "../common/RenderText";
@@ -44,7 +45,7 @@ import { shouldBlockLogin } from "../utility/disconnectHelpers";
 import Logo from "../../res/images/SpalshLogo";
 
 const config = {
-  issuer: Env.SSO_LOGIN,
+  issuer: Config.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
@@ -96,7 +97,7 @@ const SplashScreen = ({ navigation, route }) => {
     new Animated.Value(ANIMATION_CONFIG[deviceSize].logoStart)
   ).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
+console.error('BASE_URL1:', Config.API_ACP_BASEURL);
   // Dynamic style selector (matching business app)
   const getStyle = (baseStyle) => {
     const sizeStyle = `${baseStyle}_${deviceSize}`;
@@ -105,6 +106,7 @@ const SplashScreen = ({ navigation, route }) => {
 
   // Update fadeAnim based on isVisible
   useEffect(() => {
+     // Debugging line to check BASE_URL
     Animated.timing(fadeAnim, {
       toValue: isVisible ? 1 : 0,
       duration: 300,
@@ -480,7 +482,7 @@ const SplashScreen = ({ navigation, route }) => {
           );
         }
       } else {
-        Linking.openURL(Env.URL);
+        Linking.openURL(Config.URL);
       }
     });
   };

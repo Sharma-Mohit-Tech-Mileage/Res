@@ -3,6 +3,7 @@ apply plugin: "com.facebook.react"
 // Apply the Google Services plugin
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -105,14 +106,12 @@ android {
     productFlavors {
         development {
             dimension "env"
-            applicationIdSuffix ".dev"
-            versionNameSuffix "-dev"
+
             resValue "string", "build_config_package", "com.sparklight"
         }
         staging {
             dimension "env"
-            applicationIdSuffix ".staging"
-            versionNameSuffix "-stg"
+
             resValue "string", "build_config_package", "com.sparklight"
         }
         production {
