@@ -281,10 +281,10 @@ function formatUsPhone(input) {
           ]}
           accessibilityLabel={
             value && getKeyboardType() === "phone-pad"
-              ? 'Phone number ' + numberToWordsForAccessibility(value)
+              ? "Phone number " + numberToWordsForAccessibility(value)
               : secure
               ? "Password requirements are listed below. Use arrow keys to read them."
-              : undefined
+              : getAccessibilityLabel()
           }
           accessibilityRole="text"
           accessibilityHint={

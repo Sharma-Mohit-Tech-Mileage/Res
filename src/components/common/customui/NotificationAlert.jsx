@@ -246,6 +246,25 @@ const NotificationAlert = ({
   const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
   const IconComponent = config.IconComponent;
 
+
+  // Aggressively force focus to the success icon on Android after alert is visible
+  useEffect(() => {
+    if (!isVisible || type !== 'success' || !internalIconRef.current) return;
+    let timeouts = [];
+    const focusIcon = () => {
+      const handle = findNodeHandle(internalIconRef.current);
+      if (handle) {
+        AccessibilityInfo.setAccessibilityFocus(handle);
+      }
+    };
+    // Multiple retries to override navigation focus stealing
+    const delays = Platform.OS === 'android' ? [50, 150, 300, 600, 1000, 1500, 2000] : [100, 300, 600];
+    delays.forEach((ms) => {
+      timeouts.push(setTimeout(focusIcon, ms));
+    });
+    return () => timeouts.forEach(clearTimeout);
+  }, [isVisible, type]);
+
   const normalizedKeys = useMemo(() => normalizeSplitKey(splitKey), [splitKey]);
   const segments = useMemo(
     () => parseMessage(message, normalizedKeys),
@@ -553,9 +572,11 @@ const NotificationAlert = ({
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
           accessible={true}
           importantForAccessibility="yes"
-          accessibilityRole="text"
+          accessibilityRole="image"
           accessibilityLabel={config.iconLabel}
-          focusable={Platform.OS === "android" ? true : undefined}
+          focusable={false}
+          accessibilityState={undefined}
+          accessibilityHint={undefined}
         >
           <IconComponent
             width={24}
