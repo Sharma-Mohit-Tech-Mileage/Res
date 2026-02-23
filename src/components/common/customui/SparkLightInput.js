@@ -119,13 +119,17 @@ const SparkLightInput = React.forwardRef(({
 
   useEffect(() => {
     if (!keyboardHidden) {
-      inputRef.current?.focus();
-    }else{
-      if(error){
+      // Only re-assert focus for the field the user is on.
+      if (isFocused) {
+        inputRef.current?.focus();
+      }
+    } else {
+      // Only move focus to the error for the active field.
+      if (error && isFocused) {
         errorRef.current?.focus();
       }
     }
-  }, [keyboardHidden]);
+  }, [keyboardHidden, isFocused, error]);
 
   // Auto-focus input when error appears (for accessibility)
   // useEffect(() => {

@@ -61,8 +61,10 @@ const InAppNotifications = ({ navigation }) => {
   const successIconRef = useRef(null);
   const formatedData = route.params?.additionalData || {};
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+  // On Android TalkBack we may temporarily hide background elements for *error* alerts,
+  // but success banners should not disable/"hide" the toggles.
   const isAndroidA11yModalActive =
-    Platform.OS === "android" && screenReaderEnabled && !!notification;
+    Platform.OS === "android" && screenReaderEnabled && notification?.type === "error";
 
   useEffect(() => {
       AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
