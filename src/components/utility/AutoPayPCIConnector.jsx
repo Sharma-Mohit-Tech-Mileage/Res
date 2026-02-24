@@ -6,7 +6,8 @@ import CryptoJS from 'crypto-js';
 import { useSelector } from 'react-redux';
 import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
-import { Env } from '../../network/apis/account/Constants';
+//import { Env } from '../../network/apis/account/Constants';
+import Config from 'react-native-config';
 import { GetApiRequest } from '../../network/APIClient';
 import { navigationRef } from '../../navigations/UserNavigations';
 import analytics from '@react-native-firebase/analytics';
@@ -20,7 +21,7 @@ const { height, width } = Dimensions.get('window');
 const AutoPayPCIConnector = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
-    const [url, setUrl] = useState(route.params?.url || Env.URL);
+    const [url, setUrl] = useState(route.params?.url || Config.URL);
     const [currentUser, setCurrentUser] = useState({});
     const [paymentDetails, setPaymentDetails] = useState(route.params?.paymentDetails || {});
     const [status, setStatus] = useState(route.params?.status || false);
@@ -85,7 +86,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         const gui = generateGuid();
         const guiTrim = gui.split('-').join('');
 
-        const key = CryptoJS.enc.Utf8.parse(Env.encryptvalPassword);
+        const key = CryptoJS.enc.Utf8.parse(Config.encryptvalPassword);
         const ix = generateIV(guiTrim);
         const iv = CryptoJS.enc.Utf8.parse(ix);
 
@@ -97,7 +98,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             padding: CryptoJS.pad.Pkcs7
         }).toString();
 
-        const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl, apiKey: Env.secretKey };
+        const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl, apiKey: Config.secretKey };
 
         const version = 'V3';
         const paymentUrl = getPaymentUrl(version);
@@ -208,9 +209,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     referralUrl = getReferralUrl(version, type, customReferUrl);
                 } catch (error) {
                     if (version === 'V3') {
-                        referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V3 ) : (Env.REFERRAL_URL_SETUP_V3 );
+                        referralUrl = status ? (Config.REFERRAL_URL_MANAGE_V3 ) : (Config.REFERRAL_URL_SETUP_V3 );
                     } else {
-                        referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V2 ) : (Env.REFERRAL_URL_SETUP_V2 );
+                        referralUrl = status ? (Config.REFERRAL_URL_MANAGE_V2 ) : (Config.REFERRAL_URL_SETUP_V2 );
                     }
                 }
                 
@@ -228,9 +229,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 referralUrl = getReferralUrl(version, type, customReferUrl);
             } catch (error) {
                 if (version === 'V3') {
-                    referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V3 ) : (Env.REFERRAL_URL_SETUP_V3 );
+                    referralUrl = status ? (Config.REFERRAL_URL_MANAGE_V3 ) : (Config.REFERRAL_URL_SETUP_V3 );
                 } else {
-                    referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V2 ) : (Env.REFERRAL_URL_SETUP_V2 );
+                    referralUrl = status ? (Config.REFERRAL_URL_MANAGE_V2 ) : (Config.REFERRAL_URL_SETUP_V2 );
                 }
             }
             
@@ -261,7 +262,7 @@ const navigationChange = async (navState) => {
     
     console.log("Navigation change to:", navState.url);
     
-    if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
+    if (navState.url.includes('/postlogout') || navState.url.includes(Config.SSO_LOGIN)) {
         if (!navStateReloading) {
             navigation.navigate('Billing');
         }
@@ -275,7 +276,7 @@ const navigationChange = async (navState) => {
         } else {
             setNavStateReloading(false);
             userUpdateScript(userLocal);
-            setUrl(route.params?.url || Env.URL);
+            setUrl(route.params?.url || Config.URL);
             setProgress(0);
             setCurrentUser(userLocal);
         }

@@ -4,7 +4,8 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import { RefreshToken } from '../user/Session';
-import { Env } from '../../network/apis/account/Constants';
+//import { Env } from '../../network/apis/account/Constants';
+import Config from 'react-native-config';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
 import analytics from '@react-native-firebase/analytics';
@@ -110,7 +111,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         console.log('Navigation change:', navState.url);
         
         // Check for authentication redirects
-        if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
+        if (navState.url.includes('/postlogout') || navState.url.includes(Config.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setIsTokenRefreshing(true);
                 setNavStateReloading(true);

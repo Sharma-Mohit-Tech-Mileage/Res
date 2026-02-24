@@ -35,7 +35,8 @@ import { logout } from "react-native-app-auth";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from "react-native-version-check";
-import { Env } from "../../network/apis/account/Constants";
+//import { Env } from "../../network/apis/account/Constants";
+import Config from "react-native-config";
 import AppStyles from "../utility/AppStyles";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
@@ -43,7 +44,7 @@ import analytics from "@react-native-firebase/analytics";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
-const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true };
+const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
 import {
   logoutZendesk,

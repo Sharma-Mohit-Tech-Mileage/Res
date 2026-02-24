@@ -4,7 +4,8 @@ import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
-import { Env } from "../../../network/apis/account/Constants";
+//import { Env } from "../../../network/apis/account/Constants";
+import Config from "react-native-config";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import AppStyles from "../../utility/AppStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
@@ -176,7 +177,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
         <View style={styles.cardFooter}>
           <TouchableOpacity
             onPress={() => {
-              let billingURL = `${Env.ACP_BILLING}/billing`;
+              let billingURL = `${Config.ACP_BILLING}/billing`;
               console.log("Billing URL", billingURL);
               navigation.navigate("ArticalWindowUtility", {
                 url: billingURL,

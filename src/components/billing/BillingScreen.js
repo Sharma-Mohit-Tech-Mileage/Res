@@ -26,7 +26,8 @@ import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Icon from "../common/Icon";
-import { Env } from "../../network/apis/account/Constants";
+//import { Env } from "../../network/apis/account/Constants";
+import Config from "react-native-config";
 import colors from "../../res/Colors";
 import AppStyles from "../utility/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
@@ -213,12 +214,12 @@ const BillingScreen = ({ navigation }) => {
                       style={styles.frame9defaultSpaceBlock}
                       onPress={() => {
                         navigation.navigate("AutoPayPCIConnector", {
-                          url: Env.PAY_METHOD,
+                          url: Config.PAY_METHOD,
                           name: "Manage Payment Method",
                           useNewPayment: true,
                           status: isAutoPayStatus,
                           paymentDetails: defaultPaymentDetails,
-                          customPaymentUrl: Env.PAY_METHOD,
+                          customPaymentUrl: Config.PAY_METHOD,
                         });
                       }}
                       accessible={true}

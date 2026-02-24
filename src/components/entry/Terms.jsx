@@ -9,9 +9,10 @@ import { updateTermsAndConditions, fetchSMSSelection, fetchPushNotifications, } 
 import { logout } from "react-native-app-auth";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
-import { Env } from "../../network/apis/account/Constants";
+//import { Env } from "../../network/apis/account/Constants";
+import Config from "react-native-config";
 import NavigationUtils from "./NavigationUtils";
-const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true };
+const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
 const { width, height } = Dimensions.get("window");
 

@@ -10,11 +10,12 @@ import {
   getUser,
 } from "../../redux/utils/LocalStorage";
 import { logout } from "react-native-app-auth";
-import { Env } from "../../network/apis/account/Constants";
+//import { Env } from "../../network/apis/account/Constants";
+import Config from "react-native-config";
 import { navigationRef } from "../../navigations/UserNavigations";
 
 const config = {
-  issuer: Env.SSO_LOGIN,
+  issuer: Config.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
