@@ -38,28 +38,19 @@ const EeroPromoCard = () => {
       style={styles.container}
       accessible={false}
       importantForAccessibility="no"
-      accessibilityElementsHidden={false}
     >
-      <Pressable
-        style={({ pressed }) => [
-          styles.card,
-          pressed && styles.cardPressed,
-        ]}
-        onPress={handleDownload}
-        accessible={true}
-        accessibilityRole="button"
-        accessibilityLabel="Download eero app to simplify connectivity"
-        accessibilityHint="Double tap to open app store"
-      >
-        <Image
-          source={require("../../../../../assets/eero-promo-banner.jpg")}
-          style={styles.promoImage}
-          resizeMode="cover"
-          accessible={false}
-          accessibilityElementsHidden={true}
-          importantForAccessibility="no-hide-descendants"
-        />
-      </Pressable>
+      <View style={styles.container}>
+        <Pressable
+          style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+          onPress={handleDownload}
+        >
+          <Image
+            source={require("../../../../../assets/eero-promo-banner.jpg")}
+            style={styles.promoImage}
+            resizeMode="cover"
+          />
+        </Pressable>
+      </View>
     </View>
   );
 };

@@ -40,7 +40,7 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
 
   const usedMidAngle = 135 + (usedPercent / 100) * 180;
   const remainingMidAngle = 135 + (usedPercent / 100) * 360 + (remainingPercent / 100) * 180;
-  
+
   const getPoint = (angle) => {
     const rad = (angle * Math.PI) / 180;
     return {
@@ -79,7 +79,7 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
             <Stop offset="0%" stopColor={theme.colors.primaryDark} />
             <Stop offset="100%" stopColor={theme.colors.primaryDark} />
           </LinearGradient>
-          
+
           <LinearGradient id="remaining" x1="0%" y1="0%" x2="100%" y2="100%">
             <Stop offset="0%" stopColor={theme.colors.freedatabackground} />
             <Stop offset="100%" stopColor={theme.colors.freedatabackground} />
@@ -89,7 +89,7 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
         <G transform={`translate(45, 20)`}>
           <Circle cx={center} cy={center + 2} r={radius} stroke="#00000008" strokeWidth={strokeWidth} fill="none" />
           <Circle cx={center} cy={center} r={radius} stroke="#F5F5F5" strokeWidth={strokeWidth} fill="none" />
-          
+
           <Circle
             cx={center} cy={center} r={radius}
             stroke="url(#used)" strokeWidth={strokeWidth} fill="none"
@@ -97,7 +97,7 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
             strokeLinecap="butt"
             rotation="135" origin={`${center}, ${center}`}
           />
-          
+
           <Circle
             cx={center} cy={center} r={radius}
             stroke="url(#remaining)" strokeWidth={strokeWidth} fill="none"
@@ -107,18 +107,16 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
             rotation="135" origin={`${center}, ${center}`}
           />
 
-          <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y} 
-                stroke={theme.colors.primaryDark} strokeWidth="2.5" opacity={calloutOpacity} />
+          <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y}
+            stroke={theme.colors.primaryDark} strokeWidth="2.5" opacity={calloutOpacity} />
           <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} opacity={calloutOpacity} />
 
-          <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y} 
-                stroke={theme.colors.freedatabackground} strokeWidth="2.5" opacity={calloutOpacity} />
+          <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y}
+            stroke={theme.colors.freedatabackground} strokeWidth="2.5" opacity={calloutOpacity} />
           <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} opacity={calloutOpacity} />
         </G>
       </Svg>
 
-      {/* ---------- A11Y FIX #1b: Hide visual callout labels from screen readers ---------- */}
-      {/* These are purely visual; the parent's accessibilityLabel covers the data. */}
       <Animated.View
         style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0, opacity: labelOpacity }]}
         accessible={false}
@@ -126,11 +124,11 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
         importantForAccessibility="no-hide-descendants"
       >
         <Text style={[styles.labelText]}>
-          {usedGB} 
+          {usedGB}
         </Text>
         <Text style={styles.labelSubtext}> GB Used</Text>
       </Animated.View>
-      
+
       <Animated.View
         style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end', opacity: labelOpacity }]}
         accessible={false}
@@ -138,7 +136,7 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
         importantForAccessibility="no-hide-descendants"
       >
         <Text style={[styles.labelText]}>
-          {remainingGB} 
+          {remainingGB}
         </Text>
         <Text style={styles.labelSubtext}>GB Left</Text>
       </Animated.View>
@@ -167,7 +165,7 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
           <Text style={styles.headerTitle} accessibilityRole="header">DATA USAGE</Text>
         </View>
 
-        <DonutWithCallouts 
+        <DonutWithCallouts
           usedPercent={currentUsage.dataUsedPercent}
           remainingPercent={remainingPercent}
           usedGB={currentUsage.usedDataGB}
@@ -190,7 +188,7 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
             <Text style={styles.statValue}>{startDate} - {endDate}</Text>
             <Text style={styles.statLabel}>Billing Period</Text>
           </View>
-          
+
           <View
             style={styles.statBox}
             accessible={true}
@@ -206,11 +204,12 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
             <Text style={styles.statValue}>{currentUsage.remainingDays} days</Text>
             <Text style={styles.statLabel}>Remaining</Text>
           </View>
-          
+
           <View
             style={[styles.statBox, styles.statBoxNarrow]}
-            accessible={true}
-            accessibilityLabel={`${currentUsage.dataUsedPercent} percent used`}
+            accessible={false}
+            accessibilityElementsHidden={true}
+            importantForAccessibility="no-hide-descendants"
           >
             <View
               accessible={false}

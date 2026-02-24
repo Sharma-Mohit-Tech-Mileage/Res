@@ -116,19 +116,26 @@ const UsageChart = ({
   const [showList, setShowList] = useState(false);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
+
   const handleToggleView = useCallback(() => {
     const nextView = !showList;
     setShowList(nextView);
     if (isScreenReaderEnabled) {
-      const message = nextView ? "View Mode changed to List view" : "View Mode changed to Graph view";
+      const viewType = nextView ? "List" : "Graph";
+      const oppositeView = nextView ? "Graph" : "List";
+      const itemCount = data?.length ?? 0;
+      const periodType = type === "daily" ? "days" : "months";
+      const message = `Switched to ${viewType} view. Showing ${itemCount} ${periodType} of download and upload data. Double tap to switch to ${oppositeView} view.`;
       AccessibilityInfo.announceForAccessibility(message);
     }
-  }, [showList, isScreenReaderEnabled]);
+  }, [showList, isScreenReaderEnabled, type, data]);
 
   const handleSkipChartData = useCallback(() => {
     const node = findNodeHandle(skipTargetRef.current);
     if (node) {
-      AccessibilityInfo.setAccessibilityFocus(node);
+      setTimeout(() => {
+        AccessibilityInfo.setAccessibilityFocus(node);
+      }, 250);
     }
     return true;
   }, []);
@@ -483,10 +490,6 @@ const UsageChart = ({
           </View>
           <Text style={styles.chartTitle} accessibilityRole="header">Historical Usage</Text>
         </View>
-
-        {/* accessibilityState={{ selected }} already announces "selected" on iOS VoiceOver. */}
-        {/* On Android TalkBack, accessibilityRole="tab" + selected state also works. */}
-        {/* Removed manual ", selected" from accessibilityLabel to prevent double announcement. */}
         <View style={styles.tabsContainer} accessibilityRole="tablist">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -497,7 +500,11 @@ const UsageChart = ({
                 onPress={() => onTabChange?.(tab.id)}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isActive }}
-                accessibilityLabel={tab.label}
+                accessibilityLabel={
+                  isActive
+                    ? `${tab.label}, currently active. Also available: ${tabs.find(t => t.id !== tab.id).label}`
+                    : `${tab.label}. Currently viewing: ${tabs.find(t => t.id !== tab.id).label}`
+                }
                 accessibilityHint={
                   isActive
                     ? undefined
@@ -520,6 +527,7 @@ const UsageChart = ({
                 onValueChange={setSelectedRange}
                 dropDownStyle={styles.dropdown}
                 dropdownTitle={"Select Date Range"}
+                accessibilityItemName="date range"
               />
             </View>
           )}
@@ -628,7 +636,6 @@ const UsageChart = ({
                             <Pressable
                               key={index}
                               accessible={true}
-                              accessibilityRole="button"
                               accessibilityLabel={buildBarA11yLabel(item, index)}
                               accessibilityHint={barA11yHint}
                               onAccessibilityEscape={handleSkipChartData}
@@ -663,8 +670,7 @@ const UsageChart = ({
               <View
                 ref={skipTargetRef}
                 accessible={true}
-                accessibilityRole="header"
-                accessibilityLabel="Legend: Dark blue represents Download, Light blue represents Upload"
+                accessibilityLabel={`Legend. Blue represents Download, Green represents Upload. ${chartData?.length ?? 0} ${type === "daily" ? "days" : "months"} shown.`}
                 style={styles.legend}
               >
                 <View style={styles.legendItem}>
@@ -687,71 +693,71 @@ const UsageChart = ({
               style={styles.srSummary}
             />
             <View style={styles.listOuterWrapper}>
-            <View style={styles.listScrollRow}>
-              {listContentH > listViewportH && <FadeEdge side="bottom" horizontal={false} />}
+              <View style={styles.listScrollRow}>
+                {listContentH > listViewportH && <FadeEdge side="bottom" horizontal={false} />}
 
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                scrollEventThrottle={16}
-                onScroll={Animated.event(
-                  [{ nativeEvent: { contentOffset: { y: listScrollY } } }],
-                  { useNativeDriver: false }
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  scrollEventThrottle={16}
+                  onScroll={Animated.event(
+                    [{ nativeEvent: { contentOffset: { y: listScrollY } } }],
+                    { useNativeDriver: false }
+                  )}
+                  onContentSizeChange={(_w, h) => setListContentH(h)}
+                  onLayout={(e) => setListViewportH(e.nativeEvent.layout.height)}
+                  style={styles.listScrollContainer}
+                >
+                  {chartData.map((item, index) => (
+                    <View
+                      key={index}
+                      style={[styles.listItem, index === chartData.length - 1 && styles.lastListItem]}
+                      accessible={true}
+                      accessibilityLabel={`${formatPeriodLabel(item)}. Total: ${item.total.toFixed(2)} GB. Download: ${item.download.toFixed(2)} GB. Upload: ${item.upload.toFixed(2)} GB.`}
+                    >
+                      {/* Hide children from screen reader — parent label covers everything */}
+                      <View
+                        style={styles.listItemHeader}
+                        importantForAccessibility="no-hide-descendants"
+                        accessibilityElementsHidden={true}
+                      >
+                        <Text style={styles.periodLabel}>{formatPeriodLabel(item)}</Text>
+                        <Text style={styles.totalLabel}>{item.total.toFixed(4)} GB</Text>
+                      </View>
+                      <View
+                        style={styles.listItemRow}
+                        importantForAccessibility="no-hide-descendants"
+                        accessibilityElementsHidden={true}
+                      >
+                        <View style={styles.detailItem}>
+                          <View style={[styles.detailDot, { backgroundColor: theme.colors.primaryDark }]} />
+                          <Text style={styles.detailLabel}>Download (GB)</Text>
+                          <Text style={styles.detailValue}>{item.download.toFixed(4)}</Text>
+                        </View>
+                      </View>
+                      <View
+                        style={styles.listItemRow}
+                        importantForAccessibility="no-hide-descendants"
+                        accessibilityElementsHidden={true}
+                      >
+                        <View style={styles.detailItem}>
+                          <View style={[styles.detailDot, { backgroundColor: theme.colors.upload }]} />
+                          <Text style={styles.detailLabel}>Upload (GB)</Text>
+                          <Text style={styles.detailValue}>{item.upload.toFixed(4)}</Text>
+                        </View>
+                      </View>
+                    </View>
+                  ))}
+                </ScrollView>
+
+                {listContentH > listViewportH && (
+                  <VScrollIndicator
+                    scrollY={listScrollY}
+                    contentH={listContentH}
+                    viewportH={listViewportH}
+                  />
                 )}
-                onContentSizeChange={(_w, h) => setListContentH(h)}
-                onLayout={(e) => setListViewportH(e.nativeEvent.layout.height)}
-                style={styles.listScrollContainer}
-              >
-                {chartData.map((item, index) => (
-                  <View
-                    key={index}
-                    style={[styles.listItem, index === chartData.length - 1 && styles.lastListItem]}
-                    accessible={true}
-                    accessibilityLabel={`${formatPeriodLabel(item)}. Total: ${item.total.toFixed(2)} GB. Download: ${item.download.toFixed(2)} GB. Upload: ${item.upload.toFixed(2)} GB.`}
-                  >
-                    {/* Hide children from screen reader — parent label covers everything */}
-                    <View
-                      style={styles.listItemHeader}
-                      importantForAccessibility="no-hide-descendants"
-                      accessibilityElementsHidden={true}
-                    >
-                      <Text style={styles.periodLabel}>{formatPeriodLabel(item)}</Text>
-                      <Text style={styles.totalLabel}>{item.total.toFixed(4)} GB</Text>
-                    </View>
-                    <View
-                      style={styles.listItemRow}
-                      importantForAccessibility="no-hide-descendants"
-                      accessibilityElementsHidden={true}
-                    >
-                      <View style={styles.detailItem}>
-                        <View style={[styles.detailDot, { backgroundColor: theme.colors.primaryDark }]} />
-                        <Text style={styles.detailLabel}>Download (GB)</Text>
-                        <Text style={styles.detailValue}>{item.download.toFixed(4)}</Text>
-                      </View>
-                    </View>
-                    <View
-                      style={styles.listItemRow}
-                      importantForAccessibility="no-hide-descendants"
-                      accessibilityElementsHidden={true}
-                    >
-                      <View style={styles.detailItem}>
-                        <View style={[styles.detailDot, { backgroundColor: theme.colors.upload }]} />
-                        <Text style={styles.detailLabel}>Upload (GB)</Text>
-                        <Text style={styles.detailValue}>{item.upload.toFixed(4)}</Text>
-                      </View>
-                    </View>
-                  </View>
-                ))}
-              </ScrollView>
-
-              {listContentH > listViewportH && (
-                <VScrollIndicator
-                  scrollY={listScrollY}
-                  contentH={listContentH}
-                  viewportH={listViewportH}
-                />
-              )}
+              </View>
             </View>
-          </View>
           </>
         )}
       </View>

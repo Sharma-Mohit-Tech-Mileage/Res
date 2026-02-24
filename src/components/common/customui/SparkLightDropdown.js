@@ -21,9 +21,9 @@ const SparkLightDropdown = ({
   onValueChange,
   style,
   dropDownStyle,
-  isDropDownOpen = () => {},
-  dropdownTitle = 'Select Security Question',
-  accessibilityItemName = 'security question',
+  isDropDownOpen = () => { },
+  dropdownTitle = 'Select an option',
+  accessibilityItemName = 'option',
   placeholder = 'Select an option',
 }) => {
   const validItems = useMemo(() => (Array.isArray(items) ? items : []), [items]);
@@ -164,9 +164,8 @@ const SparkLightDropdown = ({
                     onPress={() => handleSelect(item)}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={`${item}, ${index + 1} of ${validItems.length}${
-                      isSelected ? ', selected' : ''
-                    }`}
+                    accessibilityLabel={`${item}, ${index + 1} of ${validItems.length}${isSelected ? ', selected' : ''
+                      }`}
                     accessibilityHint={`Double tap to select this ${accessibilityItemName}`}
                     accessibilityState={{ selected: isSelected }}
                   >
@@ -209,7 +208,7 @@ const styles = StyleSheet.create({
   dropdown: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start', 
+    alignItems: 'flex-start',
     paddingHorizontal: Padding.p_base,
     paddingVertical: 12,
     minHeight: 48,
@@ -309,7 +308,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F2F2F7',
   },
 
-   option: {
+  option: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
