@@ -32,7 +32,7 @@ import AlertIcon from "../../res/svgIcons/AlertIcon";
 import strings from "../../res/Strings";
 import { Color, FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
-import { Env, ISUAT } from "../../network/apis/account/Constants";
+//import { Env, ISUAT } from "../../network/apis/account/Constants";
 import Config from "react-native-config";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
@@ -616,7 +616,7 @@ console.error('BASE_URL1:', Config.API_ACP_BASEURL);
 
       {isVisible && (
         <Text style={getStyle("version")}>
-          {ISUAT ? "UAT" : ""} Version:{VersionCheck.getCurrentVersion()}
+          {Config.ISUAT} Version:{VersionCheck.getCurrentVersion()}
         </Text>
       )}
 

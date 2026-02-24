@@ -10,7 +10,7 @@ import { PostAuthApiRequest } from "../../network/APIClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
-import { Env, ISUAT } from "../../network/apis/account/Constants";
+//import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import moment from "moment";
@@ -22,9 +22,10 @@ import NetworkManager from "../../utils/NetworkManager";
 import AuthenticationManager from "../../utils/AuthenticationManager";
 import ErrorModal, { ErrorType } from "../common/ErrorModal";
 import LoadingStateIndicator, { LoadingState, } from "../common/LoadingStateIndicator";
+import Config from "react-native-config";
 
 const config = {
-  issuer: Env.SSO_LOGIN,
+  issuer: Config.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
@@ -744,7 +745,7 @@ const SplashScreen = ({ navigation, route }) => {
 
       {isVisible && (
         <Text style={getStyle("version")}>
-          {ISUAT ? "UAT" : ""} Version: {VersionCheck.getCurrentVersion()}
+          {Config.ISUAT} Version: {VersionCheck.getCurrentVersion()}
         </Text>
       )}
 

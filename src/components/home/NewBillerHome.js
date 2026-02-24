@@ -17,7 +17,8 @@ import { Color, Padding } from "../../../GlobalStyles";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
-import { Env ,ISUAT} from "../../network/apis/account/Constants";
+//import { Env ,ISUAT} from "../../network/apis/account/Constants";
+import Config from "react-native-config";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
@@ -296,12 +297,12 @@ const NewBillerHome = ({ navigation }) => {
           let jwtToken = response.jwt;
 
           const fields = {
-            isUAT: ISUAT,
+            isUAT: Config.ISUAT? true : false,
             userAgent: userAgent,
             appVersion: VersionCheck.getCurrentVersion(),
             timezoneOffsetId: new Date().getTimezoneOffset().toString(),
             platform: Platform.OS,
-            locationHrefId: Env.URL,
+            locationHrefId: Config.URL,
             ipAddress: IPAddress || "",
             accountNumber: user?.userInfo.accountNumber,
             email: defaultPaymentDetails.email || "",
@@ -397,7 +398,7 @@ const NewBillerHome = ({ navigation }) => {
           isActive={isAutoPayStatus}
           onButtonPress={() => {
             navigation.navigate("AutoPayPCIConnector", {
-              url: `${Env.URL}/billing`,
+              url: `${Config.URL}/billing`,
               name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
               useNewPayment: true,
               status: isAutoPayStatus,

@@ -392,11 +392,11 @@ const unsubscribPaperLess = async () => {
 };
 
 const handleSubmitFeedback = async (obj) => {
-  const zendeskRequestApiUrl = Config.ZENDESK_FEEDBACK_Url;
+  const zendeskRequestApiUrl = Config.ZENDESK_FEEDBACK_URL;
   const user = await getUser();
   const deviceMetadata = await getDeviceMetadata();
   const fullName = user.userInfo?.fullName;
-  const authToken = `${Config.ZENDESK_AUTH_email}/token:${Config.ZENDESK_AUTH_api_token}`;
+  const authToken = `${Config.ZENDESK_AUTH_EMAIL}/token:${Config.ZENDESK_AUTH_API_TOKEN}`;
 
   const base64Auth = base64.encode(authToken);
 
@@ -417,41 +417,41 @@ const handleSubmitFeedback = async (obj) => {
 
   const payload = {
     request: {
-      ticket_form_id: Config.ZENDESK_FEEDBACK_ticket_form_id,
+      ticket_form_id: Config.ZENDESK_TICKET_FORM_ID,
       requester: {
         name: fullName,
         email: obj.feedbackEmail,
       },
-      recipient: Config.ZENDESK_FEEDBACK_recipient,
-      assignee_id: Config.ZENDESK_FEEDBACK_assignee_id,
-      group_id: Config.ZENDESK_FEEDBACK_group_id,
+      recipient: Config.ZENDESK_RECIPIENT,
+      assignee_id: Config.ZENDESK_ASSIGNEE_ID,
+      group_id: Config.ZENDESK_GROUP_ID,
       type: null,
       custom_fields: [
-        { id: Config.ZENDESK_FEEDBACK_category_id, value: obj.category },
-        { id: Config.ZENDESK_FEEDBACK_feedbackValue_id, value: obj.feedbackValue },
-        { id: Config.ZENDESK_FEEDBACK_email_id, value: obj.feedbackEmail },
+        { id: Config.ZENDESK_CATEGORY_ID, value: obj.category },
+        { id: Config.ZENDESK_FEEDBACK_VALUE_ID, value: obj.feedbackValue },
+        { id: Config.ZENDESK_EMAIL_ID, value: obj.feedbackEmail },
         {
-          id: Config.ZENDESK_FEEDBACK_app_version_id,
+          id: Config.ZENDESK_APP_VERSION_ID,
           value: deviceMetadata.appVersion,
         },
         {
-          id: Config.ZENDESK_FEEDBACK_platform_id,
+          id: Config.ZENDESK_PLATFORM_ID,
           value: deviceMetadata.platform,
         },
         {
-          id: Config.ZENDESK_FEEDBACK_os_version_id,
+          id: Config.ZENDESK_OS_VERSION_ID,
           value: deviceMetadata.osVersion,
         },
         {
-          id: Config.ZENDESK_FEEDBACK_device_model_id,
+          id: Config.ZENDESK_DEVICE_MODEL_ID,
           value: deviceMetadata.deviceModel,
         },
         {
-          id: Config.ZENDESK_FEEDBACK_account_no,
+          id: Config.ZENDESK_ACCOUNT_NO,
           value: user?.userInfo?.accountNumber,
         },
         {
-          id: Config.ZENDESK_FEEDBACK_area_of_concern_id,
+          id: Config.ZENDESK_AREA_OF_CONCERN_ID,
           value: concernLabels.map((label) =>
             label
               .toLowerCase()
