@@ -39,6 +39,7 @@ const EmailNotifications = ({ navigation }) => {
   const [keyboardHidden, setKeyboardHidden] = useState(true);
   const [textInputLayout, setTextInputLayout] = useState({});
   const scrollRef = useRef();
+  const emailRef = useRef(null);
 
   const {
     control,
@@ -173,6 +174,7 @@ const EmailNotifications = ({ navigation }) => {
                   name="email"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <SparkLightInput
+                      ref={emailRef}
                       placeholder="Email Address"
                       onBlur={onBlur}
                       onChangeText={(text) => {
@@ -202,7 +204,9 @@ const EmailNotifications = ({ navigation }) => {
                   ? [styles.button, styles.buttonsLayout]
                   : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
               }
-              onPress={handleSubmit(enableEmailNotifications)}
+              onPress={handleSubmit(enableEmailNotifications, (errors) => {
+                if (errors.email) emailRef.current?.focus();
+              })}
               accessibilityRole="button"
               accessibilityLabel={
                 enableButton

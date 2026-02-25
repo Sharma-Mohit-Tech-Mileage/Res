@@ -47,6 +47,8 @@ const Feedback = () => {
     "Please enter valid information to continue."
   );
   const scrollViewRef = useRef(null);
+  const feedbackTextRef = useRef(null);
+  const feedbackEmailRef = useRef(null);
 
   const {
     control,
@@ -68,9 +70,15 @@ const Feedback = () => {
 
   useUserEmailPrefill(getValues, setValue, "feedbackEmail");
 
-  const handleValidationError = () => {
+  const handleValidationError = (errors) => {
     isSubmittingRef.current = false;
     setIsSubmitting(false);
+    const fieldOrder = [
+      { key: "feedbackText", ref: feedbackTextRef },
+      { key: "feedbackEmail", ref: feedbackEmailRef },
+    ];
+    const firstInvalid = fieldOrder.find((f) => errors?.[f.key]);
+    if (firstInvalid) firstInvalid.ref.current?.focus();
   };
 
   const handleRatingSelect = (option) => {
@@ -225,6 +233,7 @@ const Feedback = () => {
               render={({ field: { onChange, onBlur, value } }) => (
                 <>
                   <SparkLightInput
+                    ref={feedbackTextRef}
                     label="Additional Feedback *"
                     textAlignVertical="top"
                     onChangeText={onChange}
@@ -259,6 +268,7 @@ const Feedback = () => {
               name="feedbackEmail"
               render={({ field: { onChange, onBlur, value } }) => (
                 <SparkLightInput
+                  ref={feedbackEmailRef}
                   label="Email *"
                   onChangeText={onChange}
                   onBlur={onBlur}

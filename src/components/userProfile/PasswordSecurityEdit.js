@@ -26,6 +26,8 @@ const PasswordSecurityEdit = () => {
   const dispatch = useDispatch();
   const scrollViewRef = useRef(null);
   const mainContentRef = useRef(null);
+  const securityQuestionRef = useRef(null);
+  const securityAnswerRef = useRef(null);
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -85,10 +87,16 @@ const PasswordSecurityEdit = () => {
 
 
 
-  const handleValidationError = () => {
+  const handleValidationError = (errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setShowValidationAlert(true);
     announceForAccessibility("Please fix validation errors before saving");
+    const fieldOrder = [
+      { key: "securityQuestion", ref: securityQuestionRef },
+      { key: "securityAnswer", ref: securityAnswerRef },
+    ];
+    const firstInvalid = fieldOrder.find((f) => errors?.[f.key]);
+    if (firstInvalid) firstInvalid.ref.current?.focus();
   };
 
 
@@ -221,6 +229,7 @@ const PasswordSecurityEdit = () => {
                         name="securityQuestion"
                         render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                           <SparkLightInput
+                            ref={securityQuestionRef}
                             onBlur={onBlur}
                             label="Type your Question"
                             onChangeText={onChange}
@@ -252,9 +261,10 @@ const PasswordSecurityEdit = () => {
                     name="securityAnswer"
                     render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                       <SparkLightInput
+                        ref={securityAnswerRef}
                         onBlur={onBlur}
                         onChangeText={onChange}
-                        
+
                         value={value}
                         error={error?.message}
                         accessibilityHint="Enter your answer to the security question"

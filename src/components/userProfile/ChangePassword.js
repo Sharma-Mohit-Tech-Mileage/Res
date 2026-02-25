@@ -22,6 +22,7 @@ import {
   validatePassword,
   passwordTerms,
   securityQuestions,
+  getPasswordPriorityHint,
 } from "../utility/constant";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -51,6 +52,7 @@ const ChangePassword = () => {
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
+  const passwordInputRef = useRef(null);
   const [accessibilityLabelInput, setAccessibilityLabelInput] = useState(undefined);
 
   const handleSavePass = (formData) => {
@@ -77,9 +79,11 @@ const ChangePassword = () => {
     name: "newPassword",
   });
 
-  const handleValidationError = () => {
+  const handleValidationError = (errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    //setShowValidationAlert(true);
+    if (errors?.newPassword) {
+      passwordInputRef.current?.focus();
+    }
   };
 
   const getSecurityQuestions = () => {
@@ -168,20 +172,6 @@ const ChangePassword = () => {
     getSecurityQuestions();
   }, []);
 
-  // useEffect(() => {
-  //   if (newPassword && newPassword.length > 1) {
-  //     const validations = validatePassword(newPassword, profileDetails.userName);
-  //     const firstInvalidIndex = validations.findIndex(isValid => !isValid);
-  //     if (firstInvalidIndex !== -1) {
-  //       setAccessibilityLabelInput(`${passwordTerms[firstInvalidIndex]}`);
-  //     } else {
-  //       setAccessibilityLabelInput("");
-  //     }
-  //   } else {
-  //     setAccessibilityLabelInput("");
-  //   }
-  // }, [newPassword]);
-
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
@@ -265,6 +255,7 @@ const ChangePassword = () => {
                     }) => (
                       <>
                         <SparkLightInput
+                          ref={passwordInputRef}
                           placeholder="New Password"
                           onBlur={onBlur}
                           label={"New Password *"}
@@ -274,12 +265,11 @@ const ChangePassword = () => {
                           value={value}
                           secure={true}
                           error={error?.message}
+                          errorHint={getPasswordPriorityHint(value, profileDetails.userName)}
                         />
                         <View
-                          accessibilityElementsHidden={isDropDownOpen}
-                          importantForAccessibility={
-                            isDropDownOpen ? "no-hide-descendants" : "no"
-                          }
+                          accessibilityElementsHidden={true}
+                          importantForAccessibility="no-hide-descendants"
                           style={[
                             styles.passwordFlexBox,
                             { marginTop: Padding.p_base },
@@ -305,7 +295,6 @@ const ChangePassword = () => {
                                 </View>
                                 <Text
                                   style={styles.bulletPoiint}
-                                  accessibilityLiveRegion="polite"
                                 >
                                   {passwordTerms[index]}
                                 </Text>
