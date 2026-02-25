@@ -104,17 +104,17 @@ android {
 
     flavorDimensions "env"
     productFlavors {
-        development {
+        Dev {
             dimension "env"
 
             resValue "string", "build_config_package", "com.sparklight"
         }
-        staging {
+        Demo {
             dimension "env"
 
             resValue "string", "build_config_package", "com.sparklight"
         }
-        production {
+        Prod {
             dimension "env"
             resValue "string", "build_config_package", "com.sparklight"
         }
@@ -144,6 +144,16 @@ android {
     }
     
 }
+
+// Map the flavors to the correct .env files
+project.ext.envConfigFiles = [
+        Devdebug: ".env.development",
+        Demodebug: ".env.staging",
+        Proddebug: ".env.production",
+        Devrelease: ".env.development",
+        Demorelease: ".env.staging",
+        Prodrelease: ".env.production"
+]
 
 repositories {
     google()

@@ -24,6 +24,7 @@ import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest, PostApiRequest,PostApiReqZendeskToken } from "../../network/APIClient";
+import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
@@ -94,7 +95,7 @@ const NewBillerHome = ({ navigation }) => {
   /* Function to check outage status */
   const checOutagStatus = () => {
     getUser().then((res) => {
-      const request = `api/outage/GetOutages?accountNumber=${res.userInfo.accountNumber}`;
+      const request = getEndpoint(ENDPOINTS.GET_OUTAGE, { accountNumber: res.userInfo.accountNumber });
       PostApiRequest(
         request,
         {},
@@ -125,8 +126,9 @@ const NewBillerHome = ({ navigation }) => {
     setloadingAutoPay(true);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
+      const endpoint = getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber });
       GetApiRequest(
-        `api/Accounts/${accountNumber}/easypay`,
+        endpoint,
         (res) => {
           setIsAutoPayStatus(res?.isEasyPay);
           setloadingAutoPay(false);
@@ -194,26 +196,26 @@ const NewBillerHome = ({ navigation }) => {
     }
   }, [accountDetails]);
 
-  const getInAppNotificationsData = () => {
-    getUser().then((res1) => {
-      let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
-      GetApiRequest(
-        requestUrl,
-        (res) => {
-          if (res) {
-            res[0]?.pushMessageType.forEach((value, index) => {
-              if (!value?.optOutFlag) {
-                setIsNotificationEnable(true);
-              }
-            });
-          }
-        },
-        (error) => {
-          console.error("Error on retrying getInAppNotificationsData", error);
-        }
-      );
-    });
-  };
+  // const getInAppNotificationsData = () => {
+  //   getUser().then((res1) => {
+  //     let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
+  //     GetApiRequest(
+  //       requestUrl,
+  //       (res) => {
+  //         if (res) {
+  //           res[0]?.pushMessageType.forEach((value, index) => {
+  //             if (!value?.optOutFlag) {
+  //               setIsNotificationEnable(true);
+  //             }
+  //           });
+  //         }
+  //       },
+  //       (error) => {
+  //         console.error("Error on retrying getInAppNotificationsData", error);
+  //       }
+  //     );
+  //   });
+  // };
 
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
@@ -289,7 +291,7 @@ const NewBillerHome = ({ navigation }) => {
 
     console.log("request data for zendesk jwt1", requestData);
     PostApiReqZendeskToken(
-      `api/Zendesk/TokenAuth`,
+      getEndpoint(ENDPOINTS.ZENDESK_TOKEN),
       requestData,
       (response) => {
         console.log("JWT reponse for zendesk login", response);

@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { saveUserInfo, logInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
+import { getEndpoint ,ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
@@ -263,8 +264,7 @@ const SplashScreen = ({ navigation, route }) => {
 
   const callSSOLoginApi = useCallback((request) => {
     setLoadingState(LoadingState.LOADING_DATA);
-
-    PostAuthApiRequest("api/mobile/gettoken", request, onSuccess, onError);
+    PostAuthApiRequest(getEndpoint(ENDPOINTS.LOGIN_SSO), request, onSuccess, onError);
   }, []);
 
   const onSuccess = useCallback(

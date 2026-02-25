@@ -19,6 +19,7 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
+import { getEndpoint , ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
 import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
@@ -73,8 +74,9 @@ const BillingScreen = ({ navigation }) => {
     getUser()
       .then((res) => {
         const accountNumber = res.userInfo.accountNumber;
+        const endpoint = getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber });
         GetApiRequest(
-          `api/Accounts/${accountNumber}/easypay`,
+          endpoint,
           (res) => {
             setIsAutoPayStatus(res?.isEasyPay);
             setIsAutoPayStatusLoad(false);

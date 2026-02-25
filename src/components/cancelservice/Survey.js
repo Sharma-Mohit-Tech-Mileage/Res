@@ -23,6 +23,7 @@ import AppStyles from "../utility/AppStyles";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import SecondaryButton from "../common/customui/SecondaryButton";
 import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import SmallLoader from "../common/customui/SmallLoader";
 import moment from "moment";
@@ -96,7 +97,7 @@ const Survey = ({ route }) => {
 
   const getSurveyData = () => {
     setLoadingData(true);
-    GetApiRequest("api/Survey", (res) => {
+    GetApiRequest(getEndpoint(ENDPOINTS.SURVEY), (res) => {
       console.log("Survey data fetched successfully:", res);
       if (res && res.length > 0) {
         setSurveyOptions(res);
@@ -125,7 +126,7 @@ const Survey = ({ route }) => {
     };
     console.log("Request body for disconnect:", requestBody);
     PostApiRequest(
-      "api/Order/Disconnect",
+      getEndpoint(ENDPOINTS.SERVICE_DISCONNECT_SURVEY),
       requestBody,
       (res) => {
         setLoading(false);
