@@ -9,6 +9,7 @@ import { RefreshToken } from '../user/Session';
 //import { Env } from '../../network/apis/account/Constants';
 import Config from 'react-native-config';
 import { GetApiRequest } from '../../network/APIClient';
+import { getEndpoint,ENDPOINTS } from '../../network/apis/endpoints/Endpoints';
 import { navigationRef } from '../../navigations/UserNavigations';
 import analytics from '@react-native-firebase/analytics';
 import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
@@ -179,8 +180,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             });
             
             const apiRequest = new Promise((resolve) => {
+                const endpointUrl = getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber });
                 GetApiRequest(
-                   `api/Accounts/${accountNumber}/easypay`,
+                   endpointUrl,
                     (res) => {
                         resolve(res);
                     },

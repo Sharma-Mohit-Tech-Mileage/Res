@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
 import { GetApiRequest} from "../../network/APIClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
@@ -116,9 +117,9 @@ const PasswordSecurityEdit = () => {
 
 
   const getSecurityQuestions=()=>{
-    const request = 'api/securityquestions/';
+    const requestWithEndpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS);
     GetApiRequest(
-      request,
+      requestWithEndpoint,
       (res) => {
         if (res) {
           setSecurityQuestionsNew(res);

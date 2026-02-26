@@ -174,10 +174,10 @@ const Notifications = () => {
   const getInAppNotificationsData = () => {
     setInAppNotificationLoading(true);
     getUser().then((res1) => {
-      let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
-      console.log("REQUEST", requestUrl);
+      const endpointUrl = getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName: res1.userInfo?.userName, accountNumber: res1.userInfo?.accountNumber });
+      console.log("REQUEST", endpointUrl);
       GetApiRequest(
-        requestUrl,
+        endpointUrl,
         (res) => {
           if (res) {
             res[0]?.pushMessageType.forEach((value, index) => {
@@ -198,10 +198,10 @@ const Notifications = () => {
   const getTextNotificationsData = () => {
     setTextNotificationLoading(true);
     getUser().then((res1) => {
-      let requestUrl = `api/SMS/sms?AccountNumber=${res1.userInfo?.accountNumber}`;
-      console.log(requestUrl);
+      const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, { accountNumber: res1.userInfo?.accountNumber });
+      console.log("REQUEST", endpointUrl);
       GetApiRequest(
-        requestUrl,
+        endpointUrl,
         (res) => {
           if (res) {
             res[0]?.smsMessageType.forEach((value, index) => {

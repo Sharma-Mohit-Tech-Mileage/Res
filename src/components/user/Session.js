@@ -3,6 +3,7 @@ import { refresh } from "react-native-app-auth";
 import store from "../../redux/configureStore";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { PostAuthApiRequest } from "../../network/APIClient";
+import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 //import { Env } from "../../network/apis/account/Constants";
 import Config from "react-native-config";
 
@@ -47,7 +48,8 @@ const onError = (error) => {
 const retryRequest = async (data, retries = 1) => {
   try {
     return await new Promise((resolve, reject) => {
-      PostAuthApiRequest("api/mobile/gettoken", data, resolve, reject);
+      const endpointUrl = getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN);
+      PostAuthApiRequest(endpointUrl, data, resolve, reject);
     });
   } catch (error) {
     if (retries > 0) {

@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
+import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from "../utility/validationSchema"; // Update the path as necessary
 import colors from "../../res/Colors";
@@ -114,9 +115,9 @@ const ChangePassword = () => {
   };
 
   const getSecurityQuestions = () => {
-    const request = `api/securityquestions/`;
+    const endpointUrl = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS);
     GetApiRequest(
-      request,
+      endpointUrl,
       (res) => {
         console.log("getSecurityQuestions", res);
         if (res) {
@@ -135,7 +136,7 @@ const ChangePassword = () => {
       const user = await getUser();
 
       // Construct the request URL based on the user's billing type
-      const request = `api/profile/password/${user.userInfo.accountNumber}`;
+      const endpointUrl = getEndpoint(ENDPOINTS.UPDATE_PASSWORD, { accountNumber: user.userInfo.accountNumber });
 
       const body = { newPassword };
 
@@ -143,7 +144,7 @@ const ChangePassword = () => {
   
       // Call the PUT API request
       PutApiRequest(
-        request,
+        endpointUrl,
         body,
         (res) => {
           setLoading(false);

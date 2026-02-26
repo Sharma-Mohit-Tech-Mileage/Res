@@ -264,7 +264,7 @@ const SplashScreen = ({ navigation, route }) => {
 
   const callSSOLoginApi = useCallback((request) => {
     setLoadingState(LoadingState.LOADING_DATA);
-    PostAuthApiRequest(getEndpoint(ENDPOINTS.LOGIN_SSO), request, onSuccess, onError);
+    PostAuthApiRequest(getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN), request, onSuccess, onError);
   }, []);
 
   const onSuccess = useCallback(
