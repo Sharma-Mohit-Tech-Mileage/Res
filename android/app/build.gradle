@@ -106,12 +106,10 @@ android {
     productFlavors {
         Dev {
             dimension "env"
-            applicationIdSuffix=".Dev"
             resValue "string", "build_config_package", "com.sparklight"
         }
         Demo {
             dimension "env"
-            applicationIdSuffix=".Demo"
             resValue "string", "build_config_package", "com.sparklight"
         }
         Prod {
