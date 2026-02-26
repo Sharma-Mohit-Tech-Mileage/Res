@@ -233,7 +233,8 @@ const TotalBalanceFooter = memo(({ totalAmount }) => (
       </Text>
       <View style={[styles.detailItemBorder]} />
     </View>
-    <View style={styles.billPlanermainContainer}>
+    
+    {/* <View style={styles.billPlanermainContainer}>
       <Text style={[styles.detailLabelNormal, { fontSize: 18 }]} >
         Still have questions about your bill?
       </Text>
@@ -255,7 +256,7 @@ const TotalBalanceFooter = memo(({ totalAmount }) => (
           Bill Explainer!
         </Text>
       </Text>
-    </View>
+    </View> */}
     <View style={[styles.detailItemBorder]} />
   </>
 ));
