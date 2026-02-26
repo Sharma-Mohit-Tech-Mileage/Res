@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Platform, AppState, Animated, Alert } from 'rea
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
-import { RefreshToken } from '../user/Session';
+import { RefreshToken, RefreshIdTokenOnly } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
@@ -11,16 +11,18 @@ import analytics from '@react-native-firebase/analytics';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import LoadingSpinner from './LoadingSpinner';
 import { getUser, getUpgradeToken } from '../../redux/utils/LocalStorage';
+import NetInfo from '@react-native-community/netinfo';
 
 // ─── DEBUG TAG ────────────────────────────────────────────────────────────────
 const DBG = '[ArticalWindowUtility]';
+const ID_TOKEN_REFRESH_INTERVAL_MS = 4 * 60 * 1000; // 4 min — fires 1 min before 5-min IdToken expiry
 const log  = (...a) => console.log(DBG,  ...a);
 const warn = (...a) => console.warn(DBG, ...a);
 const err  = (...a) => console.error(DBG, ...a);
 
 // ─── COMPREHENSIVE INJECTION SCRIPT ──────────────────────────────────────────
 // Injected BEFORE & AFTER page load to capture everything possible.
-const buildDebugScript = (token, userInfo, upgradeToken) => `
+const buildDebugScript = (token, userInfo, upgradeToken, idToken) => `
 (function() {
     // ── 1. ENVIRONMENT SNAPSHOT ──────────────────────────────────────────────
     const env = {
@@ -97,16 +99,23 @@ const buildDebugScript = (token, userInfo, upgradeToken) => `
     window.ReactNativeWebView.postMessage(JSON.stringify({ type:'debug_token_injection', data: tokenResults }));
 
     // ── 5. SET COOKIES & VERIFY ──────────────────────────────────────────────
+    const idTokenVal = ${JSON.stringify(idToken)};
     try {
         const domain  = location.hostname;
-        const expires = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
-        document.cookie = 'Source=MobileApp; domain=' + domain + '; path=/; expires=' + expires + '; SameSite=Lax';
-        document.cookie = 'CustomerType=Residential; domain=' + domain + '; path=/; expires=' + expires + '; SameSite=Lax';
+        const longExpiry  = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+        const shortExpiry = new Date(Date.now() + 5*60*1000).toUTCString();
+        document.cookie = 'Source=MobileApp; domain=' + domain + '; path=/; expires=' + longExpiry + '; SameSite=Lax';
+        document.cookie = 'CustomerType=Residential; domain=' + domain + '; path=/; expires=' + longExpiry + '; SameSite=Lax';
+        document.cookie = 'LatestVersion=true; domain=' + domain + '; path=/; expires=' + longExpiry + '; SameSite=Lax';
+        if (idTokenVal) {
+            document.cookie = 'IdToken=' + idTokenVal + '; domain=' + domain + '; path=/; expires=' + shortExpiry + '; SameSite=Lax';
+        }
         window.ReactNativeWebView.postMessage(JSON.stringify({
             type: 'debug_cookies_after',
             data: {
                 cookiesNow: document.cookie,
                 domain:     domain,
+                hasIdToken: !!idTokenVal,
                 note:       document.cookie.includes('Source=MobileApp') ? 'Cookie write SUCCESS' : 'WARNING: Source cookie NOT visible after write (HttpOnly/SameSite issue?)'
             }
         }));
@@ -418,29 +427,103 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const toastOpacity          = useRef(new Animated.Value(0)).current;
     const initialLoadComplete   = useRef(false);
     const sessionInjected       = useRef(false);
+    const silentRefreshTimer    = useRef(null);
+    const pendingOfflineRefresh = useRef(false);
 
     const isLoading = !contentLoaded || progress < 1;
+
+    // ── Silent IdToken refresh (mimic PCI connector) ─────────────────────────
+    const silentRefreshIdToken = useCallback(async () => {
+        if (!webViewRef.current) {
+            warn('silentRefreshIdToken skipped — no WebView ref');
+            return;
+        }
+        log('── Silent IdToken refresh START ──');
+        try {
+            const freshIdToken = await RefreshIdTokenOnly();
+            if (!freshIdToken) {
+                warn('RefreshIdTokenOnly returned empty — not injecting');
+                pendingOfflineRefresh.current = true;
+                return;
+            }
+            pendingOfflineRefresh.current = false;
+            const safe = (freshIdToken || '').replace(/'/g, "\\'");
+            webViewRef.current.injectJavaScript(`
+(function() {
+    try {
+        var hostname = document.location.hostname;
+        if (!hostname || hostname === 'localhost') return;
+        var longExpiry  = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+        var shortExpiry = new Date(Date.now() + 5*60*1000).toUTCString();
+        document.cookie = 'Source=MobileApp; domain=' + hostname + '; path=/; expires=' + longExpiry + '; SameSite=Lax';
+        document.cookie = 'CustomerType=Residential; domain=' + hostname + '; path=/; expires=' + longExpiry + '; SameSite=Lax';
+        document.cookie = 'LatestVersion=true; domain=' + hostname + '; path=/; expires=' + longExpiry + '; SameSite=Lax';
+        document.cookie = 'IdToken=${safe}; domain=' + hostname + '; path=/; expires=' + shortExpiry + '; SameSite=Lax';
+        console.log('[ArticalWindow SilentRefresh] IdToken + LatestVersion updated on ' + hostname);
+        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'silent_refresh_complete', domain: hostname, timestamp: Date.now()
+        }));
+    } catch(e) {
+        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+            type: 'silent_refresh_error', error: e.message
+        }));
+    }
+})();`.trim());
+            log('── Silent IdToken refresh COMPLETE ──');
+        } catch (e) {
+            err('── Silent IdToken refresh FAILED ──', e.message);
+            pendingOfflineRefresh.current = true;
+        }
+    }, []);
+
+    const stopSilentRefresh = useCallback(() => {
+        if (silentRefreshTimer.current) {
+            clearInterval(silentRefreshTimer.current);
+            silentRefreshTimer.current = null;
+            log('Silent refresh timer cleared');
+        }
+    }, []);
+
+    const startSilentRefresh = useCallback(() => {
+        stopSilentRefresh();
+        silentRefreshTimer.current = setInterval(silentRefreshIdToken, ID_TOKEN_REFRESH_INTERVAL_MS);
+        log('Silent refresh timer started | interval:', ID_TOKEN_REFRESH_INTERVAL_MS / 1000, 's');
+    }, [silentRefreshIdToken, stopSilentRefresh]);
 
     // ── Prepare injection script ────────────────────────────────────────────
     const prepareInjectionScript = useCallback(async () => {
         log('prepareInjectionScript — start');
         try {
-            const currentUser    = await getUser();
-            const upgradeToken   = await getUpgradeToken();
+            let currentUser    = await getUser();
+            const upgradeToken = await getUpgradeToken();
 
             log('prepareInjectionScript — currentUser keys:', currentUser ? Object.keys(currentUser) : 'NULL');
             log('prepareInjectionScript — token present?', !!currentUser?.token);
             log('prepareInjectionScript — userInfo present?', !!currentUser?.userInfo);
+            log('prepareInjectionScript — idToken present?', !!currentUser?.idToken);
             log('prepareInjectionScript — upgradeToken present?', !!upgradeToken?.access_token);
 
             if (!currentUser?.token) {
                 warn('prepareInjectionScript — TOKEN IS MISSING. WebView will be unauthenticated!');
             }
 
+            // Pre-fetch idToken if missing (mimic PCI connector logic)
+            if (!currentUser?.idToken) {
+                log('prepareInjectionScript — idToken absent, pre-fetching via SSO...');
+                try {
+                    await RefreshIdTokenOnly();
+                    currentUser = await getUser();
+                    log('prepareInjectionScript — idToken pre-fetch done | hasIdToken:', !!currentUser?.idToken);
+                } catch (e) {
+                    warn('prepareInjectionScript — idToken pre-fetch failed (non-fatal):', e.message);
+                }
+            }
+
             const script = buildDebugScript(
                 currentUser?.token       || '',
                 currentUser?.userInfo    || {},
-                upgradeToken?.access_token || ''
+                upgradeToken?.access_token || '',
+                currentUser?.idToken     || ''
             );
 
             setInjectionScript(script);
@@ -453,6 +536,26 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, []);
 
     useEffect(() => { prepareInjectionScript(); }, [prepareInjectionScript]);
+
+    // ── Silent IdToken refresh timer lifecycle ──────────────────────────────
+    useEffect(() => {
+        startSilentRefresh();
+        return () => {
+            log('Component unmounting — stopping silent refresh timer');
+            stopSilentRefresh();
+        };
+    }, [startSilentRefresh, stopSilentRefresh]);
+
+    // ── Offline recovery: when connectivity returns, retry pending refresh ──
+    useEffect(() => {
+        const unsubscribe = NetInfo.addEventListener((state) => {
+            if (state.isConnected && state.isInternetReachable && pendingOfflineRefresh.current) {
+                log('Network restored — retrying pending IdToken refresh');
+                silentRefreshIdToken();
+            }
+        });
+        return () => unsubscribe();
+    }, [silentRefreshIdToken]);
 
     // ── Toast ────────────────────────────────────────────────────────────────
     const showToastMessage = useCallback(() => {
@@ -487,18 +590,25 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         try {
             const currentUser  = await getUser();
             const upgradeToken = await getUpgradeToken();
-            log('refreshTokenInWebView — token:', currentUser?.token?.substring(0,20));
+            const safeIdToken  = (currentUser?.idToken || '').replace(/'/g, "\\'");
+            log('refreshTokenInWebView — token:', currentUser?.token?.substring(0,20), '| hasIdToken:', !!currentUser?.idToken);
             webViewRef.current?.injectJavaScript(`
                 (function() {
-                    const domain  = location.hostname;
-                    const expires = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
-                    document.cookie = 'Source=MobileApp; domain=' + domain + '; path=/; expires=' + expires + '; SameSite=Lax';
-                    document.cookie = 'CustomerType=Residential; domain=' + domain + '; path=/; expires=' + expires + '; SameSite=Lax';
+                    const domain      = location.hostname;
+                    const longExpiry  = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+                    const shortExpiry = new Date(Date.now() + 5*60*1000).toUTCString();
+                    document.cookie = 'Source=MobileApp; domain=' + domain + '; path=/; expires=' + longExpiry + '; SameSite=Lax';
+                    document.cookie = 'CustomerType=Residential; domain=' + domain + '; path=/; expires=' + longExpiry + '; SameSite=Lax';
+                    document.cookie = 'LatestVersion=true; domain=' + domain + '; path=/; expires=' + longExpiry + '; SameSite=Lax';
+                    var idTok = '${safeIdToken}';
+                    if (idTok) {
+                        document.cookie = 'IdToken=' + idTok + '; domain=' + domain + '; path=/; expires=' + shortExpiry + '; SameSite=Lax';
+                    }
                     localStorage.setItem('jwt_token', '${currentUser?.token || ''}');
                     localStorage.setItem('user_info', '${JSON.stringify(currentUser?.userInfo || {})}');
                     localStorage.setItem('upgrades_token', '${upgradeToken?.access_token || ''}');
                     window.dispatchEvent(new Event('tokenRefreshed'));
-                    window.ReactNativeWebView.postMessage(JSON.stringify({ type:'debug_token_refreshed', data: { ok: true } }));
+                    window.ReactNativeWebView.postMessage(JSON.stringify({ type:'debug_token_refreshed', data: { ok: true, hasIdToken: !!idTok } }));
                 })();
                 true;
             `);
@@ -712,6 +822,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     setShowPDFModal(true);
                     break;
 
+                // ── Silent refresh ────────────────────────────────────────────
+                case 'silent_refresh_complete':
+                    log('🔄 SilentRefresh done | domain:', data.domain, '| at:', new Date(data.timestamp).toISOString());
+                    break;
+                case 'silent_refresh_error':
+                    err('🔄 SilentRefresh error:', data.error);
+                    break;
+
                 // ── Alive check ──────────────────────────────────────────────
                 case 'pong':
                     log('🏓 PONG received — WebView is alive');
@@ -816,14 +934,17 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     useEffect(() => {
         const handleAppStateChange = async (nextAppState) => {
             log('AppState change →', nextAppState);
-            if (nextAppState === 'background') {
+            if (nextAppState === 'background' || nextAppState === 'inactive') {
                 backgroundTimestamp.current = Date.now();
+                stopSilentRefresh();
                 webViewRef.current?.injectJavaScript(`window.postMessage('SAVE_STATE'); true;`);
+                log('Backgrounded — silent refresh timer paused');
             } else if (nextAppState === 'active' && backgroundTimestamp.current > 0) {
                 const bgDuration = Date.now() - backgroundTimestamp.current;
                 log('Returned from background after', Math.round(bgDuration / 1000), 'seconds');
 
                 if (bgDuration > 300000) {
+                    // >5 min: IdToken definitely expired, WebView may be dead
                     log('Background > 5 min — checking WebView alive...');
                     const isAlive = await checkWebViewAlive();
                     log('WebView alive?', isAlive);
@@ -833,18 +954,28 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         try {
                             await RefreshToken();
                             await refreshTokenInWebView();
+                            await silentRefreshIdToken();
                         } catch(e) {
                             err('Token refresh failed after background:', e);
                             recreateWebView();
                         }
                     }
+                } else if (bgDuration > 240000) {
+                    // 4–5 min: IdToken may have just expired — proactive refresh
+                    log('4–5min background — proactive IdToken refresh');
+                    await silentRefreshIdToken();
+                } else {
+                    log('<4min background — IdToken still valid, no action needed');
                 }
+
+                backgroundTimestamp.current = 0;
+                startSilentRefresh();
             }
         };
 
         const subscription = AppState.addEventListener('change', handleAppStateChange);
         return () => subscription?.remove();
-    }, [checkWebViewAlive, recreateWebView, refreshTokenInWebView]);
+    }, [checkWebViewAlive, recreateWebView, refreshTokenInWebView, silentRefreshIdToken, startSilentRefresh, stopSilentRefresh]);
 
     // ── Render ───────────────────────────────────────────────────────────────
     return (
@@ -880,6 +1011,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         javaScriptEnabled={true}
                         domStorageEnabled={true}
                         sharedCookiesEnabled={true}
+                        thirdPartyCookiesEnabled={true}
                         cacheEnabled={true}
                         originWhitelist={['https://*']}
                         mixedContentMode="compatibility"

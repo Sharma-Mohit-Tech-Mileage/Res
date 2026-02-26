@@ -12,6 +12,7 @@ import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import MaintenanceAlert from './MaintenanceAlert';
 import { RefreshIdTokenOnly } from '../user/Session';
+import NetInfo from '@react-native-community/netinfo';
 
 const TAG = '[PCI]';
 const ID_TOKEN_REFRESH_INTERVAL_MS = 4 * 60 * 1000; // 4 min — fires 1 min before 5-min IdToken expiry
@@ -68,12 +69,13 @@ const buildPreloadScript = ({ idToken, token, userInfo }) => {
             var shortExpiry = new Date(Date.now() + 5*60*1000).toUTCString();
             document.cookie = 'Source=MobileApp; path=/; expires=' + longExpiry + ';';
             document.cookie = 'CustomerType=Residential; path=/; expires=' + longExpiry + ';';
+            document.cookie = 'LatestVersion=true; path=/; expires=' + longExpiry + ';';
             if (hasIdToken) {
                 document.cookie = 'IdToken=${safeIdToken}; path=/; expires=' + shortExpiry + ';';
-                console.log('[PCI PreLoad] Cookies pre-seeded | Source + CustomerType + IdToken');
+                console.log('[PCI PreLoad] Cookies pre-seeded | Source + CustomerType + LatestVersion + IdToken');
             } else {
                 console.warn('[PCI PreLoad] IdToken empty — IdToken cookie NOT seeded');
-                console.log('[PCI PreLoad] Cookies pre-seeded | Source + CustomerType only');
+                console.log('[PCI PreLoad] Cookies pre-seeded | Source + CustomerType + LatestVersion only');
             }
         } catch(cookieErr) {
             // Expected failure on about:blank — not an error condition
@@ -184,6 +186,7 @@ const buildPostLoadScript = ({ idToken, token, userInfo }) => {
         var shortExpiry = new Date(Date.now() + 5*60*1000).toUTCString();
         document.cookie = 'Source=MobileApp; path=/; expires=' + longExpiry + ';';
         document.cookie = 'CustomerType=Residential; path=/; expires=' + longExpiry + ';';
+        document.cookie = 'LatestVersion=true; path=/; expires=' + longExpiry + ';';
         var idTokenVal = '${safeIdToken}';
         if (idTokenVal) {
             document.cookie = 'IdToken=' + idTokenVal + '; path=/; expires=' + shortExpiry + ';';
@@ -239,6 +242,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const isInitializing = useRef(false);       // guard against duplicate initializePayment calls
     const preloadScriptRef = useRef('');        // holds the injectedJavaScriptBeforeContentLoaded script
     const currentUrl = useRef('about:blank');   // tracks active WebView URL for log context
+    const pendingOfflineRefresh = useRef(false); // set when silent refresh fails (e.g. offline)
 
     const isLoading = !contentLoaded || progress < 1;
 
@@ -318,8 +322,10 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             const freshIdToken = await RefreshIdTokenOnly();
             if (!freshIdToken) {
                 console.warn(`${TAG} RefreshIdTokenOnly returned empty — not injecting`);
+                pendingOfflineRefresh.current = true;
                 return;
             }
+            pendingOfflineRefresh.current = false;
             const safe = (freshIdToken || '').replace(/'/g, "\\'");
             webViewRef.current.injectJavaScript(`
 (function() {
@@ -333,8 +339,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         var shortExpiry = new Date(Date.now() + 5*60*1000).toUTCString();
         document.cookie = 'Source=MobileApp; path=/; expires=' + longExpiry + ';';
         document.cookie = 'CustomerType=Residential; path=/; expires=' + longExpiry + ';';
+        document.cookie = 'LatestVersion=true; path=/; expires=' + longExpiry + ';';
         document.cookie = 'IdToken=${safe}; path=/; expires=' + shortExpiry + ';';
-        console.log('[PCI SilentRefresh] IdToken updated on ' + hostname);
+        console.log('[PCI SilentRefresh] IdToken + LatestVersion updated on ' + hostname);
         window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
             type: 'silent_refresh_complete', domain: hostname, timestamp: Date.now()
         }));
@@ -348,6 +355,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             console.log(`${TAG} ── Silent IdToken refresh COMPLETE ──`);
         } catch (e) {
             console.error(`${TAG} ── Silent IdToken refresh FAILED ──`, e.message);
+            pendingOfflineRefresh.current = true;
         }
     }, []);
 
@@ -608,6 +616,17 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 .catch((e) => console.warn(`${TAG} Analytics error:`, e.message));
         }
     }, [name]);
+
+    // ── Offline recovery: when connectivity returns, retry pending refresh ──
+    useEffect(() => {
+        const unsubscribe = NetInfo.addEventListener((state) => {
+            if (state.isConnected && state.isInternetReachable && pendingOfflineRefresh.current) {
+                console.log(`${TAG} Network restored — retrying pending IdToken refresh`);
+                silentRefreshIdToken();
+            }
+        });
+        return () => unsubscribe();
+    }, [silentRefreshIdToken]);
 
     // ── WebView handlers ──────────────────────────────────────────────────────
 
