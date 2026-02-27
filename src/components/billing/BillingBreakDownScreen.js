@@ -21,12 +21,15 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AppStyles from "../utility/AppStyles";
-import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActions";
+import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
+
 import {
   selectBillingBreakDownLoading,
   selectBillingBreakDownData,
   selectBillingBreakDownError,
+  selectBillExplainerData,
 } from "../../redux/selectors/billingBreakdownSelectors";
+
 import { InfoIcon } from "native-base";
 import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
 import SecondaryButton from "../common/customui/PrimaryButton";
@@ -214,7 +217,7 @@ const BreakDownItem = memo(({ item }) => {
 /**
  * Footer component showing the total balance due
  */
-const TotalBalanceFooter = memo(({ totalAmount }) => (
+const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillExplainerLink }) => (
   <>
     <View style={[styles.detailRow, styles.footerContainer]}>
       <Text
@@ -233,8 +236,8 @@ const TotalBalanceFooter = memo(({ totalAmount }) => (
       </Text>
       <View style={[styles.detailItemBorder]} />
     </View>
-    
-    {/* <View style={styles.billPlanermainContainer}>
+    { showBillExplainer && (
+     <View style={styles.billPlanermainContainer}>
       <Text style={[styles.detailLabelNormal, { fontSize: 18 }]} >
         Still have questions about your bill?
       </Text>
@@ -256,7 +259,8 @@ const TotalBalanceFooter = memo(({ totalAmount }) => (
           Bill Explainer!
         </Text>
       </Text>
-    </View> */}
+    </View>
+  )}
     <View style={[styles.detailItemBorder]} />
   </>
 ));
@@ -300,9 +304,17 @@ const BillingBreakDownScreen = ({ navigation }) => {
   // Redux state and dispatch
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userData);
+  const accountDetails = useSelector((state) => state.profile?.accountDetails);
+  
   const loading = useSelector(selectBillingBreakDownLoading);
   const billingData = useSelector(selectBillingBreakDownData);
-  const error = useSelector(selectBillingBreakDownError);
+  const error = useSelector(selectBillingBreakDownError)
+
+  const billExplainerData = useSelector(selectBillExplainerData);
+  
+  const [showBillExplainer, setShowBillExplainer] = useState(false);
+
+ 
   // Local state
   const [totalDue, setTotalDue] = useState(0);
   const [errorCode, setErrorCode] = useState("");
@@ -310,7 +322,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
   // Calculate total due whenever billing data changes
   useEffect(() => {
-    console.log("Billing Data:", billingData);
     if (!billingData?.length) return;
 
     // Reset total first
@@ -325,6 +336,23 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
     setTotalDue(calculatedTotal);
   }, [billingData]);
+
+
+   useEffect(() => {
+    if (!accountDetails?.hierarchy?.hierarchy_id) {
+      setShowBillExplainer(true);
+      let requestBody = {
+          customer_type: accountDetails?.customer_type,
+          hierarchy_id: accountDetails?.hierarchy?.hierarchy_id,    
+          account: user?.userInfo?.accountNumber,
+          utmMedium: "web",
+          utmSource: "selfcare_mobile",
+          video: accountDetails?.services?.video,
+          homesPassedId: accountDetails?.homes_passed_id || null
+    }
+      dispatch(fetchBillExplainer(requestBody));
+    }
+  }, [accountDetails]);
 
   // Fetch billing data when screen is focused
   useFocusEffect(
@@ -387,7 +415,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         maxToRenderPerBatch={10}
         initialNumToRender={5}
         windowSize={5}
-        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} />}
+        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} renderBillExplainerLink={renderBillExplainerLink} />}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
     );

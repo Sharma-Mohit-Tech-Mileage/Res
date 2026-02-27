@@ -71,7 +71,29 @@ const billingStatementApi = {
       console.error("Error fetching billing breakdown:", error);
       throw error;
     }
+  },
+
+  fetchBillExplainer: async (requestData ) => {
+    try {
+      let user = await getUser();
+      const config = {
+        headers: {
+          Authorization: "Bearer " + user.token
+        }
+      };
+      
+      const response = await _axios.post(`api/GetBillExplainer/Get`, requestData, {...config});
+      console.log("data",JSON.stringify(response));
+      return {data:response.data, status: response.status}
+    } catch (error) {
+      console.error("Error fetching bill explainer:", error);
+      throw error;
+    }
+  
   }
+
 };
+
+
 
 export default billingStatementApi;

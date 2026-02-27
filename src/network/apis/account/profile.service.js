@@ -778,8 +778,11 @@ const fetchACPUserAccountDetails = async (signal) => {
       "email",
       "account_status",
       "days_since_disconnect_date",
-      "service_address",
       "legacy_brand_by_spa",
+      "bill_to_address",
+      "service_address",
+      "homes_passed_id",
+      "hierarchy"
     ],
   };
 

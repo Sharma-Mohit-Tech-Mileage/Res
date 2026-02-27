@@ -2,6 +2,7 @@ import * as types from '../constants/billingBreakdownTypes';
 
 const initialState = {
   breakdownData: [],
+  explainerData: null,
   loading: false,
   error: null,
   totalDue: 0
@@ -47,7 +48,33 @@ const billingBreakdownReducer = (state = initialState, action) => {
         ...state,
         error: null
       };
+    case types.FETCH_BILL_EXPLAINER_REQUEST:
+      return {
+      ...state,
+      loading: true,
+      error: null
+      };
     
+    case types.FETCH_BILL_EXPLAINER_SUCCESS:
+      return {
+      ...state,
+      loading: false,
+      explainerData: action.payload.explainerData,
+      error: null
+      };
+    
+    case types.FETCH_BILL_EXPLAINER_FAILURE:
+      return {
+      ...state,
+      loading: false,
+      error: action.payload.error
+      };
+    
+    case types.CLEAR_BILL_EXPLAINER_ERROR:
+      return {
+      ...state,
+      error: null
+      };
     default:
       return state;
   }
