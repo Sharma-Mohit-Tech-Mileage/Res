@@ -76,6 +76,13 @@ const SplashScreen = ({ navigation, route }) => {
   const logoMovement = useRef( new Animated.Value(ANIMATION_CONFIG[deviceSize].logoStart) ).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  const envLabel =
+    Config.ENV === "development"
+      ? "Dev"
+      : Config.ISUAT === "UAT"
+      ? "UAT"
+      : "";
+
   const getStyle = (baseStyle) => {
     const sizeStyle = `${baseStyle}_${deviceSize}`;
     return styles[sizeStyle] || styles[baseStyle];
@@ -745,7 +752,7 @@ const SplashScreen = ({ navigation, route }) => {
 
       {isVisible && (
         <Text style={getStyle("version")}>
-          {Config.ISUAT} Version: {VersionCheck.getCurrentVersion()}
+          {envLabel ? `${envLabel} ` : ""}Version: {VersionCheck.getCurrentVersion()}
         </Text>
       )}
 

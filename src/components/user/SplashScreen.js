@@ -90,6 +90,13 @@ const SplashScreen = ({ navigation, route }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [deviceSize, setDeviceSize] = useState(getDeviceSize());
 
+  const envLabel =
+    Config.ENV === "development"
+      ? "Dev"
+      : Config.ISUAT === "UAT"
+      ? "UAT"
+      : "";
+
   // Animation refs (matching business app structure)
   const backgroundFade = useRef(new Animated.Value(0)).current;
   const logoFade = useRef(new Animated.Value(0)).current;
@@ -616,7 +623,7 @@ console.error('BASE_URL1:', Config.API_ACP_BASEURL);
 
       {isVisible && (
         <Text style={getStyle("version")}>
-          {Config.ISUAT} Version:{VersionCheck.getCurrentVersion()}
+          {envLabel ? `${envLabel} ` : ""}Version:{VersionCheck.getCurrentVersion()}
         </Text>
       )}
 
