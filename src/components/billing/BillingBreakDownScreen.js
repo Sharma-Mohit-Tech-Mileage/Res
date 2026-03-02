@@ -21,6 +21,7 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AppStyles from "../utility/AppStyles";
+import { PostApiRequest } from "../../network/APIClient";
 import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
 
 import {
@@ -217,7 +218,7 @@ const BreakDownItem = memo(({ item }) => {
 /**
  * Footer component showing the total balance due
  */
-const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillExplainerLink }) => (
+const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillExplainerLink , navigation }) => (
   <>
     <View style={[styles.detailRow, styles.footerContainer]}>
       <Text
@@ -253,7 +254,7 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
               fontSize: 18,
             },
           ]}
-          onPress={renderBillExplainerLink}
+          onPress={() => renderBillExplainerLink( navigation)}
         >
           {" "}
           Bill Explainer!
@@ -268,8 +269,15 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
 /**
  * Handler for Bill Explainer link press
  */
-const renderBillExplainerLink = () => {
-  navigation.navigate("BillExplainer");
+const renderBillExplainerLink = (data, navigation) => {
+  if (!data?.be_url) {  
+    console.error("Bill Explainer link is not available");
+    return;
+  }
+  navigation.navigate('ArticalWindowUtility', {
+    title: "Bill Explainer",
+    url: data.be_url
+  });
 };
 
 /**
@@ -310,7 +318,8 @@ const BillingBreakDownScreen = ({ navigation }) => {
   const billingData = useSelector(selectBillingBreakDownData);
   const error = useSelector(selectBillingBreakDownError)
 
-  const billExplainerData = useSelector(selectBillExplainerData);
+  //const billExplainerData = useSelector(selectBillExplainerData);
+  const [billExplainerData, setBillExplainerData] = useState(null);
   
   const [showBillExplainer, setShowBillExplainer] = useState(false);
 
@@ -339,6 +348,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
 
    useEffect(() => {
+    console.log("Account Details1:", accountDetails);
     if (!accountDetails?.hierarchy?.hierarchy_id) {
       setShowBillExplainer(true);
       let requestBody = {
@@ -350,9 +360,20 @@ const BillingBreakDownScreen = ({ navigation }) => {
           video: accountDetails?.services?.video,
           homesPassedId: accountDetails?.homes_passed_id || null
     }
-      dispatch(fetchBillExplainer(requestBody));
+    getBillExplainerData(requestBody);
     }
   }, [accountDetails]);
+
+  const getBillExplainerData =(requestBody) => {  
+    PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
+      console.log("Bill Explainer Response:", res);
+      setBillExplainerData(res);
+      }, (error) => { 
+        console.error("Bill Explainer Error:", error);
+      }
+
+    )
+  };
 
   // Fetch billing data when screen is focused
   useFocusEffect(
@@ -415,7 +436,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         maxToRenderPerBatch={10}
         initialNumToRender={5}
         windowSize={5}
-        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} renderBillExplainerLink={renderBillExplainerLink} />}
+        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} />}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
     );

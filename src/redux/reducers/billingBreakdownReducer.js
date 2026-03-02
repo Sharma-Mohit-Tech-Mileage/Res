@@ -67,7 +67,7 @@ const billingBreakdownReducer = (state = initialState, action) => {
       return {
       ...state,
       loading: false,
-      error: action.payload.error
+      error: null //action.payload.error
       };
     
     case types.CLEAR_BILL_EXPLAINER_ERROR:

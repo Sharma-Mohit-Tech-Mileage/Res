@@ -1,8 +1,9 @@
 import * as types from '../constants/billingBreakdownTypes';
 
 // Bill Explainer actions
-export const fetchBillExplainer = () => ({
-  type: types.FETCH_BILL_EXPLAINER_REQUEST
+export const fetchBillExplainer = (requestBody) => ({
+  type: types.FETCH_BILL_EXPLAINER_REQUEST,
+  payload: { requestBody }
 });
 
 export const fetchBillExplainerSuccess = (explainerData) => ({

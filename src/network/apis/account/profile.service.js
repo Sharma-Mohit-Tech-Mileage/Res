@@ -776,6 +776,7 @@ const fetchACPUserAccountDetails = async (signal) => {
       "payment_due_date",
       "services",
       "email",
+      "customer_type",
       "account_status",
       "days_since_disconnect_date",
       "legacy_brand_by_spa",

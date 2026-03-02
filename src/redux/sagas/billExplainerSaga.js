@@ -3,9 +3,11 @@ import * as types from '../constants/billingBreakdownTypes';
 import * as actions from '../actions/billingBreakdownActions';
 import billingStatementApi from '../../network/apis/account/billingBreakdown.service';
 
-function* fetchBillExplainerSaga() {
+function* fetchBillExplainerSaga(action) {
   try {
-    const explainerData = yield call(billingStatementApi.fetchBillExplainer);
+    console.log("Request Body for Bill Explainer:", action.payload);
+    let {requestBody} = action.payload;
+    const explainerData = yield call(billingStatementApi.fetchBillExplainer, requestBody);
     console.log('Fetched bill explainer:', explainerData);
 
     if(explainerData?.data.statusCode === 404) {
