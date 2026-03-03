@@ -87,7 +87,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         const gui = generateGuid();
         const guiTrim = gui.split('-').join('');
 
-        const key = CryptoJS.enc.Utf8.parse(Config.encryptvalPassword);
+        const key = CryptoJS.enc.Utf8.parse(Config.ENCRYPTVAL_PASSWORD);
         const ix = generateIV(guiTrim);
         const iv = CryptoJS.enc.Utf8.parse(ix);
 
@@ -99,7 +99,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             padding: CryptoJS.pad.Pkcs7
         }).toString();
 
-        const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl, apiKey: Config.secretKey };
+        const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl, apiKey: Config.SECRET_KEY };
 
         const version = 'V3';
         const paymentUrl = getPaymentUrl(version);
