@@ -276,7 +276,7 @@ const renderBillExplainerLink = (data, navigation) => {
     return;
   }
   navigation.navigate('ArticalWindowUtility', {
-    title: "Bill Explainer",
+    name: "Bill Explainer",
     url: data.be_url
   });
 };
