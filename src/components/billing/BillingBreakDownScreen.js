@@ -21,16 +21,21 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AppStyles from "../utility/AppStyles";
-import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActions";
+import { PostApiRequest } from "../../network/APIClient";
+import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
+
 import {
   selectBillingBreakDownLoading,
   selectBillingBreakDownData,
   selectBillingBreakDownError,
+  selectBillExplainerData,
 } from "../../redux/selectors/billingBreakdownSelectors";
+
 import { InfoIcon } from "native-base";
 import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
 import SecondaryButton from "../common/customui/PrimaryButton";
 import LoadingOverlay from "../common/customui/CustomLoading";
+
 
 // Constants
 const PLACEHOLDER_MESSAGE =
@@ -214,7 +219,7 @@ const BreakDownItem = memo(({ item }) => {
 /**
  * Footer component showing the total balance due
  */
-const TotalBalanceFooter = memo(({ totalAmount }) => (
+const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillExplainerLink , navigation }) => (
   <>
     <View style={[styles.detailRow, styles.footerContainer]}>
       <Text
@@ -231,31 +236,33 @@ const TotalBalanceFooter = memo(({ totalAmount }) => (
       >
         ${totalAmount.toFixed(2)}
       </Text>
-      <View style={[styles.detailItemBorder]} />
+      <View style={[styles.detailItemBorder, styles.totalBalanceSeparator]} />
     </View>
-    <View style={styles.billPlanermainContainer}>
-      <Text style={[styles.detailLabelNormal, { fontSize: 18 }]} >
-        Still have questions about your bill?
-      </Text>
-
-      <Text style={[styles.detailLabelNormal, { fontSize: 18 }]}>
-        Try our new{" "}
-        <Text
-          style={[
-            styles.detailLabelNormal,
-            {
-              color: Color.sparklightBrightPurple,
-              fontWeight: "700",
-              fontSize: 18,
-            },
-          ]}
-          onPress={renderBillExplainerLink}
-        >
-          {" "}
-          Bill Explainer!
+    {showBillExplainer && (
+      <View style={styles.billPlanermainContainer}>
+        <Text style={styles.billExplainerText}>
+          Still have questions about your bill?
         </Text>
-      </Text>
-    </View>
+       <View style={{ flexDirection: "row" }}>
+        <Text style={styles.billExplainerText}>
+          Try our new{' '}
+        </Text>
+        <View style={{ flexDirection: "row" }}>
+          <Text
+            accessibilityRole="link"
+            accessibilityLabel="Open Bill Explainer"
+            accessibilityHint="Double tap to open link"
+            accessible={true}
+            style={styles.billExplainerLinkText}
+            onPress={() => renderBillExplainerLink(navigation)}
+          >
+            Bill Explainer
+          </Text>
+          <Text accessible={false} importantForAccessibility="no" style={[styles.billExplainerLinkText, { textDecorationLine: 'none' }]}>!</Text>
+        </View>
+        </View>
+      </View>
+    )}
     <View style={[styles.detailItemBorder]} />
   </>
 ));
@@ -263,8 +270,15 @@ const TotalBalanceFooter = memo(({ totalAmount }) => (
 /**
  * Handler for Bill Explainer link press
  */
-const renderBillExplainerLink = () => {
-  navigation.navigate("BillExplainer");
+const renderBillExplainerLink = (data, navigation) => {
+  if (!data?.be_url) {  
+    console.error("Bill Explainer link is not available");
+    return;
+  }
+  navigation.navigate('ArticalWindowUtility', {
+    title: "Bill Explainer",
+    url: data.be_url
+  });
 };
 
 /**
@@ -299,9 +313,18 @@ const BillingBreakDownScreen = ({ navigation }) => {
   // Redux state and dispatch
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userData);
+  const accountDetails = useSelector((state) => state.profile?.accountDetails);
+  
   const loading = useSelector(selectBillingBreakDownLoading);
   const billingData = useSelector(selectBillingBreakDownData);
-  const error = useSelector(selectBillingBreakDownError);
+  const error = useSelector(selectBillingBreakDownError)
+
+  const billExplainerData = useSelector(selectBillExplainerData);
+  //const [billExplainerData, setBillExplainerData] = useState(null);
+  
+  const [showBillExplainer, setShowBillExplainer] = useState(false);
+
+ 
   // Local state
   const [totalDue, setTotalDue] = useState(0);
   const [errorCode, setErrorCode] = useState("");
@@ -309,7 +332,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
   // Calculate total due whenever billing data changes
   useEffect(() => {
-    console.log("Billing Data:", billingData);
     if (!billingData?.length) return;
 
     // Reset total first
@@ -324,6 +346,47 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
     setTotalDue(calculatedTotal);
   }, [billingData]);
+
+
+   useEffect(() => {
+    console.log("Account Details1:", accountDetails);
+    if (!accountDetails?.hierarchy?.hierarchy_id) {
+      setShowBillExplainer(true);
+      let requestBody = {
+          customer_type: accountDetails?.customer_type,
+          hierarchy_id: accountDetails?.hierarchy?.hierarchy_id,    
+          account: user?.userInfo?.accountNumber,
+          utmMedium: "web",
+          utmSource: "selfcare_mobile",
+          video: accountDetails?.services?.video,
+          homesPassedId: accountDetails?.homes_passed_id || null
+    }
+    dispatch(fetchBillExplainer(requestBody));
+    //getBillExplainerData(requestBody);
+    }
+  }, [accountDetails]);
+
+
+
+  useEffect(() => {
+    console.log("Bill Explainer Data:", billExplainerData);
+    if(!billExplainerData?.eligibility){
+      setShowBillExplainer(false);
+    }else{
+      setShowBillExplainer(true);
+    }
+  }, [billExplainerData]);
+
+  // const getBillExplainerData =(requestBody) => {  
+  //   PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
+  //     console.log("Bill Explainer Response:", res);
+  //     setBillExplainerData(res);
+  //     }, (error) => { 
+  //       console.error("Bill Explainer Error:", error);
+  //     }
+
+  //   )
+  // };
 
   // Fetch billing data when screen is focused
   useFocusEffect(
@@ -386,7 +449,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         maxToRenderPerBatch={10}
         initialNumToRender={5}
         windowSize={5}
-        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} />}
+        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} />}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
     );
@@ -612,6 +675,9 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     borderRadius: 0,
   },
+  totalBalanceSeparator: {
+    marginBottom: Padding.p_13xl,
+  },
   buttonsLayout: {
     paddingHorizontal: 0,
     marginHorizontal: 16,
@@ -650,6 +716,23 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     marginTop: 8,
     marginBottom: 8,
+  },
+
+  billExplainerText: {
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: 18,
+    lineHeight: 26,
+    textAlign: "center",
+    color: Color.colorGray_100,
+  },
+
+  billExplainerLinkText: {
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: 18,
+    lineHeight: 26,
+    textAlign: "center",
+    color: Color.sparklightBrightPurple,
+    textDecorationLine: "underline",
   },
 
   colorGreen: "#0C8306",

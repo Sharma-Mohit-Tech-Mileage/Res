@@ -3,6 +3,9 @@ import { createSelector } from 'reselect';
 // Basic selectors
 const getBillingBreakdownState = state => state.billingBreakdown;
 
+// Basic selectors
+const getBillExplainerState = state => state.billingBreakdown.explainerData;
+
 // Extract breakdown data from serviceDetailGroups with failsafe
 export const selectServiceDetailGroups = createSelector(
   [getBillingBreakdownState],
@@ -41,6 +44,22 @@ export const selectTotalDue = createSelector(
     }
   }
 );
+
+
+
+export const selectBillExplainerData = createSelector(
+  [getBillExplainerState],
+  (explainerData) => {
+    try {
+      // Return the explainer data
+      return explainerData || {};
+    } catch (error) {
+      console.error("Error accessing bill explainer data:", error.message);
+      return {};
+    }
+  }
+);
+
 
 // For consistent naming, keep the existing selectBillingBreakDownData 
 // but make it use the serviceDetailGroups data

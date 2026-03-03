@@ -1,5 +1,25 @@
 import * as types from '../constants/billingBreakdownTypes';
 
+// Bill Explainer actions
+export const fetchBillExplainer = (requestBody) => ({
+  type: types.FETCH_BILL_EXPLAINER_REQUEST,
+  payload: { requestBody }
+});
+
+export const fetchBillExplainerSuccess = (explainerData) => ({
+  type: types.FETCH_BILL_EXPLAINER_SUCCESS,
+  payload: { explainerData }
+});
+
+export const fetchBillExplainerFailure = (error) => ({
+  type: types.FETCH_BILL_EXPLAINER_FAILURE,
+  payload: { error }
+});
+
+export const clearBillExplainerError = () => ({
+  type: types.CLEAR_BILL_EXPLAINER_ERROR
+});
+
 // Fetch billing breakdown actions
 export const fetchBillingBreakdown = () => ({
   type: types.FETCH_BILLING_BREAKDOWN_REQUEST

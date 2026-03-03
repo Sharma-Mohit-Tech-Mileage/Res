@@ -29,7 +29,7 @@ const TAB_BAR_HEIGHT = {
 
 // Hardcoded walkthrough mode for testing.
 // Set to false to restore normal Redux-driven behavior.
-const HARD_CODE_WALKTHROUGH_FOR_TESTING = true;
+const HARD_CODE_WALKTHROUGH_FOR_TESTING = false;
 const HARD_CODE_WALKTHROUGH_STEP_FOR_TESTING = 0;
 
 const calculateTabBarHeight = (insets) => {
