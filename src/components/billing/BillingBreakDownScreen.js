@@ -36,6 +36,7 @@ import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
 import SecondaryButton from "../common/customui/PrimaryButton";
 import LoadingOverlay from "../common/customui/CustomLoading";
 
+
 // Constants
 const PLACEHOLDER_MESSAGE =
   "The bill breakdown reflects your latest monthly statement, showing last month's usage, charges, credits, and adjustments. It's a snapshot in time and might not capture recent account changes post-statement.";
@@ -242,17 +243,24 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
         <Text style={styles.billExplainerText}>
           Still have questions about your bill?
         </Text>
-
+       <View style={{ flexDirection: "row" }}>
         <Text style={styles.billExplainerText}>
           Try our new{' '}
+        </Text>
+        <View style={{ flexDirection: "row" }}>
           <Text
+            accessibilityRole="link"
+            accessibilityLabel="Open Bill Explainer"
+            accessibilityHint="Double tap to open link"
+            accessible={true}
             style={styles.billExplainerLinkText}
             onPress={() => renderBillExplainerLink(navigation)}
           >
             Bill Explainer
           </Text>
-          <Text style={[styles.billExplainerLinkText, { textDecorationLine: 'none' }]}>!</Text>
-        </Text>
+          <Text accessible={false} importantForAccessibility="no" style={[styles.billExplainerLinkText, { textDecorationLine: 'none' }]}>!</Text>
+        </View>
+        </View>
       </View>
     )}
     <View style={[styles.detailItemBorder]} />
@@ -311,8 +319,8 @@ const BillingBreakDownScreen = ({ navigation }) => {
   const billingData = useSelector(selectBillingBreakDownData);
   const error = useSelector(selectBillingBreakDownError)
 
-  //const billExplainerData = useSelector(selectBillExplainerData);
-  const [billExplainerData, setBillExplainerData] = useState(null);
+  const billExplainerData = useSelector(selectBillExplainerData);
+  //const [billExplainerData, setBillExplainerData] = useState(null);
   
   const [showBillExplainer, setShowBillExplainer] = useState(false);
 
@@ -353,20 +361,32 @@ const BillingBreakDownScreen = ({ navigation }) => {
           video: accountDetails?.services?.video,
           homesPassedId: accountDetails?.homes_passed_id || null
     }
-    getBillExplainerData(requestBody);
+    dispatch(fetchBillExplainer(requestBody));
+    //getBillExplainerData(requestBody);
     }
   }, [accountDetails]);
 
-  const getBillExplainerData =(requestBody) => {  
-    PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
-      console.log("Bill Explainer Response:", res);
-      setBillExplainerData(res);
-      }, (error) => { 
-        console.error("Bill Explainer Error:", error);
-      }
 
-    )
-  };
+
+  useEffect(() => {
+    console.log("Bill Explainer Data:", billExplainerData);
+    if(!billExplainerData?.eligibility){
+      setShowBillExplainer(false);
+    }else{
+      setShowBillExplainer(true);
+    }
+  }, [billExplainerData]);
+
+  // const getBillExplainerData =(requestBody) => {  
+  //   PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
+  //     console.log("Bill Explainer Response:", res);
+  //     setBillExplainerData(res);
+  //     }, (error) => { 
+  //       console.error("Bill Explainer Error:", error);
+  //     }
+
+  //   )
+  // };
 
   // Fetch billing data when screen is focused
   useFocusEffect(
