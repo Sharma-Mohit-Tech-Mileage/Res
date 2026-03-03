@@ -235,33 +235,26 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
       >
         ${totalAmount.toFixed(2)}
       </Text>
-      <View style={[styles.detailItemBorder]} />
+      <View style={[styles.detailItemBorder, styles.totalBalanceSeparator]} />
     </View>
-    { showBillExplainer && (
-     <View style={styles.billPlanermainContainer}>
-      <Text style={[styles.detailLabelNormal, { fontSize: 18 }]} >
-        Still have questions about your bill?
-      </Text>
-
-      <Text style={[styles.detailLabelNormal, { fontSize: 18 }]}>
-        Try our new{" "}
-        <Text
-          style={[
-            styles.detailLabelNormal,
-            {
-              color: Color.sparklightBrightPurple,
-              fontWeight: "700",
-              fontSize: 18,
-            },
-          ]}
-          onPress={() => renderBillExplainerLink( navigation)}
-        >
-          {" "}
-          Bill Explainer!
+    {showBillExplainer && (
+      <View style={styles.billPlanermainContainer}>
+        <Text style={styles.billExplainerText}>
+          Still have questions about your bill?
         </Text>
-      </Text>
-    </View>
-  )}
+
+        <Text style={styles.billExplainerText}>
+          Try our new{' '}
+          <Text
+            style={styles.billExplainerLinkText}
+            onPress={() => renderBillExplainerLink(navigation)}
+          >
+            Bill Explainer
+          </Text>
+          <Text style={[styles.billExplainerLinkText, { textDecorationLine: 'none' }]}>!</Text>
+        </Text>
+      </View>
+    )}
     <View style={[styles.detailItemBorder]} />
   </>
 ));
@@ -662,6 +655,9 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     borderRadius: 0,
   },
+  totalBalanceSeparator: {
+    marginBottom: Padding.p_13xl,
+  },
   buttonsLayout: {
     paddingHorizontal: 0,
     marginHorizontal: 16,
@@ -700,6 +696,23 @@ const styles = StyleSheet.create({
     borderTopWidth: 0.5,
     marginTop: 8,
     marginBottom: 8,
+  },
+
+  billExplainerText: {
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: 18,
+    lineHeight: 26,
+    textAlign: "center",
+    color: Color.colorGray_100,
+  },
+
+  billExplainerLinkText: {
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: 18,
+    lineHeight: 26,
+    textAlign: "center",
+    color: Color.sparklightBrightPurple,
+    textDecorationLine: "underline",
   },
 
   colorGreen: "#0C8306",
