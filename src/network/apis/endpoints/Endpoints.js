@@ -53,7 +53,7 @@ export const ENDPOINTS = {
     UPDATE_EMAIL_ADD_PRIMARY: 'api/UpdateEmail/AddPrimaryEmail',
     UPDATE_EMAIL_UPDATE_PRIMARY: 'api/UpdateEmail/UpdatePrimaryEmail',
     SMS_NOTIFICATION_PREFS: 'api/SMS/sms?AccountNumber=:accountNumber',
-    UPDATE_TEXT_NOTIFICATION: 'api/SMS/sms',
+    UPDATE_TEXT_NOTIFICATION: 'api/SMS',
 
     // Email (SV emails)
     SV_EMAILS_GET_ALL: 'api/email/:accountNumber/GetAllSVEmails',

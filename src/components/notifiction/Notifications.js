@@ -174,7 +174,7 @@ const Notifications = () => {
   const getInAppNotificationsData = () => {
     setInAppNotificationLoading(true);
     getUser().then((res1) => {
-      const endpointUrl = getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName: res1.userInfo?.userName, accountNumber: res1.userInfo?.accountNumber });
+      const endpointUrl = getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS_ACCOUNT, { userName: res1.userInfo?.userName, accountNumber: res1.userInfo?.accountNumber });
       console.log("REQUEST", endpointUrl);
       GetApiRequest(
         endpointUrl,

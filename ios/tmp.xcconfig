@@ -1,4 +1,4 @@
-ENV=development
+ENV=staging
 ISUAT=UAT
 URL=https:/$()/customer.uat.sparklight.com/residential
 SSO_LOGIN=https:/$()/login.uat.cableone.net/auth/realms/external-sso-realm
