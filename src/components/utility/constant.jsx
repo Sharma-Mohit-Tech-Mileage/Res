@@ -70,14 +70,14 @@ export const passwordTerms = [
 ];
 
 export const getPasswordPriorityHint = (password, userName) => {
-  if (!password) return "Enter your password.";
-  if (password.length < 8 || password.length > 20) return "Use 8 to 20 characters.";
-  if (!/[0-9]/.test(password)) return "Add at least one number.";
-  if (!/[A-Z]/.test(password)) return "Add one uppercase letter.";
-  if (!/[a-z]/.test(password)) return "Add one lowercase letter.";
-  if (!/[^a-zA-Z0-9]/.test(password)) return "Add one special character.";
-  if (/\s/.test(password)) return "Remove spaces from password.";
-  if (password === userName) return "Must differ from your username.";
+  if (!password) return "Password is required.";
+  if (password.length < 8 || password.length > 20) return "Password must be at least 8 characters long.";
+  if (!/[A-Z]/.test(password)) return "Password must have at least one uppercase letter.";
+  if (!/[a-z]/.test(password)) return "Password must have at least one lowercase letter.";
+  if (!/[0-9]/.test(password)) return "Password must have at least one number.";
+  if (!/[^a-zA-Z0-9]/.test(password)) return "Password must include special characters like %, &, _, ?, #, =, -.";
+  if (/\s/.test(password)) return "No spaces are allowed in the password.";
+  if (password === userName) return "Password must be different from your username.";
   return null;
 };
 
