@@ -50,6 +50,7 @@ const validationSchema = yup.object().shape({
 });
 const TextNotifications = ({ navigation }) => {
   const scrollViewRef = useRef(null);
+  const phoneInputRef = useRef(null);
   const route = useRoute();
   const dispatch = useDispatch();
   const animatedValue = useRef(new Animated.Value(-100)).current;
@@ -127,10 +128,12 @@ const TextNotifications = ({ navigation }) => {
     }
   }, [route.params?.updateFailed, navigation, dispatch]);
 
-  const handleValidationError = () => {
+  const handleValidationError = (errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setErrorText("Please enter valid information to continue.");
-    //setShowErrorAlert(true);
+    if (errors?.phoneNumber) {
+      phoneInputRef.current?.focus();
+    }
   };
 
 
@@ -353,9 +356,8 @@ const TextNotifications = ({ navigation }) => {
               </Text>
               <Text
                 style={styles.requiredFieldsText}
-                accessibilityRole="text"
-                accessible={true}
-                accessibilityLabel="Fields marked with an asterisk are required"
+                accessible={false}
+                importantForAccessibility="no"
               >
                 Fields marked with * are required.
               </Text>
@@ -374,12 +376,10 @@ const TextNotifications = ({ navigation }) => {
                     name="phoneNumber"
                     render={({ field: { onChange, onBlur, value } }) => (
                       <SparkLightInput
+                        ref={phoneInputRef}
                         placeholder="Mobile Number"
                         label={"Mobile Number *"}
-                        accessible={true}
-                        accessibilityRole="text"
                         accessibilityLabel="Mobile Number required"
-                        //accessibilityHint="required text field. double tap to edit."
                         onBlur={onBlur}
                         onChangeText={onChange}
                         keyboardType="number-pad"

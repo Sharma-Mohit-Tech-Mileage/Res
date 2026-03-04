@@ -47,6 +47,7 @@ const TextNotifications = ({ navigation }) => {
   const [keyboardHidden, setKeyboardHidden] = useState(true);
   const [isTermRequired, setIsTermRequired] = useState(false);
   const scrollRef = useRef();
+  const phoneInputRef = useRef(null);
   const user = useSelector((state) => state.user.userData);
   const profile = useSelector((state) => state.profile || {});
   const accountNumber = user?.userInfo?.accountNumber || "";
@@ -80,6 +81,13 @@ const TextNotifications = ({ navigation }) => {
       setEnableButton(false);
     }
   };
+
+  const handleValidationError = useCallback((errors) => {
+    scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    if (errors?.phoneNumber) {
+      phoneInputRef.current?.focus();
+    }
+  }, []);
 
   const handleTermsLinkPress = useCallback(
     (event) => {
@@ -161,9 +169,8 @@ const TextNotifications = ({ navigation }) => {
                 </Text>
                 <Text
                   style={[AppStyles.requiredField, { textAlign: "center" }]}
-                  accessibilityRole="text"
-                  accessible={true}
-                  accessibilityLabel="Fields marked with an asterisk are required"
+                  accessible={false}
+                  importantForAccessibility="no"
                 >
                   Fields marked with * are required.
                 </Text>
@@ -180,14 +187,16 @@ const TextNotifications = ({ navigation }) => {
                   <>
                     <Text
                       style={styles.inputLabel}
-                      accessibilityRole="text"
-                      accessibilityLabel="Mobile Number required"
+                      accessible={false}
+                      importantForAccessibility="no"
                     >
                       Mobile Number *
                     </Text>
                     <SparkLightInput
+                      ref={phoneInputRef}
                       placeholder="Mobile Number"
                       keyboardType="number-pad"
+                      accessibilityLabel="Mobile Number required"
                       onBlur={onBlur}
                       onChangeText={(text) => {
                         onChangeText(text);
@@ -293,7 +302,7 @@ const TextNotifications = ({ navigation }) => {
                   ? [styles.button, styles.buttonsLayout]
                   : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
               }
-              onPress={handleSubmit(enableTextNotifications)}
+              onPress={handleSubmit(enableTextNotifications, handleValidationError)}
             >
               <Text
                 style={

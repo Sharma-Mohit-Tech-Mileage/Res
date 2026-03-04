@@ -71,17 +71,29 @@ const SparkLightInput = React.forwardRef(({
   const hasBlurred = useRef(false);
   const isFocusedRef = useRef(false);
   const prevErrorRef = useRef(error);
+  const valueRef = useRef(value);
+  const errorAnnouncedRef = useRef(false);
+
+  // Keep valueRef in sync with current value prop
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
       hasBlurred.current = true;
       inputRef.current?.focus();
-      if (Platform.OS === 'ios') {
+      // Workaround: secureTextEntry may clear text on programmatic focus
+      if (secure && valueRef.current) {
+        const currentValue = valueRef.current;
         setTimeout(() => {
-          const handle = findNodeHandle(inputRef.current);
-          if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-        }, 100);
+          inputRef.current?.setNativeProps({ text: currentValue });
+        }, 50);
       }
+      setTimeout(() => {
+        const handle = findNodeHandle(inputRef.current);
+        if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+      }, 100);
     },
   }));
 
@@ -90,10 +102,15 @@ const SparkLightInput = React.forwardRef(({
     const hadError = prevErrorRef.current;
     prevErrorRef.current = error;
 
+    if (!error) {
+      errorAnnouncedRef.current = false;
+      return;
+    }
+
     if (!hadError && error && hasBlurred.current && !isFocusedRef.current) {
       const hint = errorHint || error;
-      const fieldLabel = label || accessibilityLabel || placeholder || "Field";
-      AccessibilityInfo.announceForAccessibility(`${fieldLabel} invalid. ${hint}`);
+      AccessibilityInfo.announceForAccessibility(hint);
+      errorAnnouncedRef.current = true;
     }
   }, [error]);
 
@@ -138,12 +155,12 @@ const SparkLightInput = React.forwardRef(({
     setIsFocused(true);
     isFocusedRef.current = true;
 
-    // Re-announce on refocus of invalid field
-    if (error && hasBlurred.current) {
+    // Announce error on focus only if useEffect hasn't already announced it.
+    // This covers the submit-validation flow where useEffect is blocked by isFocusedRef.
+    if (error && hasBlurred.current && !errorAnnouncedRef.current) {
       setTimeout(() => {
         const hint = errorHint || error;
-        const fieldLabel = label || accessibilityLabel || placeholder || "Field";
-        AccessibilityInfo.announceForAccessibility(`${fieldLabel} invalid. ${hint}`);
+        AccessibilityInfo.announceForAccessibility(hint);
       }, 500);
     }
 
@@ -170,8 +187,8 @@ const SparkLightInput = React.forwardRef(({
         {label && (
           <Text
             style={[styles.label, error && styles.errorLabel]}
-            accessible={true}
-            accessibilityLabel={accessibilityLabel}
+            accessible={false}
+            importantForAccessibility="no"
           >
             {label}
           </Text>
@@ -238,6 +255,8 @@ const SparkLightInput = React.forwardRef(({
           accessibilityLabel={
             value && getKeyboardType() === "phone-pad"
               ? `${label || "Phone number"} field}`
+              : error
+              ? (errorHint || error)
               : getAccessibilityLabel()
           }
           accessibilityRole="text"
@@ -256,19 +275,23 @@ const SparkLightInput = React.forwardRef(({
       </View>
 
       {error && (
-        <View style={styles.errorContainer}>
+        <View
+          style={styles.errorContainer}
+          accessible={true}
+          accessibilityLabel={errorHint || error}
+          accessibilityRole="text"
+        >
           <View
             style={styles.errorIcon}
-            accessible={true}
-            accessibilityLabel="Warning Icon"
+            accessible={false}
+            importantForAccessibility="no"
           >
             <WarningIcon />
           </View>
           <Text
             style={styles.errorText}
-            accessible={true}
-            accessibilityLabel={errorHint || error}
-            accessibilityRole="alert"
+            accessible={false}
+            importantForAccessibility="no"
           >
             {error}
           </Text>

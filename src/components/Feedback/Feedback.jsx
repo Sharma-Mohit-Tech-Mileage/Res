@@ -172,9 +172,8 @@ const Feedback = () => {
             </Text>
             <Text
               style={styles.requiredFieldsText}
-              accessibilityRole="text"
-              accessible={true}
-              accessibilityLabel="Fields marked with an asterisk are required"
+              accessible={false}
+              importantForAccessibility="no"
             >
               Fields marked with * are required.
             </Text>

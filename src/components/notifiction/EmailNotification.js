@@ -222,7 +222,12 @@ const AddNotificationScreen = () => {
     ]
   );
 
-  const handleValidationError = useCallback(() => {}, [animateNotification]);
+  const handleValidationError = useCallback((errors) => {
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    if (errors?.email) {
+      inputRef.current?.focus();
+    }
+  }, []);
 
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);
@@ -316,9 +321,8 @@ const AddNotificationScreen = () => {
 
               <Text
                style={AppStyles.requiredField}
-                  accessibilityRole="text" 
-                  accessible={true}
-                  accessibilityLabel="Fields marked with asterisk are required.">
+                  accessible={false}
+                  importantForAccessibility="no">
                 {" "}
                 Fields marked with * are required.
               </Text>
@@ -334,13 +338,12 @@ const AddNotificationScreen = () => {
                     error={errors.email?.message}
                     label="Email Address *"
                     accessibilityLabel="Email address Required"
-                    accessibilityHint={"required text field. double tap to edit"}
+                    accessibilityHint="Double tap to edit"
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
                     style={styles.emailInput}
                     ref={inputRef}
-                    
                   />
                 )}
               />

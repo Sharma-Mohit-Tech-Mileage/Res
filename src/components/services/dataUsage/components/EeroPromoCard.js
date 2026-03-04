@@ -11,8 +11,7 @@ import {
   Easing,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
-import { Svg, Circle, Path, G } from "react-native-svg";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { Svg, Circle, Path } from "react-native-svg";
 import { theme } from "../../../../styles/theme";
 
 // ── Animated Wi-Fi rings (decorative) ──
@@ -74,6 +73,8 @@ const EeroPromoCard = () => {
     ).start();
   }, []);
 
+  const storeName = Platform.OS === "ios" ? "App Store" : "Play Store";
+
   const handleDownload = async () => {
     const url =
       Platform.OS === "ios"
@@ -85,11 +86,11 @@ const EeroPromoCard = () => {
       if (canOpen) {
         await Linking.openURL(url);
       } else {
-        Alert.alert("Error", "Unable to open app store");
+        Alert.alert("Error", `Unable to open ${storeName}`);
       }
     } catch (error) {
-      console.error("Error opening app store:", error);
-      Alert.alert("Error", "Unable to open app store");
+      console.error(`Error opening ${storeName}:`, error);
+      Alert.alert("Error", `Unable to open ${storeName}`);
     }
   };
 
@@ -103,8 +104,8 @@ const EeroPromoCard = () => {
         onPress={handleDownload}
         accessible={true}
         accessibilityRole="button"
-        accessibilityLabel="Download eero app. Simplify your home Wi-Fi connectivity. Free on iOS and Android."
-        accessibilityHint="Double tap to open app store"
+        accessibilityLabel={`Download eero app. Simplify your home Wi-Fi connectivity. Available on ${storeName}.`}
+        accessibilityHint={`Double tap to open ${storeName}`}
       >
         <LinearGradient
           style={styles.card}
@@ -138,20 +139,9 @@ const EeroPromoCard = () => {
 
             {/* CTA row */}
             <View style={styles.ctaRow}>
-              <LinearGradient
-                style={styles.ctaButton}
-                colors={["#4fc3f7", "#29b6f6"]}
-                useAngle={true}
-                angle={135}
-              >
-                <MaterialCommunityIcons
-                  name="download"
-                  size={16}
-                  color="#0f142d"
-                />
+              <View style={styles.ctaButton}>
                 <Text style={styles.ctaText}>Download App</Text>
-              </LinearGradient>
-
+              </View>
             </View>
           </View>
         </LinearGradient>
@@ -244,14 +234,14 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 10,
-    fontWeight: "600",
+    fontFamily: theme.typography.family.semiBold,
     letterSpacing: 1.5,
-    color: "rgba(255,255,255,0.45)",
+    color: "rgba(255,255,255,0.7)",
   },
 
   brandName: {
     fontSize: 32,
-    fontWeight: "800",
+    fontFamily: theme.typography.family.semiBold,
     color: "#FFFFFF",
     marginBottom: 6,
   },
@@ -259,7 +249,8 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     lineHeight: 21,
-    color: "rgba(255,255,255,0.6)",
+    fontFamily: theme.typography.family.regular,
+    color: "rgba(255,255,255,0.85)",
     marginBottom: 20,
     maxWidth: 240,
   },
@@ -273,15 +264,16 @@ const styles = StyleSheet.create({
   ctaButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    justifyContent: "center",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 25,
+    backgroundColor: theme.colors.upload,
   },
   ctaText: {
     fontSize: 14,
-    fontWeight: "800",
-    color: "#0f142d",
+    fontFamily: theme.typography.family.semiBold,
+    color: theme.colors.primaryDark,
   },
 
   freeLabel: {

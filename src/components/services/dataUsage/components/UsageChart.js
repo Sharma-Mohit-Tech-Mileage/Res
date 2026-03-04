@@ -122,10 +122,9 @@ const UsageChart = ({
     setShowList(nextView);
     if (isScreenReaderEnabled) {
       const viewType = nextView ? "List" : "Graph";
-      const oppositeView = nextView ? "Graph" : "List";
       const itemCount = data?.length ?? 0;
       const periodType = type === "daily" ? "days" : "months";
-      const message = `Switched to ${viewType} view. Showing ${itemCount} ${periodType} of download and upload data. Double tap to switch to ${oppositeView} view.`;
+      const message = `Switched to ${viewType} view. Showing ${itemCount} ${periodType} of data.`;
       AccessibilityInfo.announceForAccessibility(message);
     }
   }, [showList, isScreenReaderEnabled, type, data]);
@@ -272,8 +271,12 @@ const UsageChart = ({
     (item, index) => {
       setSelectedIndex(index);
       onBarPress?.(item.raw);
+      const periodLabel = formatPeriodLabel(item);
+      AccessibilityInfo.announceForAccessibility(
+        `${periodLabel}. Download: ${item.download.toFixed(1)} GB, Upload: ${item.upload.toFixed(1)} GB. Total: ${item.total.toFixed(1)} GB.`
+      );
     },
-    [onBarPress]
+    [onBarPress, formatPeriodLabel]
   );
 
   if (!chartData.length) return null;
@@ -497,14 +500,19 @@ const UsageChart = ({
               <Pressable
                 key={tab.id}
                 style={[styles.tab, isActive && styles.activeTab]}
-                onPress={() => onTabChange?.(tab.id)}
+                onPress={() => {
+                  if (!isActive) {
+                    onTabChange?.(tab.id);
+                    if (Platform.OS === 'android') {
+                      setTimeout(() => {
+                        AccessibilityInfo.announceForAccessibility(`Switched to ${tab.label}`);
+                      }, 300);
+                    }
+                  }
+                }}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isActive }}
-                accessibilityLabel={
-                  isActive
-                    ? `${tab.label}, currently active. Also available: ${tabs.find(t => t.id !== tab.id).label}`
-                    : `${tab.label}. Currently viewing: ${tabs.find(t => t.id !== tab.id).label}`
-                }
+                accessibilityLabel={tab.label}
                 accessibilityHint={
                   isActive
                     ? undefined
@@ -539,12 +547,13 @@ const UsageChart = ({
             style={styles.listToggle}
             onPress={handleToggleView}
             accessibilityRole="button"
-            accessibilityLabel="View Mode switch"
-            accessibilityValue={{ text: showList ? "List view" : "Graph view" }}
+            accessibilityLabel={
+              showList ? "List view" : "Graph view"
+            }
             accessibilityHint={
               showList
-                ? "Double tap to change to Graph view"
-                : "Double tap to change to List view"
+                ? "Double tap to switch to Graph view"
+                : "Double tap to switch to List view"
             }
           >
             <MaterialCommunityIcons
@@ -670,7 +679,7 @@ const UsageChart = ({
               <View
                 ref={skipTargetRef}
                 accessible={true}
-                accessibilityLabel={`Legend. Blue represents Download, Green represents Upload. ${chartData?.length ?? 0} ${type === "daily" ? "days" : "months"} shown.`}
+                accessibilityLabel={`Legend. Blue represents Download, Cyan represents Upload. ${chartData?.length ?? 0} ${type === "daily" ? "days" : "months"} shown.`}
                 style={styles.legend}
               >
                 <View style={styles.legendItem}>

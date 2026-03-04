@@ -227,9 +227,8 @@ const ChangePassword = () => {
                   </Text>
                   <Text
                     style={[AppStyles.requiredField, { marginTop: 10 }]}
-                    accessible={true}
-                    accessibilityRole="text"
-                    accessibilityLabel="Fields marked with asterisk are required"
+                    accessible={false}
+                    importantForAccessibility="no"
                   >
                     {" "}
                     Fields marked with * are required.
@@ -260,7 +259,7 @@ const ChangePassword = () => {
                           onBlur={onBlur}
                           label={"New Password *"}
                           accessibilityHint="Enter your new password"
-                          accessibilityLabel={"New Password Required"}
+                          accessibilityLabel={"New Password"}
                           onChangeText={onChange}
                           value={value}
                           secure={true}
