@@ -279,7 +279,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const LoadingComponent = useCallback(() => (
         <View style={styles.loadingContainer} accessibilityRole='text' accessible={true} accessibilityLabel="Loading content" accessibilityHint="Content is loading, please wait">
-            {name === 'Billing Details' ? (
+            {(name === 'Billing Details' || name === 'Bill Explainer') ? (
                 <LoadingSpinner />
             ) : (
                 <LoadingOverlay loading={true} />
