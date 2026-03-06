@@ -344,7 +344,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
   //const [billExplainerData, setBillExplainerData] = useState(null);
   
   const [showBillExplainer, setShowBillExplainer] = useState(false);
-  const [explainerLoading, setExplainerLoading] = useState(false);
+  const [explainerLoading, setExplainerLoading] = useState(true);
 
  
   // Local state
@@ -386,6 +386,9 @@ const BillingBreakDownScreen = ({ navigation }) => {
     }
     dispatch(fetchBillExplainer(requestBody));
     //getBillExplainerData(requestBody);
+    }else{
+      setShowBillExplainer(false);
+      setExplainerLoading(false);
     }
   }, [accountDetails]);
 
@@ -393,11 +396,12 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
   useEffect(() => {
     console.log("Bill Explainer Data:", billExplainerData);
-    setExplainerLoading(false);
     if(!billExplainerData?.eligibility){
       setShowBillExplainer(false);
+      setExplainerLoading(false);
     }else{
       setShowBillExplainer(true);
+      setExplainerLoading(false);
     }
   }, [billExplainerData]);
 
@@ -473,7 +477,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         maxToRenderPerBatch={10}
         initialNumToRender={5}
         windowSize={5}
-        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={explainerLoading} />}
+        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={loading} />}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
     );
@@ -735,6 +739,7 @@ const styles = StyleSheet.create({
   billPlanermainContainer: {
     flexDirection: "column",
     alignItems: "center",
+    justifyContent: "center",   
     padding: Padding.p_xs,
     borderColor: Color.sparklightGray,
     borderTopWidth: 0.5,
