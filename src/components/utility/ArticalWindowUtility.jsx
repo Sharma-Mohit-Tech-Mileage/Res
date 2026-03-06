@@ -77,6 +77,104 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 } catch (cookieError) {
                     console.error('Cookie setting failed:', cookieError);
                 }
+
+                // Hide cookie/privacy banners and controls in WebView
+                const hideCookieBanner = function() {
+                    try {
+                        const selectorList = [
+                            '#onetrust-banner-sdk',
+                            '#onetrust-consent-sdk',
+                            '#onetrust-pc-sdk',
+                            '.onetrust-pc-dark-filter',
+                            '.ot-sdk-container',
+                            '.ot-sdk-row',
+                            '[id*="cookie"]',
+                            '[class*="cookie"]',
+                            '[id*="consent"]',
+                            '[class*="consent"]',
+                            '[id*="privacy"]',
+                            '[class*="privacy"]'
+                        ];
+
+                        selectorList.forEach(function(selector) {
+                            document.querySelectorAll(selector).forEach(function(node) {
+                                node.style.setProperty('display', 'none', 'important');
+                                node.style.setProperty('visibility', 'hidden', 'important');
+                                node.style.setProperty('opacity', '0', 'important');
+                                node.style.setProperty('pointer-events', 'none', 'important');
+                            });
+                        });
+
+                        const blockers = [
+                            'this website uses cookies',
+                            'best experience on our website',
+                            'cookie preferences',
+                            'learn more',
+                            'decline',
+                            'dismiss'
+                        ];
+
+                        document.querySelectorAll('div, section, aside, footer, p, span, button, a').forEach(function(node) {
+                            const text = (node.innerText || node.textContent || '').toLowerCase().trim();
+                            if (!text) return;
+
+                            const isCookieText = blockers.some(function(key) {
+                                return text.includes(key);
+                            });
+
+                            if (isCookieText) {
+                                // Hide full banner container when possible
+                                let container = node;
+                                let depth = 0;
+                                while (container && depth < 6) {
+                                    const containerText = (container.innerText || '').toLowerCase();
+                                    const isBannerContainer =
+                                        containerText.includes('this website uses cookies') ||
+                                        containerText.includes('cookie preferences') ||
+                                        container.id?.toLowerCase()?.includes('cookie') ||
+                                        container.className?.toString()?.toLowerCase()?.includes('cookie') ||
+                                        container.id?.toLowerCase()?.includes('consent') ||
+                                        container.className?.toString()?.toLowerCase()?.includes('consent');
+
+                                    if (isBannerContainer) {
+                                        container.style.setProperty('display', 'none', 'important');
+                                        container.style.setProperty('visibility', 'hidden', 'important');
+                                        container.style.setProperty('opacity', '0', 'important');
+                                        container.style.setProperty('pointer-events', 'none', 'important');
+                                        break;
+                                    }
+                                    container = container.parentElement;
+                                    depth++;
+                                }
+
+                                node.style.setProperty('display', 'none', 'important');
+                                node.style.setProperty('visibility', 'hidden', 'important');
+                                node.style.setProperty('pointer-events', 'none', 'important');
+                            }
+                        });
+                    } catch (cookieBannerError) {
+                        console.log('Cookie banner hide failed:', cookieBannerError);
+                    }
+                };
+
+                hideCookieBanner();
+                setTimeout(hideCookieBanner, 300);
+                setTimeout(hideCookieBanner, 1000);
+                setTimeout(hideCookieBanner, 2000);
+
+                if (!window.__cookieBannerObserverInstalled) {
+                    const observer = new MutationObserver(function() {
+                        hideCookieBanner();
+                    });
+
+                    observer.observe(document.documentElement || document.body, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true
+                    });
+
+                    window.__cookieBannerObserverInstalled = true;
+                }
                 
                 // Only intercept clicks for Bill Explainer screen
                 if (screenName === 'Bill Explainer') {
@@ -540,7 +638,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
             ): (
-                <View style={[styles.progressBar,{ backgroundColor: '#8D3B90', width: '100%' }]} 
+                <View style={[styles.progressBar,{ height:0}]} ref={mainViewRef }
                     accessible={true}
                     accessibilityLabel={ `${name} content loaded`}
                     accessibilityRole='text'
