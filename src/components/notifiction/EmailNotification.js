@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, findNodeHandle} from "react-native";
+import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo } from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -62,6 +62,7 @@ const AddNotificationScreen = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
+    mode: "onBlur",
     defaultValues: {
       email: primaryEmail || route.params?.additionalData?.email || "",
     },
@@ -122,14 +123,11 @@ const AddNotificationScreen = () => {
 
 
 
-  //
+  // Use the imperative focus() method which handles accessibility focus internally
   const setFocusEmail = () => {
       setTimeout(() => {
         if (inputRef.current) {
-          const handle = findNodeHandle(inputRef.current);
-          if (handle) {
-            AccessibilityInfo.setAccessibilityFocus(handle);
-          }
+          inputRef.current.focus();
         }
       }, 100);
     };
@@ -225,7 +223,10 @@ const AddNotificationScreen = () => {
   const handleValidationError = useCallback((errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     if (errors?.email) {
-      inputRef.current?.focus();
+      AccessibilityInfo.announceForAccessibility(errors.email.message);
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
     }
   }, []);
 
@@ -337,8 +338,8 @@ const AddNotificationScreen = () => {
                     value={value ? value.toLowerCase() : ""}
                     error={errors.email?.message}
                     label="Email Address *"
-                    accessibilityLabel="Email address Required"
-                    accessibilityHint="Double tap to edit"
+                    accessibilityLabel="Email Address"
+                    required={true}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
@@ -466,6 +467,10 @@ const AddNotificationScreen = () => {
                 marginHorizontal: Padding.p_5xl,
                 marginBottom: 16,
               }}
+              accessible={true}
+              accessibilityRole="alert"
+              accessibilityLiveRegion="assertive"
+              accessibilityLabel="Please agree to the Terms and Conditions to proceed."
             >
               <View
                 style={{

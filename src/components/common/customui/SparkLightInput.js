@@ -25,7 +25,6 @@ const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
 };
 
-// Convert numbers into words for TalkBack accessibility (Android only)
 const numberToWordsForAccessibility = (numStr) => {
   if (!numStr) return "";
   const digitsMap = {
@@ -61,6 +60,7 @@ const SparkLightInput = React.forwardRef(({
   editable = true,
   showTextIcon = false,
   inputStyle,
+  required = false,
   onBlur: parentOnBlur,
   onFocus: parentOnFocus,
   ...props
@@ -90,14 +90,15 @@ const SparkLightInput = React.forwardRef(({
           inputRef.current?.setNativeProps({ text: currentValue });
         }, 50);
       }
+      // Delay accessibility focus to allow re-render with error state
       setTimeout(() => {
         const handle = findNodeHandle(inputRef.current);
         if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-      }, 100);
+      }, 350);
     },
   }));
 
-  // Announce error on transition from falsy to truthy (after blur, not during focus)
+  // Announce error on transition from falsy to truthy
   useEffect(() => {
     const hadError = prevErrorRef.current;
     prevErrorRef.current = error;
@@ -107,9 +108,13 @@ const SparkLightInput = React.forwardRef(({
       return;
     }
 
-    if (!hadError && error && hasBlurred.current && !isFocusedRef.current) {
+    // Announce if error is new and field has been interacted with
+    if (!hadError && error && hasBlurred.current) {
       const hint = errorHint || error;
-      AccessibilityInfo.announceForAccessibility(hint);
+      // Delay slightly to ensure the error view is rendered before announcing
+      setTimeout(() => {
+        AccessibilityInfo.announceForAccessibility(hint);
+      }, 150);
       errorAnnouncedRef.current = true;
     }
   }, [error]);
@@ -156,7 +161,7 @@ const SparkLightInput = React.forwardRef(({
     isFocusedRef.current = true;
 
     // Announce error on focus only if useEffect hasn't already announced it.
-    // This covers the submit-validation flow where useEffect is blocked by isFocusedRef.
+    // This covers the case where user re-focuses a field with an unannounced error.
     if (error && hasBlurred.current && !errorAnnouncedRef.current) {
       setTimeout(() => {
         const hint = errorHint || error;
@@ -253,15 +258,25 @@ const SparkLightInput = React.forwardRef(({
             },
           ]}
           accessibilityLabel={
-            value && getKeyboardType() === "phone-pad"
-              ? `${label || "Phone number"} field}`
+            required
+              ? value
+                ? `${accessibilityLabel || label || placeholder}, required, ${Platform.OS === "android" && getKeyboardType() === "phone-pad" ? numberToWordsForAccessibility(value) : value}`
+                : `${accessibilityLabel || label || placeholder}, required`
+              : value && getKeyboardType() === "phone-pad"
+              ? error
+                ? `${accessibilityLabel || label || "Phone number"} field. ${errorHint || error}`
+                : `${accessibilityLabel || label || "Phone number"} field`
               : error
               ? (errorHint || error)
               : getAccessibilityLabel()
           }
           accessibilityRole="text"
           accessibilityHint={
-            getKeyboardType() === "phone-pad"
+            required
+              ? error
+                ? `${errorHint || error}. Double tap to edit`
+                : "Double tap to edit"
+              : getKeyboardType() === "phone-pad"
               ? "Required text field. double tap to edit."
               : accessibilityHint
           }
@@ -279,7 +294,8 @@ const SparkLightInput = React.forwardRef(({
           style={styles.errorContainer}
           accessible={true}
           accessibilityLabel={errorHint || error}
-          accessibilityRole="text"
+          accessibilityRole="alert"
+          accessibilityLiveRegion="assertive"
         >
           <View
             style={styles.errorIcon}

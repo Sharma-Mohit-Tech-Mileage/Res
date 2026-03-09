@@ -59,6 +59,7 @@ const Feedback = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(feedbackSchema),
+    mode: "onBlur",
     defaultValues: {
       category: "compliment",
       feedbackValue: 5,

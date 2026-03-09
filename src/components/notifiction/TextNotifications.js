@@ -8,7 +8,8 @@ import {
   Keyboard,
   ScrollView,
   TouchableOpacity,
-  Platform
+  Platform,
+  AccessibilityInfo,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -132,7 +133,10 @@ const TextNotifications = ({ navigation }) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setErrorText("Please enter valid information to continue.");
     if (errors?.phoneNumber) {
-      phoneInputRef.current?.focus();
+      AccessibilityInfo.announceForAccessibility(errors.phoneNumber.message);
+      setTimeout(() => {
+        phoneInputRef.current?.focus();
+      }, 300);
     }
   };
 
@@ -379,7 +383,8 @@ const TextNotifications = ({ navigation }) => {
                         ref={phoneInputRef}
                         placeholder="Mobile Number"
                         label={"Mobile Number *"}
-                        accessibilityLabel="Mobile Number required"
+                        accessibilityLabel="Mobile Number"
+                        required={true}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         keyboardType="number-pad"

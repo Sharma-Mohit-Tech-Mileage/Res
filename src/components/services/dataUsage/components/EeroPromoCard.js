@@ -104,7 +104,7 @@ const EeroPromoCard = () => {
         onPress={handleDownload}
         accessible={true}
         accessibilityRole="button"
-        accessibilityLabel={`Download eero app. Simplify your home Wi-Fi connectivity. Available on ${storeName}.`}
+        accessibilityLabel={`eero. Fast, reliable Wi-Fi for every room. Set up in minutes with the eero app. Download App. Available on ${storeName}.`}
         accessibilityHint={`Double tap to open ${storeName}`}
       >
         <LinearGradient
@@ -120,8 +120,12 @@ const EeroPromoCard = () => {
 
           {/* Content */}
           <View style={styles.content}>
-            {/* Tag line with pulse dot */}
-            <View style={styles.tagRow}>
+            {/* Tag line with pulse dot — hidden from screen reader */}
+            <View
+              style={styles.tagRow}
+              accessibilityElementsHidden={true}
+              importantForAccessibility="no-hide-descendants"
+            >
               <Animated.View
                 style={[styles.statusDot, { opacity: pulseAnim }]}
               />
@@ -273,7 +277,8 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 14,
     fontFamily: theme.typography.family.semiBold,
-    color: theme.colors.primaryDark,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
 
   freeLabel: {

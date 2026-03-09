@@ -121,11 +121,8 @@ const UsageChart = ({
     const nextView = !showList;
     setShowList(nextView);
     if (isScreenReaderEnabled) {
-      const viewType = nextView ? "List" : "Graph";
-      const itemCount = data?.length ?? 0;
-      const periodType = type === "daily" ? "days" : "months";
-      const message = `Switched to ${viewType} view. Showing ${itemCount} ${periodType} of data.`;
-      AccessibilityInfo.announceForAccessibility(message);
+      const viewType = nextView ? "List View" : "Graph View";
+      AccessibilityInfo.announceForAccessibility(`${viewType} selected.`);
     }
   }, [showList, isScreenReaderEnabled, type, data]);
 
@@ -200,8 +197,8 @@ const UsageChart = ({
 
   const tabs = useMemo(
     () => [
-      { id: "daily", label: "Daily Usage" },
-      { id: "monthly", label: "Monthly Usage" },
+      { id: "daily", label: "Daily Usage", description: "Shows daily data usage for the selected month" },
+      { id: "monthly", label: "Monthly Usage", description: "Shows monthly data usage for the current year" },
     ],
     []
   );
@@ -512,7 +509,7 @@ const UsageChart = ({
                 }}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: isActive }}
-                accessibilityLabel={tab.label}
+                accessibilityLabel={`${tab.label}. ${tab.description}`}
                 accessibilityHint={
                   isActive
                     ? undefined
@@ -548,12 +545,12 @@ const UsageChart = ({
             onPress={handleToggleView}
             accessibilityRole="button"
             accessibilityLabel={
-              showList ? "List view" : "Graph view"
+              showList ? "List View" : "Graph View"
             }
             accessibilityHint={
               showList
-                ? "Double tap to switch to Graph view"
-                : "Double tap to switch to List view"
+                ? "Double tap to switch to Graph View"
+                : "Double tap to switch to List View"
             }
           >
             <MaterialCommunityIcons

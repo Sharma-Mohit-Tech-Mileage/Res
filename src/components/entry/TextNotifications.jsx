@@ -8,6 +8,7 @@ import {
   Platform,
   TouchableOpacity,
   Linking,
+  AccessibilityInfo,
 } from "react-native";
 import {
   Color,
@@ -59,6 +60,7 @@ const TextNotifications = ({ navigation }) => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
+    mode: "onBlur",
     defaultValues: {
       phoneNumber: "",
     },
@@ -85,7 +87,10 @@ const TextNotifications = ({ navigation }) => {
   const handleValidationError = useCallback((errors) => {
     scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     if (errors?.phoneNumber) {
-      phoneInputRef.current?.focus();
+      AccessibilityInfo.announceForAccessibility(errors.phoneNumber.message);
+      setTimeout(() => {
+        phoneInputRef.current?.focus();
+      }, 300);
     }
   }, []);
 
@@ -196,7 +201,8 @@ const TextNotifications = ({ navigation }) => {
                       ref={phoneInputRef}
                       placeholder="Mobile Number"
                       keyboardType="number-pad"
-                      accessibilityLabel="Mobile Number required"
+                      accessibilityLabel="Mobile Number"
+                      required={true}
                       onBlur={onBlur}
                       onChangeText={(text) => {
                         onChangeText(text);
@@ -274,7 +280,13 @@ const TextNotifications = ({ navigation }) => {
               </TouchableOpacity>
             </View>
             {isTermRequired && (
-              <View style={{ paddingTop: 8, flexDirection: "row" }}>
+              <View
+                style={{ paddingTop: 8, flexDirection: "row" }}
+                accessible={true}
+                accessibilityRole="alert"
+                accessibilityLiveRegion="assertive"
+                accessibilityLabel="Please agree to the Terms and Conditions to proceed."
+              >
                 <View
                   style={{
                     flexDirection: "row",

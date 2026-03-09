@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   Keyboard,
+  AccessibilityInfo,
 } from "react-native";
 import {
   Color,
@@ -48,6 +49,7 @@ const EmailNotifications = ({ navigation }) => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
+    mode: "onBlur",
     defaultValues: {
       email: "",
     },
@@ -183,8 +185,8 @@ const EmailNotifications = ({ navigation }) => {
                       }}
                       value={value ? value.toLowerCase() : ""}
                       error={errors.email?.message}
-                      accessibilityLabel="Email address Required"
-                      accessibilityHint={"required text field. double tap to edit"}
+                      accessibilityLabel="Email Address"
+                      required={true}
                       keyboardType="email-address"
                       autoCapitalize="none"
                       textContentType="emailAddress"
@@ -205,7 +207,12 @@ const EmailNotifications = ({ navigation }) => {
                   : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
               }
               onPress={handleSubmit(enableEmailNotifications, (errors) => {
-                if (errors.email) emailRef.current?.focus();
+                if (errors.email) {
+                  AccessibilityInfo.announceForAccessibility(errors.email.message);
+                  setTimeout(() => {
+                    emailRef.current?.focus();
+                  }, 300);
+                }
               })}
               accessibilityRole="button"
               accessibilityLabel={
