@@ -6,16 +6,11 @@ const TAG = '[NativeCookieManager]';
 // Dot-prefix covers all subdomains (customer.*, payment.*, etc.)
 const COOKIE_DOMAIN = ISUAT ? '.uat.sparklight.com' : '.sparklight.com';
 
-// Representative URLs for each subdomain — CookieManager needs a URL context
-const DOMAIN_URLS = ISUAT
-    ? [
-        'https://customer.uat.sparklight.com',
-        'https://payment.uat.sparklight.com',
-    ]
-    : [
-        'https://customer.sparklight.com',
-        'https://payment.sparklight.com',
-    ];
+// Single representative URL — dot-prefixed domain (.sparklight.com) already covers
+// ALL subdomains (customer.*, payment.*, etc.), so one URL context is sufficient.
+const COOKIE_URL = ISUAT
+    ? 'https://uat.sparklight.com'
+    : 'https://sparklight.com';
 
 const longExpiry = () => new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
 const shortExpiry = () => new Date(Date.now() + 5 * 60 * 1000).toISOString();
@@ -34,7 +29,7 @@ const setCookie = (url, name, value, expires) =>
 
 /**
  * Sets all 4 auth cookies (Source, CustomerType, LatestVersion, IdToken)
- * on BOTH customer and payment domains simultaneously.
+ * using the common domain (.sparklight.com) which covers all subdomains.
  *
  * Call this at initialization and on every page load.
  */
@@ -43,26 +38,23 @@ export const setAuthCookiesOnAllDomains = async (idToken) => {
     const short = shortExpiry();
 
     try {
-        const promises = [];
-        for (const url of DOMAIN_URLS) {
-            promises.push(
-                setCookie(url, 'Source', 'MobileApp', long),
-                setCookie(url, 'CustomerType', 'Residential', long),
-                setCookie(url, 'LatestVersion', 'true', long),
-            );
-            if (idToken) {
-                promises.push(setCookie(url, 'IdToken', idToken, short));
-            }
+        const promises = [
+            setCookie(COOKIE_URL, 'Source', 'MobileApp', long),
+            setCookie(COOKIE_URL, 'CustomerType', 'Residential', long),
+            setCookie(COOKIE_URL, 'LatestVersion', 'true', long),
+        ];
+        if (idToken) {
+            promises.push(setCookie(COOKIE_URL, 'IdToken', idToken, short));
         }
         await Promise.all(promises);
-        console.log(`${TAG} setAuthCookiesOnAllDomains succeeded | domain: ${COOKIE_DOMAIN} | hasIdToken: ${!!idToken}`);
+        console.log(`${TAG} setAuthCookiesOnAllDomains succeeded | domain: ${COOKIE_DOMAIN} | url: ${COOKIE_URL} | hasIdToken: ${!!idToken}`);
     } catch (e) {
         console.error(`${TAG} setAuthCookiesOnAllDomains failed:`, e.message);
     }
 };
 
 /**
- * Lightweight refresh — only updates IdToken on both domains.
+ * Lightweight refresh — only updates IdToken using common domain.
  *
  * Call this from the periodic silent refresh timer.
  */
@@ -74,10 +66,8 @@ export const refreshIdTokenOnAllDomains = async (idToken) => {
     const short = shortExpiry();
 
     try {
-        await Promise.all(
-            DOMAIN_URLS.map((url) => setCookie(url, 'IdToken', idToken, short)),
-        );
-        console.log(`${TAG} refreshIdTokenOnAllDomains succeeded | domain: ${COOKIE_DOMAIN}`);
+        await setCookie(COOKIE_URL, 'IdToken', idToken, short);
+        console.log(`${TAG} refreshIdTokenOnAllDomains succeeded | domain: ${COOKIE_DOMAIN} | url: ${COOKIE_URL}`);
     } catch (e) {
         console.error(`${TAG} refreshIdTokenOnAllDomains failed:`, e.message);
     }

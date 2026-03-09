@@ -7,6 +7,9 @@ import { Env } from "../../network/apis/account/Constants";
 
 const TAG = '[Session]';
 
+// ── Refresh lock to prevent concurrent refresh calls (race condition) ──
+let _refreshLock = false;
+
 const config = {
     issuer: Env.SSO_LOGIN,
     clientId: "sparklight-customer-mobile-app",
@@ -20,12 +23,12 @@ const onSuccess = async (res, idToken = null) => {
         if (!res) throw new Error("No token received from API");
 
         const { jwtToken: token, userInfo, idTokenGuid, refreshToken } = res;
+        if (!token) throw new Error("API response missing jwtToken");
+
         const user = { userInfo, token, tokenGuid: idTokenGuid, refreshToken, idToken };
 
-        if (token) {
-            await storeUser(user);
-            console.log(`${TAG} User stored | Account: ${userInfo?.accountNumber || 'N/A'} | hasIdToken: ${!!idToken}`);
-        }
+        await storeUser(user);
+        console.log(`${TAG} User stored | Account: ${userInfo?.accountNumber || 'N/A'} | hasIdToken: ${!!idToken}`);
 
         store.dispatch(saveUserInfo(user));
         console.log(`${TAG} Redux store updated`);
@@ -62,6 +65,11 @@ const retryRequest = async (data, retries = 2) => {
 };
 
 export const RefreshToken = async () => {
+    if (_refreshLock) {
+        console.warn(`${TAG} ── RefreshToken SKIPPED (another refresh in progress) ──`);
+        return null;
+    }
+    _refreshLock = true;
     console.log(`${TAG} ── RefreshToken START ──`);
     try {
         const user = await getUser();
@@ -86,10 +94,17 @@ export const RefreshToken = async () => {
     } catch (error) {
         console.error(`${TAG} ── RefreshToken FAILED ──`, error.message);
         return onError(error);
+    } finally {
+        _refreshLock = false;
     }
 };
 
 export const RefreshIdTokenOnly = async () => {
+    if (_refreshLock) {
+        console.warn(`${TAG} ── RefreshIdTokenOnly SKIPPED (another refresh in progress) ──`);
+        return null;
+    }
+    _refreshLock = true;
     console.log(`${TAG} ── RefreshIdTokenOnly START ──`);
     try {
         const user = await getUser();
@@ -114,5 +129,7 @@ export const RefreshIdTokenOnly = async () => {
     } catch (error) {
         console.error(`${TAG} ── RefreshIdTokenOnly FAILED ──`, error.message);
         throw error;
+    } finally {
+        _refreshLock = false;
     }
 };

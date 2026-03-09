@@ -7,25 +7,36 @@ import { RefreshToken, RefreshIdTokenOnly } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
-import analytics from '@react-native-firebase/analytics';
+// import analytics from '@react-native-firebase/analytics'; // disabled — noisy logs, no useful debug info
 import LoadingOverlay from '../common/customui/CustomLoading';
 import LoadingSpinner from './LoadingSpinner';
 import { getUser } from '../../redux/utils/LocalStorage';
 import NetInfo from '@react-native-community/netinfo';
 import { setAuthCookiesOnAllDomains, refreshIdTokenOnAllDomains } from './NativeCookieManager';
+import { ISUAT } from '../../network/apis/account/Constants';
 
 const TAG = '[ArticalWindow]';
+const JS_COOKIE_DOMAIN = ISUAT ? '.uat.sparklight.com' : '.sparklight.com';
 const ID_TOKEN_REFRESH_INTERVAL_MS = 4 * 60 * 1000;
+
+// ── Timestamp helper for debug logs (will be removed after tracing) ──
+const ts = () => {
+    const d = new Date();
+    return `${d.toLocaleTimeString('en-US', { hour12: false })}.${String(d.getMilliseconds()).padStart(3, '0')}`;
+};
 
 // ── Shared cookie-setting JS (embedded in injection script + standalone injections) ──
 const buildCookieJS = (idToken) => {
     const safe = (idToken || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    // IMPORTANT: domain= ensures cookies cover ALL subdomains (customer.*, payment.*, etc.)
+    // Without it, cookies are host-specific and won't update across cross-subdomain navigations.
     return `var _long = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
 var _short = new Date(Date.now() + 5*60*1000).toUTCString();
-document.cookie = 'Source=MobileApp; path=/; expires=' + _long + ';';
-document.cookie = 'CustomerType=Residential; path=/; expires=' + _long + ';';
-document.cookie = 'LatestVersion=true; path=/; expires=' + _long + ';';
-if ('${safe}') document.cookie = 'IdToken=${safe}; path=/; expires=' + _short + ';';`;
+var _dom = '; domain=${JS_COOKIE_DOMAIN}';
+document.cookie = 'Source=MobileApp; path=/' + _dom + '; expires=' + _long + ';';
+document.cookie = 'CustomerType=Residential; path=/' + _dom + '; expires=' + _long + ';';
+document.cookie = 'LatestVersion=true; path=/' + _dom + '; expires=' + _long + ';';
+if ('${safe}') document.cookie = 'IdToken=${safe}; path=/' + _dom + '; expires=' + _short + ';';`;
 };
 
 // ── Injection script (injectedJavaScriptBeforeContentLoaded) ──
@@ -43,18 +54,53 @@ const buildInjectionScript = (token, userInfo, idToken) => {
             localStorage.setItem('user_info', '${safeUserInfo}');
         }
 
-        // Cookie injection (fails silently on about:blank — expected)
+        // Clear any stale host-specific cookies (no domain= attr) left from before the fix.
+        // This ensures the domain-scoped cookie below is the ONLY one the server sees.
+        try {
+            var _expire = 'Thu, 01 Jan 1970 00:00:00 GMT';
+            document.cookie = 'IdToken=; path=/; expires=' + _expire + ';';
+            document.cookie = 'Source=; path=/; expires=' + _expire + ';';
+            document.cookie = 'CustomerType=; path=/; expires=' + _expire + ';';
+            document.cookie = 'LatestVersion=; path=/; expires=' + _expire + ';';
+        } catch(e) {}
+
+        // Cookie injection with domain= (covers all subdomains, fails silently on about:blank)
         try { ${buildCookieJS(idToken)} } catch(e) {}
 
-        // PDF XHR intercept — catches billing statement responses
+        // ── Network activity logging (XHR) + PDF intercept ──
         var _xo = XMLHttpRequest.prototype.open, _xs = XMLHttpRequest.prototype.send;
         XMLHttpRequest.prototype.open = function(m, u) {
+            this._method = m;
             this._url = u;
             return _xo.apply(this, arguments);
         };
-        XMLHttpRequest.prototype.send = function() {
+        XMLHttpRequest.prototype.send = function(body) {
             var self = this;
+            var _ts = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+            var payload = '';
+            try { if (body) payload = typeof body === 'string' ? body.substring(0, 500) : JSON.stringify(body).substring(0, 500); } catch(e) {}
+            // Cookie diagnostics: capture what cookies the browser will send
+            var _cookies = '';
+            try {
+                var dc = document.cookie || '';
+                var idMatch = dc.match(/IdToken=([^;]{0,20})/);
+                var hasSource = dc.includes('Source=');
+                var hasCType = dc.includes('CustomerType=');
+                _cookies = 'IdToken=' + (idMatch ? idMatch[1] + '...' : 'MISSING') + ' | Source=' + (hasSource ? 'YES' : 'MISSING') + ' | CustomerType=' + (hasCType ? 'YES' : 'MISSING') + ' | cookieLen=' + dc.length;
+            } catch(e) { _cookies = 'READ_ERROR'; }
+            window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'networkLog', phase: 'request', ts: _ts,
+                method: self._method, url: self._url, payload: payload, cookies: _cookies
+            }));
             this.addEventListener('load', function() {
+                var rTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+                var respSnippet = '';
+                try { respSnippet = (self.responseText || '').substring(0, 300); } catch(e) {}
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'networkLog', phase: 'response', ts: rTs,
+                    method: self._method, url: self._url, status: self.status, body: respSnippet
+                }));
+                // PDF intercept
                 if ((self._url.includes('/statements/') || self._url.includes('Statement')) && self.status === 200) {
                     try {
                         var d = JSON.parse(self.response);
@@ -64,7 +110,43 @@ const buildInjectionScript = (token, userInfo, idToken) => {
                     } catch(e) {}
                 }
             });
+            this.addEventListener('error', function() {
+                var eTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'networkLog', phase: 'error', ts: eTs,
+                    method: self._method, url: self._url, error: 'XHR network error'
+                }));
+            });
             return _xs.apply(this, arguments);
+        };
+
+        // ── Network activity logging (fetch) ──
+        var _fetch = window.fetch;
+        window.fetch = function(input, init) {
+            var fUrl = typeof input === 'string' ? input : (input.url || '');
+            var fMethod = (init && init.method) || 'GET';
+            var fTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+            var fPayload = '';
+            try { if (init && init.body) fPayload = String(init.body).substring(0, 500); } catch(e) {}
+            window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'networkLog', phase: 'request', ts: fTs,
+                method: fMethod, url: fUrl, payload: fPayload
+            }));
+            return _fetch.apply(this, arguments).then(function(resp) {
+                var rTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'networkLog', phase: 'response', ts: rTs,
+                    method: fMethod, url: fUrl, status: resp.status
+                }));
+                return resp;
+            }).catch(function(err) {
+                var eTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'networkLog', phase: 'error', ts: eTs,
+                    method: fMethod, url: fUrl, error: err.message
+                }));
+                throw err;
+            });
         };
 
         // PING/PONG (alive check) + SAVE_STATE (form persistence)
@@ -151,14 +233,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     await RefreshIdTokenOnly();
                     cu = await getUser();
                 } catch (e) {
-                    console.warn(TAG, 'idToken pre-fetch failed (non-fatal):', e.message);
+                    console.warn(`${TAG} [${ts()}] idToken pre-fetch failed (non-fatal):`, e.message);
                 }
             }
             await setAuthCookiesOnAllDomains(cu?.idToken || '');
             setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || ''));
             setWebViewReady(true);
         } catch (e) {
-            console.error(TAG, 'prepareInjectionScript failed:', e.message);
+            console.error(`${TAG} [${ts()}] prepareInjectionScript failed:`, e.message);
             setWebViewReady(true);
         }
     }, []);
@@ -188,7 +270,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     } catch(e) {}
 })(); true;`);
         } catch (e) {
-            console.error(TAG, 'injectAuth failed:', e.message);
+            console.error(`${TAG} [${ts()}] injectAuth failed:`, e.message);
         }
     }, []);
 
@@ -212,7 +294,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     } catch(e) {}
 })(); true;`);
         } catch (e) {
-            console.error(TAG, 'Silent refresh failed:', e.message);
+            console.error(`${TAG} [${ts()}] Silent refresh failed:`, e.message);
             pendingOfflineRefresh.current = true;
         }
     }, []);
@@ -302,7 +384,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                             await injectAuth();
                             await silentRefreshIdToken();
                         } catch (e) {
-                            console.error(TAG, 'Token refresh after background failed:', e.message);
+                            console.error(`${TAG} [${ts()}] Token refresh after background failed:`, e.message);
                             recreateWebView();
                         }
                     }
@@ -318,36 +400,69 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         return () => sub?.remove();
     }, [checkWebViewAlive, recreateWebView, injectAuth, silentRefreshIdToken, startSilentRefresh, stopSilentRefresh]);
 
-    useEffect(() => {
-        if (name) {
-            analytics().logEvent('screen_view', {
-                screen_name: name,
-                screen_class: 'ArticalWindowUtility',
-            }).catch(() => {});
-        }
-    }, [name]);
+    // Firebase analytics disabled — noisy logs, no debug value
+    // useEffect(() => {
+    //     if (name) {
+    //         analytics().logEvent('screen_view', { screen_name: name, screen_class: 'ArticalWindowUtility' }).catch(() => {});
+    //     }
+    // }, [name]);
 
+    // Guard: only check auth on initial mount, not on every Redux update.
+    // During active WebView session, transient Redux updates (e.g. RefreshToken race)
+    // could temporarily set token to undefined and wrongly boot the user.
+    const authChecked = useRef(false);
     useEffect(() => {
+        if (authChecked.current) return; // Skip re-checks after initial mount
         if (!user?.token) {
+            console.warn(`${TAG} [${ts()}] Auth check FAILED — no token in Redux, redirecting to Splash`);
+            authChecked.current = true;
             Alert.alert('Authentication Required', 'Please log in to continue.', [
                 { text: 'OK', onPress: () => navigationRef.current?.navigate('Splash') },
             ]);
+        } else {
+            authChecked.current = true; // Token exists on mount, don't re-check
         }
     }, [user]);
 
     // ── WebView handlers ────────────────────────────────────────────────────
 
     const onShouldStartLoadWithRequest = useCallback((request) => {
-        if (request.url.includes('/postlogout') || request.url.includes(Env.SSO_LOGIN)) {
+        console.log(`${TAG} [${ts()}] onShouldStartLoadWithRequest → ${request.url}`);
+
+        // Only treat explicit logout as session expiry
+        if (request.url.includes('/postlogout')) {
+            console.log(`${TAG} [${ts()}] Detected /postlogout — exiting WebView`);
             showToastMessage();
             navigation.goBack();
             return false;
         }
+
+        // SSO redirect (e.g. after 401 on payment API) — DON'T let it load the login page.
+        // Instead: block it, refresh tokens, re-inject auth, and reload the billing page.
+        if (request.url.includes(Env.SSO_LOGIN)) {
+            console.log(`${TAG} [${ts()}] Detected SSO redirect — BLOCKING, refreshing tokens, reloading billing`);
+            (async () => {
+                try {
+                    const freshIdToken = await RefreshIdTokenOnly();
+                    if (freshIdToken) {
+                        await refreshIdTokenOnAllDomains(freshIdToken);
+                    }
+                    await injectAuth();
+                    console.log(`${TAG} [${ts()}] SSO recovery — navigating back to: ${url}`);
+                    webViewRef.current?.injectJavaScript(`window.location.href = '${url}'; true;`);
+                } catch (e) {
+                    console.error(`${TAG} [${ts()}] SSO recovery failed — recreating WebView:`, e.message);
+                    recreateWebView();
+                }
+            })();
+            return false;
+        }
+
         if (!request.url.startsWith('https://') && !request.url.startsWith('http://')) {
             return false;
         }
         return true;
-    }, [showToastMessage, navigation]);
+    }, [showToastMessage, navigation, url, injectAuth, recreateWebView]);
 
     const onLoadStart = useCallback(({ nativeEvent }) => {
         if (!initialLoadComplete.current) { setProgress(0); setContentLoaded(false); }
@@ -370,14 +485,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [injectAuth]);
 
     const onError = useCallback(({ nativeEvent }) => {
-        console.error(TAG, 'WebView error:', nativeEvent.description);
+        console.error(`${TAG} [${ts()}] WebView error:`, nativeEvent.description);
         setIsError(true);
         setContentLoaded(true);
         setErrorMessage(`Loading error: ${nativeEvent.description || 'Unknown error'}`);
     }, []);
 
     const onHttpError = useCallback(({ nativeEvent }) => {
-        console.error(TAG, 'HTTP error:', nativeEvent.statusCode, nativeEvent.url);
+        console.error(`${TAG} [${ts()}] HTTP error:`, nativeEvent.statusCode, nativeEvent.url);
         if (nativeEvent.statusCode === 404) {
             setIsError(true); setContentLoaded(true);
             setErrorMessage('Page not found. Please verify your account has access to this feature.');
@@ -408,7 +523,23 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     setShowPDFUrl(data.data);
                     setShowPDFModal(true);
                     break;
+                case 'networkLog': {
+                    const { phase, ts: nTs, method, url: nUrl, status, payload, body, error } = data;
+                    // Skip noisy analytics calls
+                    if (nUrl && (nUrl.includes('analytics.google.com') || nUrl.includes('google-analytics.com'))) break;
+                    if (phase === 'request') {
+                        const cookieInfo = data.cookies ? ` | 🍪 ${data.cookies}` : '';
+                        console.log(`${TAG} [${nTs}] 🌐 ${method} → ${nUrl}${payload ? ' | payload: ' + payload : ''}${cookieInfo}`);
+                    } else if (phase === 'response') {
+                        const statusLabel = status >= 400 ? '❌' : '✅';
+                        console.log(`${TAG} [${nTs}] ${statusLabel} ${method} ← ${status} ${nUrl}${body ? ' | body: ' + body : ''}`);
+                    } else if (phase === 'error') {
+                        console.error(`${TAG} [${nTs}] ❌ ${method} FAILED ${nUrl} | ${error}`);
+                    }
+                    break;
+                }
                 case 'injectionComplete':
+                    console.log(`${TAG} [${ts()}] Injection script completed`);
                     break;
                 default:
                     break;
