@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, Platform, AppState, Alert, AccessibilityInfo } from 'react-native';
+import { View, Text, StyleSheet, Platform, AppState, Alert, AccessibilityInfo, Linking } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -39,6 +39,20 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     // Set focus when the component mounts (screen appears)
     setFocus();
   }, [setFocus]);
+
+    useEffect(() => {
+        // Open Bill Explainer outside the app in the mobile browser.
+        if (name === 'Bill Explainer' && url) {
+            setModalOpen(false);
+            Linking.openURL(url)
+                .catch((error) => {
+                    console.error('Failed to open Bill Explainer in browser:', error);
+                })
+                .finally(() => {
+                    navigation.goBack();
+                });
+        }
+    }, [name, url, navigation]);
 
     // Reset navigation flag when component unmounts or name changes
     useEffect(() => {
