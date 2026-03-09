@@ -298,7 +298,7 @@ const renderBillExplainerLink = (data, navigation) => {
   }
   navigation.navigate('ArticalWindowUtility', {
     name: "Bill Explainer",
-    url: data.be_url
+    url: data.be_url,
   });
 };
 
@@ -340,8 +340,8 @@ const BillingBreakDownScreen = ({ navigation }) => {
   const billingData = useSelector(selectBillingBreakDownData);
   const error = useSelector(selectBillingBreakDownError)
 
-  const billExplainerData = useSelector(selectBillExplainerData);
-  //const [billExplainerData, setBillExplainerData] = useState(null);
+  //const billExplainerData = useSelector(selectBillExplainerData);
+  const [billExplainerData, setBillExplainerData] = useState(null);
   
   const [showBillExplainer, setShowBillExplainer] = useState(false);
   const [explainerLoading, setExplainerLoading] = useState(true);
@@ -373,8 +373,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
    useEffect(() => {
     console.log("Account Details1:", accountDetails);
     if (!accountDetails?.hierarchy?.hierarchy_id) {
-      setShowBillExplainer(true);
-      setExplainerLoading(true);
+       setExplainerLoading(true);
       let requestBody = {
           customer_type: accountDetails?.customer_type,
           hierarchy_id: accountDetails?.hierarchy?.hierarchy_id,    
@@ -384,8 +383,9 @@ const BillingBreakDownScreen = ({ navigation }) => {
           video: accountDetails?.services?.video,
           homesPassedId: accountDetails?.homes_passed_id || null
     }
-    dispatch(fetchBillExplainer(requestBody));
-    //getBillExplainerData(requestBody);
+   
+    //dispatch(fetchBillExplainer(requestBody));
+    getBillExplainerData(requestBody);
     }else{
       setShowBillExplainer(false);
       setExplainerLoading(false);
@@ -394,27 +394,36 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
 
 
-  useEffect(() => {
-    console.log("Bill Explainer Data:", billExplainerData);
-    if(!billExplainerData?.eligibility){
-      setShowBillExplainer(false);
-      setExplainerLoading(false);
-    }else{
-      setShowBillExplainer(true);
-      setExplainerLoading(false);
-    }
-  }, [billExplainerData]);
+  // useEffect(() => {
+  //   console.log("Bill Explainer Data:", billExplainerData);
+  //   if(!billExplainerData?.eligibility){
+  //     setShowBillExplainer(false);
+  //   }else{
+  //     setShowBillExplainer(true);
+  //   }
+  //   setExplainerLoading(false);
+  // }, [billExplainerData]);
 
-  // const getBillExplainerData =(requestBody) => {  
-  //   PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
-  //     console.log("Bill Explainer Response:", res);
-  //     setBillExplainerData(res);
-  //     }, (error) => { 
-  //       console.error("Bill Explainer Error:", error);
-  //     }
+  const getBillExplainerData =(requestBody) => {  
+    setExplainerLoading(true);
+    PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
+      console.log("Bill Explainer Response:", res);
+      setBillExplainerData(res);
+      if(res?.eligibility){
+        setShowBillExplainer(true);
 
-  //   )
-  // };
+      }else{
+        setShowBillExplainer(false);
+      }
+      setExplainerLoading(false);
+      }, (error) => { 
+        setShowBillExplainer(false);
+        setExplainerLoading(false);
+        console.error("Bill Explainer Error:", error);
+      }
+
+    )
+  };
 
   // Fetch billing data when screen is focused
   useFocusEffect(
@@ -477,7 +486,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         maxToRenderPerBatch={10}
         initialNumToRender={5}
         windowSize={5}
-        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={loading} />}
+        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={explainerLoading} />}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
     );
