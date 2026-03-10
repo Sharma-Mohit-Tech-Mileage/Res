@@ -360,8 +360,9 @@ const TextNotifications = ({ navigation }) => {
               </Text>
               <Text
                 style={styles.requiredFieldsText}
-                accessible={false}
-                importantForAccessibility="no"
+                accessible={true}
+                importantForAccessibility="yes"
+                accessibilityRole="text"
               >
                 Fields marked with * are required.
               </Text>

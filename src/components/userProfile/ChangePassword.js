@@ -227,8 +227,9 @@ const ChangePassword = () => {
                   </Text>
                   <Text
                     style={[AppStyles.requiredField, { marginTop: 10 }]}
-                    accessible={false}
-                    importantForAccessibility="no"
+                    accessible={true}
+                    importantForAccessibility="yes"
+                    accessibilityRole="text"
                   >
                     {" "}
                     Fields marked with * are required.

@@ -115,7 +115,6 @@ const AddNotificationScreen = () => {
         setIsSubmitting(false);
         setToggleCheckBoxTerm(false);
       }
-      setFocusEmail();
     };
   
     updateAccountDetails();
@@ -322,8 +321,9 @@ const AddNotificationScreen = () => {
 
               <Text
                style={AppStyles.requiredField}
-                  accessible={false}
-                  importantForAccessibility="no">
+                  accessible={true}
+                  importantForAccessibility="yes"
+                  accessibilityRole="text">
                 {" "}
                 Fields marked with * are required.
               </Text>

@@ -192,8 +192,9 @@ const SparkLightInput = React.forwardRef(({
         {label && (
           <Text
             style={[styles.label, error && styles.errorLabel]}
-            accessible={false}
-            importantForAccessibility="no"
+            accessible={true}
+            importantForAccessibility="yes"
+            accessibilityRole="text"
           >
             {label}
           </Text>

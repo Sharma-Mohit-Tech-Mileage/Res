@@ -190,7 +190,7 @@ const PasswordSecurityEdit = () => {
                   >
                     Security Question
                   </Text>
-                  <Text style={[AppStyles.requiredField]} accessible={false} importantForAccessibility="no">
+                  <Text style={[AppStyles.requiredField]} accessible={true} importantForAccessibility="yes" accessibilityRole="text">
                   {" "}
                   Fields marked with * are required.
                 </Text>
@@ -201,8 +201,9 @@ const PasswordSecurityEdit = () => {
                   <View style={styles.textinput}>
                     <Text
                       style={[styles.firstName1, styles.firstTypo]}
-                      accessible={false}
-                      importantForAccessibility="no"
+                      accessible={true}
+                      importantForAccessibility="yes"
+                      accessibilityRole="text"
                     >
                       Password Reset Question *
                     </Text>
@@ -249,8 +250,9 @@ const PasswordSecurityEdit = () => {
 
                   <Text
                       style={[styles.firstName1, styles.firstTypo,{marginBottom:8}]}
-                      accessible={false}
-                      importantForAccessibility="no"
+                      accessible={true}
+                      importantForAccessibility="yes"
+                      accessibilityRole="text"
                     >
                       Password Reset Answer *
                     </Text>

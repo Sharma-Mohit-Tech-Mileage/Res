@@ -174,8 +174,9 @@ const TextNotifications = ({ navigation }) => {
                 </Text>
                 <Text
                   style={[AppStyles.requiredField, { textAlign: "center" }]}
-                  accessible={false}
-                  importantForAccessibility="no"
+                  accessible={true}
+                  importantForAccessibility="yes"
+                  accessibilityRole="text"
                 >
                   Fields marked with * are required.
                 </Text>
@@ -192,8 +193,9 @@ const TextNotifications = ({ navigation }) => {
                   <>
                     <Text
                       style={styles.inputLabel}
-                      accessible={false}
-                      importantForAccessibility="no"
+                      accessible={true}
+                      importantForAccessibility="yes"
+                      accessibilityRole="text"
                     >
                       Mobile Number *
                     </Text>
