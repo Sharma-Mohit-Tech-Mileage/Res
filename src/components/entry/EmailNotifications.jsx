@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
   Keyboard,
+  AccessibilityInfo,
 } from "react-native";
 import {
   Color,
@@ -39,6 +40,7 @@ const EmailNotifications = ({ navigation }) => {
   const [keyboardHidden, setKeyboardHidden] = useState(true);
   const [textInputLayout, setTextInputLayout] = useState({});
   const scrollRef = useRef();
+  const emailRef = useRef(null);
 
   const {
     control,
@@ -47,6 +49,7 @@ const EmailNotifications = ({ navigation }) => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
+    mode: "onBlur",
     defaultValues: {
       email: "",
     },
@@ -163,8 +166,8 @@ const EmailNotifications = ({ navigation }) => {
                 <Text
                   style={styles.fieldLabel}
                   accessible={true}
+                  importantForAccessibility="yes"
                   accessibilityRole="text"
-                  accessibilityLabel="Email Address required"
                 >
                   Email Address *
                 </Text>
@@ -173,6 +176,7 @@ const EmailNotifications = ({ navigation }) => {
                   name="email"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <SparkLightInput
+                      ref={emailRef}
                       placeholder="Email Address"
                       onBlur={onBlur}
                       onChangeText={(text) => {
@@ -181,8 +185,8 @@ const EmailNotifications = ({ navigation }) => {
                       }}
                       value={value ? value.toLowerCase() : ""}
                       error={errors.email?.message}
-                      accessibilityLabel="Email address Required"
-                      accessibilityHint={"required text field. double tap to edit"}
+                      accessibilityLabel="Email Address"
+                      required={true}
                       keyboardType="email-address"
                       autoCapitalize="none"
                       textContentType="emailAddress"
@@ -202,7 +206,14 @@ const EmailNotifications = ({ navigation }) => {
                   ? [styles.button, styles.buttonsLayout]
                   : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
               }
-              onPress={handleSubmit(enableEmailNotifications)}
+              onPress={handleSubmit(enableEmailNotifications, (errors) => {
+                if (errors.email) {
+                  AccessibilityInfo.announceForAccessibility(errors.email.message);
+                  setTimeout(() => {
+                    emailRef.current?.focus();
+                  }, 300);
+                }
+              })}
               accessibilityRole="button"
               accessibilityLabel={
                 enableButton
