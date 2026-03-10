@@ -165,9 +165,8 @@ const EmailNotifications = ({ navigation }) => {
               >
                 <Text
                   style={styles.fieldLabel}
-                  accessible={true}
-                  accessibilityRole="text"
-                  accessibilityLabel="Email Address required"
+                  accessible={false}
+                  importantForAccessibility="no"
                 >
                   Email Address *
                 </Text>

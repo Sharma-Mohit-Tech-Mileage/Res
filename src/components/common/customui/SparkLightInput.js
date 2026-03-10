@@ -258,27 +258,15 @@ const SparkLightInput = React.forwardRef(({
             },
           ]}
           accessibilityLabel={
-            required
-              ? value
-                ? `${accessibilityLabel || label || placeholder}, required, ${Platform.OS === "android" && getKeyboardType() === "phone-pad" ? numberToWordsForAccessibility(value) : value}`
-                : `${accessibilityLabel || label || placeholder}, required`
-              : value && getKeyboardType() === "phone-pad"
-              ? error
-                ? `${accessibilityLabel || label || "Phone number"} field. ${errorHint || error}`
-                : `${accessibilityLabel || label || "Phone number"} field`
-              : error
-              ? (errorHint || error)
-              : getAccessibilityLabel()
+            value
+              ? (Platform.OS === "android" && getKeyboardType() === "phone-pad"
+                  ? numberToWordsForAccessibility(value)
+                  : value)
+              : " "
           }
           accessibilityRole="text"
           accessibilityHint={
-            required
-              ? error
-                ? `${errorHint || error}. Double tap to edit`
-                : "Double tap to edit"
-              : getKeyboardType() === "phone-pad"
-              ? "Required text field. double tap to edit."
-              : accessibilityHint
+            `${accessibilityLabel || label || placeholder}${required ? ', required' : ''}${error ? `, ${errorHint || error}` : ''}, double tap to edit.`
           }
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
