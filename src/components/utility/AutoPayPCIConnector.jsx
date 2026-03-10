@@ -284,6 +284,7 @@ const navigationChange = async (navState) => {
     const userUpdateScript = async (user) => {
         const upgradeToken = await getUpgradeToken();
         if (user.token) {
+            // Simplified script to avoid syntax errors
             const SAVE_FROM_RN = `(function() {
                 try {
                     localStorage.setItem('jwt_token', '${user.token}');

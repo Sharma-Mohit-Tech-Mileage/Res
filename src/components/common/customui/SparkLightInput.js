@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useImperativeHandle } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -6,8 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
-  AccessibilityInfo,
-  findNodeHandle,
+  Keyboard,
+  AccessibilityInfo
 } from "react-native";
 import {
   FontFamily,
@@ -20,6 +20,7 @@ import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
+import useAccessibilityFocus from "../../../hooks/useAccessibilityFocus";
 
 const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
@@ -56,68 +57,88 @@ const SparkLightInput = React.forwardRef(({
   accessibilityHint,
   secure = false,
   error,
-  errorHint,
   editable = true,
   showTextIcon = false,
   inputStyle,
-  required = false,
-  onBlur: parentOnBlur,
-  onFocus: parentOnFocus,
   ...props
 }, ref) => {
   const [isFocused, setIsFocused] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(!secure);
-  const inputRef = useRef(null);
-  const hasBlurred = useRef(false);
-  const isFocusedRef = useRef(false);
-  const prevErrorRef = useRef(error);
-  const valueRef = useRef(value);
-  const errorAnnouncedRef = useRef(false);
+  const inputRef = React.useRef(null);
+  const errorRef = React.useRef(null);
+  const [keyboardHidden, setKeyboardHidden] = useState(true);
+  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+  const [errorFocus, setErrorFocus] = useAccessibilityFocus();
 
-  // Keep valueRef in sync with current value prop
   useEffect(() => {
-    valueRef.current = value;
-  }, [value]);
+    const checkScreenReader = async () => {
+      const enabled = await AccessibilityInfo.isScreenReaderEnabled();
+      setIsScreenReaderEnabled(enabled);
+    };
+    checkScreenReader();
+  }, []);
 
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      hasBlurred.current = true;
-      inputRef.current?.focus();
-      // Workaround: secureTextEntry may clear text on programmatic focus
-      if (secure && valueRef.current) {
-        const currentValue = valueRef.current;
-        setTimeout(() => {
-          inputRef.current?.setNativeProps({ text: currentValue });
-        }, 50);
+
+  useEffect(() => {
+      if (error && isScreenReaderEnabled) {
+        // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
+        const t = setTimeout(() => {
+          try {
+            setErrorFocus();
+            AccessibilityInfo.announceForAccessibility(error);
+          } catch (e) {
+            console.log("Accessibility focus error:", e);
+          }
+        }, 600);
+  
+        return () => clearTimeout(t);
+        
       }
-      // Delay accessibility focus to allow re-render with error state
-      setTimeout(() => {
-        const handle = findNodeHandle(inputRef.current);
-        if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-      }, 350);
-    },
+    }, [error, isScreenReaderEnabled]);
+  
+
+  React.useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current?.focus();
+    }
   }));
 
-  // Announce error on transition from falsy to truthy
   useEffect(() => {
-    const hadError = prevErrorRef.current;
-    prevErrorRef.current = error;
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardHidden(false);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardHidden(true);
+    });
 
-    if (!error) {
-      errorAnnouncedRef.current = false;
-      return;
-    }
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
-    // Announce if error is new and field has been interacted with
-    if (!hadError && error && hasBlurred.current) {
-      const hint = errorHint || error;
-      // Delay slightly to ensure the error view is rendered before announcing
-      setTimeout(() => {
-        AccessibilityInfo.announceForAccessibility(hint);
-      }, 150);
-      errorAnnouncedRef.current = true;
+  useEffect(() => {
+    if (!keyboardHidden) {
+      // Only re-assert focus for the field the user is on.
+      if (isFocused) {
+        inputRef.current?.focus();
+      }
+    } else {
+      // Only move focus to the error for the active field.
+      if (error && isFocused) {
+        errorRef.current?.focus();
+      }
     }
-  }, [error]);
+  }, [keyboardHidden, isFocused, error]);
+
+  // Auto-focus input when error appears (for accessibility)
+  // useEffect(() => {
+  //   if (error && inputRef.current) {
+  //     setTimeout(() => {
+  //       inputRef.current?.focus();
+  //     }, 150);
+  //   }
+  // }, [error]);
 
   const handleInputChange = (text) => {
     if (onChangeText) {
@@ -129,7 +150,6 @@ const SparkLightInput = React.forwardRef(({
     setPasswordVisible(!passwordVisible);
   };
 
-  // Auto-detect keyboard type based on field name/placeholder
   const getKeyboardType = () => {
     const lowerName = (name || placeholder || "").toLowerCase();
     if (lowerName.includes("phone") || lowerName.includes("mobile")) {
@@ -144,7 +164,37 @@ const SparkLightInput = React.forwardRef(({
     return "default";
   };
 
-  // Accessibility label handling
+
+  /**
+ * Formats input US number:
+ * "+19876543210" → "+1 (987) 654-3210"
+ * "9876543210"   → "(987) 654-3210"
+ */
+function formatUsPhone(input) {
+  if (!input) return "";
+
+  let digits = String(input).replace(/\D/g, ""); // keep numbers only
+  let hasCountryCode = false;
+
+  // Handle +1 or 1 prefix
+  if (digits.length === 11 && digits.startsWith("1")) {
+    hasCountryCode = true;
+    digits = digits.slice(1); // remove country code
+  }
+
+  // Must be exactly 10 digits now
+  if (digits.length !== 11) return input;
+
+  const area = digits.substring(0, 3);
+  const middle = digits.substring(3, 6);
+  const last = digits.substring(6, 10);
+
+  const formatted = `(${area}) ${middle}-${last}`;
+
+  return hasCountryCode ? `+1 ${formatted}` : formatted;
+}
+
+
   const getAccessibilityLabel = () => {
     if (
       Platform.OS === "android" &&
@@ -154,30 +204,6 @@ const SparkLightInput = React.forwardRef(({
       return numberToWordsForAccessibility(value);
     }
     return accessibilityLabel || label || placeholder;
-  };
-
-  const handleFocus = () => {
-    setIsFocused(true);
-    isFocusedRef.current = true;
-
-    // Announce error on focus only if useEffect hasn't already announced it.
-    // This covers the case where user re-focuses a field with an unannounced error.
-    if (error && hasBlurred.current && !errorAnnouncedRef.current) {
-      setTimeout(() => {
-        const hint = errorHint || error;
-        AccessibilityInfo.announceForAccessibility(hint);
-      }, 500);
-    }
-
-    if (parentOnFocus) parentOnFocus();
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-    isFocusedRef.current = false;
-    hasBlurred.current = true;
-
-    if (parentOnBlur) parentOnBlur();
   };
 
   return (
@@ -193,8 +219,7 @@ const SparkLightInput = React.forwardRef(({
           <Text
             style={[styles.label, error && styles.errorLabel]}
             accessible={true}
-            importantForAccessibility="yes"
-            accessibilityRole="text"
+            accessibilityLabel={accessibilityLabel}
           >
             {label}
           </Text>
@@ -238,11 +263,11 @@ const SparkLightInput = React.forwardRef(({
 
         <TextInput
           placeholder={placeholder}
-          value={value}
+          value={formatUsPhone(value)}
           ref={inputRef}
           onChangeText={handleInputChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           editable={editable}
           secureTextEntry={secure && !passwordVisible}
           style={[
@@ -259,15 +284,19 @@ const SparkLightInput = React.forwardRef(({
             },
           ]}
           accessibilityLabel={
-            value
-              ? (Platform.OS === "android" && getKeyboardType() === "phone-pad"
-                  ? numberToWordsForAccessibility(value)
-                  : value)
-              : " "
+            value && getKeyboardType() === "phone-pad"
+              ? "Phone number " + numberToWordsForAccessibility(value)
+              : secure
+              ? "Password requirements are listed below. Use arrow keys to read them."
+              : getAccessibilityLabel()
           }
           accessibilityRole="text"
           accessibilityHint={
-            `${accessibilityLabel || label || placeholder}${required ? ', required' : ''}${error ? `, ${errorHint || error}` : ''}, double tap to edit.`
+            getKeyboardType() === "phone-pad"
+              ? "Required text field. double tap to edit."
+              : secure
+              ? "secure text field, double tab to edit."
+              : accessibilityHint
           }
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
@@ -279,24 +308,21 @@ const SparkLightInput = React.forwardRef(({
       </View>
 
       {error && (
-        <View
-          style={styles.errorContainer}
-          accessible={true}
-          accessibilityLabel={errorHint || error}
-          accessibilityRole="alert"
-          accessibilityLiveRegion="assertive"
-        >
+        <View style={styles.errorContainer} ref={errorRef}>
           <View
             style={styles.errorIcon}
-            accessible={false}
-            importantForAccessibility="no"
+            accessible={true}
+            accessibilityLabel="Warning Icon"
           >
             <WarningIcon />
           </View>
           <Text
             style={styles.errorText}
-            accessible={false}
-            importantForAccessibility="no"
+            accessible={true}
+            ref={errorFocus}
+            accessibilityLabel={error}
+            accessibilityRole="text"
+            accessibilityHint="Please enter valid password"
           >
             {error}
           </Text>

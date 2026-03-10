@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Platform,
   AccessibilityInfo,
+  findNodeHandle,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -23,6 +24,7 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { getUser } from "../../redux/utils/LocalStorage";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { PostApiRequest } from "../../network/APIClient";
+import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 
 import {
   Color,
@@ -51,13 +53,14 @@ const validationSchema = yup.object().shape({
 });
 const TextNotifications = ({ navigation }) => {
   const scrollViewRef = useRef(null);
-  const phoneInputRef = useRef(null);
   const route = useRoute();
   const dispatch = useDispatch();
   const animatedValue = useRef(new Animated.Value(-100)).current;
   const timeoutRef = useRef(null);
   const [notification, setNotification] = useState(null);
+  const successIconRef = useRef(null);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [errorText, setErrorText] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const formatedData = route.params?.additionalData || {};
@@ -95,6 +98,67 @@ const TextNotifications = ({ navigation }) => {
     }
   }, [toggleCheckBoxTerm]);
 
+
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+
+  const [errorRef, setErrorFocus] = useAccessibilityFocus();
+  const [successRef, setSuccessFocus] = useAccessibilityFocus();
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
+
+  // Announce error message if screen reader is enabled
+  useEffect(() => {
+    if (showErrorAlert && screenReaderEnabled) {
+     
+
+      // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
+      const t = setTimeout(() => {
+        try {
+          setErrorFocus();
+          AccessibilityInfo.announceForAccessibility('Text Notifications update failed.');
+        } catch (e) {
+          console.log("Accessibility focus error:", e);
+        }
+      }, 600);
+
+      return () => clearTimeout(t);
+    }
+  }, [showErrorAlert, screenReaderEnabled, setErrorFocus]);
+
+
+  // Announce error message if screen reader is enabled
+  useEffect(() => {
+    if (showSuccessAlert && screenReaderEnabled) {
+      const t1 = setTimeout(() => {
+        try {
+          if (successIconRef.current) {
+            const handle = findNodeHandle(successIconRef.current);
+            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+          } else {
+            setSuccessFocus();
+          }
+        } catch (e) {
+          console.log("Accessibility focus error:", e);
+        }
+      }, 600);
+
+      const t2 = setTimeout(() => {
+        try {
+          if (successIconRef.current) {
+            const handle = findNodeHandle(successIconRef.current);
+            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+          }
+        } catch (e) {
+          console.log("Accessibility focus retry error:", e);
+        }
+      }, 1200);
+
+      return () => { clearTimeout(t1); clearTimeout(t2); };
+    }
+  }, [showSuccessAlert, screenReaderEnabled]);
+
+
   const handleTermsLinkPress = useCallback(
     (event) => {
       event.stopPropagation();
@@ -129,15 +193,10 @@ const TextNotifications = ({ navigation }) => {
     }
   }, [route.params?.updateFailed, navigation, dispatch]);
 
-  const handleValidationError = (errors) => {
+  const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setErrorText("Please enter valid information to continue.");
-    if (errors?.phoneNumber) {
-      AccessibilityInfo.announceForAccessibility(errors.phoneNumber.message);
-      setTimeout(() => {
-        phoneInputRef.current?.focus();
-      }, 300);
-    }
+    //setShowErrorAlert(true);
   };
 
 
@@ -158,7 +217,7 @@ const TextNotifications = ({ navigation }) => {
     }
   }, [route.params]);
 
-  const animateNotification = useCallback(() => {
+  const animateNotification = useCallback(() => {``
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -251,6 +310,7 @@ const TextNotifications = ({ navigation }) => {
         );
         if (res) {
           setIsLoading(false);
+          setShowSuccessAlert(true);
           setNotification({
             message: "Your text notification preferences have been updated successfully.",
             type: "success",
@@ -265,7 +325,7 @@ const TextNotifications = ({ navigation }) => {
           message: "Text Notifications update failed.",
           type: "error",
         });
-        //setShowErrorAlert(true);
+        setShowErrorAlert(true);
         //navigation.navigate("Notifications", { updateFailed: true, failureMessage: "In-App Notifications update failed." });
       }
     );
@@ -297,18 +357,22 @@ const TextNotifications = ({ navigation }) => {
                   transform: [{ translateY }],
                   paddingHorizontal: Padding.p_5xl,
                 }}
-                accessible={true}
+                accessible={false}
+                importantForAccessibility="no"
               >
-                <View style={styles.spaceBottom}>
+                <View style={styles.spaceBottom} ref={notification.type === "error" ? errorRef : successRef}>
                   <NotificationAlert
                     type={notification.type}
                     title={notification.type === "error" ? "Error" : "Success"}
+                    
                     message={notification.message}
                     showCloseIcon={true}
                     onClose={() => setNotification(null)}
+                    autoFocusTitle={false}
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"
                     accessibilityLabel={notification.message}
+                    iconRef={notification.type === "success" ? successIconRef : null}
                   />
                 </View>
               </Animated.View>
@@ -324,6 +388,7 @@ const TextNotifications = ({ navigation }) => {
                   }
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowErrorAlert(false)}
                 />
               </View>
@@ -360,9 +425,9 @@ const TextNotifications = ({ navigation }) => {
               </Text>
               <Text
                 style={styles.requiredFieldsText}
-                accessible={true}
-                importantForAccessibility="yes"
                 accessibilityRole="text"
+                accessible={true}
+                accessibilityLabel="Fields marked with an asterisk are required"
               >
                 Fields marked with * are required.
               </Text>
@@ -381,17 +446,20 @@ const TextNotifications = ({ navigation }) => {
                     name="phoneNumber"
                     render={({ field: { onChange, onBlur, value } }) => (
                       <SparkLightInput
-                        ref={phoneInputRef}
                         placeholder="Mobile Number"
                         label={"Mobile Number *"}
-                        accessibilityLabel="Mobile Number"
-                        required={true}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel="Mobile Number required"
+                        //accessibilityHint="required text field. double tap to edit."
                         onBlur={onBlur}
                         onChangeText={onChange}
                         keyboardType="number-pad"
                         value={value}
                         error={errors.phoneNumber?.message}
-                        maxLength={11}
+                        maxLength={16}
+                        isVisible={false}
+                        autoFocusTitle={true}
                       />
                     )}
                   />
@@ -453,6 +521,7 @@ const TextNotifications = ({ navigation }) => {
                           false: isTermRequired? "#EF4E3E": "#D0D5DD",
                         }}
                         accessible={false}
+                        importantForAccessibility="no"
                       />
                       <Text
                         style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
@@ -543,13 +612,22 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
         <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
-          <Text style={styles.appointments}>{title}</Text>
+          <Text
+            style={styles.appointments}
+            accessible={true}
+            accessibilityRole="text"
+            accessibilityLabel={`${title} for text notifications ${description}`}
+          >
+            {title}
+          </Text>
           <Text
             style={[
               styles.receiveAppNotifications1,
               styles.receiveTypo,
               { marginTop: 8 },
             ]}
+            accessible={false}
+            importantForAccessibility="no"
           >
             {description}
           </Text>
@@ -561,6 +639,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
             initialValue={value}
             section="textNotif"
             label={title}
+            description={description}
             onToggle={onChange}
           />
         </View>

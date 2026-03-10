@@ -4,7 +4,6 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import MOCK_DATA_USAGE from '../../components/services/dataUsage/mockDataUsage';
 import LinearGradient from "react-native-linear-gradient";
 import { theme } from "../../styles/theme";
 import { container } from "../../styles/utilities";
@@ -96,11 +95,6 @@ const MyServicesContent = ({ route }) => {
               downloadSpeed={data?.internet.downloadSpeed}
               uploadSpeed={data?.internet.uploadSpeed}
               loading={loading}
-              dataPlan={{
-                usedGB: 237.75,
-                totalGB: 1500,
-                percentageUsed: 15.85,
-              }}
             />
           )}
 

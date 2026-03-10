@@ -9,6 +9,7 @@ import {
   ScrollView,
   Platform,
   AccessibilityInfo,
+  findNodeHandle,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -22,7 +23,6 @@ import {
   validatePassword,
   passwordTerms,
   securityQuestions,
-  getPasswordPriorityHint,
 } from "../utility/constant";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -44,6 +44,9 @@ const ChangePassword = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
+  const errorIconRef = useRef(null);
+  const validationIconRef = useRef(null);
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const [securityQuestionsNew, setSecurityQuestionsNew] =
     useState(securityQuestions);
   const route = useRoute();
@@ -52,7 +55,7 @@ const ChangePassword = () => {
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
-  const passwordInputRef = useRef(null);
+  const inputRef = useRef(null);
   const [accessibilityLabelInput, setAccessibilityLabelInput] = useState(undefined);
 
   const handleSavePass = (formData) => {
@@ -79,11 +82,35 @@ const ChangePassword = () => {
     name: "newPassword",
   });
 
-  const handleValidationError = (errors) => {
-    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    if (errors?.newPassword) {
-      passwordInputRef.current?.focus();
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
+
+  
+  // Focus on validation icon when validation alert is shown
+  useEffect(() => {
+    if (showValidationAlert && screenReaderEnabled) {
+      const t = setTimeout(() => {
+        try {
+          if (validationIconRef.current) {
+            const handle = findNodeHandle(validationIconRef.current);
+            if (handle) {
+              AccessibilityInfo.setAccessibilityFocus(handle);
+              AccessibilityInfo.announceForAccessibility("Error icon");
+            }
+          }
+        } catch (e) {
+          console.log("Accessibility focus error:", e);
+        }
+      }, 300);
+
+      return () => clearTimeout(t);
     }
+  }, [showValidationAlert, screenReaderEnabled]);
+
+  const handleValidationError = () => {
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    //setShowValidationAlert(true);
   };
 
   const getSecurityQuestions = () => {
@@ -113,7 +140,7 @@ const ChangePassword = () => {
       const body = { newPassword };
 
       setLoading(true);
-
+  
       // Call the PUT API request
       PutApiRequest(
         request,
@@ -172,6 +199,20 @@ const ChangePassword = () => {
     getSecurityQuestions();
   }, []);
 
+  // useEffect(() => {
+  //   if (newPassword && newPassword.length > 1) {
+  //     const validations = validatePassword(newPassword, profileDetails.userName);
+  //     const firstInvalidIndex = validations.findIndex(isValid => !isValid);
+  //     if (firstInvalidIndex !== -1) {
+  //       setAccessibilityLabelInput(`${passwordTerms[firstInvalidIndex]}`);
+  //     } else {
+  //       setAccessibilityLabelInput("");
+  //     }
+  //   } else {
+  //     setAccessibilityLabelInput("");
+  //   }
+  // }, [newPassword]);
+
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
@@ -205,7 +246,9 @@ const ChangePassword = () => {
                   message="Password and security update failed."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowErrorAlert(false)}
+                  iconRef={errorIconRef}
                 />
                 <NotificationAlert
                   type="error"
@@ -213,7 +256,9 @@ const ChangePassword = () => {
                   message="Please enter valid information to continue."
                   showCloseIcon={true}
                   isVisible={showValidationAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowValidationAlert(false)}
+                  iconRef={validationIconRef}
                 />
               </View>
               <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
@@ -228,8 +273,8 @@ const ChangePassword = () => {
                   <Text
                     style={[AppStyles.requiredField, { marginTop: 10 }]}
                     accessible={true}
-                    importantForAccessibility="yes"
                     accessibilityRole="text"
+                    accessibilityLabel="Fields marked with asterisk are required"
                   >
                     {" "}
                     Fields marked with * are required.
@@ -245,9 +290,11 @@ const ChangePassword = () => {
               >
                 <View
                   style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
+                  ref={inputRef}
                 >
                   <Controller
                     control={control}
+                    
                     name="newPassword"
                     render={({
                       field: { onChange, onBlur, value },
@@ -255,21 +302,21 @@ const ChangePassword = () => {
                     }) => (
                       <>
                         <SparkLightInput
-                          ref={passwordInputRef}
                           placeholder="New Password"
                           onBlur={onBlur}
                           label={"New Password *"}
                           accessibilityHint="Enter your new password"
-                          accessibilityLabel={"New Password"}
+                          accessibilityLabel={"New Password Required"}
                           onChangeText={onChange}
                           value={value}
                           secure={true}
                           error={error?.message}
-                          errorHint={getPasswordPriorityHint(value, profileDetails.userName)}
                         />
                         <View
-                          accessibilityElementsHidden={true}
-                          importantForAccessibility="no-hide-descendants"
+                          accessibilityElementsHidden={isDropDownOpen}
+                          importantForAccessibility={
+                            isDropDownOpen ? "no-hide-descendants" : "no"
+                          }
                           style={[
                             styles.passwordFlexBox,
                             { marginTop: Padding.p_base },

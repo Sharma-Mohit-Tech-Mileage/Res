@@ -15,8 +15,6 @@ export const theme = {
     surface: Color.sparklightWhite,
     surfaceVariant: Color.gray50,
     background: Color.colorWhitesmoke_200,
-    freedatabackground:Color.sparklight_blue,
-    upload:Color.sparklight_blue,
 
     // Text colors
     text: {

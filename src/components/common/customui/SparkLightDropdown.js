@@ -1,40 +1,60 @@
-import React, { useRef, useState, useMemo, useCallback } from 'react';
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Text,
-  Modal,
-  SafeAreaView,
-  Pressable,
-  findNodeHandle,
+import React, { useRef, useEffect } from 'react';
+import { 
+  StyleSheet, 
+  View, 
+  TouchableOpacity, 
+  Text, 
+  Modal, 
+  SafeAreaView, 
+  Pressable, 
+  findNodeHandle, 
   AccessibilityInfo,
-  Platform,
+  Platform
 } from 'react-native';
 import { Box } from 'native-base';
-import { Padding, Color, FontFamily, FontSize } from '../../../../GlobalStyles';
-import DownArrow from '../../../res/svgIcons/DownArrow';
-
+import { Padding, Color, FontFamily, FontSize } from "../../../../GlobalStyles"; 
+import DownArrow from '../../../res/svgIcons/DownArrow';    
 const SparkLightDropdown = ({
   items,
   selectedValue,
   onValueChange,
   style,
   dropDownStyle,
-  isDropDownOpen = () => { },
-  dropdownTitle = 'Select an option',
-  accessibilityItemName = 'option',
-  placeholder = 'Select an option',
+  isDropDownOpen = () => {},
+  dropdownTitle = "Select Security Question", // Modal header title (customizable)
+  accessibilityItemName = "security question", // Used in accessibility announcements
+  placeholder = "Select an option" // Placeholder text when no option is selected
 }) => {
-  const validItems = useMemo(() => (Array.isArray(items) ? items : []), [items]);
-  const [visible, setVisible] = useState(false);
+  const validItems = Array.isArray(items) ? items : [];
+  const [visible, setVisible] = React.useState(false);
+  const visibleRef = useRef(false);
   const dropdownRef = useRef(null);
+  const optionsListRef = useRef(null);
+  const firstOptionRef = useRef(null);
 
-  const getAccessibilityLabel = useCallback(() => {
-    return selectedValue ? `Currently selected: ${selectedValue}` : 'No option selected';
-  }, [selectedValue]);
+  useEffect(() => {
+    visibleRef.current = visible;
+  }, [visible]);
 
-  const focusDropdown = useCallback((announcement) => {
+  const getAccessibilityLabel = () => {
+    return selectedValue 
+      ? `Currently selected: ${selectedValue}`
+      : "No option selected";
+  };
+
+  const openPicker = () => {
+    setVisible(true);
+    isDropDownOpen(true);
+  };
+
+  const closePicker = () => {
+    // Guard: Modal callbacks (e.g., onDismiss + onRequestClose) can fire close twice.
+    if (!visibleRef.current) return;
+
+    setVisible(false);
+    isDropDownOpen(false);
+
+    // Return focus to dropdown after modal closes
     setTimeout(() => {
       if (dropdownRef.current) {
         const handle = findNodeHandle(dropdownRef.current);
@@ -42,42 +62,17 @@ const SparkLightDropdown = ({
           AccessibilityInfo.setAccessibilityFocus(handle);
         }
       }
-      if (announcement) {
-        AccessibilityInfo.announceForAccessibility(announcement);
-      }
-    }, 120);
-  }, []);
+    }, 100);
+  };
 
-  const openPicker = useCallback(() => {
-    setVisible(true);
-    isDropDownOpen(true);
-    AccessibilityInfo.announceForAccessibility(`${accessibilityItemName} dropdown opened`);
-  }, [accessibilityItemName, isDropDownOpen]);
+  const handleSelect = (value) => {
+    onValueChange(value);
 
-  const closePicker = useCallback(() => {
-    setVisible(false);
-    isDropDownOpen(false);
-    focusDropdown(`${accessibilityItemName} dropdown closed`);
-  }, [accessibilityItemName, isDropDownOpen, focusDropdown]);
-
-  const handleSelect = useCallback(
-    (value) => {
-      onValueChange?.(value);
-
-      setTimeout(() => {
-        setVisible(false);
-        isDropDownOpen(false);
-        focusDropdown(`Selected ${value}`);
-      }, 80);
-    },
-    [onValueChange, isDropDownOpen, focusDropdown]
-  );
-
-  const dropdownFontSize = FontSize.size_base || 16;
-  const dropdownLineHeight = Math.ceil(dropdownFontSize * 1.25);
-
-  const optionFontSize = 16;
-  const optionLineHeight = 20;
+    // Delay closing modal slightly to avoid TalkBack double-speaking
+    setTimeout(() => {
+      closePicker();
+    }, 50);
+  };
 
   return (
     <Box style={[styles.container, style]}>
@@ -85,113 +80,96 @@ const SparkLightDropdown = ({
         ref={dropdownRef}
         style={[styles.dropdown, dropDownStyle]}
         onPress={openPicker}
-        accessible
-        accessibilityRole="button"
+        accessible={true}
+        accessibilityRole={Platform.OS === 'android' ? undefined : 'button'}
         accessibilityLabel={getAccessibilityLabel()}
-        accessibilityHint={`Double tap to open ${accessibilityItemName} options`}
-        accessibilityState={{ expanded: visible }}
+        accessibilityHint={`Open ${accessibilityItemName} options`}
+        accessibilityState={Platform.OS === 'android' ? undefined : { expanded: visible }}
       >
-        <Text
-          style={[
-            styles.dropdownText,
-            {
-              fontSize: dropdownFontSize,
-              lineHeight: dropdownLineHeight,
-              ...(Platform.OS === 'android' ? { includeFontPadding: false } : null),
-            },
-          ]}
-          accessible={false}
-        >
+        <Text style={styles.dropdownText} accessible={false} importantForAccessibility="no">
           {selectedValue || placeholder}
         </Text>
-
-        <View style={styles.iconWrap} pointerEvents="none">
-          <DownArrow />
-        </View>
+        <DownArrow accessible={false} />
+        
       </TouchableOpacity>
 
       <Modal
         visible={visible}
-        transparent
+        transparent={true}
         animationType="slide"
         onRequestClose={closePicker}
-        onDismiss={closePicker}
       >
         <View style={styles.modalContainer}>
-          <Pressable
-            style={styles.backdrop}
+          <Pressable 
+            style={styles.backdrop} 
             onPress={closePicker}
-            accessible
-            accessibilityRole="button"
-            accessibilityLabel="Close dropdown"
+            accessible={false}
+            importantForAccessibility="no"
           />
-
-          <View style={styles.pickerContainer} accessibilityViewIsModal importantForAccessibility="yes">
+          <View 
+            style={styles.pickerContainer}
+            accessibilityViewIsModal={true}
+            importantForAccessibility="yes"
+          >
             <View style={styles.header}>
-              <View style={styles.grabber} accessible={false} />
+              <View style={styles.grabber} accessible={false} importantForAccessibility="no" />
               <View style={styles.headerContent}>
-                <Text style={styles.headerTitle} accessible accessibilityRole="text">
+                <Text ref={optionsListRef}
+                  style={styles.headerTitle}
+                  accessible={true}
+                  accessibilityRole="text"
+                >
                   {dropdownTitle}
                 </Text>
-
-                <TouchableOpacity
+                <TouchableOpacity 
                   onPress={closePicker}
                   style={styles.closeButton}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  accessible
+                  accessible={true}
                   accessibilityRole="button"
                   accessibilityLabel="Close dropdown"
                 >
-                  <Text style={styles.closeButtonText} accessible={false}>
-                    ✕
-                  </Text>
+                  <Text style={styles.closeButtonText} accessible={false} importantForAccessibility="no">✕</Text>
                 </TouchableOpacity>
               </View>
             </View>
-
-            <SafeAreaView style={styles.optionsList}>
-              {validItems.map((item, index) => {
-                const isSelected = selectedValue === item;
-                return (
-                  <TouchableOpacity
-                    key={`${item}-${index}`}
+            <SafeAreaView 
+              
+              style={styles.optionsList}
+              accessible={false}
+            >
+              {validItems.map((item, index) => (
+                <TouchableOpacity
+                  ref={index === 0 ? firstOptionRef : null}
+                  key={index}
+                  style={[
+                    styles.option,
+                    selectedValue === item && styles.selectedOption,
+                    index === 0 && styles.firstOption,
+                    index === validItems.length - 1 && styles.lastOption
+                  ]}
+                  onPress={() => handleSelect(item)}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${item}${selectedValue === item ? ', selected' : ''}`}
+                  accessibilityHint={`${index+1} of ${validItems.length}. Double tap to select`}
+                  accessibilityState={{ selected: selectedValue === item }}
+                >
+                  <Text 
                     style={[
-                      styles.option,
-                      isSelected && styles.selectedOption,
-                      index === 0 && styles.firstOption,
-                      index === validItems.length - 1 && styles.lastOption,
-                    ]}
-                    onPress={() => handleSelect(item)}
-                    accessible
-                    accessibilityRole="button"
-                    accessibilityLabel={`${item}, ${index + 1} of ${validItems.length}${isSelected ? ', selected' : ''
-                      }`}
-                    accessibilityHint={`Double tap to select this ${accessibilityItemName}`}
-                    accessibilityState={{ selected: isSelected }}
+                      styles.optionText,
+                      selectedValue === item && styles.selectedOptionText
+                    ]} 
+                    accessible={false}
+                    importantForAccessibility="no"
                   >
-                    <Text
-                      style={[
-                        styles.optionText,
-                        {
-                          fontSize: optionFontSize,
-                          lineHeight: optionLineHeight,
-                          ...(Platform.OS === 'android' ? { includeFontPadding: false } : null),
-                        },
-                        isSelected && styles.selectedOptionText,
-                      ]}
-                      accessible={false}
-                    >
-                      {item}
-                    </Text>
-
-                    {isSelected && (
-                      <Text style={styles.checkmark} accessible={false}>
-                        ✓
-                      </Text>
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
+                    {item}
+                  </Text>
+                  {selectedValue === item && (
+                    <Text style={styles.checkmark} accessible={false} importantForAccessibility="no">✓</Text>
+                  )}
+                </TouchableOpacity>
+              ))}
             </SafeAreaView>
           </View>
         </View>
@@ -200,68 +178,69 @@ const SparkLightDropdown = ({
   );
 };
 
+// Styles remain unchanged
 const styles = StyleSheet.create({
   container: {
     marginTop: 8,
   },
-
   dropdown: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     paddingHorizontal: Padding.p_base,
-    paddingVertical: 12,
-    minHeight: 48,
+    color: Color.colorGray_200,
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    paddingVertical: Padding.p_xs,
+    minHeight: 48, // Changed from fixed height to minHeight
     backgroundColor: '#FFFFFF',
     borderRadius: 4,
-    borderColor: '#C7C7CC',
+    borderColor:'#C7C7CC',
     borderWidth: 1,
   },
-
   dropdownText: {
     flex: 1,
     color: Color.colorGray_200,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
-    flexWrap: 'wrap',
-    paddingRight: 8,
+    flexWrap: 'wrap', // Allow text to wrap
+    paddingRight: 8, // Ensure space between text and icon
   },
-
-  iconWrap: {
-    alignSelf: 'stretch',
-    justifyContent: 'center',
+  chevron: {
+    fontSize: 12,
+    color: Color.colorGray_200,
     marginLeft: 8,
-    paddingTop: 2,
+    marginTop:12,
+    alignSelf: 'center',
   },
-
   modalContainer: {
     flex: 1,
     justifyContent: 'flex-end',
   },
-
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
-
   pickerContainer: {
     backgroundColor: '#F2F2F7',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     maxHeight: '80%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
   },
-
   header: {
     backgroundColor: '#F2F2F7',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     paddingTop: 8,
   },
-
   grabber: {
     width: 36,
     height: 5,
@@ -270,7 +249,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 8,
   },
-
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -280,14 +258,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#C6C6C8',
   },
-
   headerTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#000000',
     textAlign: 'center',
   },
-
   closeButton: {
     position: 'absolute',
     right: 16,
@@ -297,17 +273,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   closeButtonText: {
     fontSize: 18,
     color: '#000',
     fontWeight: '800',
   },
-
   optionsList: {
     backgroundColor: '#F2F2F7',
   },
-
   option: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -318,30 +291,25 @@ const styles = StyleSheet.create({
     borderBottomColor: '#C6C6C8',
     minHeight: 44,
   },
-
   firstOption: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#C6C6C8',
   },
-
   lastOption: {
     borderBottomWidth: 0,
   },
-
   selectedOption: {
     backgroundColor: '#FFFFFF',
   },
-
   optionText: {
+    fontSize: 16,
     color: '#000000',
     flex: 1,
     fontFamily: FontFamily.openSansRegular,
   },
-
   selectedOptionText: {
     color: '#007AFF',
   },
-
   checkmark: {
     color: '#007AFF',
     fontSize: 17,

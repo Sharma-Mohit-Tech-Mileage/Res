@@ -26,8 +26,6 @@ const PasswordSecurityEdit = () => {
   const dispatch = useDispatch();
   const scrollViewRef = useRef(null);
   const mainContentRef = useRef(null);
-  const securityQuestionRef = useRef(null);
-  const securityAnswerRef = useRef(null);
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -110,16 +108,10 @@ const PasswordSecurityEdit = () => {
 
 
 
-  const handleValidationError = (errors) => {
+  const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setShowValidationAlert(true);
     announceForAccessibility("Please fix validation errors before saving");
-    const fieldOrder = [
-      { key: "securityQuestion", ref: securityQuestionRef },
-      { key: "securityAnswer", ref: securityAnswerRef },
-    ];
-    const firstInvalid = fieldOrder.find((f) => errors?.[f.key]);
-    if (firstInvalid) firstInvalid.ref.current?.focus();
   };
 
 
@@ -214,7 +206,7 @@ const PasswordSecurityEdit = () => {
                   >
                     Security Question
                   </Text>
-                  <Text style={[AppStyles.requiredField]} accessible={true} importantForAccessibility="yes" accessibilityRole="text">
+                  <Text style={[AppStyles.requiredField]} accessible={true} accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
                   {" "}
                   Fields marked with * are required.
                 </Text>
@@ -225,9 +217,9 @@ const PasswordSecurityEdit = () => {
                   <View style={styles.textinput}>
                     <Text
                       style={[styles.firstName1, styles.firstTypo]}
-                      accessible={true}
-                      importantForAccessibility="yes"
-                      accessibilityRole="text"
+                      accessible={!dropdownFocused}
+                      accessibilityLabel="Password Reset Question Required"
+                      
                     >
                       Password Reset Question *
                     </Text>
@@ -236,7 +228,7 @@ const PasswordSecurityEdit = () => {
                       selectedValue={customSecurityQuestion}
                       onValueChange={handleSecurityQuestionChange}
                       isDropDownOpen={handleDropdownStateChange}
-                      accessibilityLabel="Password Reset Question Required"
+                      accessibilityLabel="Select security question Required"
                       accessibilityHint="Double tap to open security question options"
                     />
                   </View>
@@ -253,7 +245,6 @@ const PasswordSecurityEdit = () => {
                         name="securityQuestion"
                         render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                           <SparkLightInput
-                            ref={securityQuestionRef}
                             onBlur={onBlur}
                             label="Type your Question"
                             onChangeText={onChange}
@@ -274,9 +265,9 @@ const PasswordSecurityEdit = () => {
 
                   <Text
                       style={[styles.firstName1, styles.firstTypo,{marginBottom:8}]}
-                      accessible={true}
-                      importantForAccessibility="yes"
-                      accessibilityRole="text"
+                      accessible={!dropdownFocused}
+                      accessibilityLabel="Password Reset Answer Required"
+                      
                     >
                       Password Reset Answer *
                     </Text>
@@ -285,12 +276,11 @@ const PasswordSecurityEdit = () => {
                     name="securityAnswer"
                     render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                       <SparkLightInput
-                        ref={securityAnswerRef}
                         onBlur={onBlur}
                         onChangeText={onChange}
+                        
                         value={value}
                         error={error?.message}
-                        accessibilityLabel="Password Reset Answer"
                         accessibilityHint="Enter your answer to the security question"
                       />
                     )}
