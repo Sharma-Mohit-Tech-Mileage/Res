@@ -1,6 +1,6 @@
 // components/WelcomeCard.js
 import React,{useEffect} from 'react';
-import { View, Text, StyleSheet,AccessibilityInfo , Linking} from 'react-native';
+import { View, Text, StyleSheet,AccessibilityInfo , Linking,Image} from 'react-native';
 import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalStyles';
 import VideoPlayer from '../utility/VideoPlayer';
 
@@ -22,11 +22,16 @@ const WelcomeCard = () => {
 
   return (
     <View style={styles.container}> 
-      <Text style={styles.title} accessibilityRole="header" accessibilityLevel={1} accessible={true} accessibilityLabel="We're Excited to Connect with you!">We're Excited to Connect with you!</Text>
+      
       
       <View style={styles.videoContainer} >
-        <VideoPlayer videoId={videoId} />
+        {/* <VideoPlayer videoId={videoId} /> */}
         
+        <Image
+          source={require('../../../assets/welcome-banner-home.png')}
+          style={{ width: '100%', height: '100%' }}
+        />
+        <Text style={[styles.title,{position: 'absolute', top: 50, left: 10,width:200}]} accessibilityRole="header" accessibilityLevel={1} accessible={true} accessibilityLabel="We're Excited to Connect with you!">We're Excited to Connect with you!</Text>
       </View>
       {isAccessibilityEnabled && (
         <>
@@ -57,8 +62,9 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_base,
   },
   title: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_5xl,
+    lineHeight:26,
     color: Color.colorGray_200,
     marginBottom: Padding.p_5xl,
     fontWeight: '700',
