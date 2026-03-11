@@ -416,6 +416,8 @@ const InAppNotifications = ({ navigation }) => {
                   description="Receive app notifications for billing."
                   onChange={handleToggleChange}
                 />
+              </View>
+              </View>
 
                 <View style={styles.buttonsParent}>
                   <Pressable
@@ -454,8 +456,6 @@ const InAppNotifications = ({ navigation }) => {
                       Cancel
                     </Text>
                   </Pressable>
-                </View>
-              </View>
             </View>
           </View>
         </View>
