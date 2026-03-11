@@ -78,7 +78,7 @@ const buildInjectionScript = (token, userInfo, idToken) => {
             var self = this;
             var _ts = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
             var payload = '';
-            try { if (body) payload = typeof body === 'string' ? body.substring(0, 500) : JSON.stringify(body).substring(0, 500); } catch(e) {}
+            try { if (body) payload = typeof body === 'string' ? body : JSON.stringify(body); } catch(e) {}
             // Cookie diagnostics: capture what cookies the browser will send
             var _cookies = '';
             try {
@@ -95,7 +95,7 @@ const buildInjectionScript = (token, userInfo, idToken) => {
             this.addEventListener('load', function() {
                 var rTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
                 var respSnippet = '';
-                try { respSnippet = (self.responseText || '').substring(0, 300); } catch(e) {}
+                try { respSnippet = self.responseText || ''; } catch(e) {}
                 window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
                     type: 'networkLog', phase: 'response', ts: rTs,
                     method: self._method, url: self._url, status: self.status, body: respSnippet
@@ -127,7 +127,7 @@ const buildInjectionScript = (token, userInfo, idToken) => {
             var fMethod = (init && init.method) || 'GET';
             var fTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
             var fPayload = '';
-            try { if (init && init.body) fPayload = String(init.body).substring(0, 500); } catch(e) {}
+            try { if (init && init.body) fPayload = String(init.body); } catch(e) {}
             window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
                 type: 'networkLog', phase: 'request', ts: fTs,
                 method: fMethod, url: fUrl, payload: fPayload

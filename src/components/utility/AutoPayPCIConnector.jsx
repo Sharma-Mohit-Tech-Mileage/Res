@@ -31,7 +31,7 @@ if ('${safe}') document.cookie = 'IdToken=${safe}; path=/; expires=' + _short + 
 
 // ── Injection script (injectedJavaScriptBeforeContentLoaded) ──
 // Seeds localStorage + cookies before page JS runs. PING/PONG for alive check.
-// No XHR/Fetch interceptors, no form state (PCI-DSS: no saving card inputs).
+// Network activity logging (XHR + Fetch) for debugging — no form state (PCI-DSS: no saving card inputs).
 const buildInjectionScript = (token, userInfo, idToken) => {
     const safeToken = (token || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
     const safeUserInfo = (typeof userInfo === 'string' ? userInfo : JSON.stringify(userInfo || {}))
@@ -44,6 +44,78 @@ const buildInjectionScript = (token, userInfo, idToken) => {
             localStorage.setItem('user_info', '${safeUserInfo}');
         }
         try { ${buildCookieJS(idToken)} } catch(e) {}
+
+        // ── Network activity logging (XHR) ──
+        var _xo = XMLHttpRequest.prototype.open, _xs = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.open = function(m, u) {
+            this._method = m;
+            this._url = u;
+            return _xo.apply(this, arguments);
+        };
+        XMLHttpRequest.prototype.send = function(body) {
+            var self = this;
+            var _ts = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+            var payload = '';
+            try { if (body) payload = typeof body === 'string' ? body : JSON.stringify(body); } catch(e) {}
+            var _cookies = '';
+            try {
+                var dc = document.cookie || '';
+                var idMatch = dc.match(/IdToken=([^;]{0,20})/);
+                var hasSource = dc.includes('Source=');
+                var hasCType = dc.includes('CustomerType=');
+                _cookies = 'IdToken=' + (idMatch ? idMatch[1] + '...' : 'MISSING') + ' | Source=' + (hasSource ? 'YES' : 'MISSING') + ' | CustomerType=' + (hasCType ? 'YES' : 'MISSING') + ' | cookieLen=' + dc.length;
+            } catch(e) { _cookies = 'READ_ERROR'; }
+            window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'networkLog', phase: 'request', ts: _ts,
+                method: self._method, url: self._url, payload: payload, cookies: _cookies
+            }));
+            this.addEventListener('load', function() {
+                var rTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+                var respSnippet = '';
+                try { respSnippet = self.responseText || ''; } catch(e) {}
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'networkLog', phase: 'response', ts: rTs,
+                    method: self._method, url: self._url, status: self.status, body: respSnippet
+                }));
+            });
+            this.addEventListener('error', function() {
+                var eTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'networkLog', phase: 'error', ts: eTs,
+                    method: self._method, url: self._url, error: 'XHR network error'
+                }));
+            });
+            return _xs.apply(this, arguments);
+        };
+
+        // ── Network activity logging (fetch) ──
+        var _fetch = window.fetch;
+        window.fetch = function(input, init) {
+            var fUrl = typeof input === 'string' ? input : (input.url || '');
+            var fMethod = (init && init.method) || 'GET';
+            var fTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+            var fPayload = '';
+            try { if (init && init.body) fPayload = String(init.body); } catch(e) {}
+            window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'networkLog', phase: 'request', ts: fTs,
+                method: fMethod, url: fUrl, payload: fPayload
+            }));
+            return _fetch.apply(this, arguments).then(function(resp) {
+                var rTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'networkLog', phase: 'response', ts: rTs,
+                    method: fMethod, url: fUrl, status: resp.status
+                }));
+                return resp;
+            }).catch(function(err) {
+                var eTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
+                    type: 'networkLog', phase: 'error', ts: eTs,
+                    method: fMethod, url: fUrl, error: err.message
+                }));
+                throw err;
+            });
+        };
 
         window.addEventListener('message', function(e) {
             if (e.data === 'PING') {
@@ -473,7 +545,22 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                         aliveCheckResolver.current = null;
                     }
                     break;
+                case 'networkLog': {
+                    const { phase, ts: nTs, method, url: nUrl, status, payload, body, error } = data;
+                    if (nUrl && (nUrl.includes('analytics.google.com') || nUrl.includes('google-analytics.com'))) break;
+                    if (phase === 'request') {
+                        const cookieInfo = data.cookies ? ` | cookies: ${data.cookies}` : '';
+                        console.log(`${TAG} [${nTs}] REQUEST ${method} → ${nUrl}${payload ? ' | payload: ' + payload : ''}${cookieInfo}`);
+                    } else if (phase === 'response') {
+                        const statusLabel = status >= 400 ? 'FAIL' : 'OK';
+                        console.log(`${TAG} [${nTs}] RESPONSE [${statusLabel}] ${method} ← ${status} ${nUrl}${body ? ' | body: ' + body : ''}`);
+                    } else if (phase === 'error') {
+                        console.error(`${TAG} [${nTs}] ERROR ${method} FAILED ${nUrl} | ${error}`);
+                    }
+                    break;
+                }
                 case 'injectionComplete':
+                    console.log(`${TAG} Injection script completed`);
                     break;
                 default:
                     break;
