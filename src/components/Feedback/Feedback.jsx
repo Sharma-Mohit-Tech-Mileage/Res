@@ -176,6 +176,7 @@ const Feedback = () => {
               accessible={true}
               importantForAccessibility="yes"
               accessibilityRole="text"
+              accessibilityLabel="Fields marked with asterisk are required"
             >
               Fields marked with * are required.
             </Text>

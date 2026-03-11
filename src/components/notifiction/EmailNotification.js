@@ -323,7 +323,8 @@ const AddNotificationScreen = () => {
                style={AppStyles.requiredField}
                   accessible={true}
                   importantForAccessibility="yes"
-                  accessibilityRole="text">
+                  accessibilityRole="text"
+                  accessibilityLabel="Fields marked with asterisk are required">
                 {" "}
                 Fields marked with * are required.
               </Text>

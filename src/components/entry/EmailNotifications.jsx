@@ -168,6 +168,7 @@ const EmailNotifications = ({ navigation }) => {
                   accessible={true}
                   importantForAccessibility="yes"
                   accessibilityRole="text"
+                  accessibilityLabel="Email Address Required"
                 >
                   Email Address *
                 </Text>

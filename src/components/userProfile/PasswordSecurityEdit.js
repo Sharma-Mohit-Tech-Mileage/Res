@@ -214,7 +214,7 @@ const PasswordSecurityEdit = () => {
                   >
                     Security Question
                   </Text>
-                  <Text style={[AppStyles.requiredField]} accessible={true} importantForAccessibility="yes" accessibilityRole="text">
+                  <Text style={[AppStyles.requiredField]} accessible={true} importantForAccessibility="yes" accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
                   {" "}
                   Fields marked with * are required.
                 </Text>
@@ -228,6 +228,7 @@ const PasswordSecurityEdit = () => {
                       accessible={true}
                       importantForAccessibility="yes"
                       accessibilityRole="text"
+                      accessibilityLabel="Password Reset Question Required"
                     >
                       Password Reset Question *
                     </Text>
