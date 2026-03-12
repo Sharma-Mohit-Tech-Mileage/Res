@@ -32,6 +32,7 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from "../utility/validationSchema"; 
+import colors from "../../res/Colors";
 import AppStyles from "../utility/AppStyles";
 const ChangePassword = () => {
   const navigation = useNavigation();
