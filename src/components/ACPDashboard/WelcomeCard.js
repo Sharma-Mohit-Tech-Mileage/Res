@@ -18,11 +18,21 @@ import {
 } from "../../../GlobalStyles";
 
 import PlayIcon from "../../../assets/svgs/PlayIcon";
+import { useFeatureFlag } from "../../contexts/Featureflagscontext";
+import FeatureFlags from "../../config/Featureflags";
 
 const WelcomeCard = () => {
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] =
     React.useState(false);
-  const [isActive, setIsActive] = React.useState(true);
+  const isMarketingBannerEnabled = useFeatureFlag(
+    FeatureFlags.DASHBOARD_SPARKLIGHT_MOBILE_SECTION,
+    false
+  );
+
+  const isNewDashboardEnabled = useFeatureFlag(
+    FeatureFlags.DASHBOARD_NEW_LAYOUT,
+    false
+  );
   // YouTube video ID
   const videoId = "C3cMQoWxv6I";
   //  useEffect(() => {
@@ -70,7 +80,9 @@ const WelcomeCard = () => {
         </Text>
         <Pressable
           style={{ width:120, marginTop: 5 ,backgroundColor: Color.sparklightBrightPurple,borderRadius: 50,padding:Padding.p_base}}
-          
+          onPress={()=>{
+            Linking.openURL("https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome")
+          }}
         >
           <Text style={{color: Color.sparklightWhite,fontFamily: FontFamily.openSansSemiBold,fontSize: FontSize.size_lg,fontWeight: "600",textAlign:'center'}} accessible={true} accessibilityRole="button" accessibilityLabel="Get Offer Button">
             Get Offer
@@ -170,7 +182,7 @@ const WelcomeCard = () => {
 
   return (
     <View style={styles.container}>
-      {!isActive ? renderOfferBanner() : renderWelcomeBanner()}
+      {isNewDashboardEnabled ? renderOfferBanner() : renderWelcomeBanner()}
     </View>
   );
 };

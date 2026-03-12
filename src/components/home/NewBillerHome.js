@@ -419,10 +419,10 @@ const NewBillerHome = ({ navigation }) => {
             navigation.navigate("account", { screen: "Notifications" })
           }
         />
-        <InfoBanner
+        {/* <InfoBanner
           message="We are working diligently to enhance your experience"
           icon="megaphone"
-        />
+        /> */}
         </View>
       </View>
     </View>
