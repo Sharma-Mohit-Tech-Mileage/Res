@@ -22,7 +22,7 @@ import PlayIcon from "../../../assets/svgs/PlayIcon";
 const WelcomeCard = () => {
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] =
     React.useState(false);
-  const [isActive, setIsActive] = React.useState(false);
+  const [isActive, setIsActive] = React.useState(true);
   // YouTube video ID
   const videoId = "C3cMQoWxv6I";
   //  useEffect(() => {
@@ -90,6 +90,7 @@ const WelcomeCard = () => {
           <Image
             source={require("../../../assets/welcome-banner-home.png")}
             style={{ width: "100%", height: "100%" }}
+            resizeMode='stretch'
           />
           <View
             style={{
