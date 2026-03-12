@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, findNodeHandle} from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -19,6 +19,8 @@ import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSui
 import { getPrimaryEmail } from "../utility/constant";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
+import { A11y } from "react-native-a11y-order";
+import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({
@@ -32,6 +34,10 @@ const AddNotificationScreen = () => {
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
+  const successIconRef = useRef(null);
+  const [successRef, setSuccessFocus] = useAccessibilityFocus();
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [isTermRequired, setIsTermRequired] = useState(false);
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const user = useSelector((state) => state.user.userData);
@@ -55,6 +61,9 @@ const AddNotificationScreen = () => {
   });
   const primaryEmail = accountDetails ? getPrimaryEmail(accountDetails) : "";
 
+ 
+  const [messageRef, setMessageFocus] = useAccessibilityFocus();
+
   const {
     control,
     handleSubmit,
@@ -62,7 +71,6 @@ const AddNotificationScreen = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
-    mode: "onBlur",
     defaultValues: {
       email: primaryEmail || route.params?.additionalData?.email || "",
     },
@@ -78,9 +86,34 @@ const AddNotificationScreen = () => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
   }, []);
 
+
+
   useEffect(() => {
     if (notification && screenReaderEnabled) {
-      AccessibilityInfo.announceForAccessibility(notification.message);
+      // Focus only (no extra announcements).
+      // On iOS, focus can be stolen by the header/back during the notification animation,
+      // so we delay slightly longer and retry once.
+      const delays = Platform.OS === "ios" ? [900, 1600] : [600, 1200];
+
+      const timers = delays.map((ms) =>
+        setTimeout(() => {
+          try {
+            if (notification.type === "success" && successIconRef.current) {
+              const handle = findNodeHandle(successIconRef.current);
+              if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+              return;
+            }
+
+            setMessageFocus();
+          } catch (e) {
+            console.log("Accessibility focus error:", e);
+          }
+        }, ms)
+      );
+
+      return () => {
+        timers.forEach(clearTimeout);
+      };
     }
   }, [notification, screenReaderEnabled]);
 
@@ -115,6 +148,7 @@ const AddNotificationScreen = () => {
         setIsSubmitting(false);
         setToggleCheckBoxTerm(false);
       }
+      setFocusEmail();
     };
   
     updateAccountDetails();
@@ -122,13 +156,16 @@ const AddNotificationScreen = () => {
 
 
 
-  // Use the imperative focus() method which handles accessibility focus internally
+  //
   const setFocusEmail = () => {
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 100);
+      // setTimeout(() => {
+      //   if (inputRef.current) {
+      //     const handle = findNodeHandle(inputRef.current);
+      //     if (handle) {
+      //       AccessibilityInfo.setAccessibilityFocus(handle);
+      //     }
+      //   }
+      // }, 100);
     };
   
 
@@ -219,15 +256,7 @@ const AddNotificationScreen = () => {
     ]
   );
 
-  const handleValidationError = useCallback((errors) => {
-    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    if (errors?.email) {
-      AccessibilityInfo.announceForAccessibility(errors.email.message);
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 300);
-    }
-  }, []);
+  const handleValidationError = useCallback(() => {}, [animateNotification]);
 
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);
@@ -272,18 +301,18 @@ const AddNotificationScreen = () => {
                   transform: [{ translateY }],
                   paddingHorizontal: Padding.p_5xl,
                 }}
-                accessible={true}
+                accessible={false}
               >
-                <View style={styles.spaceBottom}>
+                <View style={styles.spaceBottom} ref={messageRef} >
                   <NotificationAlert
                     type={notification.type}
                     title={notification.type === "error" ? "Error" : "Success"}
                     message={notification.message}
                     showCloseIcon={true}
                     onClose={() => setNotification(null)}
-                    accessibilityLiveRegion="assertive"
-                    accessibilityRole="alert"
-                    accessibilityLabel={notification.message}
+                    isVisible={true}
+                    autoFocusTitle={false}
+                    iconRef={successIconRef}
                   />
                 </View>
               </Animated.View>
@@ -321,10 +350,9 @@ const AddNotificationScreen = () => {
 
               <Text
                style={AppStyles.requiredField}
+                  accessibilityRole="text" 
                   accessible={true}
-                  importantForAccessibility="yes"
-                  accessibilityRole="text"
-                  accessibilityLabel="Fields marked with asterisk are required">
+                  accessibilityLabel="Fields marked with asterisk are required.">
                 {" "}
                 Fields marked with * are required.
               </Text>
@@ -339,13 +367,14 @@ const AddNotificationScreen = () => {
                     value={value ? value.toLowerCase() : ""}
                     error={errors.email?.message}
                     label="Email Address *"
-                    accessibilityLabel="Email Address"
-                    required={true}
+                    accessibilityLabel="Email address Required"
+                    accessibilityHint={"required text field. double tap to edit"}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
                     style={styles.emailInput}
                     ref={inputRef}
+                    
                   />
                 )}
               />
@@ -355,7 +384,13 @@ const AddNotificationScreen = () => {
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
               <View style={styles.toggleHeader}>
-                <Text style={[styles.toggleTitle, { flex: 0.86 }]}>
+                <Text style={[styles.toggleTitle, { flex: 0.86 }]} accessibilityRole="text" 
+                accessible={true}  
+                accessibilityLabel={`Critical Notifications, ${
+                primaryEmail ? "enabled" : "disabled"
+              }, cannot be changed`}
+                accessibilityHint="Receive critical information, account changes, and service
+                updates.">
                   Critical Notifications
                 </Text>
                 <View style={[styles.iconContainer, { flex: 0.14 }]}>
@@ -367,44 +402,53 @@ const AddNotificationScreen = () => {
                     )}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
-                  <Text style={styles.toggleStatus}>
+                  <Text style={styles.toggleStatus} accessible={false} importantForAccessibility="no">
                     {primaryEmail ? "On" : "Off"}
                   </Text>
                 </View>
               </View>
-              <Text style={styles.toggleDescription}>
+              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
                 Receive critical information, account changes, and service
                 updates.
               </Text>
             </View>
             <View style={styles.divider} />
-            <View
-              style={{
-                paddingTop: Padding.p_base,
-                paddingBottom: 8,
-                paddingHorizontal: Padding.p_5xl,
-              }}
+            <A11y.Order
+              style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
               <View style={styles.toggleHeader}>
-                <Text style={[styles.toggleTitle, { flex: 0.9 }]}>
+                <A11y.Index index={0} style={[styles.toggleTitle, { flex: 0.9 }]}>
+                <Text
+                  style={[styles.toggleTitle]}
+                  accessible={true}
+                  accessibilityRole="text"
+                  accessibilityLabel="Paperless Billing for email notifications"
+                  accessibilityHint="Opt for email statements and say goodbye to paper clutter. It's
+                convenient, eco-friendly, and keeps your information at your
+                fingertips."
+                >
                   Paperless Billing
                 </Text>
-                <View style={{ flex: 0.1 }}>
+                </A11y.Index>
+                <View style={{ flex: 0.1 }} accessible={false} importantForAccessibility="no">
+                  <A11y.Index index={1}>
                   <Toggle
                     name="paperlessBilling"
                     initialValue={paperlessStatusAcp || false}
                     onToggle={handleToggleChange}
                     disabled={!toggleCheckBoxTerm && !paperlessStatusAcp}
                     section="paperless"
+                    description={paperlessStatusAcp ? "Paperless Billing is enabled." : "Need to accept Paperless Billing Terms & Conditions to enable this toggle. Swipe to take action."}
                   />
+                  </A11y.Index>
                 </View>
               </View>
-              <Text style={styles.toggleDescription}>
+              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
                 Opt for email statements and say goodbye to paper clutter. It's
                 convenient, eco-friendly, and keeps your information at your
                 fingertips.
               </Text>
-            </View>
+            </A11y.Order>
             {isCheckboxVisible && (
               <View style={styles.checkBoxArea}>
                 <TouchableOpacity
@@ -428,6 +472,7 @@ const AddNotificationScreen = () => {
                         false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
                       }}
                       accessible={false}
+                      importantForAccessibility="no"
                     />
                     <Text
                       style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
@@ -468,10 +513,6 @@ const AddNotificationScreen = () => {
                 marginHorizontal: Padding.p_5xl,
                 marginBottom: 16,
               }}
-              accessible={true}
-              accessibilityRole="alert"
-              accessibilityLiveRegion="assertive"
-              accessibilityLabel="Please agree to the Terms and Conditions to proceed."
             >
               <View
                 style={{
