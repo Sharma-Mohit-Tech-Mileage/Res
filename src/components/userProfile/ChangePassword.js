@@ -31,8 +31,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
-import { passwordSchema } from "../utility/validationSchema"; // Update the path as necessary
-import colors from "../../res/Colors";
+import { passwordSchema } from "../utility/validationSchema"; 
 import AppStyles from "../utility/AppStyles";
 const ChangePassword = () => {
   const navigation = useNavigation();
@@ -269,8 +268,9 @@ const ChangePassword = () => {
                           errorHint={getPasswordPriorityHint(value, profileDetails.userName)}
                         />
                         <View
-                          accessibilityElementsHidden={true}
-                          importantForAccessibility="no-hide-descendants"
+                          accessible={true}
+                          accessibilityRole="text"
+                          accessibilityLabel={`Password requirements: ${passwordTerms.join('. ')}`}
                           style={[
                             styles.passwordFlexBox,
                             { marginTop: Padding.p_base },

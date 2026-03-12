@@ -278,6 +278,7 @@ const PasswordSecurityEdit = () => {
                       accessible={true}
                       importantForAccessibility="yes"
                       accessibilityRole="text"
+                      accessibilityLabel="Password Reset Answer Required"
                     >
                       Password Reset Answer *
                     </Text>
