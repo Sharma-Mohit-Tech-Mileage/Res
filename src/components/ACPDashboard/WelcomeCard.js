@@ -7,7 +7,7 @@ import {
   AccessibilityInfo,
   Linking,
   Image,
-  Pressable
+  Pressable,
 } from "react-native";
 import {
   FontFamily,
@@ -16,13 +16,15 @@ import {
   Padding,
   Border,
 } from "../../../GlobalStyles";
-import VideoPlayer from "../utility/VideoPlayer";
-import PlayIcon from '../../../assets/svgs/PlayIcon';
+
+import PlayIcon from "../../../assets/svgs/PlayIcon";
 
 const WelcomeCard = () => {
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] =
     React.useState(false);
-
+  const [isActive, setIsActive] = React.useState(false);
+  // YouTube video ID
+  const videoId = "C3cMQoWxv6I";
   //  useEffect(() => {
   //     AccessibilityInfo.isScreenReaderEnabled().then(setIsAccessibilityEnabled);
   //     const subscription = AccessibilityInfo.addEventListener(
@@ -32,82 +34,142 @@ const WelcomeCard = () => {
 
   //     return () => subscription?.remove();
   //   }, []);
-  // YouTube video ID
-  const videoId = "C3cMQoWxv6I";
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.videoContainer}>
+  const renderOfferBanner = () => {
+    return (
+      <View style={[styles.videoContainer,{height:240}]}>
         {/* <VideoPlayer videoId={videoId} /> */}
 
         <Image
-          source={require("../../../assets/welcome-banner-home.png")}
+          source={require("../../../assets/offer-banner-home.jpg")}
           style={{ width: "100%", height: "100%" }}
+          resizeMode='stretch'
         />
-        <View style={{
-          position: "absolute",
-          top: 170,
-          width: "100%",
-          bottom: 0,
-          backgroundColor: "rgba(255, 255, 255, 0.8)" }}>
-           <Pressable style={{ flexDirection: "row",  marginTop: 5 ,marginLeft: 40}}
-            onPress={() => {
-              Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel="Watch welcome video"
-            accessibilityHint="Double tap to watch on YouTube"
-           >
-            <Text style={styles.watchVideoButton}>Watch our welcome video</Text>
-            <View style={{ marginLeft: 5, alignSelf: "center" ,marginTop: 3}}>
-            <PlayIcon/>
-            </View>
-           </Pressable>
-        </View>
+      <View style={{flexDirection:'column', position: "absolute", top: 20, left: 20}}>
+        <Text
+          style={[
+            styles.title2,
+            {  width: 230 },
+          ]}
+          accessible={true}
+          accessibilityLabel="Sparklight Internet + Mobile"
+        >
+          Sparklight Internet 
+         <Text style={{fontWeight: "700",color:'#000'}}> + </Text>
+          Mobile
+        </Text>
         <Text
           style={[
             styles.title,
-            { position: "absolute", top: 50, left: 20, width: 230 },
+            {  width: 230 },
           ]}
-          accessibilityRole="header"
-          accessibilityLevel={1}
           accessible={true}
-          accessibilityLabel="We’re excited to get you connected!"
+          accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
         >
-          We’re excited to get you connected!
+          SAVE with FREE Unlimited Mobile for 1 year
         </Text>
-      </View>
-      {isAccessibilityEnabled && (
-        <>
-          <Text
-            onPress={() => {
-              Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
-            }}
-            style={[
-              styles.accessibilityText,
-              {
-                textDecorationLine: "underline",
-                textDecorationColor: Color.colorMidnightblue,
-              },
-            ]}
-            accessibilityLabel="Video player loaded"
-            accessibilityHint="Double tap to watch on YouTube"
-          >
-            Watch on YouTube
+        <Pressable
+          style={{ width:120, marginTop: 5 ,backgroundColor: Color.sparklightBrightPurple,borderRadius: 50,padding:Padding.p_base}}
+          
+        >
+          <Text style={{color: Color.sparklightWhite,fontFamily: FontFamily.openSansSemiBold,fontSize: FontSize.size_lg,fontWeight: "600",textAlign:'center'}} accessible={true} accessibilityRole="button" accessibilityLabel="Get Offer Button">
+            Get Offer
           </Text>
-          <Text
-            style={styles.accessibilityText}
-            accessibilityLabel="Video player loaded"
-            accessibilityHint="Double tap to watch on YouTube"
+          </Pressable>
+        </View>
+      </View>
+    );
+  };
+
+  const renderWelcomeBanner = () => {
+    return (
+      <>
+        <View style={styles.videoContainer}>
+          {/* <VideoPlayer videoId={videoId} /> */}
+
+          <Image
+            source={require("../../../assets/welcome-banner-home.png")}
+            style={{ width: "100%", height: "100%" }}
+          />
+          <View
+            style={{
+              position: "absolute",
+              top: 170,
+              width: "100%",
+              bottom: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+            }}
           >
-            {`Welcomo to Sparklight Veo Transcription
+            <Pressable
+              style={{ flexDirection: "row", marginTop: 5, marginLeft: 40 }}
+              onPress={() => {
+                Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Watch welcome video"
+              accessibilityHint="Double tap to watch on YouTube"
+            >
+              <Text style={styles.watchVideoButton}>
+                Watch our welcome video
+              </Text>
+              <View
+                style={{ marginLeft: 5, alignSelf: "center", marginTop: 3 }}
+              >
+                <PlayIcon />
+              </View>
+            </Pressable>
+          </View>
+          <Text
+            style={[
+              styles.title,
+              { position: "absolute", top: 50, left: 20, width: 230 },
+            ]}
+            accessibilityRole="header"
+            accessibilityLevel={1}
+            accessible={true}
+            accessibilityLabel="We’re excited to get you connected!"
+          >
+            We’re excited to get you connected!
+          </Text>
+        </View>
+        {isAccessibilityEnabled && (
+          <>
+            <Text
+              onPress={() => {
+                Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
+              }}
+              style={[
+                styles.accessibilityText,
+                {
+                  textDecorationLine: "underline",
+                  textDecorationColor: Color.colorMidnightblue,
+                },
+              ]}
+              accessibilityLabel="Video player loaded"
+              accessibilityHint="Double tap to watch on YouTube"
+            >
+              Watch on YouTube
+            </Text>
+            <Text
+              style={styles.accessibilityText}
+              accessibilityLabel="Video player loaded"
+              accessibilityHint="Double tap to watch on YouTube"
+            >
+              {`Welcomo to Sparklight Veo Transcription
             What is great intemet? Is it strong? Is it fast? Is liable?
             At Sparklight, we know connection goes way beyond technology. From Monday morning meetings to Friday • nights with friends-and everything in between-the best connections are always there right when you nee d them.
             So how do you know it's great internet? Because it works.
             Were Sparklight, and we're always working for you.`}
-          </Text>
-        </>
-      )}
+            </Text>
+          </>
+        )}
+      </>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      {!isActive ? renderOfferBanner() : renderWelcomeBanner()}
     </View>
   );
 };
@@ -125,6 +187,13 @@ const styles = StyleSheet.create({
     color: Color.colorMidnightblue,
     marginBottom: Padding.p_5xl,
     fontWeight: "700",
+  },title2: {
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: FontSize.size_base,
+    lineHeight: 26,
+    color: Color.sparklightBrightPurple,
+    marginBottom: Padding.p_5xl,
+    fontWeight: "600",
   },
   videoContainer: {
     overflow: "hidden",
@@ -135,9 +204,10 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     color: Color.colorGray_200,
     fontFamily: FontFamily.openSansRegular,
-  },watchVideoButton: {
+  },
+  watchVideoButton: {
     marginVertical: Padding.p_sm,
-    fontSize: FontSize.size_base ,
+    fontSize: FontSize.size_base,
     color: Color.colorMidnightblue,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
