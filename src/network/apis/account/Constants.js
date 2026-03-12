@@ -110,6 +110,6 @@ export const config = {
   },
 };
 
-export const ISUAT = true; // Set to false for production environment
+export const ISUAT = false; // Set to false for production environment
 
 export const Env = ISUAT ? config.UAT : config.PRODUCTION;
