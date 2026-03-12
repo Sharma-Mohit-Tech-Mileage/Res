@@ -6,7 +6,7 @@ import { logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
 import { saveUserInfo, logInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
-import { PostAuthApiRequest } from "../../network/APIClient";
+import { PostAuthApiRequest } from "../../network/RestApiClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
@@ -337,6 +337,8 @@ const SplashScreen = ({ navigation, route }) => {
         token: token,
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken,
+        jwtTimestamp: Date.now(),
+        idTokenTimestamp: Date.now(),
       };
 
       // Check for business account first

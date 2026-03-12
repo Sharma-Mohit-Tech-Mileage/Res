@@ -28,7 +28,7 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PutApiRequest } from "../../network/RestApiClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from "../utility/validationSchema"; // Update the path as necessary
 import colors from "../../res/Colors";

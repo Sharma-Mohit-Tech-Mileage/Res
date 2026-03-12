@@ -5,117 +5,45 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';
 import { useSelector } from 'react-redux';
 import { getUser } from '../../redux/utils/LocalStorage';
-import { Env } from '../../network/apis/account/Constants';
-import { GetApiRequest } from '../../network/APIClient';
+import { Env, ISUAT } from '../../network/apis/account/Constants';
+import { GetApiRequest } from '../../network/RestApiClient';
 import analytics from '@react-native-firebase/analytics';
 import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import MaintenanceAlert from './MaintenanceAlert';
-import { RefreshToken, RefreshIdTokenOnly } from '../user/Session';
+import { RefreshToken } from '../user/Session';
 import NetInfo from '@react-native-community/netinfo';
-import { setAuthCookiesOnAllDomains, refreshIdTokenOnAllDomains } from './NativeCookieManager';
+import { setAuthCookiesOnAllDomains } from './NativeCookieManager';
 
 const TAG = '[PCI]';
-const ID_TOKEN_REFRESH_INTERVAL_MS = 4 * 60 * 1000;
+const REFRESH_INTERVAL_MS = 4 * 60 * 1000; // IdToken expires in 5min, refresh at 4min
+const JS_COOKIE_DOMAIN = ISUAT ? '.uat.sparklight.com' : '.sparklight.com';
 
-// ── Shared cookie JS (reusable in injection script + standalone injections) ──
+const safeForJS = (val) => JSON.stringify(String(val || '')).slice(1, -1);
+
 const buildCookieJS = (idToken) => {
-    const safe = (idToken || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const safe = safeForJS(idToken);
     return `var _long = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
 var _short = new Date(Date.now() + 5*60*1000).toUTCString();
-document.cookie = 'Source=MobileApp; path=/; expires=' + _long + ';';
-document.cookie = 'CustomerType=Residential; path=/; expires=' + _long + ';';
-document.cookie = 'LatestVersion=true; path=/; expires=' + _long + ';';
-if ('${safe}') document.cookie = 'IdToken=${safe}; path=/; expires=' + _short + ';';`;
+var _dom = '; domain=${JS_COOKIE_DOMAIN}';
+document.cookie = 'Source=MobileApp; path=/' + _dom + '; expires=' + _long + ';';
+document.cookie = 'CustomerType=Residential; path=/' + _dom + '; expires=' + _long + ';';
+document.cookie = 'LatestVersion=true; path=/' + _dom + '; expires=' + _long + ';';
+if ('${safe}') document.cookie = 'IdToken=${safe}; path=/' + _dom + '; expires=' + _short + ';';`;
 };
 
-// ── Injection script (injectedJavaScriptBeforeContentLoaded) ──
-// Seeds localStorage + cookies before page JS runs. PING/PONG for alive check.
-// Network activity logging (XHR + Fetch) for debugging — no form state (PCI-DSS: no saving card inputs).
-const buildInjectionScript = (token, userInfo, idToken) => {
-    const safeToken = (token || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    const safeUserInfo = (typeof userInfo === 'string' ? userInfo : JSON.stringify(userInfo || {}))
-        .replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp) => {
+    const safeToken = safeForJS(token);
+    const safeUserInfo = safeForJS(typeof userInfo === 'string' ? userInfo : JSON.stringify(userInfo || {}));
 
     return `(function() {
     try {
         if ('${safeToken}') {
             localStorage.setItem('jwt_token', '${safeToken}');
             localStorage.setItem('user_info', '${safeUserInfo}');
+            localStorage.setItem('tokenIssuedAt', '${jwtTimestamp || Date.now()}');
         }
         try { ${buildCookieJS(idToken)} } catch(e) {}
-
-        // ── Network activity logging (XHR) ──
-        var _xo = XMLHttpRequest.prototype.open, _xs = XMLHttpRequest.prototype.send;
-        XMLHttpRequest.prototype.open = function(m, u) {
-            this._method = m;
-            this._url = u;
-            return _xo.apply(this, arguments);
-        };
-        XMLHttpRequest.prototype.send = function(body) {
-            var self = this;
-            var _ts = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
-            var payload = '';
-            try { if (body) payload = typeof body === 'string' ? body : JSON.stringify(body); } catch(e) {}
-            var _cookies = '';
-            try {
-                var dc = document.cookie || '';
-                var idMatch = dc.match(/IdToken=([^;]{0,20})/);
-                var hasSource = dc.includes('Source=');
-                var hasCType = dc.includes('CustomerType=');
-                _cookies = 'IdToken=' + (idMatch ? idMatch[1] + '...' : 'MISSING') + ' | Source=' + (hasSource ? 'YES' : 'MISSING') + ' | CustomerType=' + (hasCType ? 'YES' : 'MISSING') + ' | cookieLen=' + dc.length;
-            } catch(e) { _cookies = 'READ_ERROR'; }
-            window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'networkLog', phase: 'request', ts: _ts,
-                method: self._method, url: self._url, payload: payload, cookies: _cookies
-            }));
-            this.addEventListener('load', function() {
-                var rTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
-                var respSnippet = '';
-                try { respSnippet = self.responseText || ''; } catch(e) {}
-                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'networkLog', phase: 'response', ts: rTs,
-                    method: self._method, url: self._url, status: self.status, body: respSnippet
-                }));
-            });
-            this.addEventListener('error', function() {
-                var eTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
-                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'networkLog', phase: 'error', ts: eTs,
-                    method: self._method, url: self._url, error: 'XHR network error'
-                }));
-            });
-            return _xs.apply(this, arguments);
-        };
-
-        // ── Network activity logging (fetch) ──
-        var _fetch = window.fetch;
-        window.fetch = function(input, init) {
-            var fUrl = typeof input === 'string' ? input : (input.url || '');
-            var fMethod = (init && init.method) || 'GET';
-            var fTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
-            var fPayload = '';
-            try { if (init && init.body) fPayload = String(init.body); } catch(e) {}
-            window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'networkLog', phase: 'request', ts: fTs,
-                method: fMethod, url: fUrl, payload: fPayload
-            }));
-            return _fetch.apply(this, arguments).then(function(resp) {
-                var rTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
-                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'networkLog', phase: 'response', ts: rTs,
-                    method: fMethod, url: fUrl, status: resp.status
-                }));
-                return resp;
-            }).catch(function(err) {
-                var eTs = new Date().toLocaleTimeString('en-US', {hour12:false}) + '.' + String(new Date().getMilliseconds()).padStart(3,'0');
-                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'networkLog', phase: 'error', ts: eTs,
-                    method: fMethod, url: fUrl, error: err.message
-                }));
-                throw err;
-            });
-        };
 
         window.addEventListener('message', function(e) {
             if (e.data === 'PING') {
@@ -130,8 +58,6 @@ const buildInjectionScript = (token, userInfo, idToken) => {
 })();
 true;`;
 };
-
-// ── Component ───────────────────────────────────────────────────────────────
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
@@ -150,7 +76,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const customReferUrl = route.params?.customReferUrl || route.params?.customPaymentUrl || null;
 
     const user = useSelector(state => state.user.userData);
-
     const webViewRef = useRef(null);
     const aliveCheckResolver = useRef(null);
     const aliveCheckTimeout = useRef(null);
@@ -160,10 +85,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const silentRefreshTimer = useRef(null);
     const isInitializing = useRef(false);
     const pendingOfflineRefresh = useRef(false);
+    const lastIdTokenRefresh = useRef(0);
 
     const isLoading = !contentLoaded || progress < 1;
-
-    // ── Utilities ────────────────────────────────────────────────────────────
 
     const generateGuid = () => {
         const p8 = (s) => {
@@ -195,8 +119,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         TokenCookie: token || '',
     });
 
-    // ── Toast ────────────────────────────────────────────────────────────────
-
     const showToastMessage = useCallback(() => {
         setShowToast(true);
         Animated.sequence([
@@ -206,89 +128,67 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         ]).start(() => setShowToast(false));
     }, [toastOpacity]);
 
-    // ── Inject auth into live WebView (native cookies + JS cookies + localStorage) ──
-
-    const injectAuth = useCallback(async () => {
+    // IdToken-only injection: pushes only the IdToken cookie to WebView
+    // Does NOT touch jwt_token/user_info in localStorage — portal manages its own JWT lifecycle
+    const injectIdTokenOnly = useCallback(async () => {
         if (!webViewRef.current) return;
         try {
             const cu = await getUser();
             const idToken = cu?.idToken || '';
             if (idToken) await setAuthCookiesOnAllDomains(idToken);
 
-            const safeToken = (cu?.token || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-            const safeUserInfo = (typeof cu?.userInfo === 'string' ? cu.userInfo : JSON.stringify(cu?.userInfo || {}))
-                .replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-
             webViewRef.current.injectJavaScript(`(function() {
     try {
         var h = document.location.hostname;
         if (!h || h === 'localhost') return;
         ${buildCookieJS(idToken)}
-        if ('${safeToken}') {
-            localStorage.setItem('jwt_token', '${safeToken}');
-            localStorage.setItem('user_info', '${safeUserInfo}');
-        }
     } catch(e) {}
 })(); true;`);
         } catch (e) {
-            console.error(TAG, 'injectAuth failed:', e.message);
+            console.error(TAG, 'injectIdTokenOnly failed:', e.message);
         }
     }, []);
 
-    // ── Silent IdToken refresh (runs every 4 min) ───────────────────────────
-
+    // 4-min silent refresh: refreshes SSO tokens, pushes only IdToken cookie
+    // JWT stays untouched in portal's localStorage so portal's 18-min refresh timer stays aligned
     const silentRefreshIdToken = useCallback(async () => {
         if (!webViewRef.current) return;
         try {
-            const freshIdToken = await RefreshIdTokenOnly();
-            if (!freshIdToken) {
+            const netState = await NetInfo.fetch();
+            if (!netState.isConnected || !netState.isInternetReachable) {
                 pendingOfflineRefresh.current = true;
                 return;
             }
+            const newToken = await RefreshToken();
+            if (!newToken) { pendingOfflineRefresh.current = true; return; }
             pendingOfflineRefresh.current = false;
-            await refreshIdTokenOnAllDomains(freshIdToken);
-            webViewRef.current.injectJavaScript(`(function() {
-    try {
-        var h = document.location.hostname;
-        if (!h || h === 'localhost') return;
-        ${buildCookieJS(freshIdToken)}
-    } catch(e) {}
-})(); true;`);
+            lastIdTokenRefresh.current = Date.now();
+            await injectIdTokenOnly();
         } catch (e) {
-            console.error(TAG, 'Silent refresh failed:', e.message);
+            console.error(TAG, 'Silent IdToken refresh failed:', e.message);
             pendingOfflineRefresh.current = true;
         }
-    }, []);
+    }, [injectIdTokenOnly]);
 
     const stopSilentRefresh = useCallback(() => {
-        if (silentRefreshTimer.current) {
-            clearInterval(silentRefreshTimer.current);
-            silentRefreshTimer.current = null;
-        }
+        if (silentRefreshTimer.current) { clearInterval(silentRefreshTimer.current); silentRefreshTimer.current = null; }
     }, []);
 
     const startSilentRefresh = useCallback(() => {
         stopSilentRefresh();
-        silentRefreshTimer.current = setInterval(silentRefreshIdToken, ID_TOKEN_REFRESH_INTERVAL_MS);
+        silentRefreshTimer.current = setInterval(silentRefreshIdToken, REFRESH_INTERVAL_MS);
     }, [silentRefreshIdToken, stopSilentRefresh]);
-
-    // ── WebView alive check (clears timeout on PONG — fixes leak) ───────────
 
     const checkWebViewAlive = useCallback(() => {
         return new Promise((resolve) => {
             if (aliveCheckResolver.current) { resolve(false); return; }
             aliveCheckResolver.current = resolve;
             aliveCheckTimeout.current = setTimeout(() => {
-                if (aliveCheckResolver.current) {
-                    aliveCheckResolver.current(false);
-                    aliveCheckResolver.current = null;
-                }
+                if (aliveCheckResolver.current) { aliveCheckResolver.current(false); aliveCheckResolver.current = null; }
             }, 2000);
             webViewRef.current?.injectJavaScript(`window.postMessage('PING'); true;`);
         });
     }, []);
-
-    // ── Encryption + form POST ────────────────────────────────────────────────
 
     const redirectToEBillpay = (paymentObj, makePaymentUrl) => {
         const data = JSON.stringify(paymentObj);
@@ -321,53 +221,31 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 </html>`);
     };
 
-    // ── initializePayment ─────────────────────────────────────────────────────
-
     const initializePayment = async () => {
         if (isInitializing.current) return;
         isInitializing.current = true;
 
         try {
-            let userLocal = await getUser();
-            if (!userLocal?.userInfo?.accountNumber) {
-                navigation.navigate('Billing');
-                return;
-            }
+            const userLocal = await getUser();
+            if (!userLocal?.userInfo?.accountNumber) { navigation.navigate('Billing'); return; }
 
-            if (!userLocal.idToken) {
-                try {
-                    await RefreshIdTokenOnly();
-                    userLocal = await getUser();
-                } catch (e) {
-                    console.error(TAG, 'idToken pre-fetch failed (non-fatal):', e.message);
-                }
-            }
+            // Pass stored JWT + jwtTimestamp (tokenIssuedAt) to portal — no refresh needed here.
+            // Portal uses tokenIssuedAt to know the real JWT age and schedules its own refresh.
+            lastIdTokenRefresh.current = userLocal?.idTokenTimestamp || Date.now();
 
-            // Build injection script (state) BEFORE setHtml triggers WebView render
-            setInjectionScript(buildInjectionScript(
-                userLocal?.token || '',
-                userLocal?.userInfo || {},
-                userLocal?.idToken || '',
-            ));
-
+            setInjectionScript(buildInjectionScript(userLocal?.token || '', userLocal?.userInfo || {}, userLocal?.idToken || '', userLocal?.jwtTimestamp));
             await setAuthCookiesOnAllDomains(userLocal?.idToken || '');
 
-            // EasyPay API
             const accountNumber = userLocal.userInfo.accountNumber;
             const res = await Promise.race([
                 new Promise((resolve) => {
                     GetApiRequest(
                         `api/Accounts/${accountNumber}/easypay`,
                         (r) => resolve(r),
-                        (err) => {
-                            if (err?.includes('503')) setIsServiceDown(true);
-                            resolve(null);
-                        }
+                        (err) => { if (err?.includes('503')) setIsServiceDown(true); resolve(null); }
                     );
                 }),
-                new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('EasyPay API timeout 15s')), 15000)
-                ),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('EasyPay API timeout')), 15000)),
             ]).catch(() => null);
 
             const type = status ? 'MANAGE' : 'SETUP';
@@ -388,8 +266,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         }
     };
 
-    // ── WebView recreation (clears HTML first, rebuilds injection script) ────
-
     const recreateWebView = useCallback(async () => {
         setHtml('');
         setContentLoaded(false);
@@ -398,28 +274,20 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         setErrorMessage('');
         initialLoadComplete.current = false;
         isInitializing.current = false;
-        // Short delay to unmount WebView (html=''), then re-initialize with fresh tokens
-        setTimeout(() => {
-            setWebViewKey(Date.now());
-            initializePayment();
-        }, 100);
+        setTimeout(() => { setWebViewKey(Date.now()); initializePayment(); }, 100);
     }, []);
-
-    // ── Effects ──────────────────────────────────────────────────────────────
 
     useEffect(() => { initializePayment(); }, []);
 
-    useEffect(() => {
-        startSilentRefresh();
-        return stopSilentRefresh;
-    }, [startSilentRefresh, stopSilentRefresh]);
+    useEffect(() => { startSilentRefresh(); return stopSilentRefresh; }, [startSilentRefresh, stopSilentRefresh]);
 
     useEffect(() => {
         if (user && contentLoaded) {
-            const t = setTimeout(() => injectAuth(), 500);
+            // JWT already set via injectedJavaScriptBeforeContentLoaded — just ensure IdToken cookie is current
+            const t = setTimeout(() => injectIdTokenOnly(), 500);
             return () => clearTimeout(t);
         }
-    }, [user, contentLoaded, injectAuth]);
+    }, [user, contentLoaded, injectIdTokenOnly]);
 
     useEffect(() => {
         const handleAppState = async (nextAppState) => {
@@ -428,22 +296,32 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 stopSilentRefresh();
             } else if (nextAppState === 'active' && backgroundTimestamp.current > 0) {
                 const dur = Date.now() - backgroundTimestamp.current;
-                if (dur > 300000) {
-                    const alive = await checkWebViewAlive();
-                    if (!alive) {
-                        recreateWebView();
-                    } else {
-                        try {
-                            await RefreshToken();
-                            await injectAuth();
-                            await silentRefreshIdToken();
-                        } catch (e) {
-                            console.error(TAG, 'Token refresh after background failed:', e.message);
-                            recreateWebView();
+                const idTokenAge = Date.now() - lastIdTokenRefresh.current;
+                const netState = await NetInfo.fetch();
+                const isOnline = netState.isConnected && netState.isInternetReachable;
+
+                if (dur > 600000) {
+                    // >10 min background: WebView may be dead — recreate gets fresh JWT + IdToken
+                    if (!isOnline) { pendingOfflineRefresh.current = true; }
+                    else {
+                        const alive = await checkWebViewAlive();
+                        if (!alive) { recreateWebView(); }
+                        else {
+                            // WebView alive but tokens very stale — refresh IdToken only
+                            try { await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await injectIdTokenOnly(); }
+                            catch (_) { recreateWebView(); }
                         }
                     }
-                } else if (dur > 240000) {
-                    await silentRefreshIdToken();
+                } else if (idTokenAge > 240000) {
+                    // IdToken >4 min old (expires at 5min) — refresh IdToken cookie only, don't touch JWT
+                    if (!isOnline) { pendingOfflineRefresh.current = true; }
+                    else {
+                        try { await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await injectIdTokenOnly(); }
+                        catch (_) { pendingOfflineRefresh.current = true; }
+                    }
+                } else if (dur > 60000) {
+                    // >1 min background but IdToken still fresh: just re-inject current IdToken cookie
+                    await injectIdTokenOnly();
                 }
                 backgroundTimestamp.current = 0;
                 startSilentRefresh();
@@ -451,27 +329,18 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         };
         const sub = AppState.addEventListener('change', handleAppState);
         return () => sub?.remove();
-    }, [checkWebViewAlive, recreateWebView, injectAuth, silentRefreshIdToken, startSilentRefresh, stopSilentRefresh]);
+    }, [checkWebViewAlive, recreateWebView, injectIdTokenOnly, startSilentRefresh, stopSilentRefresh]);
 
     useEffect(() => {
-        if (name) {
-            analytics().logEvent('screen_view', {
-                screen_name: name,
-                screen_class: 'AutoPayPCIConnector',
-            }).catch(() => {});
-        }
+        if (name) analytics().logEvent('screen_view', { screen_name: name, screen_class: 'AutoPayPCIConnector' }).catch(() => {});
     }, [name]);
 
     useEffect(() => {
         const unsub = NetInfo.addEventListener((state) => {
-            if (state.isConnected && state.isInternetReachable && pendingOfflineRefresh.current) {
-                silentRefreshIdToken();
-            }
+            if (state.isConnected && state.isInternetReachable && pendingOfflineRefresh.current) silentRefreshIdToken();
         });
         return () => unsub();
     }, [silentRefreshIdToken]);
-
-    // ── WebView handlers ──────────────────────────────────────────────────────
 
     const onShouldStartLoadWithRequest = useCallback((request) => {
         if (request.url.includes('/postlogout') || request.url.includes(Env.SSO_LOGIN)) {
@@ -479,55 +348,36 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             navigation.goBack();
             return false;
         }
-        // Allow about:blank (needed during form POST phase) + http(s)
         if (request.url === 'about:blank') return true;
-        if (!request.url.startsWith('https://') && !request.url.startsWith('http://')) {
-            return false;
-        }
+        if (!request.url.startsWith('https://') && !request.url.startsWith('http://')) return false;
         return true;
     }, [showToastMessage, navigation]);
 
     const onLoadStart = useCallback(() => {
-        if (!initialLoadComplete.current) {
-            setContentLoaded(false);
-            setProgress(0);
-        }
-        setIsError(false);
-        setErrorMessage('');
+        if (!initialLoadComplete.current) { setContentLoaded(false); setProgress(0); }
+        setIsError(false); setErrorMessage('');
     }, []);
 
     const onLoadEnd = useCallback(async () => {
-        setProgress(1);
-        setContentLoaded(true);
-        initialLoadComplete.current = true;
-        await injectAuth();
-    }, [injectAuth]);
+        setProgress(1); setContentLoaded(true); initialLoadComplete.current = true;
+        // JWT already set via injectedJavaScriptBeforeContentLoaded — just ensure IdToken cookie
+        await injectIdTokenOnly();
+    }, [injectIdTokenOnly]);
 
-    const onLoadProgress = useCallback(({ nativeEvent }) => {
-        setProgress(nativeEvent.progress);
-    }, []);
+    const onLoadProgress = useCallback(({ nativeEvent }) => { setProgress(nativeEvent.progress); }, []);
 
     const onError = useCallback(({ nativeEvent }) => {
         console.error(TAG, 'WebView error:', nativeEvent?.description);
-        setIsError(true);
-        setContentLoaded(true);
+        setIsError(true); setContentLoaded(true);
         setErrorMessage(`Unable to load page: ${nativeEvent?.description || 'Unknown error'}`);
     }, []);
 
     const onHttpError = useCallback(({ nativeEvent }) => {
         console.error(TAG, 'HTTP error:', nativeEvent?.statusCode, nativeEvent?.url);
-        if (nativeEvent?.statusCode === 503) {
-            setIsServiceDown(true);
-        } else if (nativeEvent?.statusCode === 404) {
-            setIsError(true);
-            setErrorMessage('Page not found. Please verify your account has access to this feature.');
-        } else if (nativeEvent?.statusCode === 403) {
-            setIsError(true);
-            setErrorMessage('Access denied. Please check your permissions.');
-        } else if (nativeEvent?.statusCode >= 500) {
-            setIsError(true);
-            setErrorMessage('Server error. Please try again later.');
-        }
+        if (nativeEvent?.statusCode === 503) setIsServiceDown(true);
+        else if (nativeEvent?.statusCode === 404) { setIsError(true); setErrorMessage('Page not found.'); }
+        else if (nativeEvent?.statusCode === 403) { setIsError(true); setErrorMessage('Access denied.'); }
+        else if (nativeEvent?.statusCode >= 500) { setIsError(true); setErrorMessage('Server error. Please try again later.'); }
         setContentLoaded(true);
     }, []);
 
@@ -536,41 +386,17 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             const data = JSON.parse(nativeEvent.data);
             switch (data.type) {
                 case 'pong':
-                    if (aliveCheckTimeout.current) {
-                        clearTimeout(aliveCheckTimeout.current);
-                        aliveCheckTimeout.current = null;
-                    }
-                    if (aliveCheckResolver.current) {
-                        aliveCheckResolver.current(true);
-                        aliveCheckResolver.current = null;
-                    }
+                    if (aliveCheckTimeout.current) { clearTimeout(aliveCheckTimeout.current); aliveCheckTimeout.current = null; }
+                    if (aliveCheckResolver.current) { aliveCheckResolver.current(true); aliveCheckResolver.current = null; }
                     break;
-                case 'networkLog': {
-                    const { phase, ts: nTs, method, url: nUrl, status, payload, body, error } = data;
-                    if (nUrl && (nUrl.includes('analytics.google.com') || nUrl.includes('google-analytics.com'))) break;
-                    if (phase === 'request') {
-                        const cookieInfo = data.cookies ? ` | cookies: ${data.cookies}` : '';
-                        console.log(`${TAG} [${nTs}] REQUEST ${method} → ${nUrl}${payload ? ' | payload: ' + payload : ''}${cookieInfo}`);
-                    } else if (phase === 'response') {
-                        const statusLabel = status >= 400 ? 'FAIL' : 'OK';
-                        console.log(`${TAG} [${nTs}] RESPONSE [${statusLabel}] ${method} ← ${status} ${nUrl}${body ? ' | body: ' + body : ''}`);
-                    } else if (phase === 'error') {
-                        console.error(`${TAG} [${nTs}] ERROR ${method} FAILED ${nUrl} | ${error}`);
-                    }
-                    break;
-                }
                 case 'injectionComplete':
-                    console.log(`${TAG} Injection script completed`);
                     break;
                 default:
                     break;
             }
         } catch {
-            // Non-JSON portal message — ignore
         }
     }, []);
-
-    // ── Render ────────────────────────────────────────────────────────────────
 
     return (
         <View style={styles.container}>
@@ -608,36 +434,21 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                         style={styles.webView}
                     />
                 )}
-
                 {isServiceDown && <MaintenanceAlert />}
-
                 {isLoading && !isServiceDown && !isError && (
-                    <View style={styles.loadingOverlay}>
-                        <LoadingOverlay loading={true} />
-                    </View>
+                    <View style={styles.loadingOverlay}><LoadingOverlay loading={true} /></View>
                 )}
-
                 {isError && !isServiceDown && (
                     <View style={styles.errorContainer}>
                         <Text style={styles.errorTitle}>Unable to Load Page</Text>
                         <Text style={styles.errorText}>{errorMessage}</Text>
-                        <Text
-                            style={styles.retryText}
-                            onPress={() => {
-                                setIsError(false);
-                                setErrorMessage('');
-                                setContentLoaded(false);
-                                setProgress(0);
-                                initialLoadComplete.current = false;
-                                isInitializing.current = false;
-                                initializePayment();
-                            }}
-                        >
-                            Tap to Retry
-                        </Text>
+                        <Text style={styles.retryText} onPress={() => {
+                            setIsError(false); setErrorMessage(''); setContentLoaded(false);
+                            setProgress(0); initialLoadComplete.current = false;
+                            isInitializing.current = false; initializePayment();
+                        }}>Tap to Retry</Text>
                     </View>
                 )}
-
                 {showToast && (
                     <Animated.View style={[styles.toast, { opacity: toastOpacity }]}>
                         <Text style={styles.toastText}>Session expired. Please try again.</Text>
@@ -649,28 +460,16 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        marginBottom: Platform.OS === 'ios' ? 90 : 60,
-    },
-    contentContainer: {
-        flex: 1,
-        position: 'relative',
-    },
-    webView: {
-        flex: 1,
-        backgroundColor: '#ffffff',
-    },
+    container: { flex: 1, backgroundColor: '#fff', marginBottom: Platform.OS === 'ios' ? 90 : 60 },
+    contentContainer: { flex: 1, position: 'relative' },
+    webView: { flex: 1, backgroundColor: '#ffffff' },
     loadingOverlay: {
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        justifyContent: 'center', alignItems: 'center',
-        backgroundColor: '#ffffff', zIndex: 1000,
+        justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff', zIndex: 1000,
     },
     errorContainer: {
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        justifyContent: 'center', alignItems: 'center',
-        padding: 20, backgroundColor: '#ffffff',
+        justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#ffffff',
     },
     errorTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 10 },
     errorText: { fontSize: 16, color: '#666', textAlign: 'center', marginBottom: 20, lineHeight: 24 },

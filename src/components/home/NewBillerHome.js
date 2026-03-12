@@ -22,7 +22,7 @@ import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
-import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PostApiRequest } from "../../network/RestApiClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";

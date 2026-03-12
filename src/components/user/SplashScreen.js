@@ -23,7 +23,7 @@ import {
   getUser,
   cleanUserData,
 } from "../../redux/utils/LocalStorage";
-import { PostAuthApiRequest } from "../../network/APIClient";
+import { PostAuthApiRequest } from "../../network/RestApiClient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -222,8 +222,6 @@ const SplashScreen = ({ navigation, route }) => {
       hasIdToken: !!request.idToken,
       hasAccessToken: !!request.accessToken,
     });
-    console.log("Calling SSO Login API with request:", JSON.stringify(request));
-
     PostAuthApiRequest("api/mobile/gettoken", request, onSuccess, onError);
   }, []);
 
@@ -270,7 +268,6 @@ const SplashScreen = ({ navigation, route }) => {
   );
 
   const handleLogin = async (res) => {
-    console.log("User data", res);
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -279,6 +276,8 @@ const SplashScreen = ({ navigation, route }) => {
         token: token,
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken,
+        jwtTimestamp: Date.now(),
+        idTokenTimestamp: Date.now(),
       };
       setIsBusiness(false);
 
@@ -324,8 +323,6 @@ const SplashScreen = ({ navigation, route }) => {
     try {
       storeUser(user);
       dispatch(saveUserInfo(user));
-
-      console.log("User information saved to Redux store:", user);
 
       // Analytics tracking
       if (user.userInfo && user.userInfo.userName) {

@@ -2,13 +2,12 @@ import { getUser, storeUser } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
 import store from "../../redux/configureStore";
 import { saveUserInfo } from "../../redux/actions/UserAction";
-import { PostAuthApiRequest } from "../../network/APIClient";
+import { PostAuthApiRequest } from "../../network/RestApiClient";
 import { Env } from "../../network/apis/account/Constants";
 
 const TAG = '[Session]';
 
-// ── Refresh lock to prevent concurrent refresh calls (race condition) ──
-let _refreshLock = false;
+let _refreshPromise = null;
 
 const config = {
     issuer: Env.SSO_LOGIN,
@@ -19,24 +18,17 @@ const config = {
 };
 
 const onSuccess = async (res, idToken = null) => {
-    try {
-        if (!res) throw new Error("No token received from API");
+    if (!res) throw new Error("No token received from API");
 
-        const { jwtToken: token, userInfo, idTokenGuid, refreshToken } = res;
-        if (!token) throw new Error("API response missing jwtToken");
+    const { jwtToken: token, userInfo, idTokenGuid, refreshToken } = res;
+    if (!token) throw new Error("API response missing jwtToken");
 
-        const user = { userInfo, token, tokenGuid: idTokenGuid, refreshToken, idToken };
+    const now = Date.now();
+    const user = { userInfo, token, tokenGuid: idTokenGuid, refreshToken, idToken, jwtTimestamp: now, idTokenTimestamp: now };
 
-        await storeUser(user);
-        console.log(`${TAG} User stored | Account: ${userInfo?.accountNumber || 'N/A'} | hasIdToken: ${!!idToken}`);
-
-        store.dispatch(saveUserInfo(user));
-        console.log(`${TAG} Redux store updated`);
-        return token;
-    } catch (error) {
-        console.error(`${TAG} onSuccess failed:`, error.message);
-        throw error;
-    }
+    await storeUser(user);
+    store.dispatch(saveUserInfo(user));
+    return token;
 };
 
 const onError = (error) => {
@@ -45,91 +37,50 @@ const onError = (error) => {
 };
 
 const retryRequest = async (data, retries = 2) => {
-    const attempt = 3 - retries;
     try {
-        console.log(`${TAG} [gettoken] Attempt ${attempt} → POST api/mobile/gettoken`);
-        const start = Date.now();
         const result = await new Promise((resolve, reject) => {
             PostAuthApiRequest("api/mobile/gettoken", data, resolve, reject);
         });
-        console.log(`${TAG} [gettoken] Success in ${Date.now() - start}ms`);
         return result;
     } catch (error) {
         if (retries > 0) {
-            console.warn(`${TAG} [gettoken] Attempt ${attempt} failed, retrying (${retries} left) | ${error.message}`);
             return retryRequest(data, retries - 1);
         }
-        console.error(`${TAG} [gettoken] All retries exhausted | ${error.message}`);
+        console.error(`${TAG} Token refresh retries exhausted:`, error.message);
         throw error;
     }
 };
 
 export const RefreshToken = async () => {
-    if (_refreshLock) {
-        console.warn(`${TAG} ── RefreshToken SKIPPED (another refresh in progress) ──`);
-        return null;
+    if (_refreshPromise) {
+        return _refreshPromise;
     }
-    _refreshLock = true;
-    console.log(`${TAG} ── RefreshToken START ──`);
-    try {
-        const user = await getUser();
-        if (!user?.refreshToken) throw new Error("No refresh token in storage");
 
-        console.log(`${TAG} [SSO] Calling refresh...`);
-        const ssoStart = Date.now();
-        const result = await refresh(config, { refreshToken: user.refreshToken });
-        console.log(`${TAG} [SSO] Done in ${Date.now() - ssoStart}ms | hasIdToken: ${!!result.idToken} | hasAccessToken: ${!!result.accessToken} | tokenRotated: ${result.refreshToken !== user.refreshToken}`);
+    _refreshPromise = (async () => {
+        try {
+            const user = await getUser();
+            if (!user?.refreshToken) throw new Error("No refresh token in storage");
 
-        const data = {
-            idToken: result.idToken,
-            accessToken: result.accessToken,
-            idTokenGuid: result.additionalParameters?.session_state || "",
-            refreshToken: result.refreshToken,
-        };
+            const result = await refresh(config, { refreshToken: user.refreshToken });
 
-        const apiResponse = await retryRequest(data, 2);
-        const token = await onSuccess(apiResponse, result.idToken);
-        console.log(`${TAG} ── RefreshToken COMPLETE ──`);
-        return token;
-    } catch (error) {
-        console.error(`${TAG} ── RefreshToken FAILED ──`, error.message);
-        return onError(error);
-    } finally {
-        _refreshLock = false;
-    }
-};
+            const data = {
+                idToken: result.idToken,
+                accessToken: result.accessToken,
+                idTokenGuid: result.additionalParameters?.session_state || "",
+                refreshToken: result.refreshToken,
+            };
 
-export const RefreshIdTokenOnly = async () => {
-    if (_refreshLock) {
-        console.warn(`${TAG} ── RefreshIdTokenOnly SKIPPED (another refresh in progress) ──`);
-        return null;
-    }
-    _refreshLock = true;
-    console.log(`${TAG} ── RefreshIdTokenOnly START ──`);
-    try {
-        const user = await getUser();
-        if (!user?.refreshToken) throw new Error("No refresh token in storage");
-
-        console.log(`${TAG} [SSO] Calling refresh (IdToken only)...`);
-        const ssoStart = Date.now();
-        const result = await refresh(config, { refreshToken: user.refreshToken });
-        const elapsed = Date.now() - ssoStart;
-        console.log(`${TAG} [SSO] Done in ${elapsed}ms | hasIdToken: ${!!result.idToken} | tokenRotated: ${result.refreshToken !== user.refreshToken}`);
-
-        if (result.refreshToken && result.refreshToken !== user.refreshToken) {
-            await storeUser({ ...user, idToken: result.idToken, refreshToken: result.refreshToken });
-            console.log(`${TAG} Rotated refresh token + fresh idToken persisted`);
-        } else {
-            await storeUser({ ...user, idToken: result.idToken });
-            console.log(`${TAG} Fresh idToken persisted`);
+            const apiResponse = await retryRequest(data, 2);
+            return await onSuccess(apiResponse, result.idToken);
+        } catch (error) {
+            console.error(`${TAG} RefreshToken failed:`, error.message);
+            return onError(error);
         }
+    })();
 
-        console.log(`${TAG} ── RefreshIdTokenOnly COMPLETE (${elapsed}ms) ──`);
-        return result.idToken;
-    } catch (error) {
-        console.error(`${TAG} ── RefreshIdTokenOnly FAILED ──`, error.message);
-        throw error;
+    try {
+        return await _refreshPromise;
     } finally {
-        _refreshLock = false;
+        _refreshPromise = null;
     }
 };
