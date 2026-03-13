@@ -31,8 +31,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Vertically centers icon with text block
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_xs,
-    marginBottom: Padding.p_5xl,
-    paddingVertical: Padding.p_xs,
+    marginBottom: Padding.p_5xl,  
   },
   iconContainer: {
     width: 40,

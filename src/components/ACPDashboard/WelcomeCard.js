@@ -52,8 +52,7 @@ const WelcomeCard = () => {
 
         <Image
           source={require("../../../assets/offer-banner-home.jpg")}
-          style={{ width: "100%", height: "100%" }}
-          resizeMode='stretch'
+          style={{ width: '100%' }}
         />
       <View style={{flexDirection:'column', position: "absolute", top: 20, left: 20}}>
         <Text
@@ -101,8 +100,7 @@ const WelcomeCard = () => {
 
           <Image
             source={require("../../../assets/welcome-banner-home.png")}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode='stretch'
+            style={{ width: '100%' }}
           />
           <View
             style={{
