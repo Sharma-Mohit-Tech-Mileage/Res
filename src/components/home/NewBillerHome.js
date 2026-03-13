@@ -379,14 +379,17 @@ const NewBillerHome = ({ navigation }) => {
     );
 
   const renderWelcomeCard = () => (
-    <View style={[styles.card, styles.shadowProp, styles.welcomeCard]}>
-      <View style={styles.contentWrapper}>
+    <View style={[styles.card, styles.shadowProp, styles.welcomeCard,{paddingTop:0}]}>
+      <View >
         {showDisconnectedBanner ? (
-          <DisconnectedBanner navigation={navigation} />
+          <View style={styles.contentWrapper}>
+            <DisconnectedBanner navigation={navigation} />
+          </View>
         ) : (
           <WelcomeCard />
         )}
         {/* <MenuGrid /> */}
+         <View style={styles.contentWrapper}>
         <PromoBanner
           title="Sign up and save with Auto Pay and Paperless Billing"
           showBonus={true}
@@ -419,10 +422,11 @@ const NewBillerHome = ({ navigation }) => {
             navigation.navigate("account", { screen: "Notifications" })
           }
         />
-        <InfoBanner
+        {/* <InfoBanner
           message="We are working diligently to enhance your experience"
           icon="megaphone"
-        />
+        /> */}
+        </View>
       </View>
     </View>
   );
