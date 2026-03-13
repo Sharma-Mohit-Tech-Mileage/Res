@@ -47,9 +47,6 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
   const identifier = useMemo(() => getIdentifier(item), [item]);
   const a11yLabel = useMemo(() => buildA11yLabel(item), [item]);
 
-  const connectionIcon =
-    String(item?.connectionType).toLowerCase() === "wired" ? "ethernet" : "wifi";
-
   return (
     <View
       style={[styles.equipmentItem, isLast && styles.lastItem]}
@@ -63,7 +60,7 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
         importantForAccessibility="no-hide-descendants"
         accessibilityElementsHidden={true}
       >
-       
+        <MaterialCommunityIcons name={icon} size={20} color={theme.colors.primary} />
       </View>
 
       <View
@@ -169,12 +166,13 @@ const styles = StyleSheet.create({
   lastItem: { borderBottomWidth: 0 },
 
   equipmentIconWrapper: {
-   
+    width: 40,
+    height: 40,
     borderRadius: 20,
     backgroundColor: theme.colors.surfaceVariant,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 25,
+    marginRight: theme.spacing.md,
   },
 
   equipmentInfo: {

@@ -7,13 +7,18 @@ import servicesApi from "../../network/apis/services/services.service";
 function* fetchServiceDetailsSaga(action) {
   try {
     const { accountNumber } = action.payload;
+    console.log("[ServicesSaga] fetchServiceDetails called with accountNumber:", accountNumber);
 
     const response = yield call(servicesApi.fetchServiceDetails, accountNumber);
+    console.log("[ServicesSaga] fetchServiceDetails raw API response:", JSON.stringify(response, null, 2));
 
     const transformedData = transformServiceData(response);
+    console.log("[ServicesSaga] fetchServiceDetails transformed data:", JSON.stringify(transformedData, null, 2));
 
     yield put(actions.fetchServiceDetailsSuccess(transformedData));
+    console.log("[ServicesSaga] fetchServiceDetails SUCCESS dispatched");
   } catch (error) {
+    console.error("[ServicesSaga] fetchServiceDetails FAILED:", error?.message, error);
     yield put(
       actions.fetchServiceDetailsFailure(
         error.message || "Failed to fetch service details"
@@ -69,6 +74,7 @@ function transformServiceData(apiResponse) {
 
 function* checkOutageStatusSaga() {
   try {
+    console.log("[ServicesSaga] checkOutageStatus called");
     yield put(actions.clearOutageData());
     const minDelay = new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -76,10 +82,15 @@ function* checkOutageStatusSaga() {
       call(servicesApi.checkOutageStatus),
       minDelay,
     ]);
+    console.log("[ServicesSaga] checkOutageStatus raw API response:", JSON.stringify(response, null, 2));
 
     const transformedOutageData = transformOutageData(response);
+    console.log("[ServicesSaga] checkOutageStatus transformed data:", JSON.stringify(transformedOutageData, null, 2));
+
     yield put(actions.checkOutageStatusSuccess(transformedOutageData));
+    console.log("[ServicesSaga] checkOutageStatus SUCCESS dispatched");
   } catch (error) {
+    console.error("[ServicesSaga] checkOutageStatus FAILED:", error?.message, error);
     const minDelay = new Promise((resolve) => setTimeout(resolve, 5000));
     yield minDelay;
 

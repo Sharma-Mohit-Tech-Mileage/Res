@@ -6,7 +6,7 @@ import LinearGradient from "react-native-linear-gradient";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
-import { cardHeader } from "../../../../styles/compositions";
+import { cardHeader, dataUsageTabs } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -122,7 +122,12 @@ const UsageChart = ({
     setShowList(nextView);
     if (isScreenReaderEnabled) {
       const viewType = nextView ? "List View" : "Graph View";
-      AccessibilityInfo.announceForAccessibility(`${viewType} selected.`);
+      // Delay announcement so it doesn't get swallowed by VoiceOver/TalkBack
+      // re-reading the button's updated accessibilityLabel after state change
+      const delay = Platform.OS === "ios" ? 600 : 400;
+      setTimeout(() => {
+        AccessibilityInfo.announceForAccessibility(`${viewType} selected.`);
+      }, delay);
     }
   }, [showList, isScreenReaderEnabled, type, data]);
 
@@ -800,26 +805,21 @@ const styles = StyleSheet.create({
   chartTitle: cardHeader.title,
 
   tabsContainer: {
-    flexDirection: "row",
-    backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: theme.radius.sm,
+    ...dataUsageTabs.tabsContainer,
     padding: 3,
     marginBottom: theme.spacing.sm,
   },
   tab: {
-    flex: 1,
+    ...dataUsageTabs.tab,
     paddingVertical: 10,
-    alignItems: "center",
-    borderRadius: theme.radius.xs,
     minHeight: 42,
     justifyContent: "center",
   },
-  activeTab: { backgroundColor: theme.colors.white, ...theme.shadows.sm },
+  activeTab: dataUsageTabs.activeTab,
   tabText: {
+    ...dataUsageTabs.tabText,
     fontSize: theme.typography.size.base,
-    fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
-    color: theme.colors.text.secondary,
   },
   activeTabText: { color: theme.colors.primaryDark },
 

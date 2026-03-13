@@ -50,7 +50,10 @@ const WifiWatermark = () => (
   </View>
 );
 
-const EeroPromoCard = () => {
+const EERO_DEFAULT_IOS_URL = "https://apps.apple.com/us/app/eero-wifi-system/id1023499075";
+const EERO_DEFAULT_ANDROID_URL = "https://play.google.com/store/apps/details?id=com.eero.android&pcampaignid=web_share";
+
+const EeroPromoCard = ({ promoData }) => {
   // ── Subtle pulse animation on the status dot ──
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -78,8 +81,8 @@ const EeroPromoCard = () => {
   const handleDownload = async () => {
     const url =
       Platform.OS === "ios"
-        ? "https://apps.apple.com/us/app/eero-wifi-system/id1023499075"
-        : "https://play.google.com/store/apps/details?id=com.eero.android&pcampaignid=web_share";
+        ? (promoData?.iosUrl || EERO_DEFAULT_IOS_URL)
+        : (promoData?.androidUrl || EERO_DEFAULT_ANDROID_URL);
 
     try {
       const canOpen = await Linking.canOpenURL(url);
@@ -160,13 +163,9 @@ const styles = StyleSheet.create({
   },
 
   cardWrapper: {
-    borderRadius: 18,
+    borderRadius: theme.radius.lg,
     overflow: "hidden",
-    elevation: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
+    ...theme.shadows.lg,
   },
   cardPressed: {
     opacity: 0.92,
@@ -278,7 +277,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
-    color: "#FFFFFF",
+    color: theme.colors.primaryDark,
   },
 
   freeLabel: {

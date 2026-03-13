@@ -4,7 +4,6 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import MOCK_DATA_USAGE from '../../components/services/dataUsage/mockDataUsage';
 import LinearGradient from "react-native-linear-gradient";
 import { theme } from "../../styles/theme";
 import { container } from "../../styles/utilities";
@@ -17,6 +16,7 @@ import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector } from "react-redux";
 import { extractZipCode } from "../utility/constant";
+import { SERVICE_HEADER_GRADIENT } from "./utils/constants";
 const MyServicesContent = ({ route }) => {
   const insets = useSafeAreaInsets();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
@@ -30,10 +30,9 @@ const MyServicesContent = ({ route }) => {
     loading || (!flagsReady ? true : accountDetails?.services?.video === true);
   const showPhone =
     loading || (!flagsReady ? true : accountDetails?.services?.phone === true);
-  const accountNumber = profileDetails.accountNumber || "1234567890";
+  const accountNumber = profileDetails.accountNumber || "";
   const legacySPA = accountDetails?.legacy_brand_by_spa;
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
-  console.log("Service Details Error:", legacySPA, error);
   const { outageData, checking, checkStatus, clearOutageData } =
     useOutageStatus();
   const [refreshing, setRefreshing] = useState(false);
@@ -63,7 +62,7 @@ const MyServicesContent = ({ route }) => {
       <LinearGradient
         style={[styles.gradientHeader, { height: 88 + insets.top }]}
         locations={[0, 1]}
-        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+        colors={SERVICE_HEADER_GRADIENT}
         useAngle={true}
         angle={90}
       />

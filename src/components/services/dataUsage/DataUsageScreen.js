@@ -50,7 +50,6 @@ const DataUsageContent = ({ navigation, route }) => {
 
   const handlePeriodChange = useCallback((period) => {
     setSelectedPeriod(period);
-    console.log("Selected period:", period);
   }, []);
 
   const onRefresh = useCallback(async () => {

@@ -242,13 +242,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   labelText: {
-    fontSize: 16,
+    fontSize: theme.typography.size.base,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     fontWeight: '700',
   },
   labelSubtext: {
-    fontSize: 14,
+    fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     marginTop: 1,
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     flex: 0.7,
   },
   statValue: {
-    fontSize: 14,
+    fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.text.primary,
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   statLabel: {
-    fontSize: 14,
+    fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     textAlign: "center",
