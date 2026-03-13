@@ -13,13 +13,46 @@ import LoadingOverlay from '../common/customui/CustomLoading';
 import MaintenanceAlert from './MaintenanceAlert';
 import { RefreshToken } from '../user/Session';
 import NetInfo from '@react-native-community/netinfo';
-import { setAuthCookiesOnAllDomains } from './NativeCookieManager';
+import { setAuthCookiesOnAllDomains, dumpCookies } from './NativeCookieManager';
 
 const TAG = '[PCI]';
 const REFRESH_INTERVAL_MS = 4 * 60 * 1000; // IdToken expires in 5min, refresh at 4min
 const JS_COOKIE_DOMAIN = ISUAT ? '.uat.sparklight.com' : '.sparklight.com';
 
 const safeForJS = (val) => JSON.stringify(String(val || '')).slice(1, -1);
+
+const tokenPreview = (t) => {
+    if (!t) return '(none)';
+    const s = String(t);
+    if (s.length <= 16) return s.substring(0, 4) + '…';
+    return s.substring(0, 8) + '…' + s.substring(s.length - 4);
+};
+
+const logStorageSnapshot = async (caller) => {
+    try {
+        const cu = await getUser();
+        const jwtAge = cu?.jwtTimestamp ? Date.now() - cu.jwtTimestamp : '?';
+        const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?';
+        console.log(`${TAG} STORAGE [${caller}] | ts=${new Date().toISOString()} | jwt=${tokenPreview(cu?.token)} | jwtAge=${jwtAge}ms | jwtIssuedAt=${cu?.jwtTimestamp ? new Date(cu.jwtTimestamp).toISOString() : '?'} | idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${idTokenAge}ms | idTokenIssuedAt=${cu?.idTokenTimestamp ? new Date(cu.idTokenTimestamp).toISOString() : '?'} | account=${cu?.userInfo?.accountNumber || '?'}`);
+    } catch (e) {
+        console.warn(`${TAG} STORAGE [${caller}] read failed:`, e.message);
+    }
+};
+
+const WEBVIEW_STORAGE_DUMP_JS = `(function() {
+    try {
+        var snap = {
+            jwt_token: localStorage.getItem('jwt_token') || null,
+            user_info: localStorage.getItem('user_info') || null,
+            tokenIssuedAt: localStorage.getItem('tokenIssuedAt') || null,
+            cookies: document.cookie || '',
+            origin: location.origin,
+            href: location.href,
+            ts: new Date().toISOString()
+        };
+        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'storageSnapshot', data: snap }));
+    } catch(e) {}
+})(); true;`;
 
 const buildCookieJS = (idToken) => {
     const safe = safeForJS(idToken);
@@ -52,6 +85,16 @@ const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp) => {
         });
 
         window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'injectionComplete' }));
+        var snap = {
+            jwt_token: localStorage.getItem('jwt_token') || null,
+            user_info: localStorage.getItem('user_info') || null,
+            tokenIssuedAt: localStorage.getItem('tokenIssuedAt') || null,
+            cookies: document.cookie || '',
+            origin: location.origin,
+            href: location.href,
+            ts: new Date().toISOString()
+        };
+        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'storageSnapshot_postInjection', data: snap }));
     } catch(e) {
         console.error('${TAG} Injection error:', e.message);
     }
@@ -103,6 +146,14 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         return bytes;
     };
 
+    // Asks the WebView to post back its current localStorage + cookies for logging
+    const dumpWebViewStorage = useCallback((caller) => {
+        if (!webViewRef.current) return;
+        webViewRef.current.injectJavaScript(
+            WEBVIEW_STORAGE_DUMP_JS.replace('storageSnapshot', 'storageSnapshot_' + caller)
+        );
+    }, []);
+
     const getPaymentObj = (token, userInfo, isEasyPay, easyPayId) => ({
         AccountNumber: userInfo.accountNumber || '',
         FirstName: userInfo.firstName || '',
@@ -149,26 +200,43 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         }
     }, []);
 
-    // 4-min silent refresh: refreshes SSO tokens, pushes only IdToken cookie
+    // 4-min silent refresh: refreshes SSO tokens via native layer only
     // JWT stays untouched in portal's localStorage so portal's 18-min refresh timer stays aligned
+    // Only refreshes native cookies (setAuthCookiesOnAllDomains) — does NOT inject into WebView
+    // to avoid overwriting cookies mid-transaction on the payment domain
     const silentRefreshIdToken = useCallback(async () => {
         if (!webViewRef.current) return;
+        const refreshStartTs = Date.now();
+        const lastRefreshAge = lastIdTokenRefresh.current ? refreshStartTs - lastIdTokenRefresh.current : '?';
+        console.log(`${TAG} silentRefresh START | ts=${new Date(refreshStartTs).toISOString()} | lastRefreshAge=${lastRefreshAge}ms`);
         try {
             const netState = await NetInfo.fetch();
             if (!netState.isConnected || !netState.isInternetReachable) {
+                console.warn(`${TAG} silentRefresh SKIP — offline | ts=${new Date().toISOString()}`);
                 pendingOfflineRefresh.current = true;
                 return;
             }
+            await logStorageSnapshot('silentRefresh-before');
             const newToken = await RefreshToken();
-            if (!newToken) { pendingOfflineRefresh.current = true; return; }
+            if (!newToken) {
+                console.warn(`${TAG} silentRefresh — RefreshToken returned null | ts=${new Date().toISOString()}`);
+                pendingOfflineRefresh.current = true;
+                return;
+            }
             pendingOfflineRefresh.current = false;
             lastIdTokenRefresh.current = Date.now();
-            await injectIdTokenOnly();
+            // Refresh native cookies only — avoid JS injection into payment WebView mid-transaction
+            const cu = await getUser();
+            console.log(`${TAG} silentRefresh | native cookies only (payment domain) | idToken=${tokenPreview(cu?.idToken)} | ts=${new Date().toISOString()}`);
+            if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken);
+            await logStorageSnapshot('silentRefresh-after');
+            await dumpCookies('PCI-silentRefresh-after');
+            console.log(`${TAG} silentRefresh DONE | duration=${Date.now() - refreshStartTs}ms`);
         } catch (e) {
-            console.error(TAG, 'Silent IdToken refresh failed:', e.message);
+            console.error(`${TAG} silentRefresh FAILED | duration=${Date.now() - refreshStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
             pendingOfflineRefresh.current = true;
         }
-    }, [injectIdTokenOnly]);
+    }, []);
 
     const stopSilentRefresh = useCallback(() => {
         if (silentRefreshTimer.current) { clearInterval(silentRefreshTimer.current); silentRefreshTimer.current = null; }
@@ -222,31 +290,64 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     const initializePayment = async () => {
-        if (isInitializing.current) return;
+        if (isInitializing.current) {
+            console.log(`${TAG} initializePayment SKIP — already initializing | ts=${new Date().toISOString()}`);
+            return;
+        }
         isInitializing.current = true;
+        const initStartTs = Date.now();
+        console.log(`${TAG} initializePayment START | ts=${new Date(initStartTs).toISOString()} | name=${name} | status=${status}`);
 
         try {
-            const userLocal = await getUser();
-            if (!userLocal?.userInfo?.accountNumber) { navigation.navigate('Billing'); return; }
+            let userLocal = await getUser();
+            if (!userLocal?.userInfo?.accountNumber) {
+                console.error(`${TAG} initializePayment — no accountNumber, navigating to Billing`);
+                navigation.navigate('Billing');
+                return;
+            }
 
-            // Pass stored JWT + jwtTimestamp (tokenIssuedAt) to portal — no refresh needed here.
-            // Portal uses tokenIssuedAt to know the real JWT age and schedules its own refresh.
+            const idTokenAge = userLocal?.idTokenTimestamp ? Date.now() - userLocal.idTokenTimestamp : Infinity;
+            console.log(`${TAG} initializePayment | account=${userLocal.userInfo.accountNumber} | jwt=${tokenPreview(userLocal.token)} | jwtTimestamp=${userLocal.jwtTimestamp ? new Date(userLocal.jwtTimestamp).toISOString() : '?'} | idToken=${tokenPreview(userLocal.idToken)} | idTokenAge=${idTokenAge}ms | idTokenTimestamp=${userLocal.idTokenTimestamp ? new Date(userLocal.idTokenTimestamp).toISOString() : '?'}`);
+
+            // Refresh if IdToken is older than 4 minutes (expires at 5min) to avoid injecting stale JWT
+            if (idTokenAge > 240000) {
+                console.warn(`${TAG} initializePayment | IdToken stale (${idTokenAge}ms old) — refreshing before injection | ts=${new Date().toISOString()}`);
+                try {
+                    await RefreshToken();
+                    userLocal = await getUser();
+                    console.log(`${TAG} initializePayment | post-refresh idToken=${tokenPreview(userLocal?.idToken)} | idTokenAge=${userLocal?.idTokenTimestamp ? Date.now() - userLocal.idTokenTimestamp : '?'}ms`);
+                } catch (refreshErr) {
+                    console.error(`${TAG} initializePayment | refresh failed, using existing token | error=${refreshErr.message}`);
+                }
+            }
+
             lastIdTokenRefresh.current = userLocal?.idTokenTimestamp || Date.now();
-
             setInjectionScript(buildInjectionScript(userLocal?.token || '', userLocal?.userInfo || {}, userLocal?.idToken || '', userLocal?.jwtTimestamp));
             await setAuthCookiesOnAllDomains(userLocal?.idToken || '');
+            await dumpCookies('PCI-initPayment');
 
             const accountNumber = userLocal.userInfo.accountNumber;
+            console.log(`${TAG} initializePayment | calling EasyPay API: api/Accounts/${accountNumber}/easypay | ts=${new Date().toISOString()}`);
             const res = await Promise.race([
                 new Promise((resolve) => {
                     GetApiRequest(
                         `api/Accounts/${accountNumber}/easypay`,
-                        (r) => resolve(r),
-                        (err) => { if (err?.includes('503')) setIsServiceDown(true); resolve(null); }
+                        (r) => {
+                            console.log(`${TAG} EasyPay API OK | isEasyPay=${r?.isEasyPay} | easyPayId=${r?.easyPayId || '(none)'} | ts=${new Date().toISOString()}`);
+                            resolve(r);
+                        },
+                        (err) => {
+                            console.error(`${TAG} EasyPay API FAILED | error=${JSON.stringify(err)} | ts=${new Date().toISOString()}`);
+                            if (err?.includes?.('503')) setIsServiceDown(true);
+                            resolve(null);
+                        }
                     );
                 }),
                 new Promise((_, reject) => setTimeout(() => reject(new Error('EasyPay API timeout')), 15000)),
-            ]).catch(() => null);
+            ]).catch((e) => {
+                console.error(`${TAG} EasyPay API TIMEOUT or error | error=${e.message} | ts=${new Date().toISOString()}`);
+                return null;
+            });
 
             const type = status ? 'MANAGE' : 'SETUP';
             let referralUrl;
@@ -255,11 +356,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             } catch {
                 referralUrl = status ? Env.REFERRAL_URL_MANAGE_V3 : Env.REFERRAL_URL_SETUP_V3;
             }
+            console.log(`${TAG} initializePayment | type=${type} | referralUrl=${referralUrl} | customReferUrl=${customReferUrl || '(none)'}`);
 
             const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay || false, res?.easyPayId || '');
+            console.log(`${TAG} initializePayment | redirecting to eBillpay | account=${paymentObj.AccountNumber} | totalDue=${paymentObj.TotalDue} | dueDate=${paymentObj.DueDate} | easyPayEnabled=${paymentObj.EasyPayEnabled} | duration=${Date.now() - initStartTs}ms`);
             redirectToEBillpay(paymentObj, referralUrl);
         } catch (e) {
-            console.error(TAG, 'initializePayment failed:', e.message);
+            console.error(`${TAG} initializePayment FAILED | duration=${Date.now() - initStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
             navigation.navigate('Billing');
         } finally {
             isInitializing.current = false;
@@ -267,6 +370,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     const recreateWebView = useCallback(async () => {
+        console.log(`${TAG} recreateWebView START | ts=${new Date().toISOString()}`);
         setHtml('');
         setContentLoaded(false);
         setProgress(0);
@@ -274,54 +378,62 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         setErrorMessage('');
         initialLoadComplete.current = false;
         isInitializing.current = false;
-        setTimeout(() => { setWebViewKey(Date.now()); initializePayment(); }, 100);
+        setTimeout(() => {
+            console.log(`${TAG} recreateWebView | re-initializing payment | ts=${new Date().toISOString()}`);
+            setWebViewKey(Date.now()); initializePayment();
+        }, 100);
     }, []);
 
     useEffect(() => { initializePayment(); }, []);
 
     useEffect(() => { startSilentRefresh(); return stopSilentRefresh; }, [startSilentRefresh, stopSilentRefresh]);
 
-    useEffect(() => {
-        if (user && contentLoaded) {
-            // JWT already set via injectedJavaScriptBeforeContentLoaded — just ensure IdToken cookie is current
-            const t = setTimeout(() => injectIdTokenOnly(), 500);
-            return () => clearTimeout(t);
-        }
-    }, [user, contentLoaded, injectIdTokenOnly]);
+    // Skip redundant injection — IdToken cookie is already set by injectedJavaScriptBeforeContentLoaded
+    // and native cookies are set during initializePayment. Re-injecting on user/contentLoaded change
+    // causes unnecessary overwrites mid-transaction on the payment domain.
 
     useEffect(() => {
         const handleAppState = async (nextAppState) => {
             if (nextAppState === 'background' || nextAppState === 'inactive') {
                 backgroundTimestamp.current = Date.now();
+                console.log(`${TAG} AppState → ${nextAppState} | ts=${new Date().toISOString()} | stoppingSilentRefresh`);
                 stopSilentRefresh();
             } else if (nextAppState === 'active' && backgroundTimestamp.current > 0) {
                 const dur = Date.now() - backgroundTimestamp.current;
                 const idTokenAge = Date.now() - lastIdTokenRefresh.current;
                 const netState = await NetInfo.fetch();
                 const isOnline = netState.isConnected && netState.isInternetReachable;
+                console.log(`${TAG} AppState → active | bgDuration=${dur}ms | idTokenAge=${idTokenAge}ms | isOnline=${isOnline} | ts=${new Date().toISOString()}`);
+                await logStorageSnapshot('PCI-appState-resume');
+                await dumpCookies('PCI-appState-resume');
 
                 if (dur > 600000) {
-                    // >10 min background: WebView may be dead — recreate gets fresh JWT + IdToken
-                    if (!isOnline) { pendingOfflineRefresh.current = true; }
+                    console.log(`${TAG} AppState | >10min bg — checking WebView alive`);
+                    if (!isOnline) { console.warn(`${TAG} AppState | offline, deferring refresh`); pendingOfflineRefresh.current = true; }
                     else {
                         const alive = await checkWebViewAlive();
-                        if (!alive) { recreateWebView(); }
+                        console.log(`${TAG} AppState | WebView alive=${alive}`);
+                        if (!alive) { console.log(`${TAG} AppState | recreating WebView`); recreateWebView(); }
                         else {
-                            // WebView alive but tokens very stale — refresh IdToken only
-                            try { await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await injectIdTokenOnly(); }
-                            catch (_) { recreateWebView(); }
+                            try {
+                                console.log(`${TAG} AppState | WebView alive, refreshing IdToken`);
+                                await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await injectIdTokenOnly();
+                            }
+                            catch (_) { console.warn(`${TAG} AppState | refresh failed, recreating WebView`); recreateWebView(); }
                         }
                     }
                 } else if (idTokenAge > 240000) {
-                    // IdToken >4 min old (expires at 5min) — refresh IdToken cookie only, don't touch JWT
+                    console.log(`${TAG} AppState | idToken >4min old, refreshing`);
                     if (!isOnline) { pendingOfflineRefresh.current = true; }
                     else {
                         try { await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await injectIdTokenOnly(); }
                         catch (_) { pendingOfflineRefresh.current = true; }
                     }
                 } else if (dur > 60000) {
-                    // >1 min background but IdToken still fresh: just re-inject current IdToken cookie
+                    console.log(`${TAG} AppState | >1min bg, re-injecting current IdToken`);
                     await injectIdTokenOnly();
+                } else {
+                    console.log(`${TAG} AppState | short bg (${dur}ms), no action needed`);
                 }
                 backgroundTimestamp.current = 0;
                 startSilentRefresh();
@@ -343,7 +455,10 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     }, [silentRefreshIdToken]);
 
     const onShouldStartLoadWithRequest = useCallback((request) => {
+        console.log(`${TAG} NAV onShouldStartLoad | url=${request.url} | ts=${new Date().toISOString()}`);
         if (request.url.includes('/postlogout') || request.url.includes(Env.SSO_LOGIN)) {
+            const reason = request.url.includes('/postlogout') ? 'postlogout' : 'SSO redirect';
+            console.warn(`${TAG} NAV | ${reason} detected — session expired, going back | ts=${new Date().toISOString()}`);
             showToastMessage();
             navigation.goBack();
             return false;
@@ -353,27 +468,37 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         return true;
     }, [showToastMessage, navigation]);
 
-    const onLoadStart = useCallback(() => {
+    const onLoadStart = useCallback(({ nativeEvent }) => {
+        console.log(`${TAG} NAV onLoadStart | url=${nativeEvent?.url || '?'} | ts=${new Date().toISOString()}`);
         if (!initialLoadComplete.current) { setContentLoaded(false); setProgress(0); }
         setIsError(false); setErrorMessage('');
     }, []);
 
-    const onLoadEnd = useCallback(async () => {
+    const onLoadEnd = useCallback(async ({ nativeEvent }) => {
         setProgress(1); setContentLoaded(true); initialLoadComplete.current = true;
-        // JWT already set via injectedJavaScriptBeforeContentLoaded — just ensure IdToken cookie
-        await injectIdTokenOnly();
-    }, [injectIdTokenOnly]);
+        console.log(`${TAG} NAV onLoadEnd | url=${nativeEvent?.url || '?'} | ts=${new Date().toISOString()}`);
+        await logStorageSnapshot('PCI-onLoadEnd');
+        await dumpCookies('PCI-onLoadEnd');
+        dumpWebViewStorage('PCI-onLoadEnd');
+        // JWT + IdToken cookie already set via injectedJavaScriptBeforeContentLoaded and native cookies
+        // No redundant injection — avoid overwriting cookies mid-transaction on payment domain
+    }, [dumpWebViewStorage]);
 
     const onLoadProgress = useCallback(({ nativeEvent }) => { setProgress(nativeEvent.progress); }, []);
 
     const onError = useCallback(({ nativeEvent }) => {
-        console.error(TAG, 'WebView error:', nativeEvent?.description);
+        console.error(`${TAG} WebView ERROR | description=${nativeEvent?.description} | ts=${new Date().toISOString()}`);
         setIsError(true); setContentLoaded(true);
         setErrorMessage(`Unable to load page: ${nativeEvent?.description || 'Unknown error'}`);
     }, []);
 
     const onHttpError = useCallback(({ nativeEvent }) => {
-        console.error(TAG, 'HTTP error:', nativeEvent?.statusCode, nativeEvent?.url);
+        console.error(`${TAG} HTTP ERROR | status=${nativeEvent?.statusCode} | url=${nativeEvent?.url} | ts=${new Date().toISOString()}`);
+        // Dump storage + cookies on HTTP errors for diagnostics
+        (async () => {
+            await logStorageSnapshot('PCI-httpError-' + nativeEvent?.statusCode);
+            await dumpCookies('PCI-httpError-' + nativeEvent?.statusCode);
+        })();
         if (nativeEvent?.statusCode === 503) setIsServiceDown(true);
         else if (nativeEvent?.statusCode === 404) { setIsError(true); setErrorMessage('Page not found.'); }
         else if (nativeEvent?.statusCode === 403) { setIsError(true); setErrorMessage('Access denied.'); }
@@ -386,12 +511,29 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             const data = JSON.parse(nativeEvent.data);
             switch (data.type) {
                 case 'pong':
+                    console.log(`${TAG} MSG pong | WebView alive | ts=${new Date().toISOString()}`);
                     if (aliveCheckTimeout.current) { clearTimeout(aliveCheckTimeout.current); aliveCheckTimeout.current = null; }
                     if (aliveCheckResolver.current) { aliveCheckResolver.current(true); aliveCheckResolver.current = null; }
                     break;
                 case 'injectionComplete':
+                    console.log(`${TAG} MSG injectionComplete | ts=${new Date().toISOString()}`);
                     break;
                 default:
+                    if (data.type && data.type.startsWith('storageSnapshot') && data.data) {
+                        const s = data.data;
+                        const caller = data.type.replace('storageSnapshot_', '');
+                        const cookiePairs = (s.cookies || '').split(';').map(c => c.trim()).filter(Boolean);
+                        const cookieObj = {};
+                        cookiePairs.forEach(pair => {
+                            const idx = pair.indexOf('=');
+                            if (idx > 0) cookieObj[pair.substring(0, idx)] = pair.substring(idx + 1);
+                        });
+                        console.log(`${TAG} WEBVIEW_STORAGE [${caller}] | origin=${s.origin} | href=${s.href} | ts=${s.ts}`);
+                        console.log(`${TAG} WEBVIEW_STORAGE [${caller}] | jwt_token=${tokenPreview(s.jwt_token)} | tokenIssuedAt=${s.tokenIssuedAt} | user_info=${s.user_info ? s.user_info.substring(0, 100) + (s.user_info.length > 100 ? '…' : '') : '(none)'}`);
+                        console.log(`${TAG} WEBVIEW_STORAGE [${caller}] | cookies=${JSON.stringify(cookieObj)}`);
+                    } else {
+                        console.log(`${TAG} MSG unknown | type=${data.type} | ts=${new Date().toISOString()}`);
+                    }
                     break;
             }
         } catch {

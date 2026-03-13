@@ -9,6 +9,14 @@ const TAG = '[Session]';
 
 let _refreshPromise = null;
 
+// Show first 8 + last 4 chars of a token for safe logging
+const tokenPreview = (t) => {
+    if (!t) return '(none)';
+    const s = String(t);
+    if (s.length <= 16) return s.substring(0, 4) + '…';
+    return s.substring(0, 8) + '…' + s.substring(s.length - 4);
+};
+
 const config = {
     issuer: Env.SSO_LOGIN,
     clientId: "sparklight-customer-mobile-app",
@@ -26,6 +34,8 @@ const onSuccess = async (res, idToken = null) => {
     const now = Date.now();
     const user = { userInfo, token, tokenGuid: idTokenGuid, refreshToken, idToken, jwtTimestamp: now, idTokenTimestamp: now };
 
+    console.log(`${TAG} onSuccess | ts=${new Date(now).toISOString()} | jwt=${tokenPreview(token)} | idToken=${tokenPreview(idToken)} | jwtTimestamp=${now} | idTokenTimestamp=${now} | account=${userInfo?.accountNumber || '?'}`);
+
     await storeUser(user);
     store.dispatch(saveUserInfo(user));
     return token;
@@ -38,11 +48,14 @@ const onError = (error) => {
 
 const retryRequest = async (data, retries = 2) => {
     try {
+        console.log(`${TAG} retryRequest | endpoint=api/mobile/gettoken | retriesLeft=${retries} | ts=${new Date().toISOString()}`);
         const result = await new Promise((resolve, reject) => {
             PostAuthApiRequest("api/mobile/gettoken", data, resolve, reject);
         });
+        console.log(`${TAG} retryRequest OK | ts=${new Date().toISOString()} | hasJwt=${!!result?.jwtToken}`);
         return result;
     } catch (error) {
+        console.error(`${TAG} retryRequest FAIL | retriesLeft=${retries} | error=${error.message} | status=${error?.status || '?'} | ts=${new Date().toISOString()}`);
         if (retries > 0) {
             return retryRequest(data, retries - 1);
         }
@@ -53,15 +66,24 @@ const retryRequest = async (data, retries = 2) => {
 
 export const RefreshToken = async () => {
     if (_refreshPromise) {
+        console.log(`${TAG} RefreshToken | DEDUP — already in flight, awaiting existing promise | ts=${new Date().toISOString()}`);
         return _refreshPromise;
     }
+
+    const refreshStartTs = Date.now();
+    console.log(`${TAG} RefreshToken START | ts=${new Date(refreshStartTs).toISOString()}`);
 
     _refreshPromise = (async () => {
         try {
             const user = await getUser();
             if (!user?.refreshToken) throw new Error("No refresh token in storage");
 
+            const jwtAge = user.jwtTimestamp ? Date.now() - user.jwtTimestamp : '?';
+            const idTokenAge = user.idTokenTimestamp ? Date.now() - user.idTokenTimestamp : '?';
+            console.log(`${TAG} RefreshToken | storedJwt=${tokenPreview(user.token)} | jwtAge=${jwtAge}ms | storedIdToken=${tokenPreview(user.idToken)} | idTokenAge=${idTokenAge}ms | hasRefreshToken=${!!user.refreshToken}`);
+
             const result = await refresh(config, { refreshToken: user.refreshToken });
+            console.log(`${TAG} RefreshToken | SSO refresh OK | newIdToken=${tokenPreview(result.idToken)} | hasAccessToken=${!!result.accessToken} | hasNewRefreshToken=${!!result.refreshToken} | ts=${new Date().toISOString()}`);
 
             const data = {
                 idToken: result.idToken,
@@ -71,9 +93,11 @@ export const RefreshToken = async () => {
             };
 
             const apiResponse = await retryRequest(data, 2);
-            return await onSuccess(apiResponse, result.idToken);
+            const token = await onSuccess(apiResponse, result.idToken);
+            console.log(`${TAG} RefreshToken COMPLETE | duration=${Date.now() - refreshStartTs}ms | newJwt=${tokenPreview(token)} | ts=${new Date().toISOString()}`);
+            return token;
         } catch (error) {
-            console.error(`${TAG} RefreshToken failed:`, error.message);
+            console.error(`${TAG} RefreshToken FAILED | duration=${Date.now() - refreshStartTs}ms | error=${error.message} | ts=${new Date().toISOString()}`);
             return onError(error);
         }
     })();

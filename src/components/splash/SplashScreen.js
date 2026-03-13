@@ -22,6 +22,7 @@ import NetworkManager from "../../utils/NetworkManager";
 import AuthenticationManager from "../../utils/AuthenticationManager";
 import ErrorModal, { ErrorType } from "../common/ErrorModal";
 import LoadingStateIndicator, { LoadingState, } from "../common/LoadingStateIndicator";
+import { clearAuthCookies } from "../utility/NativeCookieManager";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -59,6 +60,7 @@ const SplashScreen = ({ navigation, route }) => {
   const [errorState, setErrorState] = useState({ visible: false, type: null, message: null, });
   const [authInProgress, setAuthInProgress] = useState(false);
   const authLockRef = useRef(false);
+  const ssoIdTokenRef = useRef(null);
   const [loginEnable, setLoginEnable] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -262,7 +264,8 @@ const SplashScreen = ({ navigation, route }) => {
 
   const callSSOLoginApi = useCallback((request) => {
     setLoadingState(LoadingState.LOADING_DATA);
-
+    // Capture SSO idToken from request so handleLogin can store it in the user object
+    ssoIdTokenRef.current = request.idToken || null;
     PostAuthApiRequest("api/mobile/gettoken", request, onSuccess, onError);
   }, []);
 
@@ -337,6 +340,7 @@ const SplashScreen = ({ navigation, route }) => {
         token: token,
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken,
+        idToken: ssoIdTokenRef.current || null,
         jwtTimestamp: Date.now(),
         idTokenTimestamp: Date.now(),
       };
@@ -555,6 +559,7 @@ const SplashScreen = ({ navigation, route }) => {
               .then(async () => {
                 try {
                   await analytics().resetAnalyticsData();
+                  await clearAuthCookies();
                   cleanUserData();
                   if (
                     postLogoutCallback &&
@@ -572,8 +577,9 @@ const SplashScreen = ({ navigation, route }) => {
                   }
                 }
               })
-              .catch((error) => {
+              .catch(async (error) => {
                 console.error("Logout error:", error);
+                await clearAuthCookies();
                 cleanUserData();
                 if (
                   postLogoutCallback &&
@@ -583,6 +589,7 @@ const SplashScreen = ({ navigation, route }) => {
                 }
               });
           } else {
+            clearAuthCookies();
             cleanUserData();
             if (
               postLogoutCallback &&
@@ -593,8 +600,9 @@ const SplashScreen = ({ navigation, route }) => {
           }
         });
       })
-      .catch((error) => {
+      .catch(async (error) => {
         console.error("Error getting SSO token for logout:", error);
+        await clearAuthCookies();
         cleanUserData();
         if (postLogoutCallback && typeof postLogoutCallback === "function") {
           postLogoutCallback();

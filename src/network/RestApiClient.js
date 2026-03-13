@@ -4,6 +4,7 @@ import { Env } from "./apis/account/Constants";
 import { getUser, cleanUserData } from "../redux/utils/LocalStorage";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
+import { clearAuthCookies } from '../components/utility/NativeCookieManager';
 
 const API_ACP_BASEURL = Env.API_ACP_BASEURL;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
@@ -52,6 +53,7 @@ const retryRequest = async (axiosInstance, originalRequest, retryCount = 0) => {
 
 const redirectToLogin = async () => {
     try {
+        await clearAuthCookies();
         await cleanUserData();
         if (navigationRef.current) {
             navigationRef.current.reset({ index: 0, routes: [{ name: 'Splash' }] });
@@ -74,7 +76,9 @@ const AxiosInterceptorProvider = ({ children }) => {
                 const originalRequest = error.config;
 
                 if (error.response?.status === 401 && !originalRequest._retry) {
+                    console.warn(`[RestApiClient] 401 received | endpoint=${originalRequest.url} | isRefreshing=${isRefreshing} | queueLength=${failedQueue.length} | ts=${new Date().toISOString()}`);
                     if (isRefreshing) {
+                        console.log(`[RestApiClient] 401 | queuing request (refresh already in flight) | endpoint=${originalRequest.url}`);
                         return new Promise((resolve, reject) => {
                             failedQueue.push({ resolve, reject });
                         }).then(token => {
@@ -87,8 +91,10 @@ const AxiosInterceptorProvider = ({ children }) => {
                     isRefreshing = true;
 
                     try {
+                        console.log(`[RestApiClient] 401 | starting token refresh | endpoint=${originalRequest.url} | ts=${new Date().toISOString()}`);
                         await RefreshToken();
                         const user = await getUser();
+                        console.log(`[RestApiClient] 401 | refresh OK, retrying | endpoint=${originalRequest.url} | queuedRequests=${failedQueue.length} | ts=${new Date().toISOString()}`);
                         _axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.token;
                         originalRequest.headers['Authorization'] = 'Bearer ' + user.token;
                         processQueue(null, user.token);
@@ -97,7 +103,7 @@ const AxiosInterceptorProvider = ({ children }) => {
                     } catch (refreshError) {
                         processQueue(refreshError, null);
                         isRefreshing = false;
-                        console.error('[RestApiClient] Token refresh failed, redirecting to login');
+                        console.error(`[RestApiClient] 401 | token refresh FAILED, redirecting to login | error=${refreshError.message} | ts=${new Date().toISOString()}`);
                         await redirectToLogin();
                         return Promise.reject(refreshError);
                     }
@@ -133,10 +139,14 @@ const handleResponse = (res, onSuccess, onError, endpoint) => {
 };
 
 const handleError = (err, onError, endpoint) => {
+    const status = err.response?.status || 0;
+    const statusText = err.response?.statusText || 'Unknown Error';
+    const message = err.response?.data?.message || err.message || 'Request failed';
+    console.error(`[RestApiClient] API ERROR | endpoint=${endpoint} | status=${status} | statusText=${statusText} | message=${message} | code=${err.code || '?'} | ts=${new Date().toISOString()}`);
     onError({
-        status: err.response?.status || 0,
-        statusText: err.response?.statusText || 'Unknown Error',
-        message: err.response?.data?.message || err.message || 'Request failed',
+        status,
+        statusText,
+        message,
         data: err.response?.data,
         endpoint,
     });

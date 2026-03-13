@@ -12,6 +12,7 @@ import {
 import { logout } from "react-native-app-auth";
 import { Env } from "../../network/apis/account/Constants";
 import { navigationRef } from "../../navigations/UserNavigations";
+import { clearAuthCookies } from "../utility/NativeCookieManager";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -394,6 +395,7 @@ export const MaintenanceProvider = ({ children }) => {
     try {
       if (isBlockingLogout) {
         await Promise.all([
+          clearAuthCookies(),
           storeUser({}),
           storeUser(null),
           storeSsoToken({}),
@@ -424,6 +426,7 @@ export const MaintenanceProvider = ({ children }) => {
           });
         }
 
+        await clearAuthCookies();
         await storeUser({});
         await storeSsoToken({});
         await cleanUserData();
@@ -452,6 +455,7 @@ export const MaintenanceProvider = ({ children }) => {
       console.error("Error during logout:", error);
 
       try {
+        await clearAuthCookies();
         await storeUser({});
         await storeSsoToken({});
         await cleanUserData();
