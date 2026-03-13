@@ -250,7 +250,7 @@ const Feedback = () => {
 
                   if (thresholdToAnnounce != null) {
                     AccessibilityInfo.announceForAccessibility(
-                      `You have ${thresholdToAnnounce} characters available`
+                      `You have ${thresholdToAnnounce} characters Remaining`
                     );
                   }
                 };
