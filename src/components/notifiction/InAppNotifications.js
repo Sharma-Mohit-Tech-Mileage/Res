@@ -31,7 +31,6 @@ import Toggle from "../common/Toggle";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
 import { PostApiRequest } from "../../network/APIClient";
-import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 
@@ -65,49 +64,47 @@ const InAppNotifications = ({ navigation }) => {
   // On Android TalkBack we may temporarily hide background elements for *error* alerts,
   // but success banners should not disable/"hide" the toggles.
   const isAndroidA11yModalActive =
-    Platform.OS === "android" &&
-    screenReaderEnabled &&
-    notification?.type === "error";
+    Platform.OS === "android" && screenReaderEnabled && notification?.type === "error";
 
   useEffect(() => {
-    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
-  }, []);
-
-  useEffect(() => {
-    if (notification && screenReaderEnabled) {
-      // Focus-only, mirror Text Notifications: prefer success icon; fallback to container refs. Retry once.
-      const t1 = setTimeout(() => {
-        try {
-          if (notification.type === "success" && successIconRef.current) {
-            const handle = findNodeHandle(successIconRef.current);
-            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-          } else if (notification.type === "success") {
-            setSuccessFocus();
-          } else {
-            setErrorFocus();
+      AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+    }, []);
+  
+  
+  
+    useEffect(() => {
+      if (notification && screenReaderEnabled) {
+        // Focus-only, mirror Text Notifications: prefer success icon; fallback to container refs. Retry once.
+        const t1 = setTimeout(() => {
+          try {
+            if (notification.type === "success" && successIconRef.current) {
+              const handle = findNodeHandle(successIconRef.current);
+              if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+            } else if (notification.type === "success") {
+              setSuccessFocus();
+            } else {
+              setErrorFocus();
+            }
+          } catch (e) {
+            console.log("Accessibility focus error:", e);
           }
-        } catch (e) {
-          console.log("Accessibility focus error:", e);
-        }
-      }, 600);
+        }, 600);
 
-      const t2 = setTimeout(() => {
-        try {
-          if (notification.type === "success" && successIconRef.current) {
-            const handle = findNodeHandle(successIconRef.current);
-            if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+        const t2 = setTimeout(() => {
+          try {
+            if (notification.type === "success" && successIconRef.current) {
+              const handle = findNodeHandle(successIconRef.current);
+              if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
+            }
+          } catch (e) {
+            console.log("Accessibility focus retry error:", e);
           }
-        } catch (e) {
-          console.log("Accessibility focus retry error:", e);
-        }
-      }, 1200);
+        }, 1200);
 
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
-    }
-  }, [notification, screenReaderEnabled, setSuccessFocus, setErrorFocus]);
+        return () => { clearTimeout(t1); clearTimeout(t2); };
+      }
+    }, [notification, screenReaderEnabled, setSuccessFocus, setErrorFocus]);
+  
 
   const translateY = animatedValue;
   const animateNotification = useCallback(() => {
@@ -300,11 +297,9 @@ const InAppNotifications = ({ navigation }) => {
       customerType: "Residential",
     };
     console.log("postRequestInAppNotification requestData", requestData);
-    const endpointUrl = getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, {
-      userName,
-    });
+    const requestUrl = `api/mobilenotificationpreferences/${userName}/mobilepreferences`;
     PostApiRequest(
-      endpointUrl,
+      requestUrl,
       requestData,
       (res) => {
         console.log("postRequestInAppNotification response", res);
@@ -422,45 +417,45 @@ const InAppNotifications = ({ navigation }) => {
                   onChange={handleToggleChange}
                 />
               </View>
-            </View>
+              </View>
 
-            <View style={styles.buttonsParent}>
-              <Pressable
-                accessible={true}
-                accessibilityLabel="Save"
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  {
-                    backgroundColor: Color.colorMidnightblue,
-                    opacity: pressed ? 0.7 : 1.0,
-                  }, // Changes opacity based on press state
-                  styles.buttonsLayout,
-                ]}
-                onPress={handleSave}
-              >
-                <Text
-                  style={[{ color: Color.sparklightWhite }, styles.makeTypo]}
-                >
-                  Save
-                </Text>
-              </Pressable>
-              <Pressable
-                accessible={true}
-                accessibilityLabel="Cancel"
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  styles.buttons1,
-                  styles.buttonsLayout,
-                  { opacity: pressed ? 0.7 : 1.0 },
-                ]}
-                onPress={() => navigation.navigate("Notifications")}
-              >
-                <Text
-                  style={[{ color: Color.colorMidnightblue }, styles.makeTypo]}
-                >
-                  Cancel
-                </Text>
-              </Pressable>
+                <View style={styles.buttonsParent}>
+                  <Pressable
+                    accessible={true}
+                    accessibilityLabel="Save"
+                    accessibilityRole="button"
+                    style={({ pressed }) => [
+                      {
+                        backgroundColor: Color.colorMidnightblue,
+                        opacity: pressed ? 0.7 : 1.0,
+                      }, // Changes opacity based on press state
+                      styles.buttonsLayout,
+                    ]}
+                    onPress={handleSave}
+                  >
+                    <Text
+                      style={[{ color: Color.sparklightWhite }, styles.makeTypo]}
+                    >
+                      Save
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    accessible={true}
+                    accessibilityLabel="Cancel"
+                    accessibilityRole="button"
+                    style={({ pressed }) => [
+                      styles.buttons1,
+                      styles.buttonsLayout,
+                      { opacity: pressed ? 0.7 : 1.0 },
+                    ]}
+                    onPress={() => navigation.navigate("Notifications")}
+                  >
+                    <Text
+                      style={[{ color: Color.colorMidnightblue }, styles.makeTypo]}
+                    >
+                      Cancel
+                    </Text>
+                  </Pressable>
             </View>
           </View>
         </View>

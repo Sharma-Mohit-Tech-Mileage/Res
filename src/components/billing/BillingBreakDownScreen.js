@@ -19,7 +19,7 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import AppStyles from "../utility/AppStyles";
 import { PostApiRequest } from "../../network/APIClient";
 import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
@@ -35,6 +35,7 @@ import { InfoIcon } from "native-base";
 import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
 import SecondaryButton from "../common/customui/PrimaryButton";
 import LoadingOverlay from "../common/customui/CustomLoading";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 
 // Constants
@@ -219,7 +220,7 @@ const BreakDownItem = memo(({ item }) => {
 /**
  * Footer component showing the total balance due
  */
-const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillExplainerLink , navigation }) => (
+const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillExplainerLink , navigation, explainerLoading }) => (
   <>
     <View style={[styles.detailRow, styles.footerContainer]}>
       <Text
@@ -238,7 +239,27 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
       </Text>
       <View style={[styles.detailItemBorder, styles.totalBalanceSeparator]} />
     </View>
-    {showBillExplainer && (
+    {explainerLoading ? (
+      <View style={styles.billPlanermainContainer}>
+        <SkeletonPlaceholder>
+          <View
+            style={{
+              width: wp("80%"),
+              height: 20,
+              borderRadius: 4,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: wp("60%"),
+              height: 20,
+              borderRadius: 4,
+            }}
+          />
+        </SkeletonPlaceholder>
+      </View>
+    ) : showBillExplainer ? (
       <View style={styles.billPlanermainContainer}>
         <Text style={styles.billExplainerText}>
           Still have questions about your bill?
@@ -262,7 +283,7 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
         </View>
         </View>
       </View>
-    )}
+    ) : null}
     <View style={[styles.detailItemBorder]} />
   </>
 ));
@@ -277,7 +298,7 @@ const renderBillExplainerLink = (data, navigation) => {
   }
   navigation.navigate('ArticalWindowUtility', {
     name: "Bill Explainer",
-    url: data.be_url
+    url: data.be_url,
   });
 };
 
@@ -319,10 +340,11 @@ const BillingBreakDownScreen = ({ navigation }) => {
   const billingData = useSelector(selectBillingBreakDownData);
   const error = useSelector(selectBillingBreakDownError)
 
-  const billExplainerData = useSelector(selectBillExplainerData);
-  //const [billExplainerData, setBillExplainerData] = useState(null);
+  //const billExplainerData = useSelector(selectBillExplainerData);
+  const [billExplainerData, setBillExplainerData] = useState(null);
   
   const [showBillExplainer, setShowBillExplainer] = useState(false);
+  const [explainerLoading, setExplainerLoading] = useState(true);
 
  
   // Local state
@@ -351,7 +373,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
    useEffect(() => {
     console.log("Account Details1:", accountDetails);
     if (!accountDetails?.hierarchy?.hierarchy_id) {
-      setShowBillExplainer(true);
+       setExplainerLoading(true);
       let requestBody = {
           customer_type: accountDetails?.customer_type,
           hierarchy_id: accountDetails?.hierarchy?.hierarchy_id,    
@@ -361,32 +383,47 @@ const BillingBreakDownScreen = ({ navigation }) => {
           video: accountDetails?.services?.video,
           homesPassedId: accountDetails?.homes_passed_id || null
     }
-    dispatch(fetchBillExplainer(requestBody));
-    //getBillExplainerData(requestBody);
+   
+    //dispatch(fetchBillExplainer(requestBody));
+    getBillExplainerData(requestBody);
+    }else{
+      setShowBillExplainer(false);
+      setExplainerLoading(false);
     }
   }, [accountDetails]);
 
 
 
-  useEffect(() => {
-    console.log("Bill Explainer Data:", billExplainerData);
-    if(!billExplainerData?.eligibility){
-      setShowBillExplainer(false);
-    }else{
-      setShowBillExplainer(true);
-    }
-  }, [billExplainerData]);
+  // useEffect(() => {
+  //   console.log("Bill Explainer Data:", billExplainerData);
+  //   if(!billExplainerData?.eligibility){
+  //     setShowBillExplainer(false);
+  //   }else{
+  //     setShowBillExplainer(true);
+  //   }
+  //   setExplainerLoading(false);
+  // }, [billExplainerData]);
 
-  // const getBillExplainerData =(requestBody) => {  
-  //   PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
-  //     console.log("Bill Explainer Response:", res);
-  //     setBillExplainerData(res);
-  //     }, (error) => { 
-  //       console.error("Bill Explainer Error:", error);
-  //     }
+  const getBillExplainerData =(requestBody) => {  
+    setExplainerLoading(true);
+    PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
+      console.log("Bill Explainer Response:", res);
+      setBillExplainerData(res);
+      if(res?.eligibility){
+        setShowBillExplainer(true);
 
-  //   )
-  // };
+      }else{
+        setShowBillExplainer(false);
+      }
+      setExplainerLoading(false);
+      }, (error) => { 
+        setShowBillExplainer(false);
+        setExplainerLoading(false);
+        console.error("Bill Explainer Error:", error);
+      }
+
+    )
+  };
 
   // Fetch billing data when screen is focused
   useFocusEffect(
@@ -449,7 +486,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         maxToRenderPerBatch={10}
         initialNumToRender={5}
         windowSize={5}
-        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} />}
+        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={explainerLoading} />}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
     );
@@ -711,6 +748,7 @@ const styles = StyleSheet.create({
   billPlanermainContainer: {
     flexDirection: "column",
     alignItems: "center",
+    justifyContent: "center",   
     padding: Padding.p_xs,
     borderColor: Color.sparklightGray,
     borderTopWidth: 0.5,

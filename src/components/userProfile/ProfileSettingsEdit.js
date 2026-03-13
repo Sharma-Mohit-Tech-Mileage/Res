@@ -29,6 +29,8 @@ const ProfileSettingsEdit = () => {
   const profileDetailsfromStore = profile.profileDetails || {};
   const isPrimaryUser = isPrimaryAdmin(profileDetailsfromStore.memberType);
   const scrollViewRef = useRef(null);
+  const firstNameRef = useRef(null);
+  const lastNameRef = useRef(null);
   const handleSave = async (data) => {
     const newData = { ...data };
     dispatch(updateProfileRequest(newData, navigation));
@@ -48,9 +50,15 @@ const ProfileSettingsEdit = () => {
     },
   });
 
-  const handleValidationError = () => {
+  const handleValidationError = (errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setShowValidationAlert(true);
+    const fieldOrder = [
+      { key: "firstName", ref: firstNameRef },
+      { key: "lastName", ref: lastNameRef },
+    ];
+    const firstInvalid = fieldOrder.find((f) => errors?.[f.key]);
+    if (firstInvalid) firstInvalid.ref.current?.focus();
   };
 
   useEffect(() => {
@@ -120,6 +128,7 @@ const ProfileSettingsEdit = () => {
                     fieldState: { error },
                   }) => (
                     <SparkLightInput
+                      ref={firstNameRef}
                       placeholder="First Name"
                       label={"First Name"}
                       onBlur={onBlur}
@@ -141,6 +150,7 @@ const ProfileSettingsEdit = () => {
                     fieldState: { error },
                   }) => (
                     <SparkLightInput
+                      ref={lastNameRef}
                       label={"Last Name"}
                       placeholder="First Name"
                       onBlur={onBlur}

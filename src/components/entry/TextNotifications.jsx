@@ -8,6 +8,7 @@ import {
   Platform,
   TouchableOpacity,
   Linking,
+  AccessibilityInfo,
 } from "react-native";
 import {
   Color,
@@ -47,6 +48,7 @@ const TextNotifications = ({ navigation }) => {
   const [keyboardHidden, setKeyboardHidden] = useState(true);
   const [isTermRequired, setIsTermRequired] = useState(false);
   const scrollRef = useRef();
+  const phoneInputRef = useRef(null);
   const user = useSelector((state) => state.user.userData);
   const profile = useSelector((state) => state.profile || {});
   const accountNumber = user?.userInfo?.accountNumber || "";
@@ -58,6 +60,7 @@ const TextNotifications = ({ navigation }) => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(validationSchema),
+    mode: "onBlur",
     defaultValues: {
       phoneNumber: "",
     },
@@ -80,6 +83,16 @@ const TextNotifications = ({ navigation }) => {
       setEnableButton(false);
     }
   };
+
+  const handleValidationError = useCallback((errors) => {
+    scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    if (errors?.phoneNumber) {
+      AccessibilityInfo.announceForAccessibility(errors.phoneNumber.message);
+      setTimeout(() => {
+        phoneInputRef.current?.focus();
+      }, 300);
+    }
+  }, []);
 
   const handleTermsLinkPress = useCallback(
     (event) => {
@@ -161,9 +174,10 @@ const TextNotifications = ({ navigation }) => {
                 </Text>
                 <Text
                   style={[AppStyles.requiredField, { textAlign: "center" }]}
-                  accessibilityRole="text"
                   accessible={true}
-                  accessibilityLabel="Fields marked with an asterisk are required"
+                  importantForAccessibility="yes"
+                  accessibilityRole="text"
+                  accessibilityLabel="Fields marked with asterisk are required"
                 >
                   Fields marked with * are required.
                 </Text>
@@ -180,14 +194,19 @@ const TextNotifications = ({ navigation }) => {
                   <>
                     <Text
                       style={styles.inputLabel}
+                      accessible={true}
+                      importantForAccessibility="yes"
                       accessibilityRole="text"
-                      accessibilityLabel="Mobile Number required"
+                      accessibilityLabel="Mobile Number Required"
                     >
                       Mobile Number *
                     </Text>
                     <SparkLightInput
+                      ref={phoneInputRef}
                       placeholder="Mobile Number"
                       keyboardType="number-pad"
+                      accessibilityLabel="Mobile Number"
+                      required={true}
                       onBlur={onBlur}
                       onChangeText={(text) => {
                         onChangeText(text);
@@ -266,7 +285,13 @@ const TextNotifications = ({ navigation }) => {
               </TouchableOpacity>
             </View>
             {isTermRequired && (
-              <View style={{ paddingTop: 8, flexDirection: "row" }}>
+              <View
+                style={{ paddingTop: 8, flexDirection: "row" }}
+                accessible={true}
+                accessibilityRole="alert"
+                accessibilityLiveRegion="assertive"
+                accessibilityLabel="Please agree to the Terms and Conditions to proceed."
+              >
                 <View
                   style={{
                     flexDirection: "row",
@@ -294,7 +319,7 @@ const TextNotifications = ({ navigation }) => {
                   ? [styles.button, styles.buttonsLayout]
                   : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
               }
-              onPress={handleSubmit(enableTextNotifications)}
+              onPress={handleSubmit(enableTextNotifications, handleValidationError)}
             >
               <Text
                 style={

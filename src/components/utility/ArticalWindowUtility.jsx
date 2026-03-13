@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, Platform, AppState, Alert, AccessibilityInfo } from 'react-native';
+import { View, Text, StyleSheet, Platform, AppState, Alert, AccessibilityInfo, Linking } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -30,14 +30,38 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [forceWebViewRecreation, setForceWebViewRecreation] = useState(false);
     const [appBackgroundTime, setAppBackgroundTime] = useState(0);
     const user = useSelector(state => state.user.userData);
-    const [loading, setLoading] = useState(true);
+    // Don't show loading spinner if coming from Bill Explainer redirect
+    const [loading, setLoading] = useState(!route.params?.isBilling);
     const webViewRef = useRef();
     const [mainViewRef, setFocus] = useAccessibilityFocus();
+    const isNavigatingAway = useRef(false);
 
     useEffect(() => {
     // Set focus when the component mounts (screen appears)
     setFocus();
   }, [setFocus]);
+
+    useEffect(() => {
+        // Open Bill Explainer outside the app in the mobile browser.
+        if (name === 'Bill Explainer' && url) {
+            setModalOpen(false);
+            Linking.openURL(url)
+                .catch((error) => {
+                    console.error('Failed to open Bill Explainer in browser:', error);
+                })
+                .finally(() => {
+                    navigation.goBack();
+                });
+        }
+    }, [name, url, navigation]);
+
+    // Reset navigation flag when component unmounts or name changes
+    useEffect(() => {
+        isNavigatingAway.current = false;
+        return () => {
+            isNavigatingAway.current = false;
+        };
+    }, [name]);
 
     // FIXED: Simplified and more compatible script
     const enhancedScript = `
@@ -48,6 +72,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 // Simple localStorage setup
                 const token = '${user?.token || ''}';
                 const userInfo = '${JSON.stringify(user?.userInfo || {})}';
+                const screenName = '${name || ''}';
+                const initialUrl = '${url || ''}';
+                const isLegalPage =
+                    screenName === 'Privacy Policy' ||
+                    screenName === 'Terms & Conditions' ||
+                    initialUrl.includes('/legal/');
                 
                 if (token) {
                     localStorage.setItem('jwt_token', token);
@@ -66,6 +96,214 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     console.log('Cookie set successfully');
                 } catch (cookieError) {
                     console.error('Cookie setting failed:', cookieError);
+                }
+
+                // Hide known consent overlays without touching normal page content.
+                const hideCookieBanner = function() {
+                    try {
+                        const selectorList = [
+                            '#onetrust-banner-sdk',
+                            '#onetrust-consent-sdk',
+                            '#onetrust-pc-sdk',
+                            '.onetrust-pc-dark-filter',
+                            '.ot-sdk-container',
+                            '.ot-sdk-row',
+                            '[id*="cookie"]',
+                            '[class*="cookie"]',
+                            '[id*="consent"]',
+                            '[class*="consent"]'
+                        ];
+
+                        selectorList.forEach(function(selector) {
+                            document.querySelectorAll(selector).forEach(function(node) {
+                                const computedStyle = window.getComputedStyle(node);
+                                const isOverlayLike =
+                                    selector.startsWith('#onetrust') ||
+                                    selector.startsWith('.ot-') ||
+                                    computedStyle.position === 'fixed' ||
+                                    computedStyle.position === 'sticky' ||
+                                    computedStyle.zIndex === '2147483647' ||
+                                    node.getAttribute('role') === 'dialog';
+
+                                if (!isOverlayLike) {
+                                    return;
+                                }
+
+                                node.style.setProperty('display', 'none', 'important');
+                                node.style.setProperty('visibility', 'hidden', 'important');
+                                node.style.setProperty('opacity', '0', 'important');
+                                node.style.setProperty('pointer-events', 'none', 'important');
+                            });
+                        });
+
+                        const blockers = [
+                            'this website uses cookies',
+                            'best experience on our website',
+                            'cookie preferences',
+                            'decline',
+                            'dismiss'
+                        ];
+
+                        document.querySelectorAll('div, section, aside, footer, p, span, button, a').forEach(function(node) {
+                            const text = (node.innerText || node.textContent || '').toLowerCase().trim();
+                            if (!text) return;
+
+                            const isCookieText = blockers.some(function(key) {
+                                return text.includes(key);
+                            });
+
+                            if (isCookieText) {
+                                // Hide full banner container when possible
+                                let container = node;
+                                let depth = 0;
+                                while (container && depth < 6) {
+                                    const containerText = (container.innerText || '').toLowerCase();
+                                    const isBannerContainer =
+                                        containerText.includes('this website uses cookies') ||
+                                        containerText.includes('cookie preferences') ||
+                                        container.id?.toLowerCase()?.includes('cookie') ||
+                                        container.className?.toString()?.toLowerCase()?.includes('cookie') ||
+                                        container.id?.toLowerCase()?.includes('consent') ||
+                                        container.className?.toString()?.toLowerCase()?.includes('consent');
+
+                                    const computedStyle = window.getComputedStyle(container);
+                                    const isOverlayLike =
+                                        computedStyle.position === 'fixed' ||
+                                        computedStyle.position === 'sticky' ||
+                                        Number(computedStyle.zIndex || 0) > 100;
+
+                                    if (isBannerContainer && isOverlayLike) {
+                                        container.style.setProperty('display', 'none', 'important');
+                                        container.style.setProperty('visibility', 'hidden', 'important');
+                                        container.style.setProperty('opacity', '0', 'important');
+                                        container.style.setProperty('pointer-events', 'none', 'important');
+                                        break;
+                                    }
+                                    container = container.parentElement;
+                                    depth++;
+                                }
+
+                                node.style.setProperty('display', 'none', 'important');
+                                node.style.setProperty('visibility', 'hidden', 'important');
+                                node.style.setProperty('pointer-events', 'none', 'important');
+                            }
+                        });
+                    } catch (cookieBannerError) {
+                        console.log('Cookie banner hide failed:', cookieBannerError);
+                    }
+                };
+
+                if (!isLegalPage) {
+                    hideCookieBanner();
+                    setTimeout(hideCookieBanner, 300);
+                    setTimeout(hideCookieBanner, 1000);
+                    setTimeout(hideCookieBanner, 2000);
+
+                    if (!window.__cookieBannerObserverInstalled) {
+                        const observer = new MutationObserver(function() {
+                            hideCookieBanner();
+                        });
+
+                        observer.observe(document.documentElement || document.body, {
+                            childList: true,
+                            subtree: true,
+                            attributes: true
+                        });
+
+                        window.__cookieBannerObserverInstalled = true;
+                    }
+                }
+                
+                // Only intercept clicks for Bill Explainer screen
+                if (screenName === 'Bill Explainer') {
+                    console.log('Bill Explainer detected - activating payment link interceptor');
+                    
+                    // Intercept ALL clicks to detect billing/payment navigation
+                    document.addEventListener('click', function(e) {
+                        let target = e.target;
+                        console.log('Click detected on:', target.tagName, target.className, target.textContent?.substring(0, 50));
+                        
+                        // Check if clicked element or any parent contains billing/payment related text or attributes
+                        let currentElement = target;
+                        let maxDepth = 10;
+                        let depth = 0;
+                        
+                        while (currentElement && depth < maxDepth) {
+                            // Check text content
+                            const textContent = currentElement.textContent?.toLowerCase() || '';
+                            const className = currentElement.className?.toLowerCase() || '';
+                            const id = currentElement.id?.toLowerCase() || '';
+                            const href = currentElement.href?.toLowerCase() || '';
+                            const onclick = currentElement.getAttribute('onclick')?.toLowerCase() || '';
+                            
+                            // Check for "Pay Now" or "Pay" text/attributes
+                            if (textContent.includes('pay now') || 
+                                textContent.includes('make payment') ||
+                                textContent.includes('pay bill') ||
+                                className.includes('pay') ||
+                                id.includes('pay') ||
+                                href.includes('billing') ||
+                                href.includes('payment') ||
+                                href.includes('app-secure') ||
+                                onclick.includes('billing') ||
+                                onclick.includes('payment')) {
+                                
+                                console.log('Payment/Billing element detected:', {
+                                    tag: currentElement.tagName,
+                                    text: textContent.substring(0, 100),
+                                    className: className,
+                                    id: id,
+                                    href: href
+                                });
+                                
+                                // Send message to React Native
+                                window.ReactNativeWebView.postMessage(JSON.stringify({
+                                    type: 'billing_navigation',
+                                    url: href || window.location.href,
+                                    elementType: currentElement.tagName,
+                                    text: textContent.substring(0, 100)
+                                }));
+                                
+                                // Prevent default navigation
+                                e.preventDefault();
+                                e.stopPropagation();
+                                return false;
+                            }
+                            
+                            currentElement = currentElement.parentElement;
+                            depth++;
+                        }
+                    }, true);
+                    
+                    // Intercept window.location changes
+                    const originalLocationSetter = Object.getOwnPropertyDescriptor(window, 'location').set;
+                    if (originalLocationSetter) {
+                        Object.defineProperty(window, 'location', {
+                            set: function(value) {
+                                const url = value.toString().toLowerCase();
+                                console.log('Location change detected:', url);
+                                
+                                if (url.includes('/billing') || 
+                                    url.includes('/payment') || 
+                                    url.includes('app-secure') ||
+                                    url.includes('payment.sparklight.com')) {
+                                    
+                                    console.log('Billing URL detected in location change');
+                                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                                        type: 'billing_navigation',
+                                        url: url
+                                    }));
+                                    return;
+                                }
+                                originalLocationSetter.call(window, value);
+                            },
+                            get: function() {
+                                return window.location;
+                            }
+                        });
+                    }
+                } else {
+                    console.log('Screen is not Bill Explainer (' + screenName + ') - payment interception disabled');
                 }
                 
                 // FIXED: Simplified PDF interceptor setup
@@ -107,8 +345,96 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         })();
     `;
 
+    // Handle navigation interception - prevent billing URLs from loading in Bill Explainer
+    const onShouldStartLoadWithRequest = useCallback((request) => {
+        console.log('Should start load with request:', request.url);
+        
+        // If we're already navigating away, block all new requests
+        if (isNavigatingAway.current) {
+            return false;
+        }
+        
+        // Check for billing/payment URLs
+        const isBillingUrl = request.url.includes('/billing') || 
+            request.url.includes('/payment') || 
+            request.url.includes('payment.sparklight.com') ||
+            request.url.includes('/portals/app-secure/billing') ||
+            request.url.includes('app-secure');
+        
+        if (isBillingUrl) {
+            // If we're already on a billing page, allow the navigation
+            if (url.includes('/billing') || name === 'Billing Details') {
+                return true;
+            }
+            
+            // If we're in Bill Explainer, intercept and navigate to Billing Details
+            if (name === 'Bill Explainer') {
+                console.log('Billing URL detected in Bill Explainer, redirecting to Billing Details');
+                isNavigatingAway.current = true;
+                
+                // Stop the webview from loading
+                if (webViewRef.current) {
+                    webViewRef.current.stopLoading();
+                }
+                
+                setModalOpen(false);
+                
+                setTimeout(() => {
+                    navigation.replace('ArticalWindowUtility', {
+                        url: `${Env.ACP_BILLING}/billing`,
+                        name: 'Billing Details',
+                        isBilling: true
+                    });
+                }, 150);
+                
+                return false; // Prevent the navigation in current webview
+            }
+        }
+        
+        return true; // Allow all other navigations
+    }, [url, name, navigation, Env.ACP_BILLING]);
+
     const navigationChange = useCallback(async (navState) => {
-        console.log('Navigation change:', navState.url);
+        console.log('Navigation change:', navState.url, 'Current name:', name);
+        
+        // If we're already navigating away, don't process further
+        if (isNavigatingAway.current) {
+            return;
+        }
+        
+        // Check for billing/payment URLs (for Android support)
+        const isBillingUrl = navState.url.includes('/billing') || 
+            navState.url.includes('/payment') || 
+            navState.url.includes('payment.sparklight.com') ||
+            navState.url.includes('/portals/app-secure/billing') ||
+            navState.url.includes('app-secure');
+        
+        if (isBillingUrl && name === 'Bill Explainer') {
+            // If we're already on a billing page, allow the navigation
+            if (url.includes('/billing') || name === 'Billing Details') {
+                return;
+            }
+            
+            console.log('Billing URL detected in navigationChange for Bill Explainer, redirecting');
+            isNavigatingAway.current = true;
+            
+            // Stop the webview from loading
+            if (webViewRef.current) {
+                webViewRef.current.stopLoading();
+            }
+            
+            setModalOpen(false);
+            
+            setTimeout(() => {
+                navigation.replace('ArticalWindowUtility', {
+                    url: `${Env.ACP_BILLING}/billing`,
+                    name: 'Billing Details',
+                    isBilling: true
+                });
+            }, 150);
+            
+            return;
+        }
         
         // Check for authentication redirects
         if (navState.url.includes('/postlogout') || navState.url.includes(Config.SSO_LOGIN)) {
@@ -138,7 +464,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
         }
         
-    }, [navStateReloading]);
+    }, [navStateReloading, name, url, navigation, Env.ACP_BILLING, Env.SSO_LOGIN]);
 
     const onMessage = useCallback((event) => {
         try {
@@ -146,6 +472,29 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             console.log('WebView message received:', data.type);
             
             switch (data.type) {
+                case 'billing_navigation':
+                    // Handle billing/payment link clicks from Bill Explainer
+                    if (name === 'Bill Explainer') {
+                        console.log('Billing navigation message received from Bill Explainer, URL:', data.url);
+                        isNavigatingAway.current = true;
+                        
+                        // Stop the webview from loading
+                        if (webViewRef.current) {
+                            webViewRef.current.stopLoading();
+                        }
+                        
+                        setModalOpen(false);
+                        
+                        setTimeout(() => {
+                            navigation.replace('ArticalWindowUtility', {
+                                url: `${Env.ACP_BILLING}/billing`,
+                                name: 'Billing Details',
+                                isBilling: true
+                            });
+                        }, 100);
+                    }
+                    break;
+                
                 case 'pdf':
                     if (data.data) {
                         setShowPDFUrl(data.data);
@@ -168,7 +517,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         } catch (error) {
             console.log('Message parsing error:', error);
         }
-    }, []);
+    }, [name, navigation, Env.ACP_BILLING]);
 
     const onLoadStart = useCallback((syntheticEvent) => {
         const startTime = Date.now();
@@ -279,7 +628,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 }, [contentLoaded, appBackgroundTime]);
 
     const LoadingComponent = useCallback(() => (
-        <View style={styles.loadingContainer} accessibilityRole='text' accessible={true} accessibilityLabel="Loading content" accessibilityHint="Content is loading, please wait">
+       <View style={styles.loadingContainer} accessibilityRole='text' accessible={true} accessibilityLabel="Loading content" accessibilityHint="Content is loading, please wait">
             {name === 'Billing Details' ? (
                 <LoadingSpinner />
             ) : (
@@ -327,7 +676,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
             ): (
-                <View style={[styles.progressBar,{ backgroundColor: '#8D3B90', width: '100%' }]} 
+                <View style={[styles.progressBar,{ height:0}]} ref={mainViewRef }
                     accessible={true}
                     accessibilityLabel={ `${name} content loaded`}
                     accessibilityRole='text'
@@ -353,14 +702,15 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     onHttpError={onHttpError}
                     onMessage={onMessage}
                     onNavigationStateChange={navigationChange}
+                    onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
                     
                     // Script injection
                     injectedJavaScript={enhancedScript}
                     // Add this property to the WebView (around line 330 where other props are)
                     injectedJavaScriptBeforeContentLoaded={Platform.OS === 'android' ? enhancedScript : undefined}
-                    // FIXED: Simplified WebView settings to prevent first-load errors
-                    startInLoadingState={true}
-                    renderLoading={LoadingComponent}
+                    // FIXED: Don't show loading spinner when transitioning from Bill Explainer
+                    startInLoadingState={!route.params?.isBilling}
+                    renderLoading={!route.params?.isBilling ? LoadingComponent : undefined}
                     javaScriptEnabled={true}
                     domStorageEnabled={true}
                     sharedCookiesEnabled={true}

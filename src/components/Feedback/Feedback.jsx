@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { AccessibilityInfo } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
@@ -48,7 +47,8 @@ const Feedback = () => {
     "Please enter valid information to continue."
   );
   const scrollViewRef = useRef(null);
-  const feedbackRemainingRef = useRef(500);
+  const feedbackTextRef = useRef(null);
+  const feedbackEmailRef = useRef(null);
 
   const {
     control,
@@ -59,6 +59,7 @@ const Feedback = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(feedbackSchema),
+    mode: "onBlur",
     defaultValues: {
       category: "compliment",
       feedbackValue: 5,
@@ -70,9 +71,15 @@ const Feedback = () => {
 
   useUserEmailPrefill(getValues, setValue, "feedbackEmail");
 
-  const handleValidationError = () => {
+  const handleValidationError = (errors) => {
     isSubmittingRef.current = false;
     setIsSubmitting(false);
+    const fieldOrder = [
+      { key: "feedbackText", ref: feedbackTextRef },
+      { key: "feedbackEmail", ref: feedbackEmailRef },
+    ];
+    const firstInvalid = fieldOrder.find((f) => errors?.[f.key]);
+    if (firstInvalid) firstInvalid.ref.current?.focus();
   };
 
   const handleRatingSelect = (option) => {
@@ -152,7 +159,6 @@ const Feedback = () => {
                 message={errormsg}
                 showCloseIcon={true}
                 isVisible={showErrorAlert}
-                autoFocusTitle={true}
                 onClose={() => setShowErrorAlert(false)}
               />
             </Animated.View>
@@ -167,9 +173,10 @@ const Feedback = () => {
             </Text>
             <Text
               style={styles.requiredFieldsText}
-              accessibilityRole="text"
               accessible={true}
-              accessibilityLabel="Fields marked with an asterisk are required"
+              importantForAccessibility="yes"
+              accessibilityRole="text"
+              accessibilityLabel="Fields marked with asterisk are required"
             >
               Fields marked with * are required.
             </Text>
@@ -225,59 +232,32 @@ const Feedback = () => {
             <Controller
               control={control}
               name="feedbackText"
-              render={({ field: { onChange, onBlur, value } }) => {
-                const handleChange = (text) => {
-                  onChange(text);
-                  const remaining = 500 - (text?.length || 0);
-                  const previousRemaining = feedbackRemainingRef.current;
-                  feedbackRemainingRef.current = remaining;
-
-                  const thresholds = [320, 160, 80, 40, 20, 10, 0];
-
-                  let thresholdToAnnounce = null;
-
-                  if (thresholds.includes(remaining)) {
-                    thresholdToAnnounce = remaining;
-                  } else {
-                    const crossed = thresholds.find(
-                      (t) => remaining < t && previousRemaining >= t
-                    );
-
-                    if (crossed != null) {
-                      thresholdToAnnounce = crossed;
-                    }
-                  }
-
-                  if (thresholdToAnnounce != null) {
-                    AccessibilityInfo.announceForAccessibility(
-                      `You have ${thresholdToAnnounce} characters remaining`
-                    );
-                  }
-                };
-                return (
-                  <>
-                    <SparkLightInput
-                      label="Additional Feedback *"
-                      textAlignVertical="top"
-                      onChangeText={handleChange}
-                      onBlur={onBlur}
-                      value={value}
-                      multiline={true}
-                      maxLength={500}
-                      height={130}
-                      error={errors.feedbackText?.message}
-                      accessibilityLabel="Additional Feedback required"
-                    />
-                    <Text
-                      style={styles.charCount}
-                      accessibilityRole="text"
-                      accessibilityLabel={`Character count ${value?.length || 0} of 500`}
-                    >
-                      {`${value?.length || 0}/500`}
-                    </Text>
-                  </>
-                );
-              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <>
+                  <SparkLightInput
+                    ref={feedbackTextRef}
+                    label="Additional Feedback *"
+                    textAlignVertical="top"
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                    multiline={true}
+                    maxLength={500}
+                    height={130}
+                    error={errors.feedbackText?.message}
+                    accessibilityLabel="Additional Feedback required"
+                  />
+                  <Text
+                    style={styles.charCount}
+                    accessibilityRole="text"
+                    accessibilityLabel={`Character count: ${
+                      value?.length || 0
+                    } out of 500`}
+                  >
+                    {`${value?.length || 0}/500`}
+                  </Text>
+                </>
+              )}
             />
           </Animated.View>
 
@@ -290,6 +270,7 @@ const Feedback = () => {
               name="feedbackEmail"
               render={({ field: { onChange, onBlur, value } }) => (
                 <SparkLightInput
+                  ref={feedbackEmailRef}
                   label="Email *"
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -309,7 +290,7 @@ const Feedback = () => {
           >
             <Pressable
               accessibilityLabel={
-                isSubmitting ? "Feedback Submitting in progress" : "Submit Feedback"
+                isSubmitting ? "Submitting..." : "Submit Feedback"
               }
               accessibilityRole="button"
               accessible={true}

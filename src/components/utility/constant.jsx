@@ -69,6 +69,18 @@ export const passwordTerms = [
   "Your new password cannot have any spaces.",
 ];
 
+export const getPasswordPriorityHint = (password, userName) => {
+  if (!password) return "Password is required.";
+  if (password.length < 8 || password.length > 20) return "Password must be at least 8 characters long.";
+  if (!/[A-Z]/.test(password)) return "Password must have at least one uppercase letter.";
+  if (!/[a-z]/.test(password)) return "Password must have at least one lowercase letter.";
+  if (!/[0-9]/.test(password)) return "Password must have at least one number.";
+  if (!/[^a-zA-Z0-9]/.test(password)) return "Password must include special characters like %, &, _, ?, #, =, -.";
+  if (/\s/.test(password)) return "No spaces are allowed in the password.";
+  if (password === userName) return "Password must be different from your username.";
+  return null;
+};
+
 export const getUserType = (input) => {
   if (input === null || input.trim() === "") {
     return "";
