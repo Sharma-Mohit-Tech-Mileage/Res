@@ -96,10 +96,10 @@ const WelcomeCard = () => {
             </Text>
           </Pressable>
 
-          <Text style={styles.offerDesclaimer}>
-          {`*Offer not available for FlexConnect or LIFT customers. Certain
-taxes & 
-            fees do not apply.`}
+    <Text style={styles.offerDesclaimer}>
+  {`*Offer not available for FlexConnect
+     or LIFT customers. Certain taxes & 
+          fees do not apply.`}
           </Text>
         </View>
       </View>
@@ -243,7 +243,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     fontWeight: "400",
-    width: '60%',
     marginTop: Padding.p_13xl,
     
   },

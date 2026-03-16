@@ -22,48 +22,60 @@ const MobilePromo = () => {
 
   const renderOfferBanner = () => {
       return (
-        <View style={[{overflow:'hidden', height:260}]}>
+        <View style={[styles.videoContainer, { height: 340 }]}>
           {/* <VideoPlayer videoId={videoId} /> */}
   
           <Image
             source={require("../../../assets/offer-banner-home.jpg")}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode='stretch'
+            style={{ width: "100%" }}
           />
-        <View style={{flexDirection:'column', position: "absolute", top: 10, left: 15}}>
-          <Text
-            style={[
-              styles.title2,
-              {  width: 230 },
-            ]}
-            accessible={true}
-            accessibilityLabel="Sparklight Internet + Mobile"
+          <View
+            style={{
+              flexDirection: "column",
+              position: "absolute",
+              top: 20,
+              left: 20,
+            }}
           >
-            Sparklight Internet 
-           <Text style={{fontWeight: "700",color:'#000'}}> + </Text>
-            Mobile
-          </Text>
-          <Text
-            style={[
-              styles.title,
-              {  width: 200 },
-            ]}
-            accessible={true}
-            accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
-          >
-            SAVE with FREE Unlimited Mobile for 1 year
-          </Text>
-          <Pressable
-            style={{ width:120, marginTop: 5 ,backgroundColor: Color.sparklightBrightPurple,borderRadius: 50,padding:Padding.p_base}}
-            onPress={handleAddMobile}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="Get Offer Button"
-          >
-            <Text style={{color: Color.sparklightWhite,fontFamily: FontFamily.openSansSemiBold,fontSize: FontSize.size_lg,fontWeight: "600",textAlign:'center'}} accessible={true} accessibilityRole="button" accessibilityLabel="Get Offer Button">
-              Get Offer
+            <Text
+              style={[styles.title2, { width: 230 }]}
+              accessible={true}
+              accessibilityLabel="Sparklight Internet + Mobile"
+            >
+              Sparklight Internet
+              <Text style={{ fontWeight: "700", color: "#000" }}> + </Text>
+              Mobile
             </Text>
+            <Text
+              style={[styles.title, { width: 230 }]}
+              accessible={true}
+              accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
+            >
+              SAVE with FREE Unlimited Mobile for 1 year
+            </Text>
+            <Pressable
+              style={styles.offerBtn}
+              onPress={() => {
+                Linking.openURL(
+                  "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome",
+                );
+              }}
+            >
+              <Text
+                style={styles.getOfferButton}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Get Offer Button"
+              >
+                Get Offer
+              </Text>
             </Pressable>
+  
+            <Text style={styles.offerDesclaimer}>
+      {`*Offer not available for FlexConnect
+    or LIFT customers. Certain taxes & 
+             fees do not apply.`}
+            </Text>
           </View>
         </View>
       );
@@ -135,6 +147,27 @@ const styles = StyleSheet.create({
     color: Color.sparklightBrightPurple,
     marginBottom: Padding.p_5xl,
     fontWeight: "600",
+  },offerDesclaimer: {
+    color: Color.colorblack_100,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_base,
+    fontWeight: "400",
+    marginTop: Padding.p_13xl,
+    
+    
+  },
+  getOfferButton: {
+    color: Color.sparklightWhite,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: FontSize.size_lg,
+    fontWeight: "600",
+    textAlign: "center",
+  },offerBtn: {
+    width: 120,
+    marginTop: 5,
+    backgroundColor: Color.sparklightBrightPurple,
+    borderRadius: 50,
+    padding: Padding.p_base,
   },
 });
 
