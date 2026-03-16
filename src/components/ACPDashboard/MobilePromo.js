@@ -4,11 +4,16 @@ import { FontFamily, FontSize, Color, Padding, Border } from "../../../GlobalSty
 import AppStyles from "../utility/AppStyles";
 import FeatureCard from "./FeatureCardMobile";
 import { useNavigation } from "@react-navigation/native";
-
+import { useFeatureFlag } from "../../contexts/Featureflagscontext";
+import FeatureFlags from "../../config/Featureflags";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
 const MobilePromo = () => {
   const navigation = useNavigation();
+
+   const showSparklightMobile = useFeatureFlag(
+      FeatureFlags.DASHBOARD_SPARKLIGHT_MOBILE_SECTION
+    );
 
   const handleAddMobile = () => {
     Linking.openURL("https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=pendingact");
@@ -17,7 +22,7 @@ const MobilePromo = () => {
 
   const renderOfferBanner = () => {
       return (
-        <View style={[{overflow:'hidden', height:240}]}>
+        <View style={[{overflow:'hidden', height:260}]}>
           {/* <VideoPlayer videoId={videoId} /> */}
   
           <Image
@@ -25,7 +30,7 @@ const MobilePromo = () => {
             style={{ width: "100%", height: "100%" }}
             resizeMode='stretch'
           />
-        <View style={{flexDirection:'column', position: "absolute", top: 20, left: 20}}>
+        <View style={{flexDirection:'column', position: "absolute", top: 10, left: 15}}>
           <Text
             style={[
               styles.title2,
@@ -41,7 +46,7 @@ const MobilePromo = () => {
           <Text
             style={[
               styles.title,
-              {  width: 230 },
+              {  width: 200 },
             ]}
             accessible={true}
             accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
@@ -67,8 +72,9 @@ const MobilePromo = () => {
 
   return (
     <View style={[AppStyles.card, styles.container]}>
-      {renderOfferBanner()}
-      {/*<View style={styles.imageContainer}>
+      {showSparklightMobile ?renderOfferBanner() : (
+        <>
+      <View style={styles.imageContainer}>
          <Image
           accessible={true}
           accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
@@ -91,8 +97,10 @@ const MobilePromo = () => {
         buttonVariant="primary"
         isActive={true}
         onButtonPress={handleAddMobile}
-      /> */}
+      /> 
+      </>)}
     </View>
+      
   );
 };
 
