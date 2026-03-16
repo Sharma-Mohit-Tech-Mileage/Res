@@ -115,18 +115,24 @@ const UsageChart = ({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showList, setShowList] = useState(false);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+  const [isViewTransitioning, setIsViewTransitioning] = useState(false);
 
 
   const handleToggleView = useCallback(() => {
     const nextView = !showList;
+    // Temporarily make the toggle button non-accessible so VoiceOver doesn't
+    // re-read the updated label before our "selected" announcement fires
+    if (isScreenReaderEnabled) {
+      setIsViewTransitioning(true);
+    }
     setShowList(nextView);
     if (isScreenReaderEnabled) {
       const viewType = nextView ? "List View" : "Graph View";
-      // Delay announcement so it doesn't get swallowed by VoiceOver/TalkBack
-      // re-reading the button's updated accessibilityLabel after state change
       const delay = Platform.OS === "ios" ? 600 : 400;
       setTimeout(() => {
         AccessibilityInfo.announceForAccessibility(`${viewType} selected.`);
+        // Restore button accessibility after announcement is posted
+        setTimeout(() => setIsViewTransitioning(false), 300);
       }, delay);
     }
   }, [showList, isScreenReaderEnabled, type, data]);
@@ -548,6 +554,7 @@ const UsageChart = ({
           <Pressable
             style={styles.listToggle}
             onPress={handleToggleView}
+            accessible={!isViewTransitioning}
             accessibilityRole="button"
             accessibilityLabel={
               showList ? "List View" : "Graph View"

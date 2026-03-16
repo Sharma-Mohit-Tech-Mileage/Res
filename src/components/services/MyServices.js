@@ -85,9 +85,9 @@ const MyServicesContent = ({ route }) => {
         }
       >
         <View style={styles.servicesContainer}>
-          {showInternet && (
+          {true && (
             <InternetCard
-              planName={data?.internet.planName}
+              planName={"data?.internet.planName"}
               downloadSpeed={data?.internet.downloadSpeed}
               uploadSpeed={data?.internet.uploadSpeed}
               loading={loading}
