@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: 'flex-start',
     marginHorizontal: 14,
-    marginVertical: 20,
+    marginVertical: 8,
     borderRadius: 8, // Updated to match finalized design
     borderWidth: 1,
     paddingLeft: 16,

@@ -26,12 +26,12 @@ const WelcomeCard = () => {
     React.useState(false);
   const isMarketingBannerEnabled = useFeatureFlag(
     FeatureFlags.DASHBOARD_SPARKLIGHT_MOBILE_SECTION,
-    false
+    false,
   );
 
   const isNewDashboardEnabled = useFeatureFlag(
     FeatureFlags.DASHBOARD_NEW_LAYOUT,
-    false
+    false,
   );
   // YouTube video ID
   const videoId = "C3cMQoWxv6I";
@@ -47,46 +47,60 @@ const WelcomeCard = () => {
 
   const renderOfferBanner = () => {
     return (
-      <View style={[styles.videoContainer,{height:240}]}>
+      <View style={[styles.videoContainer, { height: 340 }]}>
         {/* <VideoPlayer videoId={videoId} /> */}
 
         <Image
           source={require("../../../assets/offer-banner-home.jpg")}
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
         />
-      <View style={{flexDirection:'column', position: "absolute", top: 20, left: 20}}>
-        <Text
-          style={[
-            styles.title2,
-            {  width: 230 },
-          ]}
-          accessible={true}
-          accessibilityLabel="Sparklight Internet + Mobile"
-        >
-          Sparklight Internet 
-         <Text style={{fontWeight: "700",color:'#000'}}> + </Text>
-          Mobile
-        </Text>
-        <Text
-          style={[
-            styles.title,
-            {  width: 230 },
-          ]}
-          accessible={true}
-          accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
-        >
-          SAVE with FREE Unlimited Mobile for 1 year
-        </Text>
-        <Pressable
-          style={{ width:120, marginTop: 5 ,backgroundColor: Color.sparklightBrightPurple,borderRadius: 50,padding:Padding.p_base}}
-          onPress={()=>{
-            Linking.openURL("https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome")
+        <View
+          style={{
+            flexDirection: "column",
+            position: "absolute",
+            top: 20,
+            left: 20,
           }}
         >
-          <Text style={{color: Color.sparklightWhite,fontFamily: FontFamily.openSansSemiBold,fontSize: FontSize.size_lg,fontWeight: "600",textAlign:'center'}} accessible={true} accessibilityRole="button" accessibilityLabel="Get Offer Button">
-            Get Offer
+          <Text
+            style={[styles.title2, { width: 230 }]}
+            accessible={true}
+            accessibilityLabel="Sparklight Internet + Mobile"
+          >
+            Sparklight Internet
+            <Text style={{ fontWeight: "700", color: "#000" }}> + </Text>
+            Mobile
           </Text>
+          <Text
+            style={[styles.title, { width: 230 }]}
+            accessible={true}
+            accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
+          >
+            SAVE with FREE Unlimited Mobile for 1 year
+          </Text>
+          <Pressable
+            style={styles.offerBtn}
+            onPress={() => {
+              Linking.openURL(
+                "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome",
+              );
+            }}
+          >
+            <Text
+              style={styles.getOfferButton}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Get Offer Button"
+            >
+              Get Offer
+            </Text>
           </Pressable>
+
+          <Text style={styles.offerDesclaimer}>
+          {`*Offer not available for FlexConnect or LIFT customers. Certain
+taxes & 
+            fees do not apply.`}
+          </Text>
         </View>
       </View>
     );
@@ -100,7 +114,7 @@ const WelcomeCard = () => {
 
           <Image
             source={require("../../../assets/welcome-banner-home.png")}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
           <View
             style={{
@@ -198,7 +212,8 @@ const styles = StyleSheet.create({
     color: Color.colorMidnightblue,
     marginBottom: Padding.p_5xl,
     fontWeight: "700",
-  },title2: {
+  },
+  title2: {
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: FontSize.size_base,
     lineHeight: 26,
@@ -223,6 +238,30 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
   },
+  offerDesclaimer: {
+    color: Color.colorblack_100,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_base,
+    fontWeight: "400",
+    width: '60%',
+    marginTop: Padding.p_13xl,
+    
+  },
+  getOfferButton: {
+    color: Color.sparklightWhite,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: FontSize.size_lg,
+    fontWeight: "600",
+    textAlign: "center",
+  },offerBtn: {
+    width: 120,
+    marginTop: 5,
+    backgroundColor: Color.sparklightBrightPurple,
+    borderRadius: 50,
+    padding: Padding.p_base,
+  },
+  
+
 });
 
 export default WelcomeCard;
