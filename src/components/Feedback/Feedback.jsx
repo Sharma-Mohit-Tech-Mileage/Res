@@ -49,6 +49,9 @@ const Feedback = () => {
   );
   const scrollViewRef = useRef(null);
   const feedbackRemainingRef = useRef(500);
+  const announcementTimerRef = useRef(null);
+  const emailFieldRef = useRef(null);
+  const feedbackTextRef = useRef(null);
 
   const {
     control,
@@ -59,6 +62,7 @@ const Feedback = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(feedbackSchema),
+    mode: "onBlur",
     defaultValues: {
       category: "compliment",
       feedbackValue: 5,
@@ -70,9 +74,19 @@ const Feedback = () => {
 
   useUserEmailPrefill(getValues, setValue, "feedbackEmail");
 
-  const handleValidationError = () => {
+  const handleValidationError = (fieldErrors) => {
     isSubmittingRef.current = false;
     setIsSubmitting(false);
+
+    // Scroll to and focus the first field with an error so inline error is visible
+    if (fieldErrors.areaOfConcern || fieldErrors.feedbackText) {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      if (fieldErrors.feedbackText) {
+        setTimeout(() => feedbackTextRef.current?.focus(), 400);
+      }
+    } else if (fieldErrors.feedbackEmail) {
+      emailFieldRef.current?.focus();
+    }
   };
 
   const handleRatingSelect = (option) => {
@@ -249,14 +263,25 @@ const Feedback = () => {
                   }
 
                   if (thresholdToAnnounce != null) {
-                    AccessibilityInfo.announceForAccessibility(
-                      `You have ${thresholdToAnnounce} characters available`
-                    );
+                    // Cancel any pending announcement so rapid typing doesn't
+                    // stack multiple calls that would swallow each other or
+                    // collide with inline validation announcements
+                    if (announcementTimerRef.current) {
+                      clearTimeout(announcementTimerRef.current);
+                    }
+                    const delay = Platform.OS === "ios" ? 500 : 350;
+                    announcementTimerRef.current = setTimeout(() => {
+                      announcementTimerRef.current = null;
+                      AccessibilityInfo.announceForAccessibility(
+                        `${thresholdToAnnounce} characters remaining`
+                      );
+                    }, delay);
                   }
                 };
                 return (
                   <>
                     <SparkLightInput
+                      ref={feedbackTextRef}
                       label="Additional Feedback *"
                       textAlignVertical="top"
                       onChangeText={handleChange}
@@ -271,7 +296,11 @@ const Feedback = () => {
                     <Text
                       style={styles.charCount}
                       accessibilityRole="text"
-                      accessibilityLabel={`Character count ${value?.length || 0} of 500`}
+                      accessibilityLabel={`${value?.length || 0} of 500 characters used`}
+                      {...Platform.select({
+                        android: { accessibilityLiveRegion: "polite" },
+                        ios: {},
+                      })}
                     >
                       {`${value?.length || 0}/500`}
                     </Text>
@@ -290,6 +319,7 @@ const Feedback = () => {
               name="feedbackEmail"
               render={({ field: { onChange, onBlur, value } }) => (
                 <SparkLightInput
+                  ref={emailFieldRef}
                   label="Email *"
                   onChangeText={onChange}
                   onBlur={onBlur}
