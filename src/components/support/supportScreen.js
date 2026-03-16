@@ -154,7 +154,7 @@ const Support = ({ route }) => {
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/15840476056727-Billing-Payments?isMobile=true",
+      url: "https://support.sparklight.com/hc/en-us/sections/22829302944279-Billing?isMobile=true",
     },
     {
       key: "moreOptions",
@@ -163,7 +163,7 @@ const Support = ({ route }) => {
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/115000833068-Internet?isMobile=true",
+      url: "https://support.sparklight.com/hc/en-us/categories/115000833068-Internet",
     },
     {
       key: "moreOptions",
@@ -181,7 +181,7 @@ const Support = ({ route }) => {
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us?isMobile=true",
+      url: "https://support.sparklight.com/hc/en-us",
     },
   ];
 
