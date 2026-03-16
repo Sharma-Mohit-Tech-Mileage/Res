@@ -72,6 +72,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 const token = '${user?.token || ''}';
                 const userInfo = '${JSON.stringify(user?.userInfo || {})}';
                 const screenName = '${name || ''}';
+                const initialUrl = '${url || ''}';
+                const isLegalPage =
+                    screenName === 'Privacy Policy' ||
+                    screenName === 'Terms & Conditions' ||
+                    initialUrl.includes('/legal/');
                 
                 if (token) {
                     localStorage.setItem('jwt_token', token);
@@ -92,7 +97,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     console.error('Cookie setting failed:', cookieError);
                 }
 
-                // Hide cookie/privacy banners and controls in WebView
+                // Hide known consent overlays without touching normal page content.
                 const hideCookieBanner = function() {
                     try {
                         const selectorList = [
@@ -105,13 +110,24 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                             '[id*="cookie"]',
                             '[class*="cookie"]',
                             '[id*="consent"]',
-                            '[class*="consent"]',
-                            '[id*="privacy"]',
-                            '[class*="privacy"]'
+                            '[class*="consent"]'
                         ];
 
                         selectorList.forEach(function(selector) {
                             document.querySelectorAll(selector).forEach(function(node) {
+                                const computedStyle = window.getComputedStyle(node);
+                                const isOverlayLike =
+                                    selector.startsWith('#onetrust') ||
+                                    selector.startsWith('.ot-') ||
+                                    computedStyle.position === 'fixed' ||
+                                    computedStyle.position === 'sticky' ||
+                                    computedStyle.zIndex === '2147483647' ||
+                                    node.getAttribute('role') === 'dialog';
+
+                                if (!isOverlayLike) {
+                                    return;
+                                }
+
                                 node.style.setProperty('display', 'none', 'important');
                                 node.style.setProperty('visibility', 'hidden', 'important');
                                 node.style.setProperty('opacity', '0', 'important');
@@ -123,7 +139,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                             'this website uses cookies',
                             'best experience on our website',
                             'cookie preferences',
-                            'learn more',
                             'decline',
                             'dismiss'
                         ];
@@ -150,7 +165,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                                         container.id?.toLowerCase()?.includes('consent') ||
                                         container.className?.toString()?.toLowerCase()?.includes('consent');
 
-                                    if (isBannerContainer) {
+                                    const computedStyle = window.getComputedStyle(container);
+                                    const isOverlayLike =
+                                        computedStyle.position === 'fixed' ||
+                                        computedStyle.position === 'sticky' ||
+                                        Number(computedStyle.zIndex || 0) > 100;
+
+                                    if (isBannerContainer && isOverlayLike) {
                                         container.style.setProperty('display', 'none', 'important');
                                         container.style.setProperty('visibility', 'hidden', 'important');
                                         container.style.setProperty('opacity', '0', 'important');
@@ -171,23 +192,25 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     }
                 };
 
-                hideCookieBanner();
-                setTimeout(hideCookieBanner, 300);
-                setTimeout(hideCookieBanner, 1000);
-                setTimeout(hideCookieBanner, 2000);
+                if (!isLegalPage) {
+                    hideCookieBanner();
+                    setTimeout(hideCookieBanner, 300);
+                    setTimeout(hideCookieBanner, 1000);
+                    setTimeout(hideCookieBanner, 2000);
 
-                if (!window.__cookieBannerObserverInstalled) {
-                    const observer = new MutationObserver(function() {
-                        hideCookieBanner();
-                    });
+                    if (!window.__cookieBannerObserverInstalled) {
+                        const observer = new MutationObserver(function() {
+                            hideCookieBanner();
+                        });
 
-                    observer.observe(document.documentElement || document.body, {
-                        childList: true,
-                        subtree: true,
-                        attributes: true
-                    });
+                        observer.observe(document.documentElement || document.body, {
+                            childList: true,
+                            subtree: true,
+                            attributes: true
+                        });
 
-                    window.__cookieBannerObserverInstalled = true;
+                        window.__cookieBannerObserverInstalled = true;
+                    }
                 }
                 
                 // Only intercept clicks for Bill Explainer screen
