@@ -77,7 +77,7 @@ const WelcomeCard = () => {
             accessible={true}
             accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
           >
-            SAVE with FREE Unlimited Mobile for 1 year
+            SAVE with FREE Unlimited Mobile for 1 year*
           </Text>
           <Pressable
             style={styles.offerBtn}

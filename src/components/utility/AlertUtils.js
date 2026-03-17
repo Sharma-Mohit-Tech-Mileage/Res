@@ -238,10 +238,12 @@ const styles = StyleSheet.create({
   },
   actionText: {
     color: Color.colorMidnightblue, // Restored original link color
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansSemiBold,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "700",
+    textDecorationLine: "underline",
+    textDecorationColor: Color.colorMidnightblue,
     marginLeft: 20,
     marginTop: 7,
     marginRight: 5,

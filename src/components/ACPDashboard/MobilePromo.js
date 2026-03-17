@@ -52,7 +52,7 @@ const MobilePromo = () => {
               accessible={true}
               accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
             >
-              SAVE with FREE Unlimited Mobile for 1 year
+              SAVE with FREE Unlimited Mobile for 1 year*
             </Text>
             <Pressable
               style={styles.offerBtn}
@@ -88,7 +88,8 @@ const MobilePromo = () => {
       <View style={styles.imageContainer}>
          <Image
           accessible={true}
-          accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
+          accessibilityRole="header" accessibilityLevel={2} 
+          //accessibilityHint="Header"
           source={PromoImage}
           resizeMode="stretch"
           style={styles.promoImage}
