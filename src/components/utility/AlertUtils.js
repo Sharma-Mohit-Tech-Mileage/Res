@@ -63,7 +63,8 @@ export const AlertComponent = ({
       mergedStyles.errorBox,
       {
         backgroundColor: alertStyles.backgroundColor,
-        borderColor: alertStyles.borderColor
+        borderColor: alertStyles.borderColor,
+        marginBottom: type === "warning" ? wp("15%") : wp("11%"),
       }
     ]}>
       <View style={[
@@ -89,7 +90,7 @@ export const AlertComponent = ({
             </Text>
           </View>
           <Text style={mergedStyles.alertMessage}>
-            {" "}{message}
+            {message}
             {boldText && (
               <Text style={[mergedStyles.alertMessage, mergedStyles.boldText]}>
                 {" "}{boldText}{" "}

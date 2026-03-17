@@ -488,7 +488,7 @@ const NewBillerHome = ({ navigation }) => {
                   <View
                     style={[
                       styles.contentWrapper,
-                      { paddingHorizontal: Padding.p_base },
+                      { paddingHorizontal: Padding.p_base},
                     ]}
                   >
                     <MobilePilotLandingPage />

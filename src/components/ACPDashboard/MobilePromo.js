@@ -6,6 +6,7 @@ import FeatureCard from "./FeatureCardMobile";
 import { useNavigation } from "@react-navigation/native";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
 const MobilePromo = () => {
@@ -22,7 +23,7 @@ const MobilePromo = () => {
 
   const renderOfferBanner = () => {
       return (
-        <View style={[styles.videoContainer, { height: 340 }]}>
+        <View style={[ {height: 380 }]}>
           {/* <VideoPlayer videoId={videoId} /> */}
   
           <Image
@@ -47,7 +48,7 @@ const MobilePromo = () => {
               Mobile
             </Text>
             <Text
-              style={[styles.title, { width: 230 }]}
+              style={[styles.title, { width: wp("50%") }]}
               accessible={true}
               accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
             >
@@ -71,10 +72,8 @@ const MobilePromo = () => {
               </Text>
             </Pressable>
   
-            <Text style={styles.offerDesclaimer}>
-      {`*Offer not available for FlexConnect
-    or LIFT customers. Certain taxes & 
-             fees do not apply.`}
+            <Text style={[styles.offerDesclaimer, { marginEnd:10}]}>
+             *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
             </Text>
           </View>
         </View>

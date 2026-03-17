@@ -1,9 +1,12 @@
+import { Radio } from "native-base";
+
 export const FontFamily = {
     openSansSemiBold: "OpenSans-SemiBold",
     textXsSemibold: "Inter-SemiBold",
     openSansRegular: 'OpenSans-Regular',
     interBold: "Inter-Bold",
     textXsMedium: "Inter-Medium",
+    radioCanadaRegular: "RadioCanada-Regular",
 };
 
 /* font sizes */

@@ -20,6 +20,7 @@ import {
 import PlayIcon from "../../../assets/svgs/PlayIcon";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 const WelcomeCard = () => {
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] =
@@ -47,7 +48,7 @@ const WelcomeCard = () => {
 
   const renderOfferBanner = () => {
     return (
-      <View style={[styles.videoContainer, { height: 340 }]}>
+      <View style={[styles.videoContainer, { height: 380 }]}>
         {/* <VideoPlayer videoId={videoId} /> */}
 
         <Image
@@ -63,7 +64,7 @@ const WelcomeCard = () => {
           }}
         >
           <Text
-            style={[styles.title2, { width: 230 }]}
+            style={[styles.title2, { width: wp("55%")  }]}
             accessible={true}
             accessibilityLabel="Sparklight Internet + Mobile"
           >
@@ -96,11 +97,9 @@ const WelcomeCard = () => {
             </Text>
           </Pressable>
 
-    <Text style={styles.offerDesclaimer}>
-  {`*Offer not available for FlexConnect
-     or LIFT customers. Certain taxes & 
-          fees do not apply.`}
-          </Text>
+    <Text style={[styles.offerDesclaimer, { marginEnd:10}]}>
+      *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
+    </Text>
         </View>
       </View>
     );
@@ -126,7 +125,7 @@ const WelcomeCard = () => {
             }}
           >
             <Pressable
-              style={{ flexDirection: "row", marginTop: 5, marginLeft: 40 }}
+              style={{ flexDirection: "row", marginTop: 5, marginLeft: 20 }}
               onPress={() => {
                 Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
               }}
