@@ -71,7 +71,12 @@ const MobilePromo = () => {
                 Get Offer
               </Text>
             </Pressable>
-  
+            <Text
+                  style={[styles.offerDesclaimer, { marginEnd:10}]}
+                  accessible={true}
+                  accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
+                >
+                </Text>
             <Text style={[styles.offerDesclaimer, { marginEnd:10}]}>
              *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
             </Text>

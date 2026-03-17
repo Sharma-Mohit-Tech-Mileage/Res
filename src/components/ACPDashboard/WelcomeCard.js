@@ -48,7 +48,7 @@ const WelcomeCard = () => {
 
   const renderOfferBanner = () => {
     return (
-      <View style={[styles.videoContainer, { height: 380 }]}>
+      <View style={[styles.videoContainer, { height: 310 }]}>
         {/* <VideoPlayer videoId={videoId} /> */}
 
         <Image
@@ -97,7 +97,11 @@ const WelcomeCard = () => {
             </Text>
           </Pressable>
 
-    <Text style={[styles.offerDesclaimer, { marginEnd:10}]}>
+    <Text
+      style={[styles.offerDesclaimer, { marginEnd:10}]}
+      accessible={true}
+      accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
+    >
       *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
     </Text>
         </View>

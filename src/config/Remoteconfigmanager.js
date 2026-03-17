@@ -32,7 +32,7 @@ const DEFAULT_MAINTENANCE = {
 const DEFAULT_FEATURES = {
   dashboard: {
     pending_activation: {
-      show_sparklight_mobile_section: false
+      show_sparklight_mobile_section: true
     }
   },
   tabs: {

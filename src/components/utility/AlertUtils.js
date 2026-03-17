@@ -101,9 +101,10 @@ export const AlertComponent = ({
                 style={mergedStyles.actionText}
                 onPress={onActionPress}
               >
-                {" "}{actionText}{" "}
+                {actionText}
               </Text>
             )}
+            {actionText && " and keep your app running smoothly."}
             {actionText && "and keep your app running smoothly."}
           </Text>
         </View>
@@ -152,7 +153,7 @@ export const AlertUtils = {
     <AlertComponent
       type="info"
       title="What's New"
-      message="Enhance your app experience with the latest version."
+      message="Enhance your app experience with the latest version. "
       indicatorColor={Color.sparklightGreen} // Maps to info styling internally (per user spec)
       iconTint="#0060AE" // Use finalized info color for icon
       titleStyle={{ color: "#0060AE" }}
