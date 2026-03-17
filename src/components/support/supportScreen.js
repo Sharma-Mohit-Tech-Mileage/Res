@@ -19,6 +19,7 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 import PubSub from "pubsub-js";
 import base64 from "react-native-base64";
 import { startChatWithConfig, startChat } from "../utility/RNZendeskChat";
@@ -36,6 +37,7 @@ const Support = ({ route }) => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const scrollViewRef = useRef(null);
+  const { triggerOnScreenEntry } = useAnnouncement();
   const [isAgentAvailable, setisAgentAvailable] = useState(false);
   const [istechAgentAvailable, setIstechAgentAvailable] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -112,9 +114,10 @@ const Support = ({ route }) => {
 
   useFocusEffect(
     useCallback(() => {
+      triggerOnScreenEntry('SupportStack');
       checkAgentAvailibilty("1500003304341");
       checkAgentAvailibilty("1500003312422");
-    }, [])
+    }, [triggerOnScreenEntry])
   );
 
   React.useEffect(() => {

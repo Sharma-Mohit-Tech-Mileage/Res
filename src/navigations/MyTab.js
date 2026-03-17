@@ -228,7 +228,11 @@ const createTabBarButton = useCallback(
     const isWalkthroughRunning = home.walkThroughStep !== null && home.walkThroughStep !== undefined;
 
     if (!isNewUser && !isWalkthroughRunning) {
-      triggerOnAppLaunch();
+      // Delay to ensure Terms/TC flow is fully complete before showing announcement
+      const timer = setTimeout(() => {
+        triggerOnAppLaunch();
+      }, 1500);
+      return () => clearTimeout(timer);
     }
   }, [userData?.userInfo?.mobileTCAcceptanceFlag, home.walkThroughStep, triggerOnAppLaunch]);
 

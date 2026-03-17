@@ -49,8 +49,14 @@ class AnnouncementManager {
 
     const dismissed = await AnnouncementPersistence.hasBeenDismissed(campaignId);
     if (dismissed) {
-      console.log(`[AnnouncementManager] Campaign ${campaignId} already dismissed`);
-      return false;
+      // If showOnFirstVisitOnly is false, allow re-showing after dismiss (skip)
+      const showOnFirstVisitOnly = campaign.trigger?.showOnFirstVisitOnly;
+      if (showOnFirstVisitOnly === false) {
+        console.log(`[AnnouncementManager] Campaign ${campaignId} was dismissed but showOnFirstVisitOnly is false — allowing re-show`);
+      } else {
+        console.log(`[AnnouncementManager] Campaign ${campaignId} already dismissed`);
+        return false;
+      }
     }
 
     if (campaign.trigger?.type === 'screen_entry' && 
