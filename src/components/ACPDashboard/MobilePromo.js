@@ -72,12 +72,13 @@ const MobilePromo = () => {
               </Text>
             </Pressable>
             <Text
-                  style={[styles.offerDesclaimer, { marginEnd:10}]}
-                  accessible={true}
-                  accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
+              style={[styles.offerDesclaimer, { marginEnd:10}]}
+              accessible={false} 
                 >
                 </Text>
-            <Text style={[styles.offerDesclaimer, { marginEnd:10}]}>
+            <Text style={[styles.offerDesclaimer, { marginEnd:10}]}
+              accessible={true}
+              accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply.">
              *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
             </Text>
           </View>
@@ -93,7 +94,9 @@ const MobilePromo = () => {
       <View style={styles.imageContainer}>
          <Image
           accessible={true}
-          accessibilityRole="header" accessibilityLevel={2} 
+          accessibilityRole="header"
+          accessibilityLabel="Plan starting at $ 15 per month"
+          accessibilityLevel={2} 
           //accessibilityHint="Header"
           source={PromoImage}
           resizeMode="stretch"
