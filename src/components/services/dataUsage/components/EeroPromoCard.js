@@ -14,14 +14,6 @@ import LinearGradient from "react-native-linear-gradient";
 import { Svg, Circle, Path } from "react-native-svg";
 import { theme } from "../../../../styles/theme";
 
-// ── Animated Wi-Fi rings (decorative) ──
-const WifiRings = () => (
-  <View style={styles.ringsContainer} pointerEvents="none">
-    <View style={[styles.ring, styles.ringOuter]} />
-    <View style={[styles.ring, styles.ringMiddle]} />
-    <View style={[styles.ring, styles.ringInner]} />
-  </View>
-);
 
 // ── Wi-Fi icon (bottom-right watermark) ──
 const WifiWatermark = () => (
@@ -54,7 +46,6 @@ const EERO_DEFAULT_IOS_URL = "https://apps.apple.com/us/app/eero-wifi-system/id1
 const EERO_DEFAULT_ANDROID_URL = "https://play.google.com/store/apps/details?id=com.eero.android&pcampaignid=web_share";
 
 const EeroPromoCard = ({ promoData }) => {
-  // ── Subtle pulse animation on the status dot ──
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -118,22 +109,11 @@ const EeroPromoCard = ({ promoData }) => {
           angle={145}
         >
           {/* Decorative elements */}
-          <WifiRings />
           <WifiWatermark />
 
           {/* Content */}
           <View style={styles.content}>
-            {/* Tag line with pulse dot — hidden from screen reader */}
-            <View
-              style={styles.tagRow}
-              accessibilityElementsHidden={true}
-              importantForAccessibility="no-hide-descendants"
-            >
-              <Animated.View
-                style={[styles.statusDot, { opacity: pulseAnim }]}
-              />
-              <Text style={styles.tagText}>WHOLE-HOME WI-FI</Text>
-            </View>
+
 
             {/* eero brand name */}
             <Text style={styles.brandName}>eero</Text>
@@ -178,36 +158,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  // ── Decorative rings (top-right) ──
-  ringsContainer: {
-    position: "absolute",
-    top: -30,
-    right: -30,
-  },
-  ring: {
-    position: "absolute",
-    borderRadius: 999,
-    borderWidth: 1,
-  },
-  ringOuter: {
-    width: 160,
-    height: 160,
-    borderColor: "rgba(38,48,103,0.35)",
-  },
-  ringMiddle: {
-    width: 120,
-    height: 120,
-    top: 20,
-    left: 20,
-    borderColor: "rgba(38,48,103,0.2)",
-  },
-  ringInner: {
-    width: 80,
-    height: 80,
-    top: 40,
-    left: 40,
-    borderColor: "rgba(38,48,103,0.12)",
-  },
 
   // ── Wi-Fi watermark (bottom-right) ──
   watermark: {
@@ -221,25 +171,6 @@ const styles = StyleSheet.create({
   content: {
     position: "relative",
     zIndex: 2,
-  },
-
-  tagRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginBottom: 12,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#2ecc71",
-  },
-  tagText: {
-    fontSize: 10,
-    fontFamily: theme.typography.family.semiBold,
-    letterSpacing: 1.5,
-    color: "rgba(255,255,255,0.7)",
   },
 
   brandName: {
@@ -275,15 +206,11 @@ const styles = StyleSheet.create({
   },
   ctaText: {
     fontSize: 14,
-    fontFamily: theme.typography.family.semiBold,
+    fontFamily: "theme.typography.family.semiBold",
     fontWeight: "600",
     color: theme.colors.primaryDark,
   },
 
-  freeLabel: {
-    fontSize: 11,
-    color: "rgba(255,255,255,0.35)",
-  },
 });
 
 export default EeroPromoCard;
