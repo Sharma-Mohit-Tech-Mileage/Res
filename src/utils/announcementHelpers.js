@@ -149,15 +149,18 @@ export const trackAnnouncementDismissal = async (campaignId, dismissedAtStep) =>
 export const navigateToDestination = (navConfig, navigationRef) => {
   if (!navConfig || !navigationRef.current) return;
 
-  const { type, destination } = navConfig;
+  const { type, destination, params } = navConfig;
 
   try {
     switch (type) {
       case 'tab':
-        navigationRef.current.navigate('MyTab', { screen: destination });
+        navigationRef.current.navigate('MyTab', {
+          screen: destination,
+          ...(params && { params }),
+        });
         break;
       case 'screen':
-        navigationRef.current.navigate(destination);
+        navigationRef.current.navigate(destination, params);
         break;
       case 'external':
       case 'deep_link':

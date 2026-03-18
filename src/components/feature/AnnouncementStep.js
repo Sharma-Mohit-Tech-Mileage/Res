@@ -24,18 +24,21 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, navigation
   const handleNavigation = (navConfig) => {
     if (!navConfig) return;
 
-    const { type, destination } = navConfig;
+    const { type, destination, params } = navConfig;
 
     try {
       switch (type) {
         case 'tab':
           if (navigationRef?.current) {
-            navigationRef.current.navigate('MyTab', { screen: destination });
+            navigationRef.current.navigate('MyTab', {
+              screen: destination,
+              ...(params && { params }),
+            });
           }
           break;
         case 'screen':
           if (navigationRef?.current) {
-            navigationRef.current.navigate(destination);
+            navigationRef.current.navigate(destination, params);
           }
           break;
         case 'external':
