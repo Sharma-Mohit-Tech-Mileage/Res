@@ -112,14 +112,15 @@ const WelcomeCard = () => {
   const renderWelcomeBanner = () => {
     return (
       <>
-        <View style={styles.videoContainer} accessibilityRole="header"
-            accessibilityLevel={1}
-            accessible={true}
-            accessibilityLabel="We’re excited to get you connected!">
+        <View style={styles.videoContainer}>
           {/* <VideoPlayer videoId={videoId} /> */}
 
           <Image
             source={require("../../../assets/welcome-banner-home.png")}
+            accessibilityRole="header"
+            accessibilityLevel={1}
+            accessible={true}
+            accessibilityLabel="We’re excited to get you connected!"
             style={{ width: "100%" }}
           />
           <View
@@ -137,6 +138,7 @@ const WelcomeCard = () => {
                 Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
               }}
               accessible={true}
+              importantForAccessibility="yes"
               accessibilityRole="link"
               accessibilityLabel="Watch welcome video"
               accessibilityHint="Double tap to watch on YouTube"

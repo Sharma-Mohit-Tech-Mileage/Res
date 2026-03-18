@@ -1,20 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet,Image } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import {  Color, Padding, Border } from '../../../GlobalStyles';
-import Icon from '../common/Icon';
-const PamoImage = require('../../../assets/papaerless-signup-bg.jpg');
+import SignSaveResSvg from '../../res/svgIcons/SignSaveResSvg';
 
 const PromoBanner = ({ title }) => {
   return (
     <View style={styles.container}>
-
-      <Image
-        source={PamoImage}
+      <View
         accessible={true}
         accessibilityRole="text"
         accessibilityLabel="Sign up and save with Auto Pay and Paperless Billing"
-        style={{  marginRight: Padding.p_xs,borderRadius:Border.br_7xs }}
-      />
+        style={styles.bannerGraphic}
+      >
+        <SignSaveResSvg width="100%" height={118} />
+      </View>
       {/* <View style={styles.iconContainer}>
         <Icon name="refresh-cw" size={20} color="#8D3B90" />
       </View>
@@ -34,7 +33,13 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Vertically centers icon with text block
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_xs,
-    marginBottom: Padding.p_5xl,  
+    marginBottom: Padding.p_5xl,
+    overflow: 'hidden',
+  },
+  bannerGraphic: {
+    width: '100%',
+    borderRadius: Border.br_7xs,
+    overflow: 'hidden',
   },
   iconContainer: {
     width: 40,
