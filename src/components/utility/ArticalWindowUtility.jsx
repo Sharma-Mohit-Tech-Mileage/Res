@@ -332,12 +332,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 console.log(`${TAG} silentRefresh — setting native cookies | idToken=${tokenPreview(cu.idToken)} | ts=${new Date().toISOString()}`);
                 await setAuthCookiesOnAllDomains(cu.idToken);
             }
-            if (!isOnPaymentDomain()) {
-                console.log(`${TAG} silentRefresh — injecting IdToken to WebView (not on payment domain) | ts=${new Date().toISOString()}`);
-                await injectIdTokenOnly();
-            } else {
-                console.log(`${TAG} silentRefresh — SKIPPING WebView JS injection (on payment domain) | ts=${new Date().toISOString()}`);
-            }
+            // Always inject IdToken cookie into WebView via JS — sharedCookiesEnabled only syncs
+            // on page navigation, not in real-time. Without this, document.cookie has a stale IdToken
+            // and the portal fires postlogout. injectIdTokenOnly only touches cookies, NOT localStorage,
+            // so it's safe on the payment domain (jwt_token/user_info/tokenIssuedAt stay untouched).
+            console.log(`${TAG} silentRefresh — injecting IdToken cookie to WebView | onPaymentDomain=${isOnPaymentDomain()} | ts=${new Date().toISOString()}`);
+            await injectIdTokenOnly();
             await logStorageSnapshot('silentRefresh-after');
             await dumpCookies('silentRefresh-after');
             console.log(`${TAG} silentRefresh DONE | duration=${Date.now() - refreshStartTs}ms`);
