@@ -140,12 +140,12 @@ const Support = ({ route }) => {
     },
     {
       key: "Faqs",
-      text: "FAQs",
-      accessibilityLabel: "Frequently Asked Questions",
+      text: "Getting Started",
+      accessibilityLabel: "Getting Started",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the left of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/articles/18929657224855?isMobile=true",
+      url: "https://support.sparklight.com/hc/en-us/articles/21493968056343-How-Do-I-Get-Started-with-the-MySparklight-Mobile-App?isMobile=true",
     },
     {
       key: "moreOptions",
@@ -154,25 +154,25 @@ const Support = ({ route }) => {
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/15840476056727-Billing-Payments?isMobile=true",
+      url: "https://support.sparklight.com/hc/en-us/sections/22829302944279-Billing?isMobile=true",
     },
     {
       key: "moreOptions",
-      text: "Internet Service",
-      accessibilityLabel: "Internet Service",
+      text: "Contact Information & Alerts ",
+      accessibilityLabel: "Contact Information & Alerts",
+      icon: RighIcon,
+      iconAlignment: "right", // Icon to the right of the text
+      navigateTo: "ArticalWindowUtility",
+      url: "https://support.sparklight.com/hc/en-us/sections/36871771193623-Profile-Settings?isMobile=true",
+    },
+    {
+      key: "moreOptions",
+      text: "Internet Services",
+      accessibilityLabel: "Internet Services",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
       url: "https://support.sparklight.com/hc/en-us/categories/115000833068-Internet?isMobile=true",
-    },
-    {
-      key: "moreOptions",
-      text: "WiFi",
-      accessibilityLabel: "WiFi Support",
-      icon: RighIcon,
-      iconAlignment: "right", // Icon to the right of the text
-      navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/115001419607-WiFi?isMobile=true",
     },
     {
       key: "moreOptions",

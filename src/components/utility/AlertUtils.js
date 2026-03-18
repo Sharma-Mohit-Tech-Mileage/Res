@@ -63,7 +63,8 @@ export const AlertComponent = ({
       mergedStyles.errorBox,
       {
         backgroundColor: alertStyles.backgroundColor,
-        borderColor: alertStyles.borderColor
+        borderColor: alertStyles.borderColor,
+        marginBottom: type === "warning" ? wp("15%") : wp("11%"),
       }
     ]}>
       <View style={[
@@ -89,7 +90,7 @@ export const AlertComponent = ({
             </Text>
           </View>
           <Text style={mergedStyles.alertMessage}>
-            {" "}{message}
+            {message}
             {boldText && (
               <Text style={[mergedStyles.alertMessage, mergedStyles.boldText]}>
                 {" "}{boldText}{" "}
@@ -100,9 +101,10 @@ export const AlertComponent = ({
                 style={mergedStyles.actionText}
                 onPress={onActionPress}
               >
-                {" "}{actionText}{" "}
+                {actionText}
               </Text>
             )}
+            {actionText && " and keep your app running smoothly."}
             {actionText && "and keep your app running smoothly."}
           </Text>
         </View>
@@ -151,7 +153,7 @@ export const AlertUtils = {
     <AlertComponent
       type="info"
       title="What's New"
-      message="Enhance your app experience with the latest version."
+      message="Enhance your app experience with the latest version. "
       indicatorColor={Color.sparklightGreen} // Maps to info styling internally (per user spec)
       iconTint="#0060AE" // Use finalized info color for icon
       titleStyle={{ color: "#0060AE" }}
@@ -175,7 +177,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: 'flex-start',
     marginHorizontal: 14,
-    marginVertical: 20,
+    marginVertical: 8,
     borderRadius: 8, // Updated to match finalized design
     borderWidth: 1,
     paddingLeft: 16,
@@ -237,10 +239,12 @@ const styles = StyleSheet.create({
   },
   actionText: {
     color: Color.colorMidnightblue, // Restored original link color
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansSemiBold,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "700",
+    textDecorationLine: "underline",
+    textDecorationColor: Color.colorMidnightblue,
     marginLeft: 20,
     marginTop: 7,
     marginRight: 5,

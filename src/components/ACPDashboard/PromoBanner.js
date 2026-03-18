@@ -10,6 +10,9 @@ const PromoBanner = ({ title }) => {
 
       <Image
         source={PamoImage}
+        accessible={true}
+        accessibilityRole="text"
+        accessibilityLabel="Sign up and save with Auto Pay and Paperless Billing"
         style={{  marginRight: Padding.p_xs,borderRadius:Border.br_7xs }}
       />
       {/* <View style={styles.iconContainer}>
