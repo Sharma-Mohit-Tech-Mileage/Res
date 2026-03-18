@@ -186,15 +186,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const isLoading = !contentLoaded || progress < 1;
 
-    // Re-read stored tokens and update injectedJavaScriptBeforeContentLoaded so that
-    // any future page load (including cross-domain navigations) uses fresh credentials.
     const refreshInjectionScript = useCallback(async () => {
         const cu = await getUser();
         setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp));
     }, []);
 
-    // Pass stored JWT + jwtTimestamp (tokenIssuedAt) to portal.
-    // If IdToken is near expiry (>4min old), refresh it first to avoid injecting a stale JWT.
+
     const prepareInjectionScript = useCallback(async () => {
         try {
             console.log(`${TAG} prepareInjectionScript START | ts=${new Date().toISOString()} | targetUrl=${url}`);
@@ -226,8 +223,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         }
     }, []);
 
-    // Full auth injection: pushes both JWT (localStorage) + tokenIssuedAt and IdToken (cookie)
-    // Used only for SSO redirect recovery where portal needs a fresh JWT handoff
     const injectAuth = useCallback(async () => {
         if (!webViewRef.current) return;
         try {
@@ -261,8 +256,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         }
     }, []);
 
-    // IdToken-only injection: pushes only the IdToken cookie to WebView
-    // Does NOT touch jwt_token/user_info in localStorage — portal manages its own JWT lifecycle
+
     const injectIdTokenOnly = useCallback(async () => {
         if (!webViewRef.current) return;
         try {
@@ -298,9 +292,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         return cur.includes('payment.sparklight.com') || cur.includes('payment.uat.sparklight.com');
     }, []);
 
-    // 4-min silent refresh: refreshes SSO tokens, pushes only IdToken cookie
-    // JWT stays untouched in portal's localStorage so portal's 18-min refresh timer stays aligned
-    // Skips WebView cookie injection when user is on payment domain to avoid mid-transaction overwrite
+
     const silentRefreshIdToken = useCallback(async () => {
         if (!webViewRef.current) return;
         const refreshStartTs = Date.now();
@@ -322,20 +314,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
             pendingOfflineRefresh.current = false;
             lastIdTokenRefresh.current = Date.now();
-            // Keep injectedJavaScriptBeforeContentLoaded up-to-date so cross-domain
-            // navigations (e.g. payment → billing) inject fresh tokens into localStorage
             await refreshInjectionScript();
-            // Always update native cookies — IdToken cookie must stay fresh regardless of domain
-            // Without this, the cookie expires after 5min and the portal fires postlogout
             const cu = await getUser();
             if (cu?.idToken) {
                 console.log(`${TAG} silentRefresh — setting native cookies | idToken=${tokenPreview(cu.idToken)} | ts=${new Date().toISOString()}`);
                 await setAuthCookiesOnAllDomains(cu.idToken);
             }
-            // Always inject IdToken cookie into WebView via JS — sharedCookiesEnabled only syncs
-            // on page navigation, not in real-time. Without this, document.cookie has a stale IdToken
-            // and the portal fires postlogout. injectIdTokenOnly only touches cookies, NOT localStorage,
-            // so it's safe on the payment domain (jwt_token/user_info/tokenIssuedAt stay untouched).
             console.log(`${TAG} silentRefresh — injecting IdToken cookie to WebView | onPaymentDomain=${isOnPaymentDomain()} | ts=${new Date().toISOString()}`);
             await injectIdTokenOnly();
             await logStorageSnapshot('silentRefresh-after');
@@ -395,7 +379,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     useEffect(() => { prepareInjectionScript(); }, [prepareInjectionScript]);
 
-    // Clear sensitive form data from WebView localStorage on unmount to prevent data leak across sessions
     useEffect(() => {
         return () => {
             webViewRef.current?.injectJavaScript(`
@@ -504,8 +487,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
         if (request.url.includes(Env.SSO_LOGIN)) {
             console.warn(`${TAG} NAV | SSO redirect detected — session expired on portal | ssoInFlight=${ssoRedirectInFlight.current}`);
-            // SSO redirect = session expired on portal side — full refresh with JWT handoff
-            // Guard against re-entry if multiple redirects fire while refresh is in flight
+
             if (!ssoRedirectInFlight.current) {
                 ssoRedirectInFlight.current = true;
                 (async () => {
@@ -540,8 +522,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         if (!initialLoadComplete.current) { setProgress(0); setContentLoaded(false); }
         setIsError(false);
         setErrorMessage('');
-        // When navigating to payment domain, ensure current cookies are set via native layer only
-        // PCI portal relies on IdToken cookie — don't refresh, just re-inject stored values
         if (nativeEvent?.url && (nativeEvent.url.includes('payment.sparklight.com') || nativeEvent.url.includes('payment.uat.sparklight.com'))) {
             console.log(`${TAG} NAV onLoadStart | PAYMENT DOMAIN detected — setting native cookies only`);
             (async () => {
@@ -561,8 +541,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         setProgress(1);
         const onPayment = isOnPaymentDomain();
         console.log(`${TAG} NAV onLoadEnd | url=${currentUrlRef.current} | onPaymentDomain=${onPayment} | ts=${new Date().toISOString()}`);
-        // JWT already set via injectedJavaScriptBeforeContentLoaded — just ensure IdToken cookie is current
-        // Skip when on payment domain — native cookies already set in onLoadStart
+
         if (!onPayment) {
             console.log(`${TAG} NAV onLoadEnd | injecting IdToken cookie (not payment domain)`);
             await injectIdTokenOnly();
@@ -584,7 +563,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const onHttpError = useCallback(({ nativeEvent }) => {
         console.error(`${TAG} HTTP ERROR | status=${nativeEvent.statusCode} | url=${nativeEvent.url} | currentUrl=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
-        // Dump storage + cookies on HTTP errors for diagnostics
         (async () => {
             await logStorageSnapshot('httpError-' + nativeEvent.statusCode);
             await dumpCookies('httpError-' + nativeEvent.statusCode);
@@ -619,11 +597,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     console.log(`${TAG} MSG injectionComplete | script injected OK | url=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
                     break;
                 default:
-                    // Handle storageSnapshot messages (storageSnapshot_postInjection, storageSnapshot_onLoadEnd, etc.)
                     if (data.type && data.type.startsWith('storageSnapshot') && data.data) {
                         const s = data.data;
                         const caller = data.type.replace('storageSnapshot_', '');
-                        // Parse cookies string into key=value pairs
                         const cookiePairs = (s.cookies || '').split(';').map(c => c.trim()).filter(Boolean);
                         const cookieObj = {};
                         cookiePairs.forEach(pair => {
