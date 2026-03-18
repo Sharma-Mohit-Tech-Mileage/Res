@@ -76,6 +76,13 @@ const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp) => {
             localStorage.setItem('user_info', '${safeUserInfo}');
             localStorage.setItem('tokenIssuedAt', '${jwtTimestamp || Date.now()}');
         }
+        try {
+            var _expire = 'Thu, 01 Jan 1970 00:00:00 GMT';
+            document.cookie = 'IdToken=; path=/; expires=' + _expire + ';';
+            document.cookie = 'Source=; path=/; expires=' + _expire + ';';
+            document.cookie = 'CustomerType=; path=/; expires=' + _expire + ';';
+            document.cookie = 'LatestVersion=; path=/; expires=' + _expire + ';';
+        } catch(e) {}
         try { ${buildCookieJS(idToken)} } catch(e) {}
 
         window.addEventListener('message', function(e) {
@@ -179,6 +186,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         ]).start(() => setShowToast(false));
     }, [toastOpacity]);
 
+    // Re-read stored tokens and update injectedJavaScriptBeforeContentLoaded so that
+    // any future WebView recreation uses fresh credentials.
+    const refreshInjectionScript = useCallback(async () => {
+        const cu = await getUser();
+        setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp));
+    }, []);
+
     // IdToken-only injection: pushes only the IdToken cookie to WebView
     // Does NOT touch jwt_token/user_info in localStorage — portal manages its own JWT lifecycle
     const injectIdTokenOnly = useCallback(async () => {
@@ -225,6 +239,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             }
             pendingOfflineRefresh.current = false;
             lastIdTokenRefresh.current = Date.now();
+            // Do NOT call refreshInjectionScript() here — updating injectionScript state triggers
+            // a React re-render which can cause the payment WebView to reload and redirect to portal.
+            // The injection script is only needed on initial load / WebView recreation.
             // Refresh native cookies only — avoid JS injection into payment WebView mid-transaction
             const cu = await getUser();
             console.log(`${TAG} silentRefresh | native cookies only (payment domain) | idToken=${tokenPreview(cu?.idToken)} | ts=${new Date().toISOString()}`);
@@ -460,6 +477,12 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             const reason = request.url.includes('/postlogout') ? 'postlogout' : 'SSO redirect';
             console.warn(`${TAG} NAV | ${reason} detected — session expired, going back | ts=${new Date().toISOString()}`);
             showToastMessage();
+            navigation.goBack();
+            return false;
+        }
+        // Block navigation to customer portal — PCI is payment-only, take user back to mobile
+        if (request.url.includes('customer.sparklight.com') || request.url.includes('customer.uat.sparklight.com')) {
+            console.warn(`${TAG} NAV | portal redirect detected — returning to mobile | url=${request.url} | ts=${new Date().toISOString()}`);
             navigation.goBack();
             return false;
         }
