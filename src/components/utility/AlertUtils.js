@@ -105,7 +105,6 @@ export const AlertComponent = ({
               </Text>
             )}
             {actionText && " and keep your app running smoothly."}
-            {actionText && "and keep your app running smoothly."}
           </Text>
         </View>
         {onClose && (

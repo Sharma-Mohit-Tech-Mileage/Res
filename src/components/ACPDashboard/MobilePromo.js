@@ -6,7 +6,7 @@ import FeatureCard from "./FeatureCardMobile";
 import { useNavigation } from "@react-navigation/native";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { widthPercentageToDP as wp , heightPercentageToDP as hp} from "react-native-responsive-screen";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
 const MobilePromo = () => {
@@ -23,7 +23,7 @@ const MobilePromo = () => {
 
   const renderOfferBanner = () => {
       return (
-        <View style={[ {height: 380 }]}>
+        <View style={[ {height: hp("40%") }]}>
           {/* <VideoPlayer videoId={videoId} /> */}
   
           <Image
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     fontWeight: "400",
-    marginTop: Padding.p_13xl,
+   
     
     
   },

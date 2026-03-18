@@ -112,7 +112,10 @@ const WelcomeCard = () => {
   const renderWelcomeBanner = () => {
     return (
       <>
-        <View style={styles.videoContainer}>
+        <View style={styles.videoContainer} accessibilityRole="header"
+            accessibilityLevel={1}
+            accessible={true}
+            accessibilityLabel="We’re excited to get you connected!">
           {/* <VideoPlayer videoId={videoId} /> */}
 
           <Image
@@ -133,7 +136,8 @@ const WelcomeCard = () => {
               onPress={() => {
                 Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
               }}
-              accessibilityRole="button"
+              accessible={true}
+              accessibilityRole="link"
               accessibilityLabel="Watch welcome video"
               accessibilityHint="Double tap to watch on YouTube"
             >
@@ -150,17 +154,15 @@ const WelcomeCard = () => {
           <Text
             style={[
               styles.title,
-              { position: "absolute", top: 50, left: 20, width: 230 },
+              { position: "absolute", top: 50, left: 20, width: wp("55%") },
             ]}
-            accessibilityRole="header"
-            accessibilityLevel={1}
-            accessible={true}
-            accessibilityLabel="We’re excited to get you connected!"
+            accessible={false}
+            importantForAccessibility="no"
           >
             We’re excited to get you connected!
           </Text>
         </View>
-        {isAccessibilityEnabled && (
+        {/* {isAccessibilityEnabled && (
           <>
             <Text
               onPress={() => {
@@ -190,7 +192,7 @@ const WelcomeCard = () => {
             Were Sparklight, and we're always working for you.`}
             </Text>
           </>
-        )}
+        )} */}
       </>
     );
   };
