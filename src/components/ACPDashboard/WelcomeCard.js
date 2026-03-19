@@ -21,6 +21,7 @@ import PlayIcon from "../../../assets/svgs/PlayIcon";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import Config from "react-native-config";
 
 const WelcomeCard = () => {
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] =
@@ -82,9 +83,7 @@ const WelcomeCard = () => {
           <Pressable
             style={styles.offerBtn}
             onPress={() => {
-              Linking.openURL(
-                "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome",
-              );
+              Linking.openURL(Config.OFFER_URL+"?utm_source=mobileapp&utm_medium=activehome");
             }}
           >
             <Text
@@ -117,6 +116,10 @@ const WelcomeCard = () => {
 
           <Image
             source={require("../../../assets/welcome-banner-home.png")}
+            accessibilityRole="header"
+            accessibilityLevel={1}
+            accessible={true}
+            accessibilityLabel="We’re excited to get you connected!"
             style={{ width: "100%" }}
           />
           <View
@@ -133,8 +136,10 @@ const WelcomeCard = () => {
               onPress={() => {
                 Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
               }}
-              accessibilityRole="button"
-              accessibilityLabel="Watch welcome video"
+              accessible={true}
+              importantForAccessibility="yes"
+              accessibilityRole="link"
+              accessibilityLabel="Watch our welcome video"
               accessibilityHint="Double tap to watch on YouTube"
             >
               <Text style={styles.watchVideoButton}>
@@ -150,17 +155,15 @@ const WelcomeCard = () => {
           <Text
             style={[
               styles.title,
-              { position: "absolute", top: 50, left: 20, width: 230 },
+              { position: "absolute", top: 50, left: 20, width: wp("55%") },
             ]}
-            accessibilityRole="header"
-            accessibilityLevel={1}
-            accessible={true}
-            accessibilityLabel="We’re excited to get you connected!"
+            accessible={false}
+            importantForAccessibility="no"
           >
             We’re excited to get you connected!
           </Text>
         </View>
-        {isAccessibilityEnabled && (
+        {/* {isAccessibilityEnabled && (
           <>
             <Text
               onPress={() => {
@@ -190,7 +193,7 @@ const WelcomeCard = () => {
             Were Sparklight, and we're always working for you.`}
             </Text>
           </>
-        )}
+        )} */}
       </>
     );
   };

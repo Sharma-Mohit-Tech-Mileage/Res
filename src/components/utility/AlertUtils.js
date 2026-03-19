@@ -96,17 +96,19 @@ export const AlertComponent = ({
                 {" "}{boldText}{" "}
               </Text>
             )}
-            {actionText && (
-              <Text
-                style={mergedStyles.actionText}
-                onPress={onActionPress}
-              >
-                {actionText}
-              </Text>
-            )}
-            {actionText && " and keep your app running smoothly."}
-            {actionText && "and keep your app running smoothly."}
           </Text>
+          {actionText && (
+            <Text
+              accessible={true}
+              accessibilityRole="link"
+              accessibilityLabel={actionText}
+              accessibilityHint={Platform.OS === "android" ? "Double tap to open playstore store" : "Double tap to open app store"}
+              style={mergedStyles.actionText}
+              onPress={onActionPress}
+            >
+              {actionText}
+            </Text>
+          )}
         </View>
         {onClose && (
           <TouchableOpacity
@@ -153,7 +155,7 @@ export const AlertUtils = {
     <AlertComponent
       type="info"
       title="What's New"
-      message="Enhance your app experience with the latest version. "
+      message="Enhance your app experience with the latest version for improved performance and reliability."
       indicatorColor={Color.sparklightGreen} // Maps to info styling internally (per user spec)
       iconTint="#0060AE" // Use finalized info color for icon
       titleStyle={{ color: "#0060AE" }}
@@ -245,7 +247,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textDecorationLine: "underline",
     textDecorationColor: Color.colorMidnightblue,
-    marginLeft: 20,
+    marginLeft: 0,
     marginTop: 7,
     marginRight: 5,
   }

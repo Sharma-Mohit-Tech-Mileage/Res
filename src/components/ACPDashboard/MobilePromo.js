@@ -6,7 +6,8 @@ import FeatureCard from "./FeatureCardMobile";
 import { useNavigation } from "@react-navigation/native";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import Config from "react-native-config";
+import { widthPercentageToDP as wp , heightPercentageToDP as hp} from "react-native-responsive-screen";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
 const MobilePromo = () => {
@@ -17,13 +18,13 @@ const MobilePromo = () => {
     );
 
   const handleAddMobile = () => {
-    Linking.openURL("https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=pendingact");
+    Linking.openURL(Config.OFFER_URL+"?utm_source=mobileapp&utm_medium=pendingact");
   };
 
 
   const renderOfferBanner = () => {
       return (
-        <View style={[ {height: 380 }]}>
+        <View style={[ {height: hp("40%") }]}>
           {/* <VideoPlayer videoId={videoId} /> */}
   
           <Image
@@ -36,6 +37,7 @@ const MobilePromo = () => {
               position: "absolute",
               top: 20,
               left: 20,
+              right: 15,
             }}
           >
             <Text
@@ -57,9 +59,7 @@ const MobilePromo = () => {
             <Pressable
               style={styles.offerBtn}
               onPress={() => {
-                Linking.openURL(
-                  "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome",
-                );
+                Linking.openURL(Config.OFFER_URL);
               }}
             >
               <Text
@@ -72,12 +72,13 @@ const MobilePromo = () => {
               </Text>
             </Pressable>
             <Text
-                  style={[styles.offerDesclaimer, { marginEnd:10}]}
-                  accessible={true}
-                  accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
+              style={[styles.offerDesclaimer, { marginEnd:10}]}
+              accessible={false} 
                 >
                 </Text>
-            <Text style={[styles.offerDesclaimer, { marginEnd:10}]}>
+            <Text style={[styles.offerDesclaimer, { marginEnd:10}]}
+              accessible={true}
+              accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply.">
              *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
             </Text>
           </View>
@@ -93,7 +94,9 @@ const MobilePromo = () => {
       <View style={styles.imageContainer}>
          <Image
           accessible={true}
-          accessibilityRole="header" accessibilityLevel={2} 
+          accessibilityRole="header"
+          accessibilityLabel="Plan starting at $ 15 per month"
+          accessibilityLevel={2} 
           //accessibilityHint="Header"
           source={PromoImage}
           resizeMode="stretch"
@@ -157,9 +160,8 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     fontWeight: "400",
-    marginTop: Padding.p_13xl,
-    
-    
+    lineHeight: 20,
+    flexShrink: 2,
   },
   getOfferButton: {
     color: Color.sparklightWhite,
