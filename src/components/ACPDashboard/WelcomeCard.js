@@ -21,6 +21,7 @@ import PlayIcon from "../../../assets/svgs/PlayIcon";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import Config from "react-native-config";
 
 const WelcomeCard = () => {
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] =
@@ -82,9 +83,7 @@ const WelcomeCard = () => {
           <Pressable
             style={styles.offerBtn}
             onPress={() => {
-              Linking.openURL(
-                "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome",
-              );
+              Linking.openURL(Config.OFFER_URL+"?utm_source=mobileapp&utm_medium=activehome");
             }}
           >
             <Text

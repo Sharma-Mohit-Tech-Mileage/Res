@@ -18,6 +18,7 @@ VIEW_PAYMENT=https:/$()/customer.uat.sparklight.com/residential/billing/all-paym
 BILLING_HISTORY=https:/$()/customer.uat.sparklight.com/residential/billing/statement
 PAY_METHOD=https:/$()/payment.uat.sparklight.com/portalsV3-Demo/billing-payment
 ACP_BILLING=https:/$()/customer.uat.sparklight.com/portals/app-secure
+OFFER_URL=https:/$()/sparklightmobile.com/
 ENCRYPTVAL_PASSWORD=1 0 7 2 8 3 3634
 SECRET_KEY=6LeG6bEUAAAAAM7vlsL7QL6xw2IFhvtbgbQng-za
 PAYMENTURLNEW=https:/$()/customer.uat.sparklight.com/portals/app-secure/billing

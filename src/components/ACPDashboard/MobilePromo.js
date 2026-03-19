@@ -6,6 +6,7 @@ import FeatureCard from "./FeatureCardMobile";
 import { useNavigation } from "@react-navigation/native";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import Config from "react-native-config";
 import { widthPercentageToDP as wp , heightPercentageToDP as hp} from "react-native-responsive-screen";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
@@ -17,7 +18,7 @@ const MobilePromo = () => {
     );
 
   const handleAddMobile = () => {
-    Linking.openURL("https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=pendingact");
+    Linking.openURL(Config.OFFER_URL+"?utm_source=mobileapp&utm_medium=pendingact");
   };
 
 
@@ -57,9 +58,7 @@ const MobilePromo = () => {
             <Pressable
               style={styles.offerBtn}
               onPress={() => {
-                Linking.openURL(
-                  "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome",
-                );
+                Linking.openURL(Config.OFFER_URL);
               }}
             >
               <Text

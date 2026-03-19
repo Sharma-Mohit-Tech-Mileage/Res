@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.sparklight.Demo",
+  "applicationId": "com.sparklight",
   "variantName": "DemoRelease",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 388,
-      "versionName": "25.0.1",
+      "versionCode": 396,
+      "versionName": "25.2.0",
       "outputFile": "app-Demo-release.apk"
     }
   ],
