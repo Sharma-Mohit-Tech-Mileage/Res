@@ -139,7 +139,7 @@ const WelcomeCard = () => {
               accessible={true}
               importantForAccessibility="yes"
               accessibilityRole="link"
-              accessibilityLabel="Watch welcome video"
+              accessibilityLabel="Watch our welcome video"
               accessibilityHint="Double tap to watch on YouTube"
             >
               <Text style={styles.watchVideoButton}>

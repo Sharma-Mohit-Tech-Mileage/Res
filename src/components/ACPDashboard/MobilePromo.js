@@ -37,6 +37,7 @@ const MobilePromo = () => {
               position: "absolute",
               top: 20,
               left: 20,
+              right: 15,
             }}
           >
             <Text
@@ -159,9 +160,8 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     fontWeight: "400",
-   
-    
-    
+    lineHeight: 20,
+    flexShrink: 2,
   },
   getOfferButton: {
     color: Color.sparklightWhite,

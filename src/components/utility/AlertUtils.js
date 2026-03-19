@@ -102,7 +102,7 @@ export const AlertComponent = ({
               accessible={true}
               accessibilityRole="link"
               accessibilityLabel={actionText}
-              accessibilityHint="Double tap to open app store"
+              accessibilityHint={Platform.OS === "android" ? "Double tap to open playstore store" : "Double tap to open app store"}
               style={mergedStyles.actionText}
               onPress={onActionPress}
             >
