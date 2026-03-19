@@ -842,7 +842,6 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.borderLight,
     borderRadius: theme.radius.xs,
     minHeight: 44,
-    height: 44,
   },
   listToggle: {
     width: 44,

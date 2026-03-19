@@ -202,11 +202,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 25,
-    backgroundColor: theme.colors.upload,
+    backgroundColor: "#FFFFFF",
   },
   ctaText: {
     fontSize: 14,
-    fontFamily: "theme.typography.family.semiBold",
+    fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.primaryDark,
   },
