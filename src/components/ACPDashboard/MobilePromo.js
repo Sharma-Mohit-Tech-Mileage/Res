@@ -24,7 +24,7 @@ const MobilePromo = () => {
 
   const renderOfferBanner = () => {
       return (
-        <View style={[ {height: hp("40%") }]}>
+        <View style={[ {height: 250 }]}>
           {/* <VideoPlayer videoId={videoId} /> */}
   
           <Image
@@ -36,7 +36,7 @@ const MobilePromo = () => {
               flexDirection: "column",
               position: "absolute",
               top: 20,
-              left: 20,
+              left: 15,
               right: 15,
             }}
           >
@@ -71,16 +71,8 @@ const MobilePromo = () => {
                 Get Offer
               </Text>
             </Pressable>
-            <Text
-              style={[styles.offerDesclaimer, { marginEnd:10}]}
-              accessible={false} 
-                >
-                </Text>
-            <Text style={[styles.offerDesclaimer, { marginEnd:10}]}
-              accessible={true}
-              accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply.">
-             *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
-            </Text>
+            
+            
           </View>
         </View>
       );
@@ -88,8 +80,9 @@ const MobilePromo = () => {
   
 
   return (
+    <>
     <View style={[AppStyles.card, styles.container]}>
-      {showSparklightMobile ?renderOfferBanner() : (
+      {showSparklightMobile ? renderOfferBanner() : (
         <>
       <View style={styles.imageContainer}>
          <Image
@@ -120,7 +113,12 @@ const MobilePromo = () => {
       /> 
       </>)}
     </View>
-      
+    {showSparklightMobile && <Text style={[styles.offerDesclaimer, { marginEnd:10}]}
+              accessible={true}
+              accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply.">
+             *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
+            </Text>}
+      </>
   );
 };
 
@@ -143,8 +141,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 3,
   },title: {
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_5xl,
-    lineHeight: 26,
+    fontSize: FontSize.size_3xl,
+    lineHeight: 22,
     color: Color.colorMidnightblue,
     marginBottom: Padding.p_5xl,
     fontWeight: "700",
@@ -160,6 +158,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     fontWeight: "400",
+    marginHorizontal:20,
     lineHeight: 20,
     flexShrink: 2,
   },
