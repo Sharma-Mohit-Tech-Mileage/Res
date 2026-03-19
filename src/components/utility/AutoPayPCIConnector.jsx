@@ -239,13 +239,14 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             }
             pendingOfflineRefresh.current = false;
             lastIdTokenRefresh.current = Date.now();
-            // Do NOT call refreshInjectionScript() here — updating injectionScript state triggers
-            // a React re-render which can cause the payment WebView to reload and redirect to portal.
-            // The injection script is only needed on initial load / WebView recreation.
-            // Refresh native cookies only — avoid JS injection into payment WebView mid-transaction
+            await refreshInjectionScript();
             const cu = await getUser();
-            console.log(`${TAG} silentRefresh | native cookies only (payment domain) | idToken=${tokenPreview(cu?.idToken)} | ts=${new Date().toISOString()}`);
-            if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken);
+            if (cu?.idToken) {
+                console.log(`${TAG} silentRefresh — setting native cookies | idToken=${tokenPreview(cu.idToken)} | ts=${new Date().toISOString()}`);
+                await setAuthCookiesOnAllDomains(cu.idToken);
+            }
+            console.log(`${TAG} silentRefresh — injecting IdToken cookie to WebView | ts=${new Date().toISOString()}`);
+            await injectIdTokenOnly();
             await logStorageSnapshot('silentRefresh-after');
             await dumpCookies('PCI-silentRefresh-after');
             console.log(`${TAG} silentRefresh DONE | duration=${Date.now() - refreshStartTs}ms`);
@@ -253,7 +254,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             console.error(`${TAG} silentRefresh FAILED | duration=${Date.now() - refreshStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
             pendingOfflineRefresh.current = true;
         }
-    }, []);
+    }, [injectIdTokenOnly, refreshInjectionScript]);
 
     const stopSilentRefresh = useCallback(() => {
         if (silentRefreshTimer.current) { clearInterval(silentRefreshTimer.current); silentRefreshTimer.current = null; }
@@ -434,7 +435,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                         else {
                             try {
                                 console.log(`${TAG} AppState | WebView alive, refreshing IdToken`);
-                                await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await injectIdTokenOnly();
+                                await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly();
                             }
                             catch (_) { console.warn(`${TAG} AppState | refresh failed, recreating WebView`); recreateWebView(); }
                         }
@@ -443,7 +444,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     console.log(`${TAG} AppState | idToken >4min old, refreshing`);
                     if (!isOnline) { pendingOfflineRefresh.current = true; }
                     else {
-                        try { await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await injectIdTokenOnly(); }
+                        try { await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly(); }
                         catch (_) { pendingOfflineRefresh.current = true; }
                     }
                 } else if (dur > 60000) {
@@ -458,7 +459,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         };
         const sub = AppState.addEventListener('change', handleAppState);
         return () => sub?.remove();
-    }, [checkWebViewAlive, recreateWebView, injectIdTokenOnly, startSilentRefresh, stopSilentRefresh]);
+    }, [checkWebViewAlive, recreateWebView, injectIdTokenOnly, refreshInjectionScript, startSilentRefresh, stopSilentRefresh]);
 
     useEffect(() => {
         if (name) analytics().logEvent('screen_view', { screen_name: name, screen_class: 'AutoPayPCIConnector' }).catch(() => {});
