@@ -66,7 +66,6 @@ const StatusIcon = ({ isAnimating = false }) => {
   });
 
   const primaryColor = theme.colors.primary;
-  const lineColor = `${primaryColor}60`;
 
   return (
     <View
@@ -106,24 +105,47 @@ const StatusIcon = ({ isAnimating = false }) => {
         </Animated.View>
       )}
 
-      {/* Globe in center */}
+      {/* Globe in center — solid style */}
       <View style={styles.globeCenter}>
         <Svg width={GLOBE_SIZE} height={GLOBE_SIZE} viewBox={`0 0 ${GLOBE_SIZE} ${GLOBE_SIZE}`}>
-          <Circle cx={CX} cy={CY} r={R} fill="none" stroke={primaryColor} strokeWidth={2} />
-          <Ellipse cx={CX} cy={CY} rx={R} ry={R * 0.3} fill="none" stroke={lineColor} strokeWidth={1.2} />
-          <Ellipse cx={CX} cy={CY - R * 0.45} rx={R * 0.7} ry={R * 0.15} fill="none" stroke={lineColor} strokeWidth={0.8} />
-          <Ellipse cx={CX} cy={CY + R * 0.45} rx={R * 0.7} ry={R * 0.15} fill="none" stroke={lineColor} strokeWidth={0.8} />
+          {/* Outer circle */}
+          <Circle cx={CX} cy={CY} r={R} fill="none" stroke={primaryColor} strokeWidth={2.5} />
 
+          {/* Equator — single curved arc across full width */}
+          <Path
+            d={`M ${CX - R} ${CY} Q ${CX} ${CY + R * 0.18} ${CX + R} ${CY}`}
+            fill="none"
+            stroke={primaryColor}
+            strokeWidth={2}
+          />
+
+          {/* Upper latitude parallel — curves downward toward center */}
+          <Path
+            d={`M ${CX - R * 0.82} ${CY - R * 0.58} Q ${CX} ${CY - R * 0.58 + R * 0.22} ${CX + R * 0.82} ${CY - R * 0.58}`}
+            fill="none"
+            stroke={primaryColor}
+            strokeWidth={2}
+          />
+
+          {/* Lower latitude parallel — curves upward toward center */}
+          <Path
+            d={`M ${CX - R * 0.82} ${CY + R * 0.58} Q ${CX} ${CY + R * 0.58 - R * 0.22} ${CX + R * 0.82} ${CY + R * 0.58}`}
+            fill="none"
+            stroke={primaryColor}
+            strokeWidth={2}
+          />
+
+          {/* Vertical meridians */}
           {isAnimating ? (
             <>
-              <AnimatedEllipse cx={CX} cy={CY} rx={meridian1Rx} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
-              <AnimatedEllipse cx={CX} cy={CY} rx={meridian2Rx} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
-              <AnimatedEllipse cx={CX} cy={CY} rx={meridian3Rx} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
+              <AnimatedEllipse cx={CX} cy={CY} rx={meridian1Rx} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
+              <AnimatedEllipse cx={CX} cy={CY} rx={meridian2Rx} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
+              <AnimatedEllipse cx={CX} cy={CY} rx={meridian3Rx} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
             </>
           ) : (
             <>
-              <Ellipse cx={CX} cy={CY} rx={2} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
-              <Ellipse cx={CX} cy={CY} rx={R * 0.5} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
+              <Ellipse cx={CX} cy={CY} rx={R * 0.35} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
+              <Ellipse cx={CX} cy={CY} rx={R * 0.7} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
             </>
           )}
         </Svg>

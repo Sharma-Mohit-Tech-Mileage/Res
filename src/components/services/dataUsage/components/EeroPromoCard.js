@@ -181,12 +181,12 @@ const styles = StyleSheet.create({
   },
 
   description: {
-    fontSize: 14,
-    lineHeight: 21,
+    fontSize: 16,
+    lineHeight: 22,
     fontFamily: theme.typography.family.regular,
     color: "rgba(255,255,255,0.85)",
     marginBottom: 20,
-    maxWidth: 240,
+    maxWidth: 300,
   },
 
   ctaRow: {
@@ -205,9 +205,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   ctaText: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
+    fontWeight: "700",
     color: theme.colors.primaryDark,
   },
 
