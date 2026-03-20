@@ -7,6 +7,7 @@ import {
   AccessibilityInfo,
   Linking,
   Image,
+  ImageBackground,
   Pressable,
 } from "react-native";
 import {
@@ -111,28 +112,31 @@ const WelcomeCard = () => {
   const renderWelcomeBanner = () => {
     return (
       <>
-        <View style={styles.videoContainer}>
+        <ImageBackground
+          source={require("../../../assets/welcome-banner-home.png")}
+          style={styles.videoContainer}
+          imageStyle={styles.welcomeBannerImage}
+          accessible={false}
+          importantForAccessibility="no"
+        >
           {/* <VideoPlayer videoId={videoId} /> */}
-
-          <Image
-            source={require("../../../assets/welcome-banner-home.png")}
+          <Text
+            style={[
+              styles.title,
+              styles.welcomeTitle,
+            ]}
+            accessible={true}
             accessibilityRole="header"
             accessibilityLevel={1}
-            accessible={true}
             accessibilityLabel="We’re excited to get you connected!"
-            style={{ width: "100%" }}
-          />
+          >
+            We’re excited to get you connected!
+          </Text>
           <View
-            style={{
-              position: "absolute",
-              top: 170,
-              width: "100%",
-              bottom: 0,
-              backgroundColor: "rgba(255, 255, 255, 0.8)",
-            }}
+            style={styles.welcomeOverlay}
           >
             <Pressable
-              style={{ flexDirection: "row", marginTop: 5, marginLeft: 20 }}
+              style={styles.welcomeVideoLink}
               onPress={() => {
                 Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
               }}
@@ -152,17 +156,7 @@ const WelcomeCard = () => {
               </View>
             </Pressable>
           </View>
-          <Text
-            style={[
-              styles.title,
-              { position: "absolute", top: 50, left: 20, width: wp("55%") },
-            ]}
-            accessible={false}
-            importantForAccessibility="no"
-          >
-            We’re excited to get you connected!
-          </Text>
-        </View>
+        </ImageBackground>
         {/* {isAccessibilityEnabled && (
           <>
             <Text
@@ -230,6 +224,27 @@ const styles = StyleSheet.create({
   videoContainer: {
     overflow: "hidden",
     height: 200,
+  },
+  welcomeBannerImage: {
+    width: "100%",
+  },
+  welcomeTitle: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    width: wp("55%"),
+  },
+  welcomeOverlay: {
+    position: "absolute",
+    top: 170,
+    width: "100%",
+    bottom: 0,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+  },
+  welcomeVideoLink: {
+    flexDirection: "row",
+    marginTop: 5,
+    marginLeft: 20,
   },
   accessibilityText: {
     marginTop: Padding.p_sm,
