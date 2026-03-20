@@ -65,7 +65,7 @@ const InternetCard = ({
             accessibilityElementsHidden={true}
           >
             <MaterialCommunityIcons
-              name="wifi"
+              name="web"
               size={16}
               color={theme.colors.primary}
               accessible={false}
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   // Data Usage Snapshot
   dataUsageSnapshot: {
     marginTop: theme.spacing.base,
-    paddingTop: theme.spacing.sm,
+    paddingTop: theme.spacing.base,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
   },

@@ -385,7 +385,8 @@ const styles = {
   },
   makeTypo: {
     width: 282,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "700",
     fontSize: FontSize.size_base,
     textAlign: "center",
   },

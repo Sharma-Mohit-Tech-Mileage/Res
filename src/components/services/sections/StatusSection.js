@@ -1,44 +1,133 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Animated, Easing } from "react-native";
+import { Svg, Circle, Ellipse, Path, Defs, LinearGradient, Stop } from "react-native-svg";
 import { statusSection } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
 import NotificationAlert from "../../common/customui/NotificationAlert";
-import SupportIcon from "../../../res/svgIcons/SupportIcon";
 import SecondaryButton from "../../common/customui/PrimaryButton";
-import SmallLoader from "../../common/customui/SmallLoader";
 
-const WiFiLoadingAnimation = ({ isAnimating = false }) => {
+const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
+
+const GLOBE_SIZE = 58;
+const CX = GLOBE_SIZE / 2;
+const CY = GLOBE_SIZE / 2;
+const R = GLOBE_SIZE / 2 - 3;
+
+const StatusIcon = ({ isAnimating = false }) => {
+  const meridianAnim = useRef(new Animated.Value(0)).current;
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isAnimating) {
+      const spin = Animated.loop(
+        Animated.timing(meridianAnim, {
+          toValue: 1,
+          duration: 2500,
+          easing: Easing.linear,
+          useNativeDriver: false,
+        })
+      );
+      const arrow = Animated.loop(
+        Animated.timing(rotateAnim, {
+          toValue: 1,
+          duration: 1400,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      );
+      spin.start();
+      arrow.start();
+      return () => {
+        spin.stop();
+        arrow.stop();
+      };
+    } else {
+      meridianAnim.setValue(0);
+      rotateAnim.setValue(0);
+    }
+  }, [isAnimating]);
+
+  const meridian1Rx = meridianAnim.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: [2, R * 0.6, R, R * 0.6, 2],
+  });
+  const meridian2Rx = meridianAnim.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: [R * 0.6, R, R * 0.6, 2, R * 0.6],
+  });
+  const meridian3Rx = meridianAnim.interpolate({
+    inputRange: [0, 0.25, 0.5, 0.75, 1],
+    outputRange: [R, R * 0.6, 2, R * 0.6, R],
+  });
+
+  const rotate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["360deg", "0deg"],
+  });
+
+  const primaryColor = theme.colors.primary;
+  const lineColor = `${primaryColor}60`;
+
   return (
     <View
       accessible={false}
       importantForAccessibility="no-hide-descendants"
       accessibilityElementsHidden={true}
+      style={styles.iconContainer}
     >
-      {!isAnimating ? (
-        <SupportIcon
-          color={theme.colors.primary}
-          filled={true}
-          size={28}
-        />
-      ) : (
-        <View style={styles.animationContainer}>
-          <View style={styles.lottieWrapper}>
-            <SmallLoader
-              isWhite={false}
-              width={210}
-              height={210}
+      {/* Rotating arrow ring */}
+      {isAnimating && (
+        <Animated.View
+          style={[
+            styles.arrowRing,
+            { transform: [{ rotate }] },
+          ]}
+        >
+          <Svg width={88} height={88} viewBox="0 0 88 88">
+            <Defs>
+              <LinearGradient id="arrowGrad" x1="0" y1="0" x2="1" y2="0">
+                <Stop offset="0" stopColor={primaryColor} stopOpacity="0.9" />
+                <Stop offset="0.6" stopColor={primaryColor} stopOpacity="0.3" />
+                <Stop offset="1" stopColor={primaryColor} stopOpacity="0" />
+              </LinearGradient>
+            </Defs>
+            <Path
+              d="M44 6 A38 38 0 1 1 6 44"
+              fill="none"
+              stroke="url(#arrowGrad)"
+              strokeWidth={3}
+              strokeLinecap="round"
             />
-          </View>
-
-          <View style={styles.centerIcon}>
-            <SupportIcon
-              color={theme.colors.primary}
-              filled={true}
-              size={28}
+            <Path
+              d="M44 2 L44 10 L37 6 Z"
+              fill={primaryColor}
             />
-          </View>
-        </View>
+          </Svg>
+        </Animated.View>
       )}
+
+      {/* Globe in center */}
+      <View style={styles.globeCenter}>
+        <Svg width={GLOBE_SIZE} height={GLOBE_SIZE} viewBox={`0 0 ${GLOBE_SIZE} ${GLOBE_SIZE}`}>
+          <Circle cx={CX} cy={CY} r={R} fill="none" stroke={primaryColor} strokeWidth={2} />
+          <Ellipse cx={CX} cy={CY} rx={R} ry={R * 0.3} fill="none" stroke={lineColor} strokeWidth={1.2} />
+          <Ellipse cx={CX} cy={CY - R * 0.45} rx={R * 0.7} ry={R * 0.15} fill="none" stroke={lineColor} strokeWidth={0.8} />
+          <Ellipse cx={CX} cy={CY + R * 0.45} rx={R * 0.7} ry={R * 0.15} fill="none" stroke={lineColor} strokeWidth={0.8} />
+
+          {isAnimating ? (
+            <>
+              <AnimatedEllipse cx={CX} cy={CY} rx={meridian1Rx} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
+              <AnimatedEllipse cx={CX} cy={CY} rx={meridian2Rx} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
+              <AnimatedEllipse cx={CX} cy={CY} rx={meridian3Rx} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
+            </>
+          ) : (
+            <>
+              <Ellipse cx={CX} cy={CY} rx={2} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
+              <Ellipse cx={CX} cy={CY} rx={R * 0.5} ry={R} fill="none" stroke={lineColor} strokeWidth={1.2} />
+            </>
+          )}
+        </Svg>
+      </View>
     </View>
   );
 };
@@ -75,21 +164,17 @@ const StatusSection = ({
 
         <View
           style={styles.iconWrapper}
-           accessible={false}
-      importantForAccessibility="no-hide-descendants"
-      accessibilityElementsHidden={true}
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
+          accessibilityElementsHidden={true}
           accessibilityLabel={
             checking
               ? "Checking service status, loading animation"
-              : "Support icon"
+              : "Globe icon"
           }
         >
-          <View style={styles.iconBadge} >
-            <WiFiLoadingAnimation
-              isAnimating={checking}
-              accessible={false}
-              importantForAccessibility="no"
-            />
+          <View style={styles.iconBadge}>
+            <StatusIcon isAnimating={checking} />
           </View>
         </View>
 
@@ -133,29 +218,27 @@ const styles = StyleSheet.create({
   card: statusSection.card,
   alertInsideCard: statusSection.alertInsideCard,
   iconWrapper: statusSection.iconWrapper,
-  iconBadge: statusSection.iconBadge,
+  iconBadge: {
+    ...statusSection.iconBadge,
+    backgroundColor: "transparent",
+  },
   title: statusSection.title,
   subtitle: statusSection.subtitle,
 
-  animationContainer: {
-    width: 90,
-    height: 90,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-
-  lottieWrapper: {
-    position: "absolute",
-    width: 90,
-    height: 90,
+  iconContainer: {
+    width: 88,
+    height: 88,
     alignItems: "center",
     justifyContent: "center",
   },
 
-  centerIcon: {
+  arrowRing: {
     position: "absolute",
-    zIndex: 10,
+    width: 88,
+    height: 88,
+  },
+
+  globeCenter: {
     alignItems: "center",
     justifyContent: "center",
   },
