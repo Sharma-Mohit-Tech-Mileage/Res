@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Image, Linking, Text, Pressable } from "react-native";
+import { View, StyleSheet, Image, ImageBackground, Linking, Text, Pressable } from "react-native";
 import { FontFamily, FontSize, Color, Padding, Border } from "../../../GlobalStyles";
 import AppStyles from "../utility/AppStyles";
 import FeatureCard from "./FeatureCardMobile";
@@ -85,16 +85,26 @@ const MobilePromo = () => {
       {showSparklightMobile ? renderOfferBanner() : (
         <>
       <View style={styles.imageContainer}>
-         <Image
-          accessible={true}
-          accessibilityRole="header"
-          accessibilityLabel="Plan starting at $ 15 per month"
-          accessibilityLevel={2} 
-          //accessibilityHint="Header"
+         <ImageBackground
           source={PromoImage}
           resizeMode="stretch"
           style={styles.promoImage}
-        />
+          imageStyle={styles.promoImageBackground}
+          accessible={false}
+          importantForAccessibility="no"
+        >
+          <View style={styles.promoHeadingOverlay}>
+            <Text
+              accessible={true}
+              accessibilityRole="header"
+              accessibilityLabel="Plan starting at $ 15 per month"
+              accessibilityLevel={2}
+              style={styles.promoHeadingAccessibilityText}
+            >
+              Plan starting at $ 15 per month
+            </Text>
+          </View>
+        </ImageBackground>
       </View>
       
       <FeatureCard
@@ -136,9 +146,22 @@ const styles = StyleSheet.create({
   promoImage: {
     width: "100%",
     aspectRatio: 1.1,
+  },
+  promoImageBackground: {
     resizeMode: "cover",
     borderTopLeftRadius: 3,
     borderTopRightRadius: 3,
+  },
+  promoHeadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  promoHeadingAccessibilityText: {
+    color: "rgba(0,0,0,0.01)",
+    fontSize: 1,
+    lineHeight: 1,
   },title: {
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_3xl,
