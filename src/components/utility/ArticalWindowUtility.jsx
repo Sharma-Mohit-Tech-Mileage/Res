@@ -381,7 +381,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 
                 setTimeout(() => {
                     navigation.replace('ArticalWindowUtility', {
-                        url: `${Env.ACP_BILLING}/billing`,
+                        url: `${Config.ACP_BILLING}/billing`,
                         name: 'Billing Details',
                         isBilling: true
                     });
@@ -392,7 +392,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         }
         
         return true; // Allow all other navigations
-    }, [url, name, navigation, Env.ACP_BILLING]);
+    }, [url, name, navigation, Config.ACP_BILLING]);
 
     const navigationChange = useCallback(async (navState) => {
         console.log('Navigation change:', navState.url, 'Current name:', name);
@@ -427,7 +427,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             
             setTimeout(() => {
                 navigation.replace('ArticalWindowUtility', {
-                    url: `${Env.ACP_BILLING}/billing`,
+                    url: `${Config.ACP_BILLING}/billing`,
                     name: 'Billing Details',
                     isBilling: true
                 });
@@ -464,7 +464,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
         }
         
-    }, [navStateReloading, name, url, navigation, Env.ACP_BILLING, Env.SSO_LOGIN]);
+    }, [navStateReloading, name, url, navigation, Config.ACP_BILLING, Config.SSO_LOGIN]);
 
     const onMessage = useCallback((event) => {
         try {
@@ -487,7 +487,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         
                         setTimeout(() => {
                             navigation.replace('ArticalWindowUtility', {
-                                url: `${Env.ACP_BILLING}/billing`,
+                                url: `${Config.ACP_BILLING}/billing`,
                                 name: 'Billing Details',
                                 isBilling: true
                             });
@@ -517,7 +517,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         } catch (error) {
             console.log('Message parsing error:', error);
         }
-    }, [name, navigation, Env.ACP_BILLING]);
+    }, [name, navigation, Config.ACP_BILLING]);
 
     const onLoadStart = useCallback((syntheticEvent) => {
         const startTime = Date.now();

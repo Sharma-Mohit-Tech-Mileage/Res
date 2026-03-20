@@ -113,7 +113,7 @@ const MobilePromo = () => {
       /> 
       </>)}
     </View>
-    {showSparklightMobile && <Text style={[styles.offerDesclaimer, { marginEnd:10}]}
+    {showSparklightMobile && <Text style={[styles.offerDesclaimer]}
               accessible={true}
               accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply.">
              *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
@@ -159,8 +159,10 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontWeight: "400",
     marginHorizontal:20,
+    marginBottom:8,
     lineHeight: 20,
     flexShrink: 2,
+    textAlign: "center",
   },
   getOfferButton: {
     color: Color.sparklightWhite,
