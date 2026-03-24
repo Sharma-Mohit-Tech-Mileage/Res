@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Image, Linking, Text, Pressable } from "react-native";
+import { View, StyleSheet, Image, ImageBackground, Linking, Text, Pressable } from "react-native";
 import { FontFamily, FontSize, Color, Padding, Border } from "../../../GlobalStyles";
 import AppStyles from "../utility/AppStyles";
 import FeatureCard from "./FeatureCardMobile";
@@ -24,7 +24,7 @@ const MobilePromo = () => {
 
   const renderOfferBanner = () => {
       return (
-        <View style={[ {height: hp("40%") }]}>
+        <View style={[ {height: 250 }]}>
           {/* <VideoPlayer videoId={videoId} /> */}
   
           <Image
@@ -36,7 +36,7 @@ const MobilePromo = () => {
               flexDirection: "column",
               position: "absolute",
               top: 20,
-              left: 20,
+              left: 15,
               right: 15,
             }}
           >
@@ -71,16 +71,8 @@ const MobilePromo = () => {
                 Get Offer
               </Text>
             </Pressable>
-            <Text
-              style={[styles.offerDesclaimer, { marginEnd:10}]}
-              accessible={false} 
-                >
-                </Text>
-            <Text style={[styles.offerDesclaimer, { marginEnd:10}]}
-              accessible={true}
-              accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply.">
-             *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
-            </Text>
+            
+            
           </View>
         </View>
       );
@@ -88,20 +80,31 @@ const MobilePromo = () => {
   
 
   return (
+    <>
     <View style={[AppStyles.card, styles.container]}>
-      {showSparklightMobile ?renderOfferBanner() : (
+      {showSparklightMobile ? renderOfferBanner() : (
         <>
       <View style={styles.imageContainer}>
-         <Image
-          accessible={true}
-          accessibilityRole="header"
-          accessibilityLabel="Plan starting at $ 15 per month"
-          accessibilityLevel={2} 
-          //accessibilityHint="Header"
+         <ImageBackground
           source={PromoImage}
           resizeMode="stretch"
           style={styles.promoImage}
-        />
+          imageStyle={styles.promoImageBackground}
+          accessible={false}
+          importantForAccessibility="no"
+        >
+          <View style={styles.promoHeadingOverlay}>
+            <Text
+              accessible={true}
+              accessibilityRole="header"
+              accessibilityLabel="Plan starting at $ 15 per month"
+              accessibilityLevel={2}
+              style={styles.promoHeadingAccessibilityText}
+            >
+              Plan starting at $ 15 per month
+            </Text>
+          </View>
+        </ImageBackground>
       </View>
       
       <FeatureCard
@@ -120,7 +123,12 @@ const MobilePromo = () => {
       /> 
       </>)}
     </View>
-      
+    {showSparklightMobile && <Text style={[styles.offerDesclaimer]}
+              accessible={true}
+              accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply.">
+             *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
+            </Text>}
+      </>
   );
 };
 
@@ -138,13 +146,26 @@ const styles = StyleSheet.create({
   promoImage: {
     width: "100%",
     aspectRatio: 1.1,
+  },
+  promoImageBackground: {
     resizeMode: "cover",
     borderTopLeftRadius: 3,
     borderTopRightRadius: 3,
+  },
+  promoHeadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  promoHeadingAccessibilityText: {
+    color: "rgba(0,0,0,0.01)",
+    fontSize: 1,
+    lineHeight: 1,
   },title: {
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_5xl,
-    lineHeight: 26,
+    fontSize: FontSize.size_3xl,
+    lineHeight: 22,
     color: Color.colorMidnightblue,
     marginBottom: Padding.p_5xl,
     fontWeight: "700",
@@ -160,8 +181,11 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     fontWeight: "400",
+    marginHorizontal:20,
+    marginBottom:8,
     lineHeight: 20,
     flexShrink: 2,
+    textAlign: "center",
   },
   getOfferButton: {
     color: Color.sparklightWhite,
