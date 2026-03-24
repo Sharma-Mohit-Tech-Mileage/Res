@@ -16,7 +16,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { setAuthCookiesOnAllDomains, dumpCookies } from './NativeCookieManager';
 
 const TAG = '[PCI]';
-const REFRESH_INTERVAL_MS = 4 * 60 * 1000; // IdToken expires in 5min, refresh at 4min
+const REFRESH_INTERVAL_MS = 4 * 60 * 1000;
 const JS_COOKIE_DOMAIN = ISUAT ? '.uat.sparklight.com' : '.sparklight.com';
 
 const safeForJS = (val) => JSON.stringify(String(val || '')).slice(1, -1);
@@ -204,9 +204,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 
             webViewRef.current.injectJavaScript(`(function() {
     try {
+        var _ae = document.activeElement;
+        var _wasInput = _ae && (_ae.tagName === 'INPUT' || _ae.tagName === 'TEXTAREA' || _ae.tagName === 'SELECT');
+        if (_wasInput) _ae.blur();
         var h = document.location.hostname;
         if (!h || h === 'localhost') return;
         ${buildCookieJS(idToken)}
+        if (_wasInput && _ae) { _ae.focus(); }
     } catch(e) {}
 })(); true;`);
         } catch (e) {
@@ -481,6 +485,17 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             navigation.goBack();
             return false;
         }
+        // Allow payment confirmation / thank-you pages through — refresh cookies in background
+        if (request.url.includes('/portals/app-secure/payment-confirmation') || request.url.includes('/portals/thankyou/')) {
+            console.log(`${TAG} NAV | payment confirmation allowed — url=${request.url} | ts=${new Date().toISOString()}`);
+            (async () => {
+                try {
+                    const cu = await getUser();
+                    if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken);
+                } catch (_) {}
+            })();
+            return true;
+        }
         // Block navigation to customer portal — PCI is payment-only, take user back to mobile
         if (request.url.includes('customer.sparklight.com') || request.url.includes('customer.uat.sparklight.com')) {
             console.warn(`${TAG} NAV | portal redirect detected — returning to mobile | url=${request.url} | ts=${new Date().toISOString()}`);
@@ -498,15 +513,31 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         setIsError(false); setErrorMessage('');
     }, []);
 
+    const isAllowedCustomerUrl = useCallback((url) => {
+        if (!url) return false;
+        return url.includes('/portals/app-secure/payment-confirmation') || url.includes('/portals/thankyou/');
+    }, []);
+
     const onLoadEnd = useCallback(async ({ nativeEvent }) => {
-        setProgress(1); setContentLoaded(true); initialLoadComplete.current = true;
-        console.log(`${TAG} NAV onLoadEnd | url=${nativeEvent?.url || '?'} | ts=${new Date().toISOString()}`);
+        const url = nativeEvent?.url || '';
+        console.log(`${TAG} NAV onLoadEnd | url=${url} | ts=${new Date().toISOString()}`);
+        // If user navigated to a non-allowed page on the customer portal, go back to mobile
+        if ((url.includes('customer.sparklight.com') || url.includes('customer.uat.sparklight.com')) && !isAllowedCustomerUrl(url)) {
+            console.warn(`${TAG} NAV onLoadEnd | unauthorized portal page — returning to mobile | url=${url} | ts=${new Date().toISOString()}`);
+            navigation.goBack();
+            return;
+        }
+        setProgress(1);
+        // Delay showing content for customer domain pages to let CSS render
+        if (isAllowedCustomerUrl(url)) {
+            setTimeout(() => { setContentLoaded(true); initialLoadComplete.current = true; }, 500);
+        } else {
+            setContentLoaded(true); initialLoadComplete.current = true;
+        }
         await logStorageSnapshot('PCI-onLoadEnd');
         await dumpCookies('PCI-onLoadEnd');
         dumpWebViewStorage('PCI-onLoadEnd');
-        // JWT + IdToken cookie already set via injectedJavaScriptBeforeContentLoaded and native cookies
-        // No redundant injection — avoid overwriting cookies mid-transaction on payment domain
-    }, [dumpWebViewStorage]);
+    }, [dumpWebViewStorage, navigation, isAllowedCustomerUrl]);
 
     const onLoadProgress = useCallback(({ nativeEvent }) => { setProgress(nativeEvent.progress); }, []);
 

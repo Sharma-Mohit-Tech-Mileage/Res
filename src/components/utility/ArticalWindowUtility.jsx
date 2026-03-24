@@ -11,13 +11,11 @@ import LoadingOverlay from '../common/customui/CustomLoading';
 import LoadingSpinner from './LoadingSpinner';
 import { getUser } from '../../redux/utils/LocalStorage';
 import NetInfo from '@react-native-community/netinfo';
-import { setAuthCookiesOnAllDomains, dumpCookies } from './NativeCookieManager';
+import { setAuthCookiesOnAllDomains, dumpCookies, clearAuthCookies } from './NativeCookieManager';
 
 const TAG = '[ArticalWindow]';
 const JS_COOKIE_DOMAIN = ISUAT ? '.uat.sparklight.com' : '.sparklight.com';
-const REFRESH_INTERVAL_MS = 4 * 60 * 1000; // IdToken expires in 5min, refresh at 4min
-
-// JSON.stringify produces a valid JS string literal (with quotes), slice off the quotes
+const REFRESH_INTERVAL_MS = 4 * 60 * 1000; 
 const safeForJS = (val) => JSON.stringify(String(val || '')).slice(1, -1);
 
 const tokenPreview = (t) => {
@@ -38,7 +36,6 @@ const logStorageSnapshot = async (caller) => {
     }
 };
 
-// JS snippet injected into WebView to read back localStorage + cookies for comparison with portal
 const WEBVIEW_STORAGE_DUMP_JS = `(function() {
     try {
         var snap = {
@@ -198,8 +195,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             let cu = await getUser();
             const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : Infinity;
             console.log(`${TAG} prepareInjectionScript | jwt=${tokenPreview(cu?.token)} | jwtTimestamp=${cu?.jwtTimestamp ? new Date(cu.jwtTimestamp).toISOString() : '?'} | idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${idTokenAge}ms | idTokenTimestamp=${cu?.idTokenTimestamp ? new Date(cu.idTokenTimestamp).toISOString() : '?'}`);
-
-            // Refresh if IdToken is older than 4 minutes (expires at 5min)
             if (idTokenAge > 240000) {
                 console.warn(`${TAG} prepareInjectionScript | IdToken stale (${idTokenAge}ms old) — refreshing before injection | ts=${new Date().toISOString()}`);
                 try {
@@ -238,6 +233,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
             webViewRef.current.injectJavaScript(`(function() {
     try {
+        var _ae = document.activeElement;
+        var _wasInput = _ae && (_ae.tagName === 'INPUT' || _ae.tagName === 'TEXTAREA' || _ae.tagName === 'SELECT');
+        if (_wasInput) _ae.blur();
         var h = document.location.hostname;
         if (!h || h === 'localhost') return;
         ${buildCookieJS(idToken)}
@@ -246,6 +244,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             localStorage.setItem('user_info', '${safeUserInfo}');
             localStorage.setItem('tokenIssuedAt', '${jwtTs}');
         }
+        if (_wasInput && _ae) { _ae.focus(); }
     } catch(e) {}
 })(); true;`);
             console.log(`${TAG} injectAuth DONE | ts=${new Date().toISOString()}`);
@@ -268,9 +267,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
             webViewRef.current.injectJavaScript(`(function() {
     try {
+        var _ae = document.activeElement;
+        var _wasInput = _ae && (_ae.tagName === 'INPUT' || _ae.tagName === 'TEXTAREA' || _ae.tagName === 'SELECT');
+        if (_wasInput) _ae.blur();
         var h = document.location.hostname;
         if (!h || h === 'localhost') return;
         ${buildCookieJS(idToken)}
+        if (_wasInput && _ae) { _ae.focus(); }
     } catch(e) {}
 })(); true;`);
             dumpWebViewStorage('injectIdTokenOnly');
@@ -279,7 +282,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         }
     }, [dumpWebViewStorage]);
 
-    // Asks the WebView to post back its current localStorage + cookies for logging
     const dumpWebViewStorage = useCallback((caller) => {
         if (!webViewRef.current) return;
         webViewRef.current.injectJavaScript(
@@ -467,21 +469,10 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         console.log(`${TAG} NAV onShouldStartLoad | url=${request.url} | ts=${new Date().toISOString()}`);
 
         if (request.url.includes('/postlogout')) {
-            console.log(`${TAG} NAV | postlogout detected — attempting recovery | ts=${new Date().toISOString()}`);
-            (async () => {
-                try {
-                    await RefreshToken();
-                    lastIdTokenRefresh.current = Date.now();
-                    await refreshInjectionScript();
-                    await injectAuth();
-                    console.log(`${TAG} NAV | postlogout recovery — redirecting to ${url}`);
-                    webViewRef.current?.injectJavaScript(`window.location.href = '${safeForJS(url)}'; true;`);
-                } catch (e) {
-                    console.error(`${TAG} NAV | postlogout recovery failed — going back | error=${e.message}`);
-                    showToastMessage();
-                    navigation.goBack();
-                }
-            })();
+            console.log(`${TAG} NAV | postlogout detected — returning to mobile | ts=${new Date().toISOString()}`);
+            stopSilentRefresh();
+            clearAuthCookies();
+            navigation.goBack();
             return false;
         }
 
