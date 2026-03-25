@@ -30,6 +30,7 @@ export const config = {
     ACP_BILLING: "https://customer.sparklight.com/portals/app-secure",
     encryptvalPassword: "1 0 7 2 8 3 3634",
     secretKey: "6LeG6bEUAAAAAM7vlsL7QL6xw2IFhvtbgbQng-za",
+    OFFER_URL: "https://sparklight.com/",
     ZENDESK_FEEDBACK: {
       Url: "https://cableone.zendesk.com/api/v2/requests.json",
       ticket_form_id: "360000052934",
@@ -87,6 +88,7 @@ export const config = {
     secretKey: "6LeG6bEUAAAAAM7vlsL7QL6xw2IFhvtbgbQng-za",
     PAYMENTURLNEW:
       "https://customer.uat.sparklight.com/portals/app-secure/billing",
+      OFFER_URL: "https://uat.sparklight.com/residential/offers",
     ZENDESK_FEEDBACK: {
       Url: "https://cableone1718812169.zendesk.com/api/v2/requests.json",
       ticket_form_id: "24297809981847",

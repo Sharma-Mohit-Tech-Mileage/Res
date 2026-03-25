@@ -6,7 +6,7 @@ import FeatureCard from "./FeatureCardMobile";
 import { useNavigation } from "@react-navigation/native";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import Config from "react-native-config";
+import { Env ,ISUAT} from "../../network/apis/account/Constants";
 import { widthPercentageToDP as wp , heightPercentageToDP as hp} from "react-native-responsive-screen";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
@@ -18,7 +18,7 @@ const MobilePromo = () => {
     );
 
   const handleAddMobile = () => {
-    Linking.openURL(Config.OFFER_URL+"?utm_source=mobileapp&utm_medium=pendingact");
+    Linking.openURL(Env.OFFER_URL+"?utm_source=mobileapp&utm_medium=pendingact");
   };
 
 
@@ -58,15 +58,17 @@ const MobilePromo = () => {
             </Text>
             <Pressable
               style={styles.offerBtn}
-              onPress={() => {
-                Linking.openURL(Config.OFFER_URL);
-              }}
+              onPress={handleAddMobile}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Get Offer"
+              accessibilityHint="Opens Sparklight mobile offer"
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
               <Text
                 style={styles.getOfferButton}
-                accessible={true}
-                accessibilityRole="button"
-                accessibilityLabel="Get Offer Button"
+                accessible={false}
+                importantForAccessibility="no"
               >
                 Get Offer
               </Text>
@@ -195,6 +197,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },offerBtn: {
     width: 120,
+    zIndex: 1,
     marginTop: 5,
     backgroundColor: Color.sparklightBrightPurple,
     borderRadius: 50,
