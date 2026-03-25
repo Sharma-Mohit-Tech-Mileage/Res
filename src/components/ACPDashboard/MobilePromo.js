@@ -18,7 +18,7 @@ const MobilePromo = () => {
     );
 
   const handleAddMobile = () => {
-    Linking.openURL(Env.OFFER_URL+"?utm_source=mobileapp&utm_medium=pendingact");
+    Linking.openURL("https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=pendingact");
   };
 
 
