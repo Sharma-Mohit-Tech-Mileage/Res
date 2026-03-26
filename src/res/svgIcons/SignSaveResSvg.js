@@ -16,7 +16,8 @@ const SignSaveResSvg = ({ width = "100%", height = 118, ...props }) => {
       width={width}
       height={height}
       viewBox="0 0 327.402985 117.910448"
-      accessible={true}
+      accessible={false}
+      importantForAccessibility="no"
       accessibilityRole="image"
       accessibilityLabel="Sign up and save with Auto Pay and Paperless Billing"
       {...props}

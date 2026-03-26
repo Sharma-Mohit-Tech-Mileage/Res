@@ -21,8 +21,11 @@ import {
 import PlayIcon from "../../../assets/svgs/PlayIcon";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import Config from "react-native-config";
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from "react-native-responsive-screen";
+import { Env, ISUAT } from "../../network/apis/account/Constants";
 
 const WelcomeCard = () => {
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] =
@@ -50,7 +53,7 @@ const WelcomeCard = () => {
 
   const renderOfferBanner = () => {
     return (
-      <View style={[styles.videoContainer, { height: 310 }]}>
+      <View style={[styles.videoContainer, { height: 250 }]}>
         {/* <VideoPlayer videoId={videoId} /> */}
 
         <Image
@@ -66,7 +69,7 @@ const WelcomeCard = () => {
           }}
         >
           <Text
-            style={[styles.title2, { width: wp("55%")  }]}
+            style={[styles.title2, { width: wp("55%") }]}
             accessible={true}
             accessibilityLabel="Sparklight Internet + Mobile"
           >
@@ -75,7 +78,7 @@ const WelcomeCard = () => {
             Mobile
           </Text>
           <Text
-            style={[styles.title, { width: 230 }]}
+            style={[styles.title, { width: 230}]}
             accessible={true}
             accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
           >
@@ -84,7 +87,9 @@ const WelcomeCard = () => {
           <Pressable
             style={styles.offerBtn}
             onPress={() => {
-              Linking.openURL(Config.OFFER_URL+"?utm_source=mobileapp&utm_medium=activehome");
+              Linking.openURL(
+                "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome",
+              );
             }}
           >
             <Text
@@ -96,14 +101,6 @@ const WelcomeCard = () => {
               Get Offer
             </Text>
           </Pressable>
-
-    <Text
-      style={[styles.offerDesclaimer, { marginEnd:10}]}
-      accessible={true}
-      accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
-    >
-      *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
-    </Text>
         </View>
       </View>
     );
@@ -121,10 +118,7 @@ const WelcomeCard = () => {
         >
           {/* <VideoPlayer videoId={videoId} /> */}
           <Text
-            style={[
-              styles.title,
-              styles.welcomeTitle,
-            ]}
+            style={[styles.title, styles.welcomeTitle]}
             accessible={true}
             accessibilityRole="header"
             accessibilityLevel={1}
@@ -132,9 +126,7 @@ const WelcomeCard = () => {
           >
             We’re excited to get you connected!
           </Text>
-          <View
-            style={styles.welcomeOverlay}
-          >
+          <View style={styles.welcomeOverlay}>
             <Pressable
               style={styles.welcomeVideoLink}
               onPress={() => {
@@ -195,6 +187,16 @@ const WelcomeCard = () => {
   return (
     <View style={styles.container}>
       {isNewDashboardEnabled ? renderOfferBanner() : renderWelcomeBanner()}
+      {isNewDashboardEnabled && (
+        <Text
+            style={[styles.offerDesclaimer]}
+            accessible={true}
+            accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
+          >
+            *Offer not available for FlexConnect or LIFT customers. Certain
+            taxes & fees do not apply.
+          </Text>
+      )}
     </View>
   );
 };
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     lineHeight: 26,
     color: Color.sparklightBrightPurple,
-    marginBottom: Padding.p_5xl,
+    marginBottom: Padding.p_xl,
     fontWeight: "600",
   },
   videoContainer: {
@@ -264,8 +266,13 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     fontWeight: "400",
-    marginTop: Padding.p_13xl,
-    
+    width: "100%",
+    marginTop: 8,
+    maxWidth: wp("80%"),
+    alignSelf: "center",
+    marginHorizontal: 12,
+    flexShrink: 1,
+    textAlign: "center",
   },
   getOfferButton: {
     color: Color.sparklightWhite,
@@ -273,15 +280,14 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_lg,
     fontWeight: "600",
     textAlign: "center",
-  },offerBtn: {
+  },
+  offerBtn: {
     width: 120,
-    marginTop: 5,
     backgroundColor: Color.sparklightBrightPurple,
+    //marginTop: -10,
     borderRadius: 50,
     padding: Padding.p_base,
   },
-  
-
 });
 
 export default WelcomeCard;

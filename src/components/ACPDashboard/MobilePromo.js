@@ -6,7 +6,7 @@ import FeatureCard from "./FeatureCardMobile";
 import { useNavigation } from "@react-navigation/native";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import Config from "react-native-config";
+import { Env ,ISUAT} from "../../network/apis/account/Constants";
 import { widthPercentageToDP as wp , heightPercentageToDP as hp} from "react-native-responsive-screen";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
@@ -18,7 +18,7 @@ const MobilePromo = () => {
     );
 
   const handleAddMobile = () => {
-    Linking.openURL(Config.OFFER_URL+"?utm_source=mobileapp&utm_medium=pendingact");
+    Linking.openURL("https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=pendingact");
   };
 
 
@@ -35,13 +35,13 @@ const MobilePromo = () => {
             style={{
               flexDirection: "column",
               position: "absolute",
-              top: 20,
+              top: 5,
               left: 15,
               right: 15,
             }}
           >
             <Text
-              style={[styles.title2, { width: 230 }]}
+              style={[styles.title2, { width: 210 }]}
               accessible={true}
               accessibilityLabel="Sparklight Internet + Mobile"
             >
@@ -58,15 +58,17 @@ const MobilePromo = () => {
             </Text>
             <Pressable
               style={styles.offerBtn}
-              onPress={() => {
-                Linking.openURL(Config.OFFER_URL);
-              }}
+              onPress={handleAddMobile}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Get Offer"
+              accessibilityHint="Opens Sparklight mobile offer"
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
               <Text
                 style={styles.getOfferButton}
-                accessible={true}
-                accessibilityRole="button"
-                accessibilityLabel="Get Offer Button"
+                accessible={false}
+                importantForAccessibility="no"
               >
                 Get Offer
               </Text>
@@ -167,7 +169,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_3xl,
     lineHeight: 22,
     color: Color.colorMidnightblue,
-    marginBottom: Padding.p_5xl,
+    marginBottom: Padding.p_5xs,
     fontWeight: "700",
   },title2: {
     fontFamily: FontFamily.openSansSemiBold,
@@ -183,7 +185,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     marginHorizontal:20,
     marginBottom:8,
-    lineHeight: 20,
+
     flexShrink: 2,
     textAlign: "center",
   },
@@ -195,6 +197,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },offerBtn: {
     width: 120,
+    zIndex: 1,
     marginTop: 5,
     backgroundColor: Color.sparklightBrightPurple,
     borderRadius: 50,

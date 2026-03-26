@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } fr
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { A11y } from "react-native-a11y-order";
 import WarningIcon from '../../../assets/svgs/Alerttriangle'
 import InfoIcon from "../../../assets/svgs/InfoIcon";
 /**
@@ -64,64 +65,89 @@ export const AlertComponent = ({
       {
         backgroundColor: alertStyles.backgroundColor,
         borderColor: alertStyles.borderColor,
-        marginBottom: type === "warning" ? wp("15%") : wp("11%"),
+        //marginBottom: type === "warning" ? wp("15%") : wp("11%"),
       }
     ]}>
-      <View style={[
-        mergedStyles.alertRowContainer,
-        !onClose && mergedStyles.alertRowContainerNoClose
-      ]}>
-        <View style={mergedStyles.alertIcon} accessible={true} accessibilityRole="text" accessibilityLabel={type==="warning" ? "Warning Icon":"Information Icon"}>
-         { IconSource? <IconSource/> :<InfoIcon  
-              color={'#0060AE'} 
-            />}
-        </View>
+      <A11y.Order
+        style={[
+          mergedStyles.alertRowContainer,
+          !onClose && mergedStyles.alertRowContainerNoClose
+        ]}
+      >
+        <A11y.Index index={0}>
+          <View
+            style={mergedStyles.alertIcon}
+            accessible={true}
+            accessibilityRole="text"
+            accessibilityLabel={type === "warning" ? "Warning icon" : "Information icon"}
+          >
+             { IconSource? <IconSource/> :<InfoIcon  
+                  color={'#0060AE'} 
+                />}
+            </View>
+        </A11y.Index>
         <View style={mergedStyles.alertContentContainer}>
-          <View style={mergedStyles.alertTitleRow} accessibilityRole="header" accessibilityLevel={2}
+          <A11y.Index index={1}>
+            <View
+              style={mergedStyles.alertTitleRow}
+              accessibilityRole="header"
+              accessibilityLevel={2}
               accessible={true}
-                accessibilityLabel={`${title}`}>
-            <Text style={[
-              mergedStyles.alertTitle, 
-              titleStyle,
-              { color: alertStyles.titleColor }
-            ]}
-              >
-              {title}
-            </Text>
-          </View>
-          <Text style={mergedStyles.alertMessage}>
-            {message}
-            {boldText && (
-              <Text style={[mergedStyles.alertMessage, mergedStyles.boldText]}>
-                {" "}{boldText}{" "}
-              </Text>
-            )}
-          </Text>
-          {actionText && (
-            <Text
-              accessible={true}
-              accessibilityRole="link"
-              accessibilityLabel={actionText}
-              accessibilityHint={Platform.OS === "android" ? "Double tap to open playstore store" : "Double tap to open app store"}
-              style={mergedStyles.actionText}
-              onPress={onActionPress}
+              accessibilityLabel={`${title}`}
             >
-              {actionText}
+              <Text style={[
+                mergedStyles.alertTitle, 
+                titleStyle,
+                { color: alertStyles.titleColor }
+              ]}
+                >
+                {title}
+              </Text>
+            </View>
+          </A11y.Index>
+          <A11y.Index index={2}>
+            <Text
+              style={mergedStyles.alertMessage}
+              accessible={true}
+              accessibilityRole="text"
+              accessibilityLabel={boldText ? `${message} ${boldText}` : message}
+            >
+              {message}
+              {boldText && (
+                <Text style={[mergedStyles.alertMessage, mergedStyles.boldText]}>
+                  {" "}{boldText}{" "}
+                </Text>
+              )}
             </Text>
+          </A11y.Index>
+          {actionText && (
+            <A11y.Index index={4}>
+              <Text
+                accessible={true}
+                accessibilityRole="link"
+                accessibilityLabel={actionText}
+                accessibilityHint={Platform.OS === "android" ? "Double tap to open playstore store" : "Double tap to open app store"}
+                style={mergedStyles.actionText}
+                onPress={onActionPress}
+              >
+                {actionText}
+              </Text>
+            </A11y.Index>
           )}
         </View>
         {onClose && (
-          <TouchableOpacity
-            style={mergedStyles.closeButtonContainer}
-            onPress={onClose}
-            accessibilityLabel="Close alert"
-            accessibilityRole="button"
-            accessibilityHint="Double tap to close this alert"
-          >
-            <CloseIcon color={alertStyles.closeButtonColor} width={16} height={16} />
-          </TouchableOpacity>
+          <A11y.Index index={5} style={mergedStyles.closeButtonContainer}>
+            <TouchableOpacity
+              onPress={onClose}
+              accessibilityLabel="Close alert"
+              accessibilityRole="button"
+              accessibilityHint="Double tap to close this alert"
+            >
+              <CloseIcon color={alertStyles.closeButtonColor} width={16} height={16} />
+            </TouchableOpacity>
+          </A11y.Index>
         )}
-      </View>
+      </A11y.Order>
     </View>
   );
 };
