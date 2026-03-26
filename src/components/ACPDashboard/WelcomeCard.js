@@ -78,7 +78,7 @@ const WelcomeCard = () => {
             Mobile
           </Text>
           <Text
-            style={[styles.title, { width: 230 }]}
+            style={[styles.title, { width: 230}]}
             accessible={true}
             accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
           >
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     lineHeight: 26,
     color: Color.sparklightBrightPurple,
-    marginBottom: Padding.p_5xs,
+    marginBottom: Padding.p_xl,
     fontWeight: "600",
   },
   videoContainer: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginHorizontal: 12,
     flexShrink: 1,
-    textAlign: "left",
+    textAlign: "center",
   },
   getOfferButton: {
     color: Color.sparklightWhite,
@@ -284,6 +284,7 @@ const styles = StyleSheet.create({
   offerBtn: {
     width: 120,
     backgroundColor: Color.sparklightBrightPurple,
+    //marginTop: -10,
     borderRadius: 50,
     padding: Padding.p_base,
   },

@@ -38,7 +38,7 @@ export default function PilotServiceStatus({
     const iconContainerStyle = filled ? styles.iconFilledBg : styles.iconUnfilledBg;
     
     return (
-      <View style={iconContainerStyle}>
+      <View style={iconContainerStyle} accessible={false} importantForAccessibility="no">
         {filled ? (
           <FilledIcon isActive={true} />
         ) : (
@@ -70,20 +70,24 @@ export default function PilotServiceStatus({
             accessibilityRole="text"
             style={styles.stageRow}
           >
-            <View style={styles.leftColumn}>
+            <View style={styles.leftColumn} accessible={false} importantForAccessibility="no">
               <TouchableOpacity
+                accessible={false}
+                importantForAccessibility="no"
                 accessibilityRole="none"
                 onPress={() => onStagePress && onStagePress(index)}
                 activeOpacity={0.8}
               >
-                <View style={styles.iconWrapOuter}>
-                  <View style={[styles.iconWrap, filled && styles.iconWrapFilled]}>
+                <View style={styles.iconWrapOuter} accessible={false} importantForAccessibility="no">
+                  <View style={[styles.iconWrap, filled && styles.iconWrapFilled]} accessible={false} importantForAccessibility="no">
                     {renderIcon(filled, index)}
                   </View>
                 </View>
               </TouchableOpacity>
               {!isLastStage && (
                 <View
+                  accessible={false}
+                  importantForAccessibility="no"
                   style={[
                     styles.connector,
                     filled && index < activeIndex
@@ -93,8 +97,8 @@ export default function PilotServiceStatus({
                 />
               )}
             </View>
-            <View style={styles.rightColumn}>
-              <Text style={[styles.label, filled && styles.labelFilled]}>
+            <View style={styles.rightColumn} accessible={false} importantForAccessibility="no">
+              <Text style={[styles.label, filled && styles.labelFilled]} accessible={false} importantForAccessibility="no">
                 {stage.label}
               </Text>
             </View>
