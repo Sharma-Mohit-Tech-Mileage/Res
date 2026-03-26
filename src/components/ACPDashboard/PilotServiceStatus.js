@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import PilotTick from "../../res/svgIcons/PilotTick";
 import { FontFamily } from "../../../GlobalStyles";
 
@@ -24,6 +24,16 @@ export default function PilotServiceStatus({
     return "Not started.";
   };
 
+  // Build combined label for Android
+  const buildCombinedLabel = () => {
+    const stageLabels = stages.map((stage, idx) => {
+      const index = idx + 1;
+      const statusText = getStatusText(index, activeIndex);
+      return `Step ${index} of ${stages.length}: ${stage.label}. ${statusText}`;
+    }).join(" ");
+    return `${stageLabels}. Header.`;
+  };
+
   const renderIcon = (filled, index) => {
     const iconContainerStyle = filled ? styles.iconFilledBg : styles.iconUnfilledBg;
     
@@ -42,7 +52,9 @@ export default function PilotServiceStatus({
     <View
       style={styles.wrapper}
       accessible={true}
-      accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
+      accessibilityRole="header"
+      accessibilityLevel={2}
+      accessibilityLabel={Platform.OS === "android" ? buildCombinedLabel() : undefined}
     >
       {stages.map((stage, idx) => {
         const index = idx + 1;
@@ -53,8 +65,8 @@ export default function PilotServiceStatus({
         return (
           <View
             key={stage.key}
-            accessible={true}
-            accessibilityLabel={`Step ${index} of ${stages.length}. ${stage.label}. ${statusText}`}
+            accessible={Platform.OS === "ios" ? true : false}
+            accessibilityLabel={Platform.OS === "ios" ? `Step ${index} of ${stages.length}. ${stage.label}. ${statusText}` : undefined}
             accessibilityRole="text"
             style={styles.stageRow}
           >

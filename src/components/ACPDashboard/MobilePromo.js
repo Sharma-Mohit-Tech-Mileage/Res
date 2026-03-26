@@ -35,13 +35,13 @@ const MobilePromo = () => {
             style={{
               flexDirection: "column",
               position: "absolute",
-              top: 20,
+              top: 5,
               left: 15,
               right: 15,
             }}
           >
             <Text
-              style={[styles.title2, { width: 230 }]}
+              style={[styles.title2, { width: 210 }]}
               accessible={true}
               accessibilityLabel="Sparklight Internet + Mobile"
             >
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_3xl,
     lineHeight: 22,
     color: Color.colorMidnightblue,
-    marginBottom: Padding.p_5xl,
+    marginBottom: Padding.p_5xs,
     fontWeight: "700",
   },title2: {
     fontFamily: FontFamily.openSansSemiBold,
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     marginHorizontal:20,
     marginBottom:8,
-    lineHeight: 20,
+
     flexShrink: 2,
     textAlign: "center",
   },

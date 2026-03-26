@@ -50,7 +50,7 @@ const WelcomeCard = () => {
 
   const renderOfferBanner = () => {
     return (
-      <View style={[styles.videoContainer, { height: 310 }]}>
+      <View style={[styles.videoContainer, { height: 330 }]}>
         {/* <VideoPlayer videoId={videoId} /> */}
 
         <Image
@@ -98,7 +98,7 @@ const WelcomeCard = () => {
           </Pressable>
 
     <Text
-      style={[styles.offerDesclaimer, { marginEnd:10}]}
+      style={[styles.offerDesclaimer ]}
       accessible={true}
       accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
     >
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     lineHeight: 26,
     color: Color.sparklightBrightPurple,
-    marginBottom: Padding.p_5xl,
+    marginBottom: Padding.p_5xs,
     fontWeight: "600",
   },
   videoContainer: {
@@ -264,7 +264,8 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     fontWeight: "400",
-    marginTop: Padding.p_13xl,
+    width: wp("80%"),
+    marginTop: Padding.p_5xl,
     
   },
   getOfferButton: {
@@ -275,7 +276,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },offerBtn: {
     width: 120,
-    marginTop: 5,
     backgroundColor: Color.sparklightBrightPurple,
     borderRadius: 50,
     padding: Padding.p_base,

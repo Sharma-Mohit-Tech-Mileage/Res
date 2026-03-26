@@ -55,8 +55,8 @@ const FeatureCardMobile = ({
           <View
             key={index}
             style={styles.featureRow}
-            //accessibilityRole="listitem"
-            //accessibilityLabel={feature}
+            accessible={false}
+            importantForAccessibility="no"
           >
             <Icon
               name="green-checkcircle"
@@ -64,7 +64,7 @@ const FeatureCardMobile = ({
               color={Color.sparklightGreen}
               style={styles.checkIcon}
             />
-            <Text style={styles.featureText}>{feature}</Text>
+            <Text style={styles.featureText} accessible={false} importantForAccessibility="no">{feature}</Text>
           </View>
         ))}
       </View>

@@ -65,7 +65,7 @@ export const AlertComponent = ({
       {
         backgroundColor: alertStyles.backgroundColor,
         borderColor: alertStyles.borderColor,
-        marginBottom: type === "warning" ? wp("15%") : wp("11%"),
+        //marginBottom: type === "warning" ? wp("15%") : wp("11%"),
       }
     ]}>
       <A11y.Order
