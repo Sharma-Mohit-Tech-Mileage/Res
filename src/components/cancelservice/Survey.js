@@ -22,7 +22,7 @@ import {
 import AppStyles from "../utility/AppStyles";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import SecondaryButton from "../common/customui/SecondaryButton";
-import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PostApiRequest } from "../../network/RestApiClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import SmallLoader from "../common/customui/SmallLoader";
 import moment from "moment";

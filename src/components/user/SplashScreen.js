@@ -23,7 +23,7 @@ import {
   getUser,
   cleanUserData,
 } from "../../redux/utils/LocalStorage";
-import { PostAuthApiRequest } from "../../network/APIClient";
+import { PostAuthApiRequest } from "../../network/RestApiClient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -279,6 +279,8 @@ const SplashScreen = ({ navigation, route }) => {
         token: token,
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken,
+        jwtTimestamp: Date.now(),
+        idTokenTimestamp: Date.now(),
       };
       setIsBusiness(false);
 

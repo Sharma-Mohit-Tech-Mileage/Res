@@ -21,7 +21,7 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import AppStyles from "../utility/AppStyles";
-import { PostApiRequest } from "../../network/APIClient";
+import { PostApiRequest } from "../../network/RestApiClient";
 import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
 
 import {

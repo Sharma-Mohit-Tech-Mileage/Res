@@ -7,7 +7,7 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { Color, Padding } from "../../../GlobalStyles";
 import { getPrimaryEmail } from "../utility/constant";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest } from "../../network/RestApiClient";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 
 const Notifications = () => {

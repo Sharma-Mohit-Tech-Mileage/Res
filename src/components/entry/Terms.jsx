@@ -5,6 +5,7 @@ import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalSt
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useSelector, useDispatch } from "react-redux";
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser, } from "../../redux/utils/LocalStorage";
+import { clearAuthCookies } from "../utility/NativeCookieManager";
 import { updateTermsAndConditions, fetchSMSSelection, fetchPushNotifications, } from "../../redux/actions/ProfileActionSuite";
 import { logout } from "react-native-app-auth";
 import { saveUserInfo } from "../../redux/actions/UserAction";
@@ -66,7 +67,8 @@ const Terms = ({ navigation }) => {
         idToken: token,
         postLogoutRedirectUrl:
           "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
-      }).then((result) => {
+      }).then(async (result) => {
+        await clearAuthCookies();
         storeUser({});
         storeSsoToken({});
         saveUserInfo({});

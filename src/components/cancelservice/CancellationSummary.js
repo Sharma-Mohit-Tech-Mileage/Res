@@ -32,7 +32,7 @@ import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { PostApiRequest } from "../../network/APIClient";
+import { PostApiRequest } from "../../network/RestApiClient";
 import { Calendar } from "react-native-calendars";
 import moment from "moment";
 import LoadingOverlay from "../common/customui/CustomLoading";
