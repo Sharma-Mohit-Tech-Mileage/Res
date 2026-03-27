@@ -1,32 +1,17 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Animated, Easing } from "react-native";
-import { Svg, Circle, Ellipse, Path, Defs, LinearGradient, Stop } from "react-native-svg";
+import { Svg, Path, Defs, LinearGradient, Stop } from "react-native-svg";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { statusSection } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 
-const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
-
-const GLOBE_SIZE = 58;
-const CX = GLOBE_SIZE / 2;
-const CY = GLOBE_SIZE / 2;
-const R = GLOBE_SIZE / 2 - 3;
-
 const StatusIcon = ({ isAnimating = false }) => {
-  const meridianAnim = useRef(new Animated.Value(0)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (isAnimating) {
-      const spin = Animated.loop(
-        Animated.timing(meridianAnim, {
-          toValue: 1,
-          duration: 2500,
-          easing: Easing.linear,
-          useNativeDriver: false,
-        })
-      );
       const arrow = Animated.loop(
         Animated.timing(rotateAnim, {
           toValue: 1,
@@ -35,30 +20,12 @@ const StatusIcon = ({ isAnimating = false }) => {
           useNativeDriver: true,
         })
       );
-      spin.start();
       arrow.start();
-      return () => {
-        spin.stop();
-        arrow.stop();
-      };
+      return () => arrow.stop();
     } else {
-      meridianAnim.setValue(0);
       rotateAnim.setValue(0);
     }
   }, [isAnimating]);
-
-  const meridian1Rx = meridianAnim.interpolate({
-    inputRange: [0, 0.25, 0.5, 0.75, 1],
-    outputRange: [2, R * 0.6, R, R * 0.6, 2],
-  });
-  const meridian2Rx = meridianAnim.interpolate({
-    inputRange: [0, 0.25, 0.5, 0.75, 1],
-    outputRange: [R * 0.6, R, R * 0.6, 2, R * 0.6],
-  });
-  const meridian3Rx = meridianAnim.interpolate({
-    inputRange: [0, 0.25, 0.5, 0.75, 1],
-    outputRange: [R, R * 0.6, 2, R * 0.6, R],
-  });
 
   const rotate = rotateAnim.interpolate({
     inputRange: [0, 1],
@@ -105,51 +72,12 @@ const StatusIcon = ({ isAnimating = false }) => {
         </Animated.View>
       )}
 
-      {/* Globe in center — solid style */}
-      <View style={styles.globeCenter}>
-        <Svg width={GLOBE_SIZE} height={GLOBE_SIZE} viewBox={`0 0 ${GLOBE_SIZE} ${GLOBE_SIZE}`}>
-          {/* Outer circle */}
-          <Circle cx={CX} cy={CY} r={R} fill="none" stroke={primaryColor} strokeWidth={2.5} />
-
-          {/* Equator — single curved arc across full width */}
-          <Path
-            d={`M ${CX - R} ${CY} Q ${CX} ${CY + R * 0.18} ${CX + R} ${CY}`}
-            fill="none"
-            stroke={primaryColor}
-            strokeWidth={2}
-          />
-
-          {/* Upper latitude parallel — curves downward toward center */}
-          <Path
-            d={`M ${CX - R * 0.82} ${CY - R * 0.58} Q ${CX} ${CY - R * 0.58 + R * 0.22} ${CX + R * 0.82} ${CY - R * 0.58}`}
-            fill="none"
-            stroke={primaryColor}
-            strokeWidth={2}
-          />
-
-          {/* Lower latitude parallel — curves upward toward center */}
-          <Path
-            d={`M ${CX - R * 0.82} ${CY + R * 0.58} Q ${CX} ${CY + R * 0.58 - R * 0.22} ${CX + R * 0.82} ${CY + R * 0.58}`}
-            fill="none"
-            stroke={primaryColor}
-            strokeWidth={2}
-          />
-
-          {/* Vertical meridians */}
-          {isAnimating ? (
-            <>
-              <AnimatedEllipse cx={CX} cy={CY} rx={meridian1Rx} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
-              <AnimatedEllipse cx={CX} cy={CY} rx={meridian2Rx} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
-              <AnimatedEllipse cx={CX} cy={CY} rx={meridian3Rx} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
-            </>
-          ) : (
-            <>
-              <Ellipse cx={CX} cy={CY} rx={R * 0.35} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
-              <Ellipse cx={CX} cy={CY} rx={R * 0.7} ry={R} fill="none" stroke={primaryColor} strokeWidth={2} />
-            </>
-          )}
-        </Svg>
-      </View>
+      {/* Center icon */}
+      <MaterialCommunityIcons
+        name="access-point"
+        size={48}
+        color={primaryColor}
+      />
     </View>
   );
 };
@@ -258,11 +186,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 88,
     height: 88,
-  },
-
-  globeCenter: {
-    alignItems: "center",
-    justifyContent: "center",
   },
 });
 

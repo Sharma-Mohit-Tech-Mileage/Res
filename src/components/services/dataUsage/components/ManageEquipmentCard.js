@@ -43,7 +43,6 @@ const buildA11yLabel = (item) => {
 };
 
 const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
-  const icon = useMemo(() => getEquipmentIcon(item), [item]);
   const identifier = useMemo(() => getIdentifier(item), [item]);
   const a11yLabel = useMemo(() => buildA11yLabel(item), [item]);
 
@@ -54,15 +53,6 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
       accessibilityRole="text"
       accessibilityLabel={a11yLabel}
     >
-      <View
-        style={styles.equipmentIconWrapper}
-        accessible={false}
-        importantForAccessibility="no-hide-descendants"
-        accessibilityElementsHidden={true}
-      >
-        <MaterialCommunityIcons name={icon} size={20} color={theme.colors.primary} />
-      </View>
-
       <View
         style={styles.equipmentInfo}
         importantForAccessibility="no-hide-descendants"
@@ -158,22 +148,12 @@ const styles = StyleSheet.create({
 
   equipmentItem: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingVertical: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
   lastItem: { borderBottomWidth: 0 },
-
-  equipmentIconWrapper: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: theme.colors.surfaceVariant,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: theme.spacing.md,
-  },
 
   equipmentInfo: {
     flex: 1,

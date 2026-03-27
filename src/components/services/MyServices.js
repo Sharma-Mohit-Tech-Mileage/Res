@@ -88,8 +88,8 @@ const MyServicesContent = ({ route }) => {
           {true && (
             <InternetCard
               planName={"data?.internet.planName"}
-              downloadSpeed={data?.internet.downloadSpeed}
-              uploadSpeed={data?.internet.uploadSpeed}
+              downloadSpeed={data?.internet?.downloadSpeed || 200}
+              uploadSpeed={data?.internet?.uploadSpeed || 10}
               loading={loading}
               dataPlan={{
                 usedGB: 237.75,

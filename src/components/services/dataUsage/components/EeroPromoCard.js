@@ -82,8 +82,7 @@ const EeroPromoCard = ({ promoData }) => {
       } else {
         Alert.alert("Error", `Unable to open ${storeName}`);
       }
-    } catch (error) {
-      console.error(`Error opening ${storeName}:`, error);
+    } catch {
       Alert.alert("Error", `Unable to open ${storeName}`);
     }
   };
@@ -119,7 +118,7 @@ const EeroPromoCard = ({ promoData }) => {
             <Text style={styles.brandName}>eero</Text>
 
             {/* Description */}
-            <Text style={styles.description}>
+            <Text style={[styles.description, styles.descriptionBold]}>
               Fast, reliable Wi-Fi for every room.{"\n"}Set up in minutes with
               the eero app.
             </Text>
@@ -187,6 +186,10 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.85)",
     marginBottom: 20,
     maxWidth: 300,
+  },
+  descriptionBold: {
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "700",
   },
 
   ctaRow: {

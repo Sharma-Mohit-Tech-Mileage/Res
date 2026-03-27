@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   ScrollView,
@@ -21,7 +21,6 @@ import {
   MOCK_CURRENT_USAGE,
   MOCK_MONTHLY_USAGE,
   MOCK_DAILY_USAGE,
-  MOCK_USAGE_PERIODS,
 } from "./mockDataUsage";
 
 const DataUsageContent = ({ navigation, route }) => {
@@ -29,11 +28,8 @@ const DataUsageContent = ({ navigation, route }) => {
   const [activeTab, setActiveTab] = useState("daily");
   const [refreshing, setRefreshing] = useState(false);
   const [selectedBar, setSelectedBar] = useState(null);
-  const [selectedPeriod, setSelectedPeriod] = useState(MOCK_USAGE_PERIODS[0]);
-  const [showRing, setShowRing] = useState(true);
-
-
-  const [currentUsage, setCurrentUsage] = useState(MOCK_CURRENT_USAGE);
+  const showRing = true;
+  const currentUsage = MOCK_CURRENT_USAGE;
   const [monthlyData] = useState(MOCK_MONTHLY_USAGE);
   const [dailyData] = useState(MOCK_DAILY_USAGE);
 
@@ -46,10 +42,6 @@ const DataUsageContent = ({ navigation, route }) => {
 
   const handleBarPress = useCallback((item) => {
     setSelectedBar(item);
-  }, []);
-
-  const handlePeriodChange = useCallback((period) => {
-    setSelectedPeriod(period);
   }, []);
 
   const onRefresh = useCallback(async () => {
@@ -160,22 +152,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  gradientHeader: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-  },
   scrollView: container.page,
   scrollContent: {
     paddingTop: theme.spacing.md,
-  },
-  selectorContainer: {
-    marginHorizontal: theme.spacing.base,
-    marginBottom: theme.spacing.base,
-  },
-  paceContainer: {
-    marginHorizontal: theme.spacing.base,
   },
 });
 

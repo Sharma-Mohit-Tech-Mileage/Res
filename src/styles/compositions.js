@@ -26,7 +26,7 @@ export const serviceCard = {
   },
 
   serviceType: {
-    fontSize: theme.typography.size.sm,
+    fontSize: theme.typography.size.base,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.text.secondary,
@@ -45,7 +45,7 @@ export const serviceCard = {
   },
   planName: {
     flex: 1,
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.primary,
@@ -75,19 +75,7 @@ export const internetSpeed = {
   },
 
   speedIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: `${theme.colors.primary}15`,
-    alignItems: "center",
-    justifyContent: "center",
     marginRight: theme.spacing.xs,
-  },
-
-  speedArrow: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: theme.colors.primary,
   },
 
   speedInfo: {
@@ -237,7 +225,7 @@ export const cardHeader = {
     marginRight: theme.spacing.sm,
   },
   title: {
-    fontSize: theme.typography.size.sm,
+    fontSize: theme.typography.size.base,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
     color: theme.colors.text.secondary,

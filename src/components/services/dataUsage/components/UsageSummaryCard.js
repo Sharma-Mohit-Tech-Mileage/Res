@@ -174,7 +174,7 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
 
         <View style={styles.stats}>
           <View
-            style={[styles.statBox, styles.statBoxWide]}
+            style={styles.statBox}
             accessible={true}
             accessibilityLabel={`Billing Period: ${startDate} through ${endDate}`}
           >
@@ -203,23 +203,6 @@ const UsageSummaryCard = ({ currentUsage, dailyData }) => {
             </View>
             <Text style={styles.statValue}>{currentUsage.remainingDays} days</Text>
             <Text style={styles.statLabel}>Remaining</Text>
-          </View>
-
-          <View
-            style={[styles.statBox, styles.statBoxNarrow]}
-            accessible={false}
-            accessibilityElementsHidden={true}
-            importantForAccessibility="no-hide-descendants"
-          >
-            <View
-              accessible={false}
-              importantForAccessibility="no-hide-descendants"
-              accessibilityElementsHidden={true}
-            >
-              <MaterialCommunityIcons name="chart-pie" size={20} color={theme.colors.primary} />
-            </View>
-            <Text style={styles.statValue}>{currentUsage.dataUsedPercent}%</Text>
-            <Text style={styles.statLabel}>Used</Text>
           </View>
         </View>
       </View>
@@ -277,12 +260,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing["2xs"],
     backgroundColor: theme.colors.surfaceVariant,
     borderRadius: theme.radius.xs,
-  },
-  statBoxWide: {
-    flex: 1.4,
-  },
-  statBoxNarrow: {
-    flex: 0.7,
   },
   statValue: {
     fontSize: theme.typography.size.sm,

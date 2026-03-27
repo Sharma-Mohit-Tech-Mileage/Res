@@ -22,7 +22,6 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   };
 
   if (loading) {
-    // Change back to loading instead of true
     return (
       <View style={styles.container}>
         <View style={styles.card}>
@@ -109,10 +108,8 @@ const styles = StyleSheet.create({
   // Content
   content: serviceCard.content,
   planName: serviceCard.planName,
-  actionButton: serviceCard.actionButton,
 
   // Skeleton Loader
-  skeleton: skeletonLoader.skeleton,
   skeletonHeader: skeletonLoader.skeletonHeader,
   skeletonTitle: skeletonLoader.skeletonTitle,
 });

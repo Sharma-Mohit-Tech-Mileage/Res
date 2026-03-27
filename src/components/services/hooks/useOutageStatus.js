@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   checkOutageStatusRequest,
@@ -16,17 +16,7 @@ export const useOutageStatus = () => {
   const checking = useSelector(selectOutageChecking);
   const error = useSelector(selectOutageError);
 
-  useEffect(() => {
-    if (outageData) {
-      console.log("[useOutageStatus] Outage data received:", JSON.stringify(outageData, null, 2));
-    }
-    if (error) {
-      console.error("[useOutageStatus] Error state:", error);
-    }
-  }, [outageData, error]);
-
   const checkStatus = useCallback(() => {
-    console.log("[useOutageStatus] checkStatus triggered");
     dispatch(checkOutageStatusRequest());
   }, [dispatch]);
 
