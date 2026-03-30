@@ -30,7 +30,7 @@ import moment from "moment";
 import Toggle from "../common/Toggle";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
-import { PostApiRequest } from "../../network/APIClient";
+import { PostApiRequest } from "../../network/RestApiClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 
