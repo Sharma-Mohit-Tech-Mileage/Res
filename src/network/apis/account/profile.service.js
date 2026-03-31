@@ -9,7 +9,7 @@ import { getDeviceMetadata } from "../../../components/utility/DeviceInfo";
 import base64 from "react-native-base64";
 const getProfileDetails = async () => {
   let data = await getUser();
-  const accountNumber = data.userInfo?.accountNumber || null;
+  const userName = data.userInfo?.userName || null;
   const config = {
     headers: {
       Authorization: "Bearer " + data.token,
@@ -17,10 +17,10 @@ const getProfileDetails = async () => {
   };
 
   return _axios
-    .get(`api/profile/${accountNumber}`, { ...config })
+    .get(`api/Accounts/GetCustomerByUserName?userName=${userName}`, { ...config })
     .then((res) => res.data)
     .catch((error) => {
-      console.error(`Error fetching api/profile/${accountNumber}`, error);
+      console.error(`Error fetching api/Accounts/GetCustomerByUserName?userName=${userName}`, error);
       throw error;
     });
 };
