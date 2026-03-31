@@ -17,9 +17,17 @@ import LoadingOverlay from "../common/customui/CustomLoading";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
 import AppStyles from  "../utility/AppStyles";
+import aesEncryption from "../../../src/utils/AESEncryption";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
+
+const getSecurityAnswerDisplayValue = (value) => {
+  if (!value) return "";
+  const decryptedValue = aesEncryption.decryptAnswer(value);
+  return decryptedValue || value;
+};
+
 const PasswordSecurityEdit = () => {
 
   const navigation = useNavigation();
@@ -125,7 +133,8 @@ const PasswordSecurityEdit = () => {
 
 
   const getSecurityQuestions=()=>{
-    const requestWithEndpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS);
+    const userName = user?.userName || '';
+    const requestWithEndpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS, { userName });
     GetApiRequest(
       requestWithEndpoint,
       (res) => {
@@ -291,7 +300,7 @@ const PasswordSecurityEdit = () => {
                         ref={securityAnswerRef}
                         onBlur={onBlur}
                         onChangeText={onChange}
-                        value={value}
+                        value={getSecurityAnswerDisplayValue(value)}
                         error={error?.message}
                         accessibilityLabel="Password Reset Answer"
                         accessibilityHint="Enter your answer to the security question"

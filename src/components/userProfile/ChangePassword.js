@@ -109,9 +109,9 @@ const ChangePassword = () => {
       const user = await getUser();
 
       // Construct the request URL based on the user's billing type
-      const endpointUrl = getEndpoint(ENDPOINTS.UPDATE_PASSWORD, { accountNumber: user.userInfo.accountNumber });
+      const endpointUrl = getEndpoint(ENDPOINTS.RESET_PASSWORD);
 
-      const body = { newPassword };
+      const body = { newPass:newPassword,confirmNewPass:newPassword };
 
       setLoading(true);
 

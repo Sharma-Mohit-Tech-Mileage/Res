@@ -3,6 +3,7 @@ import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from "axios";
 import moment from "moment";
 //import { Env } from "./Constants";
+import { getEndpoint,ENDPOINTS } from "../endpoints/Endpoints";
 import Config from "react-native-config";
 import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
 import { getDeviceMetadata } from "../../../components/utility/DeviceInfo";
@@ -17,10 +18,10 @@ const getProfileDetails = async () => {
   };
 
   return _axios
-    .get(`api/Accounts/GetCustomerByUserName?userName=${userName}`, { ...config })
+    .get(getEndpoint(ENDPOINTS.PROFILE_DETAILS_BY_USERNAME, { userName }), { ...config })
     .then((res) => res.data)
     .catch((error) => {
-      console.error(`Error fetching api/Accounts/GetCustomerByUserName?userName=${userName}`, error);
+      console.error(`Error fetching ${getEndpoint(ENDPOINTS.PROFILE_DETAILS_BY_USERNAME, { userName })}`, error);
       throw error;
     });
 };
@@ -126,6 +127,29 @@ const fetchPushNotifications = async () => {
     throw error;
   }
 };
+
+
+const updateProfileSecurity= async (data) => {
+  let user = await getUser();
+  const userName = user.userInfo?.userName || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },  
+    };
+  try {
+    const response = await _axios.put(  
+      getEndpoint(ENDPOINTS.SECURITY_QUESTION_UPDATE, { userName }),
+      data,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating profile security:", error);
+    throw error;
+  }
+};
+
 
 const postProfileInfo = async (data) => {
   try {
@@ -832,4 +856,5 @@ export {
   deleteSVEmail,
   updateSVEmails,
   addSVEmailMktFlag,
+  updateProfileSecurity
 };

@@ -16,6 +16,7 @@ export const ENDPOINTS = {
     ZENDESK_TOKEN: 'api/Zendesk/TokenAuth',
 
     // Profile / Account
+    PROFILE_DETAILS_BY_USERNAME: 'api/Accounts/GetCustomerByUserName?userName=:userName',
     PROFILE_DETAILS: 'api/profile/:accountNumber',
     PROFILE_USERS: 'api/account/:accountNumber/users',
     SMS_SUBSCRIPTION: 'api/SMS/sms?AccountNumber=:accountNumber',
@@ -81,7 +82,9 @@ export const ENDPOINTS = {
     INTERNET_SPEED_POST: 'internet/api/internet/:accountNumber/speedTest/Post',
 
     // Security / Password
-    SECURITY_QUESTIONS: 'api/securityquestions/',
+    SECURITY_QUESTIONS: 'api/Security/SecurityQuestion?userName=:userName',
+    SECURITY_QUESTION_UPDATE: 'api/Security/UpdateSecurityAnswer?userName=:userName',
+    RESET_PASSWORD: 'api/Security/ResetPassword/',
     PROFILE_PASSWORD_UPDATE: 'api/profile/password/:accountNumber',
 
     // Survey / Cancellation

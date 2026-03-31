@@ -14,6 +14,7 @@ import {
   fetchACPUserAccountDetails,
   isPaperlessEnabled,
   getProfileDetails,
+  updateProfileSecurity,
   fetchUserList,
   fetchSmsSubscription,
   fetchBillingStatus,
@@ -187,9 +188,9 @@ function* saveUserFeedBack(action) {
   }
 }
 
-function* updateProfileSecurity(action) {
+function* handleUpdateProfileSecurity(action) {
   try {
-    const response = yield call(postProfileInfo, action.payload);
+    const response = yield call(updateProfileSecurity, action.payload);
     console.log("API Success Response:", response);
     action.navigation.navigate("PasswordSecurity", { updateSuccess: true });
   } catch (error) {
@@ -719,7 +720,7 @@ function* ProfileSagas() {
   yield takeLatest(FETCH_PAPERLESS, fetchPaperlessDetails);
   yield takeLatest(FETCH_PUSH_NOTIFICATIONS, getPushNotifications);
   yield takeLatest(UPDATE_PROFILE_REQUEST, updateProfile);
-  yield takeLatest(UPDATE_PROFILE_SECURITY, updateProfileSecurity);
+  yield takeLatest(UPDATE_PROFILE_SECURITY, handleUpdateProfileSecurity);
   yield takeLatest(UPDATE_TEXT_NOTIFICATION, updateTextNotification);
   yield takeLatest(UPDATE_EMAIL_NOTIFICATION, updateEmailNotification);
   yield takeLatest(UPDATE_TERMS_AND_CONDITIONS, updateTermsAndConditions);
