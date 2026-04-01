@@ -87,8 +87,20 @@ const ChangePassword = () => {
     }
   };
 
-  const getSecurityQuestions = () => {
-    const endpointUrl = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS);
+  const getSecurityQuestions = async () => {
+    const storedUser = await getUser();
+    const userName =
+      profileDetails?.userName ||
+      storedUser?.userInfo?.userName ||
+      storedUser?.userName ||
+      "";
+
+    if (!userName.trim()) {
+      console.warn("Skipping security questions API call: userName is missing");
+      return;
+    }
+
+    const endpointUrl = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS, { userName });
     GetApiRequest(
       endpointUrl,
       (res) => {

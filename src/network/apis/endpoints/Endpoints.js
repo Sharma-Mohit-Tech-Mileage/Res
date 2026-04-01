@@ -82,7 +82,7 @@ export const ENDPOINTS = {
     INTERNET_SPEED_POST: 'internet/api/internet/:accountNumber/speedTest/Post',
 
     // Security / Password
-    SECURITY_QUESTIONS: 'api/Security/SecurityQuestion?userName=:userName',
+    SECURITY_QUESTIONS: 'api/Security/SecurityQuestions?userName=:userName',
     SECURITY_QUESTION_UPDATE: 'api/Security/UpdateSecurityAnswer?userName=:userName',
     RESET_PASSWORD: 'api/Security/ResetPassword/',
     PROFILE_PASSWORD_UPDATE: 'api/profile/password/:accountNumber',

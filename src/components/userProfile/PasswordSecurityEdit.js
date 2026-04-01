@@ -18,6 +18,7 @@ import { securitySchema } from '../utility/validationSchema'; // Update the path
 import colors from "../../res/Colors";
 import AppStyles from  "../utility/AppStyles";
 import aesEncryption from "../../../src/utils/AESEncryption";
+import { getUser } from "../../../src/redux/utils/LocalStorage";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
@@ -132,12 +133,16 @@ const PasswordSecurityEdit = () => {
   };
 
 
-  const getSecurityQuestions=()=>{
-    const userName = user?.userName || '';
+  const getSecurityQuestions= async()=>{
+    const user = await getUser();
+    console.log("User info:", user);
+    const userName = user?.userInfo?.userName || user?.userName || '';
     const requestWithEndpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS, { userName });
+    console.log("Fetching security questions from endpoint:", requestWithEndpoint);
     GetApiRequest(
       requestWithEndpoint,
       (res) => {
+        console.log("Security questions response:", res);
         if (res) {
           setSecurityQuestionsNew(res);
           checkCustomSecurityQuestion(res);
@@ -169,8 +174,9 @@ const PasswordSecurityEdit = () => {
   }, []);
 
   useEffect(() => {
-     getSecurityQuestions();
+    getSecurityQuestions();
   }, []);
+
 
   useEffect(() => {
     if (route.params?.updateFailed) {

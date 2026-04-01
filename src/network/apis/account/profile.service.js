@@ -129,20 +129,18 @@ const fetchPushNotifications = async () => {
 };
 
 
-const updateProfileSecurity= async (data) => {
-  let user = await getUser();
-  const userName = user.userInfo?.userName || null;
+const updateProfileSecurity = async (data) => {
+  const user = await getUser();
+  const userName = user.userInfo?.userName || user.userName || null;
+  const endpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTION_UPDATE, { userName });
   const config = {
     headers: {
       Authorization: "Bearer " + user.token,
-    },  
-    };
+    },
+  };
+
   try {
-    const response = await _axios.put(  
-      getEndpoint(ENDPOINTS.SECURITY_QUESTION_UPDATE, { userName }),
-      data,
-      config
-    );
+    const response = await _axios.put(endpoint, data, config);
     return response.data;
   } catch (error) {
     console.error("Error updating profile security:", error);
