@@ -3,6 +3,7 @@ import moment from "moment";
 import * as types from "../constants/servicesTypes";
 import * as actions from "../actions/servicesActions";
 import servicesApi from "../../network/apis/services/services.service";
+import dataUsageApi from "../../network/apis/services/dataUsageService";
 
 function* fetchServiceDetailsSaga(action) {
   try {
@@ -151,12 +152,86 @@ function transformOutageData(apiResponse) {
   }
 }
 
+// ========== Data Usage Sagas ==========
+
+function* fetchCurrentUsageSaga() {
+  try {
+    console.log("[ServicesSaga] fetchCurrentUsage called");
+    const response = yield call(dataUsageApi.getCurrentUsage);
+    console.log("[ServicesSaga] fetchCurrentUsage response:", JSON.stringify(response, null, 2));
+    yield put(actions.fetchCurrentUsageSuccess(response));
+  } catch (error) {
+    const status = error?.response?.status;
+    console.error("[ServicesSaga] fetchCurrentUsage FAILED:", status, error?.message);
+    if (status === 404 || status === 204) {
+      yield put(actions.fetchCurrentUsageSuccess(null));
+    } else {
+      yield put(actions.fetchCurrentUsageFailure(error.message || "Failed to fetch current usage"));
+    }
+  }
+}
+
+function* fetchMonthlyUsageSaga() {
+  try {
+    console.log("[ServicesSaga] fetchMonthlyUsage called");
+    const response = yield call(dataUsageApi.getMonthlyUsage);
+    console.log("[ServicesSaga] fetchMonthlyUsage response:", JSON.stringify(response, null, 2));
+    yield put(actions.fetchMonthlyUsageSuccess(response));
+  } catch (error) {
+    const status = error?.response?.status;
+    console.error("[ServicesSaga] fetchMonthlyUsage FAILED:", status, error?.message);
+    if (status === 404 || status === 204) {
+      yield put(actions.fetchMonthlyUsageSuccess([]));
+    } else {
+      yield put(actions.fetchMonthlyUsageFailure(error.message || "Failed to fetch monthly usage"));
+    }
+  }
+}
+
+function* fetchDailyUsageSaga(action) {
+  try {
+    const { startDate, endDate } = action.payload;
+    console.log("[ServicesSaga] fetchDailyUsage called:", startDate, "→", endDate);
+    const response = yield call(dataUsageApi.getDailyUsage, startDate, endDate);
+    console.log("[ServicesSaga] fetchDailyUsage response:", JSON.stringify(response, null, 2));
+    yield put(actions.fetchDailyUsageSuccess(response || []));
+  } catch (error) {
+    const status = error?.response?.status;
+    console.error("[ServicesSaga] fetchDailyUsage FAILED:", status, error?.message);
+    if (status === 404 || status === 204) {
+      // No data for this period — treat as empty, not an error
+      console.log("[ServicesSaga] No daily data available for this period");
+      yield put(actions.fetchDailyUsageSuccess([]));
+    } else {
+      yield put(actions.fetchDailyUsageFailure(error.message || "Failed to fetch daily usage"));
+    }
+  }
+}
+
+function* fetchUsagePeriodsSaga() {
+  try {
+    console.log("[ServicesSaga] fetchUsagePeriods called");
+    const response = yield call(dataUsageApi.getUsagePeriods);
+    console.log("[ServicesSaga] fetchUsagePeriods response:", JSON.stringify(response, null, 2));
+    yield put(actions.fetchUsagePeriodsSuccess(response));
+  } catch (error) {
+    console.error("[ServicesSaga] fetchUsagePeriods FAILED:", error?.message, error);
+    yield put(actions.fetchUsagePeriodsFailure(error.message || "Failed to fetch usage periods"));
+  }
+}
+
 export function* watchServicesActions() {
   yield takeLatest(
     types.FETCH_SERVICE_DETAILS_REQUEST,
     fetchServiceDetailsSaga
   );
   yield takeLatest(types.CHECK_OUTAGE_STATUS_REQUEST, checkOutageStatusSaga);
+
+  // Data Usage watchers
+  yield takeLatest(types.FETCH_CURRENT_USAGE_REQUEST, fetchCurrentUsageSaga);
+  yield takeLatest(types.FETCH_MONTHLY_USAGE_REQUEST, fetchMonthlyUsageSaga);
+  yield takeLatest(types.FETCH_DAILY_USAGE_REQUEST, fetchDailyUsageSaga);
+  yield takeLatest(types.FETCH_USAGE_PERIODS_REQUEST, fetchUsagePeriodsSaga);
 }
 
 export default watchServicesActions;

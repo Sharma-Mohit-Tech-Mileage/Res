@@ -16,10 +16,10 @@ const X_LABEL_HEIGHT = 34;
 const CHART_TOTAL_HEIGHT = CHART_HEIGHT + X_LABEL_HEIGHT;
 const LIST_VIEW_HEIGHT = 280;
 
-const BAR_WIDTH = 10;
+const BAR_WIDTH = 12;
 const TOOLTIP_WIDTH = 120;
 const TOOLTIP_HEIGHT = 46;
-const MIN_SPACING = 2;
+const MIN_SPACING = 14;
 
 const TRACK_THICKNESS = 3.5;
 const THUMB_MIN = 28;
@@ -110,8 +110,11 @@ const UsageChart = ({
   onBarPress,
   activeTab,
   onTabChange,
+  periodLabels = [],
+  selectedPeriodLabel = "",
+  onPeriodChange,
+  loading = false,
 }) => {
-  const [selectedRange, setSelectedRange] = useState("Feb 2025 - Jan 2026");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showList, setShowList] = useState(false);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
@@ -201,10 +204,7 @@ const UsageChart = ({
   });
   const legendOpacity = barAnim;
 
-  const dateRanges = useMemo(
-    () => ["Feb 2025 - Jan 2026", "Jan 2025 - Dec 2025", "Dec 2024 - Nov 2025"],
-    []
-  );
+  const dateRanges = periodLabels;
 
   const tabs = useMemo(
     () => [
@@ -287,7 +287,76 @@ const UsageChart = ({
     [onBarPress, formatPeriodLabel]
   );
 
-  if (!chartData.length) return null;
+  // No data state — still show tabs + dropdown so user can switch periods
+  if (!chartData.length && !loading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <View style={styles.iconWrapper} accessible={false} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden={true}>
+              <MaterialCommunityIcons name="chart-bar" size={20} color={theme.colors.primary} />
+            </View>
+            <Text style={styles.chartTitle} accessibilityRole="header">Historical Usage</Text>
+          </View>
+          <View style={styles.tabsContainer} accessibilityRole="tablist">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <Pressable
+                  key={tab.id}
+                  style={[styles.tab, isActive && styles.activeTab]}
+                  onPress={() => { if (!isActive) onTabChange?.(tab.id); }}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: isActive }}
+                  accessibilityLabel={tab.label}
+                >
+                  <Text style={[styles.tabText, isActive && styles.activeTabText]}>{tab.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+          <View style={styles.controlsRow}>
+            {activeTab === "daily" && dateRanges.length > 0 && (
+              <View style={styles.dropdownWrapper}>
+                <SparkLightDropdown
+                  items={dateRanges}
+                  selectedValue={selectedPeriodLabel}
+                  onValueChange={onPeriodChange}
+                  dropDownStyle={styles.dropdown}
+                  dropdownTitle={"Select Billing Period"}
+                  accessibilityItemName="billing period"
+                />
+              </View>
+            )}
+            {activeTab !== "daily" && <View style={{ flex: 1 }} />}
+            <Pressable
+              style={styles.listToggle}
+              onPress={handleToggleView}
+              accessibilityRole="button"
+              accessibilityLabel={showList ? "List View" : "Graph View"}
+            >
+              <MaterialCommunityIcons
+                name={showList ? "chart-bar" : "format-list-bulleted"}
+                size={20}
+                color={theme.colors.primary}
+                accessible={false}
+                importantForAccessibility="no"
+              />
+            </Pressable>
+          </View>
+          <View style={styles.noDataContainer}>
+            <MaterialCommunityIcons name="chart-timeline-variant" size={48} color={theme.colors.borderLight} />
+            <Text style={styles.noDataTitle}>No Data Available</Text>
+            <Text style={styles.noDataSubtext}>
+              {activeTab === "daily"
+                ? "No usage data found for the selected billing period. Try selecting a different period."
+                : "No monthly usage data available at this time."}
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
 
   // — Chart needs horizontal scroll? —
   const chartScrollable = contentWidth > chartViewportW && chartViewportW > 0;
@@ -539,11 +608,11 @@ const UsageChart = ({
             <View style={styles.dropdownWrapper}>
               <SparkLightDropdown
                 items={dateRanges}
-                selectedValue={selectedRange}
-                onValueChange={setSelectedRange}
+                selectedValue={selectedPeriodLabel}
+                onValueChange={onPeriodChange}
                 dropDownStyle={styles.dropdown}
-                dropdownTitle={"Select Date Range"}
-                accessibilityItemName="date range"
+                dropdownTitle={"Select Billing Period"}
+                accessibilityItemName="billing period"
               />
             </View>
           )}
@@ -610,6 +679,7 @@ const UsageChart = ({
 
                   <ScrollView
                     horizontal
+                    nestedScrollEnabled={true}
                     showsHorizontalScrollIndicator={false}
                     scrollEventThrottle={16}
                     onScroll={Animated.event(
@@ -618,6 +688,8 @@ const UsageChart = ({
                     )}
                     onLayout={(e) => setChartViewportW(e.nativeEvent.layout.width)}
                     style={styles.chartScroll}
+                    accessible={false}
+                    importantForAccessibility="no"
                   >
                     <View style={{ width: contentWidth, position: "relative" }}>
                       <View
@@ -701,6 +773,51 @@ const UsageChart = ({
                 </View>
               </View>
             </Animated.View>
+
+            {/* Accessible prev/next nav for TalkBack (Android) */}
+            {isScreenReaderEnabled && chartData.length > 0 && (
+              <View style={styles.a11yNavRow}>
+                <Pressable
+                  style={styles.a11yNavButton}
+                  onPress={() => {
+                    const prev = Math.max(0, selectedIndex - 1);
+                    handlePressBar(chartData[prev], prev);
+                  }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Previous bar"
+                  accessibilityHint={selectedIndex <= 0 ? "Already at first item" : undefined}
+                  disabled={selectedIndex <= 0}
+                >
+                  <MaterialCommunityIcons name="chevron-left" size={22} color={selectedIndex <= 0 ? theme.colors.borderLight : theme.colors.primary} />
+                  <Text style={[styles.a11yNavText, selectedIndex <= 0 && { color: theme.colors.borderLight }]}>Previous</Text>
+                </Pressable>
+
+                <Text
+                  style={styles.a11yNavCounter}
+                  accessible={true}
+                  accessibilityLabel={`Item ${selectedIndex + 1} of ${chartData.length}`}
+                >
+                  {selectedIndex + 1} / {chartData.length}
+                </Text>
+
+                <Pressable
+                  style={styles.a11yNavButton}
+                  onPress={() => {
+                    const next = Math.min(chartData.length - 1, selectedIndex + 1);
+                    handlePressBar(chartData[next], next);
+                  }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Next bar"
+                  accessibilityHint={selectedIndex >= chartData.length - 1 ? "Already at last item" : undefined}
+                  disabled={selectedIndex >= chartData.length - 1}
+                >
+                  <Text style={[styles.a11yNavText, selectedIndex >= chartData.length - 1 && { color: theme.colors.borderLight }]}>Next</Text>
+                  <MaterialCommunityIcons name="chevron-right" size={22} color={selectedIndex >= chartData.length - 1 ? theme.colors.borderLight : theme.colors.primary} />
+                </Pressable>
+              </View>
+            )}
           </>
         ) : (
           <>
@@ -715,6 +832,7 @@ const UsageChart = ({
                 {listContentH > listViewportH && <FadeEdge side="bottom" horizontal={false} />}
 
                 <ScrollView
+                  nestedScrollEnabled={true}
                   showsVerticalScrollIndicator={false}
                   scrollEventThrottle={16}
                   onScroll={Animated.event(
@@ -724,6 +842,7 @@ const UsageChart = ({
                   onContentSizeChange={(_w, h) => setListContentH(h)}
                   onLayout={(e) => setListViewportH(e.nativeEvent.layout.height)}
                   style={styles.listScrollContainer}
+                  accessible={false}
                 >
                   {chartData.map((item, index) => (
                     <View
@@ -739,7 +858,7 @@ const UsageChart = ({
                         accessibilityElementsHidden={true}
                       >
                         <Text style={styles.periodLabel}>{formatPeriodLabel(item)}</Text>
-                        <Text style={styles.totalLabel}>{item.total.toFixed(4)} GB</Text>
+                        <Text style={styles.totalLabel}>{item.total.toFixed(2)} GB</Text>
                       </View>
                       <View
                         style={styles.listItemRow}
@@ -749,7 +868,7 @@ const UsageChart = ({
                         <View style={styles.detailItem}>
                           <View style={[styles.detailDot, { backgroundColor: theme.colors.primaryDark }]} />
                           <Text style={styles.detailLabel}>Download (GB)</Text>
-                          <Text style={styles.detailValue}>{item.download.toFixed(4)}</Text>
+                          <Text style={styles.detailValue}>{item.download.toFixed(2)}</Text>
                         </View>
                       </View>
                       <View
@@ -760,7 +879,7 @@ const UsageChart = ({
                         <View style={styles.detailItem}>
                           <View style={[styles.detailDot, { backgroundColor: theme.colors.upload }]} />
                           <Text style={styles.detailLabel}>Upload (GB)</Text>
-                          <Text style={styles.detailValue}>{item.upload.toFixed(4)}</Text>
+                          <Text style={styles.detailValue}>{item.upload.toFixed(2)}</Text>
                         </View>
                       </View>
                     </View>
@@ -951,6 +1070,61 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+  },
+
+  // Accessible prev/next navigation for screen readers
+  a11yNavRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
+    marginTop: theme.spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  a11yNavButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.sm,
+    minHeight: 44,
+    minWidth: 44,
+  },
+  a11yNavText: {
+    fontSize: theme.typography.size.sm,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.primary,
+  },
+  a11yNavCounter: {
+    fontSize: theme.typography.size.sm,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.text.secondary,
+  },
+
+  // No data state
+  noDataContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: theme.spacing["3xl"],
+    paddingHorizontal: theme.spacing.base,
+  },
+  noDataTitle: {
+    fontSize: theme.typography.size.base,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.text.primary,
+    marginTop: theme.spacing.sm,
+  },
+  noDataSubtext: {
+    fontSize: theme.typography.size.sm,
+    fontFamily: theme.typography.family.regular,
+    color: theme.colors.text.secondary,
+    textAlign: "center",
+    marginTop: theme.spacing.xs,
+    lineHeight: 20,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { View, ScrollView, RefreshControl, StyleSheet } from "react-native";
 import {
   SafeAreaProvider,
@@ -14,15 +14,46 @@ import PhoneCard from "./cards/PhoneCard";
 import StatusSection from "./sections/StatusSection";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { extractZipCode } from "../utility/constant";
 import { SERVICE_HEADER_GRADIENT } from "./utils/constants";
+import { fetchCurrentUsageRequest } from "../../redux/actions/servicesActions";
+import {
+  selectCurrentUsage,
+  selectCurrentUsageLoading,
+} from "../../redux/selectors/servicesSelectors";
+
 const MyServicesContent = ({ route }) => {
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
   const profileDetails =
     useSelector((state) => state.profile?.profileDetails) || {};
   const flagsReady = accountDetails?.services != null;
+
+  const accountNumber = profileDetails.accountNumber || "";
+  const legacySPA = accountDetails?.legacy_brand_by_spa;
+  const { data, loading, error, refetch } = useServiceDetails(accountNumber);
+  const { outageData, checking, checkStatus, clearOutageData } =
+    useOutageStatus();
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Current usage for InternetCard dataPlan
+  const currentUsage = useSelector(selectCurrentUsage);
+  const currentUsageLoading = useSelector(selectCurrentUsageLoading);
+
+  useEffect(() => {
+    dispatch(fetchCurrentUsageRequest());
+  }, [dispatch]);
+
+  const dataPlan = useMemo(() => {
+    if (!currentUsage) return null;
+    return {
+      usedGB: currentUsage.usedDataGB,
+      totalGB: currentUsage.dataPlanGB,
+      percentageUsed: currentUsage.dataUsedPercent,
+    };
+  }, [currentUsage]);
 
   const showInternet =
     loading || (!flagsReady ? true : accountDetails?.services?.hsd === true);
@@ -30,12 +61,6 @@ const MyServicesContent = ({ route }) => {
     loading || (!flagsReady ? true : accountDetails?.services?.video === true);
   const showPhone =
     loading || (!flagsReady ? true : accountDetails?.services?.phone === true);
-  const accountNumber = profileDetails.accountNumber || "";
-  const legacySPA = accountDetails?.legacy_brand_by_spa;
-  const { data, loading, error, refetch } = useServiceDetails(accountNumber);
-  const { outageData, checking, checkStatus, clearOutageData } =
-    useOutageStatus();
-  const [refreshing, setRefreshing] = useState(false);
 
   const zipCodeFromAccount = useMemo(() => {
     return extractZipCode(accountDetails?.service_address);
@@ -44,9 +69,10 @@ const MyServicesContent = ({ route }) => {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await refetch();
+    dispatch(fetchCurrentUsageRequest());
     clearOutageData();
     setRefreshing(false);
-  }, [refetch, clearOutageData]);
+  }, [refetch, clearOutageData, dispatch]);
 
   const handleCheckStatus = useCallback(() => {
     clearOutageData();
@@ -87,21 +113,17 @@ const MyServicesContent = ({ route }) => {
         <View style={styles.servicesContainer}>
           {true && (
             <InternetCard
-              planName={"data?.internet.planName"}
-              downloadSpeed={data?.internet?.downloadSpeed || 200}
-              uploadSpeed={data?.internet?.uploadSpeed || 10}
+              planName={"test"}
+              downloadSpeed={data?.internet?.downloadSpeed}
+              uploadSpeed={data?.internet?.uploadSpeed}
               loading={loading}
-              dataPlan={{
-                usedGB: 237.75,
-                totalGB: 1500,
-                percentageUsed: 15.85,
-              }}
+              dataPlan={dataPlan}
             />
           )}
 
           {showVideo && (
             <VideoCard
-              planName={data?.video.planName}
+              planName={data?.video?.planName}
               zipCode={zipCodeFromAccount}
               legacySpa={legacySPA}
               loading={loading}
@@ -110,7 +132,7 @@ const MyServicesContent = ({ route }) => {
 
           {showPhone && (
             <PhoneCard
-              planName={data?.phone.planName}
+              planName={data?.phone?.planName}
               legacyBrand={legacySPA}
               loading={loading}
             />

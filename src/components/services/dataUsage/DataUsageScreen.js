@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import {
   View,
   ScrollView,
@@ -17,23 +17,41 @@ import UsageSummaryCard from "./components/UsageSummaryCard";
 import UsageChart from "./components/UsageChart";
 import ManageEquipmentCard from "./components/ManageEquipmentCard";
 import EeroPromoCard from "./components/EeroPromoCard";
-import {
-  MOCK_CURRENT_USAGE,
-  MOCK_MONTHLY_USAGE,
-  MOCK_DAILY_USAGE,
-} from "./mockDataUsage";
+import { useDataUsage } from "../hooks/useDataUsage";
 
 const DataUsageContent = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState("daily");
   const [refreshing, setRefreshing] = useState(false);
   const [selectedBar, setSelectedBar] = useState(null);
-  const showRing = true;
-  const currentUsage = MOCK_CURRENT_USAGE;
-  const [monthlyData] = useState(MOCK_MONTHLY_USAGE);
-  const [dailyData] = useState(MOCK_DAILY_USAGE);
+  const [selectedPeriodIndex, setSelectedPeriodIndex] = useState(null);
 
-  const usageData = activeTab === "monthly" ? monthlyData : dailyData;
+  const {
+    currentUsage,
+    currentUsageLoading,
+    monthlyUsage,
+    monthlyUsageLoading,
+    dailyUsage,
+    dailyUsageLoading,
+    periodItems,
+    usagePeriodsLoading,
+    fetchDailyForPeriod,
+    refetchAll,
+  } = useDataUsage();
+
+  // Default to last period (most recent) once loaded
+  const activePeriodIndex = selectedPeriodIndex ?? (periodItems.length > 0 ? periodItems.length - 1 : 0);
+
+  // Period dropdown labels for SparkLightDropdown
+  const periodLabels = useMemo(
+    () => periodItems.map((p) => p.label),
+    [periodItems]
+  );
+
+  const selectedPeriodLabel = periodLabels[activePeriodIndex] || "";
+
+  const usageData = activeTab === "monthly" ? (monthlyUsage || []) : (dailyUsage || []);
+  const showRing = true;
 
   const handleTabChange = useCallback((tabId) => {
     setActiveTab(tabId);
@@ -44,11 +62,25 @@ const DataUsageContent = ({ navigation, route }) => {
     setSelectedBar(item);
   }, []);
 
+  const handlePeriodChange = useCallback(
+    (label) => {
+      const idx = periodLabels.indexOf(label);
+      if (idx >= 0) {
+        setSelectedPeriodIndex(idx);
+        fetchDailyForPeriod(periodItems[idx]);
+        setSelectedBar(null);
+      }
+    },
+    [periodLabels, periodItems, fetchDailyForPeriod]
+  );
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    refetchAll();
+    // Give APIs a moment, then clear refreshing
+    await new Promise((resolve) => setTimeout(resolve, 1500));
     setRefreshing(false);
-  }, []);
+  }, [refetchAll]);
 
   const handleBack = () => {
     navigation.goBack();
@@ -75,15 +107,14 @@ const DataUsageContent = ({ navigation, route }) => {
           />
         }
       >
-       
 
         {/* Usage Summary with Ring */}
         <UsageSummaryCard
           currentUsage={currentUsage}
-          dailyData={dailyData}
+          dailyData={dailyUsage || []}
           showRing={showRing}
+          loading={currentUsageLoading}
         />
-
 
         {/* Historical Usage Chart */}
         <UsageChart
@@ -93,6 +124,10 @@ const DataUsageContent = ({ navigation, route }) => {
           selectedBar={selectedBar}
           activeTab={activeTab}
           onTabChange={handleTabChange}
+          periodLabels={periodLabels}
+          selectedPeriodLabel={selectedPeriodLabel}
+          onPeriodChange={handlePeriodChange}
+          loading={activeTab === "monthly" ? monthlyUsageLoading : dailyUsageLoading}
         />
 
         {/* Equipment */}

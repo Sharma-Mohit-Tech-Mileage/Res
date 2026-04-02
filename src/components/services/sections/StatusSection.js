@@ -1,38 +1,72 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Animated, Easing } from "react-native";
-import { Svg, Path, Defs, LinearGradient, Stop } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { statusSection } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 
+// Sparklight brand purples
+const RING_OUTER = "#ba92bf";
+const RING_MIDDLE = "#9e61a2";
+const DOT_INNER = "#8e3c91";
+
+const ICON_SIZE = 88;
+const RING_WIDTH = 4;
+const OUTER_SIZE = 72;
+const MIDDLE_SIZE = 48;
+const INNER_SIZE = 26;
+
+/**
+ * Sparklight concentric-ring status icon.
+ *
+ * Always shows concentric rings + globe in center.
+ * When idle      → rings are static
+ * When animating → rings spin (outer CW, middle CCW), globe stays centered
+ */
 const StatusIcon = ({ isAnimating = false }) => {
-  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const outerAnim = useRef(new Animated.Value(0)).current;
+  const middleAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (isAnimating) {
-      const arrow = Animated.loop(
-        Animated.timing(rotateAnim, {
+      const outer = Animated.loop(
+        Animated.timing(outerAnim, {
           toValue: 1,
-          duration: 1400,
+          duration: 4000,
           easing: Easing.linear,
           useNativeDriver: true,
         })
       );
-      arrow.start();
-      return () => arrow.stop();
+      const middle = Animated.loop(
+        Animated.timing(middleAnim, {
+          toValue: 1,
+          duration: 2000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      );
+      outer.start();
+      middle.start();
+      return () => {
+        outer.stop();
+        middle.stop();
+      };
     } else {
-      rotateAnim.setValue(0);
+      outerAnim.setValue(0);
+      middleAnim.setValue(0);
     }
   }, [isAnimating]);
 
-  const rotate = rotateAnim.interpolate({
+  const outerRotate = outerAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ["360deg", "0deg"],
+    outputRange: ["0deg", "1600deg"],
   });
 
-  const primaryColor = theme.colors.primary;
+  const middleRotate = middleAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "-1600deg"],
+  });
 
   return (
     <View
@@ -41,42 +75,29 @@ const StatusIcon = ({ isAnimating = false }) => {
       accessibilityElementsHidden={true}
       style={styles.iconContainer}
     >
-      {/* Rotating arrow ring */}
-      {isAnimating && (
-        <Animated.View
-          style={[
-            styles.arrowRing,
-            { transform: [{ rotate }] },
-          ]}
-        >
-          <Svg width={88} height={88} viewBox="0 0 88 88">
-            <Defs>
-              <LinearGradient id="arrowGrad" x1="0" y1="0" x2="1" y2="0">
-                <Stop offset="0" stopColor={primaryColor} stopOpacity="0.9" />
-                <Stop offset="0.6" stopColor={primaryColor} stopOpacity="0.3" />
-                <Stop offset="1" stopColor={primaryColor} stopOpacity="0" />
-              </LinearGradient>
-            </Defs>
-            <Path
-              d="M44 6 A38 38 0 1 1 6 44"
-              fill="none"
-              stroke="url(#arrowGrad)"
-              strokeWidth={3}
-              strokeLinecap="round"
-            />
-            <Path
-              d="M44 2 L44 10 L37 6 Z"
-              fill={primaryColor}
-            />
-          </Svg>
-        </Animated.View>
-      )}
+      {/* Outer ring */}
+      <Animated.View
+        style={[
+          styles.ring,
+          styles.outerRing,
+          isAnimating ? { transform: [{ rotate: outerRotate }] } : null,
+        ]}
+      />
 
-      {/* Center icon */}
+      {/* Middle ring */}
+      <Animated.View
+        style={[
+          styles.ring,
+          styles.middleRing,
+          isAnimating ? { transform: [{ rotate: middleRotate }] } : null,
+        ]}
+      />
+
+      {/* Globe icon in center */}
       <MaterialCommunityIcons
-        name="access-point"
-        size={48}
-        color={primaryColor}
+        name="earth"
+        size={INNER_SIZE + 4}
+        color={DOT_INNER}
       />
     </View>
   );
@@ -120,7 +141,7 @@ const StatusSection = ({
           accessibilityLabel={
             checking
               ? "Checking service status, loading animation"
-              : "Globe icon"
+              : "Service status icon"
           }
         >
           <View style={styles.iconBadge}>
@@ -176,17 +197,35 @@ const styles = StyleSheet.create({
   subtitle: statusSection.subtitle,
 
   iconContainer: {
-    width: 88,
-    height: 88,
+    width: ICON_SIZE,
+    height: ICON_SIZE,
     alignItems: "center",
     justifyContent: "center",
   },
 
-  arrowRing: {
+  // Shared ring base — left/right borders visible, top/bottom transparent (horizontal)
+  ring: {
     position: "absolute",
-    width: 88,
-    height: 88,
+    borderWidth: RING_WIDTH,
+    borderTopColor: "transparent",
+    borderBottomColor: "transparent",
+    borderRadius: 999,
   },
+
+  outerRing: {
+    width: OUTER_SIZE,
+    height: OUTER_SIZE,
+    borderLeftColor: RING_OUTER,
+    borderRightColor: RING_OUTER,
+  },
+
+  middleRing: {
+    width: MIDDLE_SIZE,
+    height: MIDDLE_SIZE,
+    borderLeftColor: RING_MIDDLE,
+    borderRightColor: RING_MIDDLE,
+  },
+
 });
 
 export default StatusSection;

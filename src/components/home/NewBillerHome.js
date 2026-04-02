@@ -561,6 +561,7 @@ const styles = StyleSheet.create({
     marginTop: -40,
   },
   shadowProp: {
+    backgroundColor: "white",
     shadowColor: "#171717",
     shadowOffset: { width: -2, height: 4 },
     shadowOpacity: 0.2,

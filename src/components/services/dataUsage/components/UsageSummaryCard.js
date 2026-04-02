@@ -21,8 +21,8 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
     const id = animValue.addListener(({ value }) => setProgress(value));
     Animated.timing(animValue, {
       toValue: 1,
-      duration: 1200,
-      easing: Easing.out(Easing.cubic),
+      duration: 1800,
+      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
       useNativeDriver: false,
     }).start();
     return () => animValue.removeListener(id);
@@ -144,7 +144,25 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
   );
 };
 
-const UsageSummaryCard = ({ currentUsage, dailyData }) => {
+const UsageSummaryCard = ({ currentUsage, dailyData, loading = false }) => {
+  if (!currentUsage || loading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <View style={styles.iconWrapper} accessible={false} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden={true}>
+              <MaterialCommunityIcons name="chart-donut" size={20} color={theme.colors.primary} />
+            </View>
+            <Text style={styles.headerTitle} accessibilityRole="header">DATA USAGE</Text>
+          </View>
+          <View style={{ height: 200, alignItems: "center", justifyContent: "center" }}>
+            <Text style={styles.statLabel}>Loading usage data...</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   const startDate = new Date(currentUsage.beginDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
   const endDate = new Date(currentUsage.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
   const remainingPercent = 100 - currentUsage.dataUsedPercent;
