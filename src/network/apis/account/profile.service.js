@@ -140,7 +140,7 @@ const updateProfileSecurity = async (data) => {
   };
 
   try {
-    const response = await _axios.put(endpoint, data, config);
+    const response = await _axios.patch(endpoint, data, config);
     return response.data;
   } catch (error) {
     console.error("Error updating profile security:", error);
