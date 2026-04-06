@@ -32,8 +32,23 @@ const ProfileSettings = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {};
+  const accountDetails = profile.accountDetails || {};
   const convertedRole = getUserType(profileDetails.memberType || "");
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
+  const customerFirstName =
+    accountDetails.first_name ||
+    accountDetails.firstName ||
+    profileDetails.firstName ||
+    "";
+  const customerLastName =
+    accountDetails.last_name ||
+    accountDetails.lastName ||
+    profileDetails.lastName ||
+    "";
+  const customerName =
+    `${customerFirstName} ${customerLastName}`.trim() ||
+    profileDetails.fullName ||
+    "";
 
   const userInfo = useSelector(
     (state) => state.user.userData.userInfo
@@ -116,7 +131,7 @@ const numberToWordsForAccessibility = (numStr) => {
                 <View style={styles.firstNameParent} accessible={true}>
                   <Text style={styles.firstName}>{"Customer Name"}</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
-                    {profileDetails.fullName}
+                    {customerName}
                   </Text>
                 </View>
                 <View style={styles.firstNameParent} accessible={true}>
