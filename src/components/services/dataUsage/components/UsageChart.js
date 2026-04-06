@@ -459,7 +459,7 @@ const UsageChart = ({
               x={bx - dynamicSpacing / 2}
               y={0}
               width={bandwidth + dynamicSpacing}
-              height={CHART_HEIGHT}
+              height={CHART_TOTAL_HEIGHT}
               fill="transparent"
               onPress={() => handlePressBar(item, index)}
             />

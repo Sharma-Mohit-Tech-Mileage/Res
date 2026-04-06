@@ -130,33 +130,7 @@ const DataUsageContent = ({ navigation, route }) => {
           loading={activeTab === "monthly" ? monthlyUsageLoading : dailyUsageLoading}
         />
 
-        {/* Equipment */}
-        <ManageEquipmentCard
-          equipment={[
-            {
-              id: "1",
-              name: "Sparklight Modem",
-              type: "modem",
-              model: "C3000Z",
-              macId: "00:1A:2B:3C:4D:5E",
-              connectionType: "Wired",
-              location: "Living Room",
-              connectedDevices: 8,
-              icon: "router-wireless",
-            },
-            {
-              id: "2",
-              name: "eero Pro 6e",
-              type: "router",
-              model: "J010001",
-              macId: "00:1A:2B:3C:4D:5F",
-              connectionType: "Wireless",
-              location: "Main Floor",
-              connectedDevices: 12,
-              icon: "wifi",
-            },
-          ]}
-        />
+        {/* Equipment - hidden for now */}
 
         {/* eero Promo */}
         <EeroPromoCard
