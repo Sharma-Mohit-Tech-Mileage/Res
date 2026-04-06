@@ -17,6 +17,7 @@ export const ENDPOINTS = {
 
     // Profile / Account
     PROFILE_DETAILS_BY_USERNAME: 'api/Accounts/GetCustomerByUserName?userName=:userName',
+    PROFILE_DETAILS_BY_ACCOUNTID: 'api/Accounts/GetCustomerByAccountId?accountId=:accountNumber',
     PROFILE_DETAILS: 'api/profile/:accountNumber',
     PROFILE_USERS: 'api/account/:accountNumber/users',
     SMS_SUBSCRIPTION: 'api/SMS/sms?AccountNumber=:accountNumber',
@@ -45,6 +46,7 @@ export const ENDPOINTS = {
     USERS_BY_USERNAME: 'api/users/:userName',
     USERS_REMOVE: 'api/users/remove/:accountNumber/:userName',
     CHANGE_PASSWORD: 'api/profile/password/:accountNumber',
+    PROFILE_INFO_UPDATE: 'api/profile',
 
     // Email / Paperless (notification service)
     PAPERLESS_GET_ALL_EMAILS: 'api/Paperless/GetAllEmails?account=:accountNumber',
@@ -74,6 +76,7 @@ export const ENDPOINTS = {
     STATEMENT_LIST: 'api/Statement/:accountNumber/get',
     STATEMENT_GET_BY_ID: 'api/Statement/:accountNumber/getbyId/:statementId',
     BILL_BREAKDOWN_GET: 'api/BillBreakdown/GetBills?accountId=:accountNumber&startDate=:startDate&endDate=:endDate',
+    GET_BILL_EXPLAINER: 'api/GetBillExplainer/Get',
 
     // Dashboard (internet/account APIs)
     INTERNET_PLAN: 'internet/api/internet/:accountId/plan',
@@ -82,15 +85,20 @@ export const ENDPOINTS = {
     INTERNET_SPEED_POST: 'internet/api/internet/:accountNumber/speedTest/Post',
 
     // Security / Password
-    SECURITY_QUESTIONS: 'api/Security/SecurityQuestions?userName=:userName',
-    SECURITY_QUESTION_UPDATE: 'api/Security/UpdateSecurityAnswer?userName=:userName',
-    RESET_PASSWORD: 'api/Security/ResetPassword/',
+    SECURITY_QUESTIONS: 'api/Security/GetSecurityQuestions',
+    GET_SECURTY_ANSWERS: 'api/Security/GetSecurityQuestion?userName=:userName&accountNumber=:accountNumber',
+    SECURITY_QUESTION_UPDATE: 'api/Security/UpdateSecurityAnswer/:userName/:accountNumber',
+    RESET_PASSWORD: 'api/Security/ResetPassword?accountNumber=:accountNumber&userName=:userName',
     PROFILE_PASSWORD_UPDATE: 'api/profile/password/:accountNumber',
 
     // Survey / Cancellation
     SURVEY: 'api/Survey',
     SERVICE_DISCONNECT_SURVEY: 'api/Order/Disconnect',
     ORDER_COMMIT_DISCONNECT: 'api/Order/CommitDisconnect',
+
+    //Payment methods
+    PAYMENTS_HISTORY: 'api/payments/:accountNumber/paymentHistory',
+    PAYMENT_RECEIPT: 'api/payments/:accountNumber/receipt/:paymentId',
 };  
 
 

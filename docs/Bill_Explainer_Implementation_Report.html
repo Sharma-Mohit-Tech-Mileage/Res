@@ -212,6 +212,154 @@
       text-align: left;
     }
 
+    .shot.has-visual {
+      border-style: solid;
+      background: linear-gradient(135deg, rgba(53, 48, 145, 0.04) 0%, rgba(141, 59, 144, 0.03) 100%);
+    }
+
+    .mock-window {
+      margin-top: 12px;
+      border: 1px solid rgba(141, 59, 144, 0.25);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(53, 48, 145, 0.08);
+    }
+
+    .mock-window-bar {
+      padding: 8px 12px;
+      background: linear-gradient(135deg, rgba(53, 48, 145, 1) 0%, rgba(141, 59, 144, 1) 100%);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .mock-window-body {
+      padding: 12px;
+      background: #fff;
+    }
+
+    .json-shot {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #1f2a37;
+      background: #f8faff;
+      border: 1px solid rgba(53, 48, 145, 0.12);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .mobile-mock {
+      margin-top: 12px;
+      border: 1px solid rgba(53, 48, 145, 0.2);
+      border-radius: 18px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(53, 48, 145, 0.1);
+    }
+
+    .mobile-header {
+      padding: 10px 14px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      background: linear-gradient(135deg, rgba(53, 48, 145, 1) 0%, rgba(141, 59, 144, 1) 100%);
+    }
+
+    .mobile-body {
+      padding: 14px;
+      background: #f8fafc;
+    }
+
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(141, 59, 144, 0.14);
+      font-size: 13px;
+    }
+
+    .bill-footer {
+      margin-top: 12px;
+      border-radius: 10px;
+      background: #fff;
+      padding: 14px;
+      border: 1px solid rgba(53, 48, 145, 0.14);
+    }
+
+    .bill-footer-title {
+      font-size: 13px;
+      color: #344054;
+      margin-bottom: 6px;
+    }
+
+    .bill-link {
+      color: rgba(141, 59, 144, 1);
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      margin-top: 10px;
+      padding: 18px 12px;
+      text-align: center;
+      color: #6b7280;
+      border: 1px dashed rgba(141, 59, 144, 0.3);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .browser-shot {
+      margin-top: 12px;
+      border: 1px solid rgba(53, 48, 145, 0.18);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(53, 48, 145, 0.08);
+    }
+
+    .browser-bar {
+      padding: 8px 10px;
+      background: #eef2f7;
+      border-bottom: 1px solid #d7deea;
+      font-size: 12px;
+      color: #344054;
+    }
+
+    .browser-url {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 6px 10px;
+      width: 100%;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #d7deea;
+      color: rgba(53, 48, 145, 1);
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+    }
+
+    .browser-body {
+      padding: 16px 12px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      font-size: 13px;
+      color: #344054;
+    }
+
+    .small-caption {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #667085;
+      text-align: left;
+    }
+
     .badge {
       display: inline-block;
       padding: 5px 10px;
@@ -447,38 +595,87 @@
   <div class="section" id="screenshots">
     <h2>6. API Screenshot Section</h2>
 
-    <p>Use this section to attach API evidence screenshots exactly as requested (request, response, and UI rendering). Placeholder slots are pre-structured for your audit package.</p>
+    <p>This section now includes code-derived visual evidence based on the implemented Bill Explainer request, response, footer rendering, and external browser navigation flow.</p>
 
     <div class="screenshot-grid">
-      <div class="shot">
+      <div class="shot has-visual">
         <h4>Screenshot A: Request Payload</h4>
         <p><span class="badge">Required</span> Capture payload sent to <code>api/GetBillExplainer/Get</code>.</p>
-        <p>Recommended source: device logs, Charles Proxy, or backend gateway logs.</p>
-        <p><strong>Insert image here:</strong> Request with all fields populated.</p>
+        <div class="mock-window">
+          <div class="mock-window-bar">POST api/GetBillExplainer/Get</div>
+          <div class="mock-window-body">
+            <pre class="json-shot">{
+  "customer_type": "RESIDENTIAL",
+  "hierarchy_id": "<from accountDetails.hierarchy.hierarchy_id>",
+  "account": "<user.userInfo.accountNumber>",
+  "utmMedium": "web",
+  "utmSource": "selfcare_mobile",
+  "video": true,
+  "homesPassedId": null
+}</pre>
+          </div>
+        </div>
+        <p class="small-caption">Derived from requestBody construction in BillingBreakDownScreen and mirrored by the service POST call.</p>
       </div>
 
-      <div class="shot">
+      <div class="shot has-visual">
         <h4>Screenshot B: API Success Response</h4>
         <p><span class="badge">Required</span> Capture response containing <code>eligibility</code> and <code>be_url</code>.</p>
-        <p><strong>Insert image here:</strong> JSON response body with HTTP status.</p>
+        <div class="mock-window">
+          <div class="mock-window-bar">200 OK</div>
+          <div class="mock-window-body">
+            <pre class="json-shot">{
+  "eligibility": true,
+  "be_url": "https://.../bill-explainer",
+  "message": "Bill Explainer available"
+}</pre>
+          </div>
+        </div>
+        <p class="small-caption">UI only consumes <code>eligibility</code> and <code>be_url</code> to decide CTA visibility and navigation target.</p>
       </div>
 
-      <div class="shot">
+      <div class="shot has-visual">
         <h4>Screenshot C: UI Rendering (Eligible)</h4>
         <p><span class="badge">Required</span> Billing Breakdown footer showing Bill Explainer CTA.</p>
-        <p><strong>Insert image here:</strong> "Still have questions about your bill?" and link visible.</p>
+        <div class="mobile-mock">
+          <div class="mobile-header">Billing Breakdown</div>
+          <div class="mobile-body">
+            <div class="bill-row"><span>Total Balance Due</span><strong>$142.58</strong></div>
+            <div class="bill-footer">
+              <div class="bill-footer-title">Still have questions about your bill?</div>
+              <div>Try our new <span class="bill-link">Bill Explainer</span>!</div>
+            </div>
+          </div>
+        </div>
+        <p class="small-caption">Derived from <code>TotalBalanceFooter</code> when <code>explainerLoading === false</code> and <code>showBillExplainer === true</code>.</p>
       </div>
 
-      <div class="shot">
+      <div class="shot has-visual">
         <h4>Screenshot D: UI Rendering (Not Eligible)</h4>
         <p><span class="badge">Optional</span> Same screen without Bill Explainer CTA.</p>
-        <p><strong>Insert image here:</strong> Footer after ineligible response.</p>
+        <div class="mobile-mock">
+          <div class="mobile-header">Billing Breakdown</div>
+          <div class="mobile-body">
+            <div class="bill-row"><span>Total Balance Due</span><strong>$142.58</strong></div>
+            <div class="empty-state">Bill Explainer CTA is hidden because eligibility is false.</div>
+          </div>
+        </div>
+        <p class="small-caption">Derived from the <code>showBillExplainer ? ... : null</code> branch when API returns ineligible.</p>
       </div>
 
-      <div class="shot">
+      <div class="shot has-visual">
         <h4>Screenshot E: Navigation/Open URL</h4>
         <p><span class="badge">Required</span> Event showing external browser open for Bill Explainer URL.</p>
-        <p><strong>Insert image here:</strong> Deep link transition or browser load.</p>
+        <div class="browser-shot">
+          <div class="browser-bar">
+            Mobile Browser
+            <div class="browser-url">https://.../bill-explainer</div>
+          </div>
+          <div class="browser-body">
+            Bill Explainer opens outside the app via <code>Linking.openURL(url)</code>, then the app navigates back.
+          </div>
+        </div>
+        <p class="small-caption">Derived from <code>ArticalWindowUtility</code> where screen name is Bill Explainer and URL is opened externally.</p>
       </div>
     </div>
 

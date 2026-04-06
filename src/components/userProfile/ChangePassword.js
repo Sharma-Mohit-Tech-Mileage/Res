@@ -29,7 +29,7 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PutApiRequest , PostApiRequest} from "../../network/APIClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from "../utility/validationSchema"; 
@@ -121,14 +121,17 @@ const ChangePassword = () => {
       const user = await getUser();
 
       // Construct the request URL based on the user's billing type
-      const endpointUrl = getEndpoint(ENDPOINTS.RESET_PASSWORD);
+      const endpointUrl = getEndpoint(ENDPOINTS.RESET_PASSWORD, {
+        accountNumber: user.userInfo?.accountNumber,
+        userName: user.userInfo?.userName || user.userName,
+      });
 
       const body = { newPass:newPassword,confirmNewPass:newPassword };
 
       setLoading(true);
 
       // Call the PUT API request
-      PutApiRequest(
+      PostApiRequest(
         endpointUrl,
         body,
         (res) => {

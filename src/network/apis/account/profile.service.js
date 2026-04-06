@@ -18,10 +18,10 @@ const getProfileDetails = async () => {
   };
 
   return _axios
-    .get(getEndpoint(ENDPOINTS.PROFILE_DETAILS_BY_USERNAME, { userName }), { ...config })
+    .get(getEndpoint(ENDPOINTS.PROFILE_DETAILS_BY_ACCOUNTID, { accountNumber: data?.userInfo?.accountNumber }), { ...config })
     .then((res) => res.data)
     .catch((error) => {
-      console.error(`Error fetching ${getEndpoint(ENDPOINTS.PROFILE_DETAILS_BY_USERNAME, { userName })}`, error);
+      console.error(`Error fetching ${getEndpoint(ENDPOINTS.PROFILE_DETAILS_BY_ACCOUNTID, { accountNumber: data?.userInfo?.accountNumber })}`, error);
       throw error;
     });
 };
@@ -36,12 +36,12 @@ const fetchUserList = async () => {
   };
 
   return _axios
-    .get(`api/account/${accountNumber}/users`, { ...config })
+    .get(getEndpoint(ENDPOINTS.PROFILE_USERS, { accountNumber }), { ...config })
     .then((res) => {
       return res.data;
     })
     .catch((error) => {
-      console.error("Error fetching user list:", error);
+      console.error(`Error fetching ${getEndpoint(ENDPOINTS.PROFILE_USERS, { accountNumber })}`, error);
       throw error;
     });
 };
@@ -56,12 +56,12 @@ const fetchSmsSubscription = async () => {
   };
 
   return _axios
-    .get(`api/SMS/sms?AccountNumber=${accountNumber}`, { ...config })
+    .get(getEndpoint(ENDPOINTS.SMS_SUBSCRIPTION, { accountNumber }), { ...config })
     .then((res) => {
       return res.data;
     })
     .catch((error) => {
-      console.error("Error fetching SMS subscription:", error);
+      console.error(`Error fetching ${getEndpoint(ENDPOINTS.SMS_SUBSCRIPTION, { accountNumber })}`, error);
       throw error;
     });
 };
@@ -76,14 +76,14 @@ const fetchBillingStatus = async () => {
   };
 
   return _axios
-    .get(`account/api/account/${accountNumber}/paperless/status`, {
+    .get(getEndpoint(ENDPOINTS.BILLING_STATUS, { accountNumber }), {
       ...config,
     })
     .then((res) => {
       return res.data;
     })
     .catch((error) => {
-      console.error("Error fetching billing status:", error);
+      console.error(`Error fetching ${getEndpoint(ENDPOINTS.BILLING_STATUS, { accountNumber })}`, error);
       throw error;
     });
 };
@@ -98,7 +98,7 @@ const fetchPaperLessDetails = async () => {
   };
 
   return _axios
-    .get(`account/api/account/${accountNumber}/paperless`, { ...config })
+    .get(getEndpoint(ENDPOINTS.PAPERLESS_DETAILS, { accountNumber }), { ...config })
     .then((res) => {
       return res.data;
     })
@@ -118,12 +118,12 @@ const fetchPushNotifications = async () => {
   };
   try {
     const response = await _axios.get(
-      `api/mobilenotificationpreferences/${user.userInfo?.userName}/mobilepreferences/${accountNumber}`,
+      getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS_ACCOUNT, { userName: user.userInfo?.userName, accountNumber }),
       { ...config }
     );
     return response.data;
   } catch (error) {
-    console.error("Error fetching push notifications:", error);
+    console.error(`Error fetching ${getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS_ACCOUNT, { userName: user.userInfo?.userName, accountNumber })}:`, error);
     throw error;
   }
 };
@@ -132,7 +132,7 @@ const fetchPushNotifications = async () => {
 const updateProfileSecurity = async (data) => {
   const user = await getUser();
   const userName = user.userInfo?.userName || user.userName || null;
-  const endpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTION_UPDATE, { userName });
+  const endpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTION_UPDATE, { userName ,accountNumber: user.userInfo?.accountNumber});
   const config = {
     headers: {
       Authorization: "Bearer " + user.token,
@@ -143,7 +143,7 @@ const updateProfileSecurity = async (data) => {
     const response = await _axios.patch(endpoint, data, config);
     return response.data;
   } catch (error) {
-    console.error("Error updating profile security:", error);
+    console.error(`Error updating ${endpoint}:`, error);
     throw error;
   }
 };
@@ -159,7 +159,7 @@ const postProfileInfo = async (data) => {
       },
     };
 
-    const response = await _axios.put(`api/profile`, data, config);
+    const response = await _axios.put(getEndpoint(ENDPOINTS.PROFILE_INFO_UPDATE), data, config);
 
     return response.data;
   } catch (error) {
@@ -187,10 +187,10 @@ const postTextNotifictionInfo = async (data) => {
   };
   console.log("Making API Call to api/SMS with data:", postData); // Log the request data
   try {
-    const response = await _axios.post(`api/SMS`, postData, config);
+    const response = await _axios.post(getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION), postData, config);
     return response.data;
   } catch (error) {
-    console.error("API Call Failed, Error:", error); // Log the error
+    console.error(`Error in API Call to ${getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION)}:`, error); // Log the error
     throw error;
   }
 };
@@ -206,19 +206,19 @@ const putEmailNotification = async (email) => {
 
   try {
     const response = await _axios.put(
-      `api/account/${accountNumber}/paperless/${email}`,
+      getEndpoint(ENDPOINTS.PAPERLESS_EMAIL_NOTIFICATION, { accountNumber, email }),
       {},
       config
     );
 
     console.log(
-      `API Call Successful to api/account/${accountNumber}/paperless/${email}, Response:`,
+      `API Call Successful to ${getEndpoint(ENDPOINTS.PAPERLESS_EMAIL_NOTIFICATION, { accountNumber, email })}, Response:`,
       response
     );
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to api/account/${accountNumber}/paperless/${email}:`,
+      `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_EMAIL_NOTIFICATION, { accountNumber, email })}:`,
       error
     );
     throw error;
@@ -236,19 +236,19 @@ const resendEmailVerification = async () => {
 
   try {
     const response = await _axios.post(
-      `api/account/${accountNumber}/paperless/resend`,
+      getEndpoint(ENDPOINTS.PAPERLESS_RESEND_VERIFICATION, { accountNumber }),
       {},
       config
     );
 
     console.log(
-      `API Call Successful to api/account/${accountNumber}/paperless/resend, Response:`,
+      `API Call Successful to ${getEndpoint(ENDPOINTS.PAPERLESS_RESEND_VERIFICATION, { accountNumber })}, Response:`,
       response
     );
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to api/account/${accountNumber}/paperless/resend:`,
+      `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_RESEND_VERIFICATION, { accountNumber })}:`,
       error
     );
     throw error;
@@ -266,20 +266,20 @@ const postEmailNotification = async (email) => {
 
   try {
     const response = await _axios.post(
-      `api/account/${accountNumber}/paperless/${email}`,
+      getEndpoint(ENDPOINTS.PAPERLESS_ENROLL, { accountNumber, emailAddress: email }),
       {},
       config
     );
 
     console.log(
-      `API Call Successful to api/account/${accountNumber}/paperless, Response:`,
+      `API Call Successful to ${getEndpoint(ENDPOINTS.PAPERLESS_ENROLL, { accountNumber, emailAddress: email })}, Response:`,
       response
     );
     return response;
   } catch (error) {
     // Log the error with a descriptive message
     console.error(
-      `Error in API Call to api/account/${accountNumber}/paperless:`,
+      `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_ENROLL, { accountNumber, emailAddress: email })}:`,
       error
     );
     throw error;
@@ -298,7 +298,7 @@ const postTermsAndConditions = async (flag) => {
 
   try {
     const response = await _axios.put(
-      `api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}`,
+      getEndpoint(ENDPOINTS.MOBILE_TC_FLAG, { accountNumber, userName, flag }),
       {},
       config
     );
@@ -306,7 +306,7 @@ const postTermsAndConditions = async (flag) => {
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`,
+      `Error in API Call to ${getEndpoint(ENDPOINTS.MOBILE_TC_FLAG, { accountNumber, userName, flag })}:`,
       error
     );
     throw error;
@@ -336,18 +336,18 @@ const postTermsAndConditionsv2 = async (flag) => {
   };
   try {
     const response = await _axios.put(
-      "api/Mobile/UpdateMobileAspnetUserData",
+      getEndpoint(ENDPOINTS.MOBILE_TC_UPDATE_USERDATA),
       payload,
       config
     );
     console.log(
-      `API Call Successful to api/Mobile/UpdateMobileAspnetUserData, Response:`,
+      `API Call Successful to ${getEndpoint(ENDPOINTS.MOBILE_TC_UPDATE_USERDATA)}, Response:`,
       response
     );
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to api/Mobile/UpdateMobileAspnetUserData:`,
+      `Error in API Call to ${getEndpoint(ENDPOINTS.MOBILE_TC_UPDATE_USERDATA)}:`,
       error
     );
     throw error;
@@ -373,7 +373,7 @@ const postPushNotifications = async (data) => {
 
   try {
     const response = await _axios.post(
-      `api/mobilenotificationpreferences/${userName}/mobilepreferences`,
+      getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName, accountNumber }),
       data,
       config
     );
@@ -381,7 +381,7 @@ const postPushNotifications = async (data) => {
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to api/mobilenotificationpreferences/${userName}/mobilepreferences`,
+      `Error in API Call to ${getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName, accountNumber })}`,
       error
     );
     throw error;
@@ -399,14 +399,14 @@ const unsubscribPaperLess = async () => {
   };
   try {
     const response = await _axios.put(
-      `account/api/account/${accountNumber}/paperless/unsubscribe`,
+      getEndpoint(ENDPOINTS.PAPERLESS_UNENROLL, { accountNumber, email: user.userInfo?.email }),
       {},
       config
     );
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to account/api/account/${accountNumber}/paperless/unsubscribe:`,
+      `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_UNENROLL, { accountNumber, email: user.userInfo?.email })}:`,
       error
     );
     throw error;
@@ -522,7 +522,7 @@ const handleSubmitFeedback = async (obj) => {
 
 const logError = async (errorData) => {
   try {
-    await _axios.post("api/log/error", errorData);
+    await _axios.post(getEndpoint(ENDPOINTS.LOG_ERROR), errorData);
     console.log("Error logged successfully");
   } catch (logErr) {
     console.error("Failed to log error:", logErr);
@@ -531,7 +531,7 @@ const logError = async (errorData) => {
 
 const logInfo = async (infoData) => {
   try {
-    const response = await _axios.post("api/log/info", infoData);
+    const response = await _axios.post(getEndpoint(ENDPOINTS.LOG_INFO), infoData);
     console.log("Info logged successfully");
   } catch (logErr) {
     console.error("Requested BASE URL:", Config.BASE_URL);
@@ -551,7 +551,7 @@ const addUserAction = async (data) => {
   };
 
   try {
-    const response = await _axios.post("api/users", data, config);
+    const response = await _axios.post(getEndpoint(ENDPOINTS.USERS_BASE), data, config);
     console.log("API Call Successful, Response:", response.data);
     return response.data;
   } catch (error) {
@@ -573,7 +573,7 @@ const editUserAction = async (data) => {
 
   try {
     const response = await _axios.put(
-      `api/users/${data.userName}`,
+      getEndpoint(ENDPOINTS.USERS_BY_USERNAME, { userName: data.userName }),
       data,
       config
     );
@@ -594,11 +594,11 @@ const removeUser = async (data) => {
     },
   };
 
-  console.log(`api/users/remove/${data.accountNumber}/${data.userName}`); // Log the request data
+  console.log(getEndpoint(ENDPOINTS.USERS_REMOVE, { accountNumber: data.accountNumber, userName: data.userName })); // Log the request data
 
   try {
     const response = await _axios.put(
-      `api/users/remove/${data.accountNumber}/${data.userName}`,
+      getEndpoint(ENDPOINTS.USERS_REMOVE, { accountNumber: data.accountNumber, userName: data.userName }),
       data,
       config
     );
@@ -617,18 +617,16 @@ const fetchAllSvEmails = async (data) => {
       Authorization: "Bearer " + user.token,
     },
   };
-  console.log(`api/email/${accountNumber}/GetAllSVEmails`);
-  try {
-    const response = await _axios.get(
-      `api/email/${accountNumber}/GetAllSVEmails`,
-      config
-    );
-    console.log("API Call Successful, Response:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("API Call Failed, Error:", error); // Log the error
-    throw error;
-  }
+  const requestUrl = getEndpoint(ENDPOINTS.SV_EMAILS_GET_ALL, { accountNumber });
+   console.log(`Making API Call to ${requestUrl}`); // Log the request URL
+   try {
+     const response = await _axios.get(requestUrl, config);
+     console.log("API Call Successful, Response:", response.data); // Log the successful response
+     return response.data;
+   } catch (error) {
+     console.error("API Call Failed, Error:", error); // Log the error
+     throw error;
+     }
 };
 
 const addSVEmailNoFlags = async (email) => {
@@ -642,7 +640,7 @@ const addSVEmailNoFlags = async (email) => {
 
   try {
     const response = await _axios.post(
-      `mobile/api/email/${accountNumber}/${email}/AddSVEmailNoFlags`,
+      getEndpoint(ENDPOINTS.SV_EMAIL_ADD_NO_FLAGS, { accountNumber, email }),
       {},
       config
     );
@@ -671,7 +669,7 @@ const deleteSVEmail = async (email) => {
 
   try {
     const response = await _axios.post(
-      `mobile/api/email/${accountNumber}/${email}/DeleteSVEmail`,
+      getEndpoint(ENDPOINTS.SV_EMAIL_DELETE, { accountNumber, email }),
       {},
       config
     );
@@ -722,11 +720,9 @@ const manageSVEmails = async (emailList) => {
     };
     console.log("Request Config:", config);
     console.log("Email List:", emailList);
-    const response = await _axios.post(
-      `mobile/api/email/${accountNumber}/UpdateSVEmails`,
-      emailList,
-      config
-    );
+    const requestUrl = getEndpoint(ENDPOINTS.SV_EMAIL_UPDATE, { accountNumber });
+    console.log(`Making API Call to ${requestUrl}`);
+    const response = await _axios.post(requestUrl, emailList, config);
     console.log("Response Data:", response.data);
     return response.data;
   } catch (error) {
@@ -743,11 +739,9 @@ const addSVEmailMktFlag = async (email) => {
     },
   };
   try {
-    const response = await _axios.post(
-      `api/email/${accountNumber}/${email}/AddSVEmailMktFlag`,
-      {},
-      config
-    );
+    const requestUrl = getEndpoint(ENDPOINTS.SV_EMAIL_ADD_MKT_FLAG, { accountNumber, email });
+    console.log(`Making API Call to ${requestUrl}`);
+    const response = await _axios.post(requestUrl, {}, config);
     console.log(
       `API Call Successful to add SV email marketing flag: ${email}`,
       response.data
@@ -764,10 +758,10 @@ const addSVEmailMktFlag = async (email) => {
 
 const isPaperlessEnabled = async (email, signal) => {
   const user = await getUser();
+  const emailParam = encodeURIComponent(email);
+  const requestUrl = getEndpoint(ENDPOINTS.PAPERLESS_IS_ENABLED, { accountNumber: user.userInfo?.accountNumber, email: emailParam });
   const response = await _axios.get(
-    `api/Paperless/IsPaperless?account=${
-      user.userInfo.accountNumber
-    }&email=${encodeURIComponent(email)}`,
+    requestUrl,
     {
       headers: { Authorization: `Bearer ${user.token}` },
       signal, 
@@ -791,7 +785,7 @@ const fetchACPUserAccountDetails = async (signal) => {
     signal: signal,
   };
 
-  const requestUrl = `api/Accounts/GetAccountDetails`;
+  const requestUrl = getEndpoint(ENDPOINTS.ACCOUNTS_DETAILS);
   const data = {
     accountNumber: accountNumber,
     fieldList: [

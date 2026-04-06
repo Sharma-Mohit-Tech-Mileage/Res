@@ -147,11 +147,12 @@ const PasswordSecurityEdit = () => {
           setSecurityQuestionsNew(res);
           checkCustomSecurityQuestion(res);
         }
-
       },
+      
       (error) => console.log(error)
     );
   };
+
 
   const checkCustomSecurityQuestion = (questions) => {
     const storedQuestion = profileDetails.securityQuestion;

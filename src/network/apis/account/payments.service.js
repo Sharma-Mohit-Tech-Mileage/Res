@@ -1,6 +1,6 @@
 import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-
+import { getEndpoint,ENDPOINTS } from "../endpoints/Endpoints";
 // API service for payment history
 const paymentHistoryApi = {
   /**
@@ -18,7 +18,8 @@ const paymentHistoryApi = {
       };
       
       // Use the actual API endpoint from your requirements
-      const response = await _axios.get(`api/payments/${accountNumber}/paymentHistory`, {...config});
+      const requestUrl = getEndpoint(ENDPOINTS.PAYMENTS_HISTORY, { accountNumber });
+      const response = await _axios.get(requestUrl, {...config});
       return response.data;
     } catch (error) {
       console.error("Error fetching payment history:", error);
@@ -41,10 +42,8 @@ const paymentHistoryApi = {
         },
       };
       
-      const response = await _axios.get(
-        `api/payments/${accountNumber}/receipt/${paymentId}`,
-        {...config}
-      );
+      const requestUrl = getEndpoint(ENDPOINTS.PAYMENT_RECEIPT, { accountNumber, paymentId });
+      const response = await _axios.get(requestUrl, {...config});
       
       return response.data;
     } catch (error) {
