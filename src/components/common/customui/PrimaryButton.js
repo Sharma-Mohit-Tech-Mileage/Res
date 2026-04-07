@@ -3,10 +3,6 @@ import { Text, Pressable, StyleSheet, View } from 'react-native';
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../../GlobalStyles";
 
 const PrimaryButtom = ({ title, onPress, buttonType, accessibilityLabel }) => {
-  const buttonStyles = [
-    buttonType === 'submit' ? styles.button : styles.canbutton,
-    buttonType === 'submit' ? styles.submitButton : null,
-  ];
   const textStyles = [buttonType === 'submit' ? styles.submitText : styles.cancelText];
 
   return (
@@ -14,7 +10,11 @@ const PrimaryButtom = ({ title, onPress, buttonType, accessibilityLabel }) => {
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel !== undefined ? accessibilityLabel : undefined}
-        style={buttonStyles}
+        style={({ pressed }) => [
+          buttonType === 'submit' ? styles.button : styles.canbutton,
+          buttonType === 'submit' ? styles.submitButton : null,
+          pressed && styles.pressed,
+        ]}
         onPress={onPress}
       >
         <Text style={textStyles}>{title}</Text>
@@ -46,13 +46,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Color.sparklightWhite,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "700",
   },
   cancelText: {
     textAlign: "center",
     color: Color.colorMidnightblue,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
+  },
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.97 }],
   },
 });
 

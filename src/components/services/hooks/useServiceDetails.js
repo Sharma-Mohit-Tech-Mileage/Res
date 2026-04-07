@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchServiceDetailsRequest } from '../../../redux/actions/servicesActions';
 import { 
@@ -19,11 +19,11 @@ export const useServiceDetails = (accountNumber) => {
     }
   }, [accountNumber, dispatch]);
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
     if (accountNumber) {
       dispatch(fetchServiceDetailsRequest(accountNumber));
     }
-  };
+  }, [accountNumber, dispatch]);
 
   return {
     data,

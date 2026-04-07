@@ -884,7 +884,6 @@ const CancellationSummary = ({ navigation, route }) => {
                       : "#D0D5DD",
                 }}
                 accessible={false}
-                importantForAccessibility="no"
               />
               <Text
                 style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
@@ -1035,7 +1034,8 @@ const styles = {
   },
   makeTypo: {
     width: 282,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "700",
     fontSize: FontSize.size_base,
     textAlign: "center",
   },

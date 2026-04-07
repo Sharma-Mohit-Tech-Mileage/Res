@@ -49,3 +49,49 @@ export const selectOutageError = createSelector(
   [getServicesState],
   (servicesState) => servicesState.outageError
 );
+
+// ========== Data Usage Selectors ==========
+export const selectCurrentUsage = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.currentUsage
+);
+
+export const selectCurrentUsageLoading = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.currentUsageLoading
+);
+
+export const selectCurrentUsageError = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.currentUsageError
+);
+
+export const selectMonthlyUsage = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.monthlyUsage
+);
+
+export const selectMonthlyUsageLoading = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.monthlyUsageLoading
+);
+
+export const selectDailyUsage = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.dailyUsage
+);
+
+export const selectDailyUsageLoading = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.dailyUsageLoading
+);
+
+export const selectUsagePeriods = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.usagePeriods
+);
+
+export const selectUsagePeriodsLoading = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.usagePeriodsLoading
+);

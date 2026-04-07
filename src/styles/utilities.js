@@ -131,6 +131,6 @@ export const button = {
     fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
-    color: theme.colors.text.white,
+    color: theme.colors.white,
   },
 };
