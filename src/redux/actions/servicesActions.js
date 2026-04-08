@@ -39,3 +39,65 @@ export const clearOutageData = () => ({
 export const clearServicesError = () => ({
   type: types.CLEAR_SERVICES_ERROR
 });
+
+// ========== Data Usage Actions ==========
+export const fetchCurrentUsageRequest = () => ({
+  type: types.FETCH_CURRENT_USAGE_REQUEST,
+});
+
+export const fetchCurrentUsageSuccess = (data) => ({
+  type: types.FETCH_CURRENT_USAGE_SUCCESS,
+  payload: { data },
+});
+
+export const fetchCurrentUsageFailure = (error) => ({
+  type: types.FETCH_CURRENT_USAGE_FAILURE,
+  payload: { error },
+});
+
+export const fetchMonthlyUsageRequest = () => ({
+  type: types.FETCH_MONTHLY_USAGE_REQUEST,
+});
+
+export const fetchMonthlyUsageSuccess = (data) => ({
+  type: types.FETCH_MONTHLY_USAGE_SUCCESS,
+  payload: { data },
+});
+
+export const fetchMonthlyUsageFailure = (error) => ({
+  type: types.FETCH_MONTHLY_USAGE_FAILURE,
+  payload: { error },
+});
+
+export const fetchDailyUsageRequest = (startDate, endDate) => ({
+  type: types.FETCH_DAILY_USAGE_REQUEST,
+  payload: { startDate, endDate },
+});
+
+export const fetchDailyUsageSuccess = (data) => ({
+  type: types.FETCH_DAILY_USAGE_SUCCESS,
+  payload: { data },
+});
+
+export const fetchDailyUsageFailure = (error) => ({
+  type: types.FETCH_DAILY_USAGE_FAILURE,
+  payload: { error },
+});
+
+export const fetchUsagePeriodsRequest = () => ({
+  type: types.FETCH_USAGE_PERIODS_REQUEST,
+});
+
+export const fetchUsagePeriodsSuccess = (data) => ({
+  type: types.FETCH_USAGE_PERIODS_SUCCESS,
+  payload: { data },
+});
+
+export const fetchUsagePeriodsFailure = (error) => ({
+  type: types.FETCH_USAGE_PERIODS_FAILURE,
+  payload: { error },
+});
+
+export const clearDataUsage = () => ({
+  type: types.CLEAR_DATA_USAGE,
+});

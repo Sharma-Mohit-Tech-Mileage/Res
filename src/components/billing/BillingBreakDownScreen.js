@@ -19,24 +19,18 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AppStyles from "../utility/AppStyles";
-import { PostApiRequest } from "../../network/APIClient";
-import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
-
+import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActions";
 import {
   selectBillingBreakDownLoading,
   selectBillingBreakDownData,
   selectBillingBreakDownError,
-  selectBillExplainerData,
 } from "../../redux/selectors/billingBreakdownSelectors";
-
 import { InfoIcon } from "native-base";
 import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
 import SecondaryButton from "../common/customui/PrimaryButton";
 import LoadingOverlay from "../common/customui/CustomLoading";
-import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-
 
 // Constants
 const PLACEHOLDER_MESSAGE =
@@ -122,7 +116,10 @@ const DetailItem = memo(({ detail }) => {
   const textStyle = isDiscount ? { color: styles.colorGreen } : {};
 
   return (
-    <View style={[styles.detailRow, styles.detailItemBorder]}>
+    <View
+      style={[styles.detailRow, styles.detailItemBorder]}
+      
+    >
       <View style={styles.detailLabelContainer80}>
         <Text
           style={[styles.detailLabelNormal, textStyle]}
@@ -136,13 +133,7 @@ const DetailItem = memo(({ detail }) => {
         {hasExpiryDate && (
           <View style={styles.discountExpiryContainer}>
             <InfoIcon size="xs" color={Color.colorGray_200} />
-            <Text
-              style={styles.discountExpiryText}
-              accessible={true}
-              accessibilityLabel={`Discount expires on ${moment(
-                detail.endDate,
-              ).format(DEFAULT_DATE_FORMAT)}`}
-            >
+            <Text style={styles.discountExpiryText} accessible={true} accessibilityLabel={`Discount expires on ${moment(detail.endDate).format(DEFAULT_DATE_FORMAT)}`}>
               Discount expires on{" "}
               {moment(detail.endDate).format(DEFAULT_DATE_FORMAT)}
             </Text>
@@ -154,7 +145,7 @@ const DetailItem = memo(({ detail }) => {
           style={[styles.detailValueNormal, textStyle]}
           numberOfLines={2}
           ellipsizeMode="tail"
-          accessible={true}
+           accessible={true}
           accessibilityLabel={`${parseFloat(detail.amount).toFixed(2)}`}
         >
           ${parseFloat(detail.amount).toFixed(2)}
@@ -172,7 +163,7 @@ const BreakDownItem = memo(({ item }) => {
   if (!item || !item.header) return null;
 
   return (
-    <View style={styles.paymentRow}>
+    <View style={styles.paymentRow} >
       {/* Header section */}
       <View style={styles.paymentDetails}>
         <View style={styles.detailRow}>
@@ -182,8 +173,7 @@ const BreakDownItem = memo(({ item }) => {
               numberOfLines={2}
               ellipsizeMode="tail"
               accessible={true}
-              accessibilityRole="header"
-              accessibilityLevel={2}
+              accessibilityRole="header" accessibilityLevel={2} 
             >
               {item.header.description}
             </Text>
@@ -220,87 +210,12 @@ const BreakDownItem = memo(({ item }) => {
 /**
  * Footer component showing the total balance due
  */
-const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillExplainerLink , navigation, explainerLoading }) => (
-  <>
-    <View style={[styles.detailRow, styles.footerContainer]}>
-      <Text
-        style={styles.totalBalanceLabel}
-        accessible={true}
-        accessibilityLabel="Total Balance Due"
-      >
-        Total Balance Due
-      </Text>
-      <Text
-        style={styles.totalBalanceValue}
-        accessible={true}
-        accessibilityLabel={`${totalAmount.toFixed(2)}`}
-      >
-        ${totalAmount.toFixed(2)}
-      </Text>
-      <View style={[styles.detailItemBorder, styles.totalBalanceSeparator]} />
-    </View>
-    {explainerLoading ? (
-      <View style={styles.billPlanermainContainer}>
-        <SkeletonPlaceholder>
-          <View
-            style={{
-              width: wp("80%"),
-              height: 20,
-              borderRadius: 4,
-              marginBottom: 8,
-            }}
-          />
-          <View
-            style={{
-              width: wp("60%"),
-              height: 20,
-              borderRadius: 4,
-            }}
-          />
-        </SkeletonPlaceholder>
-      </View>
-    ) : showBillExplainer ? (
-      <View style={styles.billPlanermainContainer}>
-        <Text style={styles.billExplainerText}>
-          Still have questions about your bill?
-        </Text>
-       <View style={{ flexDirection: "row" }}>
-        <Text style={styles.billExplainerText}>
-          Try our new{' '}
-        </Text>
-        <View style={{ flexDirection: "row" }}>
-          <Text
-            accessibilityRole="link"
-            accessibilityLabel="Open Bill Explainer"
-            accessibilityHint="Double tap to open link"
-            accessible={true}
-            style={styles.billExplainerLinkText}
-            onPress={() => renderBillExplainerLink(navigation)}
-          >
-            Bill Explainer
-          </Text>
-          <Text accessible={false} importantForAccessibility="no" style={[styles.billExplainerLinkText, { textDecorationLine: 'none' }]}>!</Text>
-        </View>
-        </View>
-      </View>
-    ) : null}
-    <View style={[styles.detailItemBorder]} />
-  </>
+const TotalBalanceFooter = memo(({ totalAmount }) => (
+  <View style={[styles.detailRow, styles.footerContainer]}>
+    <Text style={styles.totalBalanceLabel} accessible={true} accessibilityLabel="Total Balance Due">Total Balance Due</Text>
+    <Text style={styles.totalBalanceValue} accessible={true} accessibilityLabel={`${totalAmount.toFixed(2)}`}>${totalAmount.toFixed(2)}</Text>
+  </View>
 ));
-
-/**
- * Handler for Bill Explainer link press
- */
-const renderBillExplainerLink = (data, navigation) => {
-  if (!data?.be_url) {  
-    console.error("Bill Explainer link is not available");
-    return;
-  }
-  navigation.navigate('ArticalWindowUtility', {
-    name: "Bill Explainer",
-    url: data.be_url,
-  });
-};
 
 /**
  * Empty state component when no billing data is available
@@ -334,19 +249,9 @@ const BillingBreakDownScreen = ({ navigation }) => {
   // Redux state and dispatch
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.userData);
-  const accountDetails = useSelector((state) => state.profile?.accountDetails);
-  
   const loading = useSelector(selectBillingBreakDownLoading);
   const billingData = useSelector(selectBillingBreakDownData);
-  const error = useSelector(selectBillingBreakDownError)
-
-  //const billExplainerData = useSelector(selectBillExplainerData);
-  const [billExplainerData, setBillExplainerData] = useState(null);
-  
-  const [showBillExplainer, setShowBillExplainer] = useState(false);
-  const [explainerLoading, setExplainerLoading] = useState(true);
-
- 
+  const error = useSelector(selectBillingBreakDownError);
   // Local state
   const [totalDue, setTotalDue] = useState(0);
   const [errorCode, setErrorCode] = useState("");
@@ -354,6 +259,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
   // Calculate total due whenever billing data changes
   useEffect(() => {
+    console.log("Billing Data:", billingData);
     if (!billingData?.length) return;
 
     // Reset total first
@@ -368,62 +274,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
     setTotalDue(calculatedTotal);
   }, [billingData]);
-
-
-   useEffect(() => {
-    console.log("Account Details1:", accountDetails);
-    if (!accountDetails?.hierarchy?.hierarchy_id) {
-       setExplainerLoading(true);
-      let requestBody = {
-          customer_type: accountDetails?.customer_type,
-          hierarchy_id: accountDetails?.hierarchy?.hierarchy_id,    
-          account: user?.userInfo?.accountNumber,
-          utmMedium: "web",
-          utmSource: "selfcare_mobile",
-          video: accountDetails?.services?.video,
-          homesPassedId: accountDetails?.homes_passed_id || null
-    }
-   
-    //dispatch(fetchBillExplainer(requestBody));
-    getBillExplainerData(requestBody);
-    }else{
-      setShowBillExplainer(false);
-      setExplainerLoading(false);
-    }
-  }, [accountDetails]);
-
-
-
-  // useEffect(() => {
-  //   console.log("Bill Explainer Data:", billExplainerData);
-  //   if(!billExplainerData?.eligibility){
-  //     setShowBillExplainer(false);
-  //   }else{
-  //     setShowBillExplainer(true);
-  //   }
-  //   setExplainerLoading(false);
-  // }, [billExplainerData]);
-
-  const getBillExplainerData =(requestBody) => {  
-    setExplainerLoading(true);
-    PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
-      console.log("Bill Explainer Response:", res);
-      setBillExplainerData(res);
-      if(res?.eligibility){
-        setShowBillExplainer(true);
-
-      }else{
-        setShowBillExplainer(false);
-      }
-      setExplainerLoading(false);
-      }, (error) => { 
-        setShowBillExplainer(false);
-        setExplainerLoading(false);
-        console.error("Bill Explainer Error:", error);
-      }
-
-    )
-  };
 
   // Fetch billing data when screen is focused
   useFocusEffect(
@@ -443,7 +293,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
       return () => {
         // Cleanup if needed
       };
-    }, [dispatch]),
+    }, [dispatch])
   );
   useEffect(() => {
     console.log("Error:123", errorCode);
@@ -462,7 +312,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
   // Memoized key extractor for FlatList
   const keyExtractor = useCallback(
     (item, index) => `billing-item-${index}`,
-    [],
+    []
   );
 
   // Render content based on state
@@ -486,7 +336,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         maxToRenderPerBatch={10}
         initialNumToRender={5}
         windowSize={5}
-        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={explainerLoading} />}
+        ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} />}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
     );
@@ -519,7 +369,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
                 message={userMsg}
                 showCloseIcon={false}
                 isVisible={true}
-                autoFocusTitle={true}
                 accessibilityLabel={userMsg}
                 accessibilityLiveRegion="polite"
                 accessibilityRole="alert"
@@ -703,17 +552,12 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
     fontWeight: "700",
-    flex: 3,
-    textAlign: "right",
   },
   warningAlert: {
     borderLeftWidth: 4,
     borderLeftColor: "#FF9800",
     marginBottom: 0,
     borderRadius: 0,
-  },
-  totalBalanceSeparator: {
-    marginBottom: Padding.p_13xl,
   },
   buttonsLayout: {
     paddingHorizontal: 0,
@@ -727,7 +571,8 @@ const styles = StyleSheet.create({
   },
   makeTypo: {
     width: 282,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "700",
     fontSize: FontSize.size_base,
     textAlign: "center",
   },
@@ -745,34 +590,6 @@ const styles = StyleSheet.create({
     marginTop: Padding.p_base,
     alignSelf: "stretch",
   },
-  billPlanermainContainer: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",   
-    padding: Padding.p_xs,
-    borderColor: Color.sparklightGray,
-    borderTopWidth: 0.5,
-    marginTop: 8,
-    marginBottom: 8,
-  },
-
-  billExplainerText: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: 18,
-    lineHeight: 26,
-    textAlign: "center",
-    color: Color.colorGray_100,
-  },
-
-  billExplainerLinkText: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: 18,
-    lineHeight: 26,
-    textAlign: "center",
-    color: Color.sparklightBrightPurple,
-    textDecorationLine: "underline",
-  },
-
   colorGreen: "#0C8306",
 });
 

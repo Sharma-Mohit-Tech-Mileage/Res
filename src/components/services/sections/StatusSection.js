@@ -1,44 +1,104 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Animated, Easing } from "react-native";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { statusSection } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
 import NotificationAlert from "../../common/customui/NotificationAlert";
-import SupportIcon from "../../../res/svgIcons/SupportIcon";
 import SecondaryButton from "../../common/customui/PrimaryButton";
-import SmallLoader from "../../common/customui/SmallLoader";
 
-const WiFiLoadingAnimation = ({ isAnimating = false }) => {
+// Sparklight brand purples
+const RING_OUTER = "#ba92bf";
+const RING_MIDDLE = "#9e61a2";
+const DOT_INNER = "#8e3c91";
+
+const ICON_SIZE = 88;
+const RING_WIDTH = 4;
+const OUTER_SIZE = 72;
+const MIDDLE_SIZE = 48;
+const INNER_SIZE = 26;
+
+/**
+ * Sparklight concentric-ring status icon.
+ *
+ * Always shows concentric rings + globe in center.
+ * When idle      → rings are static
+ * When animating → rings spin (outer CW, middle CCW), globe stays centered
+ */
+const StatusIcon = ({ isAnimating = false }) => {
+  const outerAnim = useRef(new Animated.Value(0)).current;
+  const middleAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isAnimating) {
+      const outer = Animated.loop(
+        Animated.timing(outerAnim, {
+          toValue: 1,
+          duration: 4000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      );
+      const middle = Animated.loop(
+        Animated.timing(middleAnim, {
+          toValue: 1,
+          duration: 2000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      );
+      outer.start();
+      middle.start();
+      return () => {
+        outer.stop();
+        middle.stop();
+      };
+    } else {
+      outerAnim.setValue(0);
+      middleAnim.setValue(0);
+    }
+  }, [isAnimating]);
+
+  const outerRotate = outerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "1600deg"],
+  });
+
+  const middleRotate = middleAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "-1600deg"],
+  });
+
   return (
     <View
       accessible={false}
       importantForAccessibility="no-hide-descendants"
       accessibilityElementsHidden={true}
+      style={styles.iconContainer}
     >
-      {!isAnimating ? (
-        <SupportIcon
-          color={theme.colors.primary}
-          filled={true}
-          size={28}
-        />
-      ) : (
-        <View style={styles.animationContainer}>
-          <View style={styles.lottieWrapper}>
-            <SmallLoader
-              isWhite={false}
-              width={210}
-              height={210}
-            />
-          </View>
+      {/* Outer ring */}
+      <Animated.View
+        style={[
+          styles.ring,
+          styles.outerRing,
+          isAnimating ? { transform: [{ rotate: outerRotate }] } : null,
+        ]}
+      />
 
-          <View style={styles.centerIcon}>
-            <SupportIcon
-              color={theme.colors.primary}
-              filled={true}
-              size={28}
-            />
-          </View>
-        </View>
-      )}
+      {/* Middle ring */}
+      <Animated.View
+        style={[
+          styles.ring,
+          styles.middleRing,
+          isAnimating ? { transform: [{ rotate: middleRotate }] } : null,
+        ]}
+      />
+
+      {/* Globe icon in center */}
+      <MaterialCommunityIcons
+        name="earth"
+        size={INNER_SIZE + 4}
+        color={DOT_INNER}
+      />
     </View>
   );
 };
@@ -75,21 +135,17 @@ const StatusSection = ({
 
         <View
           style={styles.iconWrapper}
-           accessible={false}
-      importantForAccessibility="no-hide-descendants"
-      accessibilityElementsHidden={true}
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
+          accessibilityElementsHidden={true}
           accessibilityLabel={
             checking
               ? "Checking service status, loading animation"
-              : "Support icon"
+              : "Service status icon"
           }
         >
-          <View style={styles.iconBadge} >
-            <WiFiLoadingAnimation
-              isAnimating={checking}
-              accessible={false}
-              importantForAccessibility="no"
-            />
+          <View style={styles.iconBadge}>
+            <StatusIcon isAnimating={checking} />
           </View>
         </View>
 
@@ -133,32 +189,43 @@ const styles = StyleSheet.create({
   card: statusSection.card,
   alertInsideCard: statusSection.alertInsideCard,
   iconWrapper: statusSection.iconWrapper,
-  iconBadge: statusSection.iconBadge,
+  iconBadge: {
+    ...statusSection.iconBadge,
+    backgroundColor: "transparent",
+  },
   title: statusSection.title,
   subtitle: statusSection.subtitle,
 
-  animationContainer: {
-    width: 90,
-    height: 90,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-
-  lottieWrapper: {
-    position: "absolute",
-    width: 90,
-    height: 90,
+  iconContainer: {
+    width: ICON_SIZE,
+    height: ICON_SIZE,
     alignItems: "center",
     justifyContent: "center",
   },
 
-  centerIcon: {
+  // Shared ring base — left/right borders visible, top/bottom transparent (horizontal)
+  ring: {
     position: "absolute",
-    zIndex: 10,
-    alignItems: "center",
-    justifyContent: "center",
+    borderWidth: RING_WIDTH,
+    borderTopColor: "transparent",
+    borderBottomColor: "transparent",
+    borderRadius: 999,
   },
+
+  outerRing: {
+    width: OUTER_SIZE,
+    height: OUTER_SIZE,
+    borderLeftColor: RING_OUTER,
+    borderRightColor: RING_OUTER,
+  },
+
+  middleRing: {
+    width: MIDDLE_SIZE,
+    height: MIDDLE_SIZE,
+    borderLeftColor: RING_MIDDLE,
+    borderRightColor: RING_MIDDLE,
+  },
+
 });
 
 export default StatusSection;

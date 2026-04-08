@@ -4,7 +4,12 @@ import { Padding, Color, Border, FontSize, FontFamily } from "../../../../Global
 const SparkLightLoginButton = ({ onPress, buttonText,customStyle }) => {
     return (
         <Pressable
-            style={[styles.buttons, styles.buttonsBg,customStyle]}
+            style={({ pressed }) => [
+                styles.buttons,
+                styles.buttonsBg,
+                customStyle,
+                pressed && styles.pressed,
+            ]}
             onPress={onPress}
             accessible={true}
             accessibilityRole="button"
@@ -33,6 +38,10 @@ const styles = StyleSheet.create({
         color: Color.colorGray_200,
         padding: 16,
         fontSize: 18,
+    },
+    pressed: {
+        opacity: 0.85,
+        transform: [{ scale: 0.97 }],
     },
 });
 
