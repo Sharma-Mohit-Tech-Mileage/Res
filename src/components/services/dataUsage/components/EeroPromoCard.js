@@ -139,6 +139,7 @@ const EeroPromoCard = ({ promoData }) => {
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: theme.spacing.base,
+    marginBottom: 50,
   },
 
   cardWrapper: {

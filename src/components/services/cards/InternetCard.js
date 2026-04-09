@@ -13,9 +13,9 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed }) => (
     <View
       style={styles.speedColumn}
       accessible={true}
-      accessibilityLabel={`Download Speed: ${downloadSpeed || 0} Megabits per second`}
+      accessibilityLabel={`Download Speed: ${downloadSpeed || '--'} Megabits per second`}
     >
-      <Text style={styles.speedHeroValue}>{downloadSpeed || 0}</Text>
+      <Text style={styles.speedHeroValue}>{downloadSpeed || '--'}</Text>
       <Text style={styles.speedHeroUnit}>Mbps</Text>
       <View style={styles.speedTagRow}>
         <Text style={styles.speedTagArrow}>{"↓ "}</Text>
@@ -30,9 +30,9 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed }) => (
     <View
       style={styles.speedColumn}
       accessible={true}
-      accessibilityLabel={`Upload Speed: ${uploadSpeed || 0} Megabits per second`}
+      accessibilityLabel={`Upload Speed: ${uploadSpeed || '--'} Megabits per second`}
     >
-      <Text style={styles.speedHeroValue}>{uploadSpeed || 0}</Text>
+      <Text style={styles.speedHeroValue}>{uploadSpeed || '--'}</Text>
       <Text style={styles.speedHeroUnit}>Mbps</Text>
       <View style={styles.speedTagRow}>
         <Text style={styles.speedTagArrow}>{"↑ "}</Text>
