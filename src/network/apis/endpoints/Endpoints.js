@@ -67,6 +67,7 @@ export const ENDPOINTS = {
 
     // Account details
     ACCOUNTS_DETAILS: 'api/Accounts/GetAccountDetails',
+     ACCT_MGR_GET_BY_USER: 'api/Profile/AcctMgrGetByAcct/:accountNumber',
 
     // Payments
     PAYMENTS_HISTORY: 'api/payments/:accountNumber/paymentHistory',

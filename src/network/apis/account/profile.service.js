@@ -18,10 +18,10 @@ const getProfileDetails = async () => {
   };
 
   return _axios
-    .get(getEndpoint(ENDPOINTS.PROFILE_DETAILS_BY_ACCOUNTID, { accountNumber: data?.userInfo?.accountNumber }), { ...config })
+    .get(getEndpoint(ENDPOINTS.ACCT_MGR_GET_BY_USER, { accountNumber: data?.userInfo?.accountNumber }), { ...config })
     .then((res) => res.data)
     .catch((error) => {
-      console.error(`Error fetching ${getEndpoint(ENDPOINTS.PROFILE_DETAILS_BY_ACCOUNTID, { accountNumber: data?.userInfo?.accountNumber })}`, error);
+      console.error(`Error fetching ${getEndpoint(ENDPOINTS.ACCT_MGR_GET_BY_USER, { accountNumber: data?.userInfo?.accountNumber })}`, error);
       throw error;
     });
 };
