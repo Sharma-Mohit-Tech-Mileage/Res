@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { useVisibleTabs } from "../hooks/useVisibleTabs";
+import { useAnnouncement } from "../hooks/useAnnouncement";
 import { fetchProfileDetails } from "../redux/actions/ProfileActionSuite";
 import WalkthroughOverlay from "../components/walkthrough/WalkthroughOverlay";
 import AccountStackScreen from "./stackNavigation/AccountStack";
@@ -77,7 +78,9 @@ const getIconComponent = (tabId, focused) => {
   const dispatch = useDispatch();
   const visibleTabs = useVisibleTabs();
   const home = useSelector((state) => state.home);
-  
+  const userData = useSelector((state) => state.user.userData);
+  const { triggerOnAppLaunch } = useAnnouncement();
+
   const [showWalkthrough, setShowWalkthrough] = useState(
     HARD_CODE_WALKTHROUGH_FOR_TESTING
   );
@@ -226,6 +229,17 @@ const createTabBarButton = useCallback(
     }, [dispatch])
   );
 
+  useEffect(() => {
+    const isNewUser = !userData?.userInfo?.mobileTCAcceptanceFlag;
+    const isWalkthroughRunning = home.walkThroughStep !== null && home.walkThroughStep !== undefined;
+
+    if (!isNewUser && !isWalkthroughRunning) {
+      const timer = setTimeout(() => {
+        triggerOnAppLaunch();
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [userData?.userInfo?.mobileTCAcceptanceFlag, home.walkThroughStep, triggerOnAppLaunch]);
 
   if (visibleTabs.length === 0) {
     return null;

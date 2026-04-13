@@ -8,6 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
   Color,
   FontFamily,
@@ -105,6 +106,13 @@ const logoutAction = (dispatch, navigation) => {
 
 const AccountOverview = () => {
   const navigation = useNavigation();
+  const { triggerOnScreenEntry } = useAnnouncement();
+
+  useFocusEffect(
+    useCallback(() => {
+      triggerOnScreenEntry('AccountStackScreen');
+    }, [triggerOnScreenEntry])
+  );
   const [fullName, setFullName] = useState("");
   const [initials, setInitials] = useState("");
   const [menues, setMenues] = useState([]);

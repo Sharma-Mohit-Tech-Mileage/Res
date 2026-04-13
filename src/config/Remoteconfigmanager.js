@@ -378,6 +378,28 @@ class RemoteConfigManager {
     this._featureSubscribers.clear();
     console.log('[RemoteConfig] Cleaned up');
   }
+
+  /**
+   * Get feature announcements configuration
+   * @returns {Object} Feature announcements config
+   */
+  static getFeatureAnnouncements() {
+    const announcements = this.getFeatureFlag('feature_announcements', {
+      campaigns: []
+    });
+    return announcements;
+  }
+
+  /**
+   * Get specific announcement campaign by ID
+   * @param {string} campaignId - Campaign identifier
+   * @returns {Object|null} Campaign config or null
+   */
+  static getAnnouncementCampaign(campaignId) {
+    const announcements = this.getFeatureAnnouncements();
+    const campaigns = announcements?.campaigns || [];
+    return campaigns.find(c => c.id === campaignId) || null;
+  }
 }
 
 export default RemoteConfigManager;

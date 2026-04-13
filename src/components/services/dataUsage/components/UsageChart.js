@@ -281,7 +281,7 @@ const UsageChart = ({
       onBarPress?.(item.raw);
       const periodLabel = formatPeriodLabel(item);
       AccessibilityInfo.announceForAccessibility(
-        `${periodLabel}. Download: ${item.download.toFixed(1)} GB, Upload: ${item.upload.toFixed(1)} GB. Total: ${item.total.toFixed(1)} GB.`
+        `${periodLabel}. Download: ${item.download.toFixed(2)} GB, Upload: ${item.upload.toFixed(2)} GB. Total: ${item.total.toFixed(2)} GB.`
       );
     },
     [onBarPress, formatPeriodLabel]
@@ -433,13 +433,13 @@ const UsageChart = ({
         />
 
         <SvgText x={tooltipX + 10} y={tooltipY + 18} fontSize="13" fontWeight="700" fill={theme.colors.text.primaryDark}>
-          {item.total.toFixed(1)} GB
+          {item.total.toFixed(2)} GB
         </SvgText>
         <SvgText x={tooltipX + 10} y={tooltipY + 34} fontSize="11" fontWeight="600" fill={theme.colors.primaryDark}>
-          DL {item.download.toFixed(1)}
+          DL {item.download.toFixed(2)}
         </SvgText>
         <SvgText x={tooltipX + 70} y={tooltipY + 34} fontSize="11" fontWeight="600" fill={theme.colors.upload}>
-          UL {item.upload.toFixed(1)}
+          UL {item.upload.toFixed(2)}
         </SvgText>
       </G>
     );
