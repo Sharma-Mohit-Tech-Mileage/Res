@@ -1,9 +1,9 @@
 import React, { createContext, useContext } from 'react';
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 
 // Export the context
 export const AnalyticsContext = createContext({
-    logEvent: (eventName, eventData) => analytics().logEvent(eventName, eventData),
+    logEvent: (eventName, eventData) => logEvent(getAnalytics(), eventName, eventData),
 });
 
 // Export the custom hook

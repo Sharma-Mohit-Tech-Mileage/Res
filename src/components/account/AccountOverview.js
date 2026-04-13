@@ -8,6 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
   Color,
   FontFamily,
@@ -39,7 +40,11 @@ import { Env } from "../../network/apis/account/Constants";
 import AppStyles from "../utility/AppStyles";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
-import analytics from "@react-native-firebase/analytics";
+import {
+  getAnalytics,
+  setUserId,
+  setUserProperty,
+} from "@react-native-firebase/analytics";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
@@ -83,8 +88,8 @@ const logoutAction = (dispatch, navigation) => {
         "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
     }).then(async (result) => {
       try {
-        analytics().setUserId(null);
-        await analytics().setUserProperty("Sparklight_user_id", null);
+        setUserId(getAnalytics(), null);
+        await setUserProperty(getAnalytics(), "Sparklight_user_id", null);
         console.log("Analytics User ID cleared on logout");
       } catch (error) {
         console.error("Error clearing analytics user ID:", error);
@@ -105,6 +110,13 @@ const logoutAction = (dispatch, navigation) => {
 
 const AccountOverview = () => {
   const navigation = useNavigation();
+  const { triggerOnScreenEntry } = useAnnouncement();
+
+  useFocusEffect(
+    useCallback(() => {
+      triggerOnScreenEntry('AccountStackScreen');
+    }, [triggerOnScreenEntry])
+  );
   const [fullName, setFullName] = useState("");
   const [initials, setInitials] = useState("");
   const [menues, setMenues] = useState([]);

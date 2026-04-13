@@ -2,6 +2,7 @@ import { all, call, put, takeLatest } from "redux-saga/effects";
 import {
   UPDATE_PRIMARY_AND_PAPERLESS_REQUEST, ADD_PRIMARY_EMAIL_REQUEST
 } from "../constants/notificationConstants";
+import { FETCH_ACP_USER_ACCOUNT_DETAILS } from "../constants";
 
 import {
   setLoading,
@@ -122,6 +123,10 @@ function* handleUpdatePrimaryAndPaperless(action) {
       
     }
     console.log('end of try block result:', result);
+    yield put({
+      type: FETCH_ACP_USER_ACCOUNT_DETAILS,
+      payload: { force: true },
+    });
     yield put(updatePrimaryAndPaperlessSuccess(result));
   } catch (error) {
     console.error("Combined update failed:", error);
@@ -145,6 +150,10 @@ function* handleAddPrimaryAndEmail(action) {
     let result;
     console.log("No primary email exists – adding new primary:", newEmail);
     result = yield call(addPrimaryEmail, { newEmail, oldEmail: "" });
+    yield put({
+      type: FETCH_ACP_USER_ACCOUNT_DETAILS,
+      payload: { force: true },
+    });
     navigation.navigate('MyTab');
   } catch (error) {
     navigation.navigate('EntryEmailNotifications', { updateFailed: true });

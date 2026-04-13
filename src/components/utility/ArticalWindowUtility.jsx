@@ -7,7 +7,7 @@ import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import LoadingSpinner from './LoadingSpinner';
 import useAccessibilityFocus from '../../hooks/useAccessibilityFocus';
@@ -583,7 +583,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     // Analytics tracking
     useEffect(() => {
         if (name) {
-            analytics().logEvent('screen_view', {
+            logEvent(getAnalytics(), 'screen_view', {
                 screen_name: name,
                 screen_class: 'ArticalWindowUtility'
             }).catch(console.error);

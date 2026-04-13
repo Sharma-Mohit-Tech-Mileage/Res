@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { BackHandler } from "react-native"; 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import SplashScreen from "../components/splash/SplashScreen";
 import ArticalWindowUtility from '../components/utility/ArticalWindowUtility';
 import EmailNotifications from '../components/entry/EmailNotifications';
@@ -12,6 +12,7 @@ import Terms from '../components/entry/Terms';
 import MyTabs from "./MyTab";
 import { AxiosInterceptorProvider } from '../network/RestApiClient';
 import MaintenanceWrapper from '../components/maintenance/MaintenanceWrapper';
+import { AnnouncementProvider } from "../contexts/AnnouncementContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,7 +42,7 @@ const UserNavigations = (props) => {
 
     if (previousRouteName !== currentRouteName && currentRouteName && currentRouteName.trim() !== "") {
       try {
-        await analytics().logEvent('screen_view', {
+        await logEvent(getAnalytics(), 'screen_view', {
           screen_name: currentRouteName,
           screen_class: currentRouteName
         });
@@ -123,6 +124,7 @@ const UserNavigations = (props) => {
      <MaintenanceWrapper>
     <NavigationContainer ref={navigationRef} onReady={onReady} onStateChange={onStateChange}>
       <AxiosInterceptorProvider>
+        <AnnouncementProvider>
           <Stack.Navigator>
             <Stack.Screen
               name="Splash"
@@ -164,7 +166,7 @@ const UserNavigations = (props) => {
             }}
           />
         </Stack.Navigator>
-     
+        </AnnouncementProvider>
     </AxiosInterceptorProvider>
   </NavigationContainer>
    </MaintenanceWrapper>

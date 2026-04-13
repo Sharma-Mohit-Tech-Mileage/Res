@@ -9,12 +9,17 @@ import DeviceInfo from "react-native-device-info";
 import VersionCheck from "react-native-version-check";
 import AppUpdateAlert from "./src/components/utility/AppUpdateAlert";
 import { initializeApp } from "./src/firebase/FirebaseUtils";
-import analytics from "@react-native-firebase/analytics";
+import {
+  getAnalytics,
+  logEvent,
+  setAnalyticsCollectionEnabled,
+} from "@react-native-firebase/analytics";
 import { ISUAT } from "./src/network/apis/account/Constants";
 import { MaintenanceProvider } from "./src/components/maintenance/MaintenanceContext";
 import { GlobalErrorModal } from "./src/components/common/GlobalErrorModal";
 import RemoteConfigManager from "./src/config/Remoteconfigmanager";
 import { FeatureFlagsProvider } from "./src/contexts/Featureflagscontext";
+
 Text.defaultProps = { ...Text.defaultProps, maxFontSizeMultiplier: 1.25 };
 
 const App = () => {
@@ -23,7 +28,7 @@ const App = () => {
 
   useEffect(() => {
     const enableAnalytics = async () => {
-      await analytics().setAnalyticsCollectionEnabled(!__DEV__ && !ISUAT);
+      await setAnalyticsCollectionEnabled(getAnalytics(), !__DEV__ && !ISUAT);
     };
     enableAnalytics();
     Appearance.setColorScheme('light');
@@ -100,7 +105,7 @@ const App = () => {
         <AnalyticsContext.Provider
           value={{
             logEvent: (eventName, eventData) =>
-              analytics().logEvent(eventName, eventData),
+              logEvent(getAnalytics(), eventName, eventData),
           }}
         >
           <FeatureFlagsProvider>

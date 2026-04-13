@@ -3,13 +3,14 @@ import { View, StyleSheet, Dimensions, Platform, AppState, AccessibilityInfo } f
 import WebView from 'react-native-webview';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
+import { fetchACPUserAccountDetails } from '../../redux/actions/ProfileActionSuite';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
 import { navigationRef } from '../../navigations/UserNavigations';
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import MaintenanceAlert from './MaintenanceAlert';
@@ -28,7 +29,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const [navStateReloading, setNavStateReloading] = useState(false);
     const [ isServiceDown, setIsServiceDown ] = useState(false);
     const user = useSelector(state => state.user.userData);
+    const dispatch = useDispatch();
     const webViewRef = useRef();
+    const cacheUpdateFiredRef = useRef(false);
     const [html, setHtml] = useState('');
     const [appState, setAppState] = useState(AppState.currentState);
     const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
@@ -361,7 +364,7 @@ const navigationChange = async (navState) => {
         const trackScreen = async () => {
             if (name && !hasTrackedInitialScreen) {
                 try {
-                    await analytics().logEvent('screen_view', {
+                    await logEvent(getAnalytics(), 'screen_view', {
                         screen_name: name,
                         screen_class: 'AutoPayPCIConnector'
                     });
@@ -441,6 +444,20 @@ const navigationChange = async (navState) => {
                     androidHardwareAccelerationDisabled={Platform.OS === 'android'}
                     onShouldStartLoadWithRequest={(request) => {
                         console.log("Load request:", request.url);
+                        // PCI redirects to one of these two URLs on a successful payment or
+                        // AutoPay change. Backend cache is stale at this point — fire a
+                        // force-refresh so Redux has fresh data by the time the user navigates
+                        // back. UpdateCache: true on GetAccountDetails also refreshes the
+                        // EasyPay cache, so one dispatch is enough.
+                        if (
+                            !cacheUpdateFiredRef.current &&
+                            (request.url.includes('/portals/app-secure/payment-confirmation') ||
+                                request.url.includes('/portals/thankyou/'))
+                        ) {
+                            cacheUpdateFiredRef.current = true;
+                            console.log('[PCI] confirmation URL detected, dispatching force-refresh');
+                            dispatch(fetchACPUserAccountDetails({ force: true }));
+                        }
                         return true;
                     }}
                     style={styles.webView}

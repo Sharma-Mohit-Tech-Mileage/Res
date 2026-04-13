@@ -39,7 +39,13 @@ import RenderText from "../common/RenderText";
 import moment from "moment";
 import LoginLogger from "../../components/utility/LoginLogger";
 import LoadingOverlay from "../common/customui/CustomLoading";
-import analytics from "@react-native-firebase/analytics";
+import {
+  getAnalytics,
+  logEvent,
+  setUserId,
+  setUserProperty,
+  resetAnalyticsData,
+} from "@react-native-firebase/analytics";
 import { shouldBlockLogin } from "../utility/disconnectHelpers";
 import Logo from "../../res/images/SpalshLogo";
 
@@ -329,12 +335,13 @@ const SplashScreen = ({ navigation, route }) => {
 
       // Analytics tracking
       if (user.userInfo && user.userInfo.userName) {
-        await analytics().setUserId(user.userInfo.userName.toString());
-        await analytics().setUserProperty(
+        await setUserId(getAnalytics(), user.userInfo.userName.toString());
+        await setUserProperty(
+          getAnalytics(),
           "Sparklight_user_id",
           user.userInfo.userName.toString()
         );
-        await analytics().logEvent("login", {
+        await logEvent(getAnalytics(), "login", {
           Sparklight_user_id: user.userInfo.userName.toString(),
         });
       }
@@ -418,7 +425,7 @@ const SplashScreen = ({ navigation, route }) => {
           })
             .then(async () => {
               try {
-                await analytics().resetAnalyticsData();
+                await resetAnalyticsData(getAnalytics());
                 cleanUserData();
                 if (
                   postLogoutCallback &&

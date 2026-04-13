@@ -750,13 +750,13 @@ const isPaperlessEnabled = async (email, signal) => {
   return response.data;
 };
 
-const fetchACPUserAccountDetails = async (signal) => {
-  console.log("[DEBUG] fetchACPUserAccountDetails called, signal:", !!signal); 
+const fetchACPUserAccountDetails = async (signal, force = false) => {
+  console.log("[DEBUG] fetchACPUserAccountDetails called, signal:", !!signal, "force:", force);
 
   let user = await getUser();
   const accountNumber = user.userInfo?.accountNumber || null;
 
-  console.log("[DEBUG] accountNumber:", accountNumber); 
+  console.log("[DEBUG] accountNumber:", accountNumber);
 
   const config = {
     headers: {
@@ -768,6 +768,7 @@ const fetchACPUserAccountDetails = async (signal) => {
   const requestUrl = `api/Accounts/GetAccountDetails`;
   const data = {
     accountNumber: accountNumber,
+    UpdateCache: !!force,
     fieldList: [
       "first_name",
       "last_name",

@@ -1,5 +1,14 @@
 import { Alert, Linking, PermissionsAndroid, Platform } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
+import {
+  getMessaging,
+  hasPermission,
+  requestPermission,
+  getToken,
+  onNotificationOpenedApp,
+  getInitialNotification,
+  onMessage,
+  AuthorizationStatus,
+} from '@react-native-firebase/messaging';
 import * as Keychain from 'react-native-keychain';
 import { v4 as uuidv4 } from 'uuid';
 import 'react-native-get-random-values';
@@ -20,16 +29,16 @@ const requestUserPermission = async () => {
       logMessage = `Android API ${Platform.Version} POST_NOTIFICATIONS Permission: ${status}`;
     }
   } else {
-    const authStatus = await messaging().hasPermission();
-    if (authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL) {
+    const authStatus = await hasPermission(getMessaging());
+    if (authStatus === AuthorizationStatus.AUTHORIZED ||
+      authStatus === AuthorizationStatus.PROVISIONAL) {
       granted = true;
       logMessage = 'FCM Authorization Status: Already authorized/provisional';
     } else {
-      const requestStatus = await messaging().requestPermission();
+      const requestStatus = await requestPermission(getMessaging());
       granted =
-        requestStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        requestStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        requestStatus === AuthorizationStatus.AUTHORIZED ||
+        requestStatus === AuthorizationStatus.PROVISIONAL;
       logMessage = `FCM Authorization Status: ${granted ? 'authorized/provisional' : 'denied/undetermined'}`;
     }
   }
@@ -40,18 +49,18 @@ const requestUserPermission = async () => {
 };
 
 const notifyPermission = async () => {
-  let authStatus = await messaging().hasPermission();
+  let authStatus = await hasPermission(getMessaging());
 
-  if (authStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
-    authStatus = await messaging().requestPermission();
+  if (authStatus === AuthorizationStatus.NOT_DETERMINED) {
+    authStatus = await requestPermission(getMessaging());
   }
 
   console.log('Notification permission status:', authStatus);
   const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    authStatus === AuthorizationStatus.AUTHORIZED ||
+    authStatus === AuthorizationStatus.PROVISIONAL;
 
-  if (authStatus === messaging.AuthorizationStatus.DENIED) {
+  if (authStatus === AuthorizationStatus.DENIED) {
     Alert.alert(
       'Sparklight Would Like to Send You Notifications',
       'Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.',
@@ -81,7 +90,7 @@ const notifyPermission = async () => {
 
 const getFcmToken = async () => {
   try {
-    const newFcmToken = await messaging().getToken();
+    const newFcmToken = await getToken(getMessaging());
     console.log(newFcmToken);
     return newFcmToken;
   } catch (error) {
@@ -92,7 +101,7 @@ const getFcmToken = async () => {
 
 const notificationListener = () => {
 
-  messaging().onNotificationOpenedApp(remoteMessage => {
+  onNotificationOpenedApp(getMessaging(), remoteMessage => {
     console.log(
       'Notification caused app to open from background state:',
       remoteMessage.notification,
@@ -100,8 +109,7 @@ const notificationListener = () => {
   });
 
   // Quiet and Background State -> Check whether an initial notification is available
-  messaging()
-    .getInitialNotification()
+  getInitialNotification(getMessaging())
     .then(remoteMessage => {
       if (remoteMessage) {
         console.log(
@@ -113,7 +121,7 @@ const notificationListener = () => {
     .catch(error => console.log('failed', error));
 
   // Foreground State
-  messaging().onMessage(async remoteMessage => {
+  onMessage(getMessaging(), async remoteMessage => {
     console.log('foreground', remoteMessage);
   });
 };

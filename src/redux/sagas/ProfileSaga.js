@@ -2,6 +2,8 @@ import {
   all,
   call,
   put,
+  select,
+  takeEvery,
   takeLatest,
   takeLeading,
   cancelled,
@@ -84,6 +86,15 @@ import {
   clearLoading,
 } from "../actions/ProfileActionSuite";
 
+const ACCOUNT_DETAILS_FRESHNESS_WINDOW_MS = 60_000;
+
+// Module-level dedup state for the account fetch saga.
+// We track in-flight force and non-force fetches separately so a non-force
+// (e.g. screen-focus) dispatch can never cancel an in-flight force-refresh.
+// See the architectural pattern doc for the full decision table.
+let inFlightForceController = null;
+let inFlightNonForceController = null;
+
 function* getProfileUsers(action) {
   try {
     const response = yield call(fetchUserList);
@@ -151,6 +162,10 @@ function* updateNewEmail(action) {
         });
       }
     }
+    yield put({
+      type: FETCH_ACP_USER_ACCOUNT_DETAILS,
+      payload: { force: true },
+    });
     if (action.navigation !== null) {
       action.navigation.navigate("Notifications", {
         updateSuccess: true,
@@ -171,6 +186,10 @@ function* updateProfile(action) {
   try {
     console.log("updateProfile: ", JSON.stringify(action.payload));
     const response = yield call(postProfileInfo, action.payload);
+    yield put({
+      type: FETCH_ACP_USER_ACCOUNT_DETAILS,
+      payload: { force: true },
+    });
     action.navigation.navigate("ProfileSettings", { updateSuccess: true });
   } catch (error) {
     action.navigation.navigate("ProfileSettingsEdit", { updateFailed: true });
@@ -240,6 +259,10 @@ function* updateEmailNotification(action) {
         });
       }
     }
+    yield put({
+      type: FETCH_ACP_USER_ACCOUNT_DETAILS,
+      payload: { force: true },
+    });
     if (action.navigation !== null) {
       action.navigation.navigate("Notifications", {
         updateSuccess: true,
@@ -672,13 +695,71 @@ export function* checkPaperlessSaga(action) {
   }
 }
 
-function* fetchACPUserAccountDetailsSaga() {
+function* fetchACPUserAccountDetailsSaga(action) {
+  const force = action?.payload?.force === true;
+
+  // Dedup rule 1: if a force fetch is already in flight, skip the new dispatch.
+  // The in-flight force will return fresh data, so any subsequent fetch
+  // (force or non-force) is redundant.
+  if (inFlightForceController) {
+    console.log(
+      "[fetchACPUserAccountDetailsSaga] skipping fetch — force fetch already in flight"
+    );
+    return;
+  }
+
+  // Dedup rule 2: if a non-force fetch is in flight, branch on the new dispatch.
+  if (inFlightNonForceController) {
+    if (force) {
+      // Force pre-empts the non-force. Abort it and proceed to run the force.
+      console.log(
+        "[fetchACPUserAccountDetailsSaga] force pre-empting in-flight non-force fetch"
+      );
+      const previousNonForceController = inFlightNonForceController;
+      inFlightNonForceController = null;
+      previousNonForceController.abort();
+      // fall through to run the force fetch
+    } else {
+      // Non-force during in-flight non-force is redundant.
+      console.log(
+        "[fetchACPUserAccountDetailsSaga] skipping fetch — non-force fetch already in flight"
+      );
+      return;
+    }
+  }
+
+  // Freshness guard: skip non-force fetches if data is recent.
+  // Force always bypasses the guard.
+  if (!force) {
+    const lastFetchedAt = yield select(
+      (state) => state.profile?.accountDetailsFetchedAt
+    );
+    if (
+      lastFetchedAt &&
+      Date.now() - lastFetchedAt < ACCOUNT_DETAILS_FRESHNESS_WINDOW_MS
+    ) {
+      console.log(
+        "[fetchACPUserAccountDetailsSaga] skipping fetch — data is fresh (age:",
+        Date.now() - lastFetchedAt,
+        "ms)"
+      );
+      return;
+    }
+  }
+
   const controller = new AbortController();
+  if (force) {
+    inFlightForceController = controller;
+  } else {
+    inFlightNonForceController = controller;
+  }
+
   yield put(setLoading(true));
   try {
     const accountData = yield call(
       fetchACPUserAccountDetails,
-      controller.signal
+      controller.signal,
+      force
     );
 
     if (!accountData) {
@@ -701,8 +782,23 @@ function* fetchACPUserAccountDetailsSaga() {
 
     yield put(setPaperlessStatus(paperlessStatus));
   } catch (error) {
-    console.error("Error in account/paperless fetch:", error);
+    // Cancellation is expected when a force pre-empts a non-force; suppress it.
+    const isCancelled =
+      error?.name === "CanceledError" ||
+      error?.code === "ERR_CANCELED" ||
+      error?.message === "canceled";
+    if (!isCancelled) {
+      console.error("Error in account/paperless fetch:", error);
+    }
   } finally {
+    // Only clear our own in-flight ref. If a pre-emption already replaced it,
+    // the === check fails and we leave the new owner alone.
+    if (force && inFlightForceController === controller) {
+      inFlightForceController = null;
+    }
+    if (!force && inFlightNonForceController === controller) {
+      inFlightNonForceController = null;
+    }
     yield put(clearLoading());
 
     if (yield cancelled()) {
@@ -744,7 +840,7 @@ function* ProfileSagas() {
   yield takeLatest(MANAGE_EMAIL_REQUEST, handleManageEmailRequest);
   yield takeLatest(UPDATE_EMAIL_ASSOCIATIONS, handleUpdateEmailAssociations);
   yield takeLeading(GET_PAPERLESS_STATUS, checkPaperlessSaga);
-  yield takeLeading(
+  yield takeEvery(
     FETCH_ACP_USER_ACCOUNT_DETAILS,
     fetchACPUserAccountDetailsSaga
   );

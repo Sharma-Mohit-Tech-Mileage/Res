@@ -1,4 +1,11 @@
-import remoteConfig from '@react-native-firebase/remote-config';
+import {
+  getRemoteConfig,
+  setDefaults,
+  setConfigSettings,
+  fetch as fetchRemoteConfig,
+  activate,
+  getValue,
+} from '@react-native-firebase/remote-config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 import { ISUAT } from '../network/apis/account/Constants';
@@ -87,14 +94,14 @@ class RemoteConfigManager {
       await this._loadFromCache();
 
       // Set defaults
-      await remoteConfig().setDefaults({
+      await setDefaults(getRemoteConfig(), {
         [CONFIG_KEY_MAINTENANCE]: JSON.stringify(DEFAULT_MAINTENANCE),
         [CONFIG_KEY_FEATURES]: JSON.stringify(DEFAULT_FEATURES)
       });
 
       // Configure fetch settings
       const minimumFetchInterval = ISUAT ? FETCH_INTERVAL_DEV : FETCH_INTERVAL_PROD;
-      await remoteConfig().setConfigSettings({
+      await setConfigSettings(getRemoteConfig(), {
         minimumFetchIntervalMillis: minimumFetchInterval
       });
 
@@ -208,15 +215,15 @@ class RemoteConfigManager {
       console.log('[RemoteConfig] Fetching...', force ? '(forced)' : '');
 
       // Fetch with timeout
-      await remoteConfig().fetch(0);
-      
+      await fetchRemoteConfig(getRemoteConfig(), 0);
+
       // Activate
-      await remoteConfig().activate();
+      await activate(getRemoteConfig());
 
       console.log('[RemoteConfig] Config activated, processing values...');
 
       // Parse maintenance config
-      const maintenanceJson = remoteConfig().getValue(CONFIG_KEY_MAINTENANCE).asString();
+      const maintenanceJson = getValue(getRemoteConfig(), CONFIG_KEY_MAINTENANCE).asString();
       let parsedMaintenance = {};
       
       try {
@@ -231,7 +238,7 @@ class RemoteConfigManager {
       }
 
       // Parse feature flags
-      const featuresJson = remoteConfig().getValue(CONFIG_KEY_FEATURES).asString();
+      const featuresJson = getValue(getRemoteConfig(), CONFIG_KEY_FEATURES).asString();
       let parsedFeatures = {};
       
       try {
@@ -377,6 +384,28 @@ class RemoteConfigManager {
     this._maintenanceSubscribers.clear();
     this._featureSubscribers.clear();
     console.log('[RemoteConfig] Cleaned up');
+  }
+
+  /**
+   * Get feature announcements configuration
+   * @returns {Object} Feature announcements config
+   */
+  static getFeatureAnnouncements() {
+    const announcements = this.getFeatureFlag('feature_announcements', {
+      campaigns: []
+    });
+    return announcements;
+  }
+
+  /**
+   * Get specific announcement campaign by ID
+   * @param {string} campaignId - Campaign identifier
+   * @returns {Object|null} Campaign config or null
+   */
+  static getAnnouncementCampaign(campaignId) {
+    const announcements = this.getFeatureAnnouncements();
+    const campaigns = announcements?.campaigns || [];
+    return campaigns.find(c => c.id === campaignId) || null;
   }
 }
 

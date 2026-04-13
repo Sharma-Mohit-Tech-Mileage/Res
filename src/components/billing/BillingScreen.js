@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
   Color,
   FontFamily,
@@ -36,6 +37,13 @@ import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const { triggerOnScreenEntry } = useAnnouncement();
+
+  useFocusEffect(
+    useCallback(() => {
+      triggerOnScreenEntry('BillingStackScreen');
+    }, [triggerOnScreenEntry])
+  );
   const accountDetails = useSelector(
     (state) => state.profile?.accountDetails
   );
