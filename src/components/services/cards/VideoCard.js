@@ -103,10 +103,8 @@ const styles = StyleSheet.create({
   // Content
   content: serviceCard.content,
   planName: serviceCard.planName,
-  actionButton: serviceCard.actionButton,
 
   // Skeleton Loader
-  skeleton: skeletonLoader.skeleton,
   skeletonHeader: skeletonLoader.skeletonHeader,
   skeletonTitle: skeletonLoader.skeletonTitle,
 });

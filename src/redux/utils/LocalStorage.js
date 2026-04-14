@@ -39,7 +39,12 @@ export const getSsoToken = async () => {
 export const cleanUserData = async () => {
   try {
     const keys = await AsyncStorage.getAllKeys();
-    const keysToRemove = keys.filter(key => !key.includes("pushNotificationStatus"));
+    const keysToRemove = keys.filter(
+      key =>
+        !key.includes("pushNotificationStatus") &&
+        key !== "FEATURE_ANNOUNCEMENTS_STATE" &&
+        key !== "LAST_APP_VERSION"
+    );
 
     await AsyncStorage.multiRemove(keysToRemove);
   } catch (error) {

@@ -1,16 +1,22 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, Pressable } from 'react-native';
 import colors from '../../../res/Colors';
 import { FontFamily } from '../../../../GlobalStyles';
- 
+
 const SecondaryButton=(props)=>{
-  
+
     return (
-      <TouchableOpacity style={styles.TouchableOpacityButton} onPress={props.onPress}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.TouchableOpacityButton,
+          pressed && styles.pressed,
+        ]}
+        onPress={props.onPress}
+      >
         <Text style={styles.txtStyle}>{props.text}</Text>
-      </TouchableOpacity>
+      </Pressable>
     );
-  
+
 }
 
 const styles = StyleSheet.create({
@@ -27,7 +33,11 @@ const styles = StyleSheet.create({
     fontStyle:'normal',
     fontSize:16,
     
-  }
+  },
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.97 }],
+  },
 });
 
 export default SecondaryButton

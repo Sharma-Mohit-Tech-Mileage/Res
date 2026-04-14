@@ -12,6 +12,7 @@ import moment from "moment";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
@@ -50,6 +51,14 @@ import {
 
 
 const NewBillerHome = ({ navigation }) => {
+  const { triggerOnScreenEntry } = useAnnouncement();
+
+  useFocusEffect(
+    useCallback(() => {
+      triggerOnScreenEntry('HomeStackScreen');
+    }, [triggerOnScreenEntry])
+  );
+
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
