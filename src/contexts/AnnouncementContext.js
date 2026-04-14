@@ -54,6 +54,29 @@ export const AnnouncementProvider = ({ children }) => {
     }, 350);
   }, [activeCampaign]);
 
+  const handleLearnMoreNavigate = useCallback(async (navConfig) => {
+    if (!activeCampaign) return;
+
+    console.log(`[AnnouncementContext] Learn more navigation: ${activeCampaign.id}`);
+
+    await AnnouncementPersistence.markAsCompleted(activeCampaign.id);
+
+    trackAnnouncementCompletion(
+      activeCampaign.id,
+      activeCampaign.content?.steps?.length || 0,
+      0
+    );
+
+    setShowModal(false);
+
+    setTimeout(() => {
+      setActiveCampaign(null);
+      if (navConfig) {
+        navigateToDestination(navConfig, navigationRef);
+      }
+    }, 350);
+  }, [activeCampaign]);
+
   const handleDismiss = useCallback(async (dismissedAtStep) => {
     if (!activeCampaign) return;
 
@@ -63,7 +86,7 @@ export const AnnouncementProvider = ({ children }) => {
     trackAnnouncementDismissal(activeCampaign.id, dismissedAtStep);
 
     setShowModal(false);
-    
+
     setTimeout(() => {
       setActiveCampaign(null);
     }, 300);
@@ -86,6 +109,7 @@ export const AnnouncementProvider = ({ children }) => {
         campaign={activeCampaign}
         onComplete={handleComplete}
         onDismiss={handleDismiss}
+        onLearnMoreNavigate={handleLearnMoreNavigate}
         navigationRef={navigationRef}
       />
     </AnnouncementContext.Provider>

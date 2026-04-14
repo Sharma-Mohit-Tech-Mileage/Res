@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Animated, Easing } from "react-native";
+import Svg, { Circle } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { statusSection } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
@@ -16,6 +17,39 @@ const RING_WIDTH = 4;
 const OUTER_SIZE = 72;
 const MIDDLE_SIZE = 48;
 const INNER_SIZE = 26;
+
+// SVG arc ring: two opposite 60° arcs (left + right), 120° gaps (top + bottom).
+// Replaces the old borderLeft/Right + transparent top/bottom trick, which
+// Android refuses to render on rounded views (all-or-nothing border color).
+const Ring = ({ size, color, style }) => {
+  const r = (size - RING_WIDTH) / 2;
+  const C = 2 * Math.PI * r;
+  const arcLen = C / 6; // 60°
+  const gapLen = C / 3; // 120°
+  const c = size / 2;
+  return (
+    <Animated.View
+      style={[
+        { position: "absolute", width: size, height: size },
+        style,
+      ]}
+    >
+      <Svg width={size} height={size}>
+        <Circle
+          cx={c}
+          cy={c}
+          r={r}
+          stroke={color}
+          strokeWidth={RING_WIDTH}
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray={`${arcLen} ${gapLen}`}
+          transform={`rotate(-30 ${c} ${c})`}
+        />
+      </Svg>
+    </Animated.View>
+  );
+};
 
 /**
  * Sparklight concentric-ring status icon.
@@ -76,21 +110,17 @@ const StatusIcon = ({ isAnimating = false }) => {
       style={styles.iconContainer}
     >
       {/* Outer ring */}
-      <Animated.View
-        style={[
-          styles.ring,
-          styles.outerRing,
-          isAnimating ? { transform: [{ rotate: outerRotate }] } : null,
-        ]}
+      <Ring
+        size={OUTER_SIZE}
+        color={RING_OUTER}
+        style={isAnimating ? { transform: [{ rotate: outerRotate }] } : null}
       />
 
       {/* Middle ring */}
-      <Animated.View
-        style={[
-          styles.ring,
-          styles.middleRing,
-          isAnimating ? { transform: [{ rotate: middleRotate }] } : null,
-        ]}
+      <Ring
+        size={MIDDLE_SIZE}
+        color={RING_MIDDLE}
+        style={isAnimating ? { transform: [{ rotate: middleRotate }] } : null}
       />
 
       {/* Globe icon in center */}
@@ -192,6 +222,7 @@ const styles = StyleSheet.create({
   iconBadge: {
     ...statusSection.iconBadge,
     backgroundColor: "transparent",
+    overflow: "visible",
   },
   title: statusSection.title,
   subtitle: statusSection.subtitle,
@@ -202,30 +233,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
-  // Shared ring base — left/right borders visible, top/bottom transparent (horizontal)
-  ring: {
-    position: "absolute",
-    borderWidth: RING_WIDTH,
-    borderTopColor: "transparent",
-    borderBottomColor: "transparent",
-    borderRadius: 999,
-  },
-
-  outerRing: {
-    width: OUTER_SIZE,
-    height: OUTER_SIZE,
-    borderLeftColor: RING_OUTER,
-    borderRightColor: RING_OUTER,
-  },
-
-  middleRing: {
-    width: MIDDLE_SIZE,
-    height: MIDDLE_SIZE,
-    borderLeftColor: RING_MIDDLE,
-    borderRightColor: RING_MIDDLE,
-  },
-
 });
 
 export default StatusSection;

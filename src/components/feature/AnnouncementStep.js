@@ -1,9 +1,9 @@
 import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Linking, AccessibilityInfo, findNodeHandle, Image } from 'react-native';
+import { View, Text, StyleSheet, Pressable, AccessibilityInfo, findNodeHandle, Image } from 'react-native';
 import { theme } from '../../styles/theme';
 import { typography } from '../../styles/utilities';
 
-const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, navigationRef }) => {
+const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, onLearnMoreNavigate }) => {
   const titleRef = useRef(null);
 
   useEffect(() => {
@@ -21,60 +21,17 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, navigation
     return () => clearTimeout(timeout);
   }, [isActive, currentIndex]);
 
-  const handleNavigation = (navConfig) => {
+  const handleLearnMorePress = (navConfig) => {
     if (!navConfig) return;
 
-    const { type, destination, params, childScreen } = navConfig;
-
-    try {
-      switch (type) {
-        case 'tab':
-          if (navigationRef?.current) {
-            if (childScreen) {
-              // First navigate to the tab to ensure the stack is mounted
-              navigationRef.current.navigate('MyTab', {
-                screen: destination,
-              });
-              // Then navigate to the child screen after the tab stack initializes
-              setTimeout(() => {
-                if (navigationRef?.current) {
-                  navigationRef.current.navigate('MyTab', {
-                    screen: destination,
-                    params: {
-                      screen: childScreen,
-                      ...(params && { params }),
-                    },
-                  });
-                }
-              }, 400);
-            } else {
-              navigationRef.current.navigate('MyTab', {
-                screen: destination,
-                ...(params && { params }),
-              });
-            }
-          }
-          break;
-        case 'screen':
-          if (navigationRef?.current) {
-            navigationRef.current.navigate(destination, params);
-          }
-          break;
-        case 'external':
-        case 'deep_link':
-          Linking.openURL(destination);
-          break;
-        default:
-          break;
-      }
-    } catch (error) {
-      console.error('[AnnouncementStep] Navigation error:', error);
+    if (onLearnMoreNavigate) {
+      onLearnMoreNavigate(navConfig);
     }
   };
 
   const renderLearnMoreLinks = () => {
     const { learnMore } = step;
-    
+
     if (!learnMore) return null;
 
     // Support both single object and array of objects
@@ -83,9 +40,9 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, navigation
     return (
       <View style={styles.learnMoreWrapper}>
         {links.map((link, index) => (
-          <Pressable 
+          <Pressable
             key={index}
-            onPress={() => handleNavigation(link)}
+            onPress={() => handleLearnMorePress(link)}
             style={styles.learnMoreContainer}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             accessible={true}
@@ -106,7 +63,7 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, navigation
       <View style={styles.content}>
         {/* Image Support */}
         {step.imageUrl && (
-          <Image 
+          <Image
             source={{ uri: step.imageUrl }}
             style={styles.stepImage}
             resizeMode="contain"
@@ -115,10 +72,10 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, navigation
           />
         )}
 
-        <Text 
-          ref={titleRef} 
-          style={styles.title} 
-          accessible={true} 
+        <Text
+          ref={titleRef}
+          style={styles.title}
+          accessible={true}
           accessibilityRole="header"
         >
           {step.title}

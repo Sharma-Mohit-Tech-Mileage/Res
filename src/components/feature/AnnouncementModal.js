@@ -9,7 +9,7 @@ import { trackStepViewed } from '../../utils/announcementHelpers';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDismiss, navigationRef }) => {
+const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDismiss, onLearnMoreNavigate, navigationRef }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [startTime] = useState(Date.now());
 
@@ -171,7 +171,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
               currentIndex={currentStep}
               totalSteps={totalSteps}
               isActive={true}
-              navigationRef={navigationRef}
+              onLearnMoreNavigate={onLearnMoreNavigate}
             />
           </ScrollView>
 
