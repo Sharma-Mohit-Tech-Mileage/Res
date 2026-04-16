@@ -307,7 +307,7 @@ const PasswordSecurityEdit = () => {
                         ref={securityAnswerRef}
                         onBlur={onBlur}
                         onChangeText={onChange}
-                        value={getSecurityAnswerDisplayValue(value)}
+                        value={value}
                         error={error?.message}
                         accessibilityLabel="Password Reset Answer"
                         accessibilityHint="Enter your answer to the security question"
