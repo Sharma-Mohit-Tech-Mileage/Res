@@ -210,7 +210,7 @@ const PasswordSecurityEdit = () => {
                 <NotificationAlert
                   type="error"
                   title="Error"
-                  message="Password and security question update failed."
+                  message="Update failed. Please try again."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
                   onClose={() => setShowErrorAlert(false)}

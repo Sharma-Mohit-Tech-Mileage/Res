@@ -137,14 +137,18 @@ const ChangePassword = () => {
         (res) => {
           setLoading(false);
           console.log("Password updated successfully", res);
+          if(res.code=="204" || res.code=="200" ){
           navigation.navigate("PasswordSecurity", {
             updateSuccess: true,
             isPassword: true,
           });
-        },
+        } else{
+          setShowErrorAlert(true); // Show an error alert if the response code is not 200 or 204  
+        }
+      },
         (error) => {
           setLoading(false);
-          // console.error("Error updating password", error);
+           console.error("Error updating password", error);
 
           // Handle specific errors, such as '204 No Content' or others
           if (error.code == "204") {
@@ -218,7 +222,7 @@ const ChangePassword = () => {
                 <NotificationAlert
                   type="error"
                   title="Error"
-                  message="Password and security update failed."
+                  message="Update failed. Please try again."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
                   onClose={() => setShowErrorAlert(false)}
