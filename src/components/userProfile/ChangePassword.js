@@ -142,7 +142,12 @@ const ChangePassword = () => {
             updateSuccess: true,
             isPassword: true,
           });
-        } else{
+        } else if(res===true  ){
+         navigation.navigate("PasswordSecurity", {
+            updateSuccess: true,
+            isPassword: true,
+          });
+        }else{
           setShowErrorAlert(true); // Show an error alert if the response code is not 200 or 204  
         }
       },
