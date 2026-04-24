@@ -3,7 +3,7 @@ import { StyleSheet, View, } from "react-native";
 import { Color} from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SearchSuggestions from "../common/customui/SearchSuggestions";
-import { GetApiRequestSearch } from "../../network/APIClient";
+import { GetApiRequestSearch } from "../../network/RestApiClient";
 
 import debounce from "lodash.debounce";
 import SmallLoader from "../common/customui/SmallLoader";

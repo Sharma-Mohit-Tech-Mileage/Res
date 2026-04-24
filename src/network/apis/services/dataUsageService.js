@@ -8,7 +8,7 @@
 
 import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-import { Env } from "../account/Constants";
+import Config from "react-native-config";
 
 const ENDPOINT = "api/Internet/Usage";
 
@@ -25,7 +25,7 @@ const buildRequest = async (usageType, extra = {}) => {
 };
 
 const logRequest = (usageType, body, token) => {
-  const fullUrl = `${Env.API_ACP_BASEURL}${ENDPOINT}`;
+  const fullUrl = `${Config.API_ACP_BASEURL}${ENDPOINT}`;
   console.log(
     `\n========== DATA USAGE API CALL ==========\n` +
     `METHOD:  POST\n` +

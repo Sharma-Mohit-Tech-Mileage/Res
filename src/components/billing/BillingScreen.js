@@ -19,7 +19,7 @@ import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
 import { getUser } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint , ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
 import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";

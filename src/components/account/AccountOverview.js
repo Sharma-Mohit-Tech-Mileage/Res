@@ -50,6 +50,7 @@ const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true };
 import {
   logoutZendesk,
 } from "../utility/RNZendeskChat";
+import { clearAuthCookies } from "../utility/NativeCookieManager";
 
 const logoutConfirmationPopup = (dispatch, navigation) => {
   Alert.alert(
@@ -95,6 +96,7 @@ const logoutAction = (dispatch, navigation) => {
         index: 0,
         routes: [{ name: "Splash", params: { isLogout: true } }],
       });
+      clearAuthCookies();
       storeUser({});
       storeSsoToken({});
       dispatch(saveUserInfo({}));

@@ -534,10 +534,7 @@ const logInfo = async (infoData) => {
     const response = await _axios.post(getEndpoint(ENDPOINTS.LOG_INFO), infoData);
     console.log("Info logged successfully");
   } catch (logErr) {
-    console.error("Requested BASE URL:", Config.BASE_URL);
     console.error("Failed to log info:", logErr);
-
-
   }
 };
 

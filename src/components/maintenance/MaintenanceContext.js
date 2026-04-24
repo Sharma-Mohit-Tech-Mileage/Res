@@ -13,6 +13,7 @@ import { logout } from "react-native-app-auth";
 //import { Env } from "../../network/apis/account/Constants";
 import Config from "react-native-config";
 import { navigationRef } from "../../navigations/UserNavigations";
+import { clearAuthCookies } from "../utility/NativeCookieManager";
 
 const config = {
   issuer: Config.SSO_LOGIN,
@@ -101,7 +102,7 @@ export const MaintenanceProvider = ({ children }) => {
         if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
           isTimeValid = false;
         } else {
-          isTimeValid = now <= endTime;
+          isTimeValid = now >= startTime && now <= endTime;
         }
       } catch (error) {
         console.error("Error parsing blocking times:", error);
@@ -196,10 +197,22 @@ export const MaintenanceProvider = ({ children }) => {
     }
 
     const handleSessionInvalidation = async () => {
-      const { sessionConfig } = maintenanceConfig;
+      const { sessionConfig, maintenanceWindow } = maintenanceConfig;
 
       if (!sessionConfig) {
         return;
+      }
+
+      // Honor the maintenance window time before invalidating sessions
+      if (maintenanceWindow?.enabled && maintenanceWindow.mode === "SCHEDULED") {
+        const now = Date.now();
+        const startTime = new Date(maintenanceWindow.startTime).getTime();
+        const endTime = new Date(maintenanceWindow.endTime).getTime();
+
+        if (isNaN(startTime) || isNaN(endTime) || now < startTime || now > endTime) {
+          console.log("SESSION INVALIDATION SKIPPED - outside scheduled maintenance window");
+          return;
+        }
       }
 
       if (
@@ -395,6 +408,7 @@ export const MaintenanceProvider = ({ children }) => {
     try {
       if (isBlockingLogout) {
         await Promise.all([
+          clearAuthCookies(),
           storeUser({}),
           storeUser(null),
           storeSsoToken({}),
@@ -425,6 +439,7 @@ export const MaintenanceProvider = ({ children }) => {
           });
         }
 
+        await clearAuthCookies();
         await storeUser({});
         await storeSsoToken({});
         await cleanUserData();
@@ -453,6 +468,7 @@ export const MaintenanceProvider = ({ children }) => {
       console.error("Error during logout:", error);
 
       try {
+        await clearAuthCookies();
         await storeUser({});
         await storeSsoToken({});
         await cleanUserData();

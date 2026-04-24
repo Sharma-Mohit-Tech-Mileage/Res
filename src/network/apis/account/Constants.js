@@ -9,16 +9,11 @@ export const config = {
     MODEM_BASE_URL: "https://mule-gateway.cableone.net/customer-api",
     TRUCK_ROLL_BASE_URL:
       "https://adb-1771418802186593.13.azuredatabricks.net/model/lgb_model_fs_mobile/Production/invocations",
-    PAYMENTURL_V2: "https://payment.sparklight.com/PortalsV2/PortalsPayment",
-    URL_EASYPAY_SETUP_V2:
-      "https://payment.sparklight.com/portalsV2/setup-auto-pay",
-    URL_EASYPAY_MANAGE_V2:
-      "https://payment.sparklight.com/portalsV2/manage-auto-pay",
-    PAYMENTURL_V3:
+    PAYMENTURL:
       "https://payment.sparklight.com/portalsV3/PortalsBiller/GetPostDataWithKey",
-    URL_EASYPAY_SETUP_V3:
+    URL_EASYPAY_SETUP:
       "https://payment.sparklight.com/portalsV3/activate-autopay",
-    URL_EASYPAY_MANAGE_V3:
+    URL_EASYPAY_MANAGE:
       "https://payment.sparklight.com/portalsV3/manage-autopay",
     PAYMENTURLNEW: "https://customer.sparklight.com/portals/app-secure/billing",
     VIEW_BILLINGS: "https://customer.sparklight.com/residential/billing",
@@ -62,18 +57,11 @@ export const config = {
     MODEM_BASE_URL: "https://mule-gateway.cableone.net/customer-api",
     TRUCK_ROLL_BASE_URL:
       "https://adb-1771418802186593.13.azuredatabricks.net/model/lgb_model_fs/Staging/invocations",
-    PAYMENTURL_V2:
-      "https://payment.uat.sparklight.com/PortalsV2/PortalsPayment",
-    URL_EASYPAY_SETUP_V2:
-      "https://payment.uat.sparklight.com/PortalsV2/setup-auto-pay",
-    URL_EASYPAY_MANAGE_V2:
-      "https://payment.uat.sparklight.com/PortalsV2/manage-auto-pay",
-
-    PAYMENTURL_V3:
+    PAYMENTURL:
       "https://payment.uat.sparklight.com/portalsV3-Demo/PortalsBiller/GetPostDataWithKey",
-    URL_EASYPAY_SETUP_V3:
+    URL_EASYPAY_SETUP:
       "https://payment.uat.sparklight.com/portalsV3-Demo/activate-autopay",
-    URL_EASYPAY_MANAGE_V3:
+    URL_EASYPAY_MANAGE:
       "https://payment.uat.sparklight.com/portalsV3-Demo/manage-autopay",
     VIEW_BILLINGS: "https://customer.uat.sparklight.com/residential/billing",
     VIEW_PAYMENT:

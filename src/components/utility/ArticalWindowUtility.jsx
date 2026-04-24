@@ -1,18 +1,159 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, Platform, AppState, Alert, AccessibilityInfo, Linking } from 'react-native';
+import { View, Text, StyleSheet, Platform, AppState, Animated, Alert } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import { RefreshToken } from '../user/Session';
-//import { Env } from '../../network/apis/account/Constants';
+import { ISUAT } from '../../network/apis/account/Constants';
 import Config from 'react-native-config';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
-import analytics from '@react-native-firebase/analytics';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import LoadingSpinner from './LoadingSpinner';
-import useAccessibilityFocus from '../../hooks/useAccessibilityFocus';
+import { getUser } from '../../redux/utils/LocalStorage';
+import NetInfo from '@react-native-community/netinfo';
+import { setAuthCookiesOnAllDomains, dumpCookies, clearAuthCookies } from './NativeCookieManager';
 
+const TAG = '[ArticalWindow]';
+const JS_COOKIE_DOMAIN = ISUAT ? '.uat.sparklight.com' : '.sparklight.com';
+const REFRESH_INTERVAL_MS = 4 * 60 * 1000; 
+const safeForJS = (val) => JSON.stringify(String(val || '')).slice(1, -1);
+
+const tokenPreview = (t) => {
+    if (!t) return '(none)';
+    const s = String(t);
+    if (s.length <= 16) return s.substring(0, 4) + '…';
+    return s.substring(0, 8) + '…' + s.substring(s.length - 4);
+};
+
+const logStorageSnapshot = async (caller) => {
+    try {
+        const cu = await getUser();
+        const jwtAge = cu?.jwtTimestamp ? Date.now() - cu.jwtTimestamp : '?';
+        const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?';
+        console.log(`${TAG} STORAGE [${caller}] | ts=${new Date().toISOString()} | jwt=${tokenPreview(cu?.token)} | jwtAge=${jwtAge}ms | jwtIssuedAt=${cu?.jwtTimestamp ? new Date(cu.jwtTimestamp).toISOString() : '?'} | idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${idTokenAge}ms | idTokenIssuedAt=${cu?.idTokenTimestamp ? new Date(cu.idTokenTimestamp).toISOString() : '?'} | account=${cu?.userInfo?.accountNumber || '?'}`);
+    } catch (e) {
+        console.warn(`${TAG} STORAGE [${caller}] read failed:`, e.message);
+    }
+};
+
+const WEBVIEW_STORAGE_DUMP_JS = `(function() {
+    try {
+        var snap = {
+            jwt_token: localStorage.getItem('jwt_token') || null,
+            user_info: localStorage.getItem('user_info') || null,
+            tokenIssuedAt: localStorage.getItem('tokenIssuedAt') || null,
+            cookies: document.cookie || '',
+            origin: location.origin,
+            href: location.href,
+            ts: new Date().toISOString()
+        };
+        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'storageSnapshot', data: snap }));
+    } catch(e) {}
+})(); true;`;
+
+const buildCookieJS = (idToken) => {
+    const safe = safeForJS(idToken);
+    return `var _long = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+var _short = new Date(Date.now() + 5*60*1000).toUTCString();
+var _dom = '; domain=${JS_COOKIE_DOMAIN}';
+document.cookie = 'Source=MobileApp; path=/' + _dom + '; expires=' + _long + '; Secure; SameSite=Lax;';
+document.cookie = 'CustomerType=Residential; path=/' + _dom + '; expires=' + _long + '; Secure; SameSite=Lax;';
+document.cookie = 'LatestVersion=true; path=/' + _dom + '; expires=' + _long + '; Secure; SameSite=Lax;';
+if ('${safe}') document.cookie = 'IdToken=${safe}; path=/' + _dom + '; expires=' + _short + '; Secure; SameSite=Lax;';`;
+};
+
+const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp) => {
+    const safeToken = safeForJS(token);
+    const safeUserInfo = safeForJS(typeof userInfo === 'string' ? userInfo : JSON.stringify(userInfo || {}));
+
+    return `(function() {
+    try {
+        if ('${safeToken}') {
+            localStorage.setItem('jwt_token', '${safeToken}');
+            localStorage.setItem('user_info', '${safeUserInfo}');
+            localStorage.setItem('tokenIssuedAt', '${jwtTimestamp || Date.now()}');
+        }
+
+        try {
+            var _expire = 'Thu, 01 Jan 1970 00:00:00 GMT';
+            document.cookie = 'IdToken=; path=/; expires=' + _expire + ';';
+            document.cookie = 'Source=; path=/; expires=' + _expire + ';';
+            document.cookie = 'CustomerType=; path=/; expires=' + _expire + ';';
+            document.cookie = 'LatestVersion=; path=/; expires=' + _expire + ';';
+        } catch(e) {}
+        try { ${buildCookieJS(idToken)} } catch(e) {}
+
+        var _xo = XMLHttpRequest.prototype.open, _xs = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.open = function(m, u) {
+            this._url = u;
+            return _xo.apply(this, arguments);
+        };
+        XMLHttpRequest.prototype.send = function(body) {
+            var self = this;
+            this.addEventListener('load', function() {
+                if ((self._url.includes('/statements/') || self._url.includes('Statement')) && self.status === 200) {
+                    try {
+                        var d = JSON.parse(self.response);
+                        if (d.fileBinary) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'pdf', data: d.fileBinary }));
+                    } catch(e) {}
+                }
+            });
+            return _xs.apply(this, arguments);
+        };
+
+        window.addEventListener('message', function(e) {
+            if (e.data === 'PING') {
+                window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'pong' }));
+            } else if (e.data === 'SAVE_STATE' && window.saveFormState) {
+                window.saveFormState();
+            }
+        });
+
+        window.saveFormState = function() {
+            var fd = {};
+            document.querySelectorAll('input, select, textarea').forEach(function(el, i) {
+                if (el.type !== 'password' && el.value) fd['field_' + i] = { value: el.value, id: el.id, name: el.name };
+            });
+            localStorage.setItem('formState', JSON.stringify(fd));
+            localStorage.setItem('scrollPosition', window.scrollY);
+        };
+        window.restoreFormState = function() {
+            try {
+                var s = localStorage.getItem('formState');
+                if (s) {
+                    var fd = JSON.parse(s);
+                    document.querySelectorAll('input, select, textarea').forEach(function(el, i) {
+                        var sf = fd['field_' + i];
+                        if (sf && el.type !== 'password') el.value = sf.value;
+                    });
+                    var sp = localStorage.getItem('scrollPosition');
+                    if (sp) window.scrollTo(0, parseInt(sp));
+                }
+            } catch(e) {}
+        };
+        setInterval(window.saveFormState, 5000);
+        if (document.readyState === 'complete') window.restoreFormState();
+        else window.addEventListener('load', window.restoreFormState);
+
+        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'injectionComplete' }));
+        // Post back localStorage + cookies immediately after injection for comparison with portal
+        var snap = {
+            jwt_token: localStorage.getItem('jwt_token') || null,
+            user_info: localStorage.getItem('user_info') || null,
+            tokenIssuedAt: localStorage.getItem('tokenIssuedAt') || null,
+            cookies: document.cookie || '',
+            origin: location.origin,
+            href: location.href,
+            ts: new Date().toISOString()
+        };
+        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'storageSnapshot_postInjection', data: snap }));
+    } catch(e) {
+        console.error('${TAG} Injection error:', e.message);
+    }
+})();
+true;`;
+};
 
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
@@ -20,806 +161,548 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [url] = useState(route.params?.url);
-    const [modalOpen, setModalOpen] = useState(true);
-    const [navStateReloading, setNavStateReloading] = useState(false);
     const [showPDFModal, setShowPDFModal] = useState(false);
     const [showPDFUrl, setShowPDFUrl] = useState('');
-    const [isTokenRefreshing, setIsTokenRefreshing] = useState(false);
     const [contentLoaded, setContentLoaded] = useState(false);
-    const [loadStartTime, setLoadStartTime] = useState(0);
-    const [forceWebViewRecreation, setForceWebViewRecreation] = useState(false);
-    const [appBackgroundTime, setAppBackgroundTime] = useState(0);
+    const [webViewKey, setWebViewKey] = useState(Date.now());
+    const [showToast, setShowToast] = useState(false);
+    const [webViewReady, setWebViewReady] = useState(false);
+    const [injectionScript, setInjectionScript] = useState('');
+
     const user = useSelector(state => state.user.userData);
-    // Don't show loading spinner if coming from Bill Explainer redirect
-    const [loading, setLoading] = useState(!route.params?.isBilling);
     const webViewRef = useRef();
-    const [mainViewRef, setFocus] = useAccessibilityFocus();
-    const isNavigatingAway = useRef(false);
+    const aliveCheckResolver = useRef(null);
+    const aliveCheckTimeout = useRef(null);
+    const backgroundTimestamp = useRef(0);
+    const toastOpacity = useRef(new Animated.Value(0)).current;
+    const initialLoadComplete = useRef(false);
+    const silentRefreshTimer = useRef(null);
+    const pendingOfflineRefresh = useRef(false);
+    const lastIdTokenRefresh = useRef(0);
+    const currentUrlRef = useRef('');
+    const ssoRedirectInFlight = useRef(false);
 
-    useEffect(() => {
-    // Set focus when the component mounts (screen appears)
-    setFocus();
-  }, [setFocus]);
+    const isLoading = !contentLoaded || progress < 1;
 
-    useEffect(() => {
-        // Open Bill Explainer outside the app in the mobile browser.
-        if (name === 'Bill Explainer' && url) {
-            setModalOpen(false);
-            Linking.openURL(url)
-                .catch((error) => {
-                    console.error('Failed to open Bill Explainer in browser:', error);
-                })
-                .finally(() => {
-                    navigation.goBack();
-                });
-        }
-    }, [name, url, navigation]);
+    const refreshInjectionScript = useCallback(async () => {
+        const cu = await getUser();
+        setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp));
+    }, []);
 
-    // Reset navigation flag when component unmounts or name changes
-    useEffect(() => {
-        isNavigatingAway.current = false;
-        return () => {
-            isNavigatingAway.current = false;
-        };
-    }, [name]);
 
-    // FIXED: Simplified and more compatible script
-    const enhancedScript = `
-        (function() {
-            try {
-                console.log('Sparklight script injection started');
-                
-                // Simple localStorage setup
-                const token = '${user?.token || ''}';
-                const userInfo = '${JSON.stringify(user?.userInfo || {})}';
-                const screenName = '${name || ''}';
-                const initialUrl = '${url || ''}';
-                const isLegalPage =
-                    screenName === 'Privacy Policy' ||
-                    screenName === 'Terms & Conditions' ||
-                    initialUrl.includes('/legal/');
-                
-                if (token) {
-                    localStorage.setItem('jwt_token', token);
-                    console.log('JWT token set');
-                }
-                
-                if (userInfo && userInfo !== '{}') {
-                    localStorage.setItem('user_info', userInfo);
-                    console.log('User info set');
-                }
-                
-                // Simplified cookie setting - removed problematic flags
-                try {
-                    const cookieValue = "Source=MobileApp; domain=" + location.hostname + "; path=/; max-age=31536000";
-                    document.cookie = cookieValue;
-                    console.log('Cookie set successfully');
-                } catch (cookieError) {
-                    console.error('Cookie setting failed:', cookieError);
-                }
-
-                // Hide known consent overlays without touching normal page content.
-                const hideCookieBanner = function() {
-                    try {
-                        const selectorList = [
-                            '#onetrust-banner-sdk',
-                            '#onetrust-consent-sdk',
-                            '#onetrust-pc-sdk',
-                            '.onetrust-pc-dark-filter',
-                            '.ot-sdk-container',
-                            '.ot-sdk-row',
-                            '[id*="cookie"]',
-                            '[class*="cookie"]',
-                            '[id*="consent"]',
-                            '[class*="consent"]'
-                        ];
-
-                        selectorList.forEach(function(selector) {
-                            document.querySelectorAll(selector).forEach(function(node) {
-                                const computedStyle = window.getComputedStyle(node);
-                                const isOverlayLike =
-                                    selector.startsWith('#onetrust') ||
-                                    selector.startsWith('.ot-') ||
-                                    computedStyle.position === 'fixed' ||
-                                    computedStyle.position === 'sticky' ||
-                                    computedStyle.zIndex === '2147483647' ||
-                                    node.getAttribute('role') === 'dialog';
-
-                                if (!isOverlayLike) {
-                                    return;
-                                }
-
-                                node.style.setProperty('display', 'none', 'important');
-                                node.style.setProperty('visibility', 'hidden', 'important');
-                                node.style.setProperty('opacity', '0', 'important');
-                                node.style.setProperty('pointer-events', 'none', 'important');
-                            });
-                        });
-
-                        const blockers = [
-                            'this website uses cookies',
-                            'best experience on our website',
-                            'cookie preferences',
-                            'decline',
-                            'dismiss'
-                        ];
-
-                        document.querySelectorAll('div, section, aside, footer, p, span, button, a').forEach(function(node) {
-                            const text = (node.innerText || node.textContent || '').toLowerCase().trim();
-                            if (!text) return;
-
-                            const isCookieText = blockers.some(function(key) {
-                                return text.includes(key);
-                            });
-
-                            if (isCookieText) {
-                                // Hide full banner container when possible
-                                let container = node;
-                                let depth = 0;
-                                while (container && depth < 6) {
-                                    const containerText = (container.innerText || '').toLowerCase();
-                                    const isBannerContainer =
-                                        containerText.includes('this website uses cookies') ||
-                                        containerText.includes('cookie preferences') ||
-                                        container.id?.toLowerCase()?.includes('cookie') ||
-                                        container.className?.toString()?.toLowerCase()?.includes('cookie') ||
-                                        container.id?.toLowerCase()?.includes('consent') ||
-                                        container.className?.toString()?.toLowerCase()?.includes('consent');
-
-                                    const computedStyle = window.getComputedStyle(container);
-                                    const isOverlayLike =
-                                        computedStyle.position === 'fixed' ||
-                                        computedStyle.position === 'sticky' ||
-                                        Number(computedStyle.zIndex || 0) > 100;
-
-                                    if (isBannerContainer && isOverlayLike) {
-                                        container.style.setProperty('display', 'none', 'important');
-                                        container.style.setProperty('visibility', 'hidden', 'important');
-                                        container.style.setProperty('opacity', '0', 'important');
-                                        container.style.setProperty('pointer-events', 'none', 'important');
-                                        break;
-                                    }
-                                    container = container.parentElement;
-                                    depth++;
-                                }
-
-                                node.style.setProperty('display', 'none', 'important');
-                                node.style.setProperty('visibility', 'hidden', 'important');
-                                node.style.setProperty('pointer-events', 'none', 'important');
-                            }
-                        });
-                    } catch (cookieBannerError) {
-                        console.log('Cookie banner hide failed:', cookieBannerError);
-                    }
-                };
-
-                if (!isLegalPage) {
-                    hideCookieBanner();
-                    setTimeout(hideCookieBanner, 300);
-                    setTimeout(hideCookieBanner, 1000);
-                    setTimeout(hideCookieBanner, 2000);
-
-                    if (!window.__cookieBannerObserverInstalled) {
-                        const observer = new MutationObserver(function() {
-                            hideCookieBanner();
-                        });
-
-                        observer.observe(document.documentElement || document.body, {
-                            childList: true,
-                            subtree: true,
-                            attributes: true
-                        });
-
-                        window.__cookieBannerObserverInstalled = true;
-                    }
-                }
-                
-                // Only intercept clicks for Bill Explainer screen
-                if (screenName === 'Bill Explainer') {
-                    console.log('Bill Explainer detected - activating payment link interceptor');
-                    
-                    // Intercept ALL clicks to detect billing/payment navigation
-                    document.addEventListener('click', function(e) {
-                        let target = e.target;
-                        console.log('Click detected on:', target.tagName, target.className, target.textContent?.substring(0, 50));
-                        
-                        // Check if clicked element or any parent contains billing/payment related text or attributes
-                        let currentElement = target;
-                        let maxDepth = 10;
-                        let depth = 0;
-                        
-                        while (currentElement && depth < maxDepth) {
-                            // Check text content
-                            const textContent = currentElement.textContent?.toLowerCase() || '';
-                            const className = currentElement.className?.toLowerCase() || '';
-                            const id = currentElement.id?.toLowerCase() || '';
-                            const href = currentElement.href?.toLowerCase() || '';
-                            const onclick = currentElement.getAttribute('onclick')?.toLowerCase() || '';
-                            
-                            // Check for "Pay Now" or "Pay" text/attributes
-                            if (textContent.includes('pay now') || 
-                                textContent.includes('make payment') ||
-                                textContent.includes('pay bill') ||
-                                className.includes('pay') ||
-                                id.includes('pay') ||
-                                href.includes('billing') ||
-                                href.includes('payment') ||
-                                href.includes('app-secure') ||
-                                onclick.includes('billing') ||
-                                onclick.includes('payment')) {
-                                
-                                console.log('Payment/Billing element detected:', {
-                                    tag: currentElement.tagName,
-                                    text: textContent.substring(0, 100),
-                                    className: className,
-                                    id: id,
-                                    href: href
-                                });
-                                
-                                // Send message to React Native
-                                window.ReactNativeWebView.postMessage(JSON.stringify({
-                                    type: 'billing_navigation',
-                                    url: href || window.location.href,
-                                    elementType: currentElement.tagName,
-                                    text: textContent.substring(0, 100)
-                                }));
-                                
-                                // Prevent default navigation
-                                e.preventDefault();
-                                e.stopPropagation();
-                                return false;
-                            }
-                            
-                            currentElement = currentElement.parentElement;
-                            depth++;
-                        }
-                    }, true);
-                    
-                    // Intercept window.location changes
-                    const originalLocationSetter = Object.getOwnPropertyDescriptor(window, 'location').set;
-                    if (originalLocationSetter) {
-                        Object.defineProperty(window, 'location', {
-                            set: function(value) {
-                                const url = value.toString().toLowerCase();
-                                console.log('Location change detected:', url);
-                                
-                                if (url.includes('/billing') || 
-                                    url.includes('/payment') || 
-                                    url.includes('app-secure') ||
-                                    url.includes('payment.sparklight.com')) {
-                                    
-                                    console.log('Billing URL detected in location change');
-                                    window.ReactNativeWebView.postMessage(JSON.stringify({
-                                        type: 'billing_navigation',
-                                        url: url
-                                    }));
-                                    return;
-                                }
-                                originalLocationSetter.call(window, value);
-                            },
-                            get: function() {
-                                return window.location;
-                            }
-                        });
-                    }
-                } else {
-                    console.log('Screen is not Bill Explainer (' + screenName + ') - payment interception disabled');
-                }
-                
-                // FIXED: Simplified PDF interceptor setup
-                if (!window.pdfInterceptorSetup) {
-                    const origOpen = XMLHttpRequest.prototype.open;
-                    XMLHttpRequest.prototype.open = function(method, url) {
-                        this.addEventListener('load', function() {
-                            if ((url.includes('/statements/') || url.includes('Statement')) && this.status === 200) {
-                                try {
-                                    const data = JSON.parse(this.response);
-                                    if (data.fileBinary) {
-                                        window.ReactNativeWebView.postMessage(JSON.stringify({
-                                            type: 'pdf',
-                                            data: data.fileBinary
-                                        }));
-                                    }
-                                } catch(parseError) {
-                                    console.error('PDF parsing error:', parseError);
-                                }
-                            }
-                        });
-                        
-                        this.addEventListener('error', function() {
-                            console.error('XHR Error:', this.status, url);
-                        });
-                        
-                        origOpen.apply(this, arguments);
-                    };
-                    
-                    window.pdfInterceptorSetup = true;
-                    console.log('PDF interceptor setup complete');
-                }
-                
-                console.log('Script injection completed successfully');
-                
-            } catch(scriptError) {
-                console.error('Script injection error:', scriptError);
-            }
-        })();
-    `;
-
-    // Handle navigation interception - prevent billing URLs from loading in Bill Explainer
-    const onShouldStartLoadWithRequest = useCallback((request) => {
-        console.log('Should start load with request:', request.url);
-        
-        // If we're already navigating away, block all new requests
-        if (isNavigatingAway.current) {
-            return false;
-        }
-        
-        // Check for billing/payment URLs
-        const isBillingUrl = request.url.includes('/billing') || 
-            request.url.includes('/payment') || 
-            request.url.includes('payment.sparklight.com') ||
-            request.url.includes('/portals/app-secure/billing') ||
-            request.url.includes('app-secure');
-        
-        if (isBillingUrl) {
-            // If we're already on a billing page, allow the navigation
-            if (url.includes('/billing') || name === 'Billing Details') {
-                return true;
-            }
-            
-            // If we're in Bill Explainer, intercept and navigate to Billing Details
-            if (name === 'Bill Explainer') {
-                console.log('Billing URL detected in Bill Explainer, redirecting to Billing Details');
-                isNavigatingAway.current = true;
-                
-                // Stop the webview from loading
-                if (webViewRef.current) {
-                    webViewRef.current.stopLoading();
-                }
-                
-                setModalOpen(false);
-                
-                setTimeout(() => {
-                    navigation.replace('ArticalWindowUtility', {
-                        url: `${Config.ACP_BILLING}/billing`,
-                        name: 'Billing Details',
-                        isBilling: true
-                    });
-                }, 150);
-                
-                return false; // Prevent the navigation in current webview
-            }
-        }
-        
-        return true; // Allow all other navigations
-    }, [url, name, navigation, Config.ACP_BILLING]);
-
-    const navigationChange = useCallback(async (navState) => {
-        console.log('Navigation change:', navState.url, 'Current name:', name);
-        
-        // If we're already navigating away, don't process further
-        if (isNavigatingAway.current) {
-            return;
-        }
-        
-        // Check for billing/payment URLs (for Android support)
-        const isBillingUrl = navState.url.includes('/billing') || 
-            navState.url.includes('/payment') || 
-            navState.url.includes('payment.sparklight.com') ||
-            navState.url.includes('/portals/app-secure/billing') ||
-            navState.url.includes('app-secure');
-        
-        if (isBillingUrl && name === 'Bill Explainer') {
-            // If we're already on a billing page, allow the navigation
-            if (url.includes('/billing') || name === 'Billing Details') {
-                return;
-            }
-            
-            console.log('Billing URL detected in navigationChange for Bill Explainer, redirecting');
-            isNavigatingAway.current = true;
-            
-            // Stop the webview from loading
-            if (webViewRef.current) {
-                webViewRef.current.stopLoading();
-            }
-            
-            setModalOpen(false);
-            
-            setTimeout(() => {
-                navigation.replace('ArticalWindowUtility', {
-                    url: `${Config.ACP_BILLING}/billing`,
-                    name: 'Billing Details',
-                    isBilling: true
-                });
-            }, 150);
-            
-            return;
-        }
-        
-        // Check for authentication redirects
-        if (navState.url.includes('/postlogout') || navState.url.includes(Config.SSO_LOGIN)) {
-            if (!navStateReloading) {
-                setIsTokenRefreshing(true);
-                setNavStateReloading(true);
-                
+    const prepareInjectionScript = useCallback(async () => {
+        try {
+            console.log(`${TAG} prepareInjectionScript START | ts=${new Date().toISOString()} | targetUrl=${url}`);
+            let cu = await getUser();
+            const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : Infinity;
+            console.log(`${TAG} prepareInjectionScript | jwt=${tokenPreview(cu?.token)} | jwtTimestamp=${cu?.jwtTimestamp ? new Date(cu.jwtTimestamp).toISOString() : '?'} | idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${idTokenAge}ms | idTokenTimestamp=${cu?.idTokenTimestamp ? new Date(cu.idTokenTimestamp).toISOString() : '?'}`);
+            if (idTokenAge > 240000) {
+                console.warn(`${TAG} prepareInjectionScript | IdToken stale (${idTokenAge}ms old) — refreshing before injection | ts=${new Date().toISOString()}`);
                 try {
                     await RefreshToken();
-                    console.log('Token refresh successful');
-                    setTimeout(() => {
-                        webViewRef.current?.reload();
-                        setIsTokenRefreshing(false);
-                        setNavStateReloading(false);
-                        console.log('WebView reload completed');
-                    }, 500);
-                } catch (error) {
-                    console.log('Token refresh failed:', error);
-                    setIsTokenRefreshing(false);
-                    setNavStateReloading(false);
-                    Alert.alert(
-                        'Session Expired',
-                        'Please log in again.',
-                        [{ text: 'OK', onPress: () => navigationRef.current?.navigate('Splash') }]
-                    );
+                    cu = await getUser();
+                    console.log(`${TAG} prepareInjectionScript | post-refresh idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?'}ms`);
+                } catch (refreshErr) {
+                    console.error(`${TAG} prepareInjectionScript | refresh failed, using existing token | error=${refreshErr.message}`);
                 }
             }
-        }
-        
-    }, [navStateReloading, name, url, navigation, Config.ACP_BILLING, Config.SSO_LOGIN]);
 
-    const onMessage = useCallback((event) => {
+            lastIdTokenRefresh.current = cu?.idTokenTimestamp || Date.now();
+            await setAuthCookiesOnAllDomains(cu?.idToken || '');
+            setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp));
+            setWebViewReady(true);
+            console.log(`${TAG} prepareInjectionScript DONE | WebView ready | ts=${new Date().toISOString()}`);
+            await dumpCookies('prepareInjection');
+        } catch (e) {
+            console.error(`${TAG} prepareInjectionScript FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
+            setWebViewReady(true);
+        }
+    }, []);
+
+    const injectAuth = useCallback(async () => {
+        if (!webViewRef.current) return;
         try {
-            const data = JSON.parse(event.nativeEvent.data);
-            console.log('WebView message received:', data.type);
-            
-            switch (data.type) {
-                case 'billing_navigation':
-                    // Handle billing/payment link clicks from Bill Explainer
-                    if (name === 'Bill Explainer') {
-                        console.log('Billing navigation message received from Bill Explainer, URL:', data.url);
-                        isNavigatingAway.current = true;
-                        
-                        // Stop the webview from loading
-                        if (webViewRef.current) {
-                            webViewRef.current.stopLoading();
-                        }
-                        
-                        setModalOpen(false);
-                        
-                        setTimeout(() => {
-                            navigation.replace('ArticalWindowUtility', {
-                                url: `${Config.ACP_BILLING}/billing`,
-                                name: 'Billing Details',
-                                isBilling: true
-                            });
-                        }, 100);
-                    }
-                    break;
-                
-                case 'pdf':
-                    if (data.data) {
-                        setShowPDFUrl(data.data);
-                        setShowPDFModal(true);
-                        console.log('PDF modal opened');
-                    }
-                    break;
-                    
-                case 'xhr_error':
-                    console.log('XHR Error:', data);
-                    break;
-                    
-                case 'page_error':
-                    console.log('Page Error:', data);
-                    break;
-                    
-                default:
-                    console.log('Unknown message type:', data.type);
-            }
-        } catch (error) {
-            console.log('Message parsing error:', error);
-        }
-    }, [name, navigation, Config.ACP_BILLING]);
+            console.log(`${TAG} injectAuth START (full JWT+IdToken) | ts=${new Date().toISOString()} | currentUrl=${currentUrlRef.current}`);
+            const cu = await getUser();
+            const idToken = cu?.idToken || '';
+            const jwtTs = cu?.jwtTimestamp || Date.now();
+            console.log(`${TAG} injectAuth | jwt=${tokenPreview(cu?.token)} | idToken=${tokenPreview(idToken)} | jwtTimestamp=${new Date(jwtTs).toISOString()} | setting localStorage: jwt_token, user_info, tokenIssuedAt | setting cookies: IdToken, Source, CustomerType, LatestVersion`);
+            if (idToken) await setAuthCookiesOnAllDomains(idToken);
 
-    const onLoadStart = useCallback((syntheticEvent) => {
-        const startTime = Date.now();
-        setLoadStartTime(startTime);
-        setProgress(0.1);
+            const safeToken = safeForJS(cu?.token);
+            const safeUserInfo = safeForJS(typeof cu?.userInfo === 'string' ? cu.userInfo : JSON.stringify(cu?.userInfo || {}));
+
+            webViewRef.current.injectJavaScript(`(function() {
+    try {
+        var _ae = document.activeElement;
+        var _wasInput = _ae && (_ae.tagName === 'INPUT' || _ae.tagName === 'TEXTAREA' || _ae.tagName === 'SELECT');
+        if (_wasInput) _ae.blur();
+        var h = document.location.hostname;
+        if (!h || h === 'localhost') return;
+        ${buildCookieJS(idToken)}
+        if ('${safeToken}') {
+            localStorage.setItem('jwt_token', '${safeToken}');
+            localStorage.setItem('user_info', '${safeUserInfo}');
+            localStorage.setItem('tokenIssuedAt', '${jwtTs}');
+        }
+        if (_wasInput && _ae) { _ae.focus(); }
+    } catch(e) {}
+})(); true;`);
+            console.log(`${TAG} injectAuth DONE | ts=${new Date().toISOString()}`);
+            await dumpCookies('injectAuth');
+            dumpWebViewStorage('injectAuth');
+        } catch (e) {
+            console.error(`${TAG} injectAuth FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
+        }
+    }, []);
+
+
+    const injectIdTokenOnly = useCallback(async () => {
+        if (!webViewRef.current) return;
+        try {
+            const cu = await getUser();
+            const idToken = cu?.idToken || '';
+            const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?';
+            console.log(`${TAG} injectIdTokenOnly | ts=${new Date().toISOString()} | idToken=${tokenPreview(idToken)} | idTokenAge=${idTokenAge}ms | currentUrl=${currentUrlRef.current}`);
+            if (idToken) await setAuthCookiesOnAllDomains(idToken);
+
+            webViewRef.current.injectJavaScript(`(function() {
+    try {
+        var _ae = document.activeElement;
+        var _wasInput = _ae && (_ae.tagName === 'INPUT' || _ae.tagName === 'TEXTAREA' || _ae.tagName === 'SELECT');
+        if (_wasInput) _ae.blur();
+        var h = document.location.hostname;
+        if (!h || h === 'localhost') return;
+        ${buildCookieJS(idToken)}
+        if (_wasInput && _ae) { _ae.focus(); }
+    } catch(e) {}
+})(); true;`);
+            dumpWebViewStorage('injectIdTokenOnly');
+        } catch (e) {
+            console.error(`${TAG} injectIdTokenOnly FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
+        }
+    }, [dumpWebViewStorage]);
+
+    const dumpWebViewStorage = useCallback((caller) => {
+        if (!webViewRef.current) return;
+        webViewRef.current.injectJavaScript(
+            WEBVIEW_STORAGE_DUMP_JS.replace('storageSnapshot', 'storageSnapshot_' + caller)
+        );
+    }, []);
+
+    const isOnPaymentDomain = useCallback(() => {
+        const cur = currentUrlRef.current || '';
+        return cur.includes('payment.sparklight.com') || cur.includes('payment.uat.sparklight.com');
+    }, []);
+
+
+    const silentRefreshIdToken = useCallback(async () => {
+        if (!webViewRef.current) return;
+        const refreshStartTs = Date.now();
+        const lastRefreshAge = lastIdTokenRefresh.current ? refreshStartTs - lastIdTokenRefresh.current : '?';
+        console.log(`${TAG} silentRefresh START | ts=${new Date(refreshStartTs).toISOString()} | lastRefreshAge=${lastRefreshAge}ms | currentUrl=${currentUrlRef.current} | onPaymentDomain=${isOnPaymentDomain()}`);
+        try {
+            const netState = await NetInfo.fetch();
+            if (!netState.isConnected || !netState.isInternetReachable) {
+                console.warn(`${TAG} silentRefresh SKIP — offline | ts=${new Date().toISOString()}`);
+                pendingOfflineRefresh.current = true;
+                return;
+            }
+            await logStorageSnapshot('silentRefresh-before');
+            const newToken = await RefreshToken();
+            if (!newToken) {
+                console.warn(`${TAG} silentRefresh — RefreshToken returned null | ts=${new Date().toISOString()}`);
+                pendingOfflineRefresh.current = true;
+                return;
+            }
+            pendingOfflineRefresh.current = false;
+            lastIdTokenRefresh.current = Date.now();
+            await refreshInjectionScript();
+            const cu = await getUser();
+            if (cu?.idToken) {
+                console.log(`${TAG} silentRefresh — setting native cookies | idToken=${tokenPreview(cu.idToken)} | ts=${new Date().toISOString()}`);
+                await setAuthCookiesOnAllDomains(cu.idToken);
+            }
+            console.log(`${TAG} silentRefresh — injecting IdToken cookie to WebView | onPaymentDomain=${isOnPaymentDomain()} | ts=${new Date().toISOString()}`);
+            await injectIdTokenOnly();
+            await logStorageSnapshot('silentRefresh-after');
+            await dumpCookies('silentRefresh-after');
+            console.log(`${TAG} silentRefresh DONE | duration=${Date.now() - refreshStartTs}ms`);
+        } catch (e) {
+            console.error(`${TAG} silentRefresh FAILED | duration=${Date.now() - refreshStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
+            pendingOfflineRefresh.current = true;
+        }
+    }, [injectIdTokenOnly, isOnPaymentDomain, refreshInjectionScript]);
+
+    const stopSilentRefresh = useCallback(() => {
+        if (silentRefreshTimer.current) {
+            clearInterval(silentRefreshTimer.current);
+            silentRefreshTimer.current = null;
+        }
+    }, []);
+
+    const startSilentRefresh = useCallback(() => {
+        stopSilentRefresh();
+        silentRefreshTimer.current = setInterval(silentRefreshIdToken, REFRESH_INTERVAL_MS);
+    }, [silentRefreshIdToken, stopSilentRefresh]);
+
+    const checkWebViewAlive = useCallback(() => {
+        return new Promise((resolve) => {
+            if (aliveCheckResolver.current) { resolve(false); return; }
+            aliveCheckResolver.current = resolve;
+            aliveCheckTimeout.current = setTimeout(() => {
+                if (aliveCheckResolver.current) {
+                    aliveCheckResolver.current(false);
+                    aliveCheckResolver.current = null;
+                }
+            }, 2000);
+            webViewRef.current?.injectJavaScript(`window.postMessage('PING'); true;`);
+        });
+    }, []);
+
+    const recreateWebView = useCallback(async () => {
+        console.log(`${TAG} recreateWebView START | ts=${new Date().toISOString()} | currentUrl=${currentUrlRef.current}`);
+        webViewRef.current?.injectJavaScript(`window.postMessage('SAVE_STATE'); true;`);
+        initialLoadComplete.current = false;
+        setContentLoaded(false);
+        setProgress(0);
+        await prepareInjectionScript();
+        setWebViewKey(Date.now());
+        console.log(`${TAG} recreateWebView DONE | newKey=${Date.now()} | ts=${new Date().toISOString()}`);
+    }, [prepareInjectionScript]);
+
+    const showToastMessage = useCallback(() => {
+        setShowToast(true);
+        Animated.sequence([
+            Animated.timing(toastOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+            Animated.delay(2000),
+            Animated.timing(toastOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
+        ]).start(() => setShowToast(false));
+    }, [toastOpacity]);
+
+    useEffect(() => { prepareInjectionScript(); }, [prepareInjectionScript]);
+
+    useEffect(() => {
+        return () => {
+            webViewRef.current?.injectJavaScript(`
+                try { localStorage.removeItem('formState'); localStorage.removeItem('scrollPosition'); } catch(e) {}
+                true;
+            `);
+        };
+    }, []);
+
+    useEffect(() => {
+        startSilentRefresh();
+        return stopSilentRefresh;
+    }, [startSilentRefresh, stopSilentRefresh]);
+
+    useEffect(() => {
+        const unsub = NetInfo.addEventListener((state) => {
+            if (state.isConnected && state.isInternetReachable && pendingOfflineRefresh.current) silentRefreshIdToken();
+        });
+        return () => unsub();
+    }, [silentRefreshIdToken]);
+
+    useEffect(() => {
+        const handleAppState = async (nextAppState) => {
+            if (nextAppState === 'background' || nextAppState === 'inactive') {
+                backgroundTimestamp.current = Date.now();
+                console.log(`${TAG} AppState → ${nextAppState} | ts=${new Date().toISOString()} | stoppingSilentRefresh`);
+                stopSilentRefresh();
+                webViewRef.current?.injectJavaScript(`window.postMessage('SAVE_STATE'); true;`);
+            } else if (nextAppState === 'active' && backgroundTimestamp.current > 0) {
+                const dur = Date.now() - backgroundTimestamp.current;
+                const idTokenAge = Date.now() - lastIdTokenRefresh.current;
+                const netState = await NetInfo.fetch();
+                const isOnline = netState.isConnected && netState.isInternetReachable;
+                console.log(`${TAG} AppState → active | bgDuration=${dur}ms | idTokenAge=${idTokenAge}ms | isOnline=${isOnline} | currentUrl=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
+                await logStorageSnapshot('appState-resume');
+                await dumpCookies('appState-resume');
+
+                if (dur > 600000) {
+                    console.log(`${TAG} AppState | >10min bg — checking WebView alive`);
+                    if (!isOnline) { console.warn(`${TAG} AppState | offline, deferring refresh`); pendingOfflineRefresh.current = true; }
+                    else {
+                        const alive = await checkWebViewAlive();
+                        console.log(`${TAG} AppState | WebView alive=${alive}`);
+                        if (!alive) { console.log(`${TAG} AppState | recreating WebView`); recreateWebView(); }
+                        else {
+                            try {
+                                console.log(`${TAG} AppState | WebView alive, refreshing IdToken only`);
+                                await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly();
+                            }
+                            catch (_) { console.warn(`${TAG} AppState | refresh failed, recreating WebView`); recreateWebView(); }
+                        }
+                    }
+                } else if (idTokenAge > 240000) {
+                    console.log(`${TAG} AppState | idToken >4min old, refreshing`);
+                    if (!isOnline) { pendingOfflineRefresh.current = true; }
+                    else {
+                        try { await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly(); }
+                        catch (_) { pendingOfflineRefresh.current = true; }
+                    }
+                } else if (dur > 60000) {
+                    console.log(`${TAG} AppState | >1min bg, re-injecting current IdToken`);
+                    await injectIdTokenOnly();
+                } else {
+                    console.log(`${TAG} AppState | short bg (${dur}ms), no action needed`);
+                }
+                backgroundTimestamp.current = 0;
+                startSilentRefresh();
+            }
+        };
+        const sub = AppState.addEventListener('change', handleAppState);
+        return () => sub?.remove();
+    }, [checkWebViewAlive, recreateWebView, injectIdTokenOnly, refreshInjectionScript, startSilentRefresh, stopSilentRefresh]);
+
+    const authChecked = useRef(false);
+    useEffect(() => {
+        if (authChecked.current) return;
+        authChecked.current = true;
+        if (!user?.token) {
+            Alert.alert('Authentication Required', 'Please log in to continue.', [
+                { text: 'OK', onPress: () => navigationRef.current?.navigate('Splash') },
+            ]);
+        }
+    }, [user]);
+
+    const onShouldStartLoadWithRequest = useCallback((request) => {
+        console.log(`${TAG} NAV onShouldStartLoad | url=${request.url} | ts=${new Date().toISOString()}`);
+
+        if (request.url.includes('/postlogout')) {
+            console.log(`${TAG} NAV | postlogout detected — returning to mobile | ts=${new Date().toISOString()}`);
+            stopSilentRefresh();
+            clearAuthCookies();
+            navigation.goBack();
+            return false;
+        }
+
+        if (request.url.includes(Config.SSO_LOGIN)) {
+            console.warn(`${TAG} NAV | SSO redirect detected — session expired on portal | ssoInFlight=${ssoRedirectInFlight.current}`);
+
+            if (!ssoRedirectInFlight.current) {
+                ssoRedirectInFlight.current = true;
+                (async () => {
+                    try {
+                        console.log(`${TAG} NAV SSO | refreshing token + full auth injection | ts=${new Date().toISOString()}`);
+                        await RefreshToken();
+                        lastIdTokenRefresh.current = Date.now();
+                        await refreshInjectionScript();
+                        await injectAuth();
+                        console.log(`${TAG} NAV SSO | redirecting WebView back to ${url}`);
+                        webViewRef.current?.injectJavaScript(`window.location.href = '${url}'; true;`);
+                    } catch (e) {
+                        console.error(`${TAG} NAV SSO | refresh failed, recreating WebView | error=${e.message}`);
+                        recreateWebView();
+                    } finally {
+                        ssoRedirectInFlight.current = false;
+                    }
+                })();
+            }
+            return false;
+        }
+
+        if (!request.url.startsWith('https://') && !request.url.startsWith('http://')) return false;
+        return true;
+    }, [showToastMessage, navigation, url, injectAuth, recreateWebView, refreshInjectionScript]);
+
+    const onLoadStart = useCallback(({ nativeEvent }) => {
+        const prevUrl = currentUrlRef.current;
+        if (nativeEvent?.url) currentUrlRef.current = nativeEvent.url;
+        const domainChanged = prevUrl && nativeEvent?.url && new URL(prevUrl).hostname !== new URL(nativeEvent.url).hostname;
+        console.log(`${TAG} NAV onLoadStart | url=${nativeEvent?.url} | prevUrl=${prevUrl || '(initial)'} | domainChanged=${!!domainChanged} | ts=${new Date().toISOString()}`);
+        if (!initialLoadComplete.current) { setProgress(0); setContentLoaded(false); }
         setIsError(false);
         setErrorMessage('');
-        setLoading(true);
-        console.log('WebView load started:', syntheticEvent.nativeEvent.url);
+        if (nativeEvent?.url && (nativeEvent.url.includes('payment.sparklight.com') || nativeEvent.url.includes('payment.uat.sparklight.com'))) {
+            console.log(`${TAG} NAV onLoadStart | PAYMENT DOMAIN detected — setting native cookies only`);
+            (async () => {
+                try {
+                    const cu = await getUser();
+                    console.log(`${TAG} NAV onLoadStart | payment domain cookie set | idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?'}ms`);
+                    if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken);
+                    await dumpCookies('onLoadStart-payment');
+                } catch (_) {}
+            })();
+        }
     }, []);
 
-    const onLoadProgress = useCallback(({ nativeEvent }) => {
-        setProgress(nativeEvent.progress);
-        
-    }, []);
+    const onLoadProgress = useCallback(({ nativeEvent }) => { setProgress(nativeEvent.progress); }, []);
 
-    const onLoadEnd = useCallback((syntheticEvent) => {
-        const endTime = Date.now();
-        const loadTime = endTime - loadStartTime;
-        
-        setContentLoaded(true);
-        setLoading(false);
-        setTimeout(() => setProgress(1), 300);
-        console.log(`Page loaded in: ${loadTime}ms (${(loadTime/1000).toFixed(2)}s)`);
-        
-        // Announce content loaded for accessibility
-        //AccessibilityInfo.announceForAccessibility("Content loaded");
-    }, [loadStartTime]);
+    const onLoadEnd = useCallback(async () => {
+        setProgress(1);
+        const onPayment = isOnPaymentDomain();
+        console.log(`${TAG} NAV onLoadEnd | url=${currentUrlRef.current} | onPaymentDomain=${onPayment} | ts=${new Date().toISOString()}`);
 
-    const onError = useCallback((syntheticEvent) => {
-        const { nativeEvent } = syntheticEvent;
-        console.error('WebView error:', nativeEvent);
+        if (!onPayment) {
+            console.log(`${TAG} NAV onLoadEnd | injecting IdToken cookie (not payment domain)`);
+            await injectIdTokenOnly();
+        } else {
+            console.log(`${TAG} NAV onLoadEnd | SKIP IdToken injection (payment domain — avoid overwrite)`);
+        }
+        await logStorageSnapshot('onLoadEnd');
+        await dumpCookies('onLoadEnd');
+        dumpWebViewStorage('onLoadEnd');
+        setTimeout(() => { setContentLoaded(true); initialLoadComplete.current = true; }, 300);
+    }, [injectIdTokenOnly, isOnPaymentDomain, dumpWebViewStorage]);
+
+    const onError = useCallback(({ nativeEvent }) => {
+        console.error(`${TAG} WebView ERROR | description=${nativeEvent.description} | url=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
         setIsError(true);
+        setContentLoaded(true);
         setErrorMessage(`Loading error: ${nativeEvent.description || 'Unknown error'}`);
     }, []);
 
-    const onHttpError = useCallback((syntheticEvent) => {
-        const { nativeEvent } = syntheticEvent;
-        console.error('HTTP error:', nativeEvent.statusCode);
-        
+    const onHttpError = useCallback(({ nativeEvent }) => {
+        console.error(`${TAG} HTTP ERROR | status=${nativeEvent.statusCode} | url=${nativeEvent.url} | currentUrl=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
+        (async () => {
+            await logStorageSnapshot('httpError-' + nativeEvent.statusCode);
+            await dumpCookies('httpError-' + nativeEvent.statusCode);
+        })();
         if (nativeEvent.statusCode === 404) {
-            setIsError(true);
-            setErrorMessage('Page not found (404). Please verify your account has access to this feature.');
+            setIsError(true); setContentLoaded(true);
+            setErrorMessage('Page not found. Please verify your account has access to this feature.');
         } else if (nativeEvent.statusCode === 403) {
-            setIsError(true);
-            setErrorMessage('Access denied (403). Please check your permissions.');
+            setIsError(true); setContentLoaded(true);
+            setErrorMessage('Access denied. Please check your permissions.');
         } else if (nativeEvent.statusCode >= 500) {
-            setIsError(true);
+            setIsError(true); setContentLoaded(true);
             setErrorMessage('Server error. Please try again later.');
         }
     }, []);
 
-    // User validation
-    useEffect(() => {
-        if (!user?.token) {
-            Alert.alert(
-                'Authentication Required',
-                'Please log in to continue.',
-                [{ text: 'OK', onPress: () => navigationRef.current?.navigate('Splash') }]
-            );
-        }
-    }, [user]);
-
-    // Analytics tracking
-    useEffect(() => {
-        if (name) {
-            analytics().logEvent('screen_view', {
-                screen_name: name,
-                screen_class: 'ArticalWindowUtility'
-            }).catch(console.error);
-        }
-    }, [name]);
-
-  useEffect(() => {
-    const handleAppStateChange = (nextAppState) => {
-        if (nextAppState === 'background') {
-            // Track when app goes to background
-            setAppBackgroundTime(Date.now());
-        } else if (nextAppState === 'active') {
-            const backgroundDuration = Date.now() - appBackgroundTime;
-            const wasBackgroundedLong = backgroundDuration > 300000; // 5 minutes
-            
-            if (wasBackgroundedLong || !contentLoaded) {
-                // Force WebView recreation for long background periods
-                console.log('App was backgrounded for', Math.round(backgroundDuration/1000), 'seconds - forcing WebView recreation');
-                setForceWebViewRecreation(true);
-                setModalOpen(false);
-                
-                // Recreate after brief delay
-                setTimeout(() => {
-                    setForceWebViewRecreation(false);
-                    setModalOpen(true);
-                    setContentLoaded(false);
-                }, 100);
-            } else if (contentLoaded) {
-                // Short background - try gentle reload first
-                setTimeout(() => {
-                    if (webViewRef.current) {
-                        webViewRef.current.reload();
+    const onMessage = useCallback(({ nativeEvent }) => {
+        try {
+            const data = JSON.parse(nativeEvent.data);
+            switch (data.type) {
+                case 'pong':
+                    console.log(`${TAG} MSG pong | WebView alive | ts=${new Date().toISOString()}`);
+                    if (aliveCheckTimeout.current) { clearTimeout(aliveCheckTimeout.current); aliveCheckTimeout.current = null; }
+                    if (aliveCheckResolver.current) { aliveCheckResolver.current(true); aliveCheckResolver.current = null; }
+                    break;
+                case 'pdf':
+                    console.log(`${TAG} MSG pdf | received PDF binary | ts=${new Date().toISOString()}`);
+                    setShowPDFUrl(data.data);
+                    setShowPDFModal(true);
+                    break;
+                case 'injectionComplete':
+                    console.log(`${TAG} MSG injectionComplete | script injected OK | url=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
+                    break;
+                default:
+                    if (data.type && data.type.startsWith('storageSnapshot') && data.data) {
+                        const s = data.data;
+                        const caller = data.type.replace('storageSnapshot_', '');
+                        const cookiePairs = (s.cookies || '').split(';').map(c => c.trim()).filter(Boolean);
+                        const cookieObj = {};
+                        cookiePairs.forEach(pair => {
+                            const idx = pair.indexOf('=');
+                            if (idx > 0) cookieObj[pair.substring(0, idx)] = pair.substring(idx + 1);
+                        });
+                        console.log(`${TAG} WEBVIEW_STORAGE [${caller}] | origin=${s.origin} | href=${s.href} | ts=${s.ts}`);
+                        console.log(`${TAG} WEBVIEW_STORAGE [${caller}] | jwt_token=${tokenPreview(s.jwt_token)} | tokenIssuedAt=${s.tokenIssuedAt} | user_info=${s.user_info ? s.user_info.substring(0, 100) + (s.user_info.length > 100 ? '…' : '') : '(none)'}`);
+                        console.log(`${TAG} WEBVIEW_STORAGE [${caller}] | cookies=${JSON.stringify(cookieObj)}`);
+                    } else {
+                        console.log(`${TAG} MSG unknown | type=${data.type} | ts=${new Date().toISOString()}`);
                     }
-                }, 500);
+                    break;
             }
+        } catch {
         }
-    };
-
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
-    return () => subscription?.remove();
-}, [contentLoaded, appBackgroundTime]);
-
-    const LoadingComponent = useCallback(() => (
-       <View style={styles.loadingContainer} accessibilityRole='text' accessible={true} accessibilityLabel="Loading content" accessibilityHint="Content is loading, please wait">
-            {name === 'Billing Details' ? (
-                <LoadingSpinner />
-            ) : (
-                <LoadingOverlay loading={true} />
-            )}
-        </View>
-    ), [name]);
-
-    const TokenRefreshOverlay = useCallback(() => (
-        <View style={styles.refreshOverlay}>
-            <LoadingSpinner />
-        </View>
-    ), []);
+    }, []);
 
     return (
-        <View style={styles.container} 
-        >
-            <ProfileSettingsHeader 
+        <View style={styles.container}>
+            <ProfileSettingsHeader
                 onPressBack={() => {
-                    console.log('Back button pressed');
-                    setModalOpen(false);
                     if (route.params?.isBilling) {
-                        navigation.reset({
-                            index: 0,
-                            routes: [{ name: "MyTab" }],
-                        });
+                        navigation.reset({ index: 0, routes: [{ name: 'MyTab' }] });
                     } else if (route.params?.isPayBill) {
-                        navigation.reset({
-                            index: 0,
-                            routes: [{ name: "MyServices" }],
-                        });
+                        navigation.reset({ index: 0, routes: [{ name: 'MyServices' }] });
                     } else {
                         navigation.goBack();
                     }
-                }} 
-                title={name} 
+                }}
+                title={name}
             />
-            
-            {progress < 1 ? (
-                <View style={styles.progressBar} ref={mainViewRef}
-         accessible={true}
-                    accessibilityLabel={`${name} content loading` }
-                    accessibilityLiveRegion="polite"
-                    accessibilityRole="text">
-                    <View style={[styles.progress, { width: `${progress * 100}%` }]} />
-                </View>
-            ): (
-                <View style={[styles.progressBar,{ height:0}]} ref={mainViewRef }
-                    accessible={true}
-                    accessibilityLabel={ `${name} content loaded`}
-                    accessibilityRole='text'
-                    accessibilityLiveRegion="polite"
-                    >
-                
-                </View>
-            )
-            }
-            
-            {modalOpen && !isTokenRefreshing && !forceWebViewRecreation && (
-                <WebView
-                    key={forceWebViewRecreation ? Date.now() : undefined}
-                    ref={webViewRef}
-                   
-                    style={styles.webView}
-                    source={{ uri: url }}
-                    // Event handlers
-                    onLoadStart={onLoadStart}
-                    onLoadProgress={onLoadProgress}
-                    onLoadEnd={onLoadEnd}
-                    onError={onError}
-                    onHttpError={onHttpError}
-                    onMessage={onMessage}
-                    onNavigationStateChange={navigationChange}
-                    onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-                    
-                    // Script injection
-                    injectedJavaScript={enhancedScript}
-                    // Add this property to the WebView (around line 330 where other props are)
-                    injectedJavaScriptBeforeContentLoaded={Platform.OS === 'android' ? enhancedScript : undefined}
-                    // FIXED: Don't show loading spinner when transitioning from Bill Explainer
-                    startInLoadingState={!route.params?.isBilling}
-                    renderLoading={!route.params?.isBilling ? LoadingComponent : undefined}
-                    javaScriptEnabled={true}
-                    domStorageEnabled={true}
-                    sharedCookiesEnabled={true}
-                    cacheEnabled={true}
-                    
-                    // FIXED: Removed problematic props that cause first-load errors
-                    originWhitelist={['https://*']}
-                    mixedContentMode="compatibility"
-                    allowsInlineMediaPlayback={true}
-                    
-                    // FIXED: Removed dataDetectorTypes and other problematic performance settings
-                    allowsBackForwardNavigationGestures={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
-                />
-            )}
-
-            {(isTokenRefreshing || forceWebViewRecreation)&& <TokenRefreshOverlay />}
-            
-            {isError && (
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorTitle}>Unable to Load Page</Text>
-                    <Text style={styles.errorText}>{errorMessage || 'An error occurred while loading the page.'}</Text>
-                    <Text style={styles.retryText} onPress={() => {
-                        setIsError(false);
-                        setErrorMessage('');
-                        webViewRef.current?.reload();
-                    }}>
-                        Tap to Retry
-                    </Text>
-                </View>
-            )}
-            
-            {showPDFModal && (
-                <PDFViewModal
-                    url={showPDFUrl}
-                    onClose={() => setShowPDFModal(false)}
-                />
-            )}
+            <View style={styles.contentContainer}>
+                {webViewReady && (
+                    <WebView
+                        key={webViewKey}
+                        ref={webViewRef}
+                        source={{ uri: url }}
+                        injectedJavaScriptBeforeContentLoaded={injectionScript}
+                        onLoadStart={onLoadStart}
+                        onLoadProgress={onLoadProgress}
+                        onLoadEnd={onLoadEnd}
+                        onError={onError}
+                        onHttpError={onHttpError}
+                        onMessage={onMessage}
+                        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+                        javaScriptEnabled={true}
+                        domStorageEnabled={true}
+                        sharedCookiesEnabled={true}
+                        thirdPartyCookiesEnabled={true}
+                        cacheEnabled={true}
+                        originWhitelist={['https://*']}
+                        mixedContentMode="compatibility"
+                        allowsInlineMediaPlayback={true}
+                        allowsBackForwardNavigationGestures={false}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}
+                        androidLayerType="hardware"
+                        nestedScrollEnabled={true}
+                        overScrollMode="never"
+                        style={styles.webView}
+                    />
+                )}
+                {(isLoading || !webViewReady) && !isError && (
+                    <View style={styles.loadingOverlay}>
+                        {name === 'Billing Details' ? <LoadingSpinner /> : <LoadingOverlay loading={true} />}
+                    </View>
+                )}
+                {isError && (
+                    <View style={styles.errorContainer}>
+                        <Text style={styles.errorTitle}>Unable to Load Page</Text>
+                        <Text style={styles.errorText}>{errorMessage}</Text>
+                        <Text style={styles.retryText} onPress={() => {
+                            setIsError(false); setErrorMessage(''); setContentLoaded(false);
+                            setProgress(0); initialLoadComplete.current = false;
+                            webViewRef.current?.reload();
+                        }}>Tap to Retry</Text>
+                    </View>
+                )}
+                {showToast && (
+                    <Animated.View style={[styles.toast, { opacity: toastOpacity }]}>
+                        <Text style={styles.toastText}>Session expired</Text>
+                    </Animated.View>
+                )}
+            </View>
+            {showPDFModal && <PDFViewModal url={showPDFUrl} onClose={() => setShowPDFModal(false)} />}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        marginBottom: Platform.OS === 'ios' ? 90 : 60,
-    },
-    progressBar: {
-        height: 3,
-        backgroundColor: '#E0E0E0',
-    },
-    progress: {
-        height: '100%',
-        backgroundColor: '#8D3B90',
-    },
-    loadingContainer: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'transparent',
-    },
-    refreshOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-        top: 100,
-    },
-    refreshText: {
-        marginTop: 16,
-        fontSize: 16,
-        color: '#333',
-        fontWeight: '500',
+    container: { flex: 1, marginBottom: Platform.OS === 'ios' ? 90 : 60 },
+    contentContainer: { flex: 1, position: 'relative' },
+    webView: { flex: 1 },
+    loadingOverlay: {
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff', zIndex: 1000,
     },
     errorContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#ffffff',
     },
-    errorTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 10,
+    errorTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 10 },
+    errorText: { fontSize: 16, color: '#666', textAlign: 'center', marginBottom: 20, lineHeight: 24 },
+    retryText: { fontSize: 16, color: '#8D3B90', fontWeight: '600', textDecorationLine: 'underline' },
+    toast: {
+        position: 'absolute', bottom: 100, left: 20, right: 20,
+        backgroundColor: 'rgba(0,0,0,0.8)', paddingVertical: 12, paddingHorizontal: 20,
+        borderRadius: 8, alignItems: 'center', zIndex: 2000,
     },
-    errorText: {
-        fontSize: 16,
-        color: '#666',
-        textAlign: 'center',
-        marginBottom: 20,
-        lineHeight: 24,
-    },
-    retryText: {
-        fontSize: 16,
-        color: '#8D3B90',
-        fontWeight: '600',
-        textDecorationLine: 'underline',
-    },
+    toastText: { color: '#ffffff', fontSize: 14, fontWeight: '500' },
 });
 
 export default ArticalWindowUtility;
