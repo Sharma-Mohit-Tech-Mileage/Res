@@ -106,7 +106,6 @@ const AddNotificationScreen = () => {
           setIsSubmitting(false);
           setToggleCheckBoxTerm(false);
         }
-        setFocusEmail();
       } else if (route.params?.updateFailed) {
         setNotification({
           message: route.params.failureMessage,
@@ -119,18 +118,6 @@ const AddNotificationScreen = () => {
   
     updateAccountDetails();
   }, [route.params, dispatch]);
-
-
-
-  // Use the imperative focus() method which handles accessibility focus internally
-  const setFocusEmail = () => {
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 100);
-    };
-  
 
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -272,7 +259,8 @@ const AddNotificationScreen = () => {
                   transform: [{ translateY }],
                   paddingHorizontal: Padding.p_5xl,
                 }}
-                accessible={true}
+                accessible={false}
+                importantForAccessibility="no"
               >
                 <View style={styles.spaceBottom}>
                   <NotificationAlert
