@@ -37,13 +37,10 @@ export const MaintenanceProvider = ({ children }) => {
   const [showBanner, setShowBanner] = useState(false);
   const [showMaintenancePage, setShowMaintenancePage] = useState(false);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  const [currentUserAudience, setCurrentUserAudience] = useState(null);
 
-  // Enhanced blocking state management
   const [blockingState, setBlockingState] = useState({
     isBlocking: false,
     wasBlocked: false,
-    blockedAudience: null,
     blockingConfig: null,
     blockingTimestamp: null,
   });
@@ -51,16 +48,6 @@ export const MaintenanceProvider = ({ children }) => {
   const userData = useSelector((state) => state.user?.userData);
   const dispatch = useDispatch();
 
-  // Simple user audience detection using ONLY  flag
-  function getUserAudience(userInfo) {
-    if (!userInfo) {
-      return null;
-    }
-    const audience = "ACP";
-    return audience;
-  }
-
-  // Check if user is logged in by checking local storage
   const checkLoginStatus = async () => {
     try {
       const userData = await getUser();
@@ -68,36 +55,35 @@ export const MaintenanceProvider = ({ children }) => {
 
       setIsUserLoggedIn(isLoggedIn);
 
-      if (isLoggedIn) {
-        const audience = getUserAudience(userData.userInfo);
-        setCurrentUserAudience(audience);
-      } else {
-        setCurrentUserAudience(null);
-      }
-
       return { isLoggedIn, userData };
     } catch (error) {
       console.error("Error checking login status:", error);
       setIsUserLoggedIn(false);
-      setCurrentUserAudience(null);
       return { isLoggedIn: false, userData: null };
     }
   };
 
-  const performImmediateBlockingCheck = (userAudience) => {
-    const { pageConfig } = maintenanceConfig;
+  const performImmediateBlockingCheck = () => {
+    const { pageConfig, maintenanceWindow } = maintenanceConfig;
 
     if (!pageConfig || !pageConfig.enabled) {
+      return;
+    }
+
+    if (!maintenanceWindow || !maintenanceWindow.enabled) {
       return;
     }
 
     const now = new Date();
     let isTimeValid = true;
 
-    if (pageConfig.startTime && pageConfig.endTime) {
+    if (maintenanceWindow.mode === "SCHEDULED") {
+      if (!maintenanceWindow.startTime || !maintenanceWindow.endTime) {
+        return;
+      }
       try {
-        const startTime = new Date(pageConfig.startTime);
-        const endTime = new Date(pageConfig.endTime);
+        const startTime = new Date(maintenanceWindow.startTime);
+        const endTime = new Date(maintenanceWindow.endTime);
 
         if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
           isTimeValid = false;
@@ -105,7 +91,7 @@ export const MaintenanceProvider = ({ children }) => {
           isTimeValid = now >= startTime && now <= endTime;
         }
       } catch (error) {
-        console.error("Error parsing blocking times:", error);
+        console.error("Error parsing maintenance window times:", error);
         isTimeValid = false;
       }
     }
@@ -114,18 +100,14 @@ export const MaintenanceProvider = ({ children }) => {
       return;
     }
 
-    // Check audience and type
-    const isAudienceValid = isAudienceMatch(pageConfig.audience, userAudience);
     const isBlockingType = pageConfig.type === "BLOCK_AND_LOGOUT";
 
-    if (isAudienceValid && isBlockingType) {
-      console.log("IMMEDIATE BLOCKING TRIGGERED for audience:", userAudience);
+    if (isBlockingType) {
+      console.log("IMMEDIATE BLOCKING TRIGGERED");
 
-      // Set comprehensive blocking state
       setBlockingState({
         isBlocking: true,
         wasBlocked: true,
-        blockedAudience: userAudience,
         blockingConfig: pageConfig,
         blockingTimestamp: now.toISOString(),
       });
@@ -178,10 +160,7 @@ export const MaintenanceProvider = ({ children }) => {
       Object.keys(userData.userInfo).length > 0
     ) {
       setIsUserLoggedIn(true);
-      const audience = getUserAudience(userData.userInfo);
-      setCurrentUserAudience(audience);
-
-      performImmediateBlockingCheck(audience);
+      performImmediateBlockingCheck();
     } else {
       checkLoginStatus();
     }
@@ -189,7 +168,7 @@ export const MaintenanceProvider = ({ children }) => {
 
   useEffect(() => {
     determineMaintenanceState();
-  }, [maintenanceConfig, isUserLoggedIn, currentUserAudience, blockingState]);
+  }, [maintenanceConfig, isUserLoggedIn, blockingState]);
 
   useEffect(() => {
     if (!isUserLoggedIn) {
@@ -215,27 +194,18 @@ export const MaintenanceProvider = ({ children }) => {
         }
       }
 
-      if (
-        sessionConfig.invalidateSessionsForAudience !== "NONE" &&
-        currentUserAudience
-      ) {
-        const shouldInvalidate = isAudienceMatch(
-          sessionConfig.invalidateSessionsForAudience,
-          currentUserAudience
-        );
+      const invalidationFlag = sessionConfig.invalidateSessionsForAudience;
+      const shouldInvalidate =
+        !!invalidationFlag && invalidationFlag !== "NONE";
 
-        if (shouldInvalidate && sessionConfig.redirectToSplash) {
-          console.log(
-            "SESSION LOGOUT TRIGGERED for audience:",
-            currentUserAudience
-          );
-          await performLogout(false);
-        }
+      if (shouldInvalidate && sessionConfig.redirectToSplash) {
+        console.log("SESSION LOGOUT TRIGGERED");
+        await performLogout(false);
       }
     };
 
     handleSessionInvalidation();
-  }, [maintenanceConfig.sessionConfig, isUserLoggedIn, currentUserAudience]);
+  }, [maintenanceConfig.sessionConfig, isUserLoggedIn]);
 
   const determineMaintenanceState = () => {
     const { maintenanceWindow, bannerConfig, pageConfig, sessionConfig } =
@@ -320,6 +290,20 @@ export const MaintenanceProvider = ({ children }) => {
     if (!isMaintenanceActive) {
       setShowBanner(false);
       setShowMaintenancePage(false);
+      if (blockingState.wasBlocked) {
+        if (navigationRef.current) {
+          navigationRef.current.reset({
+            index: 0,
+            routes: [{ name: "Splash", params: { isLogout: true } }],
+          });
+        }
+        setBlockingState({
+          isBlocking: false,
+          wasBlocked: false,
+          blockingConfig: null,
+          blockingTimestamp: null,
+        });
+      }
       return;
     }
 
@@ -332,7 +316,6 @@ export const MaintenanceProvider = ({ children }) => {
       setBlockingState({
         isBlocking: false,
         wasBlocked: false,
-        blockedAudience: null,
         blockingConfig: null,
         blockingTimestamp: null,
       });
@@ -346,47 +329,21 @@ export const MaintenanceProvider = ({ children }) => {
       }
 
       if (!isUserLoggedIn) {
-        const shouldShowForNotLoggedIn = pageConfig.audience === "BOTH";
-        setShowMaintenancePage(shouldShowForNotLoggedIn);
+        setShowMaintenancePage(true);
+      } else if (pageConfig.type === "BLOCK_AND_LOGOUT") {
+        performImmediateBlockingCheck();
       } else {
-        const isAudienceValid = isAudienceMatch(
-          pageConfig.audience,
-          currentUserAudience
-        );
-
-        if (isAudienceValid && pageConfig.type === "BLOCK_AND_LOGOUT") {
-          performImmediateBlockingCheck(currentUserAudience);
-        } else if (isAudienceValid) {
-          setShowMaintenancePage(true);
-        } else {
-          setShowMaintenancePage(false);
-        }
+        setShowMaintenancePage(true);
       }
     } else {
       setShowMaintenancePage(false);
     }
 
     if (bannerConfig && bannerConfig.enabled && isUserLoggedIn) {
-      const isAudienceValid = isAudienceMatch(
-        bannerConfig.audience,
-        currentUserAudience
-      );
-
-      setShowBanner(isAudienceValid);
+      setShowBanner(true);
     } else {
       setShowBanner(false);
     }
-  };
-
-  const isAudienceMatch = (targetAudience, userAudience) => {
-    if (!userAudience && targetAudience !== "BOTH") {
-      return false;
-    }
-
-    const isMatch =
-      targetAudience === "BOTH" || targetAudience === userAudience;
-
-    return isMatch;
   };
 
   const dismissBanner = () => {
@@ -397,7 +354,6 @@ export const MaintenanceProvider = ({ children }) => {
     setBlockingState({
       isBlocking: false,
       wasBlocked: false,
-      blockedAudience: null,
       blockingConfig: null,
       blockingTimestamp: null,
     });
@@ -407,12 +363,27 @@ export const MaintenanceProvider = ({ children }) => {
   const performLogout = async (isBlockingLogout = false) => {
     try {
       if (isBlockingLogout) {
+        console.log("STARTING ENHANCED SILENT LOGOUT");
+
+        try {
+          const storedSsoToken = await getSsoToken();
+          if (storedSsoToken && storedSsoToken.idToken) {
+            await logout(config, {
+              idToken: storedSsoToken.idToken,
+              postLogoutRedirectUrl: config.redirectUrl,
+            });
+          }
+        } catch (auth0Error) {
+          console.error(
+            "Auth0 logout failed during silent logout:",
+            auth0Error
+          );
+        }
+
         await Promise.all([
           clearAuthCookies(),
           storeUser({}),
-          storeUser(null),
           storeSsoToken({}),
-          storeSsoToken(null),
           cleanUserData(),
         ]);
 
@@ -420,7 +391,6 @@ export const MaintenanceProvider = ({ children }) => {
 
         await new Promise((resolve) => setTimeout(resolve, 200));
         setIsUserLoggedIn(false);
-        setCurrentUserAudience(null);
         setBlockingState((prev) => ({
           ...prev,
           isBlocking: false,
@@ -446,13 +416,11 @@ export const MaintenanceProvider = ({ children }) => {
         dispatch(saveUserInfo({}));
 
         setIsUserLoggedIn(false);
-        setCurrentUserAudience(null);
         setShowBanner(false);
         setShowMaintenancePage(false);
         setBlockingState({
           isBlocking: false,
           wasBlocked: false,
-          blockedAudience: null,
           blockingConfig: null,
           blockingTimestamp: null,
         });
@@ -475,7 +443,6 @@ export const MaintenanceProvider = ({ children }) => {
         dispatch(saveUserInfo({}));
 
         setIsUserLoggedIn(false);
-        setCurrentUserAudience(null);
 
         if (!isBlockingLogout) {
           setShowBanner(false);
@@ -483,7 +450,6 @@ export const MaintenanceProvider = ({ children }) => {
           setBlockingState({
             isBlocking: false,
             wasBlocked: false,
-            blockedAudience: null,
             blockingConfig: null,
             blockingTimestamp: null,
           });
@@ -513,7 +479,6 @@ export const MaintenanceProvider = ({ children }) => {
         refreshConfig: () => RemoteConfigManager.refresh(),
         clearBlockingState,
         isUserLoggedIn,
-        currentUserAudience,
         blockingState,
       }}
     >
