@@ -4,7 +4,6 @@ import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
-//import { Env } from "../../../network/apis/account/Constants";
 import Config from "react-native-config";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import AppStyles from "../../utility/AppStyles";
@@ -356,9 +355,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F8F8",
     width: "100%",
     padding: 10,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
   },
 });
 

@@ -6,7 +6,6 @@ import FeatureCard from "./FeatureCardMobile";
 import { useNavigation } from "@react-navigation/native";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import { Env ,ISUAT} from "../../network/apis/account/Constants";
 import { widthPercentageToDP as wp , heightPercentageToDP as hp} from "react-native-responsive-screen";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 

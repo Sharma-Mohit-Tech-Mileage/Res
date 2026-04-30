@@ -138,11 +138,9 @@ const PasswordSecurityEdit = () => {
     console.log("User info:", user);
     const userName = user?.userInfo?.userName || user?.userName || '';
     const requestWithEndpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS, { userName });
-    console.log("Fetching security questions from endpoint:", requestWithEndpoint);
     GetApiRequest(
       requestWithEndpoint,
       (res) => {
-        console.log("Security questions response:", res);
         if (res) {
           setSecurityQuestionsNew(res);
           checkCustomSecurityQuestion(res);

@@ -24,7 +24,6 @@ export const isDateInRange = (startDate, endDate) => {
   if (startDate) {
     const start = new Date(startDate);
     if (now < start) {
-      console.log('[AnnouncementHelpers] Campaign not yet started');
       return false;
     }
   }
@@ -32,7 +31,6 @@ export const isDateInRange = (startDate, endDate) => {
   if (endDate) {
     const end = new Date(endDate);
     if (now > end) {
-      console.log('[AnnouncementHelpers] Campaign has ended');
       return false;
     }
   }
@@ -59,32 +57,26 @@ export const isCampaignEligible = (campaign, userInfo = {}, currentVersion = '1.
   // Version requirements
   if (targeting.minAppVersion) {
     if (compareVersions(currentVersion, targeting.minAppVersion) < 0) {
-      console.log('[AnnouncementHelpers] App version too old');
       return false;
     }
   }
 
   if (targeting.maxAppVersion) {
     if (compareVersions(currentVersion, targeting.maxAppVersion) > 0) {
-      console.log('[AnnouncementHelpers] App version too new');
       return false;
     }
   }
 
-  // Platform check
   if (targeting.platforms && targeting.platforms.length > 0) {
     const platform = require('react-native').Platform.OS;
     if (!targeting.platforms.includes(platform)) {
-      console.log(`[AnnouncementHelpers] Platform ${platform} not targeted`);
       return false;
     }
   }
 
-  // User segment check (extensible)
   if (targeting.userSegments && targeting.userSegments.length > 0) {
     const userSegment = userInfo?.segment || 'default';
     if (!targeting.userSegments.includes(userSegment)) {
-      console.log(`[AnnouncementHelpers] User segment ${userSegment} not targeted`);
       return false;
     }
   }
@@ -99,7 +91,6 @@ export const trackAnnouncementImpression = async (campaignId, triggerType) => {
       trigger_type: triggerType,
       timestamp: new Date().toISOString(),
     });
-    console.log(`[Analytics] Tracked impression: ${campaignId}`);
   } catch (error) {
     console.error('[Analytics] Error tracking impression:', error);
   }
@@ -113,7 +104,6 @@ export const trackStepViewed = async (campaignId, stepNumber, stepTitle) => {
       step_title: stepTitle,
       timestamp: new Date().toISOString(),
     });
-    console.log(`[Analytics] Tracked step view: ${campaignId} - Step ${stepNumber}`);
   } catch (error) {
     console.error('[Analytics] Error tracking step view:', error);
   }
@@ -127,7 +117,6 @@ export const trackAnnouncementCompletion = async (campaignId, totalSteps, timeSp
       time_spent_seconds: timeSpentSeconds,
       timestamp: new Date().toISOString(),
     });
-    console.log(`[Analytics] Tracked completion: ${campaignId} (${timeSpentSeconds}s)`);
   } catch (error) {
     console.error('[Analytics] Error tracking completion:', error);
   }
@@ -140,7 +129,6 @@ export const trackAnnouncementDismissal = async (campaignId, dismissedAtStep) =>
       dismissed_at_step: dismissedAtStep,
       timestamp: new Date().toISOString(),
     });
-    console.log(`[Analytics] Tracked dismissal: ${campaignId} at step ${dismissedAtStep}`);
   } catch (error) {
     console.error('[Analytics] Error tracking dismissal:', error);
   }

@@ -6,18 +6,13 @@
 
 @implementation RNZendeskChatModule
 
-static const BOOL ISUAT = YES; // Set to YES for UAT, NO for Production
-
 RCT_EXPORT_MODULE(RNZendeskChatModule);
 
 
 
 + (void) init {
   dispatch_async(dispatch_get_main_queue(), ^{
-    // Select channel key based on static environment flag
-    static NSString * const UATChannelKey = @"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTczNDcxNTE4Mi56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUtGRkJKN0RDNTJSREZNWVhRM0c1U1laMC5qc29uIn0=";
-    static NSString * const PRODChannelKey = @"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTczNDcxNTE4Mi56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUtGRkJKN0RDNTJSREZNWVhRM0c1U1laMC5qc29uIn0=";
-    static NSString * const channelKey = ISUAT ? UATChannelKey : PRODChannelKey;
+    NSString *channelKey = [NSBundle mainBundle].infoDictionary[@"ZENDESK_CHANNEL_KEY_IOS"];
 
     [Zendesk initializeWithChannelKey:channelKey
                      messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]

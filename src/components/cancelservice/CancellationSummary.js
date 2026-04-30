@@ -33,6 +33,7 @@ import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { PostApiRequest } from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { Calendar } from "react-native-calendars";
 import moment from "moment";
 import LoadingOverlay from "../common/customui/CustomLoading";
@@ -263,13 +264,10 @@ const CancellationSummary = ({ navigation, route }) => {
       },
     };
 
-    const requestURL = `api/Order/CommitDisconnect`;
-    console.log("Request body for cancellation service:", requestBody);
     PostApiRequest(
-      requestURL,
+      getEndpoint(ENDPOINTS.ORDER_COMMIT_DISCONNECT),
       requestBody,
       (res) => {
-        console.log("Cancellation service request successful:", res);
         setLoading(false);
         if (res.error != null && res?.error?.message) {
           setError(res.error);

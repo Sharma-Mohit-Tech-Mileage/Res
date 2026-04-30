@@ -62,7 +62,6 @@ const billingStatementApi = {
         }
       };
       const response = await _axios.get(getEndpoint(ENDPOINTS.BILL_BREAKDOWN_GET, { accountNumber, startDate, endDate }), {...config});
-      console.log("Response Data for Billing Breakdown:", JSON.stringify(response));
       return {data:response.data, status: response.status}
     } catch (error) {
       console.error("Error fetching billing breakdown:", error);
@@ -78,7 +77,6 @@ const billingStatementApi = {
           Authorization: "Bearer " + user.token
         }
       };
-      console.log("Request Data for Bill Explainer:", JSON.stringify(requestData));
       const response = await _axios.post(getEndpoint(ENDPOINTS.GET_BILL_EXPLAINER, {}), requestData, {...config});
       return {data:response.data, status: response.status}
     } catch (error) {

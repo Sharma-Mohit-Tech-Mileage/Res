@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
-//import { Env } from "./apis/account/Constants";
 import Config from "react-native-config";
 import { getUser, cleanUserData } from "../redux/utils/LocalStorage";
 import { RefreshToken } from '../components/user/Session';
@@ -39,13 +38,31 @@ const isRetryableError = (error) => {
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const retryRequest = async (axiosInstance, originalRequest, retryCount = 0) => {
-    if (retryCount >= 3) throw new Error('Max retries exceeded');
+// Recurses until success or 3 retries; on bail-out preserves the LAST axios
+// failure (code/status/message/url) on the thrown Error so callers can
+// distinguish timeout vs network vs 5xx instead of just seeing "Max retries
+// exceeded".
+const retryRequest = async (axiosInstance, originalRequest, retryCount = 0, lastError = null) => {
+    if (retryCount >= 3) {
+        const url = originalRequest?.url || lastError?.config?.url || '?';
+        const code = lastError?.code || '?';
+        const status = lastError?.response?.status ?? 'no-response';
+        const msg = lastError?.message || 'unknown';
+        const enriched = new Error(`Max retries exceeded | url=${url} | code=${code} | status=${status} | message=${msg}`);
+        enriched.lastError = lastError;
+        enriched.code = code;
+        enriched.status = status;
+        throw enriched;
+    }
     await delay(1000 * Math.pow(2, retryCount));
     try {
         return await axiosInstance(originalRequest);
     } catch (error) {
-        if (isRetryableError(error)) return retryRequest(axiosInstance, originalRequest, retryCount + 1);
+        const url = originalRequest?.url || '?';
+        const code = error?.code || '?';
+        const status = error?.response?.status ?? 'no-response';
+        console.warn(`[RestApiClient] retry ${retryCount + 1}/3 failed | url=${url} | code=${code} | status=${status} | message=${error?.message}`);
+        if (isRetryableError(error)) return retryRequest(axiosInstance, originalRequest, retryCount + 1, error);
         throw error;
     }
 };
@@ -129,7 +146,6 @@ const AxiosInterceptorProvider = ({ children }) => {
     return children;
 };
 
-// ── API Functions (callback-style, same signatures as old APIClient) ────────
 
 const handleResponse = (res, onSuccess, onError, endpoint) => {
     if (res.status === 204 || !res.data) {

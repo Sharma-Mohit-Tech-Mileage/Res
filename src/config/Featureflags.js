@@ -1,5 +1,5 @@
 
-import { ISUAT } from '../network/apis/account/Constants';
+import Config from 'react-native-config';
 export const FeatureFlags = {
   DASHBOARD_SPARKLIGHT_MOBILE_SECTION: 'dashboard.pending_activation.show_sparklight_mobile_section',
   DASHBOARD_NEW_LAYOUT: 'dashboard.all_users.show_new_dashboard',
@@ -38,7 +38,7 @@ export const FeatureFlagMetadata = {
  * Helper to validate flag keys at runtime (dev mode)
  */
 export const validateFeatureFlag = (key) => {
-  if (ISUAT) {
+  if (Config.ENV !== 'production') {
     const validKeys = Object.values(FeatureFlags);
     if (!validKeys.includes(key)) {
       console.warn(`[FeatureFlags] Invalid flag key: "${key}". Valid keys:`, validKeys);

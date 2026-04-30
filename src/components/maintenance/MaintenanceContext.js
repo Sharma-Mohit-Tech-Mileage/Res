@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { Platform } from "react-native";
 import RemoteConfigManager from "../../config/Remoteconfigmanager";
 import { useSelector, useDispatch } from "react-redux";
 import { saveUserInfo } from "../../redux/actions/UserAction";
@@ -10,16 +11,14 @@ import {
   getUser,
 } from "../../redux/utils/LocalStorage";
 import { logout } from "react-native-app-auth";
-//import { Env } from "../../network/apis/account/Constants";
 import Config from "react-native-config";
 import { navigationRef } from "../../navigations/UserNavigations";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
 
 const config = {
   issuer: Config.SSO_LOGIN,
-  clientId: "sparklight-customer-mobile-app",
-  redirectUrl:
-    "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+  clientId: Config.SSO_CLIENT_ID,
+  redirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
 };
@@ -103,8 +102,6 @@ export const MaintenanceProvider = ({ children }) => {
     const isBlockingType = pageConfig.type === "BLOCK_AND_LOGOUT";
 
     if (isBlockingType) {
-      console.log("IMMEDIATE BLOCKING TRIGGERED");
-
       setBlockingState({
         isBlocking: true,
         wasBlocked: true,
@@ -122,9 +119,7 @@ export const MaintenanceProvider = ({ children }) => {
     }
   };
 
-  // Initial setup - Subscribe to RemoteConfigManager
   useEffect(() => {
-    // Get initial config
     const initialConfig = RemoteConfigManager.getMaintenanceConfig();
     setMaintenanceConfig({
       maintenanceWindow: initialConfig.maintenanceWindow,
@@ -133,10 +128,8 @@ export const MaintenanceProvider = ({ children }) => {
       sessionConfig: initialConfig.sessionManagement,
     });
 
-    // Subscribe to config changes
     const unsubscribe = RemoteConfigManager.subscribeToMaintenance(
       (newConfig) => {
-        console.log("[Maintenance] Config updated from RemoteConfigManager");
         setMaintenanceConfig({
           maintenanceWindow: newConfig.maintenanceWindow,
           bannerConfig: newConfig.maintenanceBanner,
@@ -189,7 +182,6 @@ export const MaintenanceProvider = ({ children }) => {
         const endTime = new Date(maintenanceWindow.endTime).getTime();
 
         if (isNaN(startTime) || isNaN(endTime) || now < startTime || now > endTime) {
-          console.log("SESSION INVALIDATION SKIPPED - outside scheduled maintenance window");
           return;
         }
       }
@@ -199,7 +191,6 @@ export const MaintenanceProvider = ({ children }) => {
         !!invalidationFlag && invalidationFlag !== "NONE";
 
       if (shouldInvalidate && sessionConfig.redirectToSplash) {
-        console.log("SESSION LOGOUT TRIGGERED");
         await performLogout(false);
       }
     };
@@ -248,20 +239,6 @@ export const MaintenanceProvider = ({ children }) => {
             } else {
               isMaintenanceActive =
                 nowUTC >= startTimeUTC && nowUTC <= endTimeUTC;
-              console.log("Maintenance SCHEDULED mode check:", {
-                currentTime: new Date(nowUTC).toISOString(),
-                startTime: new Date(startTimeUTC).toISOString(),
-                endTime: new Date(endTimeUTC).toISOString(),
-                isActive: isMaintenanceActive,
-                timeUntilStart:
-                  startTimeUTC > nowUTC
-                    ? `${Math.round((startTimeUTC - nowUTC) / 60000)} minutes`
-                    : "Started",
-                timeUntilEnd:
-                  endTimeUTC > nowUTC
-                    ? `${Math.round((endTimeUTC - nowUTC) / 60000)} minutes`
-                    : "Ended",
-              });
             }
           } catch (error) {
             console.error(
@@ -363,8 +340,6 @@ export const MaintenanceProvider = ({ children }) => {
   const performLogout = async (isBlockingLogout = false) => {
     try {
       if (isBlockingLogout) {
-        console.log("STARTING ENHANCED SILENT LOGOUT");
-
         try {
           const storedSsoToken = await getSsoToken();
           if (storedSsoToken && storedSsoToken.idToken) {
@@ -395,11 +370,7 @@ export const MaintenanceProvider = ({ children }) => {
           ...prev,
           isBlocking: false,
         }));
-
-        console.log("Enhanced silent logout completed");
       } else {
-        console.log("STARTING NORMAL SESSION LOGOUT");
-
         const storedSsoToken = await getSsoToken();
 
         if (storedSsoToken && storedSsoToken.idToken) {
@@ -461,7 +432,6 @@ export const MaintenanceProvider = ({ children }) => {
             });
           }
         }
-        console.log("Fallback cleanup completed");
       } catch (cleanupError) {
         console.error("Fallback cleanup failed:", cleanupError);
       }

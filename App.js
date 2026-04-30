@@ -10,7 +10,7 @@ import VersionCheck from "react-native-version-check";
 import AppUpdateAlert from "./src/components/utility/AppUpdateAlert";
 import { initializeApp } from "./src/firebase/FirebaseUtils";
 import analytics from "@react-native-firebase/analytics";
-import { ISUAT } from "./src/network/apis/account/Constants";
+import Config from "react-native-config";
 import { MaintenanceProvider } from "./src/components/maintenance/MaintenanceContext";
 import { GlobalErrorModal } from "./src/components/common/GlobalErrorModal";
 import RemoteConfigManager from "./src/config/Remoteconfigmanager";
@@ -23,7 +23,7 @@ const App = () => {
 
   useEffect(() => {
     const enableAnalytics = async () => {
-      await analytics().setAnalyticsCollectionEnabled(!__DEV__ && !ISUAT);
+      await analytics().setAnalyticsCollectionEnabled(!__DEV__ && Config.ENV === 'production');
     };
     enableAnalytics();
     Appearance.setColorScheme('light');

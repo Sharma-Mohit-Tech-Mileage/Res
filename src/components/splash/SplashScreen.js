@@ -11,7 +11,6 @@ import { getEndpoint ,ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
-//import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import moment from "moment";
@@ -28,9 +27,8 @@ import { clearAuthCookies } from "../utility/NativeCookieManager";
 
 const config = {
   issuer: Config.SSO_LOGIN,
-  clientId: "sparklight-customer-mobile-app",
-  redirectUrl:
-    "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+  clientId: Config.SSO_CLIENT_ID,
+  redirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
 };
@@ -81,8 +79,8 @@ const SplashScreen = ({ navigation, route }) => {
   const envLabel =
     Config.ENV === "development"
       ? "Dev"
-      : Config.ISUAT === "UAT"
-      ? "UAT"
+      : Config.ENV === "staging"
+      ? "Staging"
       : "";
 
   const getStyle = (baseStyle) => {

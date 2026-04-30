@@ -1,5 +1,6 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { all, call, put, takeLatest } from "redux-saga/effects";
 import moment from "moment";
+import Config from "react-native-config";
 import * as types from "../constants/servicesTypes";
 import * as actions from "../actions/servicesActions";
 import servicesApi from "../../network/apis/services/services.service";
@@ -8,16 +9,9 @@ import dataUsageApi from "../../network/apis/services/dataUsageService";
 function* fetchServiceDetailsSaga(action) {
   try {
     const { accountNumber } = action.payload;
-    console.log("[ServicesSaga] fetchServiceDetails called with accountNumber:", accountNumber);
-
     const response = yield call(servicesApi.fetchServiceDetails, accountNumber);
-    console.log("[ServicesSaga] fetchServiceDetails raw API response:", JSON.stringify(response, null, 2));
-
     const transformedData = transformServiceData(response);
-    console.log("[ServicesSaga] fetchServiceDetails transformed data:", JSON.stringify(transformedData, null, 2));
-
     yield put(actions.fetchServiceDetailsSuccess(transformedData));
-    console.log("[ServicesSaga] fetchServiceDetails SUCCESS dispatched");
   } catch (error) {
     console.error("[ServicesSaga] fetchServiceDetails FAILED:", error?.message, error);
     yield put(
@@ -52,7 +46,7 @@ function transformServiceData(apiResponse) {
       videoData = {
         hasService: true,
         planName: video.product_name,
-        zipCode: null, // TODO: Get from user state or Accounts API
+        zipCode: null,
       };
     }
 
@@ -61,7 +55,7 @@ function transformServiceData(apiResponse) {
       phoneData = {
         hasService: true,
         planName: voice.product_name,
-        legacyBrand: null, // TODO: Get from user state or Accounts API
+        legacyBrand: null,
       };
     }
   });
@@ -75,25 +69,20 @@ function transformServiceData(apiResponse) {
 
 function* checkOutageStatusSaga() {
   try {
-    console.log("[ServicesSaga] checkOutageStatus called");
+    console.log(`[OUTAGE-DIAG] saga start | API_ACP_BASEURL=${Config.API_ACP_BASEURL} | ENV=${Config.ENV}`);
     yield put(actions.clearOutageData());
-    const minDelay = new Promise((resolve) => setTimeout(resolve, 5000));
 
-    const [response] = yield Promise.all([
+    const [response] = yield all([
       call(servicesApi.checkOutageStatus),
-      minDelay,
+      call(() => new Promise((resolve) => setTimeout(resolve, 5000))),
     ]);
-    console.log("[ServicesSaga] checkOutageStatus raw API response:", JSON.stringify(response, null, 2));
 
     const transformedOutageData = transformOutageData(response);
-    console.log("[ServicesSaga] checkOutageStatus transformed data:", JSON.stringify(transformedOutageData, null, 2));
 
     yield put(actions.checkOutageStatusSuccess(transformedOutageData));
-    console.log("[ServicesSaga] checkOutageStatus SUCCESS dispatched");
   } catch (error) {
     console.error("[ServicesSaga] checkOutageStatus FAILED:", error?.message, error);
-    const minDelay = new Promise((resolve) => setTimeout(resolve, 5000));
-    yield minDelay;
+    yield call(() => new Promise((resolve) => setTimeout(resolve, 5000)));
 
     const errorData = {
       hasOutage: false,
@@ -144,21 +133,17 @@ function transformOutageData(apiResponse) {
         {
           text: "sign up or manage your notification settings",
           action: "navigate",
-          tab: "account", 
-          screen: "Notifications", 
+          tab: "account",
+          screen: "Notifications",
         },
       ],
     };
   }
 }
 
-// ========== Data Usage Sagas ==========
-
 function* fetchCurrentUsageSaga() {
   try {
-    console.log("[ServicesSaga] fetchCurrentUsage called");
     const response = yield call(dataUsageApi.getCurrentUsage);
-    console.log("[ServicesSaga] fetchCurrentUsage response:", JSON.stringify(response, null, 2));
     yield put(actions.fetchCurrentUsageSuccess(response));
   } catch (error) {
     const status = error?.response?.status;
@@ -173,9 +158,7 @@ function* fetchCurrentUsageSaga() {
 
 function* fetchMonthlyUsageSaga() {
   try {
-    console.log("[ServicesSaga] fetchMonthlyUsage called");
     const response = yield call(dataUsageApi.getMonthlyUsage);
-    console.log("[ServicesSaga] fetchMonthlyUsage response:", JSON.stringify(response, null, 2));
     yield put(actions.fetchMonthlyUsageSuccess(response));
   } catch (error) {
     const status = error?.response?.status;
@@ -191,16 +174,12 @@ function* fetchMonthlyUsageSaga() {
 function* fetchDailyUsageSaga(action) {
   try {
     const { startDate, endDate } = action.payload;
-    console.log("[ServicesSaga] fetchDailyUsage called:", startDate, "→", endDate);
     const response = yield call(dataUsageApi.getDailyUsage, startDate, endDate);
-    console.log("[ServicesSaga] fetchDailyUsage response:", JSON.stringify(response, null, 2));
     yield put(actions.fetchDailyUsageSuccess(response || []));
   } catch (error) {
     const status = error?.response?.status;
     console.error("[ServicesSaga] fetchDailyUsage FAILED:", status, error?.message);
     if (status === 404 || status === 204) {
-      // No data for this period — treat as empty, not an error
-      console.log("[ServicesSaga] No daily data available for this period");
       yield put(actions.fetchDailyUsageSuccess([]));
     } else {
       yield put(actions.fetchDailyUsageFailure(error.message || "Failed to fetch daily usage"));
@@ -210,9 +189,7 @@ function* fetchDailyUsageSaga(action) {
 
 function* fetchUsagePeriodsSaga() {
   try {
-    console.log("[ServicesSaga] fetchUsagePeriods called");
     const response = yield call(dataUsageApi.getUsagePeriods);
-    console.log("[ServicesSaga] fetchUsagePeriods response:", JSON.stringify(response, null, 2));
     yield put(actions.fetchUsagePeriodsSuccess(response));
   } catch (error) {
     console.error("[ServicesSaga] fetchUsagePeriods FAILED:", error?.message, error);
@@ -227,7 +204,6 @@ export function* watchServicesActions() {
   );
   yield takeLatest(types.CHECK_OUTAGE_STATUS_REQUEST, checkOutageStatusSaga);
 
-  // Data Usage watchers
   yield takeLatest(types.FETCH_CURRENT_USAGE_REQUEST, fetchCurrentUsageSaga);
   yield takeLatest(types.FETCH_MONTHLY_USAGE_REQUEST, fetchMonthlyUsageSaga);
   yield takeLatest(types.FETCH_DAILY_USAGE_REQUEST, fetchDailyUsageSaga);

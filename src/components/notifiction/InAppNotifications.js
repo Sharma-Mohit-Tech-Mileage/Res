@@ -31,6 +31,7 @@ import Toggle from "../common/Toggle";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
 import { PostApiRequest } from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 
@@ -296,13 +297,10 @@ const InAppNotifications = ({ navigation }) => {
       billingOptOutStatus: !formatedData.billingOptOutStatus,
       customerType: "Residential",
     };
-    console.log("postRequestInAppNotification requestData", requestData);
-    const requestUrl = `api/mobilenotificationpreferences/${userName}/mobilepreferences`;
     PostApiRequest(
-      requestUrl,
+      getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName }),
       requestData,
       (res) => {
-        console.log("postRequestInAppNotification response", res);
         setIsLoading(false);
         if (res) {
           setNotification({

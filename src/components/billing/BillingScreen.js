@@ -28,7 +28,6 @@ import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Icon from "../common/Icon";
-//import { Env } from "../../network/apis/account/Constants";
 import Config from "react-native-config";
 import colors from "../../res/Colors";
 import AppStyles from "../utility/AppStyles";
@@ -392,7 +391,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   card: {
-    height: 230,
+    minHeight: 230,
   },
   myModemSpaceBlock: {
     paddingTop: Padding.p_base,

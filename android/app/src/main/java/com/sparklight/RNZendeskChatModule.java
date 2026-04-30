@@ -33,7 +33,6 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
 
     private static final String TAG = "RNZendeskChatModule";
     private static ReactApplicationContext reactContext;
-    private boolean isUAT = true;
 
     RNZendeskChatModule(ReactApplicationContext context) {
         super(context);
@@ -44,7 +43,7 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
     private void init(){
         Zendesk.initialize(
                 getReactApplicationContext(),
-                isUAT ? ZendeskConfig.ZENDESK_CHANNEL_KEY_SANDBOX : ZendeskConfig.ZENDESK_CHANNEL_KEY_PRODUCTION,
+                BuildConfig.ZENDESK_CHANNEL_KEY_ANDROID,
                 zendesk -> Log.i("IntegrationApplication", "Initialization successful"),
                 error -> Log.e("IntegrationApplication", "Messaging failed to initialize", error),
                 new DefaultMessagingFactory());

@@ -189,7 +189,6 @@ const Support = ({ route }) => {
   ];
 
   var mySubscriber = function (msg, data) {
-    console.log(msg, data);
     scrollViewRef.current?.scrollToEnd({ animated: true });
   };
 

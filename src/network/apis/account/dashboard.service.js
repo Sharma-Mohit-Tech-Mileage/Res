@@ -30,7 +30,6 @@ const getAccountInfo = async(accountId) =>{
 
 const getCurrentSpeedInfo = async()=> {
         let res = await getUser();
-        console.log('getCurrentSpeedInfo User: ', res);
         const config = {
                 headers: {
                     Authorization: "Bearer " + res.token

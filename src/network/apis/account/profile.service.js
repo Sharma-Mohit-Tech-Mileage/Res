@@ -185,7 +185,6 @@ const postTextNotifictionInfo = async (data) => {
       Authorization: "Bearer " + user.token,
     },
   };
-  console.log("Making API Call to api/SMS with data:", postData); // Log the request data
   try {
     const response = await _axios.post(getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION), postData, config);
     return response.data;
@@ -439,41 +438,41 @@ const handleSubmitFeedback = async (obj) => {
 
   const payload = {
     request: {
-      ticket_form_id: Config.ZENDESK_TICKET_FORM_ID,
+      ticket_form_id: Config.ZENDESK_FEEDBACK_TICKET_FORM_ID,
       requester: {
         name: fullName,
         email: obj.feedbackEmail,
       },
-      recipient: Config.ZENDESK_RECIPIENT,
-      assignee_id: Config.ZENDESK_ASSIGNEE_ID,
-      group_id: Config.ZENDESK_GROUP_ID,
+      recipient: Config.ZENDESK_FEEDBACK_RECIPIENT,
+      assignee_id: Config.ZENDESK_FEEDBACK_ASSIGNEE_ID,
+      group_id: Config.ZENDESK_FEEDBACK_GROUP_ID,
       type: null,
       custom_fields: [
-        { id: Config.ZENDESK_CATEGORY_ID, value: obj.category },
+        { id: Config.ZENDESK_FEEDBACK_CATEGORY_ID, value: obj.category },
         { id: Config.ZENDESK_FEEDBACK_VALUE_ID, value: obj.feedbackValue },
-        { id: Config.ZENDESK_EMAIL_ID, value: obj.feedbackEmail },
+        { id: Config.ZENDESK_FEEDBACK_EMAIL_ID, value: obj.feedbackEmail },
         {
-          id: Config.ZENDESK_APP_VERSION_ID,
+          id: Config.ZENDESK_FEEDBACK_APP_VERSION_ID,
           value: deviceMetadata.appVersion,
         },
         {
-          id: Config.ZENDESK_PLATFORM_ID,
+          id: Config.ZENDESK_FEEDBACK_PLATFORM_ID,
           value: deviceMetadata.platform,
         },
         {
-          id: Config.ZENDESK_OS_VERSION_ID,
+          id: Config.ZENDESK_FEEDBACK_OS_VERSION_ID,
           value: deviceMetadata.osVersion,
         },
         {
-          id: Config.ZENDESK_DEVICE_MODEL_ID,
+          id: Config.ZENDESK_FEEDBACK_DEVICE_MODEL_ID,
           value: deviceMetadata.deviceModel,
         },
         {
-          id: Config.ZENDESK_ACCOUNT_NO,
+          id: Config.ZENDESK_FEEDBACK_ACCOUNT_NO,
           value: user?.userInfo?.accountNumber,
         },
         {
-          id: Config.ZENDESK_AREA_OF_CONCERN_ID,
+          id: Config.ZENDESK_FEEDBACK_AREA_OF_CONCERN_ID,
           value: concernLabels.map((label) =>
             label
               .toLowerCase()
@@ -549,7 +548,6 @@ const addUserAction = async (data) => {
 
   try {
     const response = await _axios.post(getEndpoint(ENDPOINTS.USERS_BASE), data, config);
-    console.log("API Call Successful, Response:", response.data);
     return response.data;
   } catch (error) {
     console.error("API Call Failed, Error:", error);
@@ -566,18 +564,15 @@ const editUserAction = async (data) => {
     },
   };
 
-  console.log("Making API Call to api/users with data:", data); // Log the request data
-
   try {
     const response = await _axios.put(
       getEndpoint(ENDPOINTS.USERS_BY_USERNAME, { userName: data.userName }),
       data,
       config
     );
-    console.log("API Call Successful, Response:", response.data); // Log the successful response
     return response.data;
   } catch (error) {
-    console.error("API Call Failed, Error:", error); // Log the error
+    console.error("API Call Failed, Error:", error);
     throw error;
   }
 };
@@ -591,18 +586,15 @@ const removeUser = async (data) => {
     },
   };
 
-  console.log(getEndpoint(ENDPOINTS.USERS_REMOVE, { accountNumber: data.accountNumber, userName: data.userName })); // Log the request data
-
   try {
     const response = await _axios.put(
       getEndpoint(ENDPOINTS.USERS_REMOVE, { accountNumber: data.accountNumber, userName: data.userName }),
       data,
       config
     );
-    console.log("API Call Successful, Response:", response.data); // Log the successful response
     return response.data;
   } catch (error) {
-    console.error("API Call Failed, Error:", error); // Log the error
+    console.error("API Call Failed, Error:", error);
     throw error;
   }
 };
@@ -615,13 +607,11 @@ const fetchAllSvEmails = async (data) => {
     },
   };
   const requestUrl = getEndpoint(ENDPOINTS.SV_EMAILS_GET_ALL, { accountNumber });
-   console.log(`Making API Call to ${requestUrl}`); // Log the request URL
    try {
      const response = await _axios.get(requestUrl, config);
-     console.log("API Call Successful, Response:", response.data); // Log the successful response
      return response.data;
    } catch (error) {
-     console.error("API Call Failed, Error:", error); // Log the error
+     console.error("API Call Failed, Error:", error);
      throw error;
      }
 };
@@ -694,7 +684,7 @@ const updateSVEmails = async (emailList) => {
 
   try {
     const response = await _axios.post(
-      `mobile/api/email/${accountNumber}/UpdateSVEmails`,
+      getEndpoint(ENDPOINTS.SV_EMAIL_UPDATE, { accountNumber }),
       body,
       config
     );
@@ -718,9 +708,7 @@ const manageSVEmails = async (emailList) => {
     console.log("Request Config:", config);
     console.log("Email List:", emailList);
     const requestUrl = getEndpoint(ENDPOINTS.SV_EMAIL_UPDATE, { accountNumber });
-    console.log(`Making API Call to ${requestUrl}`);
     const response = await _axios.post(requestUrl, emailList, config);
-    console.log("Response Data:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error managing SV emails:", error);
@@ -737,12 +725,7 @@ const addSVEmailMktFlag = async (email) => {
   };
   try {
     const requestUrl = getEndpoint(ENDPOINTS.SV_EMAIL_ADD_MKT_FLAG, { accountNumber, email });
-    console.log(`Making API Call to ${requestUrl}`);
     const response = await _axios.post(requestUrl, {}, config);
-    console.log(
-      `API Call Successful to add SV email marketing flag: ${email}`,
-      response.data
-    );
     return response.data;
   } catch (error) {
     console.error(
@@ -805,9 +788,7 @@ const fetchACPUserAccountDetails = async (signal) => {
   };
 
   try {
-    console.log("[DEBUG] calling _axios.post", requestUrl, data);
     const response = await _axios.post(requestUrl, data, config);
-    console.log("API Call Successful:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error in API Call:", error);

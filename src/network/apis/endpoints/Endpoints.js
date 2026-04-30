@@ -16,7 +16,7 @@ export const ENDPOINTS = {
     ZENDESK_TOKEN: 'api/Zendesk/TokenAuth',
 
     // Profile / Account
-    PROFILE_DETAILS_BY_USERNAME: 'api/Accounts/GetCustomerByUserName?userName=:userName',
+    GET_CUSTOMER_BY_USERNAME: 'api/Accounts/GetCustomerByUserName?userName=:userName',
     PROFILE_DETAILS_BY_ACCOUNTID: 'api/Accounts/GetCustomerByAccountId?accountId=:accountNumber',
     PROFILE_DETAILS: 'api/profile/:accountNumber',
     PROFILE_USERS: 'api/account/:accountNumber/users',
@@ -84,6 +84,7 @@ export const ENDPOINTS = {
     ACCOUNT_INFO: 'account/api/account/:accountId',
     INTERNET_SPEED_GET: 'internet/api/internet/:accountNumber/speedTest/Get',
     INTERNET_SPEED_POST: 'internet/api/internet/:accountNumber/speedTest/Post',
+    INTERNET_USAGE: 'api/Internet/Usage',
 
     // Security / Password
     SECURITY_QUESTIONS: 'api/Security/GetSecurityQuestions',

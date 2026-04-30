@@ -98,7 +98,6 @@ const Survey = ({ route }) => {
   const getSurveyData = () => {
     setLoadingData(true);
     GetApiRequest(getEndpoint(ENDPOINTS.SURVEY), (res) => {
-      console.log("Survey data fetched successfully:", res);
       if (res && res.length > 0) {
         setSurveyOptions(res);
       }
@@ -124,14 +123,11 @@ const Survey = ({ route }) => {
         newTransferLocationId: "",
       },
     };
-    console.log("Request body for disconnect:", requestBody);
     PostApiRequest(
       getEndpoint(ENDPOINTS.SERVICE_DISCONNECT_SURVEY),
       requestBody,
       (res) => {
         setLoading(false);
-        console.log("Disconnect request successful:", res);
-        // Handle success, e.g., navigate to a confirmation screen or show a success message
         if (res.error != null && res?.error?.message) {
           setError(res.error);
         } else {

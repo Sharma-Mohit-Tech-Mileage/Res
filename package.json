@@ -6,6 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "env:development": "react-native-config .env.development",
+    "env:staging": "react-native-config .env.staging",
     "env:production": "react-native-config .env.production",
     "lint": "eslint .",
     "start": "react-native start",

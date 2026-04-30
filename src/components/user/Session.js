@@ -4,8 +4,8 @@ import store from "../../redux/configureStore";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { PostAuthApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-//import { Env } from "../../network/apis/account/Constants";
 import Config from "react-native-config";
+import { Platform } from "react-native";
 
 const TAG = "[Session]";
 
@@ -21,9 +21,8 @@ const tokenPreview = (t) => {
 
 const config = {
   issuer: Config.SSO_LOGIN,
-  clientId: "sparklight-customer-mobile-app",
-  redirectUrl:
-    "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+  clientId: Config.SSO_CLIENT_ID,
+  redirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
 };

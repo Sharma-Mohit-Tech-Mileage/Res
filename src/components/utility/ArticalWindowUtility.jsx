@@ -4,7 +4,6 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import { RefreshToken } from '../user/Session';
-import { ISUAT } from '../../network/apis/account/Constants';
 import Config from 'react-native-config';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
@@ -15,7 +14,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { setAuthCookiesOnAllDomains, dumpCookies, clearAuthCookies } from './NativeCookieManager';
 
 const TAG = '[ArticalWindow]';
-const JS_COOKIE_DOMAIN = ISUAT ? '.uat.sparklight.com' : '.sparklight.com';
+const JS_COOKIE_DOMAIN = Config.COOKIE_DOMAIN;
 const REFRESH_INTERVAL_MS = 4 * 60 * 1000; 
 const safeForJS = (val) => JSON.stringify(String(val || '')).slice(1, -1);
 
@@ -31,7 +30,6 @@ const logStorageSnapshot = async (caller) => {
         const cu = await getUser();
         const jwtAge = cu?.jwtTimestamp ? Date.now() - cu.jwtTimestamp : '?';
         const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?';
-        console.log(`${TAG} STORAGE [${caller}] | ts=${new Date().toISOString()} | jwt=${tokenPreview(cu?.token)} | jwtAge=${jwtAge}ms | jwtIssuedAt=${cu?.jwtTimestamp ? new Date(cu.jwtTimestamp).toISOString() : '?'} | idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${idTokenAge}ms | idTokenIssuedAt=${cu?.idTokenTimestamp ? new Date(cu.idTokenTimestamp).toISOString() : '?'} | account=${cu?.userInfo?.accountNumber || '?'}`);
     } catch (e) {
         console.warn(`${TAG} STORAGE [${caller}] read failed:`, e.message);
     }
@@ -192,16 +190,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const prepareInjectionScript = useCallback(async () => {
         try {
-            console.log(`${TAG} prepareInjectionScript START | ts=${new Date().toISOString()} | targetUrl=${url}`);
             let cu = await getUser();
             const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : Infinity;
-            console.log(`${TAG} prepareInjectionScript | jwt=${tokenPreview(cu?.token)} | jwtTimestamp=${cu?.jwtTimestamp ? new Date(cu.jwtTimestamp).toISOString() : '?'} | idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${idTokenAge}ms | idTokenTimestamp=${cu?.idTokenTimestamp ? new Date(cu.idTokenTimestamp).toISOString() : '?'}`);
             if (idTokenAge > 240000) {
                 console.warn(`${TAG} prepareInjectionScript | IdToken stale (${idTokenAge}ms old) — refreshing before injection | ts=${new Date().toISOString()}`);
                 try {
                     await RefreshToken();
                     cu = await getUser();
-                    console.log(`${TAG} prepareInjectionScript | post-refresh idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?'}ms`);
                 } catch (refreshErr) {
                     console.error(`${TAG} prepareInjectionScript | refresh failed, using existing token | error=${refreshErr.message}`);
                 }
@@ -211,7 +206,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             await setAuthCookiesOnAllDomains(cu?.idToken || '');
             setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp));
             setWebViewReady(true);
-            console.log(`${TAG} prepareInjectionScript DONE | WebView ready | ts=${new Date().toISOString()}`);
             await dumpCookies('prepareInjection');
         } catch (e) {
             console.error(`${TAG} prepareInjectionScript FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
@@ -222,11 +216,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const injectAuth = useCallback(async () => {
         if (!webViewRef.current) return;
         try {
-            console.log(`${TAG} injectAuth START (full JWT+IdToken) | ts=${new Date().toISOString()} | currentUrl=${currentUrlRef.current}`);
             const cu = await getUser();
             const idToken = cu?.idToken || '';
             const jwtTs = cu?.jwtTimestamp || Date.now();
-            console.log(`${TAG} injectAuth | jwt=${tokenPreview(cu?.token)} | idToken=${tokenPreview(idToken)} | jwtTimestamp=${new Date(jwtTs).toISOString()} | setting localStorage: jwt_token, user_info, tokenIssuedAt | setting cookies: IdToken, Source, CustomerType, LatestVersion`);
             if (idToken) await setAuthCookiesOnAllDomains(idToken);
 
             const safeToken = safeForJS(cu?.token);
@@ -248,7 +240,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         if (_wasInput && _ae) { _ae.focus(); }
     } catch(e) {}
 })(); true;`);
-            console.log(`${TAG} injectAuth DONE | ts=${new Date().toISOString()}`);
             await dumpCookies('injectAuth');
             dumpWebViewStorage('injectAuth');
         } catch (e) {
@@ -263,7 +254,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             const cu = await getUser();
             const idToken = cu?.idToken || '';
             const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?';
-            console.log(`${TAG} injectIdTokenOnly | ts=${new Date().toISOString()} | idToken=${tokenPreview(idToken)} | idTokenAge=${idTokenAge}ms | currentUrl=${currentUrlRef.current}`);
             if (idToken) await setAuthCookiesOnAllDomains(idToken);
 
             webViewRef.current.injectJavaScript(`(function() {
@@ -300,7 +290,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         if (!webViewRef.current) return;
         const refreshStartTs = Date.now();
         const lastRefreshAge = lastIdTokenRefresh.current ? refreshStartTs - lastIdTokenRefresh.current : '?';
-        console.log(`${TAG} silentRefresh START | ts=${new Date(refreshStartTs).toISOString()} | lastRefreshAge=${lastRefreshAge}ms | currentUrl=${currentUrlRef.current} | onPaymentDomain=${isOnPaymentDomain()}`);
         try {
             const netState = await NetInfo.fetch();
             if (!netState.isConnected || !netState.isInternetReachable) {
@@ -320,14 +309,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             await refreshInjectionScript();
             const cu = await getUser();
             if (cu?.idToken) {
-                console.log(`${TAG} silentRefresh — setting native cookies | idToken=${tokenPreview(cu.idToken)} | ts=${new Date().toISOString()}`);
                 await setAuthCookiesOnAllDomains(cu.idToken);
             }
-            console.log(`${TAG} silentRefresh — injecting IdToken cookie to WebView | onPaymentDomain=${isOnPaymentDomain()} | ts=${new Date().toISOString()}`);
             await injectIdTokenOnly();
             await logStorageSnapshot('silentRefresh-after');
             await dumpCookies('silentRefresh-after');
-            console.log(`${TAG} silentRefresh DONE | duration=${Date.now() - refreshStartTs}ms`);
         } catch (e) {
             console.error(`${TAG} silentRefresh FAILED | duration=${Date.now() - refreshStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
             pendingOfflineRefresh.current = true;
@@ -361,14 +347,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, []);
 
     const recreateWebView = useCallback(async () => {
-        console.log(`${TAG} recreateWebView START | ts=${new Date().toISOString()} | currentUrl=${currentUrlRef.current}`);
         webViewRef.current?.injectJavaScript(`window.postMessage('SAVE_STATE'); true;`);
         initialLoadComplete.current = false;
         setContentLoaded(false);
         setProgress(0);
         await prepareInjectionScript();
         setWebViewKey(Date.now());
-        console.log(`${TAG} recreateWebView DONE | newKey=${Date.now()} | ts=${new Date().toISOString()}`);
     }, [prepareInjectionScript]);
 
     const showToastMessage = useCallback(() => {
@@ -407,7 +391,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         const handleAppState = async (nextAppState) => {
             if (nextAppState === 'background' || nextAppState === 'inactive') {
                 backgroundTimestamp.current = Date.now();
-                console.log(`${TAG} AppState → ${nextAppState} | ts=${new Date().toISOString()} | stoppingSilentRefresh`);
                 stopSilentRefresh();
                 webViewRef.current?.injectJavaScript(`window.postMessage('SAVE_STATE'); true;`);
             } else if (nextAppState === 'active' && backgroundTimestamp.current > 0) {
@@ -415,37 +398,30 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 const idTokenAge = Date.now() - lastIdTokenRefresh.current;
                 const netState = await NetInfo.fetch();
                 const isOnline = netState.isConnected && netState.isInternetReachable;
-                console.log(`${TAG} AppState → active | bgDuration=${dur}ms | idTokenAge=${idTokenAge}ms | isOnline=${isOnline} | currentUrl=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
                 await logStorageSnapshot('appState-resume');
                 await dumpCookies('appState-resume');
 
                 if (dur > 600000) {
-                    console.log(`${TAG} AppState | >10min bg — checking WebView alive`);
                     if (!isOnline) { console.warn(`${TAG} AppState | offline, deferring refresh`); pendingOfflineRefresh.current = true; }
                     else {
                         const alive = await checkWebViewAlive();
-                        console.log(`${TAG} AppState | WebView alive=${alive}`);
-                        if (!alive) { console.log(`${TAG} AppState | recreating WebView`); recreateWebView(); }
+                        if (!alive) { recreateWebView(); }
                         else {
                             try {
-                                console.log(`${TAG} AppState | WebView alive, refreshing IdToken only`);
                                 await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly();
                             }
                             catch (_) { console.warn(`${TAG} AppState | refresh failed, recreating WebView`); recreateWebView(); }
                         }
                     }
                 } else if (idTokenAge > 240000) {
-                    console.log(`${TAG} AppState | idToken >4min old, refreshing`);
                     if (!isOnline) { pendingOfflineRefresh.current = true; }
                     else {
                         try { await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly(); }
                         catch (_) { pendingOfflineRefresh.current = true; }
                     }
                 } else if (dur > 60000) {
-                    console.log(`${TAG} AppState | >1min bg, re-injecting current IdToken`);
                     await injectIdTokenOnly();
                 } else {
-                    console.log(`${TAG} AppState | short bg (${dur}ms), no action needed`);
                 }
                 backgroundTimestamp.current = 0;
                 startSilentRefresh();
@@ -467,10 +443,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [user]);
 
     const onShouldStartLoadWithRequest = useCallback((request) => {
-        console.log(`${TAG} NAV onShouldStartLoad | url=${request.url} | ts=${new Date().toISOString()}`);
 
         if (request.url.includes('/postlogout')) {
-            console.log(`${TAG} NAV | postlogout detected — returning to mobile | ts=${new Date().toISOString()}`);
             stopSilentRefresh();
             clearAuthCookies();
             navigation.goBack();
@@ -484,12 +458,10 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 ssoRedirectInFlight.current = true;
                 (async () => {
                     try {
-                        console.log(`${TAG} NAV SSO | refreshing token + full auth injection | ts=${new Date().toISOString()}`);
                         await RefreshToken();
                         lastIdTokenRefresh.current = Date.now();
                         await refreshInjectionScript();
                         await injectAuth();
-                        console.log(`${TAG} NAV SSO | redirecting WebView back to ${url}`);
                         webViewRef.current?.injectJavaScript(`window.location.href = '${url}'; true;`);
                     } catch (e) {
                         console.error(`${TAG} NAV SSO | refresh failed, recreating WebView | error=${e.message}`);
@@ -510,16 +482,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         const prevUrl = currentUrlRef.current;
         if (nativeEvent?.url) currentUrlRef.current = nativeEvent.url;
         const domainChanged = prevUrl && nativeEvent?.url && new URL(prevUrl).hostname !== new URL(nativeEvent.url).hostname;
-        console.log(`${TAG} NAV onLoadStart | url=${nativeEvent?.url} | prevUrl=${prevUrl || '(initial)'} | domainChanged=${!!domainChanged} | ts=${new Date().toISOString()}`);
         if (!initialLoadComplete.current) { setProgress(0); setContentLoaded(false); }
         setIsError(false);
         setErrorMessage('');
         if (nativeEvent?.url && (nativeEvent.url.includes('payment.sparklight.com') || nativeEvent.url.includes('payment.uat.sparklight.com'))) {
-            console.log(`${TAG} NAV onLoadStart | PAYMENT DOMAIN detected — setting native cookies only`);
             (async () => {
                 try {
                     const cu = await getUser();
-                    console.log(`${TAG} NAV onLoadStart | payment domain cookie set | idToken=${tokenPreview(cu?.idToken)} | idTokenAge=${cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?'}ms`);
                     if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken);
                     await dumpCookies('onLoadStart-payment');
                 } catch (_) {}
@@ -532,13 +501,10 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const onLoadEnd = useCallback(async () => {
         setProgress(1);
         const onPayment = isOnPaymentDomain();
-        console.log(`${TAG} NAV onLoadEnd | url=${currentUrlRef.current} | onPaymentDomain=${onPayment} | ts=${new Date().toISOString()}`);
 
         if (!onPayment) {
-            console.log(`${TAG} NAV onLoadEnd | injecting IdToken cookie (not payment domain)`);
             await injectIdTokenOnly();
         } else {
-            console.log(`${TAG} NAV onLoadEnd | SKIP IdToken injection (payment domain — avoid overwrite)`);
         }
         await logStorageSnapshot('onLoadEnd');
         await dumpCookies('onLoadEnd');
@@ -576,17 +542,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             const data = JSON.parse(nativeEvent.data);
             switch (data.type) {
                 case 'pong':
-                    console.log(`${TAG} MSG pong | WebView alive | ts=${new Date().toISOString()}`);
                     if (aliveCheckTimeout.current) { clearTimeout(aliveCheckTimeout.current); aliveCheckTimeout.current = null; }
                     if (aliveCheckResolver.current) { aliveCheckResolver.current(true); aliveCheckResolver.current = null; }
                     break;
                 case 'pdf':
-                    console.log(`${TAG} MSG pdf | received PDF binary | ts=${new Date().toISOString()}`);
                     setShowPDFUrl(data.data);
                     setShowPDFModal(true);
                     break;
                 case 'injectionComplete':
-                    console.log(`${TAG} MSG injectionComplete | script injected OK | url=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
                     break;
                 default:
                     if (data.type && data.type.startsWith('storageSnapshot') && data.data) {
@@ -598,11 +561,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                             const idx = pair.indexOf('=');
                             if (idx > 0) cookieObj[pair.substring(0, idx)] = pair.substring(idx + 1);
                         });
-                        console.log(`${TAG} WEBVIEW_STORAGE [${caller}] | origin=${s.origin} | href=${s.href} | ts=${s.ts}`);
-                        console.log(`${TAG} WEBVIEW_STORAGE [${caller}] | jwt_token=${tokenPreview(s.jwt_token)} | tokenIssuedAt=${s.tokenIssuedAt} | user_info=${s.user_info ? s.user_info.substring(0, 100) + (s.user_info.length > 100 ? '…' : '') : '(none)'}`);
-                        console.log(`${TAG} WEBVIEW_STORAGE [${caller}] | cookies=${JSON.stringify(cookieObj)}`);
                     } else {
-                        console.log(`${TAG} MSG unknown | type=${data.type} | ts=${new Date().toISOString()}`);
                     }
                     break;
             }

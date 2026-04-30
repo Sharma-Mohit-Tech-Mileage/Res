@@ -104,7 +104,6 @@ const ChangePassword = () => {
     GetApiRequest(
       endpointUrl,
       (res) => {
-        console.log("getSecurityQuestions", res);
         if (res) {
           setSecurityQuestionsNew(res);
           checkCustomSecurityQuestion(res);
@@ -136,7 +135,6 @@ const ChangePassword = () => {
         body,
         (res) => {
           setLoading(false);
-          console.log("Password updated successfully", res);
           if(res.code=="204" || res.code=="200" ){
           navigation.navigate("PasswordSecurity", {
             updateSuccess: true,

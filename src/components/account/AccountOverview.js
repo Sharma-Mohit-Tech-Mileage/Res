@@ -6,6 +6,7 @@ import {
   Pressable,
   Alert,
   ScrollView,
+  Platform,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
@@ -36,7 +37,6 @@ import { logout } from "react-native-app-auth";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from "react-native-version-check";
-//import { Env } from "../../network/apis/account/Constants";
 import Config from "react-native-config";
 import AppStyles from "../utility/AppStyles";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
@@ -77,13 +77,10 @@ const logoutConfirmationPopup = (dispatch, navigation) => {
 
 const logoutAction = (dispatch, navigation) => {
   getSsoToken().then((res) => {
-    console.log("token", res);
     let token = res.idToken;
-    console.log("idToken", token);
     logout(config, {
       idToken: token,
-      postLogoutRedirectUrl:
-        "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+      postLogoutRedirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
     }).then(async (result) => {
       try {
         analytics().setUserId(null);
