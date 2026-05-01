@@ -21,21 +21,21 @@ GRAD_BOTTOM = (141, 59, 144)  # rgba(141, 59, 144, 1)
 # iPhone frame colour & geometry
 FRAME_COLOR      = (28, 28, 30)
 FRAME_RADIUS     = 90
-FRAME_BORDER     = 18
+FRAME_BORDER     = 10
 DYNAMIC_ISLAND_W = 220
 DYNAMIC_ISLAND_H = 48
 DYNAMIC_ISLAND_R = 24
 
 # Text colours
-TEXT_LABEL    = (255, 255, 255)   # small caps label
-TEXT_HEADLINE = (255, 255, 255)   # big headline
-TEXT_BODY     = (210, 235, 255)   # description
+TEXT_LABEL    = (255, 255, 255)
+TEXT_HEADLINE = (255, 255, 255)
+TEXT_BODY     = (255, 255, 255)
 
 # Vertical layout
 LABEL_Y_FRAC    = 0.06   # label top edge as fraction of height
-HEADLINE_Y_FRAC = 0.10
-BODY_Y_FRAC     = 0.22
-PHONE_TOP_FRAC  = 0.32   # where phone frame starts
+HEADLINE_Y_FRAC = 0.05
+BODY_Y_FRAC     = 0.10
+PHONE_TOP_FRAC  = 0.29   # where phone frame starts (moved up)
 
 # ──────────────────────────────────────────────
 # Screen definitions
@@ -44,63 +44,54 @@ SCREENS = [
     {
         "file":     "ios-home.png",
         "out":      "promo-home.png",
-        "label":    "GET STARTED",
         "headline": "Everything you need\nin one place",
         "body":     "Manage billing, track services, and\nget support on the go.",
     },
     {
         "file":     "ios-billing.png",
         "out":      "promo-billing.png",
-        "label":    "BILLING & PAYMENTS",
         "headline": "Payments \nmade simple",
         "body":     "Set it once and\nnever miss a due date.",
     },
     {
         "file":     "ios-services.png",
         "out":      "promo-services.png",
-        "label":    "SERVICE HUB ",
         "headline": "Your services. \nAll in one",
         "body":     "Internet, data, and \nmore — all at a glance.",
     },
     {
         "file":     "ios-billing-period.png",
         "out":      "promo-billing-period.png",
-        "label":    "DATA USAGE",
         "headline": "Stay on top\nof your data",
         "body":     "Monitor usage across every billing cycle\n anytime.",
     },
     {
         "file":     "ios-my-services.png",
         "out":      "promo-my-services.png",
-        "label":    "HELP & SUPPORT ",
         "headline": "Answers at \nyour fingertips",
         "body":     "Search FAQs, browse topics\nor contact us anytime.",
     },
     {
         "file":     "ios-profile.png",
         "out":      "promo-profile.png",
-        "label":    "YOUR PROFILE ",
         "headline": "All your \naccount details",
         "body":     "Manage settings and\npersonal info with ease.",
     },
     {
         "file":     "ios-notifications.png",
         "out":      "promo-notifications.png",
-        "label":    "NOTIFICATIONS",
         "headline": "Never miss \na thing",
         "body":     "Get notified for billing,\noutages, and more. ",
     },
     {
         "file":     "ios-feedback.png",
         "out":      "promo-feedback.png",
-        "label":    "FEEDBACK",
         "headline": "We want to\nhear from you",
         "body":     "Share your experience and help\nus improve our service.",
     },
     {
         "file":     "ios-data-usage.png",
         "out":      "promo-data-usage.png",
-        "label":    "DATA USAGE ",
         "headline": "Your current \ndata snapshot",
         "body":     "Usage, remaining data,\nand billing period — all here.",
     },
@@ -124,35 +115,48 @@ def make_gradient(w, h, top_rgb, bottom_rgb):
     return img
 
 
-# HelveticaNeue TTC font indices
-# 0=Regular, 1=Bold, 4=CondensedBold, 5=UltraLight, 7=Light, 10=Medium, 12=Thin
-HELVETICA_NEUE = "/System/Library/Fonts/HelveticaNeue.ttc"
-HN_REGULAR        = 0
-HN_BOLD           = 1
-HN_LIGHT          = 7
-HN_MEDIUM         = 10
+# Radio Canada font candidates (prefer local bundled files, then system if available)
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+RADIO_CANADA_FONTS = {
+    "regular": [
+        os.path.join(SCRIPT_DIR, "fonts", "RadioCanada-Regular.ttf"),
+        os.path.join(SCRIPT_DIR, "RadioCanada-Regular.ttf"),
+        "/System/Library/Fonts/Supplemental/RadioCanada-Regular.ttf",
+    ],
+    "bold": [
+        os.path.join(SCRIPT_DIR, "fonts", "RadioCanada-Bold.ttf"),
+        os.path.join(SCRIPT_DIR, "RadioCanada-Bold.ttf"),
+        "/System/Library/Fonts/Supplemental/RadioCanada-Bold.ttf",
+    ],
+    "light": [
+        os.path.join(SCRIPT_DIR, "fonts", "RadioCanada-Light.ttf"),
+        os.path.join(SCRIPT_DIR, "RadioCanada-Light.ttf"),
+        "/System/Library/Fonts/Supplemental/RadioCanada-Light.ttf",
+    ],
+    "medium": [
+        os.path.join(SCRIPT_DIR, "fonts", "RadioCanada-Medium.ttf"),
+        os.path.join(SCRIPT_DIR, "RadioCanada-Medium.ttf"),
+        "/System/Library/Fonts/Supplemental/RadioCanada-Medium.ttf",
+    ],
+}
 
 
 def load_font(size, weight="regular"):
-    """Load Helvetica Neue at the requested weight; fall back to Arial if unavailable."""
-    weight_map = {
-        "regular": HN_REGULAR,
-        "bold":    HN_BOLD,
-        "light":   HN_LIGHT,
-        "medium":  HN_MEDIUM,
-    }
-    idx = weight_map.get(weight, HN_REGULAR)
-    if os.path.exists(HELVETICA_NEUE):
-        try:
-            return ImageFont.truetype(HELVETICA_NEUE, size, index=idx)
-        except Exception:
-            pass
-    # Fallback
-    fallback = "/System/Library/Fonts/Supplemental/Arial Bold.ttf" if weight == "bold" \
-               else "/System/Library/Fonts/Supplemental/Arial.ttf"
-    if os.path.exists(fallback):
-        return ImageFont.truetype(fallback, size)
-    return ImageFont.load_default()
+    """Load Radio Canada at the requested weight and fail fast if unavailable."""
+    candidates = RADIO_CANADA_FONTS.get(weight, RADIO_CANADA_FONTS["regular"])
+    for font_path in candidates:
+        if os.path.exists(font_path):
+            try:
+                return ImageFont.truetype(font_path, size)
+            except Exception:
+                pass
+
+    searched_paths = "\n".join(candidates)
+    raise RuntimeError(
+        f"Radio Canada font is required but not found for weight '{weight}'.\n"
+        f"Checked paths:\n{searched_paths}\n"
+        "Please add RadioCanada-*.ttf files to screenshots/fonts/."
+    )
 
 
 def rounded_rect_mask(w, h, r):
@@ -177,28 +181,6 @@ def draw_centered_text(draw, text, y, font, color, canvas_w, line_spacing=1.25):
         draw.text((x, current_y), line, font=font, fill=color)
         current_y += line_h
     return current_y
-
-
-def draw_spaced_label(draw, text, y, font, color, canvas_w, letter_spacing=18):
-    """Draw a single-line label with wide letter-spacing, centred on canvas_w."""
-    chars = list(text)
-    # Measure total width including spacing
-    total_w = 0
-    char_widths = []
-    for ch in chars:
-        bb = font.getbbox(ch)
-        cw = bb[2] - bb[0]
-        char_widths.append(cw)
-        total_w += cw
-    total_w += letter_spacing * (len(chars) - 1)
-
-    x = (canvas_w - total_w) // 2
-    for ch, cw in zip(chars, char_widths):
-        draw.text((x, y), ch, font=font, fill=color)
-        x += cw + letter_spacing
-
-    # Return bottom y
-    return y + font.getbbox("Ay")[3]
 
 
 def build_phone_frame(screenshot_path, frame_w, frame_h):
@@ -284,27 +266,23 @@ def generate(screen, script_dir):
     cx = (CANVAS_W - glow_w) // 2
     canvas.paste(glow, (cx, CANVAS_H - glow_h + 80), glow)
 
-    # 3. Fonts  — thin spaced label / Bold headline / Light body
-    font_label    = load_font(46, weight="light")
+    # 3. Fonts  — Bold headline / Light body
     font_headline = load_font(118, weight="bold")
     font_body     = load_font(58, weight="light")
 
-    # 4. Label: ALL CAPS with wide letter-spacing (matches reference style)
-    label_y = int(CANVAS_H * LABEL_Y_FRAC)
-    draw_spaced_label(draw, screen["label"].strip(), label_y, font_label, TEXT_LABEL, CANVAS_W, letter_spacing=18)
-
-    # 5. Headline  — bold, mixed case, tight line spacing like reference
+    # 4. Headline  — bold, mixed case, tight line spacing like reference
     headline_y = int(CANVAS_H * HEADLINE_Y_FRAC)
     body_start = draw_centered_text(draw, screen["headline"], headline_y, font_headline, TEXT_HEADLINE, CANVAS_W, 1.12)
 
-    # 6. Body text — light weight, slightly looser
-    body_y = body_start + 50
+    # 6. Body text — tightened spacing below headline
+    body_y = body_start + 55
     draw_centered_text(draw, screen["body"], body_y, font_body, TEXT_BODY, CANVAS_W, 1.35)
 
     # 7. Phone frame
     phone_top  = int(CANVAS_H * PHONE_TOP_FRAC)
     phone_h    = CANVAS_H - phone_top - int(CANVAS_H * 0.01)
-    phone_w    = int(phone_h * (393 / 852))   # iPhone 15 Pro aspect ratio
+    # Slightly wider phone to increase visible screenshot width
+    phone_w    = int(phone_h * (400 / 852))
     frame_img  = build_phone_frame(src, phone_w, phone_h)
 
     px = (CANVAS_W - phone_w) // 2
