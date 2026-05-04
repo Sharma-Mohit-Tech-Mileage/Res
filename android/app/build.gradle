@@ -3,6 +3,17 @@ apply plugin: "com.facebook.react"
 // Apply the Google Services plugin
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+
+// Map the flavors to the correct .env files — must be defined BEFORE applying dotenv.gradle
+project.ext.envConfigFiles = [
+        Devdebug: ".env.development",
+        Demodebug: ".env.staging",
+        Proddebug: ".env.production",
+        Devrelease: ".env.development",
+        Demorelease: ".env.staging",
+        Prodrelease: ".env.production"
+]
+
 apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.gradle"
 
 /**
@@ -97,7 +108,7 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode 419
+        versionCode 420
         versionName "25.6.0"
     }
 
@@ -143,16 +154,6 @@ android {
     }
     
 }
-
-// Map the flavors to the correct .env files
-project.ext.envConfigFiles = [
-        Devdebug: ".env.development",
-        Demodebug: ".env.staging",
-        Proddebug: ".env.production",
-        Devrelease: ".env.development",
-        Demorelease: ".env.staging",
-        Prodrelease: ".env.production"
-]
 
 repositories {
     google()
