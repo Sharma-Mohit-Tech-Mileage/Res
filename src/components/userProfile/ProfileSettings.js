@@ -17,13 +17,9 @@ import {
 } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getUserType,
-  convertToSpecialCase,
-  getRoleBasedMessage,
-} from "../utility/constant";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
+import { getPrimaryEmail } from "../utility/constant";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -33,8 +29,9 @@ const ProfileSettings = () => {
   const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {};
   const accountDetails = profile.accountDetails || {};
-  const convertedRole = getUserType(profileDetails.memberType || "");
-  const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
+
+  
+
   const customerFirstName =
     accountDetails.first_name ||
     accountDetails.firstName ||
@@ -54,7 +51,21 @@ const ProfileSettings = () => {
     (state) => state.user.userData.userInfo
   );
 
+  const serviceAddress = () => {
+    const serviceAddr = accountDetails.service_address || {};
+    const { line1, line2, city, state, zip } = serviceAddr;
+    return `${line1 || ""}${line2 ? ", " + line2 : ""}${
+      city ? ", " + city : ""
+    }${state ? ", " + state : ""}${zip ? " " + zip : ""}`;
+  }
 
+  const billingAddress = () => {
+    const billingAddr = accountDetails.bill_to_address || {};
+    const { line1, line2, city, state, zip } = billingAddr;
+    return `${line1 || ""}${line2 ? ", " + line2 : ""}${
+      city ? ", " + city : ""
+    }${state ? ", " + state : ""}${zip ? " " + zip : ""}`;
+  }
 
 const numberToWordsForAccessibility = (numStr) => {
   if (!numStr) return "";
@@ -141,30 +152,45 @@ const numberToWordsForAccessibility = (numStr) => {
                   </Text>
                 </View>
 
-                <View style={styles.firstNameParent} accessible={true} accessibilityLabel={`Account number ${numberToWordsForAccessibility(profileDetails.accountNumber)}`} accessibilityRole="text">
-                  <Text style={styles.firstName}>Account Number</Text>
+                <View style={styles.firstNameParent} accessible={true} accessibilityLabel={`Email address`} accessibilityRole="text">
+                  <Text style={styles.firstName}>Email Address</Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                    {getPrimaryEmail(accountDetails) || "N/A"}
+                  </Text>
+                </View>  
+
+                <View style={[styles.firstNameParent,{marginBottom: 20}]} accessible={true} accessibilityLabel={`Mobile number`} accessibilityRole="text">
+                  <Text style={styles.firstName}>Mobile Number</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {profileDetails.accountNumber}
                   </Text>
-                </View>
+                </View>    
 
+              </View>
+             
+            </View>
+          </View>
+
+
+          <View style={styles.frameParent}>
+            <View style={[styles.frameGroup]}>
+              <View style={[styles.generalInformationParent]}>
+                <Text style={[styles.generalInformation, styles.melissaTypo,{marginTop: 20}]} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
+                  Addresses
+                </Text>
+              </View>
+              <View style={styles.frameContainer}>
                 <View style={styles.firstNameParent} accessible={true}>
-                  <Text style={styles.firstName}>Member Type</Text>
-                  <View style={styles.badgeWrapper}>
-                    <View style={[styles.badge, styles.badgeBorder]}>
-                      <Text style={[styles.text, styles.textTypo]}>
-                        {convertedRole}
-                      </Text>
-                    </View>
-                  </View>
+                  <Text style={styles.firstName}>{"Service Address"}</Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                    {serviceAddress() || "N/A"}
+                  </Text>
                 </View>
-                <View style={styles.notificationsWrapper}>
-                  <NotificationAlert
-                    type="info"
-                    title={convertToSpecialCase(convertedRole)}
-                    showCloseIcon={false}
-                    message={roleBasedInfo}
-                  />
+                <View style={styles.firstNameParent} accessible={true}>
+                  <Text style={styles.firstName}>Billing Address</Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                    {billingAddress() || "N/A"}
+                  </Text>
                 </View>
               </View>
               <View
