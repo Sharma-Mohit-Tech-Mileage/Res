@@ -8,7 +8,8 @@ const initialState = {
 
   // Outage Status State
   outageData: null,
-  outageChecking: false,
+  outageCheckingDashboard: false,
+  outageCheckingServices: false,
   outageError: null,
 
   // Data Usage State
@@ -54,18 +55,22 @@ const servicesReducer = (state = initialState, action) => {
         serviceError: action.payload.error
       };
 
-    case types.CHECK_OUTAGE_STATUS_REQUEST:
+    case types.CHECK_OUTAGE_STATUS_REQUEST: {
+      const source = action.payload?.source || 'services';
       return {
         ...state,
         outageData: null,
-        outageChecking: true,
+        outageCheckingDashboard: source === 'dashboard' ? true : state.outageCheckingDashboard,
+        outageCheckingServices: source === 'services' ? true : state.outageCheckingServices,
         outageError: null
       };
+    }
 
     case types.CHECK_OUTAGE_STATUS_SUCCESS:
       return {
         ...state,
-        outageChecking: false,
+        outageCheckingDashboard: false,
+        outageCheckingServices: false,
         outageData: action.payload.outageData,
         outageError: null
       };
@@ -73,7 +78,8 @@ const servicesReducer = (state = initialState, action) => {
     case types.CHECK_OUTAGE_STATUS_FAILURE:
       return {
         ...state,
-        outageChecking: false,
+        outageCheckingDashboard: false,
+        outageCheckingServices: false,
         outageError: action.payload.error
       };
 

@@ -44,7 +44,7 @@ const MyServicesContent = ({ route }) => {
   const legacySPA = accountDetails?.legacy_brand_by_spa;
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
   const { outageData, checking, checkStatus, clearOutageData } =
-    useOutageStatus();
+    useOutageStatus('services');
   const [refreshing, setRefreshing] = useState(false);
 
   // Current usage for InternetCard dataPlan

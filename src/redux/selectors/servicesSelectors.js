@@ -40,9 +40,14 @@ export const selectOutageData = createSelector(
   (servicesState) => servicesState.outageData
 );
 
-export const selectOutageChecking = createSelector(
+export const selectOutageCheckingDashboard = createSelector(
   [getServicesState],
-  (servicesState) => servicesState.outageChecking
+  (servicesState) => servicesState.outageCheckingDashboard
+);
+
+export const selectOutageCheckingServices = createSelector(
+  [getServicesState],
+  (servicesState) => servicesState.outageCheckingServices
 );
 
 export const selectOutageError = createSelector(

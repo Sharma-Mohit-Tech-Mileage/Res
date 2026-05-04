@@ -1,24 +1,30 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
+import {
   checkOutageStatusRequest,
-  clearOutageData 
+  clearOutageData
 } from '../../../redux/actions/servicesActions';
-import { 
-  selectOutageData, 
-  selectOutageChecking, 
-  selectOutageError 
+import {
+  selectOutageData,
+  selectOutageCheckingDashboard,
+  selectOutageCheckingServices,
+  selectOutageError
 } from '../../../redux/selectors/servicesSelectors';
 
-export const useOutageStatus = () => {
+// `source` is 'dashboard' or 'services'. Each caller reads only its own spinner flag,
+// so a fetch triggered by the dashboard does not light up the services spinner.
+// The result (`outageData`) is shared, so a fresh fetch from either screen benefits both.
+export const useOutageStatus = (source = 'services') => {
   const dispatch = useDispatch();
   const outageData = useSelector(selectOutageData);
-  const checking = useSelector(selectOutageChecking);
+  const checking = useSelector(
+    source === 'dashboard' ? selectOutageCheckingDashboard : selectOutageCheckingServices
+  );
   const error = useSelector(selectOutageError);
 
   const checkStatus = useCallback(() => {
-    dispatch(checkOutageStatusRequest());
-  }, [dispatch]);
+    dispatch(checkOutageStatusRequest(source));
+  }, [dispatch, source]);
 
   const clearOutageDataCallback = useCallback(() => {
     dispatch(clearOutageData());
