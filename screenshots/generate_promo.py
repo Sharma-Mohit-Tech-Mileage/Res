@@ -14,6 +14,10 @@ from PIL import Image, ImageDraw, ImageFont
 CANVAS_W = 1284   # App Store 6.1" width
 CANVAS_H = 2778   # App Store 6.1" height
 
+# Android canvas (Play Store phone screenshots)
+ANDROID_W = 1080
+ANDROID_H = 1920
+
 # Brand gradient colours
 GRAD_TOP    = (141, 59, 144)  # rgba(141, 59, 144, 1)
 GRAD_BOTTOM = (141, 59, 144)  # rgba(141, 59, 144, 1)
@@ -97,6 +101,72 @@ SCREENS = [
         "out":      "promo-data-usage.png",
         "headline": "Your current \ndata snapshot",
         "body":     "Usage, remaining data,\nand billing period — all here.",
+    },
+]
+
+SCREENS_ANDROID = [
+    {
+        "file":     "android-home.png",
+        "fallback": "ios-home.png",
+        "out":      "android-promo-home.png",
+        "headline": "Everything you need\nin one place",
+        "body":     "Manage billing, track services, and\nget support on the go.",
+    },
+    {
+        "file":     "android-billing.png",
+        "fallback": "ios-billing.png",
+        "out":      "android-promo-billing.png",
+        "headline": "Payments\nmade simple",
+        "body":     "Set it once and\nnever miss a due date.",
+    },
+    {
+        "file":     "android-services.png",
+        "fallback": "ios-services.png",
+        "out":      "android-promo-services.png",
+        "headline": "Your services.\nAll in one",
+        "body":     "Internet, data, and\nmore - all at a glance.",
+    },
+    {
+        "file":     "android-billing-period.png",
+        "fallback": "ios-billing-period.png",
+        "out":      "android-promo-billing-period.png",
+        "headline": "Stay on top\nof your data",
+        "body":     "Monitor usage across every billing cycle\nanytime.",
+    },
+    {
+        "file":     "android-my-services.png",
+        "fallback": "ios-my-services.png",
+        "out":      "android-promo-my-services.png",
+        "headline": "Answers at\nyour fingertips",
+        "body":     "Search FAQs, browse topics\nor contact us anytime.",
+    },
+    {
+        "file":     "android-profile.png",
+        "fallback": "ios-profile.png",
+        "out":      "android-promo-profile.png",
+        "headline": "All your\naccount details",
+        "body":     "Manage settings and\npersonal info with ease.",
+    },
+    {
+        "file":     "android-notifications.png",
+        "fallback": "ios-notifications.png",
+        "out":      "android-promo-notifications.png",
+        "headline": "Never miss\na thing",
+        "body":     "Get notified for billing,\noutages, and more.",
+    },
+    {
+        "file":     "android-feedback.png",
+        "fallback": "ios-feedback.png",
+        "out":      "android-promo-feedback.png",
+        "headline": "We want to\nhear from you",
+        "body":     "Share your experience and help\nus improve our service.",
+    },
+    {
+        "file":     "android-data-usage.png",
+        "fallback": "ios-data-usage.png",
+        "out":      "android-promo-data-usage.png",
+        "headline": "Your current\ndata snapshot",
+        "body":     "Usage, remaining data,\nand billing period - all here.",
     },
 ]
 
@@ -490,10 +560,69 @@ def generate(screen, script_dir):
     return dest
 
 
+def generate_android(screen, script_dir):
+    src = os.path.join(script_dir, screen["file"])
+    if not os.path.exists(src):
+        src = os.path.join(script_dir, screen["fallback"])
+
+    dest = os.path.join(script_dir, screen["out"])
+
+    print(f"  Generating {screen['out']} ...", end=" ", flush=True)
+
+    canvas = make_gradient(ANDROID_W, ANDROID_H, GRAD_TOP, GRAD_BOTTOM).convert("RGBA")
+    draw = ImageDraw.Draw(canvas)
+
+    # Subtle bottom glow for visual consistency with iPhone promos.
+    glow_w = int(ANDROID_W * 1.45)
+    glow_h = int(ANDROID_H * 0.34)
+    glow = Image.new("RGBA", (glow_w, glow_h), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow)
+    gd.ellipse([0, 0, glow_w - 1, glow_h - 1], fill=(0, 40, 100, 72))
+    gx = (ANDROID_W - glow_w) // 2
+    canvas.paste(glow, (gx, ANDROID_H - glow_h + 64), glow)
+
+    font_headline = load_font(96, weight="bold")
+    font_body = load_font(46, weight="light")
+
+    headline_y = int(ANDROID_H * 0.07)
+    body_start = draw_centered_text(
+        draw,
+        screen["headline"],
+        headline_y,
+        font_headline,
+        TEXT_HEADLINE,
+        ANDROID_W,
+        1.12,
+    )
+
+    body_y = body_start + 34
+    draw_centered_text(draw, screen["body"], body_y, font_body, TEXT_BODY, ANDROID_W, 1.35)
+
+    phone_top = int(ANDROID_H * 0.29)
+    phone_h = ANDROID_H - phone_top - int(ANDROID_H * 0.04)
+    phone_w = int(phone_h * (393 / 851))
+
+    frame_img = build_android_frame(src, phone_w, phone_h)
+    px = (ANDROID_W - phone_w) // 2
+    canvas.paste(frame_img, (px, phone_top), frame_img)
+
+    canvas_mask = rounded_rect_mask(ANDROID_W, ANDROID_H, 80)
+    canvas.putalpha(canvas_mask)
+
+    canvas.save(dest, "PNG", optimize=True)
+    print("✓")
+    return dest
+
+
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     print(f"Generating {len(SCREENS)} iPhone promotional screenshots …\n")
     for s in SCREENS:
         generate(s, script_dir)
+
+    print(f"\nGenerating {len(SCREENS_ANDROID)} Android promotional screenshots …\n")
+    for s in SCREENS_ANDROID:
+        generate_android(s, script_dir)
+
     print("\nDone! Files saved in:", script_dir)
