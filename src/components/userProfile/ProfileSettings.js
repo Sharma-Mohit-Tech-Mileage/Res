@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   StyleSheet,
   Text,
@@ -16,6 +16,7 @@ import {
   Border,
   FontSize,
 } from "../../../GlobalStyles";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
 import NotificationAlert from "../common/customui/NotificationAlert";
@@ -23,21 +24,59 @@ import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../utility/constant";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import Vector from "../../../src/res/svgIcons/Vector";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState(undefined);
+  const [showPhoneLoading, setShowPhoneLoading] = useState(false);
   const profile = useSelector((state) => state.profile || {});
+  const TextNotifSettings = useMemo(
+    () => [
+      {
+        id: "Appointment",
+        type: "Appointments",
+        status: "Off",
+      },
+      {
+        id: "outage",
+        type: "Outage",
+        status: "Off",
+      },
+      {
+        id: "billing",
+        type: "Billing",
+        status: "Off",
+      },
+    ],
+    [],
+  );
 
   const handleArrowPress = (fieldType) => {
     console.log(`Arrow pressed for: ${fieldType}`);
     // Add your callback logic here
+    if (fieldType === "email") {
+      navigation.navigate("EmailNotifications");
+    } else if (fieldType === "mobile") {
+      navigation.navigate("TextNotifications", {
+        additionalData: {
+          optOut: TextNotifSettings[0].status == "On" ? true : false,
+          outageOptOut: TextNotifSettings[1].status == "On" ? true : false,
+          billingOptOutStatus:
+            TextNotifSettings[2].status == "On" ? true : false,
+          phoneNumber: phoneNumber,
+        },
+      });
+    }
   };
   const profileDetails = profile.profileDetails || {};
   const accountDetails = profile.accountDetails || {};
 
-  
+  const emailAddress = getPrimaryEmail(accountDetails);
 
   const customerFirstName =
     accountDetails.first_name ||
@@ -54,9 +93,7 @@ const ProfileSettings = () => {
     profileDetails.fullName ||
     "";
 
-  const userInfo = useSelector(
-    (state) => state.user.userData.userInfo
-  );
+  const userInfo = useSelector((state) => state.user.userData.userInfo);
 
   const serviceAddress = () => {
     const serviceAddr = accountDetails.service_address || {};
@@ -64,7 +101,7 @@ const ProfileSettings = () => {
     return `${line1 || ""}${line2 ? ", " + line2 : ""}${
       city ? ", " + city : ""
     }${state ? ", " + state : ""}${zip ? " " + zip : ""}`;
-  }
+  };
 
   const billingAddress = () => {
     const billingAddr = accountDetails.bill_to_address || {};
@@ -72,41 +109,69 @@ const ProfileSettings = () => {
     return `${line1 || ""}${line2 ? ", " + line2 : ""}${
       city ? ", " + city : ""
     }${state ? ", " + state : ""}${zip ? " " + zip : ""}`;
-  }
-
-const numberToWordsForAccessibility = (numStr) => {
-  if (!numStr) return "";
-  const digitsMap = {
-    0: "zero",
-    1: "one",
-    2: "two",
-    3: "three",
-    4: "four",
-    5: "five",
-    6: "six",
-    7: "seven",
-    8: "eight",
-    9: "nine",
   };
-  return numStr
-    .split("")
-    .map((digit) => digitsMap[digit] || digit)
-    .join(" ");
-};
+
+  const numberToWordsForAccessibility = (numStr) => {
+    if (!numStr) return "";
+    const digitsMap = {
+      0: "zero",
+      1: "one",
+      2: "two",
+      3: "three",
+      4: "four",
+      5: "five",
+      6: "six",
+      7: "seven",
+      8: "eight",
+      9: "nine",
+    };
+    return numStr
+      .split("")
+      .map((digit) => digitsMap[digit] || digit)
+      .join(" ");
+  };
+
+  const getTextNotificationsData = () => {
+    setShowPhoneLoading(true);
+    getUser().then((res1) => {
+      const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
+        accountNumber: res1.userInfo?.accountNumber,
+      });
+      console.log("REQUEST", endpointUrl);
+      GetApiRequest(
+        endpointUrl,
+        (res) => {
+          if (res) {
+            res[0]?.smsMessageType.forEach((value, index) => {
+              console.log(`Index: ${index}, Value: ${value}`);
+              TextNotifSettings[index].status = value?.optOutFlag
+                ? "Off"
+                : "On";
+            });
+            let phoneNum = res[0]?.phoneNum || "";
+            setPhoneNumber(phoneNum);
+          }
+          setShowPhoneLoading(false);
+        },
+        (error) => {
+          setShowPhoneLoading(false);
+          console.error("Error on retrying getTextNotificationsData", error);
+        },
+      );
+    });
+  };
 
   const showReconnectMessage = userInfo
     ? isAccountDisconnected(
         userInfo.acctStatus,
-        userInfo.daysSinceDisconnectDate
+        userInfo.daysSinceDisconnectDate,
       )
     : false;
   useEffect(() => {
-    if (route.params?.updateSuccess) {
-      setShowSuccessAlert(true);
-      dispatch(fetchProfileDetails());
-      navigation.setParams({ updateSuccess: undefined });
-    }
-  }, [route.params?.updateSuccess, navigation, dispatch]);
+    //setShowSuccessAlert(true);
+    dispatch(fetchProfileDetails());
+    getTextNotificationsData();
+  }, [accountDetails, dispatch]);
 
   const makeCall = (number) => {
     let phoneNumber = "";
@@ -140,8 +205,18 @@ const numberToWordsForAccessibility = (numStr) => {
                   onClose={() => setShowSuccessAlert(false)}
                 />
               </View> */}
-              <View style={[styles.generalInformationParent,{marginTop: Padding.p_base}]}>
-                <Text style={[styles.generalInformation, styles.melissaTypo]} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
+              <View
+                style={[
+                  styles.generalInformationParent,
+                  { marginTop: Padding.p_base },
+                ]}
+              >
+                <Text
+                  style={[styles.generalInformation, styles.melissaTypo]}
+                  accessible={true}
+                  accessibilityRole="header"
+                  accessibilityLevel={2}
+                >
                   General Information
                 </Text>
               </View>
@@ -158,50 +233,115 @@ const numberToWordsForAccessibility = (numStr) => {
                     {profileDetails.userName}
                   </Text>
                 </View>
+                {emailAddress !== undefined && (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <View
+                      style={styles.firstNameParent}
+                      accessible={true}
+                      accessibilityLabel={`Email address`}
+                      accessibilityRole="text"
+                    >
+                      <Text style={styles.firstName}>Email Address</Text>
+                      <Text style={[styles.melissa, styles.melissaTypo]}>
+                        {emailAddress || "N/A"}
+                      </Text>
+                    </View>
+                    <Pressable
+                      style={{
+                        justifyContent: "flex-end",
+                        paddingRight: Padding.p_base,
+                      }}
+                      onPress={() => handleArrowPress("email")}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel="Edit email address"
+                    >
+                      <Vector />
+                    </Pressable>
+                  </View>
+                )}
 
-               <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>   
-                <View style={styles.firstNameParent} accessible={true} accessibilityLabel={`Email address`} accessibilityRole="text">
-                  <Text style={styles.firstName}>Email Address</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
-                    {getPrimaryEmail(accountDetails) || "N/A"}
-                  </Text>
-                </View> 
-               <Pressable 
-                  style={{justifyContent: 'flex-end', paddingRight: Padding.p_base}}
-                  onPress={() => handleArrowPress('email')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Edit email address">
-                  <Vector/> 
-                </Pressable>
-               </View>  
-                 
-              <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
-                <View style={[styles.firstNameParent,{marginBottom: Padding.p_base}]} accessible={true} accessibilityLabel={`Mobile number`} accessibilityRole="text">
-                  <Text style={styles.firstName}>Mobile Number</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
-                    {profileDetails.accountNumber}
-                  </Text>
-                </View>   
-                <Pressable 
-                  style={{justifyContent: 'flex-end', paddingRight: Padding.p_base}}
-                  onPress={() => handleArrowPress('mobile')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Edit mobile number">
-                  <Vector/> 
-                </Pressable>
-               </View>
+                {showPhoneLoading && (
+                  <SkeletonPlaceholder
+                    style={{ paddingVertical: Padding.p_base }}
+                  >
+                    <View
+                      style={{
+                        margin: Padding.p_base,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <View
+                        style={{ width: 320, height: 40, borderRadius: 4 }}
+                      />
+                    </View>
+                  </SkeletonPlaceholder>
+                )}
+                {phoneNumber !== undefined && (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <View
+                      style={[
+                        styles.firstNameParent,
+                        { marginBottom: Padding.p_base },
+                      ]}
+                      accessible={true}
+                      accessibilityLabel={`Mobile number ${
+                        phoneNumber
+                          ? numberToWordsForAccessibility(phoneNumber)
+                          : "N/A"
+                      }`}
+                      accessibilityRole="text"
+                    >
+                      <Text style={styles.firstName}>Mobile Number</Text>
+                      <Text style={[styles.melissa, styles.melissaTypo]}>
+                        {phoneNumber}
+                      </Text>
+                    </View>
+                    <Pressable
+                      style={{
+                        justifyContent: "flex-end",
+                        paddingRight: Padding.p_base,
+                      }}
+                      onPress={() => handleArrowPress("mobile")}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel="Edit mobile number"
+                    >
+                      <Vector />
+                    </Pressable>
+                  </View>
+                )}
               </View>
-             
             </View>
           </View>
-
 
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup]}>
               <View style={[styles.generalInformationParent]}>
-                <Text style={[styles.generalInformation, styles.melissaTypo,{marginTop: Padding.p_base}]} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
+                <Text
+                  style={[
+                    styles.generalInformation,
+                    styles.melissaTypo,
+                    { marginTop: Padding.p_base },
+                  ]}
+                  accessible={true}
+                  accessibilityRole="header"
+                  accessibilityLevel={2}
+                >
                   Addresses
                 </Text>
               </View>
@@ -229,9 +369,16 @@ const numberToWordsForAccessibility = (numStr) => {
               </View>
             </View>
           </View>
-          <View style={[styles.frameGroup, { marginHorizontal: Padding.p_base }]}>
+          <View
+            style={[styles.frameGroup, { marginHorizontal: Padding.p_base }]}
+          >
             <View style={{ padding: Padding.p_xl, flexDirection: "column" }}>
-              <Text style={[styles.generalInformation, styles.melissaTypo]} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
+              <Text
+                style={[styles.generalInformation, styles.melissaTypo]}
+                accessible={true}
+                accessibilityRole="header"
+                accessibilityLevel={2}
+              >
                 Manage My Service
               </Text>
               {showReconnectMessage ? (
@@ -249,15 +396,14 @@ const numberToWordsForAccessibility = (numStr) => {
                       >
                         833-807-1020
                         <Text
-                        style={styles.manageSerTxt3}
-                        accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
-                        accessible={true}
-                        importantForAccessibility="yes"
-                      >
-                        {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                          style={styles.manageSerTxt3}
+                          accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                          accessible={true}
+                          importantForAccessibility="yes"
+                        >
+                          {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                        </Text>
                       </Text>
-                      </Text>
-                      
                     </Text>
                   </View>
                 ) : (
@@ -281,13 +427,12 @@ const numberToWordsForAccessibility = (numStr) => {
                     >
                       833-807-1020
                       <Text
-                      style={styles.manageSerTxt3}
-                      accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
-                    >
-                      {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                        style={styles.manageSerTxt3}
+                        accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                      >
+                        {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                      </Text>
                     </Text>
-                    </Text>
-                    
                   </View>
                 )
               ) : (
@@ -305,15 +450,14 @@ const numberToWordsForAccessibility = (numStr) => {
                         >
                           833-807-1020
                           <Text
-                          style={styles.manageSerTxt3}
-                          accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
-                          accessible={true}
-                          importantForAccessibility="yes"
-                        >
-                          {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                            style={styles.manageSerTxt3}
+                            accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                            accessible={true}
+                            importantForAccessibility="yes"
+                          >
+                            {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                          </Text>
                         </Text>
-                        </Text>
-                        
                       </Text>
                     </View>
                   ) : (
@@ -337,13 +481,12 @@ const numberToWordsForAccessibility = (numStr) => {
                       >
                         833-807-1020
                         <Text
-                        style={styles.manageSerTxt3}
-                        accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
-                      >
-                        {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                          style={styles.manageSerTxt3}
+                          accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                        >
+                          {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                        </Text>
                       </Text>
-                      </Text>
-                      
                     </View>
                   )}
                 </>
