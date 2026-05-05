@@ -1,6 +1,7 @@
 // Project Sources
 import {_axios} from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
+import { getEndpoint,ENDPOINTS } from "../endpoints/Endpoints";
 import moment from 'moment';
 
 const getInternetPlan = async(accountId) =>{
@@ -11,7 +12,8 @@ const getInternetPlan = async(accountId) =>{
             }
         };
 
-    return _axios.get(`internet/api/internet/${accountId}/plan`,{...config}).then(res=>res.data).catch(error=>{ throw error})
+    const requestUrl = getEndpoint(ENDPOINTS.INTERNET_PLAN, { accountId });
+    return _axios.get(requestUrl, {...config}).then(res=>res.data).catch(error=>{ throw error})
 };
 
 const getAccountInfo = async(accountId) =>{
@@ -22,19 +24,20 @@ const getAccountInfo = async(accountId) =>{
                 }
             };
 
-        return _axios.get(`account/api/account/${accountId}`,{...config}).then(res=>res.data).catch(error=>{ throw error})
+        const requestUrl = getEndpoint(ENDPOINTS.ACCOUNT_INFO, { accountId });
+        return _axios.get(requestUrl, {...config}).then(res=>res.data).catch(error=>{ throw error})
 };
 
 const getCurrentSpeedInfo = async()=> {
         let res = await getUser();
-        console.log('getCurrentSpeedInfo User: ', res);
         const config = {
                 headers: {
                     Authorization: "Bearer " + res.token
                 }
             };
             console.log('config',config)
-        return _axios.get(`internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`,{...config}).then(res=>res.data).catch(error=>{ throw error})
+        const requestUrl = getEndpoint(ENDPOINTS.INTERNET_SPEED_GET, { accountNumber: res.userInfo.accountNumber });
+        return _axios.get(requestUrl, {...config}).then(res=>res.data).catch(error=>{ throw error})
 };
 
 const postCurrentSpeedInfo = async(params)=> {
@@ -57,7 +60,8 @@ const postCurrentSpeedInfo = async(params)=> {
                 }
         };
 
-        return _axios.post(`internet/api/internet/${user.userInfo.accountNumber}/speedTest/Post`, data, {...config}).then(res=>res.data).catch(error=>{ throw error})
+        const requestUrl = getEndpoint(ENDPOINTS.INTERNET_SPEED_POST, { accountNumber: user.userInfo.accountNumber });
+        return _axios.post(requestUrl, data, {...config}).then(res=>res.data).catch(error=>{ throw error})
 };
 
 export {getAccountInfo, getCurrentSpeedInfo, postCurrentSpeedInfo, getInternetPlan}

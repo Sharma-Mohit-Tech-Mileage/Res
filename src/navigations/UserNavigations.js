@@ -12,6 +12,7 @@ import Terms from '../components/entry/Terms';
 import MyTabs from "./MyTab";
 import { AxiosInterceptorProvider } from '../network/RestApiClient';
 import MaintenanceWrapper from '../components/maintenance/MaintenanceWrapper';
+import { AnnouncementProvider } from "../contexts/AnnouncementContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -123,6 +124,7 @@ const UserNavigations = (props) => {
      <MaintenanceWrapper>
     <NavigationContainer ref={navigationRef} onReady={onReady} onStateChange={onStateChange}>
       <AxiosInterceptorProvider>
+        <AnnouncementProvider>
           <Stack.Navigator>
             <Stack.Screen
               name="Splash"
@@ -164,7 +166,7 @@ const UserNavigations = (props) => {
             }}
           />
         </Stack.Navigator>
-     
+        </AnnouncementProvider>
     </AxiosInterceptorProvider>
   </NavigationContainer>
    </MaintenanceWrapper>

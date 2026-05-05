@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Pressable, Dimensions, } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, Pressable, Dimensions, Platform, } from "react-native";
 import WebView from "react-native-webview";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useSelector, useDispatch } from "react-redux";
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser, } from "../../redux/utils/LocalStorage";
+import { clearAuthCookies } from "../utility/NativeCookieManager";
 import { updateTermsAndConditions, fetchSMSSelection, fetchPushNotifications, } from "../../redux/actions/ProfileActionSuite";
 import { logout } from "react-native-app-auth";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
-import { Env } from "../../network/apis/account/Constants";
+import Config from "react-native-config";
 import NavigationUtils from "./NavigationUtils";
-const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true };
+const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
 const { width, height } = Dimensions.get("window");
 
@@ -64,9 +65,9 @@ const Terms = ({ navigation }) => {
       let token = res.idToken;
       logout(config, {
         idToken: token,
-        postLogoutRedirectUrl:
-          "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
-      }).then((result) => {
+        postLogoutRedirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
+      }).then(async (result) => {
+        await clearAuthCookies();
         storeUser({});
         storeSsoToken({});
         saveUserInfo({});

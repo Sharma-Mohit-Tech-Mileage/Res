@@ -30,8 +30,7 @@ const MaintenanceWrapper = ({ children }) => {
         isBlockingUser={isCurrentlyBlocking}                                    // Pass current blocking status
         pageType={activeConfig?.type || "NORMAL"}                              // Pass page type
         onClearBlocking={clearBlockingState}                                   // NEW: Allow manual clear
-        blockingInfo={{                                                        // NEW: Pass blocking info
-          blockedAudience: blockingState.blockedAudience,
+        blockingInfo={{
           blockingTimestamp: blockingState.blockingTimestamp,
           wasBlocked: blockingState.wasBlocked
         }}

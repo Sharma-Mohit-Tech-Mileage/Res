@@ -82,7 +82,6 @@ const notifyPermission = async () => {
 const getFcmToken = async () => {
   try {
     const newFcmToken = await messaging().getToken();
-    console.log(newFcmToken);
     return newFcmToken;
   } catch (error) {
     console.error(error);

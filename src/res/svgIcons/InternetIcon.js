@@ -7,7 +7,7 @@ const InternetIcon = (props) => (
     height={24}
     fill="none"
     accessible={true}
-    accessibilityRole="image"
+    accessibilityRole="text"
     accessibilityLabel={'Internet'}
     {...props}
   >

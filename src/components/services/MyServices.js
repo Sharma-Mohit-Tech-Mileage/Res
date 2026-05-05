@@ -15,6 +15,8 @@ import StatusSection from "./sections/StatusSection";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector, useDispatch } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 import { extractZipCode } from "../utility/constant";
 import { SERVICE_HEADER_GRADIENT } from "./utils/constants";
 import { fetchCurrentUsageRequest } from "../../redux/actions/servicesActions";
@@ -24,7 +26,14 @@ import {
 } from "../../redux/selectors/servicesSelectors";
 
 const MyServicesContent = ({ route }) => {
+  const { triggerOnScreenEntry } = useAnnouncement();
   const insets = useSafeAreaInsets();
+
+  useFocusEffect(
+    useCallback(() => {
+      triggerOnScreenEntry('MyServicesStack');
+    }, [triggerOnScreenEntry])
+  );
   const dispatch = useDispatch();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
   const profileDetails =
@@ -35,7 +44,7 @@ const MyServicesContent = ({ route }) => {
   const legacySPA = accountDetails?.legacy_brand_by_spa;
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
   const { outageData, checking, checkStatus, clearOutageData } =
-    useOutageStatus();
+    useOutageStatus('services');
   const [refreshing, setRefreshing] = useState(false);
 
   // Current usage for InternetCard dataPlan

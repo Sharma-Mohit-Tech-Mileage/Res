@@ -6,11 +6,11 @@ import { logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
 import { saveUserInfo, logInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
-import { PostAuthApiRequest } from "../../network/APIClient";
+import { PostAuthApiRequest } from "../../network/RestApiClient";
+import { getEndpoint ,ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
-import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import moment from "moment";
@@ -22,12 +22,13 @@ import NetworkManager from "../../utils/NetworkManager";
 import AuthenticationManager from "../../utils/AuthenticationManager";
 import ErrorModal, { ErrorType } from "../common/ErrorModal";
 import LoadingStateIndicator, { LoadingState, } from "../common/LoadingStateIndicator";
+import Config from "react-native-config";
+import { clearAuthCookies } from "../utility/NativeCookieManager";
 
 const config = {
-  issuer: Env.SSO_LOGIN,
-  clientId: "sparklight-customer-mobile-app",
-  redirectUrl:
-    "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+  issuer: Config.SSO_LOGIN,
+  clientId: Config.SSO_CLIENT_ID,
+  redirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
 };
@@ -59,6 +60,7 @@ const SplashScreen = ({ navigation, route }) => {
   const [errorState, setErrorState] = useState({ visible: false, type: null, message: null, });
   const [authInProgress, setAuthInProgress] = useState(false);
   const authLockRef = useRef(false);
+  const ssoIdTokenRef = useRef(null);
   const [loginEnable, setLoginEnable] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -73,6 +75,13 @@ const SplashScreen = ({ navigation, route }) => {
   const logoFade = useRef(new Animated.Value(0)).current;
   const logoMovement = useRef( new Animated.Value(ANIMATION_CONFIG[deviceSize].logoStart) ).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const envLabel =
+    Config.ENV === "development"
+      ? "Dev"
+      : Config.ENV === "staging"
+      ? "Staging"
+      : "";
 
   const getStyle = (baseStyle) => {
     const sizeStyle = `${baseStyle}_${deviceSize}`;
@@ -262,8 +271,9 @@ const SplashScreen = ({ navigation, route }) => {
 
   const callSSOLoginApi = useCallback((request) => {
     setLoadingState(LoadingState.LOADING_DATA);
-
-    PostAuthApiRequest("api/mobile/gettoken", request, onSuccess, onError);
+    // Capture SSO idToken from request so handleLogin can store it in the user object
+    ssoIdTokenRef.current = request.idToken || null;
+    PostAuthApiRequest(getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN), request, onSuccess, onError);
   }, []);
 
   const onSuccess = useCallback(
@@ -337,6 +347,9 @@ const SplashScreen = ({ navigation, route }) => {
         token: token,
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken,
+        idToken: ssoIdTokenRef.current || null,
+        jwtTimestamp: Date.now(),
+        idTokenTimestamp: Date.now(),
       };
 
       // Check for business account first
@@ -553,6 +566,7 @@ const SplashScreen = ({ navigation, route }) => {
               .then(async () => {
                 try {
                   await analytics().resetAnalyticsData();
+                  await clearAuthCookies();
                   cleanUserData();
                   if (
                     postLogoutCallback &&
@@ -570,8 +584,9 @@ const SplashScreen = ({ navigation, route }) => {
                   }
                 }
               })
-              .catch((error) => {
+              .catch(async (error) => {
                 console.error("Logout error:", error);
+                await clearAuthCookies();
                 cleanUserData();
                 if (
                   postLogoutCallback &&
@@ -581,6 +596,7 @@ const SplashScreen = ({ navigation, route }) => {
                 }
               });
           } else {
+            clearAuthCookies();
             cleanUserData();
             if (
               postLogoutCallback &&
@@ -591,8 +607,9 @@ const SplashScreen = ({ navigation, route }) => {
           }
         });
       })
-      .catch((error) => {
+      .catch(async (error) => {
         console.error("Error getting SSO token for logout:", error);
+        await clearAuthCookies();
         cleanUserData();
         if (postLogoutCallback && typeof postLogoutCallback === "function") {
           postLogoutCallback();
@@ -744,7 +761,7 @@ const SplashScreen = ({ navigation, route }) => {
 
       {isVisible && (
         <Text style={getStyle("version")}>
-          {ISUAT ? "UAT" : ""} Version: {VersionCheck.getCurrentVersion()}
+          {envLabel ? `${envLabel} ` : ""}Version: {VersionCheck.getCurrentVersion()}
         </Text>
       )}
 

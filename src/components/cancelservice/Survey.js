@@ -22,7 +22,8 @@ import {
 import AppStyles from "../utility/AppStyles";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import SecondaryButton from "../common/customui/SecondaryButton";
-import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PostApiRequest } from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import SmallLoader from "../common/customui/SmallLoader";
 import moment from "moment";
@@ -96,8 +97,7 @@ const Survey = ({ route }) => {
 
   const getSurveyData = () => {
     setLoadingData(true);
-    GetApiRequest("api/Survey", (res) => {
-      console.log("Survey data fetched successfully:", res);
+    GetApiRequest(getEndpoint(ENDPOINTS.SURVEY), (res) => {
       if (res && res.length > 0) {
         setSurveyOptions(res);
       }
@@ -123,14 +123,11 @@ const Survey = ({ route }) => {
         newTransferLocationId: "",
       },
     };
-    console.log("Request body for disconnect:", requestBody);
     PostApiRequest(
-      "api/Order/Disconnect",
+      getEndpoint(ENDPOINTS.SERVICE_DISCONNECT_SURVEY),
       requestBody,
       (res) => {
         setLoading(false);
-        console.log("Disconnect request successful:", res);
-        // Handle success, e.g., navigate to a confirmation screen or show a success message
         if (res.error != null && res?.error?.message) {
           setError(res.error);
         } else {

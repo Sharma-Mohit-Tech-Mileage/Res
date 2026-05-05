@@ -38,7 +38,7 @@ export const Color = {
     colorGray_100: "#101828",
     sparklightGray1: "#4C5458",
     sparklightBrightPurple: "#8D3B90",
-    success50: "#F8F5EF",
+    success50: "#ecfdf3",
     colorAquamarine: "#abefc6",
     success700: "#067647",
     gray600: "#475467",

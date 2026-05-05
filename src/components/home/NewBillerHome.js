@@ -12,19 +12,22 @@ import moment from "moment";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
-import { Env ,ISUAT} from "../../network/apis/account/Constants";
+import Config from "react-native-config";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
-import { GetApiRequest, PostApiRequest,PostApiReqZendeskToken } from "../../network/APIClient";
+import { GetApiRequest, PostApiReqZendeskToken } from "../../network/RestApiClient";
+import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
+import { useOutageStatus } from "../services/hooks/useOutageStatus";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
@@ -48,6 +51,15 @@ import {
 
 
 const NewBillerHome = ({ navigation }) => {
+  const { triggerOnScreenEntry } = useAnnouncement();
+  const { outageData, checkStatus: checkOutageStatus } = useOutageStatus('dashboard');
+
+  useFocusEffect(
+    useCallback(() => {
+      triggerOnScreenEntry('HomeStackScreen');
+    }, [triggerOnScreenEntry])
+  );
+
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
@@ -90,42 +102,28 @@ const NewBillerHome = ({ navigation }) => {
 
   
 
-  /* Function to check outage status */
-  const checOutagStatus = () => {
-    getUser().then((res) => {
-      const request = `api/outage/GetOutages?accountNumber=${res.userInfo.accountNumber}`;
-      PostApiRequest(
-        request,
-        {},
-        (response) => {
-          console.log("checOutagStatus response", response);
-          if (response?.error == false && response?.outageStatus) {
-            console.log("its outage");
-            setIsOutageAlert(true);
-            setEstimatedRestoreTime(moment(response?.restoredBy).format("LT"));
-          } else {
-            setIsOutageAlert(false);
-          }
-         // hardcode for testing
-          if(res.userInfo.accountNumber=="8160110010005227"){
-            setIsOutageAlert(true);
-            setEstimatedRestoreTime(moment().add(2, 'hours').format("LT"));
-          }
-
-        },
-        (errorCode) => {
-          console.log("error in checOutagStatus", errorCode);
-        }
-      );
-    });
-  };
+  /* Sync outage banner with Redux outage state from servicesSaga */
+  useEffect(() => {
+    if (outageData?.hasOutage) {
+      setIsOutageAlert(true);
+      setEstimatedRestoreTime(outageData.estimatedRestoreTime || "");
+    } else {
+      setIsOutageAlert(false);
+    }
+    // hardcoded test override
+    if (userInfo?.accountNumber === "8160110010005227") {
+      setIsOutageAlert(true);
+      setEstimatedRestoreTime(moment().add(2, 'hours').format("LT"));
+    }
+  }, [outageData, userInfo?.accountNumber]);
 
   const getStatus = () => {
     setloadingAutoPay(true);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
+      const endpoint = getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber });
       GetApiRequest(
-        `api/Accounts/${accountNumber}/easypay`,
+        endpoint,
         (res) => {
           setIsAutoPayStatus(res?.isEasyPay);
           setloadingAutoPay(false);
@@ -142,7 +140,7 @@ const NewBillerHome = ({ navigation }) => {
     useCallback(() => {
       const refreshData = async () => {
         try {
-          checOutagStatus();
+          checkOutageStatus();
           const status = await checkForMinorUpdate();
           setUpdateStatus(status);
 // hardcode for testing update app feature
@@ -193,26 +191,26 @@ const NewBillerHome = ({ navigation }) => {
     }
   }, [accountDetails]);
 
-  const getInAppNotificationsData = () => {
-    getUser().then((res1) => {
-      let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
-      GetApiRequest(
-        requestUrl,
-        (res) => {
-          if (res) {
-            res[0]?.pushMessageType.forEach((value, index) => {
-              if (!value?.optOutFlag) {
-                setIsNotificationEnable(true);
-              }
-            });
-          }
-        },
-        (error) => {
-          console.error("Error on retrying getInAppNotificationsData", error);
-        }
-      );
-    });
-  };
+  // const getInAppNotificationsData = () => {
+  //   getUser().then((res1) => {
+  //     let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
+  //     GetApiRequest(
+  //       requestUrl,
+  //       (res) => {
+  //         if (res) {
+  //           res[0]?.pushMessageType.forEach((value, index) => {
+  //             if (!value?.optOutFlag) {
+  //               setIsNotificationEnable(true);
+  //             }
+  //           });
+  //         }
+  //       },
+  //       (error) => {
+  //         console.error("Error on retrying getInAppNotificationsData", error);
+  //       }
+  //     );
+  //   });
+  // };
 
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
@@ -286,22 +284,20 @@ const NewBillerHome = ({ navigation }) => {
 
     const IPAddress = await getIPAddress();
 
-    console.log("request data for zendesk jwt1", requestData);
     PostApiReqZendeskToken(
-      `api/Zendesk/TokenAuth`,
+      getEndpoint(ENDPOINTS.ZENDESK_TOKEN),
       requestData,
       (response) => {
-        console.log("JWT reponse for zendesk login", response);
         if (response) {
           let jwtToken = response.jwt;
 
           const fields = {
-            isUAT: ISUAT,
+            isUAT: Config.ENV !== 'production',
             userAgent: userAgent,
             appVersion: VersionCheck.getCurrentVersion(),
             timezoneOffsetId: new Date().getTimezoneOffset().toString(),
             platform: Platform.OS,
-            locationHrefId: Env.URL,
+            locationHrefId: Config.URL,
             ipAddress: IPAddress || "",
             accountNumber: user?.userInfo.accountNumber,
             email: defaultPaymentDetails.email || "",
@@ -400,7 +396,7 @@ const NewBillerHome = ({ navigation }) => {
           isActive={isAutoPayStatus}
           onButtonPress={() => {
             navigation.navigate("AutoPayPCIConnector", {
-              url: `${Env.URL}/billing`,
+              url: `${Config.URL}/billing`,
               name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
               useNewPayment: true,
               status: isAutoPayStatus,

@@ -37,7 +37,6 @@ function* postInternetSpeed(action) {
 function* getUserAccountInfo(action) {
   try {
     const response = yield call(getAccountInfo,action.payload)
-    console.log('Account Info',response)
     yield put(updateAccountInfo(response));
     
    } catch (error) {

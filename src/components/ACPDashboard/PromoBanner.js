@@ -3,6 +3,11 @@ import { View, StyleSheet } from 'react-native';
 import {  Color, Padding, Border } from '../../../GlobalStyles';
 import SignSaveResSvg from '../../res/svgIcons/SignSaveResSvg';
 
+// SVG viewBox is 327.402985 × 117.910448 — keep the wrapper at this aspect
+// ratio so the banner stretches edge-to-edge on tablets and the artwork
+// scales proportionally instead of leaving white space at the sides.
+const BANNER_ASPECT_RATIO = 327.402985 / 117.910448;
+
 const PromoBanner = ({ title }) => {
   return (
     <View style={styles.container}>
@@ -10,9 +15,9 @@ const PromoBanner = ({ title }) => {
         accessible={true}
         accessibilityRole="text"
         accessibilityLabel="Sign up and save with Auto Pay and Paperless Billing"
-        style={styles.bannerGraphic}
+        style={[styles.bannerGraphic, { aspectRatio: BANNER_ASPECT_RATIO }]}
       >
-        <SignSaveResSvg width="100%" height={118} />
+        <SignSaveResSvg width="100%" height="100%" />
       </View>
       {/* <View style={styles.iconContainer}>
         <Icon name="refresh-cw" size={20} color="#8D3B90" />

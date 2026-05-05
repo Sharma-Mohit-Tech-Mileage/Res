@@ -8,7 +8,7 @@ const BellRingingIcon = (props) => (
     fill="none"
     {...props}
     accessible={true}
-    accessibilityRole="image"
+    accessibilityRole="text"
     accessibilityLabel="Bell Ringing Icon"
   >
     <Path

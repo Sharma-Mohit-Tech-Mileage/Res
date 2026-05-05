@@ -17,8 +17,10 @@ export const fetchServiceDetailsFailure = (error) => ({
 });
 
 // ========== Outage Status Actions ==========
-export const checkOutageStatusRequest = () => ({
-  type: types.CHECK_OUTAGE_STATUS_REQUEST
+// `source` is 'dashboard' or 'services' so each screen owns its own spinner flag.
+export const checkOutageStatusRequest = (source = 'services') => ({
+  type: types.CHECK_OUTAGE_STATUS_REQUEST,
+  payload: { source }
 });
 
 export const checkOutageStatusSuccess = (outageData) => ({

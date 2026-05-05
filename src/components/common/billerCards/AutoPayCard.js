@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import colors from "../../../res/Colors";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Color } from "../../../../GlobalStyles";
-import { Env } from "../../../network/apis/account/Constants";
+import Config from "react-native-config";
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../utility/AppStyles";
@@ -16,7 +16,7 @@ const AutoPayCard = ({
   const handleCardPress = () => {
     if (!isStatusLoading) {
       navigation.navigate("AutoPayPCIConnector", {
-        url: `${Env.URL}/billing`,
+        url: `${Config.URL}/billing`,
         name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
         useNewPayment: true,
         status: isAutoPayStatus,

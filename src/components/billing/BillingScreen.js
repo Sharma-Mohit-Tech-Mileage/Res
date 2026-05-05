@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
   Color,
   FontFamily,
@@ -18,7 +19,8 @@ import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
 import { getUser } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest } from "../../network/RestApiClient";
+import { getEndpoint , ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
 import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
@@ -26,7 +28,7 @@ import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Icon from "../common/Icon";
-import { Env } from "../../network/apis/account/Constants";
+import Config from "react-native-config";
 import colors from "../../res/Colors";
 import AppStyles from "../utility/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
@@ -36,6 +38,13 @@ import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const { triggerOnScreenEntry } = useAnnouncement();
+
+  useFocusEffect(
+    useCallback(() => {
+      triggerOnScreenEntry('BillingStackScreen');
+    }, [triggerOnScreenEntry])
+  );
   const accountDetails = useSelector(
     (state) => state.profile?.accountDetails
   );
@@ -72,8 +81,9 @@ const BillingScreen = ({ navigation }) => {
     getUser()
       .then((res) => {
         const accountNumber = res.userInfo.accountNumber;
+        const endpoint = getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber });
         GetApiRequest(
-          `api/Accounts/${accountNumber}/easypay`,
+          endpoint,
           (res) => {
             setIsAutoPayStatus(res?.isEasyPay);
             setIsAutoPayStatusLoad(false);
@@ -213,12 +223,12 @@ const BillingScreen = ({ navigation }) => {
                       style={styles.frame9defaultSpaceBlock}
                       onPress={() => {
                         navigation.navigate("AutoPayPCIConnector", {
-                          url: Env.PAY_METHOD,
+                          url: Config.PAY_METHOD,
                           name: "Manage Payment Method",
                           useNewPayment: true,
                           status: isAutoPayStatus,
                           paymentDetails: defaultPaymentDetails,
-                          customPaymentUrl: Env.PAY_METHOD,
+                          customPaymentUrl: Config.PAY_METHOD,
                         });
                       }}
                       accessible={true}
@@ -381,7 +391,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   card: {
-    height: 230,
+    minHeight: 230,
   },
   myModemSpaceBlock: {
     paddingTop: Padding.p_base,

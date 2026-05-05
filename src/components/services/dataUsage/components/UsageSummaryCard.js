@@ -187,7 +187,7 @@ const UsageSummaryCard = ({ currentUsage, dailyData, loading = false }) => {
           usedPercent={currentUsage.dataUsedPercent}
           remainingPercent={remainingPercent}
           usedGB={currentUsage.usedDataGB}
-          remainingGB={currentUsage.dataRemaining.toFixed(1)}
+          remainingGB={currentUsage.dataRemaining.toFixed(2)}
         />
 
         <View style={styles.stats}>

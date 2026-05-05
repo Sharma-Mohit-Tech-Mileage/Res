@@ -11,14 +11,24 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
-import { GetApiRequest} from "../../network/APIClient";
+import { GetApiRequest} from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
 import AppStyles from  "../utility/AppStyles";
+import aesEncryption from "../../../src/utils/AESEncryption";
+import { getUser } from "../../../src/redux/utils/LocalStorage";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
+
+const getSecurityAnswerDisplayValue = (value) => {
+  if (!value) return "";
+  const decryptedValue = aesEncryption.decryptAnswer(value);
+  return decryptedValue || value;
+};
+
 const PasswordSecurityEdit = () => {
 
   const navigation = useNavigation();
@@ -123,20 +133,24 @@ const PasswordSecurityEdit = () => {
   };
 
 
-  const getSecurityQuestions=()=>{
-    const request = 'api/securityquestions/';
+  const getSecurityQuestions= async()=>{
+    const user = await getUser();
+    console.log("User info:", user);
+    const userName = user?.userInfo?.userName || user?.userName || '';
+    const requestWithEndpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS, { userName });
     GetApiRequest(
-      request,
+      requestWithEndpoint,
       (res) => {
         if (res) {
           setSecurityQuestionsNew(res);
           checkCustomSecurityQuestion(res);
         }
-
       },
+      
       (error) => console.log(error)
     );
   };
+
 
   const checkCustomSecurityQuestion = (questions) => {
     const storedQuestion = profileDetails.securityQuestion;
@@ -159,8 +173,9 @@ const PasswordSecurityEdit = () => {
   }, []);
 
   useEffect(() => {
-     getSecurityQuestions();
+    getSecurityQuestions();
   }, []);
+
 
   useEffect(() => {
     if (route.params?.updateFailed) {
@@ -193,7 +208,7 @@ const PasswordSecurityEdit = () => {
                 <NotificationAlert
                   type="error"
                   title="Error"
-                  message="Password and security question update failed."
+                  message="Update failed. Please try again."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
                   onClose={() => setShowErrorAlert(false)}

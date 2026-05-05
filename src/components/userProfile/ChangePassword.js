@@ -29,7 +29,8 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PutApiRequest , PostApiRequest} from "../../network/RestApiClient";
+import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from "../utility/validationSchema"; 
 import colors from "../../res/Colors";
@@ -86,12 +87,23 @@ const ChangePassword = () => {
     }
   };
 
-  const getSecurityQuestions = () => {
-    const request = `api/securityquestions/`;
+  const getSecurityQuestions = async () => {
+    const storedUser = await getUser();
+    const userName =
+      profileDetails?.userName ||
+      storedUser?.userInfo?.userName ||
+      storedUser?.userName ||
+      "";
+
+    if (!userName.trim()) {
+      console.warn("Skipping security questions API call: userName is missing");
+      return;
+    }
+
+    const endpointUrl = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS, { userName });
     GetApiRequest(
-      request,
+      endpointUrl,
       (res) => {
-        console.log("getSecurityQuestions", res);
         if (res) {
           setSecurityQuestionsNew(res);
           checkCustomSecurityQuestion(res);
@@ -108,27 +120,38 @@ const ChangePassword = () => {
       const user = await getUser();
 
       // Construct the request URL based on the user's billing type
-      const request = `api/profile/password/${user.userInfo.accountNumber}`;
+      const endpointUrl = getEndpoint(ENDPOINTS.RESET_PASSWORD, {
+        accountNumber: user.userInfo?.accountNumber,
+        userName: user.userInfo?.userName || user.userName,
+      });
 
-      const body = { newPassword };
+      const body = { newPass:newPassword,confirmNewPass:newPassword };
 
       setLoading(true);
 
       // Call the PUT API request
-      PutApiRequest(
-        request,
+      PostApiRequest(
+        endpointUrl,
         body,
         (res) => {
           setLoading(false);
-          console.log("Password updated successfully", res);
+          if(res.code=="204" || res.code=="200" ){
           navigation.navigate("PasswordSecurity", {
             updateSuccess: true,
             isPassword: true,
           });
-        },
+        } else if(res===true  ){
+         navigation.navigate("PasswordSecurity", {
+            updateSuccess: true,
+            isPassword: true,
+          });
+        }else{
+          setShowErrorAlert(true); // Show an error alert if the response code is not 200 or 204  
+        }
+      },
         (error) => {
           setLoading(false);
-          // console.error("Error updating password", error);
+           console.error("Error updating password", error);
 
           // Handle specific errors, such as '204 No Content' or others
           if (error.code == "204") {
@@ -202,7 +225,7 @@ const ChangePassword = () => {
                 <NotificationAlert
                   type="error"
                   title="Error"
-                  message="Password and security update failed."
+                  message="Update failed. Please try again."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
                   onClose={() => setShowErrorAlert(false)}

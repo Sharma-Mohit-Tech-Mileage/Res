@@ -5,6 +5,9 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
+    "env:development": "react-native-config .env.development",
+    "env:staging": "react-native-config .env.staging",
+    "env:production": "react-native-config .env.production",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"
@@ -15,6 +18,7 @@
     "@react-native-async-storage/async-storage": "^1.19.6",
     "@react-native-community/checkbox": "^0.5.16",
     "@react-native-community/netinfo": "^11.3.0",
+    "@react-native-cookies/cookies": "^6.2.1",
     "@react-native-firebase/analytics": "^21.2.0",
     "@react-native-firebase/app": "^21.2.0",
     "@react-native-firebase/crashlytics": "^21.2.0",

@@ -1,6 +1,6 @@
 import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-
+import { getEndpoint,ENDPOINTS } from "../endpoints/Endpoints";
 // API service for billing statements
 const billingStatementApi = {
   /**
@@ -17,7 +17,7 @@ const billingStatementApi = {
         }
       };
       
-      const response = await _axios.get(`api/Statement/${accountNumber}/get`, {...config});
+      const response = await _axios.get(getEndpoint(ENDPOINTS.STATEMENT_LIST, { accountNumber }), {...config});
      
       return response.data;
     } catch (error) {
@@ -40,10 +40,7 @@ const billingStatementApi = {
           Authorization: "Bearer " + user.token
         },
       };
-      const response = await _axios.get(
-        `api/Statement/${accountNumber}/getbyId/${statementId}`,
-        {...config}
-      );
+      const response = await _axios.get(getEndpoint(ENDPOINTS.STATEMENT_GET_BY_ID, { accountNumber, statementId }), {...config});
       
       return response.data;
     } catch (error) {

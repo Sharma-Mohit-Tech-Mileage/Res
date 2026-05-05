@@ -23,7 +23,8 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { getUser } from "../../redux/utils/LocalStorage";
 import LoadingOverlay from "../common/customui/CustomLoading";
-import { PostApiRequest } from "../../network/APIClient";
+import { PostApiRequest } from "../../network/RestApiClient";
+import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 
 import {
@@ -300,8 +301,9 @@ const TextNotifications = ({ navigation }) => {
 
     console.log("postTextNotifications", postData);
     setIsLoading(true);
+    const endpointUrl = getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION);
     PostApiRequest(
-      `api/SMS`,
+      endpointUrl,
       postData,
       (res) => {
         console.log(

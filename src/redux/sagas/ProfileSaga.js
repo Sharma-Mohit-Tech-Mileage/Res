@@ -14,6 +14,7 @@ import {
   fetchACPUserAccountDetails,
   isPaperlessEnabled,
   getProfileDetails,
+  updateProfileSecurity,
   fetchUserList,
   fetchSmsSubscription,
   fetchBillingStatus,
@@ -169,8 +170,7 @@ function* updateNewEmail(action) {
 
 function* updateProfile(action) {
   try {
-    console.log("updateProfile: ", JSON.stringify(action.payload));
-    const response = yield call(postProfileInfo, action.payload);
+    yield call(postProfileInfo, action.payload);
     action.navigation.navigate("ProfileSettings", { updateSuccess: true });
   } catch (error) {
     action.navigation.navigate("ProfileSettingsEdit", { updateFailed: true });
@@ -187,10 +187,9 @@ function* saveUserFeedBack(action) {
   }
 }
 
-function* updateProfileSecurity(action) {
+function* handleUpdateProfileSecurity(action) {
   try {
-    const response = yield call(postProfileInfo, action.payload);
-    console.log("API Success Response:", response);
+    yield call(updateProfileSecurity, action.payload);
     action.navigation.navigate("PasswordSecurity", { updateSuccess: true });
   } catch (error) {
     action.navigation.navigate("PasswordSecurityEdit", { updateFailed: true });
@@ -257,7 +256,6 @@ function* updateEmailNotification(action) {
 }
 
 function* updateTermsAndConditions(action) {
-  console.log("updateTermsAndConditions: ", action);
   try {
     yield call(postTermsAndConditionsv2, action.payload);
     if (action.navigation !== null) {
@@ -286,7 +284,6 @@ function* unsubscribPaperLessSaga(action) {
 }
 
 function* updatePushNotifications(action) {
-  console.log("updatePushNotification: ", action);
   try {
     yield call(postPushNotifications, action.payload);
     if (action.navigation !== null) {
@@ -329,19 +326,14 @@ function* updatePushNotificationsV2(action) {
 
 function* resentVerifiction(action) {
   const { navigation } = action;
-  console.log("resentVerifiction: action:", action);
 
   try {
-    // Call the resend email verification function
     yield call(resendEmailVerification);
 
     const successMessage =
       "Verification email resent successfully. Please check your inbox.";
 
     if (navigation) {
-      console.log(
-        `Navigating to Notifications screen with success message: ${successMessage}`
-      );
       navigation.navigate("EmailNotifications", {
         updateSuccess: true,
         updatedType: "Verification",
@@ -355,7 +347,6 @@ function* resentVerifiction(action) {
       "Failed to resend verification email. Please try again later.";
 
     if (navigation) {
-      console.log("Navigating back to Notifications with failure");
       navigation.navigate("EmailNotifications", {
         updateFailed: true,
         updatedType: "Verification",
@@ -366,10 +357,6 @@ function* resentVerifiction(action) {
 }
 
 function* logErrorSaga(action) {
-  console.log(
-    "logErrorSaga: action.payload:-------------------",
-    action.payload
-  );
   try {
     yield call(logError, action.payload);
   } catch (error) {
@@ -390,7 +377,6 @@ function* logInfoSaga(action) {
 function* addUser(action) {
   try {
     const response = yield call(addUserAction, action.payload);
-    console.log("API Success Response:", response); // Log the success response
     if (response) {
       action.navigation(true, "");
     }
@@ -400,27 +386,23 @@ function* addUser(action) {
     } else {
       action.navigation(false, "");
     }
-    console.log("Error:", error);
+    console.error("Error:", error);
   }
 }
 
 function* editUser(action) {
   try {
-    const response = yield call(editUserAction, action.payload);
-    console.log("API Success Response:", response); // Log the success response
+    yield call(editUserAction, action.payload);
     action.navigation(true);
   } catch (error) {
     action.navigation(false);
-    console.log("Error", error.response.data);
-    //action.navigation.navigate('PasswordSecurityEdit', { updateFailed: true });
-    //console.error('API Error Response:', error, action.payload); // Log the error response
+    console.error("Error", error.response.data);
   }
 }
 
 function* deleteUser(action) {
   try {
-    const response = yield call(removeUser, action.payload);
-    console.log("API Success Response:", response); // Log the success response
+    yield call(removeUser, action.payload);
     action.navigation(true);
   } catch (error) {
     action.navigation(false);
@@ -428,11 +410,9 @@ function* deleteUser(action) {
   }
 }
 function* fetchSvEmails(action) {
-  console.log("fetchAllSvEmails API Success Response");
   try {
     const response = yield call(fetchAllSvEmails);
     yield put(saveSvEmailAssociation(response));
-    console.log("fetchAllSvEmails API Success Response:", response);
   } catch (error) {
     console.error(
       "fetchAllSvEmails API Error Response:",
@@ -498,52 +478,31 @@ function* handleUpdateSVEmailsRequest(action) {
 function* handleManageEmailRequest(action) {
   const { email, isPaperless, isMarketing, newEmail } = action.payload;
   const { navigation } = action;
-  console.log("handleManageEmailRequest: action.payload:", action.payload);
-  console.log("handleManageEmailRequest: navigation:", navigation);
   try {
     let paperlessResponse = null;
     let marketingResponse = null;
     let successMessage = "";
 
     if (!isPaperless && !isMarketing) {
-      console.log("Adding email with no flags:", email);
       const noFlagEmail = updateEmailList([email], null);
-      const response = yield call(manageSVEmails, noFlagEmail);
-      console.log("Email added with no flags successfully", response);
+      yield call(manageSVEmails, noFlagEmail);
     } else if (isPaperless && isMarketing) {
-      console.log(
-        "Adding email as paperless and updating for marketing:",
-        email
-      );
       const offMarketing = updateEmailList([email], "add");
       [paperlessResponse, marketingResponse] = yield all([
         call(newEmail ? postEmailNotification : putEmailNotification, email),
         call(manageSVEmails, offMarketing),
       ]);
-      console.log(
-        "Email added to paperless notifications and updated for marketing successfully"
-      );
     } else {
       if (isPaperless) {
-        console.log("Adding email as paperless:", email);
         paperlessResponse = yield call(
           newEmail ? postEmailNotification : putEmailNotification,
           email
         );
-        console.log(
-          "Email added to paperless notifications successfully",
-          paperlessResponse
-        );
       }
 
       if (isMarketing) {
-        console.log("Updating email for marketing:", email);
         const offMarketing = updateEmailList([email], "add");
         marketingResponse = yield call(manageSVEmails, offMarketing);
-        console.log(
-          "Email updated for marketing successfully",
-          marketingResponse
-        );
       }
     }
     successMessage = `Email address (${email}) was added successfully.`;
@@ -552,17 +511,7 @@ function* handleManageEmailRequest(action) {
         " Please note that changes to paperless billing status may take up to 24 hours to reflect.";
     }
 
-    if (paperlessResponse || marketingResponse) {
-      console.log("Responses saved to store:", {
-        paperlessResponse,
-        marketingResponse,
-      });
-    }
-
     if (navigation) {
-      console.log(
-        `Navigating to Notifications screen with success message: ${successMessage}`
-      );
       navigation.navigate("EmailNotifications", {
         updateSuccess: true,
         updatedType: "Email",
@@ -572,7 +521,6 @@ function* handleManageEmailRequest(action) {
   } catch (error) {
     console.error("Error in handleManageEmailRequest:", error);
     if (navigation) {
-      console.log("Navigating back to AddEmailNotification with failure");
       navigation.navigate("AddEmailNotification", {
         updateFailed: true,
         updatedType: "Email",
@@ -584,8 +532,6 @@ function* handleManageEmailRequest(action) {
 function* handleUpdateEmailAssociations(action) {
   const { paperlessEmail, marketingEmails } = action.payload;
   const { navigation } = action;
-  console.log("handleUpdateEmailAssociations: action.payload:", action.payload);
-  console.log("handleUpdateEmailAssociations: navigation:", navigation);
   const updatedList = updateEmailList(marketingEmails, "Update");
   try {
     let paperlessResponse = null;
@@ -593,29 +539,23 @@ function* handleUpdateEmailAssociations(action) {
     let successMessage = "";
 
     if (paperlessEmail && marketingEmails && marketingEmails.length > 0) {
-      console.log("Updating both paperless and marketing emails");
       [paperlessResponse, marketingResponse] = yield all([
         call(unsubscribPaperLess),
         call(manageSVEmails, updatedList),
       ]);
       successMessage =
         "Email updated for both paperless billing and marketing. ";
-      console.log("Both paperless and marketing emails updated successfully");
     } else {
       if (paperlessEmail) {
-        console.log("Updating paperless email:", paperlessEmail);
         paperlessResponse = yield call(unsubscribPaperLess);
         successMessage =
           "Your paperless email preferences have been successfully updated. ";
-        console.log("Paperless email updated successfully");
       }
 
       if (marketingEmails && marketingEmails.length > 0) {
-        console.log("Updating marketing emails:", marketingEmails);
         marketingResponse = yield call(manageSVEmails, updatedList);
         successMessage +=
           "Your marketing email preferences have been successfully updated.";
-        console.log("Marketing emails updated successfully");
       }
     }
 
@@ -625,14 +565,7 @@ function* handleUpdateEmailAssociations(action) {
     }
 
     if (paperlessResponse || marketingResponse) {
-      console.log("Responses saved to store:", {
-        paperlessResponse,
-        marketingResponse,
-      });
       if (navigation) {
-        console.log(
-          `Navigating to Notifications screen with success message: ${successMessage}`
-        );
         navigation.navigate("EmailNotifications", {
           updateSuccess: true,
           updatedType: "Email",
@@ -644,7 +577,6 @@ function* handleUpdateEmailAssociations(action) {
     console.error("Error in handleUpdateEmailAssociations:", error);
 
     if (navigation) {
-      console.log("Navigating back to EmailNotifications with failure");
       navigation.navigate("EmailNotifications", {
         updateFailed: true,
         updatedType: "Email",
@@ -662,7 +594,6 @@ export function* checkPaperlessSaga(action) {
       action.payload.email,
       controller.signal
     );
-    console.log("isPaperlessEnabled API Success Response:", status);
     yield put(setPaperlessStatus(status));
   } catch (error) {
     console.error("Error fetching ACP user isPaperlessEnabled:", error);
@@ -719,7 +650,7 @@ function* ProfileSagas() {
   yield takeLatest(FETCH_PAPERLESS, fetchPaperlessDetails);
   yield takeLatest(FETCH_PUSH_NOTIFICATIONS, getPushNotifications);
   yield takeLatest(UPDATE_PROFILE_REQUEST, updateProfile);
-  yield takeLatest(UPDATE_PROFILE_SECURITY, updateProfileSecurity);
+  yield takeLatest(UPDATE_PROFILE_SECURITY, handleUpdateProfileSecurity);
   yield takeLatest(UPDATE_TEXT_NOTIFICATION, updateTextNotification);
   yield takeLatest(UPDATE_EMAIL_NOTIFICATION, updateEmailNotification);
   yield takeLatest(UPDATE_TERMS_AND_CONDITIONS, updateTermsAndConditions);
