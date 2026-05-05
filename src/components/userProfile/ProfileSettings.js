@@ -6,6 +6,7 @@ import {
   ScrollView,
   Linking,
   Platform,
+  Pressable,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -21,12 +22,18 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../utility/constant";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
+import Vector from "../../../src/res/svgIcons/Vector";
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const profile = useSelector((state) => state.profile || {});
+
+  const handleArrowPress = (fieldType) => {
+    console.log(`Arrow pressed for: ${fieldType}`);
+    // Add your callback logic here
+  };
   const profileDetails = profile.profileDetails || {};
   const accountDetails = profile.accountDetails || {};
 
@@ -123,7 +130,7 @@ const numberToWordsForAccessibility = (numStr) => {
         <View style={{ flexDirection: "column", marginBottom: 300 }}>
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup]}>
-              <View style={styles.infoWrapper}>
+              {/* <View style={styles.infoWrapper}>
                 <NotificationAlert
                   type="success"
                   title="Success"
@@ -132,8 +139,8 @@ const numberToWordsForAccessibility = (numStr) => {
                   isVisible={showSuccessAlert}
                   onClose={() => setShowSuccessAlert(false)}
                 />
-              </View>
-              <View style={[styles.generalInformationParent]}>
+              </View> */}
+              <View style={[styles.generalInformationParent,{marginTop: Padding.p_base}]}>
                 <Text style={[styles.generalInformation, styles.melissaTypo]} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
                   General Information
                 </Text>
@@ -152,20 +159,39 @@ const numberToWordsForAccessibility = (numStr) => {
                   </Text>
                 </View>
 
+               <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>   
                 <View style={styles.firstNameParent} accessible={true} accessibilityLabel={`Email address`} accessibilityRole="text">
                   <Text style={styles.firstName}>Email Address</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {getPrimaryEmail(accountDetails) || "N/A"}
                   </Text>
-                </View>  
-
-                <View style={[styles.firstNameParent,{marginBottom: 20}]} accessible={true} accessibilityLabel={`Mobile number`} accessibilityRole="text">
+                </View> 
+               <Pressable 
+                  style={{justifyContent: 'flex-end', paddingRight: Padding.p_base}}
+                  onPress={() => handleArrowPress('email')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit email address">
+                  <Vector/> 
+                </Pressable>
+               </View>  
+                 
+              <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
+                <View style={[styles.firstNameParent,{marginBottom: Padding.p_base}]} accessible={true} accessibilityLabel={`Mobile number`} accessibilityRole="text">
                   <Text style={styles.firstName}>Mobile Number</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {profileDetails.accountNumber}
                   </Text>
-                </View>    
-
+                </View>   
+                <Pressable 
+                  style={{justifyContent: 'flex-end', paddingRight: Padding.p_base}}
+                  onPress={() => handleArrowPress('mobile')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit mobile number">
+                  <Vector/> 
+                </Pressable>
+               </View>
               </View>
              
             </View>
@@ -175,7 +201,7 @@ const numberToWordsForAccessibility = (numStr) => {
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup]}>
               <View style={[styles.generalInformationParent]}>
-                <Text style={[styles.generalInformation, styles.melissaTypo,{marginTop: 20}]} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
+                <Text style={[styles.generalInformation, styles.melissaTypo,{marginTop: Padding.p_base}]} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
                   Addresses
                 </Text>
               </View>
@@ -203,8 +229,8 @@ const numberToWordsForAccessibility = (numStr) => {
               </View>
             </View>
           </View>
-          <View style={[styles.frameGroup, { marginHorizontal: 16 }]}>
-            <View style={{ padding: 20, flexDirection: "column" }}>
+          <View style={[styles.frameGroup, { marginHorizontal: Padding.p_base }]}>
+            <View style={{ padding: Padding.p_xl, flexDirection: "column" }}>
               <Text style={[styles.generalInformation, styles.melissaTypo]} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
                 Manage My Service
               </Text>
@@ -378,13 +404,13 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue,
   },
   generalInformationParent: {
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: Padding.p_xl,
     alignItems: "center",
     flexDirection: "row",
   },
   firstName: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
+    fontWeight: "700",
     fontSize: FontSize.size_sm,
     textAlign: "left",
     color: Color.colorGray_100,
@@ -398,7 +424,7 @@ const styles = StyleSheet.create({
   firstNameParent: {
     paddingVertical: Padding.p_5xs,
     justifyContent: "center",
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: Padding.p_xl,
     alignSelf: "stretch",
   },
   text: {
@@ -422,7 +448,7 @@ const styles = StyleSheet.create({
   notificationsWrapper: {
     paddingTop: Padding.p_base,
     paddingBottom: Padding.p_5xs,
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: Padding.p_xl,
     alignSelf: "stretch",
   },
   infoWrapper: {
