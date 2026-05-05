@@ -9,7 +9,7 @@ import math
 from PIL import Image, ImageDraw, ImageFont
 
 # ──────────────────────────────────────────────
-# Canvas & layout constants
+# Canvas & layout constants  (iPhone)
 # ──────────────────────────────────────────────
 CANVAS_W = 1284   # App Store 6.1" width
 CANVAS_H = 2778   # App Store 6.1" height
@@ -25,6 +25,9 @@ FRAME_BORDER     = 10
 DYNAMIC_ISLAND_W = 220
 DYNAMIC_ISLAND_H = 48
 DYNAMIC_ISLAND_R = 24
+
+# Side button protrusion beyond phone body on each side
+BTN_PAD = 18
 
 # Text colours
 TEXT_LABEL    = (255, 255, 255)
@@ -185,52 +188,249 @@ def draw_centered_text(draw, text, y, font, color, canvas_w, line_spacing=1.25):
 
 def build_phone_frame(screenshot_path, frame_w, frame_h):
     """
-    Composite a screenshot inside an iPhone-shaped frame.
+    Composite a screenshot inside an iPhone-shaped frame with visible side buttons.
+    Canvas is (frame_w + BTN_PAD*2) wide so buttons aren't clipped.
+    Returns RGBA image of size (frame_w + BTN_PAD*2, frame_h).
+    """
+    total_w = frame_w + BTN_PAD * 2
+    frame   = Image.new("RGBA", (total_w, frame_h), (0, 0, 0, 0))
+    draw    = ImageDraw.Draw(frame)
+    ox      = BTN_PAD   # horizontal offset — phone body starts here
+
+    # ── Phone body ──
+    # Outer shell
+    draw.rounded_rectangle(
+        [ox, 0, ox + frame_w - 1, frame_h - 1],
+        radius=FRAME_RADIUS,
+        fill=FRAME_COLOR + (255,),
+    )
+
+    # Inner screen area
+    sx = ox + FRAME_BORDER
+    sy = FRAME_BORDER
+    sw = frame_w - FRAME_BORDER * 2
+    sh = frame_h - FRAME_BORDER * 2
+    screen_r = FRAME_RADIUS - FRAME_BORDER + 4
+    draw.rounded_rectangle(
+        [sx, sy, sx + sw - 1, sy + sh - 1],
+        radius=screen_r,
+        fill=(0, 0, 0, 255),
+    )
+
+    # Paste screenshot
+    if os.path.exists(screenshot_path):
+        shot = Image.open(screenshot_path).convert("RGBA")
+        shot = shot.resize((sw, sh), Image.LANCZOS)
+        screen_mask = rounded_rect_mask(sw, sh, screen_r)
+        frame.paste(shot, (sx, sy), screen_mask)
+
+    btn_color = FRAME_COLOR + (255,)
+
+    # ── Left side buttons — flush against phone body ──
+    # Silent / Action button (short, near top)
+    draw.rounded_rectangle(
+        [ox - 10, int(frame_h * 0.22), ox, int(frame_h * 0.265)],
+        radius=4, fill=btn_color,
+    )
+    # Volume Up
+    draw.rounded_rectangle(
+        [ox - 10, int(frame_h * 0.31), ox, int(frame_h * 0.385)],
+        radius=4, fill=btn_color,
+    )
+    # Volume Down
+    draw.rounded_rectangle(
+        [ox - 10, int(frame_h * 0.40), ox, int(frame_h * 0.475)],
+        radius=4, fill=btn_color,
+    )
+
+    # ── Right side buttons — flush against phone body ──
+    # Power / Side button (tall)
+    draw.rounded_rectangle(
+        [ox + frame_w, int(frame_h * 0.30), ox + frame_w + 10, int(frame_h * 0.42)],
+        radius=4, fill=btn_color,
+    )
+
+    return frame
+
+
+def build_ipad_frame(screenshot_path, frame_w, frame_h):
+    """
+    Composite a screenshot inside an iPad Pro-shaped frame (no notch, slim bezels).
     Returns RGBA image of size (frame_w, frame_h).
     """
+    IPAD_RADIUS = 60
+    IPAD_BORDER = 18
     frame = Image.new("RGBA", (frame_w, frame_h), (0, 0, 0, 0))
     draw  = ImageDraw.Draw(frame)
 
     # Outer shell
     draw.rounded_rectangle(
         [0, 0, frame_w - 1, frame_h - 1],
-        radius=FRAME_RADIUS,
+        radius=IPAD_RADIUS,
         fill=FRAME_COLOR + (255,),
     )
-
-    # Inner screen area
-    sx = FRAME_BORDER
-    sy = FRAME_BORDER
-    sw = frame_w  - FRAME_BORDER * 2
-    sh = frame_h  - FRAME_BORDER * 2
+    # Inner screen
+    sx, sy = IPAD_BORDER, IPAD_BORDER
+    sw, sh = frame_w - IPAD_BORDER * 2, frame_h - IPAD_BORDER * 2
+    screen_r = IPAD_RADIUS - IPAD_BORDER + 4
     draw.rounded_rectangle(
         [sx, sy, sx + sw - 1, sy + sh - 1],
-        radius=FRAME_RADIUS - FRAME_BORDER + 4,
+        radius=screen_r,
         fill=(0, 0, 0, 255),
     )
-
-    # Paste screenshot into screen area
     if os.path.exists(screenshot_path):
         shot = Image.open(screenshot_path).convert("RGBA")
         shot = shot.resize((sw, sh), Image.LANCZOS)
-        screen_mask = rounded_rect_mask(sw, sh, FRAME_RADIUS - FRAME_BORDER + 4)
+        screen_mask = rounded_rect_mask(sw, sh, screen_r)
         frame.paste(shot, (sx, sy), screen_mask)
 
-    # Thin side buttons (right side)
-    btn_x = frame_w - 6
-    for by, bh in [(frame_h * 0.30, frame_h * 0.08), (frame_h * 0.42, frame_h * 0.14)]:
-        draw.rounded_rectangle(
-            [btn_x, int(by), btn_x + 5, int(by + bh)],
-            radius=3,
-            fill=(60, 60, 65, 255),
-        )
-    # Left side buttons
-    for by, bh in [(frame_h * 0.22, frame_h * 0.06), (frame_h * 0.31, frame_h * 0.10), (frame_h * 0.44, frame_h * 0.10)]:
-        draw.rounded_rectangle(
-            [-5, int(by), 0, int(by + bh)],
-            radius=3,
-            fill=(60, 60, 65, 255),
-        )
+    # Home-bar indicator (bottom centre)
+    bar_w, bar_h = int(frame_w * 0.28), 8
+    bar_x = (frame_w - bar_w) // 2
+    bar_y = frame_h - IPAD_BORDER + 4
+    draw.rounded_rectangle(
+        [bar_x, bar_y, bar_x + bar_w, bar_y + bar_h],
+        radius=4, fill=(80, 80, 85, 200),
+    )
+    # Power button — top edge centre-right
+    pb_w, pb_h = 60, 8
+    pb_x = int(frame_w * 0.65)
+    draw.rounded_rectangle(
+        [pb_x, -4, pb_x + pb_w, 4],
+        radius=4, fill=FRAME_COLOR + (255,),
+    )
+    # Volume Up — right side top
+    draw.rounded_rectangle(
+        [frame_w - 4, int(frame_h * 0.28), frame_w + 8, int(frame_h * 0.34)],
+        radius=4, fill=FRAME_COLOR + (255,),
+    )
+    # Volume Down — right side
+    draw.rounded_rectangle(
+        [frame_w - 4, int(frame_h * 0.36), frame_w + 8, int(frame_h * 0.42)],
+        radius=4, fill=FRAME_COLOR + (255,),
+    )
+    return frame
+
+
+def generate_ipad(screen, script_dir):
+    src  = os.path.join(script_dir, screen["file"])
+    dest = os.path.join(script_dir, screen["out"])
+
+    print(f"  Generating {screen['out']} ...", end=" ", flush=True)
+
+    cw, ch = IPAD_W, IPAD_H
+
+    # Gradient background
+    canvas = make_gradient(cw, ch, GRAD_TOP, GRAD_BOTTOM).convert("RGBA")
+    draw   = ImageDraw.Draw(canvas)
+
+    # Fonts — scale up for larger canvas
+    font_headline = load_font(160, weight="bold")
+    font_body     = load_font(78, weight="light")
+
+    headline_y = int(ch * 0.05)
+    body_start = draw_centered_text(draw, screen["headline"], headline_y, font_headline, TEXT_HEADLINE, cw, 1.12)
+    body_y = body_start + 70
+    draw_centered_text(draw, screen["body"], body_y, font_body, TEXT_BODY, cw, 1.35)
+
+    # iPad frame — use phone aspect scaled to canvas
+    pad = 20
+    phone_top = int(ch * 0.28)
+    phone_h   = ch - phone_top - int(ch * 0.04)
+    phone_w   = int(phone_h * (390 / 844))   # portrait phone aspect ratio
+    frame_img = build_ipad_frame(src, phone_w, phone_h)
+    px = (cw - phone_w) // 2
+    canvas.paste(frame_img, (px, phone_top), frame_img)
+
+    # Rounded canvas corners
+    canvas_mask = rounded_rect_mask(cw, ch, 120)
+    canvas.putalpha(canvas_mask)
+
+    canvas.save(dest, "PNG", optimize=True)
+    print("✓")
+    return dest
+
+
+def build_android_frame(screenshot_path, frame_w, frame_h):
+    """
+    Pixel/Samsung-style Android device:
+    - Flat aluminium sides, very slightly rounded corners
+    - Punch-hole camera centred at top
+    - Volume Up/Down + Power on the right side
+    - Thin bottom chin
+    Canvas is (frame_w + 20) wide to accommodate side buttons.
+    Returns RGBA image.
+    """
+    AND_RADIUS  = 55    # corner radius
+    AND_BORDER  = 14    # bezel thickness
+    AND_BTN_PAD = 14    # how far buttons protrude
+    BODY_COLOR  = (22, 22, 26, 255)          # near-black aluminium body
+    RIM_COLOR   = (50, 50, 56, 255)          # subtle lighter rim
+    BTN_COLOR   = (38, 38, 44, 255)          # side button colour
+
+    total_w = frame_w + AND_BTN_PAD
+    frame   = Image.new("RGBA", (total_w, frame_h), (0, 0, 0, 0))
+    draw    = ImageDraw.Draw(frame)
+
+    # Outer rim (1-px lighter band)
+    draw.rounded_rectangle(
+        [0, 0, frame_w - 1, frame_h - 1],
+        radius=AND_RADIUS, fill=RIM_COLOR,
+    )
+    # Main body (inset 2px)
+    draw.rounded_rectangle(
+        [2, 2, frame_w - 3, frame_h - 3],
+        radius=AND_RADIUS - 2, fill=BODY_COLOR,
+    )
+
+    # Screen area
+    sx, sy = AND_BORDER, AND_BORDER
+    sw, sh = frame_w - AND_BORDER * 2, frame_h - AND_BORDER * 2
+    screen_r = AND_RADIUS - AND_BORDER + 4
+    draw.rounded_rectangle(
+        [sx, sy, sx + sw - 1, sy + sh - 1],
+        radius=screen_r, fill=(0, 0, 0, 255),
+    )
+
+    # Paste screenshot
+    if os.path.exists(screenshot_path):
+        shot = Image.open(screenshot_path).convert("RGBA")
+        shot = shot.resize((sw, sh), Image.LANCZOS)
+        screen_mask = rounded_rect_mask(sw, sh, screen_r)
+        frame.paste(shot, (sx, sy), screen_mask)
+
+    # Punch-hole camera — centred, near top of screen
+    hole_r  = 22
+    hole_cx = frame_w // 2
+    hole_cy = sy + 42
+    draw.ellipse(
+        [hole_cx - hole_r, hole_cy - hole_r, hole_cx + hole_r, hole_cy + hole_r],
+        fill=(10, 10, 12, 255),
+    )
+    # Inner lens glint
+    draw.ellipse(
+        [hole_cx - 10, hole_cy - 10, hole_cx + 10, hole_cy + 10],
+        fill=(20, 20, 25, 255),
+    )
+
+    # Right side buttons (protrude into AND_BTN_PAD area)
+    rx0 = frame_w - 3
+    rx1 = frame_w + AND_BTN_PAD - 1
+    # Volume Up
+    draw.rounded_rectangle(
+        [rx0, int(frame_h * 0.28), rx1, int(frame_h * 0.345)],
+        radius=4, fill=BTN_COLOR,
+    )
+    # Volume Down
+    draw.rounded_rectangle(
+        [rx0, int(frame_h * 0.36), rx1, int(frame_h * 0.425)],
+        radius=4, fill=BTN_COLOR,
+    )
+    # Power button (slightly taller, offset lower)
+    draw.rounded_rectangle(
+        [rx0, int(frame_h * 0.48), rx1, int(frame_h * 0.57)],
+        radius=4, fill=BTN_COLOR,
+    )
 
     return frame
 
@@ -276,8 +476,9 @@ def generate(screen, script_dir):
     phone_w    = int(phone_h * (400 / 852))
     frame_img  = build_phone_frame(src, phone_w, phone_h)
 
+    # frame_img is wider than phone_w by BTN_PAD on each side — centre on phone body
     px = (CANVAS_W - phone_w) // 2
-    canvas.paste(frame_img, (px, phone_top), frame_img)
+    canvas.paste(frame_img, (px - BTN_PAD, phone_top), frame_img)
 
     # 8. Rounded corners on the canvas
     canvas_mask = rounded_rect_mask(CANVAS_W, CANVAS_H, 120)
@@ -291,7 +492,8 @@ def generate(screen, script_dir):
 
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    print(f"Generating {len(SCREENS)} promotional screenshots …\n")
+
+    print(f"Generating {len(SCREENS)} iPhone promotional screenshots …\n")
     for s in SCREENS:
         generate(s, script_dir)
     print("\nDone! Files saved in:", script_dir)
