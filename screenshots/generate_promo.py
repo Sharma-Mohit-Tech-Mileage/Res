@@ -11,8 +11,8 @@ from PIL import Image, ImageDraw, ImageFont
 # ──────────────────────────────────────────────
 # Canvas & layout constants
 # ──────────────────────────────────────────────
-CANVAS_W = 1290   # App Store 6.7" width
-CANVAS_H = 2796   # App Store 6.7" height
+CANVAS_W = 1284   # App Store 6.1" width
+CANVAS_H = 2778   # App Store 6.1" height
 
 # Brand gradient colours
 GRAD_TOP    = (141, 59, 144)  # rgba(141, 59, 144, 1)
@@ -35,7 +35,7 @@ TEXT_BODY     = (255, 255, 255)
 LABEL_Y_FRAC    = 0.06   # label top edge as fraction of height
 HEADLINE_Y_FRAC = 0.05
 BODY_Y_FRAC     = 0.10
-PHONE_TOP_FRAC  = 0.29   # where phone frame starts (moved up)
+PHONE_TOP_FRAC  = 0.27   # where phone frame starts (moved up)
 
 # ──────────────────────────────────────────────
 # Screen definitions
@@ -216,15 +216,6 @@ def build_phone_frame(screenshot_path, frame_w, frame_h):
         screen_mask = rounded_rect_mask(sw, sh, FRAME_RADIUS - FRAME_BORDER + 4)
         frame.paste(shot, (sx, sy), screen_mask)
 
-    # Dynamic island pill (centred at top)
-    di_x = (frame_w - DYNAMIC_ISLAND_W) // 2
-    di_y = sy + 18
-    draw.rounded_rectangle(
-        [di_x, di_y, di_x + DYNAMIC_ISLAND_W, di_y + DYNAMIC_ISLAND_H],
-        radius=DYNAMIC_ISLAND_R,
-        fill=FRAME_COLOR + (255,),
-    )
-
     # Thin side buttons (right side)
     btn_x = frame_w - 6
     for by, bh in [(frame_h * 0.30, frame_h * 0.08), (frame_h * 0.42, frame_h * 0.14)]:
@@ -280,7 +271,7 @@ def generate(screen, script_dir):
 
     # 7. Phone frame
     phone_top  = int(CANVAS_H * PHONE_TOP_FRAC)
-    phone_h    = CANVAS_H - phone_top - int(CANVAS_H * 0.01)
+    phone_h    = CANVAS_H - phone_top - int(CANVAS_H * 0.05)
     # Slightly wider phone to increase visible screenshot width
     phone_w    = int(phone_h * (400 / 852))
     frame_img  = build_phone_frame(src, phone_w, phone_h)
@@ -288,8 +279,12 @@ def generate(screen, script_dir):
     px = (CANVAS_W - phone_w) // 2
     canvas.paste(frame_img, (px, phone_top), frame_img)
 
-    # 8. Save
-    canvas.convert("RGB").save(dest, "PNG", optimize=True)
+    # 8. Rounded corners on the canvas
+    canvas_mask = rounded_rect_mask(CANVAS_W, CANVAS_H, 120)
+    canvas.putalpha(canvas_mask)
+
+    # 9. Save
+    canvas.save(dest, "PNG", optimize=True)
     print(f"✓")
     return dest
 
