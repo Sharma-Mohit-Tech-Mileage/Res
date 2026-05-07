@@ -750,13 +750,9 @@ const isPaperlessEnabled = async (email, signal) => {
   return response.data;
 };
 
-const fetchACPUserAccountDetails = async (signal) => {
-  console.log("[DEBUG] fetchACPUserAccountDetails called, signal:", !!signal); 
-
+const fetchACPUserAccountDetails = async (signal, force = false) => {
   let user = await getUser();
   const accountNumber = user.userInfo?.accountNumber || null;
-
-  console.log("[DEBUG] accountNumber:", accountNumber); 
 
   const config = {
     headers: {
@@ -768,6 +764,7 @@ const fetchACPUserAccountDetails = async (signal) => {
   const requestUrl = getEndpoint(ENDPOINTS.ACCOUNTS_DETAILS);
   const data = {
     accountNumber: accountNumber,
+    UpdateCache: !!force,
     fieldList: [
       "first_name",
       "last_name",
@@ -791,7 +788,10 @@ const fetchACPUserAccountDetails = async (signal) => {
     const response = await _axios.post(requestUrl, data, config);
     return response.data;
   } catch (error) {
-    console.error("Error in API Call:", error);
+    if (error?.name === "CanceledError" || error?.code === "ERR_CANCELED") {
+      throw error;
+    }
+    console.error("Error in fetchACPUserAccountDetails:", error);
     throw error;
   }
 };

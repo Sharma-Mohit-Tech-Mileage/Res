@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Platform, AppState, Animated, Alert } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchACPUserAccountDetails } from '../../redux/actions/ProfileActionSuite';
 import { RefreshToken } from '../user/Session';
 import Config from 'react-native-config';
 import PDFViewModal from './PDFViewModal';
@@ -168,6 +169,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [injectionScript, setInjectionScript] = useState('');
 
     const user = useSelector(state => state.user.userData);
+    const dispatch = useDispatch();
     const webViewRef = useRef();
     const aliveCheckResolver = useRef(null);
     const aliveCheckTimeout = useRef(null);
@@ -179,6 +181,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const lastIdTokenRefresh = useRef(0);
     const currentUrlRef = useRef('');
     const ssoRedirectInFlight = useRef(false);
+    // Fires once per WebView session when payment/AutoPay confirmation is detected,
+    // so the backend account cache gets force-refreshed before the user navigates back.
+    const cacheUpdateFiredRef = useRef(false);
 
     const isLoading = !contentLoaded || progress < 1;
 
@@ -451,6 +456,18 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             return false;
         }
 
+        // Payment / AutoPay confirmation pages — backend account cache is stale
+        // at this point. Fire a force-refresh once so Redux has fresh balance,
+        // past-due, email, etc. by the time BillingScreen regains focus.
+        if (request.url.includes('/portals/app-secure/payment-confirmation') || request.url.includes('/portals/thankyou/')) {
+            if (!cacheUpdateFiredRef.current) {
+                cacheUpdateFiredRef.current = true;
+                console.log(`${TAG} confirmation URL detected — dispatching force account refresh`);
+                dispatch(fetchACPUserAccountDetails({ force: true }));
+            }
+            return true;
+        }
+
         if (request.url.includes(Config.SSO_LOGIN)) {
             console.warn(`${TAG} NAV | SSO redirect detected — session expired on portal | ssoInFlight=${ssoRedirectInFlight.current}`);
 
@@ -476,7 +493,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
         if (!request.url.startsWith('https://') && !request.url.startsWith('http://')) return false;
         return true;
-    }, [showToastMessage, navigation, url, injectAuth, recreateWebView, refreshInjectionScript]);
+    }, [showToastMessage, navigation, url, injectAuth, recreateWebView, refreshInjectionScript, dispatch]);
 
     const onLoadStart = useCallback(({ nativeEvent }) => {
         const prevUrl = currentUrlRef.current;

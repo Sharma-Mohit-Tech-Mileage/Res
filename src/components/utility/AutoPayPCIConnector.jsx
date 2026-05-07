@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, Platform, AppState, Animated } from 'react-nati
 import WebView from 'react-native-webview';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getUser } from '../../redux/utils/LocalStorage';
+import { fetchACPUserAccountDetails } from '../../redux/actions/ProfileActionSuite';
 import Config from 'react-native-config';
 import { GetApiRequest } from '../../network/RestApiClient';
 import { getEndpoint, ENDPOINTS } from '../../network/apis/endpoints/Endpoints';
@@ -125,7 +126,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const customReferUrl = route.params?.customReferUrl || route.params?.customPaymentUrl || null;
 
     const user = useSelector(state => state.user.userData);
+    const dispatch = useDispatch();
     const webViewRef = useRef(null);
+    const cacheUpdateFiredRef = useRef(false);
     const aliveCheckResolver = useRef(null);
     const aliveCheckTimeout = useRef(null);
     const backgroundTimestamp = useRef(0);
@@ -465,6 +468,11 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken);
                 } catch (_) {}
             })();
+            // Backend cache is stale after payment / AutoPay change — force-refresh once.
+            if (!cacheUpdateFiredRef.current) {
+                cacheUpdateFiredRef.current = true;
+                dispatch(fetchACPUserAccountDetails({ force: true }));
+            }
             return true;
         }
         // Block navigation to customer portal — PCI is payment-only, take user back to mobile
@@ -476,7 +484,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         if (request.url === 'about:blank') return true;
         if (!request.url.startsWith('https://') && !request.url.startsWith('http://')) return false;
         return true;
-    }, [showToastMessage, navigation]);
+    }, [showToastMessage, navigation, dispatch]);
 
     const onLoadStart = useCallback(({ nativeEvent }) => {
         if (!initialLoadComplete.current) { setContentLoaded(false); setProgress(0); }

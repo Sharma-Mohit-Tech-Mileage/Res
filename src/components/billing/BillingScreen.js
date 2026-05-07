@@ -102,7 +102,6 @@ const BillingScreen = ({ navigation }) => {
     useCallback(() => {
       setIsContentLoading(false);
       getStatus();
-      setBillAmt(undefined);
       dispatch(fetchACPUserAccountDetails());
     }, [])
   );

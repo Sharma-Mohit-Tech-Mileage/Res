@@ -27,6 +27,7 @@ const initialState = {
   allSvEmailAssociated: [],
   paperlessStatusAcp: false,
   accountDetails: {},
+  accountDetailsFetchedAt: null,
   erro: "",
 };
 
@@ -101,6 +102,7 @@ const ProfileReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         accountDetails: action.payload,
+        accountDetailsFetchedAt: Date.now(),
       };
     case LOGOUT:
       return {
