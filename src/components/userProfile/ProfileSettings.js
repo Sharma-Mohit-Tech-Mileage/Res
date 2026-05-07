@@ -8,7 +8,7 @@ import {
   Platform,
   Pressable,
 } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
 import {
   Padding,
   Color,
@@ -35,6 +35,11 @@ const ProfileSettings = () => {
   const [phoneNumber, setPhoneNumber] = useState(undefined);
   const [showPhoneLoading, setShowPhoneLoading] = useState(false);
   const profile = useSelector((state) => state.profile || {});
+  const profileDetails = profile.profileDetails || {};
+  const accountDetails = profile.accountDetails || {};
+
+  const emailAddress = getPrimaryEmail(accountDetails);
+
   const TextNotifSettings = useMemo(
     () => [
       {
@@ -60,7 +65,10 @@ const ProfileSettings = () => {
     console.log(`Arrow pressed for: ${fieldType}`);
     // Add your callback logic here
     if (fieldType === "email") {
-      navigation.navigate("EmailNotifications");
+      navigation.navigate("EmailNotifications", {
+          email: emailAddress,
+          //isPaperLess: isPaperLess,
+        });;
     } else if (fieldType === "mobile") {
       navigation.navigate("TextNotifications", {
         additionalData: {
@@ -73,10 +81,7 @@ const ProfileSettings = () => {
       });
     }
   };
-  const profileDetails = profile.profileDetails || {};
-  const accountDetails = profile.accountDetails || {};
-
-  const emailAddress = getPrimaryEmail(accountDetails);
+  
 
   const customerFirstName =
     accountDetails.first_name ||
@@ -98,16 +103,16 @@ const ProfileSettings = () => {
   const serviceAddress = () => {
     const serviceAddr = accountDetails.service_address || {};
     const { line1, line2, city, state, zip } = serviceAddr;
-    return `${line1 || ""}${line2 ? ", " + line2 : ""}${
-      city ? ", " + city : ""
+    return `${line1 || ""}${line2 ? ", " + line2 : ""}\n${
+      city ? city : ""
     }${state ? ", " + state : ""}${zip ? " " + zip : ""}`;
   };
 
   const billingAddress = () => {
     const billingAddr = accountDetails.bill_to_address || {};
     const { line1, line2, city, state, zip } = billingAddr;
-    return `${line1 || ""}${line2 ? ", " + line2 : ""}${
-      city ? ", " + city : ""
+    return `${line1 || ""}${line2 ? ", " + line2 : ""}\n${
+      city ? city : ""
     }${state ? ", " + state : ""}${zip ? " " + zip : ""}`;
   };
 
@@ -167,11 +172,18 @@ const ProfileSettings = () => {
         userInfo.daysSinceDisconnectDate,
       )
     : false;
+  
+
+  
+
   useEffect(() => {
-    //setShowSuccessAlert(true);
+  const unsubscribe = navigation.addListener('focus', () => {
+    // Call your API here
     dispatch(fetchProfileDetails());
     getTextNotificationsData();
-  }, [accountDetails, dispatch]);
+  });
+  return unsubscribe;
+}, [navigation]);
 
   const makeCall = (number) => {
     let phoneNumber = "";
@@ -227,12 +239,19 @@ const ProfileSettings = () => {
                     {customerName}
                   </Text>
                 </View>
-                <View style={styles.firstNameParent} accessible={true}>
-                  <Text style={styles.firstName}>Username</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
-                    {profileDetails.userName}
-                  </Text>
-                </View>
+                <View style={styles.firstNameParent}>
+                <Text style={styles.firstName}>Username</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>
+                  {profileDetails.userName}
+                </Text>
+              </View>
+
+              <View style={styles.firstNameParent}>
+                <Text style={styles.firstName}>Account Number</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>
+                  {profileDetails.accountNumber}
+                </Text>
+              </View>
                 {emailAddress !== undefined && (
                   <View
                     style={{

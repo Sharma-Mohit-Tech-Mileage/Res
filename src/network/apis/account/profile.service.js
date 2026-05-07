@@ -750,6 +750,7 @@ const isPaperlessEnabled = async (email, signal) => {
   return response.data;
 };
 
+
 const fetchACPUserAccountDetails = async (signal) => {
   console.log("[DEBUG] fetchACPUserAccountDetails called, signal:", !!signal); 
 
