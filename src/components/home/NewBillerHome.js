@@ -52,7 +52,7 @@ import {
 
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
-  const { outageData, checkStatus: checkOutageStatus } = useOutageStatus();
+  const { outageData, checkStatus: checkOutageStatus } = useOutageStatus('dashboard');
 
   useFocusEffect(
     useCallback(() => {
