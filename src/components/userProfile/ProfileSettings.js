@@ -304,7 +304,7 @@ const ProfileSettings = () => {
                     </View>
                   </SkeletonPlaceholder>
                 )}
-                {phoneNumber !== undefined && (
+                {phoneNumber && (
                   <View
                     style={{
                       flexDirection: "row",
