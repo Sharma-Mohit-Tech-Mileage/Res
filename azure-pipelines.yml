@@ -1,47 +1,88 @@
 trigger:
-  branches:
-    include:
-      - Sparklight
-variables:
-  - group: iOSBuildGroup
+- cicd_pipeline
+
 pool:
-  vmImage: 'macos-latest'
+  vmImage: 'ubuntu-latest'
+
+variables:
+- name: keyAlias
+  value: business
+- name: jarsignerKeystorePassword
+  value: sparklight_123
+- name: jarsignerKeyPassword
+  value: sparklight_123
+- name: androidVersionCode
+  value: $[counter('androidBuildVersionStore', 23024)]
+- name: androidVersionName
+  value: '25.5.0'
+
 steps:
-  - checkout: self
-    persistCredentials: true
-    clean: true
-  - script: yarn install
-  - task: NodeTool@0
-    displayName: 'Install Node'
-    inputs:
-      versionSpec: '20.6.1'
-  - task: InstallAppleCertificate@2
-    displayName: Install Apple Certificate
-    inputs:
-      certSecureFile: 'Certificates.p12'
-      certPwd: '$(CertificatePassword)'
-      keychain: 'temp'
-      deleteCert: true
-  - task: InstallAppleProvisioningProfile@1
-    displayName: 'Install Apple Provisioning Profile'
-    inputs:
-      provisioningProfileLocation: 'secureFiles'
-      provProfileSecureFile: 'sparklightcustomerDev.mobileprovision'
-      removeProfile: true
-  - task: CocoaPods@0
-    displayName: 'Install CocoaPods'
-    inputs:
-      workingDirectory: 'ios'
-  - task: Xcode@5
-    displayName: 'Build IPA'
-    inputs:
-      actions: 'build'
-      configuration: 'Release'
-      sdk: 'iphoneos'
-      xcWorkspacePath: 'ios/Sparklight.xcworkspace'
-      scheme: 'Sparklight'
-      packageApp: true
-      exportPath: 'output'
-      signingOption: 'manual'
-      signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
-      provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
+- task: JavaToolInstaller@0
+  displayName: 'Install JDK 17'
+  inputs:
+    versionSpec: '17'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
+
+- script: java -version
+  displayName: 'Check Java Version'
+
+- task: NodeTool@0
+  displayName: 'Install Node'
+  inputs:
+    versionSpec: '20.6.1'
+
+- script: npm cache clean --force
+  displayName: 'Clean npm cache'
+
+- script: npm install --legacy-peer-deps
+  displayName: 'Install node dependencies'
+
+- task: DownloadSecureFile@1
+  name: keystoreFile
+  displayName: 'Download Keystore File'
+  inputs:
+    secureFile: 'Businesskey.jks'
+
+- task: Gradle@4
+  displayName: 'Build Android App Bundle'
+  inputs:
+    workingDirectory: 'android'
+    gradleWrapperFile: 'android/gradlew'
+    tasks: 'clean bundleDemoRelease'
+    options: >
+      -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
+      -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
+      -PKEY_ALIAS=$(keyAlias)
+      -PKEY_PASSWORD=$(jarsignerKeyPassword)
+      -PVERSION_CODE=$(androidVersionCode)
+      -PVERSION_NAME=$(androidVersionName)
+    publishJUnitResults: false
+
+- task: CopyFiles@2
+  displayName: 'Copy Android App Artifacts'
+  inputs:
+    SourceFolder: '$(System.DefaultWorkingDirectory)/android/app/build/outputs'
+    Contents: '**/*.aab'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/drop'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+    
+- script: |
+    keytool -printcert -jarfile $(System.DefaultWorkingDirectory)/android/app/build/outputs/bundle/DemoRelease/app-Demo-release.aab
+  displayName: 'Verify AAB certificate'
+
+- task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
+  displayName: 'Publish AAB to Google Play (Internal Track)'
+  inputs:
+    serviceConnection: 'PlayStorBussiConnection'
+    applicationId: 'com.sparklight.customer.business.app'
+    action: 'SingleBundle'
+    bundleFile: '$(System.DefaultWorkingDirectory)/android/app/build/outputs/bundle/DemoRelease/app-Demo-release.aab'
+    track: 'internal'
+    releaseName: 'MySparklight Business $(androidVersionName)'
