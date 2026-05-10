@@ -6,7 +6,7 @@ pool:
 
 variables:
 - name: keyAlias
-  value: business
+  value: residential
 - name: jarsignerKeystorePassword
   value: sparklight_123
 - name: jarsignerKeyPassword
@@ -42,7 +42,7 @@ steps:
   name: keystoreFile
   displayName: 'Download Keystore File'
   inputs:
-    secureFile: 'Businesskey.jks'
+    secureFile: 'Residentialkey.jks'
 
 - task: Gradle@4
   displayName: 'Build Android App Bundle'
@@ -80,9 +80,9 @@ steps:
 - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
   displayName: 'Publish AAB to Google Play (Internal Track)'
   inputs:
-    serviceConnection: 'PlayStorBussiConnection'
-    applicationId: 'com.sparklight.customer.business.app'
+    serviceConnection: 'PlayStorResidentialConnection'
+    applicationId: 'com.sparklight.customer.app'
     action: 'SingleBundle'
     bundleFile: '$(System.DefaultWorkingDirectory)/android/app/build/outputs/bundle/DemoRelease/app-Demo-release.aab'
     track: 'internal'
-    releaseName: 'MySparklight Business $(androidVersionName)'
+    releaseName: 'MySparklight Residential $(androidVersionName)'
