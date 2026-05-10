@@ -78,6 +78,7 @@ const logoutConfirmationPopup = (dispatch, navigation) => {
 const logoutAction = (dispatch, navigation) => {
   getSsoToken().then((res) => {
     let token = res.idToken;
+     console.log("[AccountOverview] logout initiated with idToken:", token);
     logout(config, {
       idToken: token,
       postLogoutRedirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
