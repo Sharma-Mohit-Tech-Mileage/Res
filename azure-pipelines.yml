@@ -11,6 +11,10 @@ variables:
   value: sparklight_123
 - name: jarsignerKeyPassword
   value: sparklight_123
+- name: secureFileName
+  value: ResidentialKey.keystore
+- name: googlePlayServiceConnection
+  value: PlayStoreResidentialConnection
 - name: androidVersionCode
   value: $[counter('androidBuildVersionStore', 23024)]
 - name: androidVersionName
@@ -42,7 +46,7 @@ steps:
   name: keystoreFile
   displayName: 'Download Keystore File'
   inputs:
-    secureFile: 'Residentialkey.jks'
+    secureFile: '$(secureFileName)'
 
 - task: Gradle@4
   displayName: 'Build Android App Bundle'
@@ -80,7 +84,7 @@ steps:
 - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
   displayName: 'Publish AAB to Google Play (Internal Track)'
   inputs:
-    serviceConnection: 'PlayStorResidentialConnection'
+    serviceConnection: '$(googlePlayServiceConnection)'
     applicationId: 'com.sparklight.customer.app'
     action: 'SingleBundle'
     bundleFile: '$(System.DefaultWorkingDirectory)/android/app/build/outputs/bundle/DemoRelease/app-Demo-release.aab'
