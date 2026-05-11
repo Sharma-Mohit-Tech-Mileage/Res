@@ -43,7 +43,7 @@ variables:
   - name: IOS_CODE_SIGN_IDENTITY
     value: 'Apple Distribution'
   - name: IOS_BUNDLE_ID
-    value: 'com.sparklight.customer.business.app'
+    value: 'com.sparklight.customer.app'
   - name: IOS_PROV_PROFILE_SECUREFILE
     value: 'MySparklight_Business_Provisioning_Profile.mobileprovision'
   - name: IOS_ASC_API_KEY_ID
@@ -142,7 +142,7 @@ stages:
             name: keystoreFile
             displayName: 'Download Keystore File'
             inputs:
-              secureFile: 'Businesskey.jks'
+              secureFile: 'Residentialkey.keystore'
 
           - task: Gradle@4
             displayName: 'Build Android App Bundle (Demo Release)'
@@ -994,7 +994,7 @@ stages:
             displayName: 'Publish AAB to Play Store Internal Testing'
             inputs:
               serviceConnection: 'PlayStorBussiConnection'
-              applicationId: 'com.sparklight.customer.business.app'
+              applicationId: 'com.sparklight.customer.app'
               action: 'SingleBundle'
               bundleFile: '$(AAB_FILE_PATH)'
               track: 'internal'
