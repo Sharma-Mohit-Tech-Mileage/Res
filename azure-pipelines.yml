@@ -5,7 +5,7 @@ trigger:
       - 'Demo'
       - 'main'
       - 'main-dev'
-      - 'Sparklight-Business'
+      - 'Sparklight'
 
 pr:
   autoCancel: true
@@ -15,7 +15,7 @@ pr:
       - 'Demo'
       - 'main'
       - 'main-dev'
-      - 'Sparklight-Business'
+      - 'Sparklight'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -135,7 +135,7 @@ stages:
           - script: npm cache clean --force
             displayName: 'Clean npm cache'
 
-          - script: npm ci --legacy-peer-deps
+          - script: npm install --legacy-peer-deps
             displayName: 'Install node dependencies'
 
           - task: DownloadSecureFile@1
@@ -222,7 +222,7 @@ stages:
             inputs:
               versionSpec: '20.6.1'
 
-          - script: npm ci --legacy-peer-deps
+          - script: npm install --legacy-peer-deps
             displayName: 'Install Node dependencies'
 
           - script: |
@@ -430,7 +430,7 @@ stages:
               versionSpec: '20.6.1'
 
           - script: |
-              npm ci --legacy-peer-deps
+              npm install --legacy-peer-deps
               npm install --no-save --legacy-peer-deps jest-junit
             displayName: 'Install Dependencies'
 
@@ -476,7 +476,7 @@ stages:
             inputs:
               versionSpec: '20.6.1'
 
-          - script: npm ci --legacy-peer-deps
+          - script: npm install --legacy-peer-deps
             displayName: 'Install Dependencies'
 
           - script: |
@@ -669,7 +669,7 @@ stages:
               versionSpec: '20.6.1'
 
           - script: |
-              npm ci --legacy-peer-deps
+              npm install --legacy-peer-deps
               npm install --no-save --legacy-peer-deps jest-junit
             displayName: 'Install Dependencies'
             workingDirectory: '.'
@@ -727,7 +727,7 @@ stages:
               versionSpec: '20.6.1'
 
           - script: |
-              npm ci --legacy-peer-deps
+              npm install --legacy-peer-deps
             displayName: 'Install Dependencies'
 
           - script: |
