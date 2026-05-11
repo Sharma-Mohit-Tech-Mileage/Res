@@ -14,7 +14,7 @@ variables:
 - name: secureFileName
   value: ResidentialKey.keystore
 - name: googlePlayServiceConnection
-  value: PlayStoreResidentialConnection
+  value: ''
 - name: androidVersionCode
   value: $[counter('androidBuildVersionStore', 23024)]
 - name: androidVersionName
@@ -83,6 +83,7 @@ steps:
 
 - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
   displayName: 'Publish AAB to Google Play (Internal Track)'
+  condition: and(succeeded(), ne(variables['googlePlayServiceConnection'], ''))
   inputs:
     serviceConnection: '$(googlePlayServiceConnection)'
     applicationId: 'com.sparklight.customer.app'
