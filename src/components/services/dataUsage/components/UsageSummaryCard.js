@@ -1,10 +1,12 @@
 import React, { useRef, useState, useEffect } from "react";
-import { View, Text, StyleSheet, Animated, Easing, Platform } from "react-native";
+import { View, Text, StyleSheet, Animated, Easing, Platform, useWindowDimensions } from "react-native";
 import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
+
+const CALLOUT_EPSILON = 0.5;
 
 const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB, size = 140 }) => {
   const strokeWidth = 20;
@@ -55,13 +57,16 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
   const leftLineX = -25;
   const rightLineX = size + 25;
 
+  const showUsedCallout = usedPercent > CALLOUT_EPSILON;
+  const showRemainingCallout = remainingPercent > CALLOUT_EPSILON;
+
   const gaugeA11yLabel =
     `You have used ${usedGB} gigabytes of data, which is ${usedPercent.toFixed(2)} percent of your total allowance. ` +
     `You have ${remainingGB} gigabytes remaining.`;
 
   return (
     <View
-      style={{ height: size + 60, width: '100%', alignItems: 'center' }}
+      style={{ height: size + 60, width: '100%', maxWidth: size + 280, alignSelf: 'center', alignItems: 'center' }}
       accessible={true}
       accessibilityLabel={gaugeA11yLabel}
     >
@@ -107,44 +112,59 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
             rotation="135" origin={`${center}, ${center}`}
           />
 
-          <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y}
-            stroke={theme.colors.primaryDark} strokeWidth="2.5" opacity={calloutOpacity} />
-          <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} opacity={calloutOpacity} />
+          {showUsedCallout && (
+            <G>
+              <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y}
+                stroke={theme.colors.primaryDark} strokeWidth="2.5" opacity={calloutOpacity} />
+              <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} opacity={calloutOpacity} />
+            </G>
+          )}
 
-          <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y}
-            stroke={theme.colors.freedatabackground} strokeWidth="2.5" opacity={calloutOpacity} />
-          <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} opacity={calloutOpacity} />
+          {showRemainingCallout && (
+            <G>
+              <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y}
+                stroke={theme.colors.freedatabackground} strokeWidth="2.5" opacity={calloutOpacity} />
+              <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} opacity={calloutOpacity} />
+            </G>
+          )}
         </G>
       </Svg>
 
-      <Animated.View
-        style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0, opacity: labelOpacity }]}
-        accessible={false}
-        accessibilityElementsHidden={true}
-        importantForAccessibility="no-hide-descendants"
-      >
-        <Text style={[styles.labelText]}>
-          {usedGB}
-        </Text>
-        <Text style={styles.labelSubtext}> GB Used</Text>
-      </Animated.View>
+      {showUsedCallout && (
+        <Animated.View
+          style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, right: '50%', alignItems: 'flex-end', transform: [{ translateX: -(size / 2 + 38) }], opacity: labelOpacity }]}
+          accessible={false}
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Text style={[styles.labelText]}>
+            {usedGB}
+          </Text>
+          <Text style={styles.labelSubtext}> GB Used</Text>
+        </Animated.View>
+      )}
 
-      <Animated.View
-        style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end', opacity: labelOpacity }]}
-        accessible={false}
-        accessibilityElementsHidden={true}
-        importantForAccessibility="no-hide-descendants"
-      >
-        <Text style={[styles.labelText]}>
-          {remainingGB}
-        </Text>
-        <Text style={styles.labelSubtext}>GB Left</Text>
-      </Animated.View>
+      {showRemainingCallout && (
+        <Animated.View
+          style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, left: '50%', transform: [{ translateX: size / 2 + 28 }], opacity: labelOpacity }]}
+          accessible={false}
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Text style={[styles.labelText]}>
+            {remainingGB}
+          </Text>
+          <Text style={styles.labelSubtext}>GB Left</Text>
+        </Animated.View>
+      )}
     </View>
   );
 };
 
-const UsageSummaryCard = ({ currentUsage, dailyData, loading = false }) => {
+const UsageSummaryCard = ({ currentUsage, loading = false }) => {
+  const { width: windowWidth } = useWindowDimensions();
+  const donutSize = Math.min(220, Math.max(140, Math.floor(windowWidth * 0.32)));
+
   if (!currentUsage || loading) {
     return (
       <View style={styles.container}>
@@ -170,7 +190,6 @@ const UsageSummaryCard = ({ currentUsage, dailyData, loading = false }) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {/* Header — icon already decorative */}
         <View style={styles.header}>
           <View
             style={styles.iconWrapper}
@@ -188,6 +207,7 @@ const UsageSummaryCard = ({ currentUsage, dailyData, loading = false }) => {
           remainingPercent={remainingPercent}
           usedGB={currentUsage.usedDataGB}
           remainingGB={currentUsage.dataRemaining.toFixed(2)}
+          size={donutSize}
         />
 
         <View style={styles.stats}>
@@ -253,19 +273,6 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     marginTop: 1,
-  },
-  summaryBar: {
-    alignItems: "center",
-    paddingVertical: theme.spacing.xs,
-    backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: theme.radius.xs,
-    marginBottom: theme.spacing.base,
-  },
-  summaryText: {
-    fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.text.primary,
   },
   stats: {
     flexDirection: "row",

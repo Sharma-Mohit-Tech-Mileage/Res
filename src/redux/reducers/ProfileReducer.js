@@ -3,6 +3,7 @@ import {
   SET_LOADING,
   CLEAR_LOADING,
   SAVE_ACP_USER_ACCOUNT_DETAILS,
+  INVALIDATE_ACCOUNT_CACHE,
   SAVEALLSVEMAILASSOCIATED,
   USER_PROFILE_DETAILS,
   SAVE_USER_LIST,
@@ -103,6 +104,11 @@ const ProfileReducer = (state = initialState, action) => {
         isLoading: false,
         accountDetails: action.payload,
         accountDetailsFetchedAt: Date.now(),
+      };
+    case INVALIDATE_ACCOUNT_CACHE:
+      return {
+        ...state,
+        accountDetailsFetchedAt: null,
       };
     case LOGOUT:
       return {

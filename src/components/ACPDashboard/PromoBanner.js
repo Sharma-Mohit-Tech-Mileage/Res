@@ -1,31 +1,18 @@
 import React from 'react';
-import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Color, Padding, Border } from '../../../GlobalStyles';
 import SignSaveResSvg from '../../res/svgIcons/SignSaveResSvg';
 
 const BANNER_ASPECT_RATIO = 327.402985 / 117.910448;
-const TABLET_BREAKPOINT = 600;
-const TABLET_MAX_HEIGHT = 140;
 
 const PromoBanner = () => {
-  const { width: screenWidth } = useWindowDimensions();
-  const isTablet = screenWidth >= TABLET_BREAKPOINT;
-
-  const bannerSizing = isTablet
-    ? {
-        height: TABLET_MAX_HEIGHT,
-        width: TABLET_MAX_HEIGHT * BANNER_ASPECT_RATIO,
-        alignSelf: 'center',
-      }
-    : { width: '100%', aspectRatio: BANNER_ASPECT_RATIO };
-
   return (
     <View style={styles.container}>
       <View
         accessible={true}
         accessibilityRole="text"
         accessibilityLabel="Sign up and save with Auto Pay and Paperless Billing"
-        style={[styles.bannerGraphic, bannerSizing]}
+        style={[styles.bannerGraphic, { width: '100%', aspectRatio: BANNER_ASPECT_RATIO }]}
       >
         <SignSaveResSvg width="100%" height="100%" />
       </View>
