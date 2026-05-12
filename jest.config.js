@@ -1,0 +1,20 @@
+module.exports = {
+  preset: 'react-native',
+  collectCoverage: true,
+  collectCoverageFrom: [
+    'src/**/*.{js,ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/**/*.jsx',
+    '!src/**/index.{js,jsx,ts,tsx}',
+    '!src/components/**',
+    '!src/navigations/**',
+    '!src/config/**',
+    '!src/firebase/**',
+    '!src/manager/**',
+    '!src/network/**',
+    '!src/redux/sagas/**',
+    '!src/res/**',
+    '!src/styles/**',
+  ],
+  coverageReporters: ['json-summary', 'lcov', 'text', 'text-summary'],
+};
