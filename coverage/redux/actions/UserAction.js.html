@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for redux/constants/billingStatementTypes.js</title>
+    <title>Code coverage report for redux/actions/UserAction.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">redux/constants</a> billingStatementTypes.js</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">redux/actions</a> UserAction.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/0</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>5/5</span>
             </div>
         
             
@@ -80,48 +80,57 @@
 <a name='L15'></a><a href='#L15'>15</a>
 <a name='L16'></a><a href='#L16'>16</a>
 <a name='L17'></a><a href='#L17'>17</a>
-<a name='L18'></a><a href='#L18'>18</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">// Action Types for Billing Statements
-export const FETCH_BILLING_STATEMENTS_REQUEST = 'FETCH_BILLING_STATEMENTS_REQUEST';
-export const FETCH_BILLING_STATEMENTS_SUCCESS = 'FETCH_BILLING_STATEMENTS_SUCCESS';
-export const FETCH_BILLING_STATEMENTS_FAILURE = 'FETCH_BILLING_STATEMENTS_FAILURE';
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { SAVE_USER_INFO,LOGOUT,LOG_ERROR,LOG_INFO } from '../constants';
 &nbsp;
-export const DOWNLOAD_STATEMENT_REQUEST = 'DOWNLOAD_STATEMENT_REQUEST';
-export const DOWNLOAD_STATEMENT_SUCCESS = 'DOWNLOAD_STATEMENT_SUCCESS';
-export const DOWNLOAD_STATEMENT_FAILURE = 'DOWNLOAD_STATEMENT_FAILURE';
+export const saveUserInfo = (response) =&gt; {
+   return {
+      type: SAVE_USER_INFO,
+      payload:response
+    };
+};
 &nbsp;
-export const SET_SELECTED_YEAR = 'SET_SELECTED_YEAR';
-export const SET_SORT_DIRECTION = 'SET_SORT_DIRECTION';
-&nbsp;
-// Add new constants for clearing errors
-export const CLEAR_BILLING_ERROR = 'CLEAR_BILLING_ERROR';
-export const CLEAR_DOWNLOAD_ERROR = 'CLEAR_DOWNLOAD_ERROR';
-&nbsp;
-// Add new constant for clearing downloaded statement
-export const CLEAR_DOWNLOADED_STATEMENT = 'CLEAR_DOWNLOADED_STATEMENT';</pre></td></tr></table></pre>
+export const logoutApp = () =&gt; ({
+   type: LOGOUT,
+});
+export const logInfo = infoData =&gt; ({
+   type: LOG_INFO,
+   payload: infoData,
+ });
+ 
+ export const logError = errorData =&gt; ({
+   type: LOG_ERROR,
+   payload: errorData,
+ });</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-12T14:32:40.426Z
+                at 2026-05-12T18:57:20.810Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

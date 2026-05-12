@@ -9,5 +9,5 @@ module.exports = {
     'src/redux/actions/billingStatementActions.js',
     'src/redux/actions/UserAction.js',
   ],
-  coverageReporters: ['json-summary', 'lcov', 'text', 'text-summary'],
+  coverageReporters: ['json-summary', 'json', 'text', 'text-summary'],
 };

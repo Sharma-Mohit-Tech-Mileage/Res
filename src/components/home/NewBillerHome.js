@@ -181,11 +181,7 @@ const NewBillerHome = ({ navigation }) => {
         email: getPrimaryEmail(accountDetails),
       });
       DeviceInfo.getUserAgent().then((userAgent) => {
-        // iOS: "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143"
-        // tvOS: not available
-        // Android: "Mozilla/5.0 (Linux; Android 12; sdk_gphone64_arm64 Build/SE1A.220630.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36"
-        // Windows: ?
-        //getZendeskChatToken(userAgent);
+       
         loginWithToken(userAgent);
       });
     }
@@ -311,6 +307,7 @@ const NewBillerHome = ({ navigation }) => {
             authLevel: user?.userInfo.authLevel,
             mobileApp: "mobileApp",
             jwtId: jwtToken,
+            source: "mobileApp",
           };
         
           loginWithJWT(jwtToken)
@@ -320,6 +317,7 @@ const NewBillerHome = ({ navigation }) => {
               setConversationalFields(fields);
             })
             .catch((error) => {
+              console.log("conversational fields error", JSON.stringify(fields));
               setConversationalFields(fields);
               console.error("Error logging in to Zendesk Chat:", error);
             });
