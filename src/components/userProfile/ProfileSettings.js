@@ -100,20 +100,52 @@ const ProfileSettings = () => {
 
   const userInfo = useSelector((state) => state.user.userData.userInfo);
 
+  const formatAddressPart = (value) => {
+    const input = (value || "").trim();
+    if (!input) return "";
+
+    return input
+      .toLowerCase()
+      .split(/\s+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const formatStatePart = (value) => {
+    const input = (value || "").trim();
+    if (!input) return "";
+
+    return input.toUpperCase();
+  };
+
   const serviceAddress = () => {
     const serviceAddr = accountDetails.service_address || {};
-    const { line1, line2, city, state, zip } = serviceAddr;
-    return `${line1 || ""}${line2 ? ", " + line2 : ""}\n${
-      city ? city : ""
-    }${state ? ", " + state : ""}${zip ? " " + zip : ""}`;
+    const { line1, line2, city, state, zip, postal_code } = serviceAddr;
+    const formattedLine1 = formatAddressPart(line1);
+    const formattedLine2 = formatAddressPart(line2);
+    const formattedCity = formatAddressPart(city);
+    const formattedState = formatStatePart(state);
+    const rawZip = (zip || postal_code || "").toString().trim();
+    const formattedZip = rawZip ? rawZip.slice(0, 5) : "";
+    const firstLine = `${formattedLine1}${formattedLine2 ? " " + formattedLine2 : ""}`.trim();
+    const secondLine = `${formattedCity}${formattedState ? ", " + formattedState : ""}${formattedZip ? " " + formattedZip : ""}`.trim();
+
+    return `${firstLine}${secondLine ? "\n" + secondLine : ""}`;
   };
 
   const billingAddress = () => {
     const billingAddr = accountDetails.bill_to_address || {};
-    const { line1, line2, city, state, zip } = billingAddr;
-    return `${line1 || ""}${line2 ? ", " + line2 : ""}\n${
-      city ? city : ""
-    }${state ? ", " + state : ""}${zip ? " " + zip : ""}`;
+    const { line1, line2, city, state, zip, postal_code } = billingAddr;
+    const formattedLine1 = formatAddressPart(line1);
+    const formattedLine2 = formatAddressPart(line2);
+    const formattedCity = formatAddressPart(city);
+    const formattedState = formatStatePart(state);
+    const rawZip = (zip || postal_code || "").toString().trim();
+    const formattedZip = rawZip ? rawZip.slice(0, 5) : "";
+    const firstLine = `${formattedLine1}${formattedLine2 ? " " + formattedLine2 : ""}`.trim();
+    const secondLine = `${formattedCity}${formattedState ? ", " + formattedState : ""}${formattedZip ? " " + formattedZip : ""}`.trim();
+
+    return `${firstLine}${secondLine ? "\n" + secondLine : ""}`;
   };
 
   const numberToWordsForAccessibility = (numStr) => {
@@ -172,6 +204,12 @@ const ProfileSettings = () => {
         userInfo.daysSinceDisconnectDate,
       )
     : false;
+
+  useEffect(() => {
+    if (accountDetails?.bill_to_address) {
+      console.log("Billing Address API response:", accountDetails.bill_to_address);
+    }
+  }, [accountDetails?.bill_to_address]);
   
 
   
@@ -367,13 +405,13 @@ const ProfileSettings = () => {
               <View style={styles.frameContainer}>
                 <View style={styles.firstNameParent} accessible={true}>
                   <Text style={styles.firstName}>{"Service Address"}</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                  <Text style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}>
                     {serviceAddress() || "N/A"}
                   </Text>
                 </View>
                 <View style={styles.firstNameParent} accessible={true}>
                   <Text style={styles.firstName}>Billing Address</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                  <Text style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}>
                     {billingAddress() || "N/A"}
                   </Text>
                 </View>
