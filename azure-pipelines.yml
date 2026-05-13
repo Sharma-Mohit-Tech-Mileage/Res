@@ -234,7 +234,7 @@ stages:
 
           - script: |
               set -euo pipefail
-              PBXPROJ="ios/Sparklight.xcodeproj/project.pbxproj"
+              PBXPROJ="ios/My Sparklight.xcodeproj/project.pbxproj"
               perl -pi -e 's/CODE_SIGN_IDENTITY = "iOS Distribution"/CODE_SIGN_IDENTITY = "Apple Distribution"/g' "$PBXPROJ"
               perl -pi -e 's/"iOS Distribution"/"Apple Distribution"/g' "$PBXPROJ"
               perl -pi -e 's/CODE_SIGN_IDENTITY\[sdk=iphoneos\*\] = "iOS Distribution"/CODE_SIGN_IDENTITY[sdk=iphoneos*] = "Apple Distribution"/g' "$PBXPROJ"
@@ -332,7 +332,7 @@ stages:
               set -euo pipefail
               NODE_BIN="$(command -v node)"
               echo "export NODE_BINARY=$NODE_BIN" > ios/.xcode.env.local
-              ARCHIVE_PATH="$(Build.ArtifactStagingDirectory)/Sparklight.xcarchive"
+              ARCHIVE_PATH="$(Build.ArtifactStagingDirectory)/My Sparklight.xcarchive"
               EXPORT_PATH="$(Build.ArtifactStagingDirectory)/ipa"
               ARCHIVE_LOG="$(Build.ArtifactStagingDirectory)/xcodebuild-archive.log"
               JOBS="$(sysctl -n hw.ncpu || echo 4)"
@@ -342,8 +342,8 @@ stages:
 
               echo "Archiving with Xcode..."
               if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
-                  -workspace ios/Sparklight.xcworkspace \
-                  -scheme Sparklight \
+                  -workspace ios/My Sparklight.xcworkspace \
+                  -scheme SparklightDemo \
                   -configuration Release \
                   -sdk iphoneos \
                   -archivePath "$ARCHIVE_PATH" \
@@ -818,7 +818,7 @@ stages:
               "$(pwd)/dependency-check/bin/dependency-check.sh" \
                 --scan "$(System.DefaultWorkingDirectory)" \
                 --format JSON \
-                --project "Sparklight Business App" \
+                --project "Sparklight Residential App" \
                 --out "$REPORT_DIR" || echo "Dependency check completed with warnings"
 
               if [ -f "$REPORT_DIR/dependency-check-report.json" ]; then
@@ -982,7 +982,7 @@ stages:
           - script: |
               RELEASE_NOTES_FILE="$(Build.ArtifactStagingDirectory)/play-release-notes.txt"
               {
-                echo "MySparklight Business $(androidVersionName)"
+                echo "MySparklight Residential $(androidVersionName)"
                 echo "Build: $(androidVersionCode)"
                 echo "Branch: $(Build.SourceBranchName)"
                 echo "Commit: $(Build.SourceVersion)"
@@ -998,7 +998,7 @@ stages:
               action: 'SingleBundle'
               bundleFile: '$(AAB_FILE_PATH)'
               track: 'internal'
-              releaseName: 'MySparklight Business $(androidVersionName)'
+              releaseName: 'MySparklight Residential $(androidVersionName)'
               changeLogFile: '$(GOOGLE_PLAY_RELEASE_NOTES)'
 
           - script: |
