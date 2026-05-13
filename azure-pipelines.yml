@@ -45,7 +45,7 @@ variables:
   - name: IOS_BUNDLE_ID
     value: 'com.sparklight.customer.app'
   - name: IOS_PROV_PROFILE_SECUREFILE
-    value: 'MySparklight_Business_Provisioning_Profile.mobileprovision'
+    value: 'Sparklight_Residential_Profile.mobileprovision'
   - name: IOS_ASC_API_KEY_ID
     value: 'WH2L3V82PA'
   - name: IOS_ASC_API_ISSUER_ID
