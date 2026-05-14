@@ -245,16 +245,7 @@ const ProfileSettings = () => {
         <View style={{ flexDirection: "column", marginBottom: 300 }}>
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup]}>
-              {/* <View style={styles.infoWrapper}>
-                <NotificationAlert
-                  type="success"
-                  title="Success"
-                  message="Your profile settings have been successfully saved."
-                  showCloseIcon={true}
-                  isVisible={showSuccessAlert}
-                  onClose={() => setShowSuccessAlert(false)}
-                />
-              </View> */}
+              
               <View
                 style={[
                   styles.generalInformationParent,
@@ -271,7 +262,7 @@ const ProfileSettings = () => {
                 </Text>
               </View>
               <View style={styles.frameContainer}>
-                <View style={styles.firstNameParent} accessible={true}>
+                <View style={styles.firstNameParent} >
                   <Text style={styles.firstName}>{"Customer Name"}</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {customerName}
@@ -297,15 +288,16 @@ const ProfileSettings = () => {
                       alignItems: "center",
                       justifyContent: "space-between",
                     }}
+                    accessible={false}
+                    importantForAccessibility="no"
                   >
                     <View
-                      style={styles.firstNameParent}
-                      accessible={true}
-                      accessibilityLabel={`Email address`}
-                      accessibilityRole="text"
+                      style={{flexDirection: "column", paddingVertical: Padding.p_5xs, justifyContent: "center", paddingHorizontal: Padding.p_xl, alignSelf: "stretch", marginBottom: Padding.p_base }}
+                     accessible={false}
+                     importantForAccessibility="no"
                     >
-                      <Text style={styles.firstName}>Email Address</Text>
-                      <Text style={[styles.melissa, styles.melissaTypo]}>
+                      <Text style={styles.firstName} accessible={true} accessibilityRole="text" accessibilityLabel="Email Address">Email Address</Text>
+                      <Text style={[styles.melissa, styles.melissaTypo]} accessible={true} accessibilityRole="text" accessibilityLabel={`Email Address: ${emailAddress || "N/A"}`}>
                         {emailAddress || "N/A"}
                       </Text>
                     </View>
@@ -318,6 +310,7 @@ const ProfileSettings = () => {
                       accessible={true}
                       accessibilityRole="button"
                       accessibilityLabel="Edit email address"
+                      accessibilityHint="Double tap to edit your email address"
                     >
                       <Vector />
                     </Pressable>
@@ -355,16 +348,16 @@ const ProfileSettings = () => {
                         styles.firstNameParent,
                         { marginBottom: Padding.p_base },
                       ]}
-                      accessible={true}
+                      
+                    >
+                      <Text style={styles.firstName}>Mobile Number</Text>
+                      <Text style={[styles.melissa, styles.melissaTypo]} accessible={true}
                       accessibilityLabel={`Mobile number ${
                         phoneNumber
                           ? numberToWordsForAccessibility(phoneNumber)
                           : "N/A"
                       }`}
-                      accessibilityRole="text"
-                    >
-                      <Text style={styles.firstName}>Mobile Number</Text>
-                      <Text style={[styles.melissa, styles.melissaTypo]}>
+                       accessibilityRole="text">
                         {phoneNumber}
                       </Text>
                     </View>
@@ -403,13 +396,13 @@ const ProfileSettings = () => {
                 </Text>
               </View>
               <View style={styles.frameContainer}>
-                <View style={styles.firstNameParent} accessible={true}>
+                <View style={styles.firstNameParent} >
                   <Text style={styles.firstName}>{"Service Address"}</Text>
                   <Text style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}>
                     {serviceAddress() || "N/A"}
                   </Text>
                 </View>
-                <View style={styles.firstNameParent} accessible={true}>
+                <View style={styles.firstNameParent} >
                   <Text style={styles.firstName}>Billing Address</Text>
                   <Text style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}>
                     {billingAddress() || "N/A"}
