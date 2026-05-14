@@ -3,15 +3,14 @@ import {
   Animated,
   StyleSheet,
   Text,
-  Pressable,
   View,
   Keyboard,
   ScrollView,
-  TouchableOpacity,
   Platform,
   AccessibilityInfo,
   findNodeHandle,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import CheckBox from "@react-native-community/checkbox";
@@ -22,7 +21,7 @@ import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { getUser } from "../../redux/utils/LocalStorage";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
@@ -74,7 +73,6 @@ const TextNotifications = ({ navigation }) => {
   const [message, setMessage] = useState(
     "Please enter your mobile phone number below and then select the type of message you would like to receive."
   );
-  //console.log("pass data", route.params?.additionalData);
   const {
     control,
     handleSubmit,
@@ -119,7 +117,7 @@ const TextNotifications = ({ navigation }) => {
           setErrorFocus();
           AccessibilityInfo.announceForAccessibility('Text Notifications update failed.');
         } catch (e) {
-          console.log("Accessibility focus error:", e);
+          console.warn("Accessibility focus error:", e);
         }
       }, 600);
 
@@ -140,7 +138,7 @@ const TextNotifications = ({ navigation }) => {
             setSuccessFocus();
           }
         } catch (e) {
-          console.log("Accessibility focus error:", e);
+          console.warn("Accessibility focus error:", e);
         }
       }, 600);
 
@@ -151,7 +149,7 @@ const TextNotifications = ({ navigation }) => {
             if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
           }
         } catch (e) {
-          console.log("Accessibility focus retry error:", e);
+          console.warn("Accessibility focus retry error:", e);
         }
       }, 1200);
 
@@ -163,7 +161,7 @@ const TextNotifications = ({ navigation }) => {
   const handleTermsLinkPress = useCallback(
     (event) => {
       event.stopPropagation();
-      navigation.navigate("ArticalWindowUtility", {
+      navigation.navigate("ArticleWindowUtility", {
         url: "https://www.sparklight.com/legal/text-messaging-terms-and-conditions",
         name: "Terms & Conditions",
       });
@@ -197,14 +195,12 @@ const TextNotifications = ({ navigation }) => {
   const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setErrorText("Please enter valid information to continue.");
-    //setShowErrorAlert(true);
   };
 
 
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     formatedData[name] = value;
-    console.log("toggle data", JSON.stringify(formatedData));
   };
 
   useEffect(() => {
@@ -232,18 +228,7 @@ const TextNotifications = ({ navigation }) => {
       toValue: 0,
       duration: 500,
       useNativeDriver: true,
-    }).start(() => {
-      // Only auto-dismiss if notification is NOT an error type
-      // if (notification && notification.type !== "error") {
-      //   timeoutRef.current = setTimeout(() => {
-      //     Animated.timing(animatedValue, {
-      //       toValue: -100,
-      //       duration: 500,
-      //       useNativeDriver: true,
-      //     }).start(() => setNotification(null));
-      //   }, 3000);
-      // }
-    });
+    }).start();
   }, [animatedValue, notification]);
 
   useEffect(() => {
@@ -270,7 +255,6 @@ const TextNotifications = ({ navigation }) => {
         return;
       }
       if (formatedData.billingOptOutStatus || formatedData.outageOptOut || formatedData.optOut) {
-        //dispatch(updateTextNotification(formatedData, navigation));
         postRequestTextNotification();
       } else {
         setErrorText(
@@ -280,11 +264,8 @@ const TextNotifications = ({ navigation }) => {
         scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       }
     } else {
-      //dispatch(updateTextNotification(data, navigation));
       postRequestTextNotification();
     }
-    //console.log('data',data)
-    //dispatch(updateTextNotification(data, navigation));
   };
 
   const postRequestTextNotification = async () => {
@@ -299,17 +280,12 @@ const TextNotifications = ({ navigation }) => {
       billingOptOutStatus: !formatedData.billingOptOutStatus,
     };
 
-    console.log("postTextNotifications", postData);
     setIsLoading(true);
     const endpointUrl = getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION);
     PostApiRequest(
       endpointUrl,
       postData,
       (res) => {
-        console.log(
-          "Response postRequestTextNotification",
-          JSON.stringify(res)
-        );
         if (res) {
           setIsLoading(false);
           setShowSuccessAlert(true);
@@ -317,18 +293,16 @@ const TextNotifications = ({ navigation }) => {
             message: "Your text notification preferences have been updated successfully.",
             type: "success",
           });
-          //navigation.navigate("Notifications", { updateSuccess: true, successMessage: "In-App Notifications updated successfully." });
         }
       },
       (error) => {
         setIsLoading(false);
-        console.error("Error on retrying postRequestTextNotification", error);
+        console.warn("Error on retrying postRequestTextNotification", error);
         setNotification({
           message: "Text Notifications update failed.",
           type: "error",
         });
         setShowErrorAlert(true);
-        //navigation.navigate("Notifications", { updateFailed: true, failureMessage: "In-App Notifications update failed." });
       }
     );
   };
@@ -414,9 +388,6 @@ const TextNotifications = ({ navigation }) => {
             </View>
 
             <View style={{ marginHorizontal: 20 }}>
-              {/* <Text style={[styles.mobilePhoneTypo]}>
-                Edit Mobile Phone Number
-                </Text> */}
               <Text
                 style={[styles.mobilePhoneTypo]}
                 accessibilityRole="text"
@@ -437,7 +408,6 @@ const TextNotifications = ({ navigation }) => {
 
             <View style={styles.frameGroup}>
               <View style={[styles.frameParent3,{width:widthPercentageToDP('82%')}]}>
-                {/* <Text style={styles.mobilePhoneTypo}>Mobile Phone</Text> */}
                 <View
                   style={{
                     paddingVertical: 4,
@@ -453,7 +423,6 @@ const TextNotifications = ({ navigation }) => {
                         accessible={true}
                         accessibilityRole="text"
                         accessibilityLabel="Mobile Number required"
-                        //accessibilityHint="required text field. double tap to edit."
                         onBlur={onBlur}
                         onChangeText={onChange}
                         keyboardType="number-pad"
@@ -502,8 +471,9 @@ const TextNotifications = ({ navigation }) => {
                 }}
               >
                 <View style={styles.checkBoxArea}>
-                  <TouchableOpacity
-                    style={styles.checkboxTouchable}
+                  <Touchable
+                    minSize={0}
+                    style={[styles.checkboxTouchable, { justifyContent: 'flex-start' }]}
                     onPress={handleCheckboxToggle}
                     accessibilityRole="checkbox"
                     accessibilityLabel="I agree to Text Messaging Terms and Conditions"
@@ -533,8 +503,9 @@ const TextNotifications = ({ navigation }) => {
                         I agree to{" "}
                       </Text>
                     </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
+                  </Touchable>
+                  <Touchable
+                    minSize={0}
                     onPress={handleTermsLinkPress}
                     accessibilityRole="link"
                     accessibilityLabel="View Text Messaging Terms and Conditions"
@@ -553,7 +524,7 @@ const TextNotifications = ({ navigation }) => {
                     >
                       Text Messaging Terms & Conditions
                     </Text>
-                  </TouchableOpacity>
+                  </Touchable>
                 </View>
                 {isTermRequired && (
                   <View style={{ paddingTop: 8 }}>
@@ -575,32 +546,30 @@ const TextNotifications = ({ navigation }) => {
             )}
           </View>
           <View style={[{ alignSelf: "stretch" }]}>
-            <Pressable
+            <Touchable
+              minSize={0}
               accessible={true}
               accessibilityLabel="Save"
               accessibilityRole="button"
-              style={({ pressed }) => [
+              style={[
                 styles.buttons,
                 styles.buttonsLayout,
-                { opacity: pressed ? 0.7 : 1 },
               ]}
               onPress={handleSubmit(onSubmit, handleValidationError)}
             >
               <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
-            </Pressable>
+            </Touchable>
             <View style={{ padding: 8 }}></View>
-            <Pressable
+            <Touchable
+              minSize={0}
               accessible={true}
               accessibilityLabel="Cancel"
               accessibilityRole="button"
-              style={({ pressed }) => [
-                styles.buttonsLayout,
-                { opacity: pressed ? 0.7 : 1 },
-              ]}
+              style={styles.buttonsLayout}
               onPress={() => navigation.navigate("Notifications")}
             >
               <Text style={[styles.accountClr, styles.makeTypo]}>Cancel</Text>
-            </Pressable>
+            </Touchable>
           </View>
         </View>
       </ScrollView>
@@ -722,7 +691,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   frameView: {
-    borderRadius: 8,
+    borderRadius: Border.br_5xs,
     backgroundColor: Color.colorWhitesmoke_100,
     paddingHorizontal: Padding.p_base,
     paddingVertical: 6,

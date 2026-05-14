@@ -28,7 +28,7 @@ export const useUserEmailPrefill = (
       }
     } catch (e) {
       if (typeof __DEV__ !== "undefined" && __DEV__) {
-        console.log("useUserEmailPrefill warning:", e?.message);
+        console.warn("useUserEmailPrefill warning:", e?.message);
       }
     }
   }, [accountDetails, getValues, setValue, fieldName]);

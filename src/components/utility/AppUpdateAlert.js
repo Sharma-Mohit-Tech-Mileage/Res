@@ -4,13 +4,13 @@ import {
   Platform,
   StyleSheet,
   Text,
-  TouchableOpacity,
   Modal,
   Linking,
 } from "react-native";
 import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import { Color, Padding, FontFamily, Border } from "../../../GlobalStyles";
+import Touchable from "../common/customui/Touchable";
 
 const AppUpdateAlert = ({ visible, onClose }) => {
   return (
@@ -36,7 +36,8 @@ const AppUpdateAlert = ({ visible, onClose }) => {
           <Text style={{ ...styles.message, textAlign: 'center' }}>
             To continue using the MySparklight app, please download the latest version. Enjoy new features, improved performance, and enhanced security.
           </Text>
-          <TouchableOpacity
+          <Touchable
+            minSize={0}
             style={styles.closeBtn}
             accessibilityLabel="Update the app now"
             accessibilityHint="Opens the app store to update the app"
@@ -54,7 +55,7 @@ const AppUpdateAlert = ({ visible, onClose }) => {
             }}
           >
             <Text style={styles.closeAlertTxt}>Update Now</Text>
-          </TouchableOpacity>
+          </Touchable>
         </View>
       </View>
     </Modal>

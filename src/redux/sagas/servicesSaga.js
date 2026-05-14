@@ -13,7 +13,7 @@ function* fetchServiceDetailsSaga(action) {
     const transformedData = transformServiceData(response);
     yield put(actions.fetchServiceDetailsSuccess(transformedData));
   } catch (error) {
-    console.error("[ServicesSaga] fetchServiceDetails FAILED:", error?.message, error);
+    console.warn("[ServicesSaga] fetchServiceDetails FAILED:", error?.message, error);
     yield put(
       actions.fetchServiceDetailsFailure(
         error.message || "Failed to fetch service details"
@@ -69,7 +69,6 @@ function transformServiceData(apiResponse) {
 
 function* checkOutageStatusSaga() {
   try {
-    console.log(`[OUTAGE-DIAG] saga start | API_ACP_BASEURL=${Config.API_ACP_BASEURL} | ENV=${Config.ENV}`);
     yield put(actions.clearOutageData());
 
     const [response] = yield all([
@@ -81,7 +80,7 @@ function* checkOutageStatusSaga() {
 
     yield put(actions.checkOutageStatusSuccess(transformedOutageData));
   } catch (error) {
-    console.error("[ServicesSaga] checkOutageStatus FAILED:", error?.message, error);
+    console.warn("[ServicesSaga] checkOutageStatus FAILED:", error?.message, error);
     yield call(() => new Promise((resolve) => setTimeout(resolve, 5000)));
 
     const errorData = {
@@ -147,7 +146,7 @@ function* fetchCurrentUsageSaga() {
     yield put(actions.fetchCurrentUsageSuccess(response));
   } catch (error) {
     const status = error?.response?.status;
-    console.error("[ServicesSaga] fetchCurrentUsage FAILED:", status, error?.message);
+    console.warn("[ServicesSaga] fetchCurrentUsage FAILED:", status, error?.message);
     if (status === 404 || status === 204) {
       yield put(actions.fetchCurrentUsageSuccess(null));
     } else {
@@ -162,7 +161,7 @@ function* fetchMonthlyUsageSaga() {
     yield put(actions.fetchMonthlyUsageSuccess(response));
   } catch (error) {
     const status = error?.response?.status;
-    console.error("[ServicesSaga] fetchMonthlyUsage FAILED:", status, error?.message);
+    console.warn("[ServicesSaga] fetchMonthlyUsage FAILED:", status, error?.message);
     if (status === 404 || status === 204) {
       yield put(actions.fetchMonthlyUsageSuccess([]));
     } else {
@@ -178,7 +177,7 @@ function* fetchDailyUsageSaga(action) {
     yield put(actions.fetchDailyUsageSuccess(response || []));
   } catch (error) {
     const status = error?.response?.status;
-    console.error("[ServicesSaga] fetchDailyUsage FAILED:", status, error?.message);
+    console.warn("[ServicesSaga] fetchDailyUsage FAILED:", status, error?.message);
     if (status === 404 || status === 204) {
       yield put(actions.fetchDailyUsageSuccess([]));
     } else {
@@ -192,7 +191,7 @@ function* fetchUsagePeriodsSaga() {
     const response = yield call(dataUsageApi.getUsagePeriods);
     yield put(actions.fetchUsagePeriodsSuccess(response));
   } catch (error) {
-    console.error("[ServicesSaga] fetchUsagePeriods FAILED:", error?.message, error);
+    console.warn("[ServicesSaga] fetchUsagePeriods FAILED:", error?.message, error);
     yield put(actions.fetchUsagePeriodsFailure(error.message || "Failed to fetch usage periods"));
   }
 }

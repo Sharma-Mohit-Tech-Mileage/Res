@@ -3,7 +3,6 @@ import {
   Platform,
   StyleSheet,
   View,
-  Pressable,
 } from "react-native";
 
 import LottieView from "lottie-react-native";
@@ -24,22 +23,6 @@ const ZendeskChatIcon = () => {
   };
 
   return (
-    // <Pressable
-    //   style={[styles.pressable ]}
-    //   onPress={handleChatPress}
-    //   accessible={true}
-    //   accessibilityLabel="Chat with support"
-    //   accessibilityHint="Opens the chat support screen"
-    //   accessibilityRole="button"
-      
-    // >
-    //   <LottieView
-    //     source={animationSource}
-    //     autoPlay
-    //     loop
-    //     style={{ width: 40, height: 30 }}
-    //   />
-    // </Pressable>
     <>
     </>
   );
@@ -47,10 +30,8 @@ const ZendeskChatIcon = () => {
 
 const styles = StyleSheet.create({
   perusable: {
-    //flex: 1,
     width: "100%",
   },
-  
 });
 
 export default ZendeskChatIcon;

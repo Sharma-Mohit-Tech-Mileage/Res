@@ -3,6 +3,7 @@
  * Only includes utilities actually used in the codebase
  */
 
+import { Color, FontFamily, FontSize } from "../../GlobalStyles";
 import { theme } from "./theme";
 
 /**
@@ -21,6 +22,25 @@ export const card = {
     elevation: 4,
     shadowColor: '#000',
   },
+  elevated: {
+    backgroundColor: '#fff',
+    borderRadius: 2,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+};
+
+// Required-field text style (form helper)
+export const requiredField = {
+  marginVertical: 5,
+  fontFamily: FontFamily.openSansRegular,
+  fontWeight: "400",
+  fontSize: FontSize.size_sm,
+  color: Color.sparklightGray1,
 };
 
 /**
@@ -92,6 +112,14 @@ export const container = {
   section: {
     marginBottom: theme.spacing.base,
     marginHorizontal: theme.spacing.base,
+  },
+};
+
+// Shared press-down feedback for Pressable buttons. Apply via `pressed && interaction.pressed`.
+export const interaction = {
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.97 }],
   },
 };
 

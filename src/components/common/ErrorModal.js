@@ -4,12 +4,12 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Linking,
 } from "react-native";
-import {  FontFamily } from "../../../GlobalStyles";
+import { FontFamily, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
+import Touchable from "./customui/Touchable";
 
 export const ErrorType = {
   NETWORK_ERROR: "NETWORK_ERROR",
@@ -163,8 +163,9 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
 
           <View style={styles.buttonContainer}>
             {errorConfig.actions.map((action, index) => (
-              <TouchableOpacity
+              <Touchable
                 key={action.action}
+                minSize={0}
                 style={[
                   styles.button,
                   action.primary
@@ -186,7 +187,7 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
                 >
                   {action.label}
                 </Text>
-              </TouchableOpacity>
+              </Touchable>
             ))}
           </View>
         </View>
@@ -205,7 +206,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     padding: 20,
-    borderRadius: 8,
+    borderRadius: Border.br_5xs,
     width: "90%",
     maxWidth: 400,
   },

@@ -4,8 +4,8 @@ import {
   Text,
   StyleSheet,
   Linking,
-  TouchableOpacity,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
 import {
   widthPercentageToDP as wp,
@@ -41,7 +41,7 @@ const MaintenancePage = ({
     }
 
     Linking.openURL(contactLink).catch((err) =>
-      console.error("Error opening contact link:", err)
+      console.warn("Error opening contact link:", err)
     );
   };
 
@@ -60,7 +60,7 @@ const MaintenancePage = ({
         ],
       });
     } else {
-      console.error("Navigation ref not available");
+      console.warn("Navigation ref not available");
     }
   };
 
@@ -139,7 +139,8 @@ const MaintenancePage = ({
                   <Text style={styles.contactMessage}>
                     For immediate assistance, please{" "}
                   </Text>
-                  <TouchableOpacity
+                  <Touchable
+                    minSize={0}
                     onPress={handleContactPress}
                     accessibilityRole="link"
                     accessibilityLabel={`${contactInfo} link`}
@@ -147,7 +148,7 @@ const MaintenancePage = ({
                     accessible={true}
                   >
                     <Text style={styles.contactLink}>{contactInfo}</Text>
-                  </TouchableOpacity>
+                  </Touchable>
                   <Text style={styles.contactMessage}>.</Text>
                 </View>
               </View>
@@ -155,8 +156,9 @@ const MaintenancePage = ({
 
             {/* Back to Login Button for blocking scenarios */}
             {showLoginButton && (
-              <TouchableOpacity
-                style={styles.loginButton}
+              <Touchable
+                minSize={0}
+                style={[styles.loginButton, { alignItems: 'stretch' }]}
                 onPress={handleBackToLogin}
                 accessibilityRole="button"
                 accessibilityLabel="Back to Login, go back to login screen"
@@ -164,7 +166,7 @@ const MaintenancePage = ({
                 accessible={true}
               >
                 <Text style={styles.loginButtonText}>Back to Login</Text>
-              </TouchableOpacity>
+              </Touchable>
             )}
           </View>
         </View>
@@ -265,7 +267,7 @@ const styles = StyleSheet.create({
   estimatedTimeSection: {
     backgroundColor: Color.colorWhitesmoke_200,
     padding: wp("4%"),
-    borderRadius: 8,
+    borderRadius: Border.br_5xs,
     marginBottom: hp("2%"),
     width: "100%",
     alignItems: "center",

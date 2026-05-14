@@ -3,13 +3,14 @@ import {
   View,
   Text,
   StatusBar,
-  Pressable,
   StyleSheet,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import { A11Y } from "../../styles/theme";
 import LeftIcon from "../../../assets/svgs/Chevronleft";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
+import Touchable from "./customui/Touchable";
 
 const ProfileSettingsHeader = ({
   title,
@@ -69,7 +70,7 @@ const ProfileSettingsHeader = ({
 
             {showIcon && (
               <View style={styles.buttonContainer} pointerEvents="box-none">
-                <Pressable
+                <Touchable
                   style={styles.pressable}
                   onPress={handleBackPress}
                   onAccessibilityTap={handleBackPress}
@@ -85,7 +86,7 @@ const ProfileSettingsHeader = ({
                   accessibilityRole="button"
                   accessibilityActions={[{ name: "activate", label: "Go back" }]}
                   accessibilityState={{ disabled: typeof onPressBack !== "function" }}
-                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                  hitSlop={A11Y.hitSlop}
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
                 >
@@ -97,7 +98,7 @@ const ProfileSettingsHeader = ({
                   >
                     <IconComponent accessible={false} />
                   </View>
-                </Pressable>
+                </Touchable>
               </View>
             )}
           </View>
@@ -140,8 +141,8 @@ const styles = StyleSheet.create({
   pressable: {
     justifyContent: "center",
     alignItems: "center",
-    minHeight: 44,
-    minWidth: 44,
+    minHeight: A11Y.minTouch,
+    minWidth: A11Y.minTouch,
     paddingHorizontal: 10,
     paddingVertical: 10,
   },

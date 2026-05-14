@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import {
   Color,
   Padding,
@@ -41,20 +42,20 @@ const StatusIcon = ({ status }) => (
 );
 
 const EditButton = ({ onPress, isLoading, accessibilityLabel }) => (
-  <Pressable
-    style={({ pressed }) => [
+  <Touchable
+    style={[
       styles.editButton,
-      pressed && styles.editButtonPressed,
       isLoading && { backgroundColor: Color.sparklightGray },
     ]}
     accessible={true}
     disabled={isLoading}
     accessibilityRole="button"
     accessibilityLabel={accessibilityLabel || "Edit Notifications"}
+    minSize={0}
     onPress={onPress}
   >
     <Text style={styles.editButtonText}>Edit</Text>
-  </Pressable>
+  </Touchable>
 );
 
 const ComingSoonBadge = () => (

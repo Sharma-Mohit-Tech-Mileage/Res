@@ -1,5 +1,12 @@
-import React, { useRef, useState, useEffect } from "react";
-import { View, Text, StyleSheet, Animated, Easing, Platform, useWindowDimensions } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, Platform, useWindowDimensions } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedProps,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
@@ -8,37 +15,46 @@ import { cardHeader } from "../../../../styles/compositions";
 
 const CALLOUT_EPSILON = 0.5;
 
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const AnimatedG = Animated.createAnimatedComponent(G);
+
 const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB, size = 140 }) => {
   const strokeWidth = 20;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
-  const animValue = useRef(new Animated.Value(0)).current;
-  const [progress, setProgress] = useState(0);
+  const progress = useSharedValue(0);
 
   useEffect(() => {
-    animValue.setValue(0);
-    setProgress(0);
-    const id = animValue.addListener(({ value }) => setProgress(value));
-    Animated.timing(animValue, {
-      toValue: 1,
-      duration: 1800,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-      useNativeDriver: false,
-    }).start();
-    return () => animValue.removeListener(id);
+    progress.value = 0;
+    progress.value = withTiming(1, {
+      duration: 900,
+      easing: Easing.out(Easing.cubic),
+    });
   }, [usedPercent, remainingPercent]);
 
-  const usedArc = (circumference * usedPercent * progress) / 100;
-  const remainingArc = (circumference * remainingPercent * progress) / 100;
-
-  const calloutOpacity = progress > 0.6 ? Math.min(1, (progress - 0.6) / 0.4) : 0;
-  const labelOpacity = animValue.interpolate({
-    inputRange: [0.6, 1],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
+  const usedArcAnimatedProps = useAnimatedProps(() => {
+    const arc = (circumference * usedPercent * progress.value) / 100;
+    return { strokeDasharray: [arc, circumference - arc] };
   });
+
+  const remainingArcAnimatedProps = useAnimatedProps(() => {
+    const usedArcCurrent = (circumference * usedPercent * progress.value) / 100;
+    const arc = (circumference * remainingPercent * progress.value) / 100;
+    return {
+      strokeDasharray: [arc, circumference - arc],
+      strokeDashoffset: -usedArcCurrent,
+    };
+  });
+
+  const calloutAnimatedProps = useAnimatedProps(() => ({
+    opacity: progress.value > 0.6 ? Math.min(1, (progress.value - 0.6) / 0.4) : 0,
+  }));
+
+  const labelAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: progress.value > 0.6 ? Math.min(1, (progress.value - 0.6) / 0.4) : 0,
+  }));
 
   const usedMidAngle = 135 + (usedPercent / 100) * 180;
   const remainingMidAngle = 135 + (usedPercent / 100) * 360 + (remainingPercent / 100) * 180;
@@ -95,44 +111,43 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
           <Circle cx={center} cy={center + 2} r={radius} stroke="#00000008" strokeWidth={strokeWidth} fill="none" />
           <Circle cx={center} cy={center} r={radius} stroke="#F5F5F5" strokeWidth={strokeWidth} fill="none" />
 
-          <Circle
+          <AnimatedCircle
             cx={center} cy={center} r={radius}
             stroke="url(#used)" strokeWidth={strokeWidth} fill="none"
-            strokeDasharray={`${usedArc} ${circumference - usedArc}`}
             strokeLinecap="butt"
             rotation="135" origin={`${center}, ${center}`}
+            animatedProps={usedArcAnimatedProps}
           />
 
-          <Circle
+          <AnimatedCircle
             cx={center} cy={center} r={radius}
             stroke="url(#remaining)" strokeWidth={strokeWidth} fill="none"
-            strokeDasharray={`${remainingArc} ${circumference - remainingArc}`}
-            strokeDashoffset={-usedArc}
             strokeLinecap="butt"
             rotation="135" origin={`${center}, ${center}`}
+            animatedProps={remainingArcAnimatedProps}
           />
 
           {showUsedCallout && (
-            <G>
+            <AnimatedG animatedProps={calloutAnimatedProps}>
               <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y}
-                stroke={theme.colors.primaryDark} strokeWidth="2.5" opacity={calloutOpacity} />
-              <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} opacity={calloutOpacity} />
-            </G>
+                stroke={theme.colors.primaryDark} strokeWidth="2.5" />
+              <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} />
+            </AnimatedG>
           )}
 
           {showRemainingCallout && (
-            <G>
+            <AnimatedG animatedProps={calloutAnimatedProps}>
               <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y}
-                stroke={theme.colors.freedatabackground} strokeWidth="2.5" opacity={calloutOpacity} />
-              <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} opacity={calloutOpacity} />
-            </G>
+                stroke={theme.colors.freedatabackground} strokeWidth="2.5" />
+              <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} />
+            </AnimatedG>
           )}
         </G>
       </Svg>
 
       {showUsedCallout && (
         <Animated.View
-          style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, right: '50%', alignItems: 'flex-end', transform: [{ translateX: -(size / 2 + 38) }], opacity: labelOpacity }]}
+          style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, right: '50%', alignItems: 'flex-end', transform: [{ translateX: -(size / 2 + 38) }] }, labelAnimatedStyle]}
           accessible={false}
           accessibilityElementsHidden={true}
           importantForAccessibility="no-hide-descendants"
@@ -146,7 +161,7 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
 
       {showRemainingCallout && (
         <Animated.View
-          style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, left: '50%', transform: [{ translateX: size / 2 + 28 }], opacity: labelOpacity }]}
+          style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, left: '50%', transform: [{ translateX: size / 2 + 28 }] }, labelAnimatedStyle]}
           accessible={false}
           accessibilityElementsHidden={true}
           importantForAccessibility="no-hide-descendants"

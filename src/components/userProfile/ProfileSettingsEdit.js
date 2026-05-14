@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Padding,
@@ -186,7 +187,8 @@ const ProfileSettingsEdit = () => {
             </View>
           </View>
           <View style={{ marginTop: Padding.p_5xl }}>
-            <Pressable
+            <Touchable
+              minSize={0}
               style={[
                 { backgroundColor: Color.colorMidnightblue },
                 styles.buttonsLayout,
@@ -196,10 +198,11 @@ const ProfileSettingsEdit = () => {
               <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>
                 Save
               </Text>
-            </Pressable>
+            </Touchable>
             <View style={{ padding: 8 }}></View>
-            <Pressable
-              style={[styles.buttonsLayout]}
+            <Touchable
+              minSize={0}
+              style={styles.buttonsLayout}
               onPress={() => navigation.navigate("ProfileSettings")}
             >
               <Text
@@ -207,7 +210,7 @@ const ProfileSettingsEdit = () => {
               >
                 Cancel
               </Text>
-            </Pressable>
+            </Touchable>
           </View>
         </View>
       </ScrollView>

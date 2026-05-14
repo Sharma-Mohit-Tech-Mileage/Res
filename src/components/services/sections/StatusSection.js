@@ -18,9 +18,7 @@ const OUTER_SIZE = 72;
 const MIDDLE_SIZE = 48;
 const INNER_SIZE = 26;
 
-// SVG arc ring: two opposite 60° arcs (left + right), 120° gaps (top + bottom).
-// Replaces the old borderLeft/Right + transparent top/bottom trick, which
-// Android refuses to render on rounded views (all-or-nothing border color).
+// SVG arc ring (two opposite 60° arcs, 120° gaps) — replaces the borderLeft/Right trick that Android won't render on rounded views.
 const Ring = ({ size, color, style }) => {
   const r = (size - RING_WIDTH) / 2;
   const C = 2 * Math.PI * r;
@@ -138,6 +136,7 @@ const StatusSection = ({
   outageData,
   checking,
   onCloseNotification,
+  hasUserInitiatedCheck = false,
 }) => {
   const handleCheckStatus = () => {
     if (onCheckStatus) {
@@ -148,7 +147,7 @@ const StatusSection = ({
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {outageData && (
+        {hasUserInitiatedCheck && outageData && (
           <View style={styles.alertInsideCard}>
             <NotificationAlert
               type={outageData.hasOutage ? "warning" : "info"}

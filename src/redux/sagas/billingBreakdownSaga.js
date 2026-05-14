@@ -7,7 +7,6 @@ function* fetchBillingBreakdownSaga() {
   try {
     // Call API (currently using mock data)
     const breakdownData = yield call(billingStatementApi.fetchBillingBreakdown);
-    console.log('Fetched billing breakdown:', breakdownData);
 
     // Dispatch success action with data
     if(breakdownData?.data.statusCode==404){
@@ -21,7 +20,7 @@ function* fetchBillingBreakdownSaga() {
     }
   }
   } catch (error) {
-    console.error('Error in fetchBillingBreakdownSaga:', error);
+    console.warn('Error in fetchBillingBreakdownSaga:', error);
     // Dispatch error action
     yield put(actions.fetchBillingBreakdownFailure(error.message || 'Failed to fetch billing breakdown'));
   }

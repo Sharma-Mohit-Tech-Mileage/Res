@@ -23,7 +23,7 @@ class NetworkManager {
         isInternetReachable: state.isInternetReachable,
       };
     } catch (error) {
-      console.error('Error checking connectivity:', error);
+      console.warn('Error checking connectivity:', error);
       return {
         isConnected: false,
         type: 'unknown',

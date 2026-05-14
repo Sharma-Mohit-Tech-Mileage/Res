@@ -1,10 +1,11 @@
 import React from "react";
-import { View, StyleSheet, ImageBackground, Linking, Text, Pressable } from "react-native";
+import { View, StyleSheet, ImageBackground, Linking, Text } from "react-native";
 import { FontFamily, FontSize, Color } from "../../../GlobalStyles";
-import AppStyles from "../utility/AppStyles";
+import { card } from "../../styles/utilities";
 import FeatureCard from "./FeatureCardMobile";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import Touchable from "../common/customui/Touchable";
 
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
@@ -48,7 +49,8 @@ const MobilePromo = () => {
           >
             SAVE with FREE Unlimited Mobile for 1 year*
           </Text>
-          <Pressable
+          <Touchable
+            minSize={0}
             style={({ pressed }) => [
               styles.offerBtn,
               pressed && styles.offerBtnPressed,
@@ -63,7 +65,7 @@ const MobilePromo = () => {
             <Text style={styles.getOfferButton} importantForAccessibility="no">
               Get Offer
             </Text>
-          </Pressable>
+          </Touchable>
         </View>
       </ImageBackground>
     );
@@ -72,7 +74,7 @@ const MobilePromo = () => {
 
   return (
     <>
-    <View style={[AppStyles.card, styles.container]}>
+    <View style={[card.elevated, styles.container]}>
       {showSparklightMobile ? renderOfferBanner() : (
         <>
       <View style={styles.imageContainer}>

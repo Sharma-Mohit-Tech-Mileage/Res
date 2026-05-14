@@ -67,7 +67,7 @@ class AuthenticationManager {
 
       return true;
     } catch (error) {
-      console.error("Browser availability check failed:", error);
+      console.warn("Browser availability check failed:", error);
       return false;
     }
   }
@@ -155,7 +155,7 @@ class AuthenticationManager {
     let buttons = [
       {
         text: "Try Again",
-        onPress: () => console.log("User chose to retry"),
+        onPress: () => {},
       },
     ];
 
@@ -170,11 +170,11 @@ class AuthenticationManager {
       buttons = [
         {
           text: "Check Network",
-          onPress: () => console.log("User should check network"),
+          onPress: () => {},
         },
         {
           text: "Try Again",
-          onPress: () => console.log("User chose to retry"),
+          onPress: () => {},
         },
       ];
     }

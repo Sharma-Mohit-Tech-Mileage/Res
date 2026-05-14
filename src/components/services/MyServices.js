@@ -46,6 +46,13 @@ const MyServicesContent = ({ route }) => {
   const { outageData, checking, checkStatus, clearOutageData } =
     useOutageStatus('services');
   const [refreshing, setRefreshing] = useState(false);
+  const [hasUserInitiatedCheck, setHasUserInitiatedCheck] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => setHasUserInitiatedCheck(false);
+    }, [])
+  );
 
   // Current usage for InternetCard dataPlan
   const currentUsage = useSelector(selectCurrentUsage);
@@ -85,10 +92,12 @@ const MyServicesContent = ({ route }) => {
 
   const handleCheckStatus = useCallback(() => {
     clearOutageData();
+    setHasUserInitiatedCheck(true);
     checkStatus();
-  }, [checkStatus]);
+  }, [checkStatus, clearOutageData]);
 
   const handleCloseNotification = useCallback(() => {
+    setHasUserInitiatedCheck(false);
     clearOutageData();
   }, [clearOutageData]);
 
@@ -154,6 +163,7 @@ const MyServicesContent = ({ route }) => {
           outageData={outageData}
           checking={checking}
           onCloseNotification={handleCloseNotification}
+          hasUserInitiatedCheck={hasUserInitiatedCheck}
         />
       </ScrollView>
     </View>

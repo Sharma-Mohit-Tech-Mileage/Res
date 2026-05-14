@@ -28,15 +28,6 @@ const WalkthroughOverlay = ({
   const bubbleSlide = useRef(new Animated.Value(50)).current;
   // Right after calculating positions, add:
   useEffect(() => {
-    console.log("=== WALKTHROUGH DEBUG ===");
-    console.log("Step:", localStep);
-    console.log("Tab Bar Height:", tabBarHeight);
-    console.log("Screen Height:", SCREEN_HEIGHT);
-    console.log("Top Overlay Height:", SCREEN_HEIGHT - tabBarHeight);
-    console.log("Active Tab Left:", activeTabLeft);
-    console.log("Active Tab Right:", activeTabRight);
-    console.log("Has Left Shadow:", localStep > 0);
-    console.log("Has Right Shadow:", localStep < visibleTabs.length - 1);
   }, [localStep, tabBarHeight]);
   // Entry animation
   useEffect(() => {

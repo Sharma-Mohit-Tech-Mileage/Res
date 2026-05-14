@@ -4,7 +4,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import supportScreen from "../../components/support/supportScreen";
 import Search from "../../components/support/Search";
-import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
+import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 
 const SupportStack = createNativeStackNavigator();
 
@@ -29,8 +29,8 @@ function SupportStackScreen({ route }) {
       />
 
       <SupportStack.Screen
-        name="ArticalWindowUtility"
-        component={ArticalWindowUtility}
+        name="ArticleWindowUtility"
+        component={ArticleWindowUtility}
         options={{
           headerBackVisible: false,
           headerShown: false,

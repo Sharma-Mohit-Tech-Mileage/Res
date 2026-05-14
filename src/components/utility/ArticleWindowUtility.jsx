@@ -8,11 +8,13 @@ import { RefreshToken } from '../user/Session';
 import Config from 'react-native-config';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
-import LoadingOverlay from '../common/customui/CustomLoading';
+import LoadingOverlay from '../common/customui/LoadingOverlay';
 import LoadingSpinner from './LoadingSpinner';
 import { getUser } from '../../redux/utils/LocalStorage';
 import NetInfo from '@react-native-community/netinfo';
 import { setAuthCookiesOnAllDomains, dumpCookies, clearAuthCookies } from './NativeCookieManager';
+import { logError, logWarn } from '../../utils/logger';
+import { Border } from '../../../GlobalStyles';
 
 const TAG = '[ArticalWindow]';
 const JS_COOKIE_DOMAIN = Config.COOKIE_DOMAIN;
@@ -32,7 +34,7 @@ const logStorageSnapshot = async (caller) => {
         const jwtAge = cu?.jwtTimestamp ? Date.now() - cu.jwtTimestamp : '?';
         const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?';
     } catch (e) {
-        console.warn(`${TAG} STORAGE [${caller}] read failed:`, e.message);
+        logWarn(`${TAG} STORAGE [${caller}] read failed:`, e.message);
     }
 };
 
@@ -154,7 +156,7 @@ const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp) => {
 true;`;
 };
 
-const ArticalWindowUtility = ({ navigation, route }) => {
+const ArticleWindowUtility = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
     const [name] = useState(route.params?.name);
     const [isError, setIsError] = useState(false);
@@ -181,8 +183,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const lastIdTokenRefresh = useRef(0);
     const currentUrlRef = useRef('');
     const ssoRedirectInFlight = useRef(false);
-    // Fires once per WebView session when payment/AutoPay confirmation is detected,
-    // so the backend account cache gets force-refreshed before the user navigates back.
+    // Fires once per WebView session on payment/AutoPay confirmation to force-refresh the backend account cache before the user navigates back.
     const cacheUpdateFiredRef = useRef(false);
 
     const isLoading = !contentLoaded || progress < 1;
@@ -198,12 +199,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             let cu = await getUser();
             const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : Infinity;
             if (idTokenAge > 240000) {
-                console.warn(`${TAG} prepareInjectionScript | IdToken stale (${idTokenAge}ms old) — refreshing before injection | ts=${new Date().toISOString()}`);
+                logWarn(`${TAG} prepareInjectionScript | IdToken stale (${idTokenAge}ms old) — refreshing before injection | ts=${new Date().toISOString()}`);
                 try {
                     await RefreshToken();
                     cu = await getUser();
                 } catch (refreshErr) {
-                    console.error(`${TAG} prepareInjectionScript | refresh failed, using existing token | error=${refreshErr.message}`);
+                    logError(`${TAG} prepareInjectionScript | refresh failed, using existing token | error=${refreshErr.message}`);
                 }
             }
 
@@ -213,7 +214,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             setWebViewReady(true);
             await dumpCookies('prepareInjection');
         } catch (e) {
-            console.error(`${TAG} prepareInjectionScript FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
+            logError(`${TAG} prepareInjectionScript FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
             setWebViewReady(true);
         }
     }, []);
@@ -248,7 +249,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             await dumpCookies('injectAuth');
             dumpWebViewStorage('injectAuth');
         } catch (e) {
-            console.error(`${TAG} injectAuth FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
+            logError(`${TAG} injectAuth FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
         }
     }, []);
 
@@ -274,7 +275,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 })(); true;`);
             dumpWebViewStorage('injectIdTokenOnly');
         } catch (e) {
-            console.error(`${TAG} injectIdTokenOnly FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
+            logError(`${TAG} injectIdTokenOnly FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
         }
     }, [dumpWebViewStorage]);
 
@@ -298,14 +299,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         try {
             const netState = await NetInfo.fetch();
             if (!netState.isConnected || !netState.isInternetReachable) {
-                console.warn(`${TAG} silentRefresh SKIP — offline | ts=${new Date().toISOString()}`);
+                logWarn(`${TAG} silentRefresh SKIP — offline | ts=${new Date().toISOString()}`);
                 pendingOfflineRefresh.current = true;
                 return;
             }
             await logStorageSnapshot('silentRefresh-before');
             const newToken = await RefreshToken();
             if (!newToken) {
-                console.warn(`${TAG} silentRefresh — RefreshToken returned null | ts=${new Date().toISOString()}`);
+                logWarn(`${TAG} silentRefresh — RefreshToken returned null | ts=${new Date().toISOString()}`);
                 pendingOfflineRefresh.current = true;
                 return;
             }
@@ -320,7 +321,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             await logStorageSnapshot('silentRefresh-after');
             await dumpCookies('silentRefresh-after');
         } catch (e) {
-            console.error(`${TAG} silentRefresh FAILED | duration=${Date.now() - refreshStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
+            logError(`${TAG} silentRefresh FAILED | duration=${Date.now() - refreshStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
             pendingOfflineRefresh.current = true;
         }
     }, [injectIdTokenOnly, isOnPaymentDomain, refreshInjectionScript]);
@@ -407,7 +408,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 await dumpCookies('appState-resume');
 
                 if (dur > 600000) {
-                    if (!isOnline) { console.warn(`${TAG} AppState | offline, deferring refresh`); pendingOfflineRefresh.current = true; }
+                    if (!isOnline) { logWarn(`${TAG} AppState | offline, deferring refresh`); pendingOfflineRefresh.current = true; }
                     else {
                         const alive = await checkWebViewAlive();
                         if (!alive) { recreateWebView(); }
@@ -415,7 +416,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                             try {
                                 await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly();
                             }
-                            catch (_) { console.warn(`${TAG} AppState | refresh failed, recreating WebView`); recreateWebView(); }
+                            catch (_) { logWarn(`${TAG} AppState | refresh failed, recreating WebView`); recreateWebView(); }
                         }
                     }
                 } else if (idTokenAge > 240000) {
@@ -456,20 +457,17 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             return false;
         }
 
-        // Payment / AutoPay confirmation pages — backend account cache is stale
-        // at this point. Fire a force-refresh once so Redux has fresh balance,
-        // past-due, email, etc. by the time BillingScreen regains focus.
+        // Payment / AutoPay confirmation page: force-refresh once so Redux has fresh balance/past-due/email when BillingScreen regains focus.
         if (request.url.includes('/portals/app-secure/payment-confirmation') || request.url.includes('/portals/thankyou/')) {
             if (!cacheUpdateFiredRef.current) {
                 cacheUpdateFiredRef.current = true;
-                console.log(`${TAG} confirmation URL detected — dispatching force account refresh`);
                 dispatch(fetchACPUserAccountDetails({ force: true }));
             }
             return true;
         }
 
         if (request.url.includes(Config.SSO_LOGIN)) {
-            console.warn(`${TAG} NAV | SSO redirect detected — session expired on portal | ssoInFlight=${ssoRedirectInFlight.current}`);
+            logWarn(`${TAG} NAV | SSO redirect detected — session expired on portal | ssoInFlight=${ssoRedirectInFlight.current}`);
 
             if (!ssoRedirectInFlight.current) {
                 ssoRedirectInFlight.current = true;
@@ -481,7 +479,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         await injectAuth();
                         webViewRef.current?.injectJavaScript(`window.location.href = '${url}'; true;`);
                     } catch (e) {
-                        console.error(`${TAG} NAV SSO | refresh failed, recreating WebView | error=${e.message}`);
+                        logError(`${TAG} NAV SSO | refresh failed, recreating WebView | error=${e.message}`);
                         recreateWebView();
                     } finally {
                         ssoRedirectInFlight.current = false;
@@ -530,14 +528,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [injectIdTokenOnly, isOnPaymentDomain, dumpWebViewStorage]);
 
     const onError = useCallback(({ nativeEvent }) => {
-        console.error(`${TAG} WebView ERROR | description=${nativeEvent.description} | url=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
+        logError(`${TAG} WebView ERROR | description=${nativeEvent.description} | url=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
         setIsError(true);
         setContentLoaded(true);
         setErrorMessage(`Loading error: ${nativeEvent.description || 'Unknown error'}`);
     }, []);
 
     const onHttpError = useCallback(({ nativeEvent }) => {
-        console.error(`${TAG} HTTP ERROR | status=${nativeEvent.statusCode} | url=${nativeEvent.url} | currentUrl=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
+        logError(`${TAG} HTTP ERROR | status=${nativeEvent.statusCode} | url=${nativeEvent.url} | currentUrl=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
         (async () => {
             await logStorageSnapshot('httpError-' + nativeEvent.statusCode);
             await dumpCookies('httpError-' + nativeEvent.statusCode);
@@ -676,9 +674,9 @@ const styles = StyleSheet.create({
     toast: {
         position: 'absolute', bottom: 100, left: 20, right: 20,
         backgroundColor: 'rgba(0,0,0,0.8)', paddingVertical: 12, paddingHorizontal: 20,
-        borderRadius: 8, alignItems: 'center', zIndex: 2000,
+        borderRadius: Border.br_5xs, alignItems: 'center', zIndex: 2000,
     },
     toastText: { color: '#ffffff', fontSize: 14, fontWeight: '500' },
 });
 
-export default ArticalWindowUtility;
+export default ArticleWindowUtility;

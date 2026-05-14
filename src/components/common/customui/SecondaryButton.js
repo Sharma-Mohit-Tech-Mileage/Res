@@ -1,20 +1,23 @@
 import React from 'react';
-import { StyleSheet, Text, Pressable } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import colors from '../../../res/Colors';
 import { FontFamily } from '../../../../GlobalStyles';
+import { interaction } from "../../../styles/utilities";
+import Touchable from "./Touchable";
 
 const SecondaryButton=(props)=>{
 
     return (
-      <Pressable
+      <Touchable
+        minSize={0}
         style={({ pressed }) => [
           styles.TouchableOpacityButton,
-          pressed && styles.pressed,
+          pressed && interaction.pressed,
         ]}
         onPress={props.onPress}
       >
         <Text style={styles.txtStyle}>{props.text}</Text>
-      </Pressable>
+      </Touchable>
     );
 
 }
@@ -33,10 +36,6 @@ const styles = StyleSheet.create({
     fontStyle:'normal',
     fontSize:16,
     
-  },
-  pressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.97 }],
   },
 });
 

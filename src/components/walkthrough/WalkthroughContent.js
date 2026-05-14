@@ -3,12 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   Animated,
   Easing,
   AccessibilityInfo,
   findNodeHandle,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "../common/Icon";
 import WalkthroughProgress from "./WalkthroughProgress";
@@ -107,14 +107,15 @@ const WalkthroughContent = ({
           </Text>
         </View>
 
-        <Pressable
+        <Touchable
           onPress={onSkip}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          minSize={0}
           accessibilityRole="button"
           accessibilityLabel="Skip walkthrough"
         >
           <Text style={styles.skipText}>Skip</Text>
-        </Pressable>
+        </Touchable>
       </View>
 
       {/* Content */}
@@ -149,7 +150,8 @@ const WalkthroughContent = ({
             end={{ x: 1, y: 1 }}
             style={styles.buttonNext}
           >
-            <Pressable
+            <Touchable
+              minSize={0}
               style={styles.buttonNextInner}
               onPress={onNext}
               accessibilityRole="button"
@@ -160,7 +162,7 @@ const WalkthroughContent = ({
               <Text style={styles.buttonNextText}>
                 {isLastStep ? "Let's Go!" : "Next"}
               </Text>
-            </Pressable>
+            </Touchable>
           </LinearGradient>
         </View>
       </View>

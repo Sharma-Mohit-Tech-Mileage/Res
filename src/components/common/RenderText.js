@@ -92,7 +92,7 @@ const RenderText = ({
         const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
         setScreenReaderEnabled(isEnabled);
       } catch (error) {
-        console.error("AccessibilityInfo error:", error.message);
+        console.warn("AccessibilityInfo error:", error.message);
         setScreenReaderEnabled(false);
       }
     };

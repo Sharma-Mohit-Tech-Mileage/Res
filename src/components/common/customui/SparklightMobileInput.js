@@ -4,7 +4,6 @@ import {
   TextInput,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Platform,
   Keyboard,
 } from "react-native";
@@ -20,29 +19,11 @@ import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
 import MaskInput,{ formatWithMask,Masks  } from 'react-native-mask-input'
+import { formatInputA11yReadout } from "../../../utils/a11y";
+import Touchable from "./Touchable";
 
 const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
-};
-
-const numberToWordsForAccessibility = (numStr) => {
-  if (!numStr) return "";
-  const digitsMap = {
-    0: "zero",
-    1: "one",
-    2: "two",
-    3: "three",
-    4: "four",
-    5: "five",
-    6: "six",
-    7: "seven",
-    8: "eight",
-    9: "nine",
-  };
-  return numStr
-    .split("")
-    .map((digit) => digitsMap[digit] || digit)
-    .join(" ");
 };
 
 const SparklightMobileInput = React.forwardRef(({
@@ -55,6 +36,8 @@ const SparklightMobileInput = React.forwardRef(({
   accessibilityLabel,
   accessibilityHint,
   secure = false,
+  required = false,
+  errorHint,
   error,
   editable = true,
   showTextIcon = false,
@@ -135,17 +118,6 @@ const SparklightMobileInput = React.forwardRef(({
     return "default";
   };
 
-  const getAccessibilityLabel = () => {
-    if (
-      Platform.OS === "android" &&
-      getKeyboardType() === "phone-pad" &&
-      value
-    ) {
-      return numberToWordsForAccessibility(value);
-    }
-    return accessibilityLabel || label || placeholder;
-  };
-
   return (
     <View
       style={[
@@ -158,27 +130,28 @@ const SparklightMobileInput = React.forwardRef(({
         {label && (
           <Text
             style={[styles.label, error && styles.errorLabel]}
-            accessible={true}
-            accessibilityLabel={accessibilityLabel}
+            accessible={false}
+            importantForAccessibility="no"
           >
             {label}
           </Text>
         )}
         {secure && (
-          <TouchableOpacity
+          <Touchable
             accessibilityLabel={
               passwordVisible ? "Hide password" : "Show password"
             }
             accessibilityRole="button"
             accessible={true}
             onPress={togglePasswordVisibility}
+            minSize={0}
             style={styles.eyeButton}
           >
             <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
             <Text style={styles.eyeText}>
               {passwordVisible ? "Hide" : "Show"}
             </Text>
-          </TouchableOpacity>
+          </Touchable>
         )}
       </View>
 
@@ -225,21 +198,15 @@ const SparklightMobileInput = React.forwardRef(({
                 : Color.sparklightDarkGray,
             },
           ]}
-          accessibilityLabel={
-            value && getKeyboardType() === "phone-pad"
-              ? `${label || "Phone number"} field}`
-              : secure
-              ? "Password requirements are listed below. Use arrow keys to read them."
-              : undefined
-          }
+          accessibilityLabel={formatInputA11yReadout({
+            label: accessibilityLabel || label || placeholder,
+            required,
+            value,
+            errorHint: error ? (errorHint || error) : undefined,
+            isSecure: secure,
+            isPhoneNumber: getKeyboardType() === "phone-pad",
+          })}
           accessibilityRole="text"
-          accessibilityHint={
-            getKeyboardType() === "phone-pad"
-              ? "Required text field. double tap to edit."
-              : secure
-              ? "secure text field, double tab to edit."
-              : accessibilityHint
-          }
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
           returnKeyType="done"

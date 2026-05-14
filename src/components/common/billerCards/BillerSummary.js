@@ -1,15 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import Config from "react-native-config";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
-import AppStyles from "../../utility/AppStyles";
+import { card } from "../../../styles/utilities";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import Touchable from "../customui/Touchable";
 const Card = ({ billAmt, dueDate, navigation, style }) => {
   const NotAvailable = () => {
     return (
@@ -52,7 +53,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
   };
 
   return (
-    <View style={[AppStyles.card, style]}>
+    <View style={[card.elevated, style]}>
       <View style={styles.cardHreader}>
         <View
           style={{ marginLeft: 10, flexDirection: "row", alignItems: "center" }}
@@ -174,11 +175,10 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
 
       {billAmt != undefined ? (
         <View style={styles.cardFooter}>
-          <TouchableOpacity
+          <Touchable
             onPress={() => {
               let billingURL = `${Config.ACP_BILLING}/billing`;
-              console.log("Billing URL", billingURL);
-              navigation.navigate("ArticalWindowUtility", {
+              navigation.navigate("ArticleWindowUtility", {
                 url: billingURL,
                 name: "Billing Details",
               });
@@ -186,13 +186,18 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             accessible={true}
             accessibilityLabel="Make a Payment"
             accessibilityRole="button"
+            minSize={0}
             style={styles.paymentButton}
           >
             <Text style={styles.paymentButtonText}>Make a Payment</Text>
-            <View style={{ marginLeft: 2, alignSelf: "center" }}>
+            <View
+              style={{ marginLeft: 2, alignSelf: "center" }}
+              accessible={false}
+              importantForAccessibility="no-hide-descendants"
+            >
               <RightArrow color={colors.snow_white} />
             </View>
-          </TouchableOpacity>
+          </Touchable>
         </View>
       ) : (
         <>
@@ -214,59 +219,6 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
 };
 
 const styles = StyleSheet.create({
-  shadowContainer: {
-    shadowColor: "#171717",
-    shadowOffset: { width: -2, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  card: {
-    flexDirection: "row",
-    backgroundColor: "white",
-    borderRadius: 10,
-    alignSelf: "center",
-    overflow: "hidden",
-    width: wp("92%"),
-  },
-  leftSection: {
-    paddingHorizontal: Padding.p_3xs,
-    paddingBottom: Padding.p_xs,
-    alignItems: "center",
-    justifyContent: "center",
-    width: wp("40%"),
-    height: "100%",
-    position: "relative",
-  },
-  circleContainerShadow: {
-    position: "absolute",
-    top: "50%",
-    left: -wp("38.75%") - 20,
-    width: wp("84%"),
-    height: wp("84%"),
-    borderRadius: wp("41.5%"),
-    backgroundColor: "rgba(71, 84, 103, 0.05)",
-    transform: [{ translateY: -wp("41.5%") }],
-  },
-  circleContainer: {
-    position: "absolute",
-    top: "50%",
-    left: -wp("38.75%") - 15,
-    width: wp("77.5%"),
-    height: wp("77.5%"),
-    borderRadius: wp("38.75%"),
-    backgroundColor: colors.sparklight_bright_purple,
-    transform: [{ translateY: -wp("38.75%") }],
-  },
-  circle: {
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  icon: {
-    alignContent: "center",
-    alignSelf: "center",
-  },
   leftTitle: {
     color: colors.sp_black,
     fontSize: 18,
@@ -275,9 +227,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
-  },
-  cardContent: {
-    alignItems: "flex-start",
   },
   amount: {
     fontSize: 30,
@@ -290,41 +239,16 @@ const styles = StyleSheet.create({
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.dark_grey,
+    color: colors.sparklight_purple_blue,
     alignSelf: "center",
     paddingBottom: 5,
     fontFamily: FontFamily.openSansRegular,
-    color: colors.sparklight_purple_blue,
-  },
-  statusRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-    width: "100%",
-    marginVertical: Padding.p_8xs,
   },
   label: {
     fontSize: 12,
     fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
     color: colors.gray600,
-  },
-  labelActive: {
-    fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "700",
-    color: colors.sparklight_green,
-    alignItems: "flex-end",
-    alignContent: "flex-end",
-  },
-  status: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  statusIcon: {
-    width: 13,
-    height: 13,
-    marginRight: 3,
   },
   paymentButton: {
     flexDirection: "row",

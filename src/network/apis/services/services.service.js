@@ -20,7 +20,7 @@ const servicesApi = {
 
       return response.data;
     } catch (error) {
-      console.error("Error fetching service details:", error);
+      console.warn("Error fetching service details:", error);
       throw error;
     }
   },
@@ -43,7 +43,7 @@ const servicesApi = {
 
       return response.data;
     } catch (error) {
-      console.error(
+      console.warn(
         `[checkOutageStatus] FAILED | code=${error?.code || error?.lastError?.code || '?'}` +
         ` | status=${error?.response?.status ?? error?.lastError?.response?.status ?? 'no-response'}` +
         ` | statusText=${error?.response?.statusText || error?.lastError?.response?.statusText || ''}` +

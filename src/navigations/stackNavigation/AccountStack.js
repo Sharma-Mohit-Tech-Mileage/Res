@@ -13,7 +13,7 @@ import InAppNotifications from "../../components/notifiction/InAppNotifications"
 import TextNotifications from "../../components/notifiction/TextNotifications";
 import Feedback from "../../components/Feedback/Feedback";
 import ThumbsUp from "../../components/Feedback/ThumbsUp";
-import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
+import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 import supportScreen from "../../components/support/supportScreen";
 import Survey from "../../components/cancelservice/Survey";
 import CancellationSummary from "../../components/cancelservice/CancellationSummary";
@@ -86,8 +86,8 @@ function AccountStackScreen() {
       />
 
       <AccountStack.Screen
-        name="ArticalWindowUtility"
-        component={ArticalWindowUtility}
+        name="ArticleWindowUtility"
+        component={ArticleWindowUtility}
         options={{
           headerBackVisible: false,
           headerShown: false,

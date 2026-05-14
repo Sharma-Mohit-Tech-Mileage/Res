@@ -413,7 +413,7 @@ const SplashScreen = ({ navigation, route }) => {
         navigation.reset({ index: 0, routes: [{ name: "Terms" }] });
       }
     } catch (error) {
-      console.error("Error in moveAfterLogin:", error);
+      console.warn("Error in moveAfterLogin:", error);
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
       setErrorState({
@@ -430,7 +430,6 @@ const SplashScreen = ({ navigation, route }) => {
       authInProgress ||
       loadingState !== LoadingState.NONE
     ) {
-      console.log("Auth already in progress, ignoring duplicate request");
       return;
     }
 
@@ -521,7 +520,7 @@ const SplashScreen = ({ navigation, route }) => {
       setLoadingState(LoadingState.AUTHENTICATING);
       callSSOLoginApi(data);
     } catch (error) {
-      console.error("Authorization failed:", error);
+      console.warn("Authorization failed:", error);
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
       setErrorState({
@@ -575,7 +574,7 @@ const SplashScreen = ({ navigation, route }) => {
                     postLogoutCallback();
                   }
                 } catch (error) {
-                  console.error("Error during logout cleanup:", error);
+                  console.warn("Error during logout cleanup:", error);
                   if (
                     postLogoutCallback &&
                     typeof postLogoutCallback === "function"
@@ -585,7 +584,7 @@ const SplashScreen = ({ navigation, route }) => {
                 }
               })
               .catch(async (error) => {
-                console.error("Logout error:", error);
+                console.warn("Logout error:", error);
                 await clearAuthCookies();
                 cleanUserData();
                 if (
@@ -608,7 +607,7 @@ const SplashScreen = ({ navigation, route }) => {
         });
       })
       .catch(async (error) => {
-        console.error("Error getting SSO token for logout:", error);
+        console.warn("Error getting SSO token for logout:", error);
         await clearAuthCookies();
         cleanUserData();
         if (postLogoutCallback && typeof postLogoutCallback === "function") {

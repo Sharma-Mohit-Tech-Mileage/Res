@@ -5,13 +5,13 @@ import {
   StyleSheet,
   Linking,
   ImageBackground,
-  Pressable,
 } from "react-native";
 import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
 import PlayIcon from "../../../assets/svgs/PlayIcon";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import Touchable from "../common/customui/Touchable";
 
 const WelcomeCard = () => {
   const isNewDashboardEnabled = useFeatureFlag(
@@ -49,7 +49,8 @@ const WelcomeCard = () => {
           >
             SAVE with FREE Unlimited Mobile for 1 year*
           </Text>
-          <Pressable
+          <Touchable
+            minSize={0}
             style={({ pressed }) => [
               styles.offerBtn,
               pressed && styles.offerBtnPressed,
@@ -68,7 +69,7 @@ const WelcomeCard = () => {
             <Text style={styles.getOfferButton} importantForAccessibility="no">
               Get Offer
             </Text>
-          </Pressable>
+          </Touchable>
         </View>
       </ImageBackground>
     );
@@ -94,7 +95,8 @@ const WelcomeCard = () => {
             We’re excited to get you connected!
           </Text>
           <View style={styles.welcomeOverlay}>
-            <Pressable
+            <Touchable
+              minSize={0}
               style={styles.welcomeVideoLink}
               onPress={() => {
                 Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
@@ -113,7 +115,7 @@ const WelcomeCard = () => {
               >
                 <PlayIcon />
               </View>
-            </Pressable>
+            </Touchable>
           </View>
         </ImageBackground>
       </>

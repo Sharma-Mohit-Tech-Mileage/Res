@@ -92,7 +92,7 @@ export const trackAnnouncementImpression = async (campaignId, triggerType) => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[Analytics] Error tracking impression:', error);
+    console.warn('[Analytics] Error tracking impression:', error);
   }
 };
 
@@ -105,7 +105,7 @@ export const trackStepViewed = async (campaignId, stepNumber, stepTitle) => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[Analytics] Error tracking step view:', error);
+    console.warn('[Analytics] Error tracking step view:', error);
   }
 };
 
@@ -118,7 +118,7 @@ export const trackAnnouncementCompletion = async (campaignId, totalSteps, timeSp
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[Analytics] Error tracking completion:', error);
+    console.warn('[Analytics] Error tracking completion:', error);
   }
 };
 
@@ -130,7 +130,7 @@ export const trackAnnouncementDismissal = async (campaignId, dismissedAtStep) =>
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[Analytics] Error tracking dismissal:', error);
+    console.warn('[Analytics] Error tracking dismissal:', error);
   }
 };
 
@@ -177,6 +177,6 @@ export const navigateToDestination = (navConfig, navigationRef) => {
         console.warn(`[AnnouncementHelpers] Unknown navigation type: ${type}`);
     }
   } catch (error) {
-    console.error('[AnnouncementHelpers] Navigation error:', error);
+    console.warn('[AnnouncementHelpers] Navigation error:', error);
   }
 };

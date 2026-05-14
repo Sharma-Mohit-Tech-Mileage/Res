@@ -21,7 +21,7 @@ const dataUsageApi = {
       const response = await _axios.post(getEndpoint(ENDPOINTS.INTERNET_USAGE), body, config);
       return response.data;
     } catch (error) {
-      console.error("[DataUsageService] current FAILED:", error?.response?.status, error?.message);
+      console.warn("[DataUsageService] current FAILED:", error?.response?.status, error?.message);
       throw error;
     }
   },
@@ -32,7 +32,7 @@ const dataUsageApi = {
       const response = await _axios.post(getEndpoint(ENDPOINTS.INTERNET_USAGE), body, config);
       return response.data;
     } catch (error) {
-      console.error("[DataUsageService] monthly FAILED:", error?.response?.status, error?.message);
+      console.warn("[DataUsageService] monthly FAILED:", error?.response?.status, error?.message);
       throw error;
     }
   },
@@ -46,7 +46,7 @@ const dataUsageApi = {
       const response = await _axios.post(getEndpoint(ENDPOINTS.INTERNET_USAGE), body, config);
       return response.data;
     } catch (error) {
-      console.error("[DataUsageService] daily FAILED:", error?.response?.status, error?.message);
+      console.warn("[DataUsageService] daily FAILED:", error?.response?.status, error?.message);
       throw error;
     }
   },
@@ -57,7 +57,7 @@ const dataUsageApi = {
       const response = await _axios.post(getEndpoint(ENDPOINTS.INTERNET_USAGE), body, config);
       return response.data;
     } catch (error) {
-      console.error("[DataUsageService] period FAILED:", error?.response?.status, error?.message);
+      console.warn("[DataUsageService] period FAILED:", error?.response?.status, error?.message);
       throw error;
     }
   },

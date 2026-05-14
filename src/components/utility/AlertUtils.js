@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } from "react-native";
+import { View, Text, Image, StyleSheet, Linking, Platform } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -65,7 +66,6 @@ export const AlertComponent = ({
       {
         backgroundColor: alertStyles.backgroundColor,
         borderColor: alertStyles.borderColor,
-        //marginBottom: type === "warning" ? wp("15%") : wp("11%"),
       }
     ]}>
       <A11y.Order
@@ -137,14 +137,14 @@ export const AlertComponent = ({
         </View>
         {onClose && (
           <A11y.Index index={5} style={mergedStyles.closeButtonContainer}>
-            <TouchableOpacity
+            <Touchable
               onPress={onClose}
               accessibilityLabel="Close alert"
               accessibilityRole="button"
               accessibilityHint="Double tap to close this alert"
             >
               <CloseIcon color={alertStyles.closeButtonColor} width={16} height={16} />
-            </TouchableOpacity>
+            </Touchable>
           </A11y.Index>
         )}
       </A11y.Order>
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginHorizontal: 14,
     marginVertical: 8,
-    borderRadius: 8, // Updated to match finalized design
+    borderRadius: Border.br_5xs,
     borderWidth: 1,
     paddingLeft: 16,
     paddingRight: 12,

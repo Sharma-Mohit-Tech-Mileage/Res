@@ -6,7 +6,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { Color, FontFamily, FontSize, Padding } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import Facesad from "../../../assets/svgs/SmileyUnsatisfiedsel";
 import Terrible from "../../../assets/svgs/SmileyVeryUnsatisfiedsel";
 import Faceneutral from "../../../assets/svgs/Smileyneutralsel";
@@ -97,7 +97,7 @@ const RatingOption = ({ option, isSelected, onPress, disabled, index }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    borderRadius: 8,
+    borderRadius: Border.br_5xs,
     borderWidth: 1,
     borderColor: Color.colorGainsboro_200,
     overflow: "hidden",

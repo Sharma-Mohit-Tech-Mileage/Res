@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Modal, Pressable, Animated, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Modal, Animated, ScrollView, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import AnnouncementStep from './AnnouncementStep';
 import AnnouncementProgress from './AnnouncementProgress';
 import { theme } from '../../styles/theme';
 import { button } from '../../styles/utilities';
 import { trackStepViewed } from '../../utils/announcementHelpers';
+import Touchable from '../common/customui/Touchable';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -144,7 +145,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
         inputRange: [0, 1],
         outputRange: [0, 0.4]
       })}]}>
-        <Pressable style={styles.overlayPressable} onPress={handleDismiss} />
+        <Touchable style={styles.overlayPressable} onPress={handleDismiss} minSize={0} />
       </Animated.View>
 
       <Animated.View style={[styles.modalContainer, { transform: [{ translateY: modalSlide }] }]}>
@@ -160,9 +161,9 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
               <Text style={styles.badgeText}>NEW FEATURE</Text>
             </LinearGradient>
 
-            <Pressable onPress={handleSkip} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
+            <Touchable onPress={handleSkip} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }} minSize={0}>
               <Text style={styles.skipText}>Skip</Text>
-            </Pressable>
+            </Touchable>
           </View>
 
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -183,16 +184,16 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
 
             <View style={styles.actions}>
               {currentStep > 0 && (
-                <Pressable style={styles.buttonSecondary} onPress={handleBack}>
+                <Touchable minSize={0} style={styles.buttonSecondary} onPress={handleBack}>
                   <Text style={styles.buttonSecondaryText}>Back</Text>
-                </Pressable>
+                </Touchable>
               )}
 
-              <Pressable style={styles.buttonPrimary} onPress={handleNext}>
+              <Touchable minSize={0} style={styles.buttonPrimary} onPress={handleNext}>
                 <Text style={styles.buttonPrimaryText}>
                   {isLastStep ? 'Got it' : 'Next'}
                 </Text>
-              </Pressable>
+              </Touchable>
             </View>
           </View>
         </View>

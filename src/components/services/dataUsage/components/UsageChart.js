@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Dimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
 import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
 import { G, Rect, Text as SvgText, Path, Line } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
@@ -8,6 +8,7 @@ import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 import { cardHeader, dataUsageTabs } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
+import Touchable from "../../../common/customui/Touchable";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -123,8 +124,7 @@ const UsageChart = ({
 
   const handleToggleView = useCallback(() => {
     const nextView = !showList;
-    // Temporarily make the toggle button non-accessible so VoiceOver doesn't
-    // re-read the updated label before our "selected" announcement fires
+    // Temporarily mark the toggle non-accessible so VoiceOver doesn't re-read the new label before our "selected" announcement fires.
     if (isScreenReaderEnabled) {
       setIsViewTransitioning(true);
     }
@@ -302,16 +302,17 @@ const UsageChart = ({
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
               return (
-                <Pressable
+                <Touchable
                   key={tab.id}
                   style={[styles.tab, isActive && styles.activeTab]}
                   onPress={() => { if (!isActive) onTabChange?.(tab.id); }}
                   accessibilityRole="tab"
                   accessibilityState={{ selected: isActive }}
                   accessibilityLabel={tab.label}
+                  minSize={0}
                 >
                   <Text style={[styles.tabText, isActive && styles.activeTabText]}>{tab.label}</Text>
-                </Pressable>
+                </Touchable>
               );
             })}
           </View>
@@ -329,7 +330,7 @@ const UsageChart = ({
               </View>
             )}
             {activeTab !== "daily" && <View style={{ flex: 1 }} />}
-            <Pressable
+            <Touchable
               style={styles.listToggle}
               onPress={handleToggleView}
               accessibilityRole="button"
@@ -342,7 +343,7 @@ const UsageChart = ({
                 accessible={false}
                 importantForAccessibility="no"
               />
-            </Pressable>
+            </Touchable>
           </View>
           <View style={styles.noDataContainer}>
             <MaterialCommunityIcons name="chart-timeline-variant" size={48} color={theme.colors.borderLight} />
@@ -574,7 +575,7 @@ const UsageChart = ({
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
-              <Pressable
+              <Touchable
                 key={tab.id}
                 style={[styles.tab, isActive && styles.activeTab]}
                 onPress={() => {
@@ -595,9 +596,10 @@ const UsageChart = ({
                     ? undefined
                     : `Double tap to switch to ${tab.label}`
                 }
+                minSize={0}
               >
                 <Text style={[styles.tabText, isActive && styles.activeTabText]}>{tab.label}</Text>
-              </Pressable>
+              </Touchable>
             );
           })}
         </View>
@@ -620,7 +622,7 @@ const UsageChart = ({
           {/* Spacer when dropdown is hidden to push toggle to the right */}
           {activeTab !== "daily" && <View style={{ flex: 1 }} />}
 
-          <Pressable
+          <Touchable
             style={styles.listToggle}
             onPress={handleToggleView}
             accessible={!isViewTransitioning}
@@ -641,7 +643,7 @@ const UsageChart = ({
               accessible={false}
               importantForAccessibility="no"
             />
-          </Pressable>
+          </Touchable>
         </View>
 
         {!showList ? (
@@ -723,19 +725,21 @@ const UsageChart = ({
                           const n = chartData.length;
                           const slotWidth = contentWidth / n;
                           return (
-                            <Pressable
+                            <Touchable
                               key={index}
                               accessible={true}
                               accessibilityLabel={buildBarA11yLabel(item, index)}
                               accessibilityHint={barA11yHint}
                               onAccessibilityEscape={handleSkipChartData}
                               onMagicTap={handleSkipChartData}
+                              minSize={0}
                               style={{
                                 position: "absolute",
                                 left: index * slotWidth,
                                 top: 0,
                                 width: slotWidth,
                                 height: CHART_HEIGHT,
+                                alignItems: "stretch",
                               }}
                               onPress={() => handlePressBar(item, index)}
                             />
@@ -777,7 +781,7 @@ const UsageChart = ({
             {/* Accessible prev/next nav for TalkBack (Android) */}
             {isScreenReaderEnabled && chartData.length > 0 && (
               <View style={styles.a11yNavRow}>
-                <Pressable
+                <Touchable
                   style={styles.a11yNavButton}
                   onPress={() => {
                     const prev = Math.max(0, selectedIndex - 1);
@@ -791,7 +795,7 @@ const UsageChart = ({
                 >
                   <MaterialCommunityIcons name="chevron-left" size={22} color={selectedIndex <= 0 ? theme.colors.borderLight : theme.colors.primary} />
                   <Text style={[styles.a11yNavText, selectedIndex <= 0 && { color: theme.colors.borderLight }]}>Previous</Text>
-                </Pressable>
+                </Touchable>
 
                 <Text
                   style={styles.a11yNavCounter}
@@ -801,7 +805,7 @@ const UsageChart = ({
                   {selectedIndex + 1} / {chartData.length}
                 </Text>
 
-                <Pressable
+                <Touchable
                   style={styles.a11yNavButton}
                   onPress={() => {
                     const next = Math.min(chartData.length - 1, selectedIndex + 1);
@@ -815,7 +819,7 @@ const UsageChart = ({
                 >
                   <Text style={[styles.a11yNavText, selectedIndex >= chartData.length - 1 && { color: theme.colors.borderLight }]}>Next</Text>
                   <MaterialCommunityIcons name="chevron-right" size={22} color={selectedIndex >= chartData.length - 1 ? theme.colors.borderLight : theme.colors.primary} />
-                </Pressable>
+                </Touchable>
               </View>
             )}
           </>

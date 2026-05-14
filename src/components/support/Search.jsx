@@ -35,7 +35,6 @@ const Search = ({ navigation }) => {
               setFilteredSuggestions([]); 
             }
           }else{
-            console.log('No Data')
           }
         } catch (e) {}
       },

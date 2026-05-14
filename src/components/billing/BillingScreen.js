@@ -3,9 +3,9 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   ScrollView,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
@@ -30,9 +30,9 @@ import moment from "moment";
 import Icon from "../common/Icon";
 import Config from "react-native-config";
 import colors from "../../res/Colors";
-import AppStyles from "../utility/AppStyles";
+import { card } from "../../styles/utilities";
 import { getPrimaryEmail } from "../utility/constant";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
@@ -52,14 +52,15 @@ const BillingScreen = ({ navigation }) => {
     (state) => state.profile?.paperlessStatusAcp
   );
 
-  const paperlessLoading = useSelector(
+  const paperlessLoadingFromStore = useSelector(
     (state) => state.profile?.isPaperLessStatusLoading
   );
+  const paperlessLoading = paperlessLoadingFromStore || paperlessStatusAcp === undefined;
 
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState();
 
-  const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const [isAutoPayStatus, setIsAutoPayStatus] = useState(undefined);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
@@ -68,10 +69,10 @@ const BillingScreen = ({ navigation }) => {
   });
 
   const [isContentLoading, setIsContentLoading] = useState(false);
-  const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
+  const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(true);
 
   const handleError = (error) => {
-    console.log("error on Billing auto pay", error);
+    console.warn("error on Billing auto pay", error);
     setIsContentLoading(false);
     setIsAutoPayStatusLoad(false);
   };
@@ -92,7 +93,7 @@ const BillingScreen = ({ navigation }) => {
         );
       })
       .catch((error) => {
-        console.log("Error getting user status:", error);
+        console.warn("Error getting user status:", error);
         setIsContentLoading(false);
         setIsAutoPayStatusLoad(false);
       });
@@ -103,6 +104,11 @@ const BillingScreen = ({ navigation }) => {
       setIsContentLoading(false);
       getStatus();
       dispatch(fetchACPUserAccountDetails());
+
+      return () => {
+        setIsAutoPayStatus(undefined);
+        setIsAutoPayStatusLoad(true);
+      };
     }, [])
   );
   useEffect(() => {
@@ -198,7 +204,7 @@ const BillingScreen = ({ navigation }) => {
                   navigation={navigation}
                   isStatusLoading={paperlessLoading}
                 />
-                <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
+                <View style={[card.elevated, styles.myModemSpaceBlock]}>
                   <View
                     style={[
                       styles.myModemWrapper,
@@ -218,8 +224,9 @@ const BillingScreen = ({ navigation }) => {
                     ]}
                   >
                     <View style={styles.frameLayout} />
-                    <TouchableOpacity
-                      style={styles.frame9defaultSpaceBlock}
+                    <Touchable
+                      minSize={0}
+                      style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
                       onPress={() => {
                         navigation.navigate("AutoPayPCIConnector", {
                           url: Config.PAY_METHOD,
@@ -246,12 +253,13 @@ const BillingScreen = ({ navigation }) => {
                         Manage Payment Method
                       </Text>
                       <RightIcon />
-                    </TouchableOpacity>
+                    </Touchable>
 
                     <View style={styles.frameLayout} />
                     {
-                      <TouchableOpacity
-                        style={styles.frame9defaultSpaceBlock}
+                      <Touchable
+                        minSize={0}
+                        style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
                         onPress={() => {
                           navigation.navigate("BillingBreakDown");
                         }}
@@ -271,11 +279,12 @@ const BillingScreen = ({ navigation }) => {
                           {"View Bill Breakdown"}
                         </Text>
                         <RightIcon />
-                      </TouchableOpacity>
+                      </Touchable>
                     }
                     <View style={styles.frameLayout} />
-                    <TouchableOpacity
-                      style={styles.frame9defaultSpaceBlock}
+                    <Touchable
+                      minSize={0}
+                      style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
                       onPress={() => {
                         navigation.navigate("PaymentHistory");
                       }}
@@ -296,11 +305,12 @@ const BillingScreen = ({ navigation }) => {
                         View Payment History
                       </Text>
                       <RightIcon />
-                    </TouchableOpacity>
+                    </Touchable>
                     <View style={styles.frameLayout} />
 
-                    <TouchableOpacity
-                      style={styles.frame9defaultSpaceBlock}
+                    <Touchable
+                      minSize={0}
+                      style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
                       onPress={() => {
                         navigation.navigate("BillingStatements");
                       }}
@@ -320,7 +330,7 @@ const BillingScreen = ({ navigation }) => {
                         View Billing Statements
                       </Text>
                       <RightIcon />
-                    </TouchableOpacity>
+                    </Touchable>
                   </View>
                 </View>
               </>

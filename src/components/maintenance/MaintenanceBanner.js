@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Linking } from "react-native";
+import { View, Text, Image, StyleSheet, Linking } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { Border, Color, FontFamily} from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -40,13 +41,13 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
   
   const handleLinkPress = () => {
     if (link) {
-      Linking.openURL(link).catch(err => console.error('An error occurred opening link:', err));
+      Linking.openURL(link).catch(err => console.warn('An error occurred opening link:', err));
     }
   };
   
   const handlePhonePress = () => {
     if (phoneNumber) {
-      Linking.openURL(`tel:${phoneNumber}`).catch(err => console.error('An error occurred opening phone:', err));
+      Linking.openURL(`tel:${phoneNumber}`).catch(err => console.warn('An error occurred opening phone:', err));
     }
   };
   
@@ -86,15 +87,16 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
           
           {link && (
             <A11y.Index index={3}>
-            <TouchableOpacity onPress={handleLinkPress} accessibilityRole="link">
+            <Touchable minSize={0} onPress={handleLinkPress} accessibilityRole="link">
               <Text style={[styles.actionText, { marginLeft: 20, textDecorationLine: 'underline' }]}>{linkText}</Text>
-            </TouchableOpacity>
+            </Touchable>
             </A11y.Index>
           )}
           
           {showPhoneNumber && (
             <A11y.Index index={4}>
-            <TouchableOpacity 
+            <Touchable
+              minSize={0}
               onPress={handlePhonePress}
               accessibilityRole="link"
               accessibilityLabel={`Need help? Call ${phoneNumber}`}
@@ -106,7 +108,7 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
                   {phoneNumber}
                 </Text>
               </Text>
-            </TouchableOpacity>
+            </Touchable>
             </A11y.Index>
           )}
         </View>
@@ -115,7 +117,7 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
       </View>
       {onDismiss && (
         <A11y.Index index={5} style={styles.closeButtonContainer}>
-          <TouchableOpacity
+          <Touchable
             onPress={onDismiss}
             accessibilityLabel="Close button"
             accessibilityRole="button"
@@ -123,7 +125,7 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
             accessible={true}
           >
             <CloseIcon color="#000000" />
-          </TouchableOpacity>
+          </Touchable>
         </A11y.Index>
         )}
         </A11y.Order>
@@ -139,11 +141,10 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderColor: '#0060AE',
     backgroundColor:'#F0F8FF',
-    borderRadius: Border.br_11xs,
+    borderRadius: Border.br_5xs,
     borderWidth: 1,
     marginBottom: wp("15%"),
     marginTop: wp("-10%"),
-     borderRadius: 8,
   },
   alertRowContainer: {
     flexDirection: "row",

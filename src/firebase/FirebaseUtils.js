@@ -34,7 +34,6 @@ const requestUserPermission = async () => {
     }
   }
 
-  console.log(logMessage);
 
   return granted;
 };
@@ -46,7 +45,6 @@ const notifyPermission = async () => {
     authStatus = await messaging().requestPermission();
   }
 
-  console.log('Notification permission status:', authStatus);
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
@@ -84,7 +82,7 @@ const getFcmToken = async () => {
     const newFcmToken = await messaging().getToken();
     return newFcmToken;
   } catch (error) {
-    console.error(error);
+    console.warn(error);
     return null;
   }
 };
@@ -92,10 +90,6 @@ const getFcmToken = async () => {
 const notificationListener = () => {
 
   messaging().onNotificationOpenedApp(remoteMessage => {
-    console.log(
-      'Notification caused app to open from background state:',
-      remoteMessage.notification,
-    );
   });
 
   // Quiet and Background State -> Check whether an initial notification is available
@@ -103,17 +97,12 @@ const notificationListener = () => {
     .getInitialNotification()
     .then(remoteMessage => {
       if (remoteMessage) {
-        console.log(
-          'Notification caused app to open from quit state:',
-          remoteMessage.notification,
-        );
       }
     })
-    .catch(error => console.log('failed', error));
+    .catch(error => console.warn('failed', error));
 
   // Foreground State
   messaging().onMessage(async remoteMessage => {
-    console.log('foreground', remoteMessage);
   });
 };
 
@@ -127,13 +116,13 @@ const getDeviceUniqueId = async () => {
         uniqueId = credentials.password;
       }
     } catch (error) {
-      console.error("Keychain couldn't be accessed!", error);
+      console.warn("Keychain couldn't be accessed!", error);
     }
   } else if (Platform.OS === 'android') {
     try {
       uniqueId = await DeviceInfo.getAndroidId();
     } catch (error) {
-      console.error("Encrypted Storage couldn't be accessed!", error);
+      console.warn("Encrypted Storage couldn't be accessed!", error);
     }
   }
 
@@ -153,7 +142,7 @@ export const initializeApp = async () => {
     await Keychain.setGenericPassword('uniqueId', uuid);
     return uuid;
   } catch (error) {
-    console.error("Keychain couldn't be accessed!", error);
+    console.warn("Keychain couldn't be accessed!", error);
     const newUuid = uuidv4();
     await Keychain.setGenericPassword('uniqueId', newUuid);
     return newUuid;

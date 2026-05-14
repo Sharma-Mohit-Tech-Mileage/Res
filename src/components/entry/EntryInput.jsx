@@ -6,6 +6,7 @@ import {
     Image,
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../GlobalStyles';
+import { formatInputA11yReadout } from '../../utils/a11y';
 import Phone from '../../res/svgIcons/Phone';
 import EmailIcon from '../../res/svgIcons/EmailIcone';
 
@@ -13,18 +14,7 @@ const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconI
     const inputRef = useRef(null);
 
     return (
-        <View style={[styles.inputContainer,style]}  accessibilityLabel="Input field with icon">
-        {/* <Image
-            source={iconImage}
-            style={[styles.searchIcon, styles.leftIcon]}
-        /> */}
-        {/* <View style={[styles.searchIcon, styles.leftIcon]}>
-           {name=='phone'?<Phone/>: 
-           <View style={{marginTop:4}}>
-           <EmailIcon/>
-           </View>
-           }
-        </View> */}
+        <View style={[styles.inputContainer,style]}>
         <TextInput
             autoCapitalize="none"
             ref={inputRef}
@@ -39,11 +29,16 @@ const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconI
             keyboardType={keyboardType}
             returnKeyType="done"
             enterKeyHint="done"
-            accessibilityLabel={placeholder} // Use the placeholder as the label for clarity
-            accessibilityTraits="search field"
+            accessibilityLabel={formatInputA11yReadout({
+                label: placeholder,
+                value: input,
+                isPhoneNumber: keyboardType === 'phone-pad',
+            })}
+            accessibilityRole="text"
+            importantForAccessibility="yes"
         />
     </View>
-    
+
     );
 };
 

@@ -4,7 +4,7 @@ export const storeUser = async (value) => {
   try {
     await AsyncStorage.setItem("resi_user", JSON.stringify(value));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
 
@@ -14,7 +14,7 @@ export const getUser = async () => {
     const userData = JSON.parse(await AsyncStorage.getItem("resi_user"))
     return userData;
   } catch (error) {
-   console.log(error); 
+   console.warn(error); 
   }
 };
 
@@ -22,7 +22,7 @@ export const storeSsoToken = async (value) => {
   try {
     await AsyncStorage.setItem("idToken", JSON.stringify(value));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
 
@@ -32,7 +32,7 @@ export const getSsoToken = async () => {
     const userData = JSON.parse(await AsyncStorage.getItem("idToken"))
     return userData;
   } catch (error) {
-   console.log(error); 
+   console.warn(error); 
   }
 };
 
@@ -48,7 +48,7 @@ export const cleanUserData = async () => {
 
     await AsyncStorage.multiRemove(keysToRemove);
   } catch (error) {
-    console.error('Error selectively clearing app data.', error);
+    console.warn('Error selectively clearing app data.', error);
   }
 };
 
@@ -59,7 +59,7 @@ export const storePushNotificationStatus = async (value) => {
     const key = `pushNotificationStatus_${userName}`;
     await AsyncStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
 
@@ -72,7 +72,7 @@ export const getPushNotificationStatus = async () => {
     const userData = JSON.parse(await AsyncStorage.getItem(key))
     return userData;
   } catch (error) {
-   console.log(error); 
+   console.warn(error); 
   }
 };
 
@@ -80,7 +80,7 @@ export const storeUpgradeToken = async (value) => {
   try {
     await AsyncStorage.setItem("upgradeToken", JSON.stringify(value));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
 
@@ -90,7 +90,7 @@ export const getUpgradeToken = async () => {
     const upgradeData = JSON.parse(await AsyncStorage.getItem("upgradeToken"));
     return upgradeData;
   } catch (error) {
-   console.log(error); 
+   console.warn(error); 
   }
 };
 
@@ -99,7 +99,7 @@ export const storeValue = async (value) => {
   try {
     await AsyncStorage.setItem("ptickets", JSON.stringify(value));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
 
@@ -109,7 +109,7 @@ export const getPendingTicket = async () => {
     const data = JSON.parse(await AsyncStorage.getItem("ptickets"));
     return data;
   } catch (error) {
-   console.log(error); 
+   console.warn(error); 
   }
 };
 

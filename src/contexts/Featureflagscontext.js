@@ -14,7 +14,6 @@ export const FeatureFlagsProvider = ({ children }) => {
   useEffect(() => {
     // Subscribe to feature flag changes from RemoteConfigManager
     const unsubscribe = RemoteConfigManager.subscribeToFeatures(() => {
-      console.log('[FeatureFlags] Config updated, incrementing version');
       setVersion(v => v + 1);
     });
 

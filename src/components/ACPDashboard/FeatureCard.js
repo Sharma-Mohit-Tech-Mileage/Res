@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { FontFamily, FontSize, Color, Padding, } from "../../../GlobalStyles";
 import Icon from "../common/Icon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import Touchable from "../common/customui/Touchable";
 const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primary", isActive = false, onButtonPress, isLoading, }) => {
   const getButtonStyle = () => {
     switch (buttonVariant) {
@@ -72,7 +73,8 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
           <View style={[styles.button, { height: 100, paddingVertical: 24 }]} />
         </SkeletonPlaceholder>
       ) : (
-        <TouchableOpacity
+        <Touchable
+          minSize={0}
           style={[styles.button, getButtonStyle()]}
           onPress={onButtonPress}
           accessibilityRole="button"
@@ -81,7 +83,7 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
           <Text style={[styles.buttonText, getButtonTextStyle()]}>
             {buttonText}
           </Text>
-        </TouchableOpacity>
+        </Touchable>
       )}
     </View>
   );

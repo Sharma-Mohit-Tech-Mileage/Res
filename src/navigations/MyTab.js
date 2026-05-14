@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { View, StyleSheet, Platform, Pressable, AccessibilityInfo } from "react-native";
+import { View, StyleSheet, Platform, AccessibilityInfo } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 import { useVisibleTabs } from "../hooks/useVisibleTabs";
+import Touchable from "../components/common/customui/Touchable";
 import { useAnnouncement } from "../hooks/useAnnouncement";
 import { fetchProfileDetails } from "../redux/actions/ProfileActionSuite";
 import WalkthroughOverlay from "../components/walkthrough/WalkthroughOverlay";
@@ -135,7 +136,7 @@ const getIconComponent = (tabId, focused) => {
 const createTabBarButton = useCallback(
   (props, tab, tabPosition, tabCount) => {
     if (!tab) {
-      return <Pressable {...props} />;
+      return <Touchable {...props} minSize={0} accessibilityRole="tab" />;
     }
 
     const isAccessible = isTabAccessible(tab.index);
@@ -144,8 +145,9 @@ const createTabBarButton = useCallback(
     const shouldPreventPress = isWalkthroughActive && !isAccessible;
 
     return (
-      <Pressable
+      <Touchable
         {...props}
+        minSize={0}
         accessible={!hideFromAccessibility}
         importantForAccessibility={hideFromAccessibility ? "no-hide-descendants" : "yes"}
         accessibilityElementsHidden={hideFromAccessibility}
@@ -157,6 +159,7 @@ const createTabBarButton = useCallback(
         }}
         style={[
           props.style,
+          { alignItems: "stretch" },
           shouldPreventPress && styles.disabledTab,
         ]}
         pointerEvents={shouldPreventPress ? "none" : "auto"}

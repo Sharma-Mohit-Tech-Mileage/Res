@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StyleSheet, Text, Pressable, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
+import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import { securityQuestions } from "../utility/constant";
@@ -13,10 +14,10 @@ import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
 import { GetApiRequest} from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
-import AppStyles from  "../utility/AppStyles";
+import { requiredField } from "../../styles/utilities";
 import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
 const announceForAccessibility = (message) => {
@@ -81,7 +82,7 @@ const PasswordSecurityEdit = () => {
             }
           }
         } catch (e) {
-          console.log("Accessibility focus error:", e);
+          console.warn("Accessibility focus error:", e);
         }
       }, 300);
 
@@ -135,7 +136,6 @@ const PasswordSecurityEdit = () => {
 
   const getSecurityQuestions= async()=>{
     const user = await getUser();
-    console.log("User info:", user);
     const userName = user?.userInfo?.userName || user?.userName || '';
     const requestWithEndpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS, { userName });
     GetApiRequest(
@@ -147,7 +147,7 @@ const PasswordSecurityEdit = () => {
         }
       },
       
-      (error) => console.log(error)
+      (error) => console.warn(error)
     );
   };
 
@@ -158,8 +158,6 @@ const PasswordSecurityEdit = () => {
   };
 
   useEffect(() => {
-    // Reset the form with the updated profile details
-    //reset(profileDetails);
     setLoading(false);
   }, [profileDetails]);
 
@@ -229,7 +227,7 @@ const PasswordSecurityEdit = () => {
                   >
                     Security Question
                   </Text>
-                  <Text style={[AppStyles.requiredField]} accessible={true} importantForAccessibility="yes" accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
+                  <Text style={[requiredField]} accessible={true} importantForAccessibility="yes" accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
                   {" "}
                   Fields marked with * are required.
                 </Text>
@@ -319,7 +317,8 @@ const PasswordSecurityEdit = () => {
           <View
             style={styles.frameParent1}
           >
-            <Pressable
+            <Touchable
+              minSize={0}
               style={[styles.buttons, styles.buttonsLayout]}
               onPress={handleSubmit(handleSave, handleValidationError)}
               accessibilityLabel="Save changes"
@@ -327,8 +326,9 @@ const PasswordSecurityEdit = () => {
               accessible={!dropdownFocused}
             >
               <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
-            </Pressable>
-            <Pressable
+            </Touchable>
+            <Touchable
+              minSize={0}
               style={[styles.buttons1, styles.buttonsLayout]}
               onPress={() => navigation.navigate("PasswordSecurity")}
               accessibilityLabel="Cancel and return"
@@ -336,7 +336,7 @@ const PasswordSecurityEdit = () => {
               accessible={!dropdownFocused}
             >
               <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
-            </Pressable>
+            </Touchable>
           </View>
 
           <LoadingOverlay

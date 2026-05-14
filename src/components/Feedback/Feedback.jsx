@@ -263,9 +263,7 @@ const Feedback = () => {
                   }
 
                   if (thresholdToAnnounce != null) {
-                    // Cancel any pending announcement so rapid typing doesn't
-                    // stack multiple calls that would swallow each other or
-                    // collide with inline validation announcements
+                    // Cancel pending announcement so rapid typing doesn't stack/swallow calls or collide with inline validation.
                     if (announcementTimerRef.current) {
                       clearTimeout(announcementTimerRef.current);
                     }

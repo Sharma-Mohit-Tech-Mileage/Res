@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NewBillerHome from "../../components/home/NewBillerHome";
-import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
+import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
 import { ActivityIndicator } from "react-native";
 
@@ -24,8 +24,8 @@ function HomeStackScreen() {
       </HomeStack.Screen>
 
       <HomeStack.Screen
-        name="ArticalWindowUtility"
-        component={ArticalWindowUtility}
+        name="ArticleWindowUtility"
+        component={ArticleWindowUtility}
         options={{
           headerBackVisible: false,
           headerShown: false,

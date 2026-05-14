@@ -31,7 +31,7 @@ export const NavigationUtils = {
     const emailExists = !!email && emailRegex.test(email);
     return !emailExists; 
   } catch (error) {
-    console.error("Error checking email:", error);
+    console.warn("Error checking email:", error);
     return true; 
   }
 },
@@ -93,7 +93,7 @@ export const NavigationUtils = {
         routes: [{ name: nextScreen }],
       });
     } catch (error) {
-      console.error("Navigation error:", error);
+      console.warn("Navigation error:", error);
       navigation.reset({
         index: 0,
         routes: [{ name: 'MyTab' }],

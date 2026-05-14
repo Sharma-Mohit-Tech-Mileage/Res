@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
-  Pressable,
   View,
   AccessibilityInfo,
   InteractionManager,
   Platform,
   findNodeHandle,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Color,
@@ -18,6 +18,7 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { interaction } from "../../styles/utilities";
 import { useDispatch, useSelector } from "react-redux";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
@@ -39,8 +40,7 @@ const PasswordSecurity = () => {
   }, []);
 
   useEffect(() => {
-    // On iOS, focus can land on the header/back when navigating back here.
-    // Move focus to the success icon after the banner is rendered.
+    // iOS focus can land on header/back when navigating here — move it to the success icon once the banner renders.
     if (!showSuccessAlert || !screenReaderEnabled) return;
 
     const focusSuccessIcon = () => {
@@ -52,13 +52,12 @@ const PasswordSecurity = () => {
           }
         }
       } catch (e) {
-        console.log("Accessibility focus error:", e);
+        console.warn("Accessibility focus error:", e);
       }
     };
 
-    // More aggressive retries to override navigation focus stealing
-    // Android needs longer delays as TalkBack takes more time after navigation
-    const delays = Platform.OS === "ios" 
+    // Aggressive retries to override navigation focus stealing; Android needs longer delays for TalkBack.
+    const delays = Platform.OS === "ios"
       ? [100, 300, 600, 1000, 1500, 2000] 
       : [10, 50, 150, 300, 500, 800, 1200, 1800, 2500];
     const timers = [];
@@ -130,16 +129,17 @@ const PasswordSecurity = () => {
               >
                 Password
               </Text>
-              <Pressable
+              <Touchable
                 accessible={true}
                 accessibilityLabel="Edit Password"
                 accessibilityRole="button"
                 accessibilityHint="Double click to open edit password screen"
+                minSize={0}
                 style={[styles.buttons, styles.buttonsBg]}
                 onPress={() => navigation.navigate("PasswordEdit")}
               >
                 <Text style={[styles.makePayment, styles.titleFlexBox]}>Edit</Text>
-              </Pressable>
+              </Touchable>
             </View>
             <View style={styles.frameGroup}>
               <View style={styles.passwordGroup}>
@@ -168,17 +168,18 @@ const PasswordSecurity = () => {
                   >
                     Security Question
                   </Text>
-                  <Pressable
+                  <Touchable
                     accessible={true}
                     accessibilityLabel="Edit Security Question"
                     accessibilityRole="button"
+                    minSize={0}
                     style={[styles.buttons, styles.buttonsBg]}
                     onPress={() => navigation.navigate("PasswordSecurityEdit")}
                   >
                     <Text style={[styles.makePayment, styles.titleFlexBox]}>
                       Edit
                     </Text>
-                  </Pressable>
+                  </Touchable>
                 </View>
                 <View style={styles.passwordGroup}>
                   <View style={styles.nameOfYourFirstPetParent}>
@@ -227,11 +228,11 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   buttonsBg: {
+    paddingVertical: Padding.p_7xs,
     paddingHorizontal: Padding.p_base,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
     borderRadius: Border.br_11xs,
+    minWidth: 70,
+    alignItems: "center",
   },
   frameContainerSpaceBlock: {
     marginTop: Padding.p_base,

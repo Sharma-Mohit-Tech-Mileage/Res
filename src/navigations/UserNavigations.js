@@ -4,7 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import analytics from '@react-native-firebase/analytics';
 import SplashScreen from "../components/splash/SplashScreen";
-import ArticalWindowUtility from '../components/utility/ArticalWindowUtility';
+import ArticleWindowUtility from '../components/utility/ArticleWindowUtility';
 import EmailNotifications from '../components/entry/EmailNotifications';
 import PushNotifications from '../components/entry/PushNotifications';
 import TextNotifications from '../components/entry/TextNotifications';
@@ -47,7 +47,7 @@ const UserNavigations = (props) => {
           screen_class: currentRouteName
         });
       } catch (error) {
-        console.error('Analytics error:', error);
+        console.warn('Analytics error:', error);
       }
 
       routeNameRef.current = currentRouteName;
@@ -78,7 +78,7 @@ const UserNavigations = (props) => {
 
       return true;
     } catch (error) {
-      console.error('Error in handleBackButton:', error);
+      console.warn('Error in handleBackButton:', error);
       return true; // Allow default back behavior on error
     }
   };
@@ -95,7 +95,7 @@ const UserNavigations = (props) => {
         }
         backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
       } catch (error) {
-        console.error('Error setting up listeners:', error);
+        console.warn('Error setting up listeners:', error);
       }
     };
 
@@ -111,7 +111,7 @@ const UserNavigations = (props) => {
         try {
           unsubscribe();
         } catch (error) {
-          console.error('Error removing listener:', error);
+          console.warn('Error removing listener:', error);
         }
       }
       if (backHandler) {
@@ -152,8 +152,8 @@ const UserNavigations = (props) => {
             options={{ headerShown: false }}
           />
           <Stack.Screen
-            name="ArticalWindowUtility"
-            component={ArticalWindowUtility}
+            name="ArticleWindowUtility"
+            component={ArticleWindowUtility}
             options={{ headerShown: false }}
           />
           <Stack.Screen

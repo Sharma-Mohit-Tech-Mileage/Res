@@ -3,10 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Image,
   Modal,
 } from "react-native";
+import Touchable from "./customui/Touchable";
 import colors from "../../res/Colors";
 import { FontFamily } from "../../../GlobalStyles";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
@@ -59,13 +59,14 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
           </View>
           <Text style={styles.message}>{msg2}</Text>
 
-          <TouchableOpacity
-            style={styles.closeBtn}
+          <Touchable
+            minSize={0}
+            style={[styles.closeBtn, { alignItems: 'stretch' }]}
             accessibilityRole="button"
             onPress={onClose}
           >
             <Text style={styles.closeAlertTxt}>Close</Text>
-          </TouchableOpacity>
+          </Touchable>
         </View>
       </View>
     </Modal>

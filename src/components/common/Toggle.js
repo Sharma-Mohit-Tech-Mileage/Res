@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Animated, Pressable, View, StyleSheet, Easing, AccessibilityInfo, Platform, findNodeHandle } from 'react-native';
+import { Animated, View, StyleSheet, Easing, AccessibilityInfo, Platform, findNodeHandle } from 'react-native';
 import { Color } from "../../../GlobalStyles";
+import { A11Y } from "../../styles/theme";
+import Touchable from "./customui/Touchable";
 
 const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label, description = '', section = '', includeDescriptionInAccessibility = true, a11yCategory = null, a11yName = null }) => {
     const [isActive, setIsActive] = useState(initialValue);
@@ -54,19 +56,16 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
                     }
                 }
             } catch (e) {
-                console.log('focus error', e);
+                console.warn('focus error', e);
             }
         };
 
-        // For In-app and Text notifications, rely on the control's
-        // accessibilityLabel (which already includes state + instructions)
-        // and only move focus so we don't get duplicate spoken output.
+        // For in-app/text notifications: only move focus (the accessibilityLabel already includes state + instructions).
         if (section === 'inAppNotif' || section === 'textNotif') {
             const focusDelay = Platform.OS === 'android' ? 400 : 200;
             setTimeout(focusToggle, focusDelay);
         } else {
-            // For other sections, keep a concise explicit announcement
-            // followed by moving focus to the toggle.
+            // Other sections: announce, then move focus to the toggle.
             const announce = `${sectionLabelText}. Toggle button, ${stateWord}.`;
             const announceDelay = Platform.OS === 'android' ? 300 : 80;
             const focusDelay = Platform.OS === 'android' ? 220 : 60;
@@ -74,7 +73,7 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
                 try {
                     AccessibilityInfo.announceForAccessibility(announce);
                 } catch (e) {
-                    console.log('announce error', e);
+                    console.warn('announce error', e);
                 }
 
                 setTimeout(focusToggle, focusDelay);
@@ -105,8 +104,7 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
             inAppNotif: `${label || 'Appointment'} for In-app notifications`,
         }[section] || (label || name || 'Notification');
 
-        // Special-case In-app notifications to match requested phrasing and avoid
-        // screen reader duplicates — include instruction in the label and clear hint.
+        // In-app/text notifications: bake instruction into label to avoid duplicate spoken output with the hint.
         if (section === 'inAppNotif' || section === 'textNotif') {
             const defaultPrefix = section === 'inAppNotif' ? 'In App Notification' : 'Text Notification';
             const prefix = a11yCategory || defaultPrefix;
@@ -116,9 +114,7 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
             return `${prefix} ${statusWord} for ${itemName}. Toggle setting, Double tap to ${actionWord}.`;
         }
 
-        // For other sections, allow callers to suppress the description from
-        // the accessible label and rely on the separate title element to contain
-        // the description (so screen readers read: title+description, then toggle).
+        // Callers can suppress the description here and let the separate title element carry it (read order: title+desc, then toggle).
         const labelPart = includeDescriptionInAccessibility && description ? `${description}` : `${sectionLabelText}`;
 
         // Final format: "[Description or Label]. Toggle button, [Current State]."
@@ -126,14 +122,14 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
     };
 
     return (
-        <Pressable
+        <Touchable
             ref={containerRef}
             onPress={handleToggle}
             accessible={true}
             accessibilityLabel={getAccessibilityLabel()}
-            //accessibilityRole="button"
             accessibilityHint={disabled ? '' : (section === 'inAppNotif' || section === 'textNotif' ? '' : (isActive ? 'Double tap to turn off' : 'Double tap to turn on'))}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            hitSlop={A11Y.hitSlop}
+            style={styles.touchTarget}
         >
             <View style={styles.toggle}>
                 <View style={[styles.toggleBase, { backgroundColor: isActive ? activeColor : inactiveColor }]}>
@@ -148,11 +144,18 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
                     />
                 </View>
             </View>
-        </Pressable>
+        </Touchable>
     );
 };
 
 const styles = StyleSheet.create({
+    // Scanner reads bounds, not hitSlop — visible toggle stays 36×20 inside.
+    touchTarget: {
+        minWidth: A11Y.minTouch,
+        minHeight: A11Y.minTouch,
+        alignItems: "center",
+        justifyContent: "center",
+    },
     toggleBase: {
         borderRadius: 20,
         width: 36,

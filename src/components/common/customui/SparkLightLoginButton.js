@@ -1,14 +1,16 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../../GlobalStyles";
+import { interaction } from "../../../styles/utilities";
+import Touchable from "./Touchable";
 const SparkLightLoginButton = ({ onPress, buttonText,customStyle }) => {
     return (
-        <Pressable
+        <Touchable
             style={({ pressed }) => [
                 styles.buttons,
                 styles.buttonsBg,
                 customStyle,
-                pressed && styles.pressed,
+                pressed && interaction.pressed,
             ]}
             onPress={onPress}
             accessible={true}
@@ -16,7 +18,7 @@ const SparkLightLoginButton = ({ onPress, buttonText,customStyle }) => {
             accessibilityLabel={buttonText}
         >
             <Text style={styles.buttonStyl}>{buttonText}</Text>
-        </Pressable>
+        </Touchable>
     );
 };
 
@@ -38,10 +40,6 @@ const styles = StyleSheet.create({
         color: Color.colorGray_200,
         padding: 16,
         fontSize: 18,
-    },
-    pressed: {
-        opacity: 0.85,
-        transform: [{ scale: 0.97 }],
     },
 });
 

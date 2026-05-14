@@ -10,7 +10,8 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import { Color, FontSize, FontFamily } from "../../../../GlobalStyles";
+import { Color, FontSize, FontFamily, Border } from "../../../../GlobalStyles";
+import { A11Y } from "../../../styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuite";
@@ -391,7 +392,7 @@ const NotificationAlert = ({
       if (actionConfig.action === "call" && actionConfig.value) {
         const phoneNumber = actionConfig.value.replace(/\D/g, "");
         Linking.openURL(`tel:${phoneNumber}`).catch((error) => {
-          console.error("Failed to open phone dialer:", error);
+          console.warn("Failed to open phone dialer:", error);
           Alert.alert("Error", "Unable to open phone dialer");
         });
         return;
@@ -466,7 +467,8 @@ const NotificationAlert = ({
                 : "Double tap to contact support"
             }
             onPress={() => executeAction(action)}
-            style={styles.blockWrapper}
+            style={[styles.blockWrapper, styles.actionableBlock]}
+            hitSlop={A11Y.hitSlop}
           >
             <Text>
               {blockSegments.map((segment) => (
@@ -523,7 +525,8 @@ const NotificationAlert = ({
           accessibilityActions={accessibilityActions}
           onAccessibilityAction={handleAccessibilityAction}
           onPress={() => showActionSelection(actionSegments, plainText)}
-          style={styles.blockWrapper}
+          style={[styles.blockWrapper, styles.actionableBlock]}
+          hitSlop={A11Y.hitSlop}
         >
           <Text>
             {blockSegments.map((segment) => (
@@ -631,29 +634,22 @@ const NotificationAlert = ({
         </View>
 
         {showCloseIcon && (
-          <A11y.Index index={4}>
+          <A11y.Index index={4} style={styles.closeBtn}>
             <Pressable
               ref={closeRef}
               onPress={onClose}
-              style={styles.closeBtn}
+              style={styles.closeBtnPressable}
               accessible={true}
               accessibilityLabel="Close notification"
               accessibilityRole="button"
               accessibilityHint="Double tap to dismiss"
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              hitSlop={A11Y.hitSlop}
             >
-
-              {Platform.OS === "ios" ? (
-                <CloseIcon
-                  width={16}
-                  height={16}
-                  color={config.closeButtonColor}
-                />
-              ) : (
-                <Text style={[styles.closeBtnText, { color: config.closeButtonColor }]}>
-                  ✕
-                </Text>
-              )}
+              <CloseIcon
+                width={24}
+                height={24}
+                color={config.closeButtonColor}
+              />
             </Pressable>
           </A11y.Index>
         )}
@@ -671,8 +667,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 16,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: Border.br_5xs,
     marginVertical: 8,
+    position: "relative",
   },
   iconWrapper: {
     marginTop: 1,
@@ -684,6 +681,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     marginLeft: 10,
+    paddingRight: 32,
   },
   title: {
     fontSize: FontSize.size_base,
@@ -692,6 +690,11 @@ const styles = StyleSheet.create({
   },
   blockWrapper: {
     marginTop: 8,
+  },
+  // Pressable variants only — text-only blocks stay at natural height.
+  actionableBlock: {
+    minHeight: A11Y.minTouch,
+    justifyContent: "center",
   },
   messageText: {
     fontSize: FontSize.size_sm,
@@ -712,14 +715,19 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   closeBtn: {
-    alignSelf: "flex-start",
-    padding: 8,
-    marginTop: 4,
-    marginRight: 4,
+    position: "absolute",
+    top: 8,
+    right: 8,
+    minWidth: A11Y.minTouch,
+    minHeight: A11Y.minTouch,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  closeBtnText: {
-    fontSize: 16,
-    fontWeight: "700",
+  closeBtnPressable: {
+    minWidth: A11Y.minTouch,
+    minHeight: A11Y.minTouch,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

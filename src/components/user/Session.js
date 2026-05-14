@@ -43,7 +43,7 @@ const onSuccess = async (res, idToken = null) => {
 };
 
 const onError = (error) => {
-  console.error(`${TAG} Session error:`, error.message || error);
+  console.warn(`${TAG} Session error:`, error.message || error);
   throw error;
 };
 
@@ -57,7 +57,7 @@ const retryRequest = async (data, retries = 2) => {
     if (retries > 0) {
       return retryRequest(data, retries - 1);
     }
-    console.error(`${TAG} Token refresh retries exhausted:`, error.message);
+    console.warn(`${TAG} Token refresh retries exhausted:`, error.message);
     throw error;
   }
 };
@@ -86,7 +86,7 @@ export const RefreshToken = async () => {
       store.dispatch({ type: INVALIDATE_ACCOUNT_CACHE });
       return token;
     } catch (error) {
-      console.error(
+      console.warn(
         `${TAG} RefreshToken FAILED | duration=${Date.now() - refreshStartTs}ms | error=${error.message}`
       );
       return onError(error);

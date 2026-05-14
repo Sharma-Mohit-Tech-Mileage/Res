@@ -5,8 +5,8 @@ import {
   View,
   FlatList,
   ScrollView,
-  Pressable,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -20,7 +20,7 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import AppStyles from "../utility/AppStyles";
+import { card } from "../../styles/utilities";
 import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActions";
 import {
   selectBillingBreakDownLoading,
@@ -30,7 +30,7 @@ import {
 import { InfoIcon } from "native-base";
 import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
 import SecondaryButton from "../common/customui/PrimaryButton";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 
 // Constants
 const PLACEHOLDER_MESSAGE =
@@ -49,10 +49,10 @@ const ERROR_404 =
      */
 
 const renderErrorMessage = (errorCode, navigation) => {
-  console.log("Error Code:", errorCode);
+  console.warn("Error Code:", errorCode);
   return (
     <View style={{ flexDirection: "column", margin: 8 }}>
-      <View style={[AppStyles.card, { margin: 16 }]}>
+      <View style={[card.elevated, { margin: 16 }]}>
         <View style={styles.errorContainer}>
           <BillErrorIcon color="red" size={24} style={{ marginBottom: 8 }} />
           <Text style={styles.errorTxt}>
@@ -60,14 +60,13 @@ const renderErrorMessage = (errorCode, navigation) => {
           </Text>
         </View>
       </View>
-      <Pressable
-        style={({ pressed }) => [
+      <Touchable
+        minSize={0}
+        style={[
           { backgroundColor: Color.colorMidnightblue },
           styles.buttonsLayout,
-          { opacity: pressed ? 0.7 : 1 },
         ]}
         onPress={() => {
-          console.log("Return to Billing Services button pressed");
           navigation.goBack();
         }}
         accessibilityRole="button"
@@ -76,7 +75,7 @@ const renderErrorMessage = (errorCode, navigation) => {
         <Text style={[styles.makePayment, styles.makeTypo]}>
           {"Return to Billing Services"}
         </Text>
-      </Pressable>
+      </Touchable>
       <View style={styles.buttonsParent}>
         <SecondaryButton
           title="Cancel"
@@ -98,8 +97,7 @@ const DetailItem = memo(({ detail }) => {
     (detail.description.toLowerCase().includes("ridge") &&
       parseFloat(detail.amount) < 0); // Ridge discounts
 
-  // Skip items with specific types AND promotional discount in description AND zero amount
-  // Also skip items that contain "promotional discount will end" text with zero amount
+  // Skip $0 promotional-discount items (by type list) and any "$0 promotional discount will" text item.
   const shouldSkipItem =
     (detail.type &&
       ["300", "301", "CH", "CHG", "MMDTT"].includes(detail.type) &&
@@ -259,7 +257,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
   // Calculate total due whenever billing data changes
   useEffect(() => {
-    console.log("Billing Data:", billingData);
     if (!billingData?.length) return;
 
     // Reset total first
@@ -278,10 +275,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
   // Fetch billing data when screen is focused
   useFocusEffect(
     useCallback(() => {
-      // if(user.userInfo.accountNumber=='8160440040034354'){
-      //   setErrorCode("204");
-      //   return;
-      // }
       if (user?.userInfo?.accountNumber == "8160440040062702") {
         setErrorCode("404");
         return;
@@ -296,10 +289,10 @@ const BillingBreakDownScreen = ({ navigation }) => {
     }, [dispatch])
   );
   useEffect(() => {
-    console.log("Error:123", errorCode);
+    console.warn("Error:123", errorCode);
 
     if (error && error.length > 0) {
-      console.log("Error:123", error.includes("204"));
+      console.warn("Error:123", error.includes("204"));
       setErrorCode(error);
     }
   }, [error]);
@@ -355,7 +348,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         renderErrorMessage(errorCode, navigation)
       ) : (
         <View
-          style={[AppStyles.card, styles.cardContainer, { marginBottom: 32 }]}
+          style={[card.elevated, styles.cardContainer, { marginBottom: 32 }]}
         >
           <ScrollView
             contentContainerStyle={{ paddingBottom: 24 }}

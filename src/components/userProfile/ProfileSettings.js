@@ -25,6 +25,7 @@ import {
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
+import { digitsToWords } from "../../utils/a11y";
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -55,26 +56,6 @@ const ProfileSettings = () => {
   );
 
 
-
-const numberToWordsForAccessibility = (numStr) => {
-  if (!numStr) return "";
-  const digitsMap = {
-    0: "zero",
-    1: "one",
-    2: "two",
-    3: "three",
-    4: "four",
-    5: "five",
-    6: "six",
-    7: "seven",
-    8: "eight",
-    9: "nine",
-  };
-  return numStr
-    .split("")
-    .map((digit) => digitsMap[digit] || digit)
-    .join(" ");
-};
 
   const showReconnectMessage = userInfo
     ? isAccountDisconnected(
@@ -141,7 +122,7 @@ const numberToWordsForAccessibility = (numStr) => {
                   </Text>
                 </View>
 
-                <View style={styles.firstNameParent} accessible={true} accessibilityLabel={`Account number ${numberToWordsForAccessibility(profileDetails.accountNumber)}`} accessibilityRole="text">
+                <View style={styles.firstNameParent} accessible={true} accessibilityLabel={`Account number ${digitsToWords(profileDetails.accountNumber)}`} accessibilityRole="text">
                   <Text style={styles.firstName}>Account Number</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {profileDetails.accountNumber}

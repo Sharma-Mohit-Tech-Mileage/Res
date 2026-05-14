@@ -2,11 +2,11 @@ import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from "axios";
 import moment from "moment";
-//import { Env } from "./Constants";
 import { getEndpoint,ENDPOINTS } from "../endpoints/Endpoints";
 import Config from "react-native-config";
 import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
 import { getDeviceMetadata } from "../../../components/utility/DeviceInfo";
+import * as appLogger from "../../../utils/logger";
 import base64 from "react-native-base64";
 const getProfileDetails = async () => {
   let data = await getUser();
@@ -21,7 +21,7 @@ const getProfileDetails = async () => {
     .get(getEndpoint(ENDPOINTS.ACCT_MGR_GET_BY_USER, { accountNumber: data?.userInfo?.accountNumber }), { ...config })
     .then((res) => res.data)
     .catch((error) => {
-      console.error(`Error fetching ${getEndpoint(ENDPOINTS.ACCT_MGR_GET_BY_USER, { accountNumber: data?.userInfo?.accountNumber })}`, error);
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.ACCT_MGR_GET_BY_USER, { accountNumber: data?.userInfo?.accountNumber })}`, error);
       throw error;
     });
 };
@@ -41,7 +41,7 @@ const fetchUserList = async () => {
       return res.data;
     })
     .catch((error) => {
-      console.error(`Error fetching ${getEndpoint(ENDPOINTS.PROFILE_USERS, { accountNumber })}`, error);
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.PROFILE_USERS, { accountNumber })}`, error);
       throw error;
     });
 };
@@ -61,7 +61,7 @@ const fetchSmsSubscription = async () => {
       return res.data;
     })
     .catch((error) => {
-      console.error(`Error fetching ${getEndpoint(ENDPOINTS.SMS_SUBSCRIPTION, { accountNumber })}`, error);
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.SMS_SUBSCRIPTION, { accountNumber })}`, error);
       throw error;
     });
 };
@@ -83,7 +83,7 @@ const fetchBillingStatus = async () => {
       return res.data;
     })
     .catch((error) => {
-      console.error(`Error fetching ${getEndpoint(ENDPOINTS.BILLING_STATUS, { accountNumber })}`, error);
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.BILLING_STATUS, { accountNumber })}`, error);
       throw error;
     });
 };
@@ -103,7 +103,7 @@ const fetchPaperLessDetails = async () => {
       return res.data;
     })
     .catch((error) => {
-      console.error("Error fetching fetchPaperLessDetails:", error);
+      appLogger.logError("Error fetching fetchPaperLessDetails:", error);
       throw error;
     });
 };
@@ -123,7 +123,7 @@ const fetchPushNotifications = async () => {
     );
     return response.data;
   } catch (error) {
-    console.error(`Error fetching ${getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS_ACCOUNT, { userName: user.userInfo?.userName, accountNumber })}:`, error);
+    appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS_ACCOUNT, { userName: user.userInfo?.userName, accountNumber })}:`, error);
     throw error;
   }
 };
@@ -143,7 +143,7 @@ const updateProfileSecurity = async (data) => {
     const response = await _axios.patch(endpoint, data, config);
     return response.data;
   } catch (error) {
-    console.error(`Error updating ${endpoint}:`, error);
+    appLogger.logError(`Error updating ${endpoint}:`, error);
     throw error;
   }
 };
@@ -163,7 +163,7 @@ const postProfileInfo = async (data) => {
 
     return response.data;
   } catch (error) {
-    console.error("API Call Failed:", error.message);
+    appLogger.logError("API Call Failed:", error.message);
     throw error;
   }
 };
@@ -189,7 +189,7 @@ const postTextNotifictionInfo = async (data) => {
     const response = await _axios.post(getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION), postData, config);
     return response.data;
   } catch (error) {
-    console.error(`Error in API Call to ${getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION)}:`, error); // Log the error
+    appLogger.logError(`Error in API Call to ${getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION)}:`, error); // Log the error
     throw error;
   }
 };
@@ -210,13 +210,9 @@ const putEmailNotification = async (email) => {
       config
     );
 
-    console.log(
-      `API Call Successful to ${getEndpoint(ENDPOINTS.PAPERLESS_EMAIL_NOTIFICATION, { accountNumber, email })}, Response:`,
-      response
-    );
     return response;
   } catch (error) {
-    console.error(
+    appLogger.logError(
       `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_EMAIL_NOTIFICATION, { accountNumber, email })}:`,
       error
     );
@@ -240,13 +236,9 @@ const resendEmailVerification = async () => {
       config
     );
 
-    console.log(
-      `API Call Successful to ${getEndpoint(ENDPOINTS.PAPERLESS_RESEND_VERIFICATION, { accountNumber })}, Response:`,
-      response
-    );
     return response;
   } catch (error) {
-    console.error(
+    appLogger.logError(
       `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_RESEND_VERIFICATION, { accountNumber })}:`,
       error
     );
@@ -270,14 +262,9 @@ const postEmailNotification = async (email) => {
       config
     );
 
-    console.log(
-      `API Call Successful to ${getEndpoint(ENDPOINTS.PAPERLESS_ENROLL, { accountNumber, emailAddress: email })}, Response:`,
-      response
-    );
     return response;
   } catch (error) {
-    // Log the error with a descriptive message
-    console.error(
+    appLogger.logError(
       `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_ENROLL, { accountNumber, emailAddress: email })}:`,
       error
     );
@@ -304,7 +291,7 @@ const postTermsAndConditions = async (flag) => {
 
     return response;
   } catch (error) {
-    console.error(
+    appLogger.logError(
       `Error in API Call to ${getEndpoint(ENDPOINTS.MOBILE_TC_FLAG, { accountNumber, userName, flag })}:`,
       error
     );
@@ -339,13 +326,9 @@ const postTermsAndConditionsv2 = async (flag) => {
       payload,
       config
     );
-    console.log(
-      `API Call Successful to ${getEndpoint(ENDPOINTS.MOBILE_TC_UPDATE_USERDATA)}, Response:`,
-      response
-    );
     return response;
   } catch (error) {
-    console.error(
+    appLogger.logError(
       `Error in API Call to ${getEndpoint(ENDPOINTS.MOBILE_TC_UPDATE_USERDATA)}:`,
       error
     );
@@ -379,7 +362,7 @@ const postPushNotifications = async (data) => {
 
     return response;
   } catch (error) {
-    console.error(
+    appLogger.logError(
       `Error in API Call to ${getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName, accountNumber })}`,
       error
     );
@@ -404,7 +387,7 @@ const unsubscribPaperLess = async () => {
     );
     return response;
   } catch (error) {
-    console.error(
+    appLogger.logError(
       `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_UNENROLL, { accountNumber, email: user.userInfo?.email })}:`,
       error
     );
@@ -503,8 +486,6 @@ const handleSubmitFeedback = async (obj) => {
     },
   };
 
-  console.log("ZENDESK PAYLOAD:", JSON.stringify(payload, null, 2));
-
   try {
     const response = await axios.post(zendeskRequestApiUrl, payload, {
       headers: {
@@ -514,7 +495,7 @@ const handleSubmitFeedback = async (obj) => {
     });
     return response;
   } catch (error) {
-    console.error("Zendesk API Error:", error.response?.data || error.message);
+    appLogger.logError("Zendesk API Error:", error.response?.data || error.message);
     throw error;
   }
 };
@@ -522,18 +503,16 @@ const handleSubmitFeedback = async (obj) => {
 const logError = async (errorData) => {
   try {
     await _axios.post(getEndpoint(ENDPOINTS.LOG_ERROR), errorData);
-    console.log("Error logged successfully");
   } catch (logErr) {
-    console.error("Failed to log error:", logErr);
+    appLogger.logError("Failed to log error:", logErr);
   }
 };
 
 const logInfo = async (infoData) => {
   try {
-    const response = await _axios.post(getEndpoint(ENDPOINTS.LOG_INFO), infoData);
-    console.log("Info logged successfully");
+    await _axios.post(getEndpoint(ENDPOINTS.LOG_INFO), infoData);
   } catch (logErr) {
-    console.error("Failed to log info:", logErr);
+    appLogger.logError("Failed to log info:", logErr);
   }
 };
 
@@ -550,7 +529,7 @@ const addUserAction = async (data) => {
     const response = await _axios.post(getEndpoint(ENDPOINTS.USERS_BASE), data, config);
     return response.data;
   } catch (error) {
-    console.error("API Call Failed, Error:", error);
+    appLogger.logError("API Call Failed, Error:", error);
     throw error;
   }
 };
@@ -572,7 +551,7 @@ const editUserAction = async (data) => {
     );
     return response.data;
   } catch (error) {
-    console.error("API Call Failed, Error:", error);
+    appLogger.logError("API Call Failed, Error:", error);
     throw error;
   }
 };
@@ -594,7 +573,7 @@ const removeUser = async (data) => {
     );
     return response.data;
   } catch (error) {
-    console.error("API Call Failed, Error:", error);
+    appLogger.logError("API Call Failed, Error:", error);
     throw error;
   }
 };
@@ -611,7 +590,7 @@ const fetchAllSvEmails = async (data) => {
      const response = await _axios.get(requestUrl, config);
      return response.data;
    } catch (error) {
-     console.error("API Call Failed, Error:", error);
+     appLogger.logError("API Call Failed, Error:", error);
      throw error;
      }
 };
@@ -631,13 +610,9 @@ const addSVEmailNoFlags = async (email) => {
       {},
       config
     );
-    console.log(
-      `API Call Successful to add SV email without flags: ${email}`,
-      response.data
-    );
     return response.data;
   } catch (error) {
-    console.error(
+    appLogger.logError(
       `Error in API Call to add SV email without flags: ${email}`,
       error
     );
@@ -660,13 +635,9 @@ const deleteSVEmail = async (email) => {
       {},
       config
     );
-    console.log(
-      `API Call Successful to delete SV email: ${email}`,
-      response.data
-    );
     return response.data;
   } catch (error) {
-    console.error(`Error in API Call to delete SV email: ${email}`, error);
+    appLogger.logError(`Error in API Call to delete SV email: ${email}`, error);
     throw error;
   }
 };
@@ -697,21 +668,17 @@ const updateSVEmails = async (emailList) => {
 const manageSVEmails = async (emailList) => {
   try {
     let user = await getUser();
-    console.log("User Details:", user);
     const accountNumber = user.userInfo?.accountNumber || null;
-    console.log("Account Number:", accountNumber);
     const config = {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    console.log("Request Config:", config);
-    console.log("Email List:", emailList);
     const requestUrl = getEndpoint(ENDPOINTS.SV_EMAIL_UPDATE, { accountNumber });
     const response = await _axios.post(requestUrl, emailList, config);
     return response.data;
   } catch (error) {
-    console.error("Error managing SV emails:", error);
+    appLogger.logError("Error managing SV emails:", error);
     throw error;
   }
 };
@@ -728,7 +695,7 @@ const addSVEmailMktFlag = async (email) => {
     const response = await _axios.post(requestUrl, {}, config);
     return response.data;
   } catch (error) {
-    console.error(
+    appLogger.logError(
       `Error in API Call to add SV email marketing flag: ${email}`,
       error
     );
@@ -791,7 +758,7 @@ const fetchACPUserAccountDetails = async (signal, force = false) => {
     if (error?.name === "CanceledError" || error?.code === "ERR_CANCELED") {
       throw error;
     }
-    console.error("Error in fetchACPUserAccountDetails:", error);
+    appLogger.logError("Error in fetchACPUserAccountDetails:", error);
     throw error;
   }
 };

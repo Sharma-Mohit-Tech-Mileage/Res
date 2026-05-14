@@ -14,7 +14,7 @@ export const selectServiceDetailGroups = createSelector(
       // Return the serviceDetailGroups array as the breakdown data
       return billingBreakdownState.breakdownData?.serviceDetails?.serviceDetailGroups || [];
     } catch (error) {
-      console.error("Error accessing serviceDetailGroups:", error.message);
+      console.warn("Error accessing serviceDetailGroups:", error.message);
       return [];
     }
   }
@@ -39,7 +39,7 @@ export const selectTotalDue = createSelector(
     try {
       return billingBreakdownState.data?.statementSummary?.total?.amount || 0;
     } catch (error) {
-      console.error("Error accessing total due:", error.message);
+      console.warn("Error accessing total due:", error.message);
       return 0;
     }
   }
@@ -54,7 +54,7 @@ export const selectBillExplainerData = createSelector(
       // Return the explainer data
       return explainerData || {};
     } catch (error) {
-      console.error("Error accessing bill explainer data:", error.message);
+      console.warn("Error accessing bill explainer data:", error.message);
       return {};
     }
   }

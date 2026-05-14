@@ -41,6 +41,7 @@ import {
   updateSVEmails,
   manageSVEmails,
 } from "../../network/apis/account/profile.service";
+import * as appLogger from "../../utils/logger";
 import {
   FETCH_ACP_USER_ACCOUNT_DETAILS,
   FETCH_PROFILE_DETAILS,
@@ -92,7 +93,7 @@ function* getProfileUsers(action) {
     const response = yield call(fetchUserList);
     yield put(fetchUserListSuccess(response));
   } catch (error) {
-    console.error("API Error Response:", error);
+    appLogger.logError("API Error Response:", error);
   }
 }
 
@@ -101,7 +102,7 @@ function* fetchProfileDetails(action) {
     const response = yield call(getProfileDetails);
     yield put(fetchProfileSuccess(response));
   } catch (error) {
-    console.error("API Error Response:", error);
+    appLogger.logError("API Error Response:", error);
   }
 }
 
@@ -110,7 +111,7 @@ function* fetchSMSSubs(action) {
     const response = yield call(fetchSmsSubscription);
     yield put(saveSMSSelection(response));
   } catch (error) {
-    console.error("API Error Response:", error);
+    appLogger.logError("API Error Response:", error);
   }
 }
 
@@ -119,7 +120,7 @@ function* fetchPaperlessBills(action) {
     const billingStatusResponse = yield call(fetchBillingStatus);
     yield put(saveEmailBillings(billingStatusResponse));
   } catch (error) {
-    console.error("Fetch Billing Status API Error:", error);
+    appLogger.logError("Fetch Billing Status API Error:", error);
   }
 }
 
@@ -128,7 +129,7 @@ function* fetchPaperlessDetails(action) {
     const paperlessDetailsResponse = yield call(fetchPaperLessDetails);
     yield put(savePaperlessDetails(paperlessDetailsResponse));
   } catch (error) {
-    console.error("Fetch Paperless Details API Error:", error);
+    appLogger.logError("Fetch Paperless Details API Error:", error);
   }
 }
 
@@ -178,7 +179,7 @@ function* updateProfile(action) {
     action.navigation.navigate("ProfileSettings", { updateSuccess: true });
   } catch (error) {
     action.navigation.navigate("ProfileSettingsEdit", { updateFailed: true });
-    console.error("API Error Response:", error, action.payload);
+    appLogger.logError("API Error Response:", error, action.payload);
   }
 }
 
@@ -197,7 +198,7 @@ function* handleUpdateProfileSecurity(action) {
     action.navigation.navigate("PasswordSecurity", { updateSuccess: true });
   } catch (error) {
     action.navigation.navigate("PasswordSecurityEdit", { updateFailed: true });
-    console.error("API Error Response:", error, action.payload);
+    appLogger.logError("API Error Response:", error, action.payload);
   }
 }
 
@@ -347,7 +348,7 @@ function* resentVerifiction(action) {
       });
     }
   } catch (error) {
-    console.error("Error in resentVerifiction:", error);
+    appLogger.logError("Error in resentVerifiction:", error);
 
     const failureMessage =
       "Failed to resend verification email. Please try again later.";
@@ -366,7 +367,7 @@ function* logErrorSaga(action) {
   try {
     yield call(logError, action.payload);
   } catch (error) {
-    console.error("API Error Response failed ============", error);
+    appLogger.logError("API Error Response failed ============", error);
   }
 }
 
@@ -374,7 +375,7 @@ function* logInfoSaga(action) {
   try {
     const response = yield call(logInfo, action.payload);
   } catch (error) {
-    console.error("API Error Response:", error);
+    appLogger.logError("API Error Response:", error);
   }
 }
 
@@ -392,7 +393,7 @@ function* addUser(action) {
     } else {
       action.navigation(false, "");
     }
-    console.error("Error:", error);
+    appLogger.logError("Error:", error);
   }
 }
 
@@ -402,7 +403,7 @@ function* editUser(action) {
     action.navigation(true);
   } catch (error) {
     action.navigation(false);
-    console.error("Error", error.response.data);
+    appLogger.logError("Error", error.response.data);
   }
 }
 
@@ -412,7 +413,7 @@ function* deleteUser(action) {
     action.navigation(true);
   } catch (error) {
     action.navigation(false);
-    console.error("API Error Response:", error, action.payload); // Log the error response
+    appLogger.logError("API Error Response:", error, action.payload); // Log the error response
   }
 }
 function* fetchSvEmails(action) {
@@ -420,7 +421,7 @@ function* fetchSvEmails(action) {
     const response = yield call(fetchAllSvEmails);
     yield put(saveSvEmailAssociation(response));
   } catch (error) {
-    console.error(
+    appLogger.logError(
       "fetchAllSvEmails API Error Response:",
       error,
       action.payload
@@ -525,7 +526,7 @@ function* handleManageEmailRequest(action) {
       });
     }
   } catch (error) {
-    console.error("Error in handleManageEmailRequest:", error);
+    appLogger.logError("Error in handleManageEmailRequest:", error);
     if (navigation) {
       navigation.navigate("AddEmailNotification", {
         updateFailed: true,
@@ -580,7 +581,7 @@ function* handleUpdateEmailAssociations(action) {
       }
     }
   } catch (error) {
-    console.error("Error in handleUpdateEmailAssociations:", error);
+    appLogger.logError("Error in handleUpdateEmailAssociations:", error);
 
     if (navigation) {
       navigation.navigate("EmailNotifications", {
@@ -602,7 +603,7 @@ export function* checkPaperlessSaga(action) {
     );
     yield put(setPaperlessStatus(status));
   } catch (error) {
-    console.error("Error fetching ACP user isPaperlessEnabled:", error);
+    appLogger.logError("Error fetching ACP user isPaperlessEnabled:", error);
   } finally {
     if (yield cancelled()) controller.abort();
     yield put(clearLoading());
@@ -684,7 +685,7 @@ function* fetchACPUserAccountDetailsSaga(action) {
       error?.code === "ERR_CANCELED" ||
       error?.message === "canceled";
     if (!isCancelled) {
-      console.error("Error in account/paperless fetch:", error);
+      appLogger.logError("Error in account/paperless fetch:", error);
     }
   } finally {
     if (force && inFlightForceController === controller) {

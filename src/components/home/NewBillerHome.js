@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
-  TouchableOpacity,
 } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
@@ -63,8 +62,8 @@ const NewBillerHome = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
-  const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
-  const [loadingAutoPay, setloadingAutoPay] = useState(false);
+  const [isAutoPayStatus, setIsAutoPayStatus] = useState(undefined);
+  const [loadingAutoPay, setloadingAutoPay] = useState(true);
   const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
@@ -85,9 +84,10 @@ const NewBillerHome = ({ navigation }) => {
   const paperlessStatusAcp = useSelector(
     (state) => state.profile?.paperlessStatusAcp
   );
-  const paperlessLoading = useSelector(
+  const paperlessLoadingFromStore = useSelector(
     (state) => state.profile?.isPaperLessStatusLoading
   );
+  const paperlessLoading = paperlessLoadingFromStore || paperlessStatusAcp === undefined;
   const userInfo = useSelector((state) => state.user?.userData?.userInfo);
   const isMobilePilotEnabled = useSelector(
     (state) => state.user.userData?.userInfo?.pending_activation === true
@@ -102,7 +102,7 @@ const NewBillerHome = ({ navigation }) => {
 
   
 
-  /* Sync outage banner with Redux outage state from servicesSaga */
+  // Sync outage banner with Redux outage state from servicesSaga.
   useEffect(() => {
     if (outageData?.hasOutage) {
       setIsOutageAlert(true);
@@ -129,7 +129,7 @@ const NewBillerHome = ({ navigation }) => {
           setloadingAutoPay(false);
         },
         (error) => {
-          console.log("error", error);
+          console.warn("error", error);
           setloadingAutoPay(false);
         }
       );
@@ -152,17 +152,18 @@ const NewBillerHome = ({ navigation }) => {
       }
           dispatch(fetchACPUserAccountDetails());
           getStatus();
-          //getInAppNotificationsData();
           setIsNotificationEnable(true);
         } catch (error) {
-          console.error("Error refreshing data on focus", error);
+          console.warn("Error refreshing data on focus", error);
         }
       };
 
-      
-      
-     
       refreshData();
+
+      return () => {
+        setIsAutoPayStatus(undefined);
+        setloadingAutoPay(true);
+      };
     }, [dispatch])
   );
 
@@ -181,36 +182,11 @@ const NewBillerHome = ({ navigation }) => {
         email: getPrimaryEmail(accountDetails),
       });
       DeviceInfo.getUserAgent().then((userAgent) => {
-        // iOS: "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143"
-        // tvOS: not available
-        // Android: "Mozilla/5.0 (Linux; Android 12; sdk_gphone64_arm64 Build/SE1A.220630.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36"
-        // Windows: ?
-        //getZendeskChatToken(userAgent);
+        // UA samples: iOS Safari Mobile / tvOS n/a / Android Chrome WebView / Windows ?
         loginWithToken(userAgent);
       });
     }
   }, [accountDetails]);
-
-  // const getInAppNotificationsData = () => {
-  //   getUser().then((res1) => {
-  //     let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
-  //     GetApiRequest(
-  //       requestUrl,
-  //       (res) => {
-  //         if (res) {
-  //           res[0]?.pushMessageType.forEach((value, index) => {
-  //             if (!value?.optOutFlag) {
-  //               setIsNotificationEnable(true);
-  //             }
-  //           });
-  //         }
-  //       },
-  //       (error) => {
-  //         console.error("Error on retrying getInAppNotificationsData", error);
-  //       }
-  //     );
-  //   });
-  // };
 
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
@@ -232,7 +208,6 @@ const NewBillerHome = ({ navigation }) => {
         permanentSkip: false,
       };
       storePushNotificationStatus(localData);
-      //await dispatch(updatePushNotificationsv2(data, null));
     } else {
       const token = await getFcmToken();
       const dataWithoutPermission = {
@@ -251,7 +226,6 @@ const NewBillerHome = ({ navigation }) => {
         permanentSkip: true,
       };
       storePushNotificationStatus(localData);
-      //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
     }
   };
 
@@ -265,10 +239,9 @@ const NewBillerHome = ({ navigation }) => {
       }
 
       const data = await response.json();
-      console.log("IP Address:", data.ip);
       return data.ip; // The IP address
     } catch (error) {
-      console.error("Error fetching IP address:", error);
+      console.warn("Error fetching IP address:", error);
       return null;
     }
   };
@@ -315,25 +288,19 @@ const NewBillerHome = ({ navigation }) => {
         
           loginWithJWT(jwtToken)
             .then(() => {
-              console.log("Logged in to Zendesk Chat with JWT");
               // Now set conversational fields
               setConversationalFields(fields);
             })
             .catch((error) => {
               setConversationalFields(fields);
-              console.error("Error logging in to Zendesk Chat:", error);
+              console.warn("Error logging in to Zendesk Chat:", error);
             });
         }
       },
       (error) => {
-        console.log("error in fetching JWT reponse for zendesk", error);
+        console.warn("error in fetching JWT reponse for zendesk", error);
       }
     );
-
-    // setTimeout(() => {
-    //   //console.log("Setting conversational fields", fields);
-    //   setConversationalFields(fields);
-    // }, 1000);
   };
 
   const renderHeader = () => (
@@ -381,7 +348,6 @@ const NewBillerHome = ({ navigation }) => {
         ) : (
           <WelcomeCard />
         )}
-        {/* <MenuGrid /> */}
          <View style={styles.contentWrapper}>
         <PromoBanner
           title="Sign up and save with Auto Pay and Paperless Billing"
@@ -415,10 +381,6 @@ const NewBillerHome = ({ navigation }) => {
             navigation.navigate("account", { screen: "Notifications" })
           }
         />
-        {/* <InfoBanner
-          message="We are working diligently to enhance your experience"
-          icon="megaphone"
-        /> */}
         </View>
       </View>
     </View>
@@ -442,17 +404,7 @@ const NewBillerHome = ({ navigation }) => {
           }
           accessibilityElementsHidden={isWalkthroughActive}
         >
-           {renderHeader()}  
-           {/* <View
-            accessibilityLabel="SparkLight"
-            style={styles.headerContainer}
-            importantForAccessibility={
-              isWalkthroughActive ? "no-hide-descendants" : "auto"
-            }
-            accessibilityElementsHidden={isWalkthroughActive}
-          >
-            <Logo width={120} height={33.32} />
-          </View>   */}
+           {renderHeader()}
           <ScrollView style={styles.scrollContainer}>
             <View
               style={styles.mainContentContainer}

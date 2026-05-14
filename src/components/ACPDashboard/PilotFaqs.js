@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
-import AppStyles from "../utility/AppStyles";
+import { card } from "../../styles/utilities";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { useNavigation } from "@react-navigation/native";
 
@@ -11,7 +11,7 @@ const PilotFaqs = () => {
   const navigation = useNavigation();
   
   return (
-    <View style={[AppStyles.card, styles.container]}>
+    <View style={[card.elevated, styles.container]}>
       <View
         accessible={true}
         accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
@@ -34,7 +34,7 @@ const PilotFaqs = () => {
       <Text
         style={styles.link}
         onPress={() => {
-          navigation.navigate("ArticalWindowUtility", {
+          navigation.navigate("ArticleWindowUtility", {
             url: "https://www.sparklight.com/Activation-faqs",
             name: "Sparklight Service Activation FAQs",
           });

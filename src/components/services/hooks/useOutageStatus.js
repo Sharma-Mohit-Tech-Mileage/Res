@@ -11,9 +11,7 @@ import {
   selectOutageError
 } from '../../../redux/selectors/servicesSelectors';
 
-// `source` is 'dashboard' or 'services'. Each caller reads only its own spinner flag,
-// so a fetch triggered by the dashboard does not light up the services spinner.
-// The result (`outageData`) is shared, so a fresh fetch from either screen benefits both.
+// `source` ('dashboard'|'services') gates per-caller spinner flags; `outageData` is shared, so either fetch benefits both.
 export const useOutageStatus = (source = 'services') => {
   const dispatch = useDispatch();
   const outageData = useSelector(selectOutageData);

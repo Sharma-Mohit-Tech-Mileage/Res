@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, AccessibilityInfo } from "react-native";
+import { View, Text, StyleSheet, AccessibilityInfo } from "react-native";
 import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import Icon from "../common/Icon";
+import Touchable from "../common/customui/Touchable";
 
 const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
@@ -36,7 +37,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
   const handleContactSupportPress = () => {
     if (navigation) {
       try {
-        navigation.navigate("ArticalWindowUtility", {
+        navigation.navigate("ArticleWindowUtility", {
           url: "https://www.sparklight.com/contactus",
           name: "Contact Support",
         });
@@ -57,8 +58,9 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
           style={styles.checkIcon}
         />
       </View>
-      <TouchableOpacity
-        style={styles.touchableTextContainer}
+      <Touchable
+        minSize={0}
+        style={[styles.touchableTextContainer, { alignItems: 'stretch' }]}
         onPress={onPress}
         accessibilityRole="link"
         accessibilityLabel={accessibilityLabel}
@@ -69,7 +71,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
         <Text style={styles.reconnectionText}>
           {children}
         </Text>
-      </TouchableOpacity>
+      </Touchable>
     </View>
   );
 

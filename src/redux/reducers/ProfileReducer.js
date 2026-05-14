@@ -26,7 +26,7 @@ const initialState = {
   paperLessInfo: {},
   pushNotifications: [],
   allSvEmailAssociated: [],
-  paperlessStatusAcp: false,
+  paperlessStatusAcp: undefined,
   accountDetails: {},
   accountDetailsFetchedAt: null,
   erro: "",
@@ -84,12 +84,15 @@ const ProfileReducer = (state = initialState, action) => {
       return {
         ...state,
         isPaperLessStatusLoading: true,
+        paperlessStatusAcp: undefined,
       };
 
     case CLEAR_LOADING:
       return {
         ...state,
         isPaperLessStatusLoading: false,
+        paperlessStatusAcp:
+          state.paperlessStatusAcp === undefined ? false : state.paperlessStatusAcp,
       };
 
     case SET_PAPERLESS_STATUS:
