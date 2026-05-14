@@ -168,6 +168,13 @@ const ProfileSettings = () => {
       .join(" ");
   };
 
+  const formatAddressForAccessibility = (address) => {
+    const addressText = (address || "").toString();
+    if (!addressText) return "N/A";
+
+    return addressText.replace(/\d+/g, (match) => numberToWordsForAccessibility(match));
+  };
+
   const getTextNotificationsData = () => {
     setShowPhoneLoading(true);
     getUser().then((res1) => {
@@ -398,13 +405,23 @@ const ProfileSettings = () => {
               <View style={styles.frameContainer}>
                 <View style={styles.firstNameParent} >
                   <Text style={styles.firstName}>{"Service Address"}</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}>
+                  <Text
+                    style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel={` ${formatAddressForAccessibility(serviceAddress())}`}
+                  > 
                     {serviceAddress() || "N/A"}
                   </Text>
                 </View>
                 <View style={styles.firstNameParent} >
                   <Text style={styles.firstName}>Billing Address</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}>
+                  <Text
+                    style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel={` ${formatAddressForAccessibility(billingAddress())}`}
+                  > 
                     {billingAddress() || "N/A"}
                   </Text>
                 </View>
