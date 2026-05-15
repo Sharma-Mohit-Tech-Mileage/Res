@@ -30,7 +30,7 @@ variables:
   - name: androidVersionCode
     value: $[counter('androidBuildVersionStore', 23034)]
   - name: androidVersionName
-    value: '25.7.0'
+    value: '26.1.0'
   - name: NPM_CONFIG_LEGACY_PEER_DEPS
     value: 'true'
   # iOS signing & deployment variables
@@ -142,7 +142,7 @@ stages:
             name: keystoreFile
             displayName: 'Download Keystore File'
             inputs:
-              secureFile: 'Residentialkey.keystore'
+              secureFile: 'Sparklight.keystore'
 
           - task: Gradle@4
             displayName: 'Build Android App Bundle (Demo Release)'
