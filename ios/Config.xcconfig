@@ -1,0 +1,10 @@
+//
+//  Config.xcconfig
+//  My Sparklight
+//
+//  Created by Mohit Sharma on 2/23/26.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://developer.apple.com/documentation/xcode/adding-a-build-configuration-file-to-your-project
+#include? "tmp.xcconfig"
