@@ -993,7 +993,7 @@ stages:
           - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
             displayName: 'Publish AAB to Play Store Internal Testing'
             inputs:
-              serviceConnection: 'PlaySoreResiConnection'
+              serviceConnection: 'PlaystoreRessiConnection'
               applicationId: 'com.sparklight'
               action: 'SingleBundle'
               bundleFile: '$(AAB_FILE_PATH)'
