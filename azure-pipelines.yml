@@ -994,7 +994,7 @@ stages:
             displayName: 'Publish AAB to Play Store Internal Testing'
             inputs:
               serviceConnection: 'PlayStorBussiConnection'
-              applicationId: 'com.sparklight.customer.app'
+              applicationId: 'com.sparklight'
               action: 'SingleBundle'
               bundleFile: '$(AAB_FILE_PATH)'
               track: 'internal'

@@ -59,6 +59,10 @@ describe('announcementHelpers', () => {
   });
 
   it('evaluates campaign eligibility with targeting rules', () => {
+    const fixedNow = new Date('2026-01-01T12:00:00.000Z');
+    jest.useFakeTimers();
+    jest.setSystemTime(fixedNow);
+
     expect(isCampaignEligible(null)).toBe(false);
     expect(isCampaignEligible({ enabled: false })).toBe(false);
     expect(isCampaignEligible({ enabled: true })).toBe(true);
@@ -97,6 +101,8 @@ describe('announcementHelpers', () => {
       },
     };
     expect(isCampaignEligible(outOfDateRangeCampaign, { segment: 'premium' }, '1.5.0')).toBe(false);
+
+    jest.useRealTimers();
   });
 
   it('tracks announcement impression analytics event', async () => {
