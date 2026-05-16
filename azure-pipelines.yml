@@ -461,6 +461,7 @@ stages:
           - script: |
               npm install --legacy-peer-deps
               npm install --no-save --legacy-peer-deps jest-junit
+              npx update-browserslist-db@latest --yes || true
             displayName: 'Install Dependencies'
 
           - script: |
@@ -700,6 +701,7 @@ stages:
           - script: |
               npm install --legacy-peer-deps
               npm install --no-save --legacy-peer-deps jest-junit
+              npx update-browserslist-db@latest --yes || true
             displayName: 'Install Dependencies'
             workingDirectory: '.'
 
