@@ -36,6 +36,11 @@ describe('announcementHelpers', () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
   it('compares semantic versions correctly', () => {
     expect(compareVersions('1.2.0', '1.2.0')).toBe(0);
     expect(compareVersions('1.2.1', '1.2.0')).toBe(1);

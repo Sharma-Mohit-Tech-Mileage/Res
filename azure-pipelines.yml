@@ -465,7 +465,7 @@ stages:
             displayName: 'Install Dependencies'
 
           - script: |
-              npx jest --ci --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit
+              npx jest --ci --runInBand --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit
             displayName: 'Run iOS Jest Test Cases'
 
           - task: PublishTestResults@2
