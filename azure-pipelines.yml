@@ -860,32 +860,87 @@ stages:
 
           - script: |
               echo "Running ESLint analysis..."
-              npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json || true
+              npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json 2>&1 || true
+              if [ -f eslint-report.json ]; then
+                ESLINT_COUNT=$(jq 'length' eslint-report.json 2>/dev/null || echo '0')
+                ESLINT_ISSUE_COUNT=$(jq '[.[].messages[]] | length' eslint-report.json 2>/dev/null || echo '0')
+                echo "✓ ESLint: Analyzed $ESLINT_COUNT files, found $ESLINT_ISSUE_COUNT issues"
+              else
+                echo "⚠️ ESLint: No report generated"
+              fi
             displayName: 'Run ESLint'
             continueOnError: true
 
           - script: |
               echo "Running Prettier check..."
-              npx prettier --check src/ 2>&1 | tee prettier-report.txt || true
+              PRETTIER_OUTPUT=$(npx prettier --check src/ 2>&1 || true)
+              echo "$PRETTIER_OUTPUT" | tee prettier-report.txt
+              if echo "$PRETTIER_OUTPUT" | grep -q 'file'; then
+                PRETTIER_ISSUE_COUNT=$(echo "$PRETTIER_OUTPUT" | grep -c 'file' || echo '0')
+                echo "✓ Prettier: Found $PRETTIER_ISSUE_COUNT formatting issues"
+              else
+                echo "✓ Prettier: All files formatted correctly"
+              fi
             displayName: 'Run Prettier Check'
             continueOnError: true
 
           - script: |
+              set -euo pipefail
               REPORT_DIR="$(Build.ArtifactStagingDirectory)/lint-reports"
               mkdir -p "$REPORT_DIR"
-
+              SUMMARY_FILE="$REPORT_DIR/lint-summary.txt"
+              
+              {
+                echo "=== JavaScript Lint Report Summary ==="
+                echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                echo ""
+              } > "$SUMMARY_FILE"
+              
               if [ -f "$(System.DefaultWorkingDirectory)/eslint-report.json" ]; then
                 cp "$(System.DefaultWorkingDirectory)/eslint-report.json" "$REPORT_DIR/"
+                ESLINT_COUNT=$(jq 'length' "$REPORT_DIR/eslint-report.json" 2>/dev/null || echo '0')
+                ESLINT_ISSUE_COUNT=$(jq '[.[].messages[]] | length' "$REPORT_DIR/eslint-report.json" 2>/dev/null || echo '0')
+                {
+                  echo "ESLint Results:"
+                  echo "  Files Analyzed: $ESLINT_COUNT"
+                  echo "  Total Issues: $ESLINT_ISSUE_COUNT"
+                  echo ""
+                } >> "$SUMMARY_FILE"
+              else
+                echo "  ESLint: No report generated (check npm dependencies or src/ path)" >> "$SUMMARY_FILE"
+                echo "" >> "$SUMMARY_FILE"
               fi
-
+              
               if [ -f "$(System.DefaultWorkingDirectory)/prettier-report.txt" ]; then
                 cp "$(System.DefaultWorkingDirectory)/prettier-report.txt" "$REPORT_DIR/"
+                PRETTIER_ISSUE_COUNT=$(grep -c 'file' "$REPORT_DIR/prettier-report.txt" 2>/dev/null || echo '0')
+                {
+                  echo "Prettier Results:"
+                  echo "  Formatting Issues: $PRETTIER_ISSUE_COUNT"
+                  echo ""
+                } >> "$SUMMARY_FILE"
+              else
+                echo "  Prettier: No report generated" >> "$SUMMARY_FILE"
+                echo "" >> "$SUMMARY_FILE"
               fi
-
-              if [ -z "$(find "$REPORT_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-                echo "No lint report files were generated." > "$REPORT_DIR/lint-summary.txt"
+              
+              FILE_COUNT=$(find "$REPORT_DIR" -type f \( -name 'eslint-report.json' -o -name 'prettier-report.txt' \) | wc -l)
+              if [ "$FILE_COUNT" -eq 0 ]; then
+                {
+                  echo "⚠️ Lint Report Status: No lint reports were generated."
+                  echo "Possible Causes:"
+                  echo "  - Dependencies may not have installed correctly"
+                  echo "  - Source directory (src/) may be empty or inaccessible"
+                  echo "  - ESLint/Prettier may have encountered a fatal error"
+                  echo ""
+                  echo "Action: Check build logs for npm install errors."
+                } >> "$SUMMARY_FILE"
+              else
+                {
+                  echo "✓ Lint Report Status: Reports generated successfully"
+                } >> "$SUMMARY_FILE"
               fi
-            displayName: 'Stage Lint Reports'
+            displayName: 'Stage and Summarize Lint Reports'
 
           - task: PublishBuildArtifacts@1
             displayName: 'Publish Lint Reports'
@@ -1012,24 +1067,75 @@ stages:
               jdkSourceOption: 'PreInstalled'
 
           - script: |
+              set -euo pipefail
               cd android
-              ./gradlew lintDemoRelease --no-daemon || true
+              echo "Starting Android Lint for Demo Release variant..."
+              if ./gradlew lintDemoRelease --no-daemon 2>&1 | tee lint-build.log; then
+                echo "✓ Android Lint completed successfully"
+              else
+                echo "⚠️ Android Lint encountered issues (check detailed logs below)"
+              fi
             displayName: 'Run Android Lint'
             continueOnError: true
 
           - script: |
+              set -euo pipefail
               SOURCE_DIR="$(System.DefaultWorkingDirectory)/android/app/build/reports"
               REPORT_DIR="$(Build.ArtifactStagingDirectory)/android-lint-reports"
               mkdir -p "$REPORT_DIR"
-
+              SUMMARY_FILE="$REPORT_DIR/android-lint-summary.txt"
+              
+              {
+                echo "=== Android Lint Report Summary ==="
+                echo "Variant: demoRelease"
+                echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                echo ""
+              } > "$SUMMARY_FILE"
+              
               if [ -d "$SOURCE_DIR" ]; then
-                cp -R "$SOURCE_DIR"/. "$REPORT_DIR/" || true
+                echo "Source directory found: $SOURCE_DIR"
+                cp -R "$SOURCE_DIR"/. "$REPORT_DIR/" 2>/dev/null || true
+                
+                LINT_REPORT_COUNT=$(find "$REPORT_DIR" -name 'lint-results*.xml' -o -name 'lint-results*.html' | wc -l || echo '0')
+                {
+                  echo "Reports Generated: $LINT_REPORT_COUNT"
+                  echo ""
+                  if [ "$LINT_REPORT_COUNT" -gt 0 ]; then
+                    echo "Report Files:"
+                    find "$REPORT_DIR" -type f -name 'lint-results*' -exec ls -lh {} \; | awk '{print "  " $9 " (" $5 ")"}'
+                  fi
+                  echo ""
+                } >> "$SUMMARY_FILE"
+              else
+                echo "Source directory NOT found: $SOURCE_DIR" >> "$SUMMARY_FILE"
               fi
-
-              if [ -z "$(find "$REPORT_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-                echo "Lint reports may be unavailable if lint did not produce report files." > "$REPORT_DIR/lint-summary.txt"
+              
+              if [ -f "$(System.DefaultWorkingDirectory)/android/lint-build.log" ]; then
+                {
+                  echo "Build Log (last 50 lines):"
+                  tail -50 "$(System.DefaultWorkingDirectory)/android/lint-build.log" | sed 's/^/  /'
+                  echo ""
+                } >> "$SUMMARY_FILE"
               fi
-            displayName: 'Stage Android lint reports'
+              
+              if [ -z "$(find "$REPORT_DIR" -name 'lint-results*' -type f 2>/dev/null)" ]; then
+                {
+                  echo "⚠️ Lint Report Status: No lint result files were generated."
+                  echo ""
+                  echo "Possible Causes:"
+                  echo "  1. Gradle build may have failed before lint task"
+                  echo "  2. No lint issues detected (build succeeded silently)"
+                  echo "  3. Build configuration may not include lintOptions"
+                  echo "  4. Insufficient permissions or disk space"
+                  echo ""
+                  echo "Action: Check gradle build log above for detailed errors."
+                } >> "$SUMMARY_FILE"
+              else
+                {
+                  echo "✓ Lint Report Status: Report files generated successfully"
+                } >> "$SUMMARY_FILE"
+              fi
+            displayName: 'Stage and Summarize Android Lint Reports'
 
           - task: PublishBuildArtifacts@1
             displayName: 'Publish Android Lint Reports'
