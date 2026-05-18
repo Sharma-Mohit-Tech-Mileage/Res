@@ -20,7 +20,6 @@ const billingBreakdownReducer = (state = initialState, action) => {
     
     case types.FETCH_BILLING_BREAKDOWN_SUCCESS:
 
-  console.log("Billing Data:-------------------------------------", action);
       return {
         ...state,
         loading: false,

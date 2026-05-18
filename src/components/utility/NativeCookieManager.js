@@ -29,7 +29,7 @@ export const setAuthCookiesOnAllDomains = async (idToken) => {
         }
         await Promise.all(promises);
     } catch (e) {
-        console.error(`${TAG} setAuthCookies FAILED | error=${e.message}`);
+        console.warn(`${TAG} setAuthCookies FAILED | error=${e.message}`);
     }
 };
 
@@ -41,7 +41,7 @@ export const refreshIdTokenOnAllDomains = async (idToken) => {
         const expiry = shortExpiry();
         await Promise.all(COOKIE_URLS.map(url => setCookie(url, 'IdToken', idToken, expiry)));
     } catch (e) {
-        console.error(`${TAG} refreshIdToken FAILED | error=${e.message}`);
+        console.warn(`${TAG} refreshIdToken FAILED | error=${e.message}`);
     }
 };
 
@@ -49,6 +49,6 @@ export const clearAuthCookies = async () => {
     try {
         await CookieManager.clearAll();
     } catch (e) {
-        console.error(`${TAG} clearAuthCookies FAILED | error=${e.message}`);
+        console.warn(`${TAG} clearAuthCookies FAILED | error=${e.message}`);
     }
 };

@@ -2,11 +2,9 @@ import React, { useRef, useState, useMemo, useCallback } from 'react';
 import {
   StyleSheet,
   View,
-  TouchableOpacity,
   Text,
   Modal,
   SafeAreaView,
-  Pressable,
   findNodeHandle,
   AccessibilityInfo,
   Platform,
@@ -14,6 +12,8 @@ import {
 import { Box } from 'native-base';
 import { Padding, Color, FontFamily, FontSize } from '../../../../GlobalStyles';
 import DownArrow from '../../../res/svgIcons/DownArrow';
+import IconButton from './IconButton';
+import Touchable from './Touchable';
 
 const SparkLightDropdown = ({
   items,
@@ -81,7 +81,7 @@ const SparkLightDropdown = ({
 
   return (
     <Box style={[styles.container, style]}>
-      <TouchableOpacity
+      <Touchable
         ref={dropdownRef}
         style={[styles.dropdown, dropDownStyle]}
         onPress={openPicker}
@@ -108,7 +108,7 @@ const SparkLightDropdown = ({
         <View style={styles.iconWrap} pointerEvents="none">
           <DownArrow />
         </View>
-      </TouchableOpacity>
+      </Touchable>
 
       <Modal
         visible={visible}
@@ -118,9 +118,10 @@ const SparkLightDropdown = ({
         onDismiss={closePicker}
       >
         <View style={styles.modalContainer}>
-          <Pressable
+          <Touchable
             style={styles.backdrop}
             onPress={closePicker}
+            minSize={0}
             accessible
             accessibilityRole="button"
             accessibilityLabel="Close dropdown"
@@ -134,18 +135,15 @@ const SparkLightDropdown = ({
                   {dropdownTitle}
                 </Text>
 
-                <TouchableOpacity
+                <IconButton
                   onPress={closePicker}
                   style={styles.closeButton}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  accessible
-                  accessibilityRole="button"
                   accessibilityLabel="Close dropdown"
                 >
                   <Text style={styles.closeButtonText} accessible={false}>
                     ✕
                   </Text>
-                </TouchableOpacity>
+                </IconButton>
               </View>
             </View>
 
@@ -153,7 +151,7 @@ const SparkLightDropdown = ({
               {validItems.map((item, index) => {
                 const isSelected = selectedValue === item;
                 return (
-                  <TouchableOpacity
+                  <Touchable
                     key={`${item}-${index}`}
                     style={[
                       styles.option,
@@ -189,7 +187,7 @@ const SparkLightDropdown = ({
                         ✓
                       </Text>
                     )}
-                  </TouchableOpacity>
+                  </Touchable>
                 );
               })}
             </SafeAreaView>
@@ -290,10 +288,8 @@ const styles = StyleSheet.create({
 
   closeButton: {
     position: 'absolute',
-    right: 16,
-    top: 0,
-    width: 24,
-    height: 24,
+    right: Padding.p_5xs, // 8 — slight inset so 48dp container's right edge stays clear
+    top: -Padding.p_xs, // -12 — vertically center over the 24dp header content row
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -316,7 +312,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#C6C6C8',
-    minHeight: 44,
+    minHeight: 48,
   },
 
   firstOption: {

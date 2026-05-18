@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DeviceInfo from 'react-native-device-info';
+import { logError } from '../utils/logger';
 
 const STORAGE_KEY = 'FEATURE_ANNOUNCEMENTS_STATE';
 const VERSION_KEY = 'LAST_APP_VERSION';
@@ -10,7 +11,7 @@ class AnnouncementPersistence {
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       return data ? JSON.parse(data) : {};
     } catch (error) {
-      console.error('[AnnouncementPersistence] Error getting states:', error);
+      logError('[AnnouncementPersistence] Error getting states:', error);
       return {};
     }
   }
@@ -20,7 +21,7 @@ class AnnouncementPersistence {
       const allStates = await this.getAllStates();
       return allStates[campaignId] || null;
     } catch (error) {
-      console.error(`[AnnouncementPersistence] Error getting state for ${campaignId}:`, error);
+      logError(`[AnnouncementPersistence] Error getting state for ${campaignId}:`, error);
       return null;
     }
   }
@@ -34,9 +35,8 @@ class AnnouncementPersistence {
         version: DeviceInfo.getVersion(),
       };
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allStates));
-      console.log(`[AnnouncementPersistence] Saved state for ${campaignId}:`, state);
     } catch (error) {
-      console.error(`[AnnouncementPersistence] Error saving state for ${campaignId}:`, error);
+      logError(`[AnnouncementPersistence] Error saving state for ${campaignId}:`, error);
     }
   }
 
@@ -84,18 +84,16 @@ class AnnouncementPersistence {
       const allStates = await this.getAllStates();
       delete allStates[campaignId];
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allStates));
-      console.log(`[AnnouncementPersistence] Cleared state for ${campaignId}`);
     } catch (error) {
-      console.error(`[AnnouncementPersistence] Error clearing state for ${campaignId}:`, error);
+      logError(`[AnnouncementPersistence] Error clearing state for ${campaignId}:`, error);
     }
   }
 
   static async clearAllStates() {
     try {
       await AsyncStorage.removeItem(STORAGE_KEY);
-      console.log('[AnnouncementPersistence] Cleared all states');
     } catch (error) {
-      console.error('[AnnouncementPersistence] Error clearing all states:', error);
+      logError('[AnnouncementPersistence] Error clearing all states:', error);
     }
   }
 
@@ -106,26 +104,18 @@ class AnnouncementPersistence {
 
       if (!lastVersion) {
         await AsyncStorage.setItem(VERSION_KEY, currentVersion);
-
-        if (mobileTCAcceptanceFlag) {
-          console.log(`[AnnouncementPersistence] No stored version but TC accepted — treating as upgrade`);
-          return true;
-        }
-
-        console.log(`[AnnouncementPersistence] No stored version, new user — not an upgrade`);
-        return false;
+        return mobileTCAcceptanceFlag === true;
       }
 
       const versionChanged = lastVersion !== currentVersion;
 
       if (versionChanged) {
         await AsyncStorage.setItem(VERSION_KEY, currentVersion);
-        console.log(`[AnnouncementPersistence] Version changed: ${lastVersion} -> ${currentVersion}`);
       }
 
       return versionChanged;
     } catch (error) {
-      console.error('[AnnouncementPersistence] Error checking version:', error);
+      logError('[AnnouncementPersistence] Error checking version:', error);
       return false;
     }
   }
@@ -134,7 +124,7 @@ class AnnouncementPersistence {
     try {
       return await AsyncStorage.getItem(VERSION_KEY);
     } catch (error) {
-      console.error('[AnnouncementPersistence] Error getting last version:', error);
+      logError('[AnnouncementPersistence] Error getting last version:', error);
       return null;
     }
   }

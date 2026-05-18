@@ -8,7 +8,6 @@ export const TABS = [
     component: "HomeStackScreen",
     icons: {
       default: "HomeIcon",
-      selected: "HomeIconSelected",
     },
 
     alwaysVisible: true,
@@ -63,7 +62,6 @@ export const TABS = [
     component: "MyServicesStack",
     icons: {
       default: "SupportIcon",
-      selected: "SupportIconSelected",
     },
 
     isVisible: (userInfo, featureFlags) => {

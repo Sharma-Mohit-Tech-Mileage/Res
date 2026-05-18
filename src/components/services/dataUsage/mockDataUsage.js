@@ -132,8 +132,7 @@ export const calculatePace = (currentUsage) => {
       expected: 0,
     };
   }
-  
-  // FIXED: Added endDate and beginDate
+
   const { usedDataGB, dataPlanGB, remainingDays, endDate, beginDate } = currentUsage;
   
   const totalDays = Math.ceil(

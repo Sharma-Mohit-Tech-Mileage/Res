@@ -286,7 +286,6 @@ describe('announcementHelpers', () => {
 
   it('handles unknown type and navigation errors', () => {
     const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const throwingNavigationRef = {
       current: {
@@ -300,9 +299,7 @@ describe('announcementHelpers', () => {
     navigateToDestination({ type: 'screen', destination: 'Any' }, throwingNavigationRef);
 
     expect(warnSpy).toHaveBeenCalled();
-    expect(errorSpy).toHaveBeenCalled();
 
     warnSpy.mockRestore();
-    errorSpy.mockRestore();
   });
 });

@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import {
   StyleSheet,
   View,
-  Pressable,
   ScrollView,
   RefreshControl,
   Platform,
   Text,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useSelector } from "react-redux";
 import {
   Border,
@@ -24,7 +24,7 @@ import PubSub from "pubsub-js";
 import base64 from "react-native-base64";
 import { startChatWithConfig, startChat } from "../utility/RNZendeskChat";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
-import AppStyles from "../utility/AppStyles";
+import { card } from "../../styles/utilities";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 import RighIcon from "../../../assets/svgs/Chevonright";
 import Searchmd from "../../../assets/svgs/Searchmd";
@@ -65,12 +65,6 @@ const Support = ({ route }) => {
       }
 
       const json = await response.json();
-      console.log(
-        "Agent is availibility",
-        data?.department,
-        "Count=" + json.channel_group_statuses.chat.state_counts.online
-      );
-      console.log("Agent group_id", group_id);
       if (json.channel_group_statuses.chat.state_counts.online > 0) {
         if (group_id == "1500003312422") {
           setisAgentAvailable(true);
@@ -109,7 +103,7 @@ const Support = ({ route }) => {
       setRefreshing(false);
     } catch (error) {
       setRefreshing(false);
-      console.error("Error fetching data:", error);
+      console.warn("Error fetching data:", error);
     }
   };
 
@@ -148,7 +142,7 @@ const Support = ({ route }) => {
       accessibilityLabel: "Getting Started",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the left of the text
-      navigateTo: "ArticalWindowUtility",
+      navigateTo: "ArticleWindowUtility",
       url: "https://support.sparklight.com/hc/en-us/articles/21493968056343-How-Do-I-Get-Started-with-the-MySparklight-Mobile-App?isMobile=true",
     },
     {
@@ -157,7 +151,7 @@ const Support = ({ route }) => {
       accessibilityLabel: "Billing and Payments",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
-      navigateTo: "ArticalWindowUtility",
+      navigateTo: "ArticleWindowUtility",
       url: "https://support.sparklight.com/hc/en-us/sections/22829302944279-Billing?isMobile=true",
     },
     {
@@ -166,7 +160,7 @@ const Support = ({ route }) => {
       accessibilityLabel: "Contact Information & Alerts",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
-      navigateTo: "ArticalWindowUtility",
+      navigateTo: "ArticleWindowUtility",
       url: "https://support.sparklight.com/hc/en-us/sections/36871771193623-Profile-Settings?isMobile=true",
     },
     {
@@ -175,7 +169,7 @@ const Support = ({ route }) => {
       accessibilityLabel: "Internet Services",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
-      navigateTo: "ArticalWindowUtility",
+      navigateTo: "ArticleWindowUtility",
       url: "https://support.sparklight.com/hc/en-us/categories/115000833068-Internet?isMobile=true",
     },
     {
@@ -184,7 +178,7 @@ const Support = ({ route }) => {
       accessibilityLabel: "More Support Options",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
-      navigateTo: "ArticalWindowUtility",
+      navigateTo: "ArticleWindowUtility",
       url: "https://support.sparklight.com/hc/en-us?isMobile=true",
     },
   ];
@@ -247,7 +241,7 @@ const Support = ({ route }) => {
               />
             }
           >
-            <View style={[AppStyles.card, { marginTop: Padding.p_5xs }]}>
+            <View style={[card.elevated, { marginTop: Padding.p_5xs }]}>
               <View
                 style={[
                   styles.headingContainer,
@@ -261,9 +255,10 @@ const Support = ({ route }) => {
               <View style={styles.frameChild} />
               {items.map((item, index) => (
                 <React.Fragment key={index}>
-                  <Pressable
+                  <Touchable
                     key={index}
-                    style={[styles.search, styles.navigationBorder]}
+                    minSize={0}
+                    style={[styles.search, styles.navigationBorder, { alignItems: 'stretch' }]}
                     accessible={true}
                     accessibilityLabel={
                       item.text == `More...` ? "More" : item.text
@@ -318,7 +313,7 @@ const Support = ({ route }) => {
                         </Text>
                       )}
                     </View>
-                  </Pressable>
+                  </Touchable>
                   {index < items.length - 1 && (
                     <View style={styles.frameChild} />
                   )}
@@ -327,7 +322,7 @@ const Support = ({ route }) => {
             </View>
 
             <>
-              <View style={[AppStyles.card, { marginBottom: 150 }]}>
+              <View style={[card.elevated, { marginBottom: 150 }]}>
                 <View
                   style={[
                     styles.headingContainer,
@@ -350,11 +345,13 @@ const Support = ({ route }) => {
 
                   <View style={styles.separator} />
 
-                  <Pressable
+                  <Touchable
+                    minSize={0}
+                    style={{ alignItems: 'stretch' }}
                     accessibilityLabel="Sparklight Customer Support"
                     accessibilityRole="button"
                     onPress={() => {
-                      navigation.navigate("ArticalWindowUtility", {
+                      navigation.navigate("ArticleWindowUtility", {
                         url: "https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT?isMobile=true",
                         name: "Sparklight Customer Support",
                       });
@@ -390,7 +387,7 @@ const Support = ({ route }) => {
                         {"Sparklight Customer Support"}
                       </Text>
                     </View>
-                  </Pressable>
+                  </Touchable>
                 </View>
               </View>
             </>

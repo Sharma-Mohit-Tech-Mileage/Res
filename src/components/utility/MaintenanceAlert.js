@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import MaintenaceIcon from "../../res/svgIcons/MaintenanceIcon";
-import AppStyles from "./AppStyles";
+import { card } from "../../styles/utilities";
 
 import {
   Color,
@@ -19,7 +19,7 @@ const MaintenanceAlert = ({
 }) => {
   return (
     <View style={{ flexDirection: "column" }}>
-      <View style={[AppStyles.card, { margin: 16 }]}>
+      <View style={[card.elevated, { margin: 16 }]}>
         <View
           style={{
             flexDirection: "column",

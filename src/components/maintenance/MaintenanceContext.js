@@ -56,7 +56,7 @@ export const MaintenanceProvider = ({ children }) => {
 
       return { isLoggedIn, userData };
     } catch (error) {
-      console.error("Error checking login status:", error);
+      console.warn("Error checking login status:", error);
       setIsUserLoggedIn(false);
       return { isLoggedIn: false, userData: null };
     }
@@ -90,7 +90,7 @@ export const MaintenanceProvider = ({ children }) => {
           isTimeValid = now >= startTime && now <= endTime;
         }
       } catch (error) {
-        console.error("Error parsing maintenance window times:", error);
+        console.warn("Error parsing maintenance window times:", error);
         isTimeValid = false;
       }
     }
@@ -241,7 +241,7 @@ export const MaintenanceProvider = ({ children }) => {
                 nowUTC >= startTimeUTC && nowUTC <= endTimeUTC;
             }
           } catch (error) {
-            console.error(
+            console.warn(
               "MAINTENANCE ERROR: Exception in SCHEDULED mode check:",
               error
             );
@@ -349,7 +349,7 @@ export const MaintenanceProvider = ({ children }) => {
             });
           }
         } catch (auth0Error) {
-          console.error(
+          console.warn(
             "Auth0 logout failed during silent logout:",
             auth0Error
           );
@@ -404,7 +404,7 @@ export const MaintenanceProvider = ({ children }) => {
         });
       }
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.warn("Error during logout:", error);
 
       try {
         await clearAuthCookies();
@@ -433,7 +433,7 @@ export const MaintenanceProvider = ({ children }) => {
           }
         }
       } catch (cleanupError) {
-        console.error("Fallback cleanup failed:", cleanupError);
+        console.warn("Fallback cleanup failed:", cleanupError);
       }
     }
   };

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, findNodeHandle} from "react-native";
+import { StyleSheet, Text, View, ScrollView, Animated, Platform, AccessibilityInfo, findNodeHandle} from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
+import { A11Y } from "../../styles/theme";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import AppStyles from "../utility/AppStyles";
+import { requiredField } from "../../styles/utilities";
 import CheckBox from "@react-native-community/checkbox";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from "../common/Toggle";
@@ -13,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import SecondaryButton from "../common/customui/PrimaryButton";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { updatePrimaryAndPaperlessRequest } from "../../redux/actions/NotificationActionSuite";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../utility/constant";
@@ -90,9 +92,7 @@ const AddNotificationScreen = () => {
 
   useEffect(() => {
     if (notification && screenReaderEnabled) {
-      // Focus only (no extra announcements).
-      // On iOS, focus can be stolen by the header/back during the notification animation,
-      // so we delay slightly longer and retry once.
+      // Focus only (no announcements). iOS retries because header/back may steal focus during the animation.
       const delays = Platform.OS === "ios" ? [900, 1600] : [600, 1200];
 
       const timers = delays.map((ms) =>
@@ -106,7 +106,7 @@ const AddNotificationScreen = () => {
 
             setMessageFocus();
           } catch (e) {
-            console.log("Accessibility focus error:", e);
+            console.warn("Accessibility focus error:", e);
           }
         }, ms)
       );
@@ -159,18 +159,7 @@ const AddNotificationScreen = () => {
 
 
 
-  //
-  const setFocusEmail = () => {
-      // setTimeout(() => {
-      //   if (inputRef.current) {
-      //     const handle = findNodeHandle(inputRef.current);
-      //     if (handle) {
-      //       AccessibilityInfo.setAccessibilityFocus(handle);
-      //     }
-      //   }
-      // }, 100);
-    };
-  
+  const setFocusEmail = () => {};
 
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -186,18 +175,7 @@ const AddNotificationScreen = () => {
       toValue: 0,
       duration: 500,
       useNativeDriver: true,
-    }).start(() => {
-      // Only auto-dismiss if notification is NOT an error type
-      // if (notification && notification.type !== "error") {
-      //   timeoutRef.current = setTimeout(() => {
-      //     Animated.timing(animatedValue, {
-      //       toValue: -100,
-      //       duration: 500,
-      //       useNativeDriver: true,
-      //     }).start(() => setNotification(null));
-      //   }, 3000);
-      // }
-    });
+    }).start();
   }, [animatedValue, notification]);
 
   useEffect(() => {
@@ -269,7 +247,7 @@ const AddNotificationScreen = () => {
   const handleTermsLinkPress = useCallback(
     (event) => {
       event.stopPropagation();
-      navigation.navigate("ArticalWindowUtility", {
+      navigation.navigate("ArticleWindowUtility", {
         url: "https://www.sparklight.com/legal/paperless-terms-and-conditions",
         name: "Terms & Conditions",
       });
@@ -353,7 +331,7 @@ const AddNotificationScreen = () => {
               </Text>
 
               <Text
-               style={AppStyles.requiredField}
+               style={requiredField}
                   accessibilityRole="text" 
                   accessible={true}
                   accessibilityLabel="Fields marked with asterisk are required.">
@@ -455,8 +433,9 @@ const AddNotificationScreen = () => {
             </A11y.Order>
             {isCheckboxVisible && (
               <View style={styles.checkBoxArea}>
-                <TouchableOpacity
-                  style={styles.checkboxTouchable}
+                <Touchable
+                  minSize={0}
+                  style={[styles.checkboxTouchable, { justifyContent: 'flex-start' }]}
                   onPress={handleCheckboxToggle}
                   accessibilityRole="checkbox"
                   accessibilityLabel="I agree to Paperless Billing Terms and Conditions"
@@ -486,12 +465,15 @@ const AddNotificationScreen = () => {
                       I agree to{" "}
                     </Text>
                   </View>
-                </TouchableOpacity>
-                <TouchableOpacity
+                </Touchable>
+                <Touchable
+                  minSize={0}
                   onPress={handleTermsLinkPress}
                   accessibilityRole="link"
                   accessibilityLabel="View Paperless Billing Terms and Conditions"
                   accessibilityHint="Opens Paperless Billing Terms and Conditions in a new window"
+                  hitSlop={A11Y.hitSlop}
+                  style={styles.termsLinkTouchable}
                 >
                   <Text
                     style={[
@@ -506,7 +488,7 @@ const AddNotificationScreen = () => {
                   >
                     Paperless Billing Terms & Conditions
                   </Text>
-                </TouchableOpacity>
+                </Touchable>
               </View>
             )}
           </View>
@@ -657,6 +639,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginRight: 0,
+    minHeight: A11Y.minTouch,
+    paddingVertical: Padding.p_5xs,
+  },
+  termsLinkTouchable: {
+    minHeight: A11Y.minTouch,
+    justifyContent: "center",
+    paddingVertical: Padding.p_5xs,
   },
   checkboxContainer: {
     flexDirection: "row",

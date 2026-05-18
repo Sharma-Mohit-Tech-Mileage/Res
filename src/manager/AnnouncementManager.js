@@ -12,7 +12,7 @@ class AnnouncementManager {
       const campaigns = announcements?.campaigns || [];
       return campaigns;
     } catch (error) {
-      console.error('[AnnouncementManager] Error loading campaigns:', error);
+      console.warn('[AnnouncementManager] Error loading campaigns:', error);
       return [];
     }
   }
@@ -118,7 +118,7 @@ class AnnouncementManager {
       return selectedCampaign;
 
     } catch (error) {
-      console.error('[AnnouncementManager] Error getting eligible campaign:', error);
+      console.warn('[AnnouncementManager] Error getting eligible campaign:', error);
       return null;
     }
   }

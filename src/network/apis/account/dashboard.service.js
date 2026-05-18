@@ -35,7 +35,6 @@ const getCurrentSpeedInfo = async()=> {
                     Authorization: "Bearer " + res.token
                 }
             };
-            console.log('config',config)
         const requestUrl = getEndpoint(ENDPOINTS.INTERNET_SPEED_GET, { accountNumber: res.userInfo.accountNumber });
         return _axios.get(requestUrl, {...config}).then(res=>res.data).catch(error=>{ throw error})
 };

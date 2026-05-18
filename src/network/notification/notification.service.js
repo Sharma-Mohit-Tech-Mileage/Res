@@ -26,7 +26,7 @@ export const getAllEmails = async () => {
         );
         return response.data;
     } catch (error) {
-        console.error('Error fetching emails:', error);
+        console.warn('Error fetching emails:', error);
         throw error;
     }
 };
@@ -41,7 +41,7 @@ export const isPaperlessEnabled = async (email) => {
         );
         return response.data;
     } catch (error) {
-        console.error('Error checking paperless status:', error);
+        console.warn('Error checking paperless status:', error);
         throw error;
     }
 };
@@ -57,7 +57,7 @@ export const enrollPaperless = async (data) => {
         );
         return response.data;
     } catch (error) {
-        console.error('Error enrolling in paperless:', error);
+        console.warn('Error enrolling in paperless:', error);
         throw error;
     }
 };
@@ -74,7 +74,7 @@ export const unenrollPaperless = async (data) => {
         );
         return response.data;
     } catch (error) {
-        console.error('Error unenrolling from paperless:', error);
+        console.warn('Error unenrolling from paperless:', error);
         throw error;
     }
 };
@@ -97,7 +97,7 @@ export const addPrimaryEmail = async ({ newEmail, oldEmail }) => {
         );
         return response.data;
     } catch (error) {
-        console.error('Error adding primary email:', error);
+        console.warn('Error adding primary email:', error);
         throw error;
     }
 };
@@ -120,7 +120,7 @@ export const updatePrimaryEmail = async ({ newEmail, oldEmail }) => {
         );
         return response.data;
     } catch (error) {
-        console.error('Error updating primary email:', error);
+        console.warn('Error updating primary email:', error);
         throw error;
     }
 };

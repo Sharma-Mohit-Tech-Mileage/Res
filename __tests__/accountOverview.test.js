@@ -24,6 +24,14 @@ const mockLogout = jest.fn(() => Promise.resolve({}));
 const mockSetUserId = jest.fn();
 const mockSetUserProperty = jest.fn(() => Promise.resolve());
 
+jest.mock('../src/components/common/customui/Touchable', () => {
+  const React = require('react');
+  const { Pressable } = require('react-native');
+  return function MockTouchable(props) {
+    return React.createElement(Pressable, props, props.children);
+  };
+});
+
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
@@ -88,7 +96,7 @@ jest.mock('moment', () => () => ({ year: () => 2026 }));
 
 jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
 jest.mock('../src/components/utility/ZendeskChatIcon', () => 'ZendeskChatIcon');
-jest.mock('../src/components/utility/AppStyles', () => ({ card: { borderRadius: 8 } }));
+jest.mock('../src/components/utility/AppStyles', () => ({ card: { borderRadius: 8 } }), { virtual: true });
 jest.mock('../src/res/svgIcons/UserIconWhite', () => 'UserIconWhite');
 jest.mock('../assets/svgs/Rightactionable15', () => {
   const React = require('react');
@@ -242,15 +250,15 @@ describe('AccountOverview behavior', () => {
     expect(mockNavigate).toHaveBeenCalledWith('ProfileSettings');
     expect(mockNavigate).toHaveBeenCalledWith('PasswordSecurity');
     expect(mockNavigate).toHaveBeenCalledWith('Notifications');
-    expect(mockNavigate).toHaveBeenCalledWith('ArticalWindowUtility', {
+    expect(mockNavigate).toHaveBeenCalledWith('ArticleWindowUtility', {
       url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy',
       name: 'Privacy Policy',
     });
-    expect(mockNavigate).toHaveBeenCalledWith('ArticalWindowUtility', {
+    expect(mockNavigate).toHaveBeenCalledWith('ArticleWindowUtility', {
       url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions?isMobile=true',
       name: 'Terms & Conditions',
     });
-    expect(mockNavigate).toHaveBeenCalledWith('ArticalWindowUtility', {
+    expect(mockNavigate).toHaveBeenCalledWith('ArticleWindowUtility', {
       url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true',
       name: 'App Release Notes',
     });
@@ -364,7 +372,7 @@ describe('AccountOverview behavior', () => {
   });
 
   it('handles analytics cleanup error during logout without blocking reset', async () => {
-    const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     mockSetUserProperty.mockRejectedValueOnce(new Error('analytics failed'));
 
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, msg, buttons) => {
@@ -386,10 +394,10 @@ describe('AccountOverview behavior', () => {
       await flushPromises();
     });
 
-    expect(errSpy).toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalled();
     expect(mockReset).toHaveBeenCalled();
     alertSpy.mockRestore();
-    errSpy.mockRestore();
+    warnSpy.mockRestore();
   });
 
   it('uses android logout redirect URL when platform is android', async () => {

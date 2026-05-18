@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   StyleSheet,
   Text,
-  Pressable,
   View,
   Animated,
   ScrollView,
@@ -13,6 +12,7 @@ import {
   AccessibilityInfo,
   findNodeHandle,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import {
   Color,
   FontSize,
@@ -32,7 +32,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
 import { PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 
 import {
@@ -62,8 +62,7 @@ const InAppNotifications = ({ navigation }) => {
   const successIconRef = useRef(null);
   const formatedData = route.params?.additionalData || {};
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
-  // On Android TalkBack we may temporarily hide background elements for *error* alerts,
-  // but success banners should not disable/"hide" the toggles.
+  // Android TalkBack: hide background elements only for error alerts, not for success banners.
   const isAndroidA11yModalActive =
     Platform.OS === "android" && screenReaderEnabled && notification?.type === "error";
 
@@ -87,7 +86,7 @@ const InAppNotifications = ({ navigation }) => {
               setErrorFocus();
             }
           } catch (e) {
-            console.log("Accessibility focus error:", e);
+            console.warn("Accessibility focus error:", e);
           }
         }, 600);
 
@@ -98,7 +97,7 @@ const InAppNotifications = ({ navigation }) => {
               if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
             }
           } catch (e) {
-            console.log("Accessibility focus retry error:", e);
+            console.warn("Accessibility focus retry error:", e);
           }
         }, 1200);
 
@@ -122,18 +121,7 @@ const InAppNotifications = ({ navigation }) => {
       toValue: 0,
       duration: 500,
       useNativeDriver: true,
-    }).start(() => {
-      // Only auto-dismiss if notification is NOT an error type
-      // if (notification && notification.type !== "error") {
-      //   timeoutRef.current = setTimeout(() => {
-      //     Animated.timing(animatedValue, {
-      //       toValue: -100,
-      //       duration: 500,
-      //       useNativeDriver: true,
-      //     }).start(() => setNotification(null));
-      //   }, 2000);
-      // }
-    });
+    }).start();
   }, [animatedValue, notification]);
 
   useEffect(() => {
@@ -180,20 +168,10 @@ const InAppNotifications = ({ navigation }) => {
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     formatedData[name] = value;
-    // setInitializeSettings((initialize) => {
-    //   const updatedSettings = {
-    //     ...initialize,
-    //     [name]: !value,
-    //   };
-    //   return updatedSettings;
-    // });
-
-    //checkNofif(value);
   };
 
   const initialNotificationStatus = async () => {
     const enabledPermission = await requestUserPermission();
-    console.log("FCM INITIAL ENABLED?", enabledPermission);
     if (enabledPermission) {
       setIsNotificationRequired(false);
     } else {
@@ -210,8 +188,6 @@ const InAppNotifications = ({ navigation }) => {
         const enabledPermission = await requestUserPermission();
         if (enabledPermission) {
           setIsNotificationRequired(false);
-          //storePushNotificationStatus(localData);
-          //await dispatch(updatePushNotifications(data, null));
         } else {
           setIsNotificationRequired(true);
           Alert.alert(
@@ -241,7 +217,6 @@ const InAppNotifications = ({ navigation }) => {
         }
       }
     } else {
-      console.log("FCM HOME ALREADY ENABLED");
     }
   };
 
@@ -259,13 +234,10 @@ const InAppNotifications = ({ navigation }) => {
         message: route.params.successMessage,
         type: "success",
       });
-    } else if (route.params?.updateFailed) {
-      //setNotification({ message: route.params.failureMessage, type: "error" });
     }
   }, [route.params]);
 
   const handleSave = async () => {
-    console.log("isNotificationRquired", isNotificationRquired);
 
     await postRequestInAppNotification();
   };
@@ -308,18 +280,15 @@ const InAppNotifications = ({ navigation }) => {
               "Your in-app notification preferences have been updated successfully.",
             type: "success",
           });
-          //navigation.navigate("Notifications", { updateSuccess: true, successMessage: "In-App Notifications updated successfully." });
         }
       },
       (error) => {
         setIsLoading(false);
-        console.error("Error on retrying postRequestInAppNotification", error);
+        console.warn("Error on retrying postRequestInAppNotification", error);
         setNotification({
           message: "In-App Notifications update failed.",
           type: "error",
         });
-        //setShowErrorAlert(true);
-        //navigation.navigate("Notifications", { updateFailed: true, failureMessage: "In-App Notifications update failed." });
       },
     );
   };
@@ -418,15 +387,13 @@ const InAppNotifications = ({ navigation }) => {
               </View>
 
                 <View style={styles.buttonsParent}>
-                  <Pressable
+                  <Touchable
+                    minSize={0}
                     accessible={true}
                     accessibilityLabel="Save"
                     accessibilityRole="button"
-                    style={({ pressed }) => [
-                      {
-                        backgroundColor: Color.colorMidnightblue,
-                        opacity: pressed ? 0.7 : 1.0,
-                      }, // Changes opacity based on press state
+                    style={[
+                      { backgroundColor: Color.colorMidnightblue },
                       styles.buttonsLayout,
                     ]}
                     onPress={handleSave}
@@ -436,15 +403,15 @@ const InAppNotifications = ({ navigation }) => {
                     >
                       Save
                     </Text>
-                  </Pressable>
-                  <Pressable
+                  </Touchable>
+                  <Touchable
+                    minSize={0}
                     accessible={true}
                     accessibilityLabel="Cancel"
                     accessibilityRole="button"
-                    style={({ pressed }) => [
+                    style={[
                       styles.buttons1,
                       styles.buttonsLayout,
-                      { opacity: pressed ? 0.7 : 1.0 },
                     ]}
                     onPress={() => navigation.navigate("Notifications")}
                   >
@@ -453,7 +420,7 @@ const InAppNotifications = ({ navigation }) => {
                     >
                       Cancel
                     </Text>
-                  </Pressable>
+                  </Touchable>
             </View>
           </View>
         </View>
@@ -463,8 +430,9 @@ const InAppNotifications = ({ navigation }) => {
 };
 
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
-  <Pressable
-    style={[styles.frameContainer, styles.frameBorder]}
+  <Touchable
+    minSize={0}
+    style={[styles.frameContainer, styles.frameBorder, { justifyContent: 'flex-start' }]}
     accessible={false}
     importantForAccessibility="no"
     onPress={() =>
@@ -509,7 +477,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
         </View>
       </View>
     </View>
-  </Pressable>
+  </Touchable>
 );
 
 const styles = StyleSheet.create({
@@ -571,9 +539,7 @@ const styles = StyleSheet.create({
   frameView: {
     paddingVertical: Padding.p_base,
     flexDirection: "row",
-    //alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
-    //flex: 1,
   },
   frameContainer: {
     borderBottomWidth: 1,

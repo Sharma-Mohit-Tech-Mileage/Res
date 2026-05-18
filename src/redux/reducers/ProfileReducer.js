@@ -3,6 +3,7 @@ import {
   SET_LOADING,
   CLEAR_LOADING,
   SAVE_ACP_USER_ACCOUNT_DETAILS,
+  INVALIDATE_ACCOUNT_CACHE,
   SAVEALLSVEMAILASSOCIATED,
   USER_PROFILE_DETAILS,
   SAVE_USER_LIST,
@@ -25,8 +26,9 @@ const initialState = {
   paperLessInfo: {},
   pushNotifications: [],
   allSvEmailAssociated: [],
-  paperlessStatusAcp: false,
+  paperlessStatusAcp: undefined,
   accountDetails: {},
+  accountDetailsFetchedAt: null,
   erro: "",
 };
 
@@ -82,12 +84,15 @@ const ProfileReducer = (state = initialState, action) => {
       return {
         ...state,
         isPaperLessStatusLoading: true,
+        paperlessStatusAcp: undefined,
       };
 
     case CLEAR_LOADING:
       return {
         ...state,
         isPaperLessStatusLoading: false,
+        paperlessStatusAcp:
+          state.paperlessStatusAcp === undefined ? false : state.paperlessStatusAcp,
       };
 
     case SET_PAPERLESS_STATUS:
@@ -101,6 +106,12 @@ const ProfileReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         accountDetails: action.payload,
+        accountDetailsFetchedAt: Date.now(),
+      };
+    case INVALIDATE_ACCOUNT_CACHE:
+      return {
+        ...state,
+        accountDetailsFetchedAt: null,
       };
     case LOGOUT:
       return {

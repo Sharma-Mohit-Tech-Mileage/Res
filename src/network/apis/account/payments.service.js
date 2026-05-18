@@ -22,7 +22,7 @@ const paymentHistoryApi = {
       const response = await _axios.get(requestUrl, {...config});
       return response.data;
     } catch (error) {
-      console.error("Error fetching payment history:", error);
+      console.warn("Error fetching payment history:", error);
       throw error;
     }
   },
@@ -47,7 +47,7 @@ const paymentHistoryApi = {
       
       return response.data;
     } catch (error) {
-      console.error("Error downloading payment receipt:", error);
+      console.warn("Error downloading payment receipt:", error);
       throw error;
     }
   }

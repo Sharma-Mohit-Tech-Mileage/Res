@@ -38,7 +38,7 @@ const Terms = ({ navigation }) => {
         ]);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.warn("Error fetching data:", error);
         setLoading(false);
       }
     };
@@ -94,7 +94,7 @@ const Terms = ({ navigation }) => {
         onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
         onError={(e) => {
           setIsError(true);
-          console.error("WebView error: ", e.nativeEvent);
+          console.warn("WebView error: ", e.nativeEvent);
         }}
       />
       {isError && (

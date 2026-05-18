@@ -8,7 +8,6 @@ function* fetchPaymentHistorySaga() {
   try {
     // Call API
     const payments = yield call(paymentHistoryApi.fetchPaymentHistory);
-    console.log('Fetched payment history:', payments);
 
     // Check if payments is a valid array before proceeding
     if (!Array.isArray(payments) || payments.length === 0) {
@@ -19,7 +18,7 @@ function* fetchPaymentHistorySaga() {
     // Dispatch success action with data
     yield put(actions.fetchPaymentHistorySuccess(payments));
   } catch (error) {
-    console.error('Error in fetchPaymentHistorySaga:', error);
+    console.warn('Error in fetchPaymentHistorySaga:', error);
     // Dispatch error action
     yield put(actions.fetchPaymentHistoryFailure(error.message || 'Failed to fetch payment history'));
   }
@@ -50,7 +49,7 @@ function* downloadPaymentReceiptSaga(action) {
       throw new Error('Receipt data is missing');
     }
   } catch (error) {
-    console.log('Error downloading payment receipt:', error);
+    console.warn('Error downloading payment receipt:', error);
     // Dispatch error action
     yield put(actions.downloadPaymentReceiptFailure(error.message || 'Failed to download receipt'));
   }

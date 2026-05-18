@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Keyboard,
 } from "react-native";
-import { Padding, Color, FontSize, FontFamily } from "../../../../GlobalStyles";
+import { Padding, Color, FontSize, FontFamily, Border } from "../../../../GlobalStyles";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -49,7 +49,7 @@ const SearchSuggestions = memo(
 
     const handleSuggestionClick = (suggestion) => {
       if (suggestion.html_url != "") {
-        navigation.navigate("ArticalWindowUtility", {
+        navigation.navigate("ArticleWindowUtility", {
           url: suggestion.html_url + "?isMobile=true",
           name: "Search Result",
         });
@@ -57,15 +57,8 @@ const SearchSuggestions = memo(
     };
 
     const submitValue = () => {
-    // Handle the submitted value here (e.g., send it to a server)
-    //console.log('Submitted:', value);
-    // You can optionally clear the input if needed
-    // setValue(''); 
-    
-    // The keyboard will remain open because blurOnSubmit is false
-    // If you want to manually dismiss the keyboard at some point, you can use Keyboard.dismiss()
-     Keyboard.dismiss(); 
-  }
+      Keyboard.dismiss();
+    };
 
     const renderSuggestion = ({ item, index }) => (
       <TouchableOpacity
@@ -114,8 +107,10 @@ const SearchSuggestions = memo(
             placeholderTextColor={Color.gray600}
             autoCorrect={false}
             clearButtonMode="always"
-            returnKeyType="done" // or "send", "go", etc.
+            returnKeyType="done"
             onSubmitEditing={submitValue}
+            accessible={false}
+            importantForAccessibility="no"
           />
           
         </View>
@@ -140,7 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F8F8",
     borderBottomWidth: 1,
     borderColor: Color.sparklightGray,
-    borderRadius: 8,
+    borderRadius: Border.br_5xs,
     height: 56,
   },
   searchIcon: {

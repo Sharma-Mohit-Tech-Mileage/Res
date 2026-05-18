@@ -1,10 +1,22 @@
-import React, { useRef, useState, useEffect } from "react";
-import { View, Text, StyleSheet, Animated, Easing, Platform } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, Platform, useWindowDimensions } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedProps,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
+
+const CALLOUT_EPSILON = 0.5;
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const AnimatedG = Animated.createAnimatedComponent(G);
 
 const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB, size = 140 }) => {
   const strokeWidth = 20;
@@ -12,31 +24,37 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
 
-  const animValue = useRef(new Animated.Value(0)).current;
-  const [progress, setProgress] = useState(0);
+  const progress = useSharedValue(0);
 
   useEffect(() => {
-    animValue.setValue(0);
-    setProgress(0);
-    const id = animValue.addListener(({ value }) => setProgress(value));
-    Animated.timing(animValue, {
-      toValue: 1,
-      duration: 1800,
-      easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-      useNativeDriver: false,
-    }).start();
-    return () => animValue.removeListener(id);
+    progress.value = 0;
+    progress.value = withTiming(1, {
+      duration: 900,
+      easing: Easing.out(Easing.cubic),
+    });
   }, [usedPercent, remainingPercent]);
 
-  const usedArc = (circumference * usedPercent * progress) / 100;
-  const remainingArc = (circumference * remainingPercent * progress) / 100;
-
-  const calloutOpacity = progress > 0.6 ? Math.min(1, (progress - 0.6) / 0.4) : 0;
-  const labelOpacity = animValue.interpolate({
-    inputRange: [0.6, 1],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
+  const usedArcAnimatedProps = useAnimatedProps(() => {
+    const arc = (circumference * usedPercent * progress.value) / 100;
+    return { strokeDasharray: [arc, circumference - arc] };
   });
+
+  const remainingArcAnimatedProps = useAnimatedProps(() => {
+    const usedArcCurrent = (circumference * usedPercent * progress.value) / 100;
+    const arc = (circumference * remainingPercent * progress.value) / 100;
+    return {
+      strokeDasharray: [arc, circumference - arc],
+      strokeDashoffset: -usedArcCurrent,
+    };
+  });
+
+  const calloutAnimatedProps = useAnimatedProps(() => ({
+    opacity: progress.value > 0.6 ? Math.min(1, (progress.value - 0.6) / 0.4) : 0,
+  }));
+
+  const labelAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: progress.value > 0.6 ? Math.min(1, (progress.value - 0.6) / 0.4) : 0,
+  }));
 
   const usedMidAngle = 135 + (usedPercent / 100) * 180;
   const remainingMidAngle = 135 + (usedPercent / 100) * 360 + (remainingPercent / 100) * 180;
@@ -55,13 +73,16 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
   const leftLineX = -25;
   const rightLineX = size + 25;
 
+  const showUsedCallout = usedPercent > CALLOUT_EPSILON;
+  const showRemainingCallout = remainingPercent > CALLOUT_EPSILON;
+
   const gaugeA11yLabel =
     `You have used ${usedGB} gigabytes of data, which is ${usedPercent.toFixed(2)} percent of your total allowance. ` +
     `You have ${remainingGB} gigabytes remaining.`;
 
   return (
     <View
-      style={{ height: size + 60, width: '100%', alignItems: 'center' }}
+      style={{ height: size + 60, width: '100%', maxWidth: size + 280, alignSelf: 'center', alignItems: 'center' }}
       accessible={true}
       accessibilityLabel={gaugeA11yLabel}
     >
@@ -90,61 +111,75 @@ const DonutWithCallouts = ({ usedPercent, remainingPercent, usedGB, remainingGB,
           <Circle cx={center} cy={center + 2} r={radius} stroke="#00000008" strokeWidth={strokeWidth} fill="none" />
           <Circle cx={center} cy={center} r={radius} stroke="#F5F5F5" strokeWidth={strokeWidth} fill="none" />
 
-          <Circle
+          <AnimatedCircle
             cx={center} cy={center} r={radius}
             stroke="url(#used)" strokeWidth={strokeWidth} fill="none"
-            strokeDasharray={`${usedArc} ${circumference - usedArc}`}
             strokeLinecap="butt"
             rotation="135" origin={`${center}, ${center}`}
+            animatedProps={usedArcAnimatedProps}
           />
 
-          <Circle
+          <AnimatedCircle
             cx={center} cy={center} r={radius}
             stroke="url(#remaining)" strokeWidth={strokeWidth} fill="none"
-            strokeDasharray={`${remainingArc} ${circumference - remainingArc}`}
-            strokeDashoffset={-usedArc}
             strokeLinecap="butt"
             rotation="135" origin={`${center}, ${center}`}
+            animatedProps={remainingArcAnimatedProps}
           />
 
-          <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y}
-            stroke={theme.colors.primaryDark} strokeWidth="2.5" opacity={calloutOpacity} />
-          <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} opacity={calloutOpacity} />
+          {showUsedCallout && (
+            <AnimatedG animatedProps={calloutAnimatedProps}>
+              <Line x1={usedAnchor.x} y1={usedAnchor.y} x2={leftLineX} y2={usedAnchor.y}
+                stroke={theme.colors.primaryDark} strokeWidth="2.5" />
+              <Circle cx={leftLineX} cy={usedAnchor.y} r="6" fill={theme.colors.primaryDark} />
+            </AnimatedG>
+          )}
 
-          <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y}
-            stroke={theme.colors.freedatabackground} strokeWidth="2.5" opacity={calloutOpacity} />
-          <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} opacity={calloutOpacity} />
+          {showRemainingCallout && (
+            <AnimatedG animatedProps={calloutAnimatedProps}>
+              <Line x1={remainingAnchor.x} y1={remainingAnchor.y} x2={rightLineX} y2={remainingAnchor.y}
+                stroke={theme.colors.freedatabackground} strokeWidth="2.5" />
+              <Circle cx={rightLineX} cy={remainingAnchor.y} r="6" fill={theme.colors.freedatabackground} />
+            </AnimatedG>
+          )}
         </G>
       </Svg>
 
-      <Animated.View
-        style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, left: 0, opacity: labelOpacity }]}
-        accessible={false}
-        accessibilityElementsHidden={true}
-        importantForAccessibility="no-hide-descendants"
-      >
-        <Text style={[styles.labelText]}>
-          {usedGB}
-        </Text>
-        <Text style={styles.labelSubtext}> GB Used</Text>
-      </Animated.View>
+      {showUsedCallout && (
+        <Animated.View
+          style={[styles.textLabel, { position: 'absolute', top: usedAnchor.y + 10, right: '50%', alignItems: 'flex-end', transform: [{ translateX: -(size / 2 + 38) }] }, labelAnimatedStyle]}
+          accessible={false}
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Text style={[styles.labelText]}>
+            {usedGB}
+          </Text>
+          <Text style={styles.labelSubtext}> GB Used</Text>
+        </Animated.View>
+      )}
 
-      <Animated.View
-        style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, right: 0, alignItems: 'flex-end', opacity: labelOpacity }]}
-        accessible={false}
-        accessibilityElementsHidden={true}
-        importantForAccessibility="no-hide-descendants"
-      >
-        <Text style={[styles.labelText]}>
-          {remainingGB}
-        </Text>
-        <Text style={styles.labelSubtext}>GB Left</Text>
-      </Animated.View>
+      {showRemainingCallout && (
+        <Animated.View
+          style={[styles.textLabel, { position: 'absolute', top: remainingAnchor.y + 10, left: '50%', transform: [{ translateX: size / 2 + 28 }] }, labelAnimatedStyle]}
+          accessible={false}
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Text style={[styles.labelText]}>
+            {remainingGB}
+          </Text>
+          <Text style={styles.labelSubtext}>GB Left</Text>
+        </Animated.View>
+      )}
     </View>
   );
 };
 
-const UsageSummaryCard = ({ currentUsage, dailyData, loading = false }) => {
+const UsageSummaryCard = ({ currentUsage, loading = false }) => {
+  const { width: windowWidth } = useWindowDimensions();
+  const donutSize = Math.min(220, Math.max(140, Math.floor(windowWidth * 0.32)));
+
   if (!currentUsage || loading) {
     return (
       <View style={styles.container}>
@@ -170,7 +205,6 @@ const UsageSummaryCard = ({ currentUsage, dailyData, loading = false }) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {/* Header — icon already decorative */}
         <View style={styles.header}>
           <View
             style={styles.iconWrapper}
@@ -188,6 +222,7 @@ const UsageSummaryCard = ({ currentUsage, dailyData, loading = false }) => {
           remainingPercent={remainingPercent}
           usedGB={currentUsage.usedDataGB}
           remainingGB={currentUsage.dataRemaining.toFixed(2)}
+          size={donutSize}
         />
 
         <View style={styles.stats}>
@@ -253,19 +288,6 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.secondary,
     marginTop: 1,
-  },
-  summaryBar: {
-    alignItems: "center",
-    paddingVertical: theme.spacing.xs,
-    backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: theme.radius.xs,
-    marginBottom: theme.spacing.base,
-  },
-  summaryText: {
-    fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.text.primary,
   },
   stats: {
     flexDirection: "row",

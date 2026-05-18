@@ -3,7 +3,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Search from "../../components/support/Search";
-import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
+import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 import MyServices from "../../components/services/MyServices";
 import DataUsageScreen from "../../components/services/dataUsage/DataUsageScreen";
 
@@ -36,8 +36,8 @@ function MyServicesStack({ route }) {
       />
       
       <ServiceStack.Screen
-        name="ArticalWindowUtility"
-        component={ArticalWindowUtility}
+        name="ArticleWindowUtility"
+        component={ArticleWindowUtility}
         options={{
           headerBackVisible: false,
           headerShown: false,

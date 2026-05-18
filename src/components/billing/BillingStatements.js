@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, FlatList } from "react-native";
+import { StyleSheet, Text, View, FlatList } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import { A11Y } from "../../styles/theme";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import moment from "moment";
 import Icon from "../common/Icon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
@@ -127,7 +129,8 @@ const BillingStatementsScreen = ({ navigation }) => {
     const isDownloading = downloading && downloadingStatementId === item.id;
 
     return (
-      <TouchableOpacity 
+      <Touchable
+        minSize={0}
         style={[styles.statementRow, { backgroundColor }]}
         onPress={() => handleDownload(item)}
         accessible={true}
@@ -149,7 +152,7 @@ const BillingStatementsScreen = ({ navigation }) => {
             <Text style={styles.uploadText}>Download</Text>
           )}
         </View>
-      </TouchableOpacity>
+      </Touchable>
     );
   };
 
@@ -203,7 +206,7 @@ const BillingStatementsScreen = ({ navigation }) => {
               />
             </View>
 
-            <TouchableOpacity
+            <Touchable
               style={styles.sortButton}
               onPress={toggleSortDirection}
               accessible={true}
@@ -214,14 +217,14 @@ const BillingStatementsScreen = ({ navigation }) => {
               }, tap to reverse sort order`}
             >
               <Text style={styles.sortText}>Sort date</Text>
-              <Icon 
-                name="double-arrow" 
+              <Icon
+                name="double-arrow"
                 size={30}
                 style={{
                   transform: [{ rotate: sortDirection === "asc" ? "0deg" : "180deg" }]
                 }}
               />
-            </TouchableOpacity>
+            </Touchable>
           </View>
         </View>
 
@@ -297,12 +300,14 @@ const styles = StyleSheet.create({
   },
   yearDropdownStyle: {
     backgroundColor: Color.sparklightWhite,
-    height: 42,
+    minHeight: A11Y.minTouch,
   },
   sortButton: {
     flexDirection: "row",
     alignItems: "center",
     marginLeft: 15,
+    minHeight: A11Y.minTouch,
+    paddingHorizontal: Padding.p_5xs,
   },
   sortText: {
     fontSize: FontSize.size_base,

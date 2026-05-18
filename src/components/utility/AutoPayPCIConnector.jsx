@@ -3,17 +3,20 @@ import { View, Text, StyleSheet, Platform, AppState, Animated } from 'react-nati
 import WebView from 'react-native-webview';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getUser } from '../../redux/utils/LocalStorage';
+import { fetchACPUserAccountDetails } from '../../redux/actions/ProfileActionSuite';
 import Config from 'react-native-config';
 import { GetApiRequest } from '../../network/RestApiClient';
 import { getEndpoint, ENDPOINTS } from '../../network/apis/endpoints/Endpoints';
 import analytics from '@react-native-firebase/analytics';
-import LoadingOverlay from '../common/customui/CustomLoading';
+import LoadingOverlay from '../common/customui/LoadingOverlay';
 import MaintenanceAlert from './MaintenanceAlert';
 import { RefreshToken } from '../user/Session';
+import { logError, logWarn } from '../../utils/logger';
 import NetInfo from '@react-native-community/netinfo';
 import { setAuthCookiesOnAllDomains, dumpCookies } from './NativeCookieManager';
+import { Border } from '../../../GlobalStyles';
 
 const TAG = '[PCI]';
 const REFRESH_INTERVAL_MS = 4 * 60 * 1000;
@@ -34,7 +37,7 @@ const logStorageSnapshot = async (caller) => {
         const jwtAge = cu?.jwtTimestamp ? Date.now() - cu.jwtTimestamp : '?';
         const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?';
     } catch (e) {
-        console.warn(`${TAG} STORAGE [${caller}] read failed:`, e.message);
+        logWarn(`${TAG} STORAGE [${caller}] read failed:`, e.message);
     }
 };
 
@@ -125,7 +128,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const customReferUrl = route.params?.customReferUrl || route.params?.customPaymentUrl || null;
 
     const user = useSelector(state => state.user.userData);
+    const dispatch = useDispatch();
     const webViewRef = useRef(null);
+    const cacheUpdateFiredRef = useRef(false);
     const aliveCheckResolver = useRef(null);
     const aliveCheckTimeout = useRef(null);
     const backgroundTimestamp = useRef(0);
@@ -213,7 +218,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     } catch(e) {}
 })(); true;`);
         } catch (e) {
-            console.error(TAG, 'injectIdTokenOnly failed:', e.message);
+            logError(TAG, 'injectIdTokenOnly failed:', e.message);
         }
     }, []);
 
@@ -228,14 +233,14 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         try {
             const netState = await NetInfo.fetch();
             if (!netState.isConnected || !netState.isInternetReachable) {
-                console.warn(`${TAG} silentRefresh SKIP — offline | ts=${new Date().toISOString()}`);
+                logWarn(`${TAG} silentRefresh SKIP — offline | ts=${new Date().toISOString()}`);
                 pendingOfflineRefresh.current = true;
                 return;
             }
             await logStorageSnapshot('silentRefresh-before');
             const newToken = await RefreshToken();
             if (!newToken) {
-                console.warn(`${TAG} silentRefresh — RefreshToken returned null | ts=${new Date().toISOString()}`);
+                logWarn(`${TAG} silentRefresh — RefreshToken returned null | ts=${new Date().toISOString()}`);
                 pendingOfflineRefresh.current = true;
                 return;
             }
@@ -250,7 +255,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             await logStorageSnapshot('silentRefresh-after');
             await dumpCookies('PCI-silentRefresh-after');
         } catch (e) {
-            console.error(`${TAG} silentRefresh FAILED | duration=${Date.now() - refreshStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
+            logError(`${TAG} silentRefresh FAILED | duration=${Date.now() - refreshStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
             pendingOfflineRefresh.current = true;
         }
     }, [injectIdTokenOnly, refreshInjectionScript]);
@@ -316,7 +321,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         try {
             let userLocal = await getUser();
             if (!userLocal?.userInfo?.accountNumber) {
-                console.error(`${TAG} initializePayment — no accountNumber, navigating to Billing`);
+                logError(`${TAG} initializePayment — no accountNumber, navigating to Billing`);
                 navigation.navigate('Billing');
                 return;
             }
@@ -325,12 +330,12 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 
             // Refresh if IdToken is older than 4 minutes (expires at 5min) to avoid injecting stale JWT
             if (idTokenAge > 240000) {
-                console.warn(`${TAG} initializePayment | IdToken stale (${idTokenAge}ms old) — refreshing before injection | ts=${new Date().toISOString()}`);
+                logWarn(`${TAG} initializePayment | IdToken stale (${idTokenAge}ms old) — refreshing before injection | ts=${new Date().toISOString()}`);
                 try {
                     await RefreshToken();
                     userLocal = await getUser();
                 } catch (refreshErr) {
-                    console.error(`${TAG} initializePayment | refresh failed, using existing token | error=${refreshErr.message}`);
+                    logError(`${TAG} initializePayment | refresh failed, using existing token | error=${refreshErr.message}`);
                 }
             }
 
@@ -349,7 +354,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                             resolve(r);
                         },
                         (err) => {
-                            console.error(`${TAG} EasyPay API FAILED | error=${JSON.stringify(err)} | ts=${new Date().toISOString()}`);
+                            logError(`${TAG} EasyPay API FAILED | error=${JSON.stringify(err)} | ts=${new Date().toISOString()}`);
                             if (err?.includes?.('503')) setIsServiceDown(true);
                             resolve(null);
                         }
@@ -357,7 +362,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 }),
                 new Promise((_, reject) => setTimeout(() => reject(new Error('EasyPay API timeout')), 15000)),
             ]).catch((e) => {
-                console.error(`${TAG} EasyPay API TIMEOUT or error | error=${e.message} | ts=${new Date().toISOString()}`);
+                logError(`${TAG} EasyPay API TIMEOUT or error | error=${e.message} | ts=${new Date().toISOString()}`);
                 return null;
             });
 
@@ -367,7 +372,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay || false, res?.easyPayId || '');
             redirectToEBillpay(paymentObj, referralUrl);
         } catch (e) {
-            console.error(`${TAG} initializePayment FAILED | duration=${Date.now() - initStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
+            logError(`${TAG} initializePayment FAILED | duration=${Date.now() - initStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
             navigation.navigate('Billing');
         } finally {
             isInitializing.current = false;
@@ -409,7 +414,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 await dumpCookies('PCI-appState-resume');
 
                 if (dur > 600000) {
-                    if (!isOnline) { console.warn(`${TAG} AppState | offline, deferring refresh`); pendingOfflineRefresh.current = true; }
+                    if (!isOnline) { logWarn(`${TAG} AppState | offline, deferring refresh`); pendingOfflineRefresh.current = true; }
                     else {
                         const alive = await checkWebViewAlive();
                         if (!alive) { recreateWebView(); }
@@ -417,7 +422,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                             try {
                                 await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly();
                             }
-                            catch (_) { console.warn(`${TAG} AppState | refresh failed, recreating WebView`); recreateWebView(); }
+                            catch (_) { logWarn(`${TAG} AppState | refresh failed, recreating WebView`); recreateWebView(); }
                         }
                     }
                 } else if (idTokenAge > 240000) {
@@ -452,7 +457,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const onShouldStartLoadWithRequest = useCallback((request) => {
         if (request.url.includes('/postlogout') || request.url.includes(Config.SSO_LOGIN)) {
             const reason = request.url.includes('/postlogout') ? 'postlogout' : 'SSO redirect';
-            console.warn(`${TAG} NAV | ${reason} detected — session expired, going back | ts=${new Date().toISOString()}`);
+            logWarn(`${TAG} NAV | ${reason} detected — session expired, going back | ts=${new Date().toISOString()}`);
             showToastMessage();
             navigation.goBack();
             return false;
@@ -465,18 +470,23 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken);
                 } catch (_) {}
             })();
+            // Backend cache is stale after payment / AutoPay change — force-refresh once.
+            if (!cacheUpdateFiredRef.current) {
+                cacheUpdateFiredRef.current = true;
+                dispatch(fetchACPUserAccountDetails({ force: true }));
+            }
             return true;
         }
         // Block navigation to customer portal — PCI is payment-only, take user back to mobile
         if (request.url.includes('customer.sparklight.com') || request.url.includes('customer.uat.sparklight.com')) {
-            console.warn(`${TAG} NAV | portal redirect detected — returning to mobile | url=${request.url} | ts=${new Date().toISOString()}`);
+            logWarn(`${TAG} NAV | portal redirect detected — returning to mobile | url=${request.url} | ts=${new Date().toISOString()}`);
             navigation.goBack();
             return false;
         }
         if (request.url === 'about:blank') return true;
         if (!request.url.startsWith('https://') && !request.url.startsWith('http://')) return false;
         return true;
-    }, [showToastMessage, navigation]);
+    }, [showToastMessage, navigation, dispatch]);
 
     const onLoadStart = useCallback(({ nativeEvent }) => {
         if (!initialLoadComplete.current) { setContentLoaded(false); setProgress(0); }
@@ -492,7 +502,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         const url = nativeEvent?.url || '';
         // If user navigated to a non-allowed page on the customer portal, go back to mobile
         if ((url.includes('customer.sparklight.com') || url.includes('customer.uat.sparklight.com')) && !isAllowedCustomerUrl(url)) {
-            console.warn(`${TAG} NAV onLoadEnd | unauthorized portal page — returning to mobile | url=${url} | ts=${new Date().toISOString()}`);
+            logWarn(`${TAG} NAV onLoadEnd | unauthorized portal page — returning to mobile | url=${url} | ts=${new Date().toISOString()}`);
             navigation.goBack();
             return;
         }
@@ -511,13 +521,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const onLoadProgress = useCallback(({ nativeEvent }) => { setProgress(nativeEvent.progress); }, []);
 
     const onError = useCallback(({ nativeEvent }) => {
-        console.error(`${TAG} WebView ERROR | description=${nativeEvent?.description} | ts=${new Date().toISOString()}`);
+        logError(`${TAG} WebView ERROR | description=${nativeEvent?.description} | ts=${new Date().toISOString()}`);
         setIsError(true); setContentLoaded(true);
         setErrorMessage(`Unable to load page: ${nativeEvent?.description || 'Unknown error'}`);
     }, []);
 
     const onHttpError = useCallback(({ nativeEvent }) => {
-        console.error(`${TAG} HTTP ERROR | status=${nativeEvent?.statusCode} | url=${nativeEvent?.url} | ts=${new Date().toISOString()}`);
+        logError(`${TAG} HTTP ERROR | status=${nativeEvent?.statusCode} | url=${nativeEvent?.url} | ts=${new Date().toISOString()}`);
         // Dump storage + cookies on HTTP errors for diagnostics
         (async () => {
             await logStorageSnapshot('PCI-httpError-' + nativeEvent?.statusCode);
@@ -637,7 +647,7 @@ const styles = StyleSheet.create({
     toast: {
         position: 'absolute', bottom: 100, left: 20, right: 20,
         backgroundColor: 'rgba(0, 0, 0, 0.8)', paddingVertical: 12, paddingHorizontal: 20,
-        borderRadius: 8, alignItems: 'center', zIndex: 2000,
+        borderRadius: Border.br_5xs, alignItems: 'center', zIndex: 2000,
     },
     toastText: { color: '#ffffff', fontSize: 14, fontWeight: '500' },
 });

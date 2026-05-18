@@ -65,11 +65,18 @@ jest.mock('../src/components/utility/constant', () => ({
 
 jest.mock('react-native-linear-gradient', () => 'LinearGradient');
 jest.mock('react-native-config', () => ({ PAY_METHOD: 'https://pay.method' }));
+jest.mock('../src/components/common/customui/Touchable', () => {
+  const React = require('react');
+  const { TouchableOpacity } = require('react-native');
+  return function MockTouchable(props) {
+    return React.createElement(TouchableOpacity, props, props.children);
+  };
+});
 
 jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
 jest.mock('../src/components/utility/ZendeskChatIcon', () => 'ZendeskChatIcon');
 jest.mock('../src/components/common/Icon', () => 'Icon');
-jest.mock('../src/components/common/customui/CustomLoading', () => {
+jest.mock('../src/components/common/customui/LoadingOverlay', () => {
   const React = require('react');
   const { Pressable, Text } = require('react-native');
 
@@ -84,7 +91,7 @@ jest.mock('../src/components/common/customui/CustomLoading', () => {
 jest.mock('../src/components/common/billerCards/BillerSummary', () => 'Card');
 jest.mock('../src/components/common/billerCards/AutoPayCard', () => 'AutoPayCard');
 jest.mock('../src/components/common/billerCards/PeperLessCard', () => 'PeperLessCard');
-jest.mock('../src/components/utility/AppStyles', () => ({ card: { borderRadius: 8 } }));
+jest.mock('../src/components/utility/AppStyles', () => ({ card: { borderRadius: 8 } }), { virtual: true });
 jest.mock('../src/res/svgIcons/BillingIconWhite', () => 'BillingIconWhite');
 jest.mock('../assets/svgs/Chevonright', () => 'RightIcon');
 
@@ -204,7 +211,7 @@ describe('BillingScreen behavior', () => {
   });
 
   it('handles getUser failures without crashing', async () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     mockGetUser.mockRejectedValueOnce(new Error('user unavailable'));
 
     await act(async () => {
@@ -222,7 +229,7 @@ describe('BillingScreen behavior', () => {
   });
 
   it('runs the autopay error handler when the API request fails', async () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
     mockGetApiRequest.mockImplementation((endpoint, onSuccess, onError) => {
       onError(new Error('autopay unavailable'));

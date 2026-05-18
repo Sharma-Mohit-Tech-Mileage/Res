@@ -38,10 +38,7 @@ const isRetryableError = (error) => {
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Recurses until success or 3 retries; on bail-out preserves the LAST axios
-// failure (code/status/message/url) on the thrown Error so callers can
-// distinguish timeout vs network vs 5xx instead of just seeing "Max retries
-// exceeded".
+// Recurses until success or 3 retries; preserves the last axios failure (code/status/message/url) on bail-out so callers can distinguish timeout/network/5xx vs "Max retries exceeded".
 const retryRequest = async (axiosInstance, originalRequest, retryCount = 0, lastError = null) => {
     if (retryCount >= 3) {
         const url = originalRequest?.url || lastError?.config?.url || '?';
@@ -77,7 +74,7 @@ const redirectToLogin = async () => {
             navigationRef.current.reset({ index: 0, routes: [{ name: 'Splash' }] });
         }
     } catch (error) {
-        console.error('[RestApiClient] redirectToLogin error:', error);
+        console.warn('[RestApiClient] redirectToLogin error:', error);
     }
 };
 
@@ -96,7 +93,6 @@ const AxiosInterceptorProvider = ({ children }) => {
                 if (error.response?.status === 401 && !originalRequest._retry) {
                     console.warn(`[RestApiClient] 401 received | endpoint=${originalRequest.url} | isRefreshing=${isRefreshing} | queueLength=${failedQueue.length} | ts=${new Date().toISOString()}`);
                     if (isRefreshing) {
-                        console.log(`[RestApiClient] 401 | queuing request (refresh already in flight) | endpoint=${originalRequest.url}`);
                         return new Promise((resolve, reject) => {
                             failedQueue.push({ resolve, reject });
                         }).then(token => {
@@ -109,10 +105,9 @@ const AxiosInterceptorProvider = ({ children }) => {
                     isRefreshing = true;
 
                     try {
-                        console.log(`[RestApiClient] 401 | starting token refresh | endpoint=${originalRequest.url} | ts=${new Date().toISOString()}`);
                         await RefreshToken();
                         const user = await getUser();
-                        console.log(`[RestApiClient] 401 | refresh OK, retrying | endpoint=${originalRequest.url} | queuedRequests=${failedQueue.length} | ts=${new Date().toISOString()}`);
+                        console.warn(`[RestApiClient] 401 | refresh OK, retrying | endpoint=${originalRequest.url} | queuedRequests=${failedQueue.length} | ts=${new Date().toISOString()}`);
                         _axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.token;
                         originalRequest.headers['Authorization'] = 'Bearer ' + user.token;
                         processQueue(null, user.token);
@@ -121,7 +116,7 @@ const AxiosInterceptorProvider = ({ children }) => {
                     } catch (refreshError) {
                         processQueue(refreshError, null);
                         isRefreshing = false;
-                        console.error(`[RestApiClient] 401 | token refresh FAILED, redirecting to login | error=${refreshError.message} | ts=${new Date().toISOString()}`);
+                        console.warn(`[RestApiClient] 401 | token refresh FAILED, redirecting to login | error=${refreshError.message} | ts=${new Date().toISOString()}`);
                         await redirectToLogin();
                         return Promise.reject(refreshError);
                     }
@@ -159,7 +154,7 @@ const handleError = (err, onError, endpoint) => {
     const status = err.response?.status || 0;
     const statusText = err.response?.statusText || 'Unknown Error';
     const message = err.response?.data?.message || err.message || 'Request failed';
-    console.error(`[RestApiClient] API ERROR | endpoint=${endpoint} | status=${status} | statusText=${statusText} | message=${message} | code=${err.code || '?'} | ts=${new Date().toISOString()}`);
+    console.warn(`[RestApiClient] API ERROR | endpoint=${endpoint} | status=${status} | statusText=${statusText} | message=${message} | code=${err.code || '?'} | ts=${new Date().toISOString()}`);
     onError({
         status,
         statusText,

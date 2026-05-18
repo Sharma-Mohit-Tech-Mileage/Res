@@ -1,20 +1,22 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Color } from "../../../../GlobalStyles";
 import Config from "react-native-config";
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import AppStyles from "../../utility/AppStyles";
+import { card } from "../../../styles/utilities";
+import Touchable from "../customui/Touchable";
 const AutoPayCard = ({
   isAutoPayStatus,
   paymentDetails,
   navigation,
   isStatusLoading,
 }) => {
+  const showSkeleton = isStatusLoading || isAutoPayStatus === undefined;
   const handleCardPress = () => {
-    if (!isStatusLoading) {
+    if (!showSkeleton) {
       navigation.navigate("AutoPayPCIConnector", {
         url: `${Config.URL}/billing`,
         name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
@@ -26,10 +28,10 @@ const AutoPayCard = ({
   };
 
   return (
-    <Pressable
-      style={[AppStyles.card]}
+    <Touchable
+      style={[card.elevated, { alignItems: 'stretch' }]}
+      minSize={0}
       onPress={handleCardPress}
-      activeOpacity={0.8}
      accessible={false}
       importantForAccessibility="no"
     >
@@ -47,7 +49,7 @@ const AutoPayCard = ({
         </View>
         <View style={{ flexDirection: "column" }}>
           <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Auto Pay" >Auto Pay</Text>
-          {isStatusLoading ? (
+          {showSkeleton ? (
             <SkeletonPlaceholder>
               <View
                 style={{
@@ -82,7 +84,7 @@ const AutoPayCard = ({
           )}
         </View>
         <View style={{ position: "absolute", right: 10 }}>
-          {isStatusLoading ? (
+          {showSkeleton ? (
             <SkeletonPlaceholder>
               <View
                 style={{
@@ -102,7 +104,7 @@ const AutoPayCard = ({
           )}
         </View>
       </View>
-    </Pressable>
+    </Touchable>
   );
 };
 

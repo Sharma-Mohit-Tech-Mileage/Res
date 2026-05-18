@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   Linking,
   Platform,
   Alert,
@@ -13,6 +12,7 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import { Svg, Circle, Path } from "react-native-svg";
 import { theme } from "../../../../styles/theme";
+import Touchable from "../../../common/customui/Touchable";
 
 
 // ── Wi-Fi icon (bottom-right watermark) ──
@@ -89,11 +89,13 @@ const EeroPromoCard = ({ promoData }) => {
 
   return (
     <View style={styles.container}>
-      <Pressable
+      <Touchable
         style={({ pressed }) => [
           styles.cardWrapper,
+          { alignItems: 'stretch' },
           pressed && styles.cardPressed,
         ]}
+        minSize={0}
         onPress={handleDownload}
         accessible={true}
         accessibilityRole="button"
@@ -131,7 +133,7 @@ const EeroPromoCard = ({ promoData }) => {
             </View>
           </View>
         </LinearGradient>
-      </Pressable>
+      </Touchable>
     </View>
   );
 };

@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Pressable,
   TextInput,
   ScrollView,
   Platform,
   Linking,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
+import { formatInputA11yReadout } from "../../utils/a11y";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { Radio } from "native-base";
 import { useSelector } from "react-redux";
@@ -19,12 +20,12 @@ import {
   Border,
   FontSize,
 } from "../../../GlobalStyles";
-import AppStyles from "../utility/AppStyles";
+import { card } from "../../styles/utilities";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import SecondaryButton from "../common/customui/SecondaryButton";
 import { GetApiRequest, PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import SmallLoader from "../common/customui/SmallLoader";
 import moment from "moment";
 import { useNavigation } from "@react-navigation/native";
@@ -45,7 +46,6 @@ const Survey = ({ route }) => {
   const [isError, setIsError] = useState(false);
   const [planName, setPlanName] = useState(route.params?.planName || "");
   const [planPrice, setPlanPrice] = useState(route.params?.planPrice || "");
-  // const [selectedId, setSelectedId] = useState(null);
   const [error, setError] = useState(errorRes);
   const [surveyOptions, setSurveyOptions] = useState([]);
   const profile = useSelector((state) => state.profile || {});
@@ -61,15 +61,10 @@ const Survey = ({ route }) => {
     navigation.navigate("account", { screen: "Account" });
   };
   const onContinue = (option) => {
-    // Handle the continue action with the selected option
-    console.log("Selected option:", option);
-    // Navigate to the next screen or perform any other action
-    // navigation.navigate("account", { screen: "cancelServiceSummary",item:selectedOption, comment: myComment });
     if (option) {
       requestPostDisconnect();
     } else {
       console.warn("Please select a reason before continuing.");
-      //setIsError(true);
     }
   };
 
@@ -86,7 +81,6 @@ const Survey = ({ route }) => {
   };
 
   const onChangeValue = (value) => {
-    console.log("Selected value:", value);
     setSelectedOption(value);
     setIsError(false);
   };
@@ -105,7 +99,7 @@ const Survey = ({ route }) => {
     }),
       (error) => {
         setLoadingData(false);
-        console.error("Error fetching survey data:", error);
+        console.warn("Error fetching survey data:", error);
       };
   };
 
@@ -142,14 +136,13 @@ const Survey = ({ route }) => {
       },
       (error) => {
         setLoading(false);
-        console.error("Error in disconnect request:", error);
-        // Handle error, e.g., show an error message
+        console.warn("Error in disconnect request:", error);
       }
     );
   };
 
   const renderErrorMessage = () => {
-    console.log("Error message", error);
+    console.warn("Error message", error);
     return (
       <>
         {error && error?.message && (
@@ -195,7 +188,7 @@ const Survey = ({ route }) => {
       />
       <ScrollView style={{ flex: 1, marginBottom: 100 }}>
         <View>
-          <View style={[AppStyles.card, { margin: 16 }]}>
+          <View style={[card.elevated, { margin: 16 }]}>
             {renderErrorMessage()}
             <View style={{ padding: 24 }}>
               <Text style={styles.header}>We’re Sad To See You Go</Text>
@@ -261,14 +254,6 @@ const Survey = ({ route }) => {
                   </View>
                 ))}
               </Radio.Group>
-              {/* <RadioGroup 
-         // labelStyle={styles.optionTxt}
-            radioButtons={surveyOptions} 
-            onPress={setSelectedId}
-            selectedId={selectedId}
-            containerStyle={styles.radioContainer}
-           labelStyle={styles.labelStyle}
-        /> */}
               {selectedOption != "" && (
                 <View
                   style={{
@@ -287,26 +272,30 @@ const Survey = ({ route }) => {
                       if (text.length > 0) {
                         setIsNoComment(false);
                       }
-                      //console.log("test", text);
                     }}
                     multiline
                     numberOfLines={5}
                     value={myComment}
                     style={styles.textArea}
+                    accessibilityLabel={formatInputA11yReadout({
+                      label: "Anything you want to share? Optional",
+                      value: myComment,
+                    })}
+                    accessibilityRole="text"
+                    importantForAccessibility="yes"
                   />
                 </View>
               )}
             </View>
           </View>
           <View>
-            <Pressable
-              style={({ pressed }) => [
+            <Touchable
+              minSize={0}
+              style={[
                 { backgroundColor: Color.colorMidnightblue },
                 styles.buttonsLayout,
-                { opacity: pressed ? 0.7 : 1 },
               ]}
               onPress={() => {
-                // TODo
                 onContinue(selectedOption);
               }}
               accessibilityRole="button"
@@ -315,7 +304,7 @@ const Survey = ({ route }) => {
               <Text style={[styles.makePayment, styles.makeTypo]}>
                 {"Continue to Cancel"}
               </Text>
-            </Pressable>
+            </Touchable>
             <View style={[styles.buttonsParent, { marginTop: 10 }]}>
               <SecondaryButton
                 text="Don't Cancel"

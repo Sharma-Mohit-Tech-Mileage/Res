@@ -132,4 +132,10 @@ export const theme = {
   },
 };
 
+// minTouch is the scanner-measured size (Android 48dp / iOS 44pt / WCAG 2.5.5); hitSlop adds Fitts's-law event hit-rect.
+export const A11Y = {
+  minTouch: 48,
+  hitSlop: { top: 8, bottom: 8, left: 8, right: 8 },
+};
+
 export default theme;

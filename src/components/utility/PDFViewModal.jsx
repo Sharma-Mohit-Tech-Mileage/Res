@@ -30,7 +30,7 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
   const loadAndSharePDF = async () => {
     const showError = await sharePDF(url, 'billinghistory.pdf');
     if (showError !== undefined) {
-      console.log(showError);
+      console.warn(showError);
     }
   };  
 

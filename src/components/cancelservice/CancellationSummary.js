@@ -2,11 +2,10 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  Pressable,
   ScrollView,
   Image,
-  TouchableOpacity,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -24,7 +23,7 @@ import {
   Border,
   FontSize,
 } from "../../../GlobalStyles";
-import AppStyles from "../utility/AppStyles";
+import { card } from "../../styles/utilities";
 import SecondaryButton from "../common/customui/SecondaryButton";
 import ConfimationPopup from "./ConfirmationPopup";
 import colors from "../../res/Colors";
@@ -36,7 +35,7 @@ import { PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { Calendar } from "react-native-calendars";
 import moment from "moment";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { getPrimaryEmail } from "../utility/constant";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
@@ -86,7 +85,6 @@ const CancellationSummary = ({ navigation, route }) => {
   );
 
   const [error, setError] = useState(errorRes);
-  //console.log("Account", JSON.stringify(accountDetails));
   const [devices, setDevices] = useState([]);
   const myTheme = {
     arrowColor: Color.sparklightBrightPurple,
@@ -107,7 +105,6 @@ const CancellationSummary = ({ navigation, route }) => {
 
   const handleSave = useCallback((data) => {
     const { email } = data;
-    console.log("Email:", email);
     setEmail(email);
     if (toggleCheckBoxTerm) {
       setIsConfirmationPopupVisible(true);
@@ -116,7 +113,6 @@ const CancellationSummary = ({ navigation, route }) => {
 
   const handleValidationError = useCallback(() => {
     if (!toggleCheckBoxTerm) {
-      //setIsSubmitted(true);
     }
   }, []);
 
@@ -171,11 +167,9 @@ const CancellationSummary = ({ navigation, route }) => {
     };
 
     setMarkedDates(markedDates);
-    //getEquipmentDetails();
   }, []);
 
   useEffect(() => {
-    console.log("Marked Dates Updated:", JSON.stringify(markedDates));
     setSelectedOption(date);
   }, [markedDates]);
 
@@ -198,26 +192,8 @@ const CancellationSummary = ({ navigation, route }) => {
 
         setTotalEquipmentFee(totalFee);
       }
-      //const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
-      //setEmail(updatedPrimaryEmail)
-      //setValue({email: updatedPrimaryEmail})
     }
   }, [accountDetails]);
-
-  // const getEquipmentDetails = () => {
-  //   const requestURL = `api/Equipment/GetEquipmentDetails?accountNumber=${profileDetails.accountNumber}&includeServiceCode=true`;
-  //   GetApiRequest(
-  //     requestURL,
-  //     (res) => {
-  //       console.log("Equipment Details:", res);
-  //       // Process the equipment details as needed
-  //       //setDevices(res.equipments || []);
-  //     },
-  //     (error) => {
-  //       console.error("Error fetching equipment details:", error);
-  //     }
-  //   );
-  // };
 
   // Function to handle the confirmation popup
 
@@ -278,12 +254,10 @@ const CancellationSummary = ({ navigation, route }) => {
             animated: true,
           });
         }
-
-        //getEquipmentDetails();
       },
       (error) => {
         setLoading(false);
-        console.error("Error in cancellation service request:", error);
+        console.warn("Error in cancellation service request:", error);
       }
     );
   };
@@ -321,7 +295,7 @@ const CancellationSummary = ({ navigation, route }) => {
   };
 
   const renderErrorMessage = () => {
-    console.log("Error message", error);
+    console.warn("Error message", error);
     return (
       <>
         {error && error?.message && (
@@ -525,10 +499,6 @@ const CancellationSummary = ({ navigation, route }) => {
   };
 
   const onDaySelected = (selectedDate) => {
-    //setCurrentDate(selectedDate);
-
-    //for (const date in markedDates) {
-
     // Deselect all dates first
     const updatedMarkedDates = {};
     Object.keys(markedDates).forEach((d) => {
@@ -568,49 +538,6 @@ const CancellationSummary = ({ navigation, route }) => {
 
     setMarkedDates(updatedMarkedDates);
     setSelectedOption(selectedDate);
-    //}
-
-    // if (markedDates[selectedDate]) {
-    //   const updatedMarkedDates = { ...markedDates };
-    //   //if (updatedMarkedDates[selectedDate].isSelected) {
-    //     updatedMarkedDates[selectedDate] = {
-    //       customStyles: {
-    //         container: {
-    //           backgroundColor: Color.sparklightBrightPurple,
-    //           borderColor: Color.sparklightDarkGray,
-    //           borderWidth: 1,
-    //           elevation: 0,
-    //         },
-    //         text: {
-    //           color: Color.colorWhitesmoke_200,
-    //           fontWeight: "400",
-    //         },
-    //       },
-    //     };
-    //    // updatedMarkedDates[selectedDate].isSelected = false;
-    //   setMarkedDates(updatedMarkedDates);
-    //     return;
-
-    // } else {
-    //   // If the date is not selected, select it
-    //   const updatedMarkedDates = { ...markedDates };
-    //   updatedMarkedDates[selectedDate] = {
-    //     customStyles: {
-    //       container: {
-    //         backgroundColor: Color.sparklightGray,
-    //         borderColor: Color.sparklightDarkGray,
-    //         borderWidth: 1,
-    //         elevation: 0,
-    //       },
-    //       text: {
-    //         color: Color.colorGray_200,
-    //         fontWeight: "400",
-    //       },
-    //     },
-    //   };
-    //   //updatedMarkedDates[selectedDate].isSelected = true;
-    //   setMarkedDates(updatedMarkedDates);
-    // }
   };
 
   return (
@@ -629,7 +556,7 @@ const CancellationSummary = ({ navigation, route }) => {
         angle={90}
       />
       <ScrollView style={{ flex: 1, marginBottom: 100 }} ref={MyRef}>
-        <View style={[AppStyles.card, { margin: 16 }]}>
+        <View style={[card.elevated, { margin: 16 }]}>
           {isSuccessMessageVisible && renderSuccessMessage()}
           {renderErrorMessage()}
           <Text style={styles.header}>We’re Sad To See You Go</Text>
@@ -696,7 +623,7 @@ const CancellationSummary = ({ navigation, route }) => {
               >
                 EQUIPMENT RETURN POLICY
               </Text>
-              <Pressable
+              <Touchable
                 onPress={() => {
                   setShowTerms((prev) => !prev);
                 }}
@@ -706,7 +633,7 @@ const CancellationSummary = ({ navigation, route }) => {
                 ) : (
                   <DownArrow />
                 )}
-              </Pressable>
+              </Touchable>
             </View>
             {showTerms && (
               <View
@@ -745,8 +672,7 @@ const CancellationSummary = ({ navigation, route }) => {
                         },
                       ]}
                       onPress={() => {
-                        console.log("Sparklight Local Office Pressed");
-                        navigation.navigate("ArticalWindowUtility", {
+                        navigation.navigate("ArticleWindowUtility", {
                           url: "https://www.sparklight.com/locations",
                           name: "Service Locations",
                         });
@@ -781,7 +707,7 @@ const CancellationSummary = ({ navigation, route }) => {
                       }}
                       onPress={() => {
                         // Add your contact action here
-                        navigation.navigate("ArticalWindowUtility", {
+                        navigation.navigate("ArticleWindowUtility", {
                           url: "https://www.sparklight.com/contactus?isMobile=true",
                           name: "Contact Us",
                         });
@@ -858,8 +784,9 @@ const CancellationSummary = ({ navigation, route }) => {
             )}
           </View>
 
-          <TouchableOpacity
-            style={styles.checkboxTouchable}
+          <Touchable
+            minSize={0}
+            style={[styles.checkboxTouchable, { alignItems: 'stretch' }]}
             onPress={handleCheckboxToggle}
             accessibilityRole="checkbox"
             accessibilityLabel="I agree to Paperless Billing Terms and Conditions"
@@ -891,7 +818,7 @@ const CancellationSummary = ({ navigation, route }) => {
                 I understand and agree to the Equipment Return Policy above.
               </Text>
             </View>
-          </TouchableOpacity>
+          </Touchable>
           {!toggleCheckBoxTerm && isSubmitted && (
             <View style={{ flexDirection: "row", marginHorizontal: 24 }}>
               <View style={styles.errorIcon}>
@@ -917,7 +844,6 @@ const CancellationSummary = ({ navigation, route }) => {
               marginBottom: 16,
             }}
           >
-            {/* <Text style={{fontFamily:FontFamily.openSansRegular,fontSize:14,color:Color.colorGray_200,marginRight:8}}>Email address</Text> */}
             <Text
               style={[
                 {
@@ -963,11 +889,11 @@ const CancellationSummary = ({ navigation, route }) => {
           </View>
         </View>
         <View>
-          <Pressable
-            style={({ pressed }) => [
+          <Touchable
+            minSize={0}
+            style={[
               { backgroundColor: Color.colorMidnightblue },
               styles.buttonsLayout,
-              { opacity: pressed ? 0.7 : 1 },
             ]}
             onPress={() => {
               setIsSubmitted(true);
@@ -979,7 +905,7 @@ const CancellationSummary = ({ navigation, route }) => {
             <Text style={[styles.makePayment, styles.makeTypo]}>
               {"Confirm cancel"}
             </Text>
-          </Pressable>
+          </Touchable>
           <View style={styles.buttonsParent}>
             <SecondaryButton
               text="Don't Cancel"

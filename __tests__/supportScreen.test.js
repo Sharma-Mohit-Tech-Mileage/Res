@@ -20,6 +20,14 @@ const mockCustomerErrorPage = jest.fn((props) => {
   return React.createElement('MockCustomerErrorPage', props, null);
 });
 
+jest.mock('../src/components/common/customui/Touchable', () => {
+  const React = require('react');
+  const { Pressable } = require('react-native');
+  return function MockTouchable(props) {
+    return React.createElement(Pressable, props, props.children);
+  };
+});
+
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
@@ -50,9 +58,13 @@ jest.mock('../src/res/svgIcons/NewSupportIcon', () => 'SupportIcon');
 jest.mock('../assets/svgs/Chevonright', () => 'RighIcon');
 jest.mock('../assets/svgs/Searchmd', () => 'Searchmd');
 
-jest.mock('../src/components/utility/AppStyles', () => ({
-  card: { borderRadius: 8 },
-}));
+jest.mock(
+  '../src/components/utility/AppStyles',
+  () => ({
+    card: { borderRadius: 8 },
+  }),
+  { virtual: true }
+);
 
 jest.mock('pubsub-js', () => ({
   subscribe: (...args) => mockSubscribe(...args),
@@ -132,7 +144,7 @@ describe('Support screen behavior', () => {
     });
 
     expect(mockNavigate).toHaveBeenCalledWith('searchArticals');
-    expect(mockNavigate).toHaveBeenCalledWith('ArticalWindowUtility', {
+    expect(mockNavigate).toHaveBeenCalledWith('ArticleWindowUtility', {
       url: 'https://support.sparklight.com/hc/en-us/articles/21493968056343-How-Do-I-Get-Started-with-the-MySparklight-Mobile-App?isMobile=true',
       name: 'Getting Started',
     });
@@ -154,7 +166,7 @@ describe('Support screen behavior', () => {
       supportPressable.props.onPress();
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith('ArticalWindowUtility', {
+    expect(mockNavigate).toHaveBeenCalledWith('ArticleWindowUtility', {
       url: 'https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT?isMobile=true',
       name: 'Sparklight Customer Support',
     });
@@ -184,19 +196,19 @@ describe('Support screen behavior', () => {
     });
 
     expect(mockNavigate).toHaveBeenCalledWith(
-      'ArticalWindowUtility',
+      'ArticleWindowUtility',
       expect.objectContaining({ name: 'Billing & Payments' })
     );
     expect(mockNavigate).toHaveBeenCalledWith(
-      'ArticalWindowUtility',
+      'ArticleWindowUtility',
       expect.objectContaining({ name: 'Contact Information & Alerts ' })
     );
     expect(mockNavigate).toHaveBeenCalledWith(
-      'ArticalWindowUtility',
+      'ArticleWindowUtility',
       expect.objectContaining({ name: 'Internet Services' })
     );
     expect(mockNavigate).toHaveBeenCalledWith(
-      'ArticalWindowUtility',
+      'ArticleWindowUtility',
       expect.objectContaining({ name: 'More...' })
     );
   });
@@ -229,7 +241,7 @@ describe('Support screen behavior', () => {
   });
 
   it('handles fetch non-ok response with error branch', async () => {
-    const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     global.fetch = jest.fn(() => Promise.resolve({ ok: false }));
 
     await act(async () => {
@@ -237,12 +249,12 @@ describe('Support screen behavior', () => {
       await Promise.resolve();
     });
 
-    expect(errSpy).toHaveBeenCalled();
-    errSpy.mockRestore();
+    expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 
   it('handles fetch rejection with error branch', async () => {
-    const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     global.fetch = jest.fn(() => Promise.reject(new Error('network-fail')));
 
     await act(async () => {
@@ -250,8 +262,8 @@ describe('Support screen behavior', () => {
       await Promise.resolve();
     });
 
-    expect(errSpy).toHaveBeenCalled();
-    errSpy.mockRestore();
+    expect(warnSpy).toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 
   it('subscribes and unsubscribes contact-us pubsub on mount/unmount', async () => {

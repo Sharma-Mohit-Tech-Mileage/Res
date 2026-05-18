@@ -23,7 +23,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
 import { addPrimaryEmailRequest } from "../../redux/actions/NotificationActionSuite";
-import AppStyles from "../utility/AppStyles";
+import { requiredField } from "../../styles/utilities";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({
@@ -144,7 +144,7 @@ const EmailNotifications = ({ navigation }) => {
                 </Text>
 
                 <Text
-                  style={[AppStyles.requiredField, { textAlign: "center" }]}
+                  style={[requiredField, { textAlign: "center" }]}
                   accessibilityRole="text"
                   accessible={true}
                   accessibilityLabel="Fields marked with an asterisk are required"

@@ -23,7 +23,7 @@ const billingStatementApi = {
      
       return response.data;
     } catch (error) {
-      console.error("Error fetching billing statements:", error);
+      console.warn("Error fetching billing statements:", error);
       throw error;
     }
   },
@@ -64,7 +64,7 @@ const billingStatementApi = {
       const response = await _axios.get(getEndpoint(ENDPOINTS.BILL_BREAKDOWN_GET, { accountNumber, startDate, endDate }), {...config});
       return {data:response.data, status: response.status}
     } catch (error) {
-      console.error("Error fetching billing breakdown:", error);
+      console.warn("Error fetching billing breakdown:", error);
       throw error;
     }
   },
@@ -80,7 +80,7 @@ const billingStatementApi = {
       const response = await _axios.post(getEndpoint(ENDPOINTS.GET_BILL_EXPLAINER, {}), requestData, {...config});
       return {data:response.data, status: response.status}
     } catch (error) {
-      console.error("Error fetching bill explainer:", error);
+      console.warn("Error fetching bill explainer:", error);
       throw error;
     }
   

@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { FontFamily, FontSize, Color, Padding } from '../../../GlobalStyles';
 import Icon from '../common/Icon';
 import { useNavigation } from '@react-navigation/native';
+import Touchable from '../common/customui/Touchable';
 
 const MenuCard = ({ item, style }) => {
   const navigation = useNavigation();
@@ -19,7 +20,7 @@ const MenuCard = ({ item, style }) => {
   };
 
   return (
-    <TouchableOpacity 
+    <Touchable
       style={[styles.container, style]}
       onPress={handlePress}
       accessibilityRole="button"
@@ -28,16 +29,16 @@ const MenuCard = ({ item, style }) => {
     >
       <View style={styles.content}>
         <Icon name={item.icon} size={30} color={ Color.sparklightBrightPurple} />
-        <Text 
+        <Text
           style={[
-            styles.title, 
-            item.id === 'service' && styles.disabledText // Grey out Service text
+            styles.title,
+            item.id === 'service' && styles.disabledText
           ]}
         >
           {item.title}
         </Text>
       </View>
-    </TouchableOpacity>
+    </Touchable>
   );
 };
 

@@ -237,8 +237,9 @@ export const clearLoading = () => ({
     type: CLEAR_LOADING,
     
 });
-export const fetchACPUserAccountDetails = () => ({
+export const fetchACPUserAccountDetails = ({ force = false } = {}) => ({
     type: FETCH_ACP_USER_ACCOUNT_DETAILS,
+    payload: { force },
   });
   
   export const saveACPUserAccountDetails = (data) => ({

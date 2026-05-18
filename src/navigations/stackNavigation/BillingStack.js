@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
+import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 import BillingScreen from "../../components/billing/BillingScreen";
 import BillingStatements from "../../components/billing/BillingStatements";
 import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
@@ -46,8 +46,8 @@ function BillingStackScreen({ route }) {
         }}
       />
       <BillingStack.Screen
-        name="ArticalWindowUtility"
-        component={ArticalWindowUtility}
+        name="ArticleWindowUtility"
+        component={ArticleWindowUtility}
         options={{ headerBackVisible: false, headerShown: false }}
       />
 

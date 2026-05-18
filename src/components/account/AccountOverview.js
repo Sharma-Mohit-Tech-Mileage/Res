@@ -3,11 +3,11 @@ import {
   StyleSheet,
   Text,
   View,
-  Pressable,
   Alert,
   ScrollView,
   Platform,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
@@ -18,6 +18,7 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
+import { A11Y } from "../../styles/theme";
 
 import ProfileSettingsIcon from "../../../assets/svgs/Rightactionable15";
 import PasswordSecurityIcon from "../../../assets/svgs/Rightactionable16";
@@ -38,7 +39,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from "react-native-version-check";
 import Config from "react-native-config";
-import AppStyles from "../utility/AppStyles";
+import { card } from "../../styles/utilities";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
 import analytics from "@react-native-firebase/analytics";
@@ -86,9 +87,8 @@ const logoutAction = (dispatch, navigation) => {
       try {
         analytics().setUserId(null);
         await analytics().setUserProperty("Sparklight_user_id", null);
-        console.log("Analytics User ID cleared on logout");
       } catch (error) {
-        console.error("Error clearing analytics user ID:", error);
+        console.warn("Error clearing analytics user ID:", error);
       }
       navigation.reset({
         index: 0,
@@ -244,16 +244,18 @@ const AccountOverview = () => {
         <ScrollView style={{ flex: 1 }}>
           <View style={{ marginBottom: "30%" }}>
             <View style={styles.frameGroup}>
-              <View style={AppStyles.card}>
+              <View style={card.elevated}>
                 {/* Mapping through menu items */}
                 {menues.map(
                   (item, index) =>
                     item.includeInMenu && (
                       <React.Fragment key={item.name}>
-                        <Pressable
+                        <Touchable
+                          minSize={0}
                           style={[
                             styles.rightActionableGroup,
                             styles.tabsFlexBox,
+                            { alignItems: 'stretch' },
                           ]}
                           onPress={item.onPress}
                           accessibilityLabel={item.name}
@@ -289,7 +291,7 @@ const AccountOverview = () => {
                           >
                             <RightIcon />
                           </View>
-                        </Pressable>
+                        </Touchable>
                         {/* Divider, if not the last item */}
                         {item.includeInMenu && index < menuItems.length - 1 && (
                           <View style={styles.frameChild} />
@@ -299,7 +301,8 @@ const AccountOverview = () => {
                 )}
               </View>
               <View style={styles.buttonContainer}>
-                <Pressable
+                <Touchable
+                  minSize={0}
                   accessible={true}
                   accessibilityRole="button"
                   accessibilityLabel="Logout"
@@ -309,7 +312,7 @@ const AccountOverview = () => {
                   }}
                 >
                   <Text style={[styles.accept]}>Logout</Text>
-                </Pressable>
+                </Touchable>
               </View>
 
               <View
@@ -320,11 +323,14 @@ const AccountOverview = () => {
                   ...styles.buttonsSpaceBlock,
                 }}
               >
-                <Pressable
+                <Touchable
+                  minSize={0}
                   accessible={true}
                   accessibilityRole="link"
+                  hitSlop={A11Y.hitSlop}
+                  style={styles.footerLink}
                   onPress={() =>
-                    navigation.navigate("ArticalWindowUtility", {
+                    navigation.navigate("ArticleWindowUtility", {
                       url: "https://www.sparklight.com/legal/mobile-app-privacy-policy",
                       name: "Privacy Policy",
                     })
@@ -336,15 +342,18 @@ const AccountOverview = () => {
                   >
                     Privacy Policy
                   </Text>
-                </Pressable>
+                </Touchable>
 
                 <Text style={styles.linkStyle} accessible={false} importantForAccessibility="no"> | </Text>
 
-                <Pressable
+                <Touchable
+                  minSize={0}
                   accessible={true}
                   accessibilityRole="link"
+                  hitSlop={A11Y.hitSlop}
+                  style={styles.footerLink}
                   onPress={() =>
-                    navigation.navigate("ArticalWindowUtility", {
+                    navigation.navigate("ArticleWindowUtility", {
                       url: "https://www.sparklight.com/legal/mobile-app-terms-and-conditions?isMobile=true",
                       name: "Terms & Conditions",
                     })
@@ -356,18 +365,21 @@ const AccountOverview = () => {
                   >
                     Terms & Conditions
                   </Text>
-                </Pressable>
+                </Touchable>
               </View>
             </View>
-            <Pressable
+            <Touchable
+              minSize={0}
               onPress={() =>
-                navigation.navigate("ArticalWindowUtility", {
+                navigation.navigate("ArticleWindowUtility", {
                   url: "https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true",
                   name: "App Release Notes",
                 })
               }
               accessibilityLabel={"Version " + VersionCheck.getCurrentVersion()+" Opens release notes"}
               accessibilityRole="link"
+              hitSlop={A11Y.hitSlop}
+              style={styles.footerLink}
             >
               <Text
                 style={{
@@ -378,7 +390,7 @@ const AccountOverview = () => {
               >
                 Version:{VersionCheck.getCurrentVersion()}
               </Text>
-            </Pressable>
+            </Touchable>
 
             <Text style={styles.copyright}>
               {`©${moment().year()} Cable One, Inc. All rights reserved.`}
@@ -417,6 +429,9 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "600",
     textDecorationLine: "underline", // added underscore for linkStyle
+  },
+  footerLink: {
+    paddingHorizontal: Padding.p_5xs,
   },
   makePaymentTypo: {
     fontSize: FontSize.size_base,

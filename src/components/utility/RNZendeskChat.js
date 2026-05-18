@@ -20,9 +20,8 @@ export const startChat = (config) => {
 export const loginWithJWT = async (jwtToken) => {
     try {
       const result = await RNZendeskChatModule.loginWithJWT(jwtToken);
-      console.log(result);
     } catch (error) {
-      console.error('Zendesk Login Error:', error);
+      console.warn('Zendesk Login Error:', error);
     }
   };
   
@@ -30,9 +29,8 @@ export const loginWithJWT = async (jwtToken) => {
   export const logoutZendesk = async () => {
     try {
       const result = await RNZendeskChatModule.logoutZendesk();
-      console.log(result);
     } catch (error) {
-      console.error('Zendesk Logout Error:', error);
+      console.warn('Zendesk Logout Error:', error);
     }
   };
 
@@ -41,8 +39,7 @@ export const loginWithJWT = async (jwtToken) => {
     try {
       await RNZendeskChatModule.setConversationTags(data);
     } catch (error) {
-      console.log("Result1:",false);
-      console.error('setConversationalFields  Error:', error);
+      console.warn('setConversationalFields  Error:', error);
     }
     
 };

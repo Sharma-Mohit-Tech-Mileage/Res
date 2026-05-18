@@ -1,9 +1,10 @@
 // components/FeatureCard.js
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
 import Icon from "../common/Icon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import Touchable from "../common/customui/Touchable";
 
 const FeatureCardMobile = ({
   title,
@@ -74,7 +75,8 @@ const FeatureCardMobile = ({
           <View style={[styles.button, { height: 100, paddingVertical: 24 }]} />
         </SkeletonPlaceholder>
       ) : (
-        <TouchableOpacity
+        <Touchable
+          minSize={0}
           style={[styles.button, getButtonStyle()]}
           onPress={onButtonPress}
           accessibilityRole="button"
@@ -83,7 +85,7 @@ const FeatureCardMobile = ({
           <Text style={[styles.buttonText, getButtonTextStyle()]}>
             {buttonText}
           </Text>
-        </TouchableOpacity>
+        </Touchable>
       )}
     </View>
   );

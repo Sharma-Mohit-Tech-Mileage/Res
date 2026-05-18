@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import PilotTick from "../../res/svgIcons/PilotTick";
 import { FontFamily } from "../../../GlobalStyles";
+import Touchable from "../common/customui/Touchable";
 
 const DEFAULT_STAGES = [
   { key: "purchase", label: "Service Purchased" },
@@ -71,19 +72,20 @@ export default function PilotServiceStatus({
             style={styles.stageRow}
           >
             <View style={styles.leftColumn} accessible={false} importantForAccessibility="no">
-              <TouchableOpacity
+              <Touchable
+                minSize={0}
+                style={{ alignItems: 'stretch' }}
                 accessible={false}
                 importantForAccessibility="no"
                 accessibilityRole="none"
                 onPress={() => onStagePress && onStagePress(index)}
-                activeOpacity={0.8}
               >
                 <View style={styles.iconWrapOuter} accessible={false} importantForAccessibility="no">
                   <View style={[styles.iconWrap, filled && styles.iconWrapFilled]} accessible={false} importantForAccessibility="no">
                     {renderIcon(filled, index)}
                   </View>
                 </View>
-              </TouchableOpacity>
+              </Touchable>
               {!isLastStage && (
                 <View
                   accessible={false}

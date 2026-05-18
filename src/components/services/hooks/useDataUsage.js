@@ -89,7 +89,6 @@ export const useDataUsage = () => {
     if (periodItems.length > 0 && !initialDailyFetched.current) {
       initialDailyFetched.current = true;
       const latest = periodItems[periodItems.length - 1];
-      console.log("[useDataUsage] Auto-fetching daily for latest period → startDate:", latest.startDate, "endDate:", latest.endDate);
       dispatch(fetchDailyUsageRequest(latest.startDate, latest.endDate));
     }
   }, [periodItems, dispatch]);
@@ -98,7 +97,6 @@ export const useDataUsage = () => {
   const fetchDailyForPeriod = useCallback(
     (periodItem) => {
       if (periodItem?.startDate && periodItem?.endDate) {
-        console.log("[useDataUsage] fetchDailyForPeriod → startDate:", periodItem.startDate, "endDate:", periodItem.endDate);
         dispatch(
           fetchDailyUsageRequest(periodItem.startDate, periodItem.endDate)
         );

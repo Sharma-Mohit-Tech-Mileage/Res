@@ -85,7 +85,7 @@ class RemoteConfigManager {
 
       this._fetchInBackground();
     } catch (error) {
-      console.error('[RemoteConfig] Initialization error:', error);
+      console.warn('[RemoteConfig] Initialization error:', error);
       this._maintenanceCache = DEFAULT_MAINTENANCE;
       this._featuresCache = DEFAULT_FEATURES;
       this._initialized = true;
@@ -107,7 +107,7 @@ class RemoteConfigManager {
         ? JSON.parse(featuresStr)
         : DEFAULT_FEATURES;
     } catch (error) {
-      console.error('[RemoteConfig] Cache load error:', error);
+      console.warn('[RemoteConfig] Cache load error:', error);
       this._maintenanceCache = DEFAULT_MAINTENANCE;
       this._featuresCache = DEFAULT_FEATURES;
     }
@@ -231,7 +231,7 @@ class RemoteConfigManager {
 
       return value ?? defaultValue;
     } catch (error) {
-      console.error('[RemoteConfig] Error reading feature flag:', path, error);
+      console.warn('[RemoteConfig] Error reading feature flag:', path, error);
       return defaultValue;
     }
   }
@@ -251,7 +251,7 @@ class RemoteConfigManager {
       try {
         callback(this._maintenanceCache);
       } catch (error) {
-        console.error('[RemoteConfig] Maintenance subscriber error:', error);
+        console.warn('[RemoteConfig] Maintenance subscriber error:', error);
       }
     });
   }
@@ -261,7 +261,7 @@ class RemoteConfigManager {
       try {
         callback(this._featuresCache);
       } catch (error) {
-        console.error('[RemoteConfig] Feature subscriber error:', error);
+        console.warn('[RemoteConfig] Feature subscriber error:', error);
       }
     });
   }

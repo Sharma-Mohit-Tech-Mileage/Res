@@ -3,13 +3,14 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   FlatList,
   TextInput
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import { A11Y } from "../../styles/theme";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import moment from "moment";
 import Icon from "../common/Icon";
@@ -35,7 +36,7 @@ import {
   selectHasMore,
   selectDownloadedReceipt
 } from "../../redux/selectors/paymentHistorySelectors";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import SmallLoader from "../common/customui/SmallLoader";
 
 const CLEAR_PAYMENT_HISTORY_ERROR = 'CLEAR_PAYMENT_HISTORY_ERROR';
@@ -185,7 +186,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
     if (!hasMore) return null;
     
     return (
-      <TouchableOpacity 
+      <Touchable
         style={styles.loadMoreButton}
         onPress={handleLoadMore}
         disabled={loading}
@@ -198,7 +199,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         ) : (
           <Text style={styles.loadMoreText}>Load more</Text>
         )}
-      </TouchableOpacity>
+      </Touchable>
     );
   };
 
@@ -255,7 +256,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
           </View>
           
           <View style={styles.sortContainer}>
-            <TouchableOpacity
+            <Touchable
               style={styles.sortButton}
               onPress={toggleSortDirection}
               accessible={true}
@@ -266,14 +267,14 @@ const PaymentHistoryScreen = ({ navigation }) => {
               }, tap to reverse sort order`}
             >
               <Text style={styles.sortText}>Sort date</Text>
-              <Icon 
-                name="double-arrow" 
+              <Icon
+                name="double-arrow"
                 size={30}
                 style={{
                   transform: [{ rotate: sortDirection === "asc" ? "0deg" : "180deg" }]
                 }}
               />
-            </TouchableOpacity>
+            </Touchable>
           </View>
         </View>
 
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
     borderColor: Color.sparklightGray1, // Changed from colorGainsboro_200 to sparklightGray1 for better visibility
     borderRadius: 4,
     paddingHorizontal: 10,
-    height: 42,
+    minHeight: A11Y.minTouch,
   },
   sortContainer: {
     width: "30%", // Adjusted to take the remaining width (after gap)
@@ -352,15 +353,17 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    height: 40,
+    minHeight: A11Y.minTouch,
     fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
+    fontSize: FontSize.size_base,
     color: Color.colorGray_100,
   },
   sortButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end", // Align items to the right
+    minHeight: A11Y.minTouch,
+    paddingHorizontal: Padding.p_5xs,
   },
   sortText: {
     fontSize: FontSize.size_base,

@@ -1,7 +1,8 @@
 import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, AccessibilityInfo, findNodeHandle, Image } from 'react-native';
+import { View, Text, StyleSheet, AccessibilityInfo, findNodeHandle, Image } from 'react-native';
 import { theme } from '../../styles/theme';
 import { typography } from '../../styles/utilities';
+import Touchable from '../common/customui/Touchable';
 
 const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, onLearnMoreNavigate }) => {
   const titleRef = useRef(null);
@@ -40,8 +41,9 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, onLearnMor
     return (
       <View style={styles.learnMoreWrapper}>
         {links.map((link, index) => (
-          <Pressable
+          <Touchable
             key={index}
+            minSize={0}
             onPress={() => handleLearnMorePress(link)}
             style={styles.learnMoreContainer}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -52,7 +54,7 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, onLearnMor
             <Text style={styles.learnMoreText}>
               {link.text || 'Learn more'}
             </Text>
-          </Pressable>
+          </Touchable>
         ))}
       </View>
     );

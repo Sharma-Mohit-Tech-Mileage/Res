@@ -138,7 +138,6 @@ const Notifications = () => {
   );
 
   const handleEdit = (section) => {
-    console.log(`Editing ${section}`);
 
     if (section == "app") {
       navigation.navigate("InAppNotifications", {
@@ -155,7 +154,6 @@ const Notifications = () => {
         isPaperlessEnabled: paperlessStatusAcp,
       });
     } else if (section == "text") {
-      console.log("status", TextNotifSettings[1].status);
       navigation.navigate("TextNotifications", {
         is_enrolled: profileData.emailAddress,
         additionalData: {
@@ -175,13 +173,11 @@ const Notifications = () => {
     setInAppNotificationLoading(true);
     getUser().then((res1) => {
       const endpointUrl = getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS_ACCOUNT, { userName: res1.userInfo?.userName, accountNumber: res1.userInfo?.accountNumber });
-      console.log("REQUEST", endpointUrl);
       GetApiRequest(
         endpointUrl,
         (res) => {
           if (res) {
             res[0]?.pushMessageType.forEach((value, index) => {
-              console.log(`Index: ${index}, Value: ${value}`);
               InAppSettings[index].status = value?.optOutFlag ? "Off" : "On";
             });
           }
@@ -189,7 +185,7 @@ const Notifications = () => {
         },
         (error) => {
           setInAppNotificationLoading(false);
-          console.error("Error on retrying getInAppNotificationsData", error);
+          console.warn("Error on retrying getInAppNotificationsData", error);
         }
       );
     });
@@ -199,13 +195,11 @@ const Notifications = () => {
     setTextNotificationLoading(true);
     getUser().then((res1) => {
       const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, { accountNumber: res1.userInfo?.accountNumber });
-      console.log("REQUEST", endpointUrl);
       GetApiRequest(
         endpointUrl,
         (res) => {
           if (res) {
             res[0]?.smsMessageType.forEach((value, index) => {
-              console.log(`Index: ${index}, Value: ${value}`);
               TextNotifSettings[index].status = value?.optOutFlag
                 ? "Off"
                 : "On";
@@ -217,7 +211,7 @@ const Notifications = () => {
         },
         (error) => {
           setTextNotificationLoading(false);
-          console.error("Error on retrying getTextNotificationsData", error);
+          console.warn("Error on retrying getTextNotificationsData", error);
         }
       );
     });

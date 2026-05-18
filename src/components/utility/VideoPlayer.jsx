@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { StyleSheet, View, AppState, Platform } from "react-native";
 import { WebView } from "react-native-webview";
+import { Border } from "../../../GlobalStyles";
 
 const VideoPlayer = ({ videoId, bundleId = "com.sparklight.app" }) => {
   const webViewRef = useRef(null);
@@ -147,7 +148,7 @@ const VideoPlayer = ({ videoId, bundleId = "com.sparklight.app" }) => {
         originWhitelist={["*"]}
         startInLoadingState={true}
         cacheEnabled={false}
-        onError={(error) => console.log("WebView error:", error)}
+        onError={(error) => console.warn("WebView error:", error)}
         injectedJavaScript={injectedJavaScript}
         {...(Platform.OS === "ios" && {
           allowsLinkPreview: false,
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
   },
   webView: {
     flex: 1,
-    borderRadius: 8,
+    borderRadius: Border.br_5xs,
     overflow: "hidden",
   },
 });

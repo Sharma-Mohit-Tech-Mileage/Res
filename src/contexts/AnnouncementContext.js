@@ -18,7 +18,6 @@ export const AnnouncementProvider = ({ children }) => {
   const showAnnouncement = useCallback(async (campaign, triggerType) => {
     if (!campaign) return;
 
-    console.log(`[AnnouncementContext] Showing announcement: ${campaign.id}`);
 
     await AnnouncementPersistence.markAsShown(campaign.id);
     trackAnnouncementImpression(campaign.id, triggerType);
@@ -30,7 +29,6 @@ export const AnnouncementProvider = ({ children }) => {
   const handleComplete = useCallback(async (timeSpentSeconds) => {
     if (!activeCampaign) return;
 
-    console.log(`[AnnouncementContext] Completing announcement: ${activeCampaign.id}`);
 
     await AnnouncementPersistence.markAsCompleted(activeCampaign.id);
 
@@ -57,7 +55,6 @@ export const AnnouncementProvider = ({ children }) => {
   const handleLearnMoreNavigate = useCallback(async (navConfig) => {
     if (!activeCampaign) return;
 
-    console.log(`[AnnouncementContext] Learn more navigation: ${activeCampaign.id}`);
 
     await AnnouncementPersistence.markAsCompleted(activeCampaign.id);
 
@@ -80,7 +77,6 @@ export const AnnouncementProvider = ({ children }) => {
   const handleDismiss = useCallback(async (dismissedAtStep) => {
     if (!activeCampaign) return;
 
-    console.log(`[AnnouncementContext] Dismissing announcement: ${activeCampaign.id} at step ${dismissedAtStep}`);
 
     await AnnouncementPersistence.markAsDismissed(activeCampaign.id, dismissedAtStep);
     trackAnnouncementDismissal(activeCampaign.id, dismissedAtStep);

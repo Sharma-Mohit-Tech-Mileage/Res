@@ -51,64 +51,6 @@ export const serviceCard = {
     color: theme.colors.primary,
     marginBottom: theme.spacing.sm,
   },
-
-  actionButton: {
-    padding: 4,
-  },
-};
-
-export const internetSpeed = {
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: theme.spacing.sm,
-  },
-
-  speedItem: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: theme.radius.xs,
-    padding: theme.spacing.sm,
-    marginHorizontal: 4,
-  },
-
-  speedIcon: {
-    marginRight: theme.spacing.xs,
-  },
-
-  speedInfo: {
-    flex: 1,
-  },
-
-  speedLabel: {
-    fontSize: theme.typography.size.xs,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.secondary,
-    marginBottom: 2,
-    textTransform: "uppercase",
-    letterSpacing: 0.3,
-  },
-
-  speedValueRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-  },
-
-  speedValue: {
-    fontSize: theme.typography.size.lg,
-    fontFamily: theme.typography.family.semiBold,
-    color: theme.colors.text.primary,
-    fontWeight: "700",
-  },
-
-  speedUnit: {
-    fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.primary,
-    marginLeft: 4,
-  },
 };
 
 export const statusSection = {
@@ -197,14 +139,6 @@ export const skeletonLoader = {
   },
 };
 
-export const gradientHeader = {
-  position: "absolute",
-  left: 0,
-  right: 0,
-  top: 0,
-  height: 150,
-};
-
 // ==========================================
 // SHARED CARD HEADER (reused by data usage components)
 // ==========================================
@@ -238,85 +172,6 @@ export const cardHeader = {
 // DATA USAGE COMPOSITIONS
 // ==========================================
 
-export const dataUsageSummary = {
-  container: {
-    marginBottom: theme.spacing.base,
-    marginHorizontal: theme.spacing.base,
-  },
-  card: {
-    ...card.base,
-    padding: theme.spacing.lg,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: theme.spacing.base,
-  },
-  label: {
-    fontSize: theme.typography.size.xs,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.text.secondary,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  planName: {
-    fontSize: theme.typography.size.lg,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.primary,
-    marginTop: 2,
-  },
-  usageNumbers: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    justifyContent: "center",
-    marginBottom: theme.spacing.sm,
-  },
-  usageUnit: {
-    fontSize: theme.typography.size.base,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.secondary,
-    marginLeft: 4,
-  },
-  progressBar: {
-    height: 10,
-    backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: 5,
-    overflow: "hidden",
-    marginBottom: theme.spacing.xs,
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: 5,
-  },
-};
-
-export const dataUsageChart = {
-  container: {
-    marginHorizontal: theme.spacing.base,
-    marginBottom: theme.spacing.base,
-  },
-  card: {
-    ...card.base,
-    padding: theme.spacing.base,
-  },
-  yAxisLabel: {
-    fontSize: theme.typography.size.xs,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.tertiary,
-    textAlign: "right",
-  },
-  chartArea: {
-    flex: 1,
-    position: "relative",
-  },
-  gridLine: {
-    height: 1,
-    backgroundColor: theme.colors.border,
-  },
-};
-
 export const dataUsageTabs = {
   tabsContainer: {
     flexDirection: "row",
@@ -342,21 +197,14 @@ export const dataUsageTabs = {
     fontWeight: "600",
     color: theme.colors.text.secondary,
   },
-  activeTabText: {
-    color: theme.colors.primary,
-  },
 };
 
 
 export default {
   serviceCard,
-  internetSpeed,
   statusSection,
   header,
   skeletonLoader,
-  gradientHeader,
   cardHeader,
-  dataUsageSummary,
-  dataUsageChart,
   dataUsageTabs,
 };

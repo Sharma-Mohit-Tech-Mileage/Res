@@ -8,7 +8,6 @@ function* fetchBillingStatementsSaga() {
   try {
     // Call API
     const statements = yield call(billingStatementApi.fetchBillingStatements);
-    console.log('Fetched statements:', statements);
 
     // Check if statements is a valid array before proceeding
     if (!Array.isArray(statements) || statements.length === 0) {
@@ -58,7 +57,7 @@ function* downloadStatementSaga(action) {
       throw new Error('File binary data is missing');
     }
   } catch (error) {
-    console.log('Error downloading statement:', error);
+    console.warn('Error downloading statement:', error);
     // Dispatch error action
     yield put(actions.downloadStatementFailure(error.message || 'Failed to download statement'));
   }

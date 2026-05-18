@@ -4,12 +4,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import {
   StyleSheet,
   Text,
-  Pressable,
   View,
   ScrollView,
   Platform,
   AccessibilityInfo,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   FontFamily,
@@ -31,10 +31,10 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PutApiRequest , PostApiRequest} from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { passwordSchema } from "../utility/validationSchema"; 
 import colors from "../../res/Colors";
-import AppStyles from "../utility/AppStyles";
+import { requiredField } from "../../styles/utilities";
 const ChangePassword = () => {
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
@@ -110,7 +110,7 @@ const ChangePassword = () => {
         }
       },
       (error) => {
-        console.log(error);
+        console.warn(error);
       }
     );
   };
@@ -151,7 +151,7 @@ const ChangePassword = () => {
       },
         (error) => {
           setLoading(false);
-           console.error("Error updating password", error);
+           console.warn("Error updating password", error);
 
           // Handle specific errors, such as '204 No Content' or others
           if (error.code == "204") {
@@ -166,19 +166,16 @@ const ChangePassword = () => {
       );
     } catch (err) {
       setLoading(false);
-      console.error("Error retrieving user information", err);
+      console.warn("Error retrieving user information", err);
       setShowErrorAlert(true); // Show an error alert if getUser fails
     }
   };
 
   useEffect(() => {
-    // Reset the form with the updated profile details
-    //reset(profileDetails);
     setLoading(false);
   }, [profileDetails, reset]);
 
   const checkCustomSecurityQuestion = (securityQuestions) => {
-    console.log("Profile Details", profileDetails);
     const storedSecurityQuestion = profileDetails.securityQuestion;
     const isCustomQuestion =
       storedSecurityQuestion &&
@@ -249,7 +246,7 @@ const ChangePassword = () => {
                     Password
                   </Text>
                   <Text
-                    style={[AppStyles.requiredField, { marginTop: 10 }]}
+                    style={[requiredField, { marginTop: 10 }]}
                     accessible={true}
                     importantForAccessibility="yes"
                     accessibilityRole="text"
@@ -335,7 +332,8 @@ const ChangePassword = () => {
             </View>
           </View>
           <View style={styles.frameParent1}>
-            <Pressable
+            <Touchable
+              minSize={0}
               accessibilityLabel={"Save"}
               accessibilityRole="button"
               accessible={true}
@@ -343,8 +341,9 @@ const ChangePassword = () => {
               onPress={handleSubmit(handleSavePass, handleValidationError)}
             >
               <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
-            </Pressable>
-            <Pressable
+            </Touchable>
+            <Touchable
+              minSize={0}
               accessibilityLabel={`Cancel`}
               accessibilityRole="button"
               accessible={true}
@@ -355,7 +354,7 @@ const ChangePassword = () => {
                 {" "}
                 Cancel
               </Text>
-            </Pressable>
+            </Touchable>
           </View>
 
           <LoadingOverlay
@@ -398,17 +397,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
   },
-  firstTypo: {
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
-  },
-  wrapperSpaceBlock: {
-    paddingVertical: 0,
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
-  },
   buttonsLayout: {
     width: "100%",
     justifyContent: "center",
@@ -440,64 +428,11 @@ const styles = StyleSheet.create({
     borderRadius: 3.5,
     marginRight: 10,
   },
-  firstName: {
-    color: Color.sparklightGray1,
-    fontSize: FontSize.textXsSemibold_size,
-    flex: 1,
-  },
-  eyeIcon: {
-    width: 16,
-    height: 16,
-    overflow: "hidden",
-  },
-  show: {
-    marginLeft: 6,
-    color: Color.colorMidnightblue,
-    lineHeight: 28,
-  },
-  eyeParent: {
-    marginLeft: 8,
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  firstNameParent: {
-    alignItems: "center",
-    flexDirection: "row",
-    alignSelf: "stretch",
-  },
-  textinput: {
-    justifyContent: "center",
-    alignSelf: "stretch",
-  },
   textinputWrapper: {
     justifyContent: "center",
     paddingHorizontal: Padding.p_5xl,
   },
-  itMustBe: {
-    lineHeight: 19,
-    fontSize: FontSize.size_xs,
-  },
   frameParent: {
-    alignSelf: "stretch",
-  },
-  frameChild: {
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
-  },
-  rectangleWrapper: {
-    marginTop: Padding.p_base,
-  },
-  securityQuestionWrapper: {
-    paddingBottom: Padding.p_5xs,
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
-  },
-  firstName1: {
-    color: Color.sparklightGray1,
-    fontSize: FontSize.textXsSemibold_size,
     alignSelf: "stretch",
   },
   frameParent1: {
@@ -537,17 +472,6 @@ const styles = StyleSheet.create({
   passwordSecurityEdit: {
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
-  },
-  BtnContainer: {
-    backgroundColor: colors.sparklight_purple_blue,
-    justifyContent: "center",
-  },
-  Btn: {
-    color: colors.snow_white,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "center",
-    padding: 16,
-    fontSize: 16,
   },
 });
 

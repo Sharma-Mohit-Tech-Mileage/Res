@@ -4,7 +4,7 @@ import UserNavigations from "./src/navigations/UserNavigations";
 import { Provider } from "react-redux";
 import store from "./src/redux/configureStore.js";
 import { NativeBaseProvider, extendTheme } from "native-base";
-import { AnalyticsContext } from "./src/components/utility/AnalyticsContext";
+import { AnalyticsContext } from "./src/context/AnalyticsContext";
 import DeviceInfo from "react-native-device-info";
 import VersionCheck from "react-native-version-check";
 import AppUpdateAlert from "./src/components/utility/AppUpdateAlert";

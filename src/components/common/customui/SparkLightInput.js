@@ -4,8 +4,6 @@ import {
   TextInput,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  Platform,
   AccessibilityInfo,
   findNodeHandle,
 } from "react-native";
@@ -16,33 +14,16 @@ import {
   FontSize,
   Border,
 } from "../../../../GlobalStyles";
+import { A11Y } from "../../../styles/theme";
+import { formatInputA11yReadout } from "../../../utils/a11y";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
+import Touchable from "./Touchable";
 
 const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
-};
-
-const numberToWordsForAccessibility = (numStr) => {
-  if (!numStr) return "";
-  const digitsMap = {
-    0: "zero",
-    1: "one",
-    2: "two",
-    3: "three",
-    4: "four",
-    5: "five",
-    6: "six",
-    7: "seven",
-    8: "eight",
-    9: "nine",
-  };
-  return numStr
-    .split("")
-    .map((digit) => digitsMap[digit] || digit)
-    .join(" ");
 };
 
 const SparkLightInput = React.forwardRef(({
@@ -144,24 +125,11 @@ const SparkLightInput = React.forwardRef(({
     return "default";
   };
 
-  // Accessibility label handling
-  const getAccessibilityLabel = () => {
-    if (
-      Platform.OS === "android" &&
-      getKeyboardType() === "phone-pad" &&
-      value
-    ) {
-      return numberToWordsForAccessibility(value);
-    }
-    return accessibilityLabel || label || placeholder;
-  };
-
   const handleFocus = () => {
     setIsFocused(true);
     isFocusedRef.current = true;
 
-    // Announce error on focus only if useEffect hasn't already announced it.
-    // This covers the case where user re-focuses a field with an unannounced error.
+    // Announce error on focus only if useEffect hasn't already (covers re-focus of an unannounced error).
     if (error && hasBlurred.current && !errorAnnouncedRef.current) {
       setTimeout(() => {
         const hint = errorHint || error;
@@ -188,33 +156,30 @@ const SparkLightInput = React.forwardRef(({
         error && styles.outerContainerError,
       ]}
     >
-      <View style={styles.labelContainer}>
+      <View style={[styles.labelContainer, secure && styles.labelContainerSecure]}>
         {label && (
           <Text
             style={[styles.label, error && styles.errorLabel]}
-            accessible={true}
-            importantForAccessibility="yes"
-            accessibilityRole="text"
-            accessibilityLabel={label?.includes('*') ? label.replace('*', '').trim() + ' Required' : label}
+            accessible={false}
+            importantForAccessibility="no"
           >
             {label}
           </Text>
         )}
         {secure && (
-          <TouchableOpacity
+          <Touchable
             accessibilityLabel={
               passwordVisible ? "Hide password" : "Show password"
             }
-            accessibilityRole="button"
-            accessible={true}
             onPress={togglePasswordVisibility}
+            minSize={0}
             style={styles.eyeButton}
           >
             <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
             <Text style={styles.eyeText}>
               {passwordVisible ? "Hide" : "Show"}
             </Text>
-          </TouchableOpacity>
+          </Touchable>
         )}
       </View>
 
@@ -259,17 +224,15 @@ const SparkLightInput = React.forwardRef(({
                 : Color.sparklightDarkGray,
             },
           ]}
-          accessibilityLabel={
-            value
-              ? (Platform.OS === "android" && getKeyboardType() === "phone-pad"
-                  ? numberToWordsForAccessibility(value)
-                  : value)
-              : " "
-          }
+          accessibilityLabel={formatInputA11yReadout({
+            label: accessibilityLabel || label || placeholder,
+            required,
+            value,
+            errorHint: error ? (errorHint || error) : undefined,
+            isSecure: secure,
+            isPhoneNumber: getKeyboardType() === "phone-pad",
+          })}
           accessibilityRole="text"
-          accessibilityHint={
-            `${accessibilityLabel || label || placeholder}${required ? ', required' : ''}${error ? `, ${errorHint || error}` : ''}, double tap to edit.`
-          }
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
           returnKeyType="done"
@@ -374,10 +337,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  // Only password fields grow this row; non-password inputs unchanged.
+  labelContainerSecure: {
+    minHeight: A11Y.minTouch,
+  },
   eyeButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: Padding.p_5xs,
   },
   eyeIcon: {
     width: 15,
