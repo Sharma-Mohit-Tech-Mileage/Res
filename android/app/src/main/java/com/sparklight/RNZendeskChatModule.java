@@ -164,6 +164,7 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
                 if (metadata.hasKey("authLevel"))       fields.put("29230167813271", metadata.getString("authLevel"));
                 if (metadata.hasKey("mobileApp"))       fields.put("29542765557655", metadata.getString("mobileApp"));
                 if (metadata.hasKey("jwtId"))           fields.put("29230180962071", metadata.getString("jwtId"));
+                if (metadata.hasKey("source"))           fields.put("40313200914455", metadata.getString("source"));
             } else {
                 // Prod mapping
                 if (metadata.hasKey("userAgent"))       fields.put("29542407930903", metadata.getString("userAgent"));

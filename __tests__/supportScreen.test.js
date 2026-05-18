@@ -1,0 +1,366 @@
+const React = require('react');
+const renderer = require('react-test-renderer');
+const { act } = renderer;
+const { Pressable, Platform } = require('react-native');
+
+const mockNavigate = jest.fn();
+const mockAddListener = jest.fn((event, cb) => {
+  if (event === 'focus' && cb) {
+    cb();
+  }
+  return jest.fn();
+});
+const mockTriggerOnScreenEntry = jest.fn();
+const mockSubscribe = jest.fn(() => 'token-1');
+const mockUnsubscribe = jest.fn();
+const mockStartChatWithConfig = jest.fn();
+const mockStartChat = jest.fn();
+const mockCustomerErrorPage = jest.fn((props) => {
+  const React = require('react');
+  return React.createElement('MockCustomerErrorPage', props, null);
+});
+
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    addListener: mockAddListener,
+  }),
+  useFocusEffect: (cb) => {
+    const React = require('react');
+    React.useEffect(() => cb(), []);
+  },
+}));
+
+jest.mock('../src/hooks/useAnnouncement', () => ({
+  useAnnouncement: () => ({
+    triggerOnScreenEntry: mockTriggerOnScreenEntry,
+  }),
+}));
+
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaProvider: ({ children }) => children,
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+}));
+
+jest.mock('react-native-linear-gradient', () => 'LinearGradient');
+jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
+jest.mock('../src/components/utility/SystemErrorPopup', () => (...args) => mockCustomerErrorPage(...args));
+jest.mock('../src/components/utility/ZendeskChatIcon', () => 'ZendeskChatIcon');
+jest.mock('../src/res/svgIcons/NewSupportIcon', () => 'SupportIcon');
+jest.mock('../assets/svgs/Chevonright', () => 'RighIcon');
+jest.mock('../assets/svgs/Searchmd', () => 'Searchmd');
+
+jest.mock('../src/components/utility/AppStyles', () => ({
+  card: { borderRadius: 8 },
+}));
+
+jest.mock('pubsub-js', () => ({
+  subscribe: (...args) => mockSubscribe(...args),
+  unsubscribe: (...args) => mockUnsubscribe(...args),
+}));
+
+jest.mock('react-native-base64', () => ({
+  encode: jest.fn(() => 'encodedAuth'),
+}));
+
+jest.mock('../src/components/utility/RNZendeskChat', () => ({
+  startChatWithConfig: (...args) => mockStartChatWithConfig(...args),
+  startChat: (...args) => mockStartChat(...args),
+}));
+
+describe('Support screen behavior', () => {
+  let Support;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            channel_group_statuses: {
+              chat: {
+                state_counts: {
+                  online: 2,
+                },
+              },
+            },
+          }),
+      })
+    );
+
+    Support = require('../src/components/support/supportScreen').default;
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
+
+  it('fires focus side effects and checks agent availability', async () => {
+    await act(async () => {
+      renderer.create(<Support route={{ params: {} }} />);
+      await Promise.resolve();
+    });
+
+    expect(mockTriggerOnScreenEntry).toHaveBeenCalledWith('SupportStack');
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(global.fetch.mock.calls[0][0]).toContain('1500003304341');
+    expect(global.fetch.mock.calls[1][0]).toContain('1500003312422');
+  });
+
+  it('navigates to search and article pages from knowledgebase list', async () => {
+    let tree;
+    await act(async () => {
+      tree = renderer.create(<Support route={{ params: {} }} />);
+      await Promise.resolve();
+    });
+
+    const pressables = tree.root.findAllByType(Pressable);
+    const searchButton = pressables.find(
+      (p) => p.props.accessibilityLabel === 'Search'
+    );
+    const gettingStarted = pressables.find(
+      (p) => p.props.accessibilityLabel === 'Getting Started'
+    );
+
+    act(() => {
+      searchButton.props.onPress();
+      gettingStarted.props.onPress();
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith('searchArticals');
+    expect(mockNavigate).toHaveBeenCalledWith('ArticalWindowUtility', {
+      url: 'https://support.sparklight.com/hc/en-us/articles/21493968056343-How-Do-I-Get-Started-with-the-MySparklight-Mobile-App?isMobile=true',
+      name: 'Getting Started',
+    });
+  });
+
+  it('opens Sparklight customer support article from Contact Us section', async () => {
+    let tree;
+    await act(async () => {
+      tree = renderer.create(<Support route={{ params: {} }} />);
+      await Promise.resolve();
+    });
+
+    const pressables = tree.root.findAllByType(Pressable);
+    const supportPressable = pressables.find(
+      (p) => p.props.accessibilityLabel === 'Sparklight Customer Support'
+    );
+
+    act(() => {
+      supportPressable.props.onPress();
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith('ArticalWindowUtility', {
+      url: 'https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT?isMobile=true',
+      name: 'Sparklight Customer Support',
+    });
+  });
+
+  it('opens all right-side knowledgebase options with article params', async () => {
+    let tree;
+    await act(async () => {
+      tree = renderer.create(<Support route={{ params: {} }} />);
+      await Promise.resolve();
+    });
+
+    const pressables = tree.root.findAllByType(Pressable);
+    const labels = [
+      'Billing & Payments',
+      'Contact Information & Alerts ',
+      'Internet Services',
+      'More',
+    ];
+
+    act(() => {
+      labels.forEach((label) => {
+        const btn = pressables.find((p) => p.props.accessibilityLabel === label);
+        expect(btn).toBeTruthy();
+        btn.props.onPress();
+      });
+    });
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'ArticalWindowUtility',
+      expect.objectContaining({ name: 'Billing & Payments' })
+    );
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'ArticalWindowUtility',
+      expect.objectContaining({ name: 'Contact Information & Alerts ' })
+    );
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'ArticalWindowUtility',
+      expect.objectContaining({ name: 'Internet Services' })
+    );
+    expect(mockNavigate).toHaveBeenCalledWith(
+      'ArticalWindowUtility',
+      expect.objectContaining({ name: 'More...' })
+    );
+  });
+
+  it('sets unavailable state path when agent is offline', async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            channel_group_statuses: {
+              chat: {
+                state_counts: {
+                  online: 0,
+                },
+              },
+            },
+          }),
+      })
+    );
+
+    await act(async () => {
+      renderer.create(<Support route={{ params: {} }} />);
+      await Promise.resolve();
+    });
+
+    expect(mockStartChat).not.toHaveBeenCalled();
+    expect(mockStartChatWithConfig).not.toHaveBeenCalled();
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('handles fetch non-ok response with error branch', async () => {
+    const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    global.fetch = jest.fn(() => Promise.resolve({ ok: false }));
+
+    await act(async () => {
+      renderer.create(<Support route={{ params: {} }} />);
+      await Promise.resolve();
+    });
+
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
+  it('handles fetch rejection with error branch', async () => {
+    const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    global.fetch = jest.fn(() => Promise.reject(new Error('network-fail')));
+
+    await act(async () => {
+      renderer.create(<Support route={{ params: {} }} />);
+      await Promise.resolve();
+    });
+
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
+  it('subscribes and unsubscribes contact-us pubsub on mount/unmount', async () => {
+    let tree;
+    await act(async () => {
+      tree = renderer.create(<Support route={{ params: {} }} />);
+      await Promise.resolve();
+    });
+
+    expect(mockSubscribe).toHaveBeenCalledWith(
+      'event.contactUsEvent',
+      expect.any(Function)
+    );
+
+    act(() => {
+      tree.unmount();
+    });
+
+    expect(mockUnsubscribe).toHaveBeenCalledWith('token-1');
+  });
+
+  it('starts chat on iOS when chatData is provided and agents are online', async () => {
+    let tree;
+    await act(async () => {
+      tree = renderer.create(
+        <Support route={{ params: { chatData: { department: 'billing' } } }} />
+      );
+      await Promise.resolve();
+    });
+
+    expect(Platform.OS).toBe('ios');
+    expect(mockStartChat).toHaveBeenCalledTimes(2);
+    expect(mockStartChatWithConfig).not.toHaveBeenCalled();
+
+    act(() => {
+      tree.unmount();
+    });
+  });
+
+  it('handles contact-us route timer and pubsub callback paths', async () => {
+    let tree;
+    await act(async () => {
+      tree = renderer.create(<Support route={{ params: { isContactUs: true } }} />);
+      await Promise.resolve();
+    });
+
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    const subscriber = mockSubscribe.mock.calls[0][1];
+    act(() => {
+      subscriber('event.contactUsEvent', {});
+    });
+
+    expect(mockSubscribe).toHaveBeenCalled();
+
+    act(() => {
+      tree.unmount();
+    });
+  });
+
+  it('starts chat with config on android when chatData exists', async () => {
+    const restoreOs = jest.replaceProperty(Platform, 'OS', 'android');
+
+    await act(async () => {
+      renderer.create(
+        <Support route={{ params: { chatData: { department: 'billing' } } }} />
+      );
+      await Promise.resolve();
+    });
+
+    expect(mockStartChatWithConfig).toHaveBeenCalledTimes(2);
+    restoreOs.restore();
+  });
+
+  it('shows agent unavailable modal for offline chatData and handles close action', async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            channel_group_statuses: {
+              chat: {
+                state_counts: {
+                  online: 0,
+                },
+              },
+            },
+          }),
+      })
+    );
+
+    let tree;
+    await act(async () => {
+      tree = renderer.create(
+        <Support route={{ params: { chatData: { department: 'billing' } } }} />
+      );
+      await Promise.resolve();
+    });
+
+    const modal = tree.root.findByType('MockCustomerErrorPage');
+    expect(modal.props.visible).toBe(true);
+
+    act(() => {
+      modal.props.onAction();
+    });
+
+    const updatedModal = tree.root.findByType('MockCustomerErrorPage');
+    expect(updatedModal.props.visible).toBe(false);
+  });
+});

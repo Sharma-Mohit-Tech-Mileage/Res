@@ -315,7 +315,7 @@ const TextNotifications = ({ navigation }) => {
             ? "Edit Text Notifications"
             : "Add Text Notifications"
         }
-        onPressBack={() => navigation.navigate("Notifications")}
+        onPressBack={() => navigation.goBack()}
       />
       {isLoading && (
         <LoadingOverlay

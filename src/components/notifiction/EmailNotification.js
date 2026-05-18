@@ -152,6 +152,9 @@ const AddNotificationScreen = () => {
     };
   
     updateAccountDetails();
+    let emailToSet = primaryEmail || route.params?.additionalData?.email || "";
+    setValue("email", emailToSet);
+    setIsEnrolled(!!emailToSet);
   }, [route.params, dispatch]);
 
 

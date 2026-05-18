@@ -2034,12 +2034,12 @@ DEPENDENCIES:
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - fast_float (from `../node_modules/react-native/third-party-podspecs/fast_float.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
-  - Firebase
-  - FirebaseCore
-  - FirebaseCoreInternal
+  - Firebase (= 11.11.0)
+  - FirebaseCore (= 11.11.0)
+  - FirebaseCoreInternal (= 11.11.0)
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - GoogleUtilities
+  - GoogleUtilities (= 8.1.0)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - lottie-react-native (from `../node_modules/lottie-react-native`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -2507,6 +2507,6 @@ SPEC CHECKSUMS:
   ZendeskSDKStorage: 31d8acf44b5990da425bbfc77206931b2741e397
   ZendeskSDKUIComponents: 9177b164671ce19a6da48a16ba9e7a8bef62c774
 
-PODFILE CHECKSUM: bfea80cd13802bdc15981050c231caef831a2d59
+PODFILE CHECKSUM: a1c2c4c8509dea6e54138a87a8b9d539b45de89a
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2

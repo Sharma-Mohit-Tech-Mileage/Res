@@ -246,6 +246,7 @@ const SplashScreen = ({ navigation, route }) => {
         refreshToken: result.data.refreshToken,
       };
 
+      console.log("[SplashScreen] Token Refresh - idToken:", data.idToken);
       setLoadingState(LoadingState.LOADING_DATA);
       storeSsoToken(data);
       callSSOLoginApi(data);
@@ -516,6 +517,7 @@ const SplashScreen = ({ navigation, route }) => {
         refreshToken: result.data.refreshToken,
       };
 
+      console.log("[SplashScreen] Authorization - idToken:", data.idToken);
       storeSsoToken(data);
       setLoadingState(LoadingState.AUTHENTICATING);
       callSSOLoginApi(data);

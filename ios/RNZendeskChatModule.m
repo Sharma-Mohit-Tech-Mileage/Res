@@ -159,6 +159,7 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
       if (metadata[@"authLevel"])       { fields[@"29230167813271"] = metadata[@"authLevel"]; }
       if (metadata[@"mobileApp"])       { fields[@"29542765557655"] = metadata[@"mobileApp"]; }
       if (metadata[@"jwtId"])           { fields[@"29230180962071"] = metadata[@"jwtId"]; }
+      if (metadata[@"source"])          { fields[@"40313200914455"] = metadata[@"source"]; }
     } else {
       // Prod mapping (existing behavior)
       if (metadata[@"userAgent"]) {

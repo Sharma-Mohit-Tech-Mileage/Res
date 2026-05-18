@@ -94,6 +94,12 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+def releaseKeystorePath = project.findProperty('KEYSTORE_PATH')
+def releaseKeystorePassword = project.findProperty('KEYSTORE_PASSWORD')
+def releaseKeyAlias = project.findProperty('KEY_ALIAS')
+def releaseKeyPassword = project.findProperty('KEY_PASSWORD')
+def releaseVersionCode = (project.findProperty('VERSION_CODE') ?: '426').toInteger()
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -108,7 +114,7 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode 425
+        versionCode releaseVersionCode
         versionName "26.1.0"
     }
 
@@ -138,6 +144,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (releaseKeystorePath && releaseKeystorePassword && releaseKeyAlias && releaseKeyPassword) {
+                storeFile file(releaseKeystorePath)
+                storePassword releaseKeystorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
     buildTypes {
         debug {
@@ -146,7 +160,11 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            if (releaseKeystorePath && releaseKeystorePassword && releaseKeyAlias && releaseKeyPassword) {
+                signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
+            }
             minifyEnabled enableProguardInReleaseBuilds
             //noinspection ProguardAndroidTxtUsage
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
