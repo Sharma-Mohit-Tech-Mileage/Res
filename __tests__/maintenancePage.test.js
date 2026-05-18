@@ -1,7 +1,7 @@
 const React = require('react');
 const renderer = require('react-test-renderer');
 const { act } = renderer;
-const { TouchableOpacity, Linking } = require('react-native');
+const { Linking } = require('react-native');
 const MaintenancePage = require('../src/components/maintenance/MaintenancePage').default;
 const { navigationRef } = require('../src/navigations/UserNavigations');
 
@@ -46,9 +46,8 @@ describe('MaintenancePage', () => {
       />
     );
 
-    const touchables = tree.root.findAllByType(TouchableOpacity);
-    const linkButton = touchables.find(
-      (t) => t.props.accessibilityRole === 'link'
+    const linkButton = tree.root.find(
+      (node) => node.props?.accessibilityRole === 'link'
     );
 
     await act(async () => {
@@ -63,9 +62,8 @@ describe('MaintenancePage', () => {
       <MaintenancePage showLoginButton contactLink={null} />
     );
 
-    const touchables = tree.root.findAllByType(TouchableOpacity);
-    const loginButton = touchables.find(
-      (t) => t.props.accessibilityRole === 'button'
+    const loginButton = tree.root.find(
+      (node) => node.props?.accessibilityRole === 'button'
     );
 
     act(() => {
@@ -99,34 +97,32 @@ describe('MaintenancePage', () => {
       />
     );
 
-    const touchables = tree.root.findAllByType(TouchableOpacity);
-    const linkButton = touchables.find(
-      (t) => t.props.accessibilityRole === 'link'
+    const linkButtons = tree.root.findAll(
+      (node) => node.props?.accessibilityRole === 'link'
     );
 
-    expect(linkButton).toBeUndefined();
+    expect(linkButtons.length).toBe(0);
     expect(openSpy).not.toHaveBeenCalled();
   });
 
   it('logs when navigation ref is not available', () => {
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
     navigationRef.current = null;
 
     const tree = renderer.create(
       <MaintenancePage showLoginButton contactLink={null} />
     );
 
-    const touchables = tree.root.findAllByType(TouchableOpacity);
-    const loginButton = touchables.find(
-      (t) => t.props.accessibilityRole === 'button'
+    const loginButton = tree.root.find(
+      (node) => node.props?.accessibilityRole === 'button'
     );
 
     act(() => {
       loginButton.props.onPress();
     });
 
-    expect(errorSpy).toHaveBeenCalledWith('Navigation ref not available');
-    errorSpy.mockRestore();
+    expect(warnSpy).toHaveBeenCalledWith('Navigation ref not available');
+    warnSpy.mockRestore();
   });
 
   it('shows estimated completion time when provided', () => {
@@ -149,11 +145,10 @@ describe('MaintenancePage', () => {
       />
     );
 
-    const touchables = tree.root.findAllByType(TouchableOpacity);
-    const linkButton = touchables.find(
-      (t) => t.props.accessibilityRole === 'link'
+    const linkButtons = tree.root.findAll(
+      (node) => node.props?.accessibilityRole === 'link'
     );
-    expect(linkButton).toBeUndefined();
+    expect(linkButtons.length).toBe(0);
   });
 
   it('attempts to open contact link even when openURL rejects', async () => {
@@ -169,9 +164,8 @@ describe('MaintenancePage', () => {
       />
     );
 
-    const touchables = tree.root.findAllByType(TouchableOpacity);
-    const linkButton = touchables.find(
-      (t) => t.props.accessibilityRole === 'link'
+    const linkButton = tree.root.find(
+      (node) => node.props?.accessibilityRole === 'link'
     );
 
     await act(async () => {
