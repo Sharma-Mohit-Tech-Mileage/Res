@@ -122,6 +122,7 @@ describe('redux action creators coverage', () => {
       dashboardActions.postCurrentSpeed({ mbps: 500 }),
       dashboardActions.updateCurrentSpeed({ mbps: 450 }),
       dashboardActions.getAccountInfo('123'),
+      dashboardActions.updateAccountInfo({ id: 'acct-1' }),
       dashboardActions.updateWalkThroughStep(2),
     ];
 
@@ -149,10 +150,22 @@ describe('redux reducers coverage', () => {
     expect(state.serviceData).toEqual({ internet: true });
 
     state = servicesReducer(state, {
+      type: 'FETCH_SERVICE_DETAILS_FAILURE',
+      payload: { error: 'svc error' },
+    });
+    expect(state.serviceError).toBe('svc error');
+
+    state = servicesReducer(state, {
       type: 'CHECK_OUTAGE_STATUS_REQUEST',
       payload: { source: 'dashboard' },
     });
     expect(state.outageCheckingDashboard).toBe(true);
+
+    state = servicesReducer(state, {
+      type: 'CHECK_OUTAGE_STATUS_REQUEST',
+      payload: { source: 'services' },
+    });
+    expect(state.outageCheckingServices).toBe(true);
 
     state = servicesReducer(state, {
       type: 'CHECK_OUTAGE_STATUS_SUCCESS',
@@ -161,16 +174,90 @@ describe('redux reducers coverage', () => {
     expect(state.outageCheckingDashboard).toBe(false);
 
     state = servicesReducer(state, {
+      type: 'CHECK_OUTAGE_STATUS_FAILURE',
+      payload: { error: 'outage failed' },
+    });
+    expect(state.outageError).toBe('outage failed');
+
+    state = servicesReducer(state, {
+      type: 'FETCH_CURRENT_USAGE_REQUEST',
+    });
+    expect(state.currentUsageLoading).toBe(true);
+
+    state = servicesReducer(state, {
+      type: 'FETCH_CURRENT_USAGE_SUCCESS',
+      payload: { data: { usedDataGB: 10 } },
+    });
+    expect(state.currentUsage.usedDataGB).toBe(10);
+
+    state = servicesReducer(state, {
+      type: 'FETCH_CURRENT_USAGE_FAILURE',
+      payload: { error: 'current usage failed' },
+    });
+    expect(state.currentUsageError).toBe('current usage failed');
+
+    state = servicesReducer(state, {
+      type: 'FETCH_MONTHLY_USAGE_REQUEST',
+    });
+    expect(state.monthlyUsageLoading).toBe(true);
+
+    state = servicesReducer(state, {
+      type: 'FETCH_MONTHLY_USAGE_SUCCESS',
+      payload: { data: [{ month: 'Jan' }] },
+    });
+    expect(state.monthlyUsage.length).toBe(1);
+
+    state = servicesReducer(state, {
+      type: 'FETCH_MONTHLY_USAGE_FAILURE',
+      payload: { error: 'monthly usage failed' },
+    });
+    expect(state.monthlyUsageError).toBe('monthly usage failed');
+
+    state = servicesReducer(state, {
       type: 'FETCH_DAILY_USAGE_REQUEST',
       payload: { startDate: '2026-01-01', endDate: '2026-01-02' },
     });
     expect(state.dailyUsageLoading).toBe(true);
 
     state = servicesReducer(state, {
+      type: 'FETCH_DAILY_USAGE_SUCCESS',
+      payload: { data: [{ day: 'Mon' }] },
+    });
+    expect(state.dailyUsage.length).toBe(1);
+
+    state = servicesReducer(state, {
       type: 'FETCH_DAILY_USAGE_FAILURE',
       payload: { error: 'failed' },
     });
     expect(state.dailyUsageError).toBe('failed');
+
+    state = servicesReducer(state, {
+      type: 'FETCH_USAGE_PERIODS_REQUEST',
+    });
+    expect(state.usagePeriodsLoading).toBe(true);
+
+    state = servicesReducer(state, {
+      type: 'FETCH_USAGE_PERIODS_SUCCESS',
+      payload: { data: [{ start: '2026-01-01', end: '2026-01-31' }] },
+    });
+    expect(state.usagePeriods.length).toBe(1);
+
+    state = servicesReducer(state, {
+      type: 'FETCH_USAGE_PERIODS_FAILURE',
+      payload: { error: 'periods failed' },
+    });
+    expect(state.usagePeriodsError).toBe('periods failed');
+
+    state = servicesReducer(state, {
+      type: 'CLEAR_OUTAGE_DATA',
+    });
+    expect(state.outageData).toBeNull();
+
+    state = servicesReducer(state, {
+      type: 'CLEAR_SERVICES_ERROR',
+    });
+    expect(state.serviceError).toBeNull();
+    expect(state.outageError).toBeNull();
 
     state = servicesReducer(state, {
       type: 'CLEAR_DATA_USAGE',
@@ -219,14 +306,44 @@ describe('redux reducers coverage', () => {
     expect(state.currentPage).toBeGreaterThan(1);
 
     state = paymentHistoryReducer(state, {
+      type: 'FETCH_PAYMENT_HISTORY_FAILURE',
+      payload: { error: 'history failed' },
+    });
+    expect(state.error).toBe('history failed');
+
+    state = paymentHistoryReducer(state, {
+      type: 'DOWNLOAD_PAYMENT_RECEIPT_REQUEST',
+    });
+    expect(state.downloading).toBe(true);
+
+    state = paymentHistoryReducer(state, {
       type: 'DOWNLOAD_PAYMENT_RECEIPT_SUCCESS',
       payload: { receiptData: { id: 'r-1' } },
     });
     expect(state.downloadedReceipt).toEqual({ id: 'r-1' });
 
     state = paymentHistoryReducer(state, {
+      type: 'DOWNLOAD_PAYMENT_RECEIPT_FAILURE',
+      payload: { error: 'receipt failed' },
+    });
+    expect(state.downloadError).toBe('receipt failed');
+
+    state = paymentHistoryReducer(state, {
       type: 'CLEAR_DOWNLOADED_RECEIPT',
     });
     expect(state.downloadedReceipt).toBeNull();
+
+    state = paymentHistoryReducer(state, {
+      type: 'CLEAR_PAYMENT_HISTORY_ERROR',
+    });
+    expect(state.error).toBeNull();
+
+    state = paymentHistoryReducer(state, {
+      type: 'CLEAR_DOWNLOAD_ERROR',
+    });
+    expect(state.downloadError).toBeNull();
+
+    const unchanged = paymentHistoryReducer(state, { type: 'UNKNOWN_ACTION' });
+    expect(unchanged).toBe(state);
   });
 });

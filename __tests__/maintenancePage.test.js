@@ -176,7 +176,7 @@ describe('MaintenancePage', () => {
 
     await act(async () => {
       linkButton.props.onPress();
-      await Promise.resolve();
+      await new Promise((resolve) => setTimeout(resolve, 0));
     });
 
     expect(openSpy).toHaveBeenCalledWith('https://support.example.com');

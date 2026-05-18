@@ -1,6 +1,7 @@
 const React = require('react');
 const renderer = require('react-test-renderer');
 const { act } = renderer;
+const { RefreshControl, Pressable, Text, View } = require('react-native');
 const DataUsageScreen = require('../src/components/services/dataUsage/DataUsageScreen').default;
 const { useDataUsage } = require('../src/components/services/hooks/useDataUsage');
 
@@ -16,7 +17,18 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
-jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
+jest.mock('../src/components/common/ProfileSettingsHeader', () => {
+  const React = require('react');
+  const { Pressable, Text } = require('react-native');
+
+  return function MockProfileSettingsHeader(props) {
+    return (
+      <Pressable testID="data-usage-back" onPress={props.onPressBack}>
+        <Text>{props.title}</Text>
+      </Pressable>
+    );
+  };
+});
 jest.mock('../src/components/services/dataUsage/components/UsageSummaryCard', () => 'UsageSummaryCard');
 jest.mock('../src/components/services/dataUsage/components/EeroPromoCard', () => 'EeroPromoCard');
 
@@ -31,8 +43,12 @@ jest.mock('../src/components/services/dataUsage/components/UsageChart', () => {
         <Text testID="loading-state">{String(props.loading)}</Text>
         <Text testID="selected-period-label">{props.selectedPeriodLabel}</Text>
         <Text testID="data-length">{String((props.data || []).length)}</Text>
+        <Text testID="selected-bar">{props.selectedBar ? JSON.stringify(props.selectedBar) : 'none'}</Text>
         <Pressable testID="switch-monthly" onPress={() => props.onTabChange('monthly')}>
           <Text>Monthly</Text>
+        </Pressable>
+        <Pressable testID="select-bar" onPress={() => props.onBarPress({ label: 'Mon', y: 10 })}>
+          <Text>Select Bar</Text>
         </Pressable>
         <Pressable testID="pick-period" onPress={() => props.onPeriodChange('Feb 2026')}>
           <Text>Pick Period</Text>
@@ -81,6 +97,34 @@ describe('DataUsageScreen', () => {
 
     const activeTabTextAfter = tree.root.findByProps({ testID: 'active-tab' });
     expect(activeTabTextAfter.props.children).toBe('monthly');
+  });
+
+  it('navigates back when the header back action is pressed', () => {
+    const goBack = jest.fn();
+    const tree = renderer.create(
+      <DataUsageScreen navigation={{ goBack }} route={{}} />
+    );
+
+    const backButton = tree.root.findByProps({ testID: 'data-usage-back' });
+    act(() => {
+      backButton.props.onPress();
+    });
+
+    expect(goBack).toHaveBeenCalled();
+  });
+
+  it('updates the selected bar when a bar is pressed', () => {
+    const tree = renderer.create(
+      <DataUsageScreen navigation={{ goBack: jest.fn() }} route={{}} />
+    );
+
+    const selectBar = tree.root.findByProps({ testID: 'select-bar' });
+    act(() => {
+      selectBar.props.onPress();
+    });
+
+    const selectedBar = tree.root.findByProps({ testID: 'selected-bar' });
+    expect(selectedBar.props.children).toContain('Mon');
   });
 
   it('requests daily usage for selected period', () => {
@@ -142,6 +186,35 @@ describe('DataUsageScreen', () => {
     expect(loadingState.props.children).toBe('true');
   });
 
+  it('falls back to empty monthly data when monthly usage is missing', () => {
+    useDataUsage.mockReturnValue({
+      currentUsage: { used: 50, total: 100 },
+      currentUsageLoading: false,
+      monthlyUsage: null,
+      monthlyUsageLoading: false,
+      dailyUsage: [{ x: 'Mon', y: 10 }],
+      dailyUsageLoading: false,
+      periodItems: [
+        { label: 'Jan 2026', from: '2026-01-01', to: '2026-01-31' },
+      ],
+      usagePeriodsLoading: false,
+      fetchDailyForPeriod: fetchDailyForPeriodMock,
+      refetchAll: refetchAllMock,
+    });
+
+    const tree = renderer.create(
+      <DataUsageScreen navigation={{ goBack: jest.fn() }} route={{}} />
+    );
+
+    const switchMonthly = tree.root.findByProps({ testID: 'switch-monthly' });
+    act(() => {
+      switchMonthly.props.onPress();
+    });
+
+    const dataLength = tree.root.findByProps({ testID: 'data-length' });
+    expect(dataLength.props.children).toBe('0');
+  });
+
   it('falls back to empty label/data when period list and usage data are missing', () => {
     useDataUsage.mockReturnValue({
       currentUsage: null,
@@ -172,5 +245,28 @@ describe('DataUsageScreen', () => {
     });
 
     expect(fetchDailyForPeriodMock).not.toHaveBeenCalled();
+  });
+
+  it('refetches data and clears the refreshing state on pull-to-refresh', async () => {
+    jest.useFakeTimers();
+
+    try {
+      const tree = renderer.create(
+        <DataUsageScreen navigation={{ goBack: jest.fn() }} route={{}} />
+      );
+
+      const refreshControl = tree.root.findByType(RefreshControl);
+
+      await act(async () => {
+        const refreshPromise = refreshControl.props.onRefresh();
+        expect(refetchAllMock).toHaveBeenCalled();
+        jest.advanceTimersByTime(1500);
+        await refreshPromise;
+      });
+
+      expect(tree.root.findByType(RefreshControl).props.refreshing).toBe(false);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
