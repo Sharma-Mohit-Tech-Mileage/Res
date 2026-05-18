@@ -27,6 +27,8 @@ import Vector from "../../../src/res/svgIcons/Vector";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import { set } from "react-hook-form";
+import { use } from "react";
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -34,11 +36,19 @@ const ProfileSettings = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState(undefined);
   const [showPhoneLoading, setShowPhoneLoading] = useState(false);
+  const [showEmailLoading, setShowEmailLoading] = useState(false);
   const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {};
   const accountDetails = profile.accountDetails || {};
 
   const emailAddress = getPrimaryEmail(accountDetails);
+
+
+  useEffect(() => { 
+    if(emailAddress) {
+      setShowEmailLoading(false);
+    }
+  }, [profile, emailAddress]);
 
   const TextNotifSettings = useMemo(
     () => [
@@ -225,6 +235,7 @@ const ProfileSettings = () => {
   const unsubscribe = navigation.addListener('focus', () => {
     // Call your API here
     dispatch(fetchProfileDetails());
+    setShowEmailLoading(true);
     getTextNotificationsData();
   });
   return unsubscribe;
@@ -304,9 +315,16 @@ const ProfileSettings = () => {
                      importantForAccessibility="no"
                     >
                       <Text style={styles.firstName} accessible={true} accessibilityRole="text" accessibilityLabel="Email Address">Email Address</Text>
-                      <Text style={[styles.melissa, styles.melissaTypo]} accessible={true} accessibilityRole="text" accessibilityLabel={`Email Address: ${emailAddress || "N/A"}`}>
-                        {emailAddress || "N/A"}
-                      </Text>
+                      {showEmailLoading ? (
+                        <SkeletonPlaceholder>
+                          <View style={{ width: 200, height: 20, borderRadius: 4 }} />
+                        </SkeletonPlaceholder>
+                      ) : (
+                        <Text style={[styles.melissa, styles.melissaTypo]} accessible={true} accessibilityRole="text" accessibilityLabel={`Email Address: ${emailAddress || "N/A"}`}>
+                          {emailAddress || "N/A"}
+                        </Text>
+                      )}
+                      
                     </View>
                     <Pressable
                       style={{
