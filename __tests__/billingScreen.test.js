@@ -69,7 +69,18 @@ jest.mock('react-native-config', () => ({ PAY_METHOD: 'https://pay.method' }));
 jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
 jest.mock('../src/components/utility/ZendeskChatIcon', () => 'ZendeskChatIcon');
 jest.mock('../src/components/common/Icon', () => 'Icon');
-jest.mock('../src/components/common/customui/CustomLoading', () => 'LoadingOverlay');
+jest.mock('../src/components/common/customui/CustomLoading', () => {
+  const React = require('react');
+  const { Pressable, Text } = require('react-native');
+
+  return function MockLoadingOverlay(props) {
+    return (
+      <Pressable testID="billing-loading-close" onPress={props.onRequestClose}>
+        <Text>Loading</Text>
+      </Pressable>
+    );
+  };
+});
 jest.mock('../src/components/common/billerCards/BillerSummary', () => 'Card');
 jest.mock('../src/components/common/billerCards/AutoPayCard', () => 'AutoPayCard');
 jest.mock('../src/components/common/billerCards/PeperLessCard', () => 'PeperLessCard');
@@ -190,5 +201,43 @@ describe('BillingScreen behavior', () => {
     });
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith('BillingStatements');
+  });
+
+  it('handles getUser failures without crashing', async () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    mockGetUser.mockRejectedValueOnce(new Error('user unavailable'));
+
+    await act(async () => {
+      renderer.create(<BillingScreen navigation={mockNavigation} />);
+      await flushPromises();
+    });
+
+    expect(mockGetApiRequest).not.toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Error getting user status:',
+      expect.any(Error)
+    );
+
+    consoleSpy.mockRestore();
+  });
+
+  it('runs the autopay error handler when the API request fails', async () => {
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    mockGetApiRequest.mockImplementation((endpoint, onSuccess, onError) => {
+      onError(new Error('autopay unavailable'));
+    });
+
+    await act(async () => {
+      renderer.create(<BillingScreen navigation={mockNavigation} />);
+      await flushPromises();
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'error on Billing auto pay',
+      expect.any(Error)
+    );
+
+    consoleSpy.mockRestore();
   });
 });
