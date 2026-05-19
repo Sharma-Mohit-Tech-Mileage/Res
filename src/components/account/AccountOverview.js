@@ -254,7 +254,6 @@ const AccountOverview = () => {
                           style={[
                             styles.rightActionableGroup,
                             styles.tabsFlexBox,
-                            { alignItems: 'stretch' },
                           ]}
                           onPress={item.onPress}
                           accessibilityLabel={item.name}

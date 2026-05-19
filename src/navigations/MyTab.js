@@ -258,6 +258,7 @@ const createTabBarButton = useCallback(
       },
       tabBarActiveTintColor: Color.colorMidnightblue,
       tabBarInactiveTintColor: Color.sparklightDarkGray,
+      tabBarLabelPosition: "below-icon",
       tabBarLabelStyle: {
         fontSize: FontSize.size_xs,
         fontFamily: FontFamily.openSansRegular,

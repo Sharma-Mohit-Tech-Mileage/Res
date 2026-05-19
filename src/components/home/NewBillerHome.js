@@ -16,18 +16,17 @@ import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
-import { AlertUtils } from "../utility/AlertUtils";
 import Config from "react-native-config";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
+import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PostApiReqZendeskToken } from "../../network/RestApiClient";
-import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
 import { useOutageStatus } from "../services/hooks/useOutageStatus";
-import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
@@ -95,25 +94,17 @@ const NewBillerHome = ({ navigation }) => {
 
   const showDisconnectedBanner = userInfo
     ? isAccountDisconnected(
-        userInfo.acctStatus,
-        userInfo.daysSinceDisconnectDate
-      )
+      userInfo.acctStatus,
+      userInfo.daysSinceDisconnectDate
+    )
     : false;
 
-  
-
-  // Sync outage banner with Redux outage state from servicesSaga.
   useEffect(() => {
     if (outageData?.hasOutage) {
       setIsOutageAlert(true);
       setEstimatedRestoreTime(outageData.estimatedRestoreTime || "");
     } else {
       setIsOutageAlert(false);
-    }
-    // hardcoded test override
-    if (userInfo?.accountNumber === "8160110010005227") {
-      setIsOutageAlert(true);
-      setEstimatedRestoreTime(moment().add(2, 'hours').format("LT"));
     }
   }, [outageData, userInfo?.accountNumber]);
 
@@ -143,13 +134,6 @@ const NewBillerHome = ({ navigation }) => {
           checkOutageStatus();
           const status = await checkForMinorUpdate();
           setUpdateStatus(status);
-// hardcode for testing update app feature
-          if(userInfo?.accountNumber=="8160110010005227"){
-        setUpdateStatus({
-          isMinorUpdateAvailable: true,
-          
-        });
-      }
           dispatch(fetchACPUserAccountDetails());
           getStatus();
           setIsNotificationEnable(true);
@@ -285,7 +269,7 @@ const NewBillerHome = ({ navigation }) => {
             mobileApp: "mobileApp",
             jwtId: jwtToken,
           };
-        
+
           loginWithJWT(jwtToken)
             .then(() => {
               // Now set conversational fields
@@ -320,27 +304,86 @@ const NewBillerHome = ({ navigation }) => {
         <Logo width={120} height={33.32} />
       </View>
 
-      
+
     </View>
   );
 
-  const renderOutageAlert = () =>
-    AlertUtils.createOutageAlert(estimatedRestoreTime, () =>
-      setIsOutageAlert(false)
+  const renderOutageAlert = () => {
+    const baseMessage = "Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible.";
+    const restoreLine = estimatedRestoreTime
+      ? `Estimated Time to Restore: ${estimatedRestoreTime}.`
+      : null;
+    return (
+      <View style={styles.alertWrapper}>
+        <NotificationAlert
+          type="warning"
+          title="Outage Notification"
+          message={restoreLine ? `${baseMessage}\n${restoreLine}` : baseMessage}
+          splitKey={restoreLine ? [{ text: restoreLine, bold: true }] : ""}
+          showCloseIcon={true}
+          onClose={() => setIsOutageAlert(false)}
+        />
+      </View>
     );
+  };
 
-  const renderAppUpdateAlert = () =>
-    AlertUtils.createAppUpdateAlert(() =>
-      setUpdateStatus({
-        isMinorUpdateAvailable: false,
-        currentVersion: "",
-        latestVersion: "",
-      })
+  const renderAppUpdateAlert = () => {
+    const storeUrl = Platform.OS === "android"
+      ? "https://play.google.com/store/apps/details?id=com.sparklight"
+      : "https://apps.apple.com/us/app/mysparklight/6469003880";
+    return (
+      <View style={styles.alertWrapper}>
+        <NotificationAlert
+          type="info"
+          title="What's New"
+          message={"Enhance your app experience with the latest version for improved performance and reliability.\nUpdate Now"}
+          splitKey={[{ text: "Update Now", action: "url", value: storeUrl }]}
+          showCloseIcon={true}
+          onClose={() =>
+            setUpdateStatus({
+              isMinorUpdateAvailable: false,
+              currentVersion: "",
+              latestVersion: "",
+            })
+          }
+        />
+      </View>
     );
+  };
+
+  const renderMaintenanceAlert = () => {
+    if (!bannerConfig) return null;
+    const severityToType = { critical: "error", warning: "warning", info: "info" };
+    const splitKeys = [];
+    let messageText = bannerConfig.message || "";
+    if (bannerConfig.link && bannerConfig.linkText) {
+      messageText = `${messageText}\n${bannerConfig.linkText}`;
+      splitKeys.push({ text: bannerConfig.linkText, action: "url", value: bannerConfig.link });
+    }
+    if (bannerConfig.showPhoneNumber && bannerConfig.phoneNumber) {
+      messageText = `${messageText}\nCall ${bannerConfig.phoneNumber}`;
+      splitKeys.push({ text: bannerConfig.phoneNumber, action: "call", value: bannerConfig.phoneNumber });
+    }
+    return (
+      <View style={styles.alertWrapper}>
+        <NotificationAlert
+          type={severityToType[bannerConfig.severity] || "info"}
+          title={bannerConfig.title}
+          message={messageText}
+          splitKey={splitKeys.length > 0 ? splitKeys : ""}
+          showCloseIcon={!!bannerConfig.dismissible}
+          onClose={bannerConfig.dismissible ? dismissBanner : undefined}
+        />
+      </View>
+    );
+  };
+
+  const hasAnyAlert =
+    updateStatus.isMinorUpdateAvailable || isOutageAlert || (showBanner && bannerConfig);
 
   const renderWelcomeCard = () => (
-    <View style={[styles.card, styles.shadowProp, styles.welcomeCard,{paddingTop:0}]}>
-      <View >
+    <View style={[styles.card, styles.shadowProp]}>
+      <View>
         {showDisconnectedBanner ? (
           <View style={styles.contentWrapper}>
             <DisconnectedBanner navigation={navigation} />
@@ -348,39 +391,39 @@ const NewBillerHome = ({ navigation }) => {
         ) : (
           <WelcomeCard />
         )}
-         <View style={styles.contentWrapper}>
-        <PromoBanner
-          title="Sign up and save with Auto Pay and Paperless Billing"
-          showBonus={true}
-        />
-        <FeatureCard
-          title="Auto Pay"
-          isLoading={loadingAutoPay}
-          features={["Convenient", "Timely Payments", "Peace of Mind"]}
-          buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
-          buttonVariant={isAutoPayStatus ? "success" : "primary"}
-          isActive={isAutoPayStatus}
-          onButtonPress={() => {
-            navigation.navigate("AutoPayPCIConnector", {
-              url: `${Config.URL}/billing`,
-              name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-              useNewPayment: true,
-              status: isAutoPayStatus,
-              paymentDetails: defaultPaymentDetails,
-            });
-          }}
-        />
-        <FeatureCard
-          isLoading={paperlessLoading}
-          title="Paperless Billing"
-          features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
-          buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
-          buttonVariant={paperlessStatusAcp ? "success" : "primary"}
-          isActive={paperlessStatusAcp}
-          onButtonPress={() =>
-            navigation.navigate("account", { screen: "Notifications" })
-          }
-        />
+        <View style={[styles.contentWrapper, styles.featuresWrapper]}>
+          <PromoBanner
+            title="Sign up and save with Auto Pay and Paperless Billing"
+            showBonus={true}
+          />
+          <FeatureCard
+            title="Auto Pay"
+            isLoading={loadingAutoPay}
+            features={["Convenient", "Timely Payments", "Peace of Mind"]}
+            buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
+            buttonVariant={isAutoPayStatus ? "success" : "primary"}
+            isActive={isAutoPayStatus}
+            onButtonPress={() => {
+              navigation.navigate("AutoPayPCIConnector", {
+                url: `${Config.URL}/billing`,
+                name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+                useNewPayment: true,
+                status: isAutoPayStatus,
+                paymentDetails: defaultPaymentDetails,
+              });
+            }}
+          />
+          <FeatureCard
+            isLoading={paperlessLoading}
+            title="Paperless Billing"
+            features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
+            buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
+            buttonVariant={paperlessStatusAcp ? "success" : "primary"}
+            isActive={paperlessStatusAcp}
+            onButtonPress={() =>
+              navigation.navigate("account", { screen: "Notifications" })
+            }
+          />
         </View>
       </View>
     </View>
@@ -394,7 +437,7 @@ const NewBillerHome = ({ navigation }) => {
       style={styles.container}
     >
       <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-      <ZendeskChatIcon />
+        <ZendeskChatIcon />
       </View>
       <View style={{ flex: 1 }}>
         <SafeAreaView
@@ -404,7 +447,7 @@ const NewBillerHome = ({ navigation }) => {
           }
           accessibilityElementsHidden={isWalkthroughActive}
         >
-           {renderHeader()}
+          {renderHeader()}
           <ScrollView style={styles.scrollContainer}>
             <View
               style={styles.mainContentContainer}
@@ -413,38 +456,29 @@ const NewBillerHome = ({ navigation }) => {
               }
               accessibilityElementsHidden={isWalkthroughActive}
             >
-              {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
-              {isOutageAlert && renderOutageAlert()}
-              {showBanner && bannerConfig && (
-                <MaintenanceBanner
-                  title={bannerConfig.title}
-                  message={bannerConfig.message}
-                  link={bannerConfig.link}
-                  linkText={bannerConfig.linkText}
-                  showPhoneNumber={bannerConfig.showPhoneNumber}
-                  phoneNumber={bannerConfig.phoneNumber}
-                  onDismiss={
-                    bannerConfig.dismissible ? dismissBanner : undefined
-                  }
-                  severity={bannerConfig.severity || "info"}
-                />
-              )}
-              {isMobilePilotEnabled ? (
-                <View
-                  style={[styles.card, styles.shadowProp, styles.welcomeCard]}
-                >
-                  <View
-                    style={[
-                      styles.contentWrapper,
-                      { paddingHorizontal: Padding.p_base},
-                    ]}
-                  >
-                    <MobilePilotLandingPage />
+              <View style={styles.overlayStack}>
+                {hasAnyAlert && (
+                  <View style={styles.alertsGroup}>
+                    {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+                    {isOutageAlert && renderOutageAlert()}
+                    {showBanner && bannerConfig && renderMaintenanceAlert()}
                   </View>
-                </View>
-              ) : (
-                renderWelcomeCard()
-              )}
+                )}
+                {isMobilePilotEnabled ? (
+                  <View style={[styles.card, styles.shadowProp]}>
+                    <View
+                      style={[
+                        styles.contentWrapper,
+                        { paddingHorizontal: Padding.p_base },
+                      ]}
+                    >
+                      <MobilePilotLandingPage />
+                    </View>
+                  </View>
+                ) : (
+                  renderWelcomeCard()
+                )}
+              </View>
             </View>
           </ScrollView>
         </SafeAreaView>
@@ -477,14 +511,15 @@ const styles = StyleSheet.create({
     marginTop: 50,
     paddingBottom: 50,
   },
+  overlayStack: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: -40,
+  },
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    paddingTop: 20,
     width: wp("92%"),
-  },
-  welcomeCard: {
-    marginTop: -40,
   },
   shadowProp: {
     shadowColor: "#171717",
@@ -496,7 +531,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.sparklightWhite,
     paddingHorizontal: Padding.p_5xl,
+  },
+  featuresWrapper: {
     paddingTop: 8,
+  },
+  alertsGroup: {
+    width: "100%",
+    alignItems: "center",
+  },
+  alertWrapper: {
+    width: wp("92%"),
   },
 });
 

@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_xl,
   },
   bannerWrapper: {
+    marginTop: 12,
     marginBottom: 0,
   },
   reconnectionSection: {

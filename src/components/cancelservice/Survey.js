@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
-import { formatInputA11yReadout } from "../../utils/a11y";
+import { formatInputA11yReadout, formatInputA11yValue } from "../../utils/a11y";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { Radio } from "native-base";
 import { useSelector } from "react-redux";
@@ -279,8 +279,8 @@ const Survey = ({ route }) => {
                     style={styles.textArea}
                     accessibilityLabel={formatInputA11yReadout({
                       label: "Anything you want to share? Optional",
-                      value: myComment,
                     })}
+                    accessibilityValue={formatInputA11yValue(myComment)}
                     accessibilityRole="text"
                     importantForAccessibility="yes"
                   />

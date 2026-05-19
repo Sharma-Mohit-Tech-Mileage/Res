@@ -109,10 +109,9 @@ export const MaintenanceProvider = ({ children }) => {
         blockingTimestamp: now.toISOString(),
       });
 
-      // Set maintenance page visibility immediately
       setShowMaintenancePage(true);
 
-      // Trigger immediate silent data clearing
+
       setTimeout(() => {
         performLogout(true);
       }, 500);

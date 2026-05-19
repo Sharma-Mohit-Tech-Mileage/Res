@@ -398,6 +398,13 @@ const NotificationAlert = ({
         return;
       }
 
+      if (actionConfig.action === "url" && actionConfig.value) {
+        Linking.openURL(actionConfig.value).catch((error) => {
+          console.warn("Failed to open URL:", error);
+        });
+        return;
+      }
+
       navigation.navigate("Support", { isContactUs: true });
     },
     [navigation]
@@ -423,8 +430,13 @@ const NotificationAlert = ({
   const renderBlock = useCallback(
     (block, index) => {
       const { segments: blockSegments, key } = block;
-      const actionSegments = blockSegments.filter((s) => s.type === "styled");
+      const actionSegments = blockSegments.filter(
+        (s) => s.type === "styled" && s.action?.action
+      );
       const hasActions = actionSegments.length > 0;
+      const hasBoldOnly = blockSegments.some(
+        (s) => s.type === "styled" && s.action?.bold && !s.action?.action
+      );
       const plainText = buildPlainText(blockSegments);
 
       if (!hasActions) {
@@ -437,9 +449,26 @@ const NotificationAlert = ({
             accessibilityLabel={plainText}
             style={styles.blockWrapper}
           >
-            <Text style={[styles.messageText, { color: config.textColor }]}>
-              {plainText}
-            </Text>
+            {hasBoldOnly ? (
+              <Text>
+                {blockSegments.map((segment) => (
+                  <Text
+                    key={segment.key}
+                    style={[
+                      styles.messageText,
+                      { color: config.textColor },
+                      segment.type === "styled" && segment.action?.bold && styles.boldText,
+                    ]}
+                  >
+                    {segment.content}
+                  </Text>
+                ))}
+              </Text>
+            ) : (
+              <Text style={[styles.messageText, { color: config.textColor }]}>
+                {plainText}
+              </Text>
+            )}
           </View>
         );
       }
@@ -691,9 +720,8 @@ const styles = StyleSheet.create({
   blockWrapper: {
     marginTop: 8,
   },
-  // Pressable variants only — text-only blocks stay at natural height.
+  // Inline actionable links keep natural text height; hitSlop provides 48dp tap target (WCAG 2.5.5 inline-text exception).
   actionableBlock: {
-    minHeight: A11Y.minTouch,
     justifyContent: "center",
   },
   messageText: {
@@ -704,6 +732,10 @@ const styles = StyleSheet.create({
     color: Color.colorMidnightblue,
     fontWeight: "700",
     textDecorationLine: "underline",
+  },
+  boldText: {
+    fontFamily: FontFamily.openSansBold || FontFamily.openSansSemiBold,
+    fontWeight: "700",
   },
   resendButton: {
     marginTop: 8,

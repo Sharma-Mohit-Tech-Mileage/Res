@@ -46,6 +46,29 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
     return timeSlots[timeSlot] || "";
   };
 
+  const renderGenericPending = () => (
+    <View style={styles.messageContainer}>
+      <View style={styles.textRowWithMargin}>
+        <Text style={styles.subText}>
+          Your service is being processed. If you have any questions, please call{" "}
+        </Text>
+        <Text
+          style={styles.linkText}
+          onPress={() => Linking.openURL("tel:8776922253")}
+          accessibilityLabel="877-692-2253"
+          accessibilityRole="link"
+          accessibilityHint="Double tap to call"
+          accessible={true}
+        >
+          877-692-2253
+        </Text>
+        <Text style={styles.subText} accessible={false} importantForAccessibility="no">
+          .
+        </Text>
+      </View>
+    </View>
+  );
+
   const getPendingStatusMessage = (userData) => {
     const fulfillmentType = userData?.fulfillment_type?.toLowerCase();
 
@@ -58,7 +81,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
     } else if (fulfillmentType === "self-install (pickup)") {
       return renderSelfInstallPickup();
     }
-    return null;
+    return renderGenericPending();
   };
 
   const renderProfessionalInstall = (scheduledDate, timeSlot) => (

@@ -19,7 +19,7 @@ import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
 import MaskInput,{ formatWithMask,Masks  } from 'react-native-mask-input'
-import { formatInputA11yReadout } from "../../../utils/a11y";
+import { formatInputA11yReadout, formatInputA11yValue } from "../../../utils/a11y";
 import Touchable from "./Touchable";
 
 const MyPassIcon = (passwordVisible) => {
@@ -201,8 +201,9 @@ const SparklightMobileInput = React.forwardRef(({
           accessibilityLabel={formatInputA11yReadout({
             label: accessibilityLabel || label || placeholder,
             required,
-            value,
             errorHint: error ? (errorHint || error) : undefined,
+          })}
+          accessibilityValue={formatInputA11yValue(value, {
             isSecure: secure,
             isPhoneNumber: getKeyboardType() === "phone-pad",
           })}

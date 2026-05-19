@@ -406,36 +406,28 @@ const TextNotifications = ({ navigation }) => {
               </Text>
             </View>
 
-            <View style={styles.frameGroup}>
-              <View style={[styles.frameParent3,{width:widthPercentageToDP('82%')}]}>
-                <View
-                  style={{
-                    paddingVertical: 4,
-                  }}
-                >
-                  <Controller
-                    control={control}
-                    name="phoneNumber"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <SparkLightInput
-                        placeholder="Mobile Number"
-                        label={"Mobile Number *"}
-                        accessible={true}
-                        accessibilityRole="text"
-                        accessibilityLabel="Mobile Number required"
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        keyboardType="number-pad"
-                        value={value}
-                        error={errors.phoneNumber?.message}
-                        maxLength={16}
-                        isVisible={false}
-                        autoFocusTitle={true}
-                      />
-                    )}
+            <View style={{ marginHorizontal: 20, paddingVertical: Padding.p_base }}>
+              <Controller
+                control={control}
+                name="phoneNumber"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <SparkLightInput
+                    placeholder="Mobile Number"
+                    label={"Mobile Number *"}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel="Mobile Number required"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    keyboardType="number-pad"
+                    value={value}
+                    error={errors.phoneNumber?.message}
+                    maxLength={16}
+                    isVisible={false}
+                    autoFocusTitle={true}
                   />
-                </View>
-              </View>
+                )}
+              />
             </View>
             <View style={styles.frameChild} />
             <NotificationSetting

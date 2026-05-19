@@ -15,7 +15,7 @@ import {
   Border,
 } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
-import { formatInputA11yReadout } from "../../../utils/a11y";
+import { formatInputA11yReadout, formatInputA11yValue } from "../../../utils/a11y";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
@@ -158,13 +158,15 @@ const SparkLightInput = React.forwardRef(({
     >
       <View style={[styles.labelContainer, secure && styles.labelContainerSecure]}>
         {label && (
-          <Text
-            style={[styles.label, error && styles.errorLabel]}
+          <View
             accessible={false}
-            importantForAccessibility="no"
+            accessibilityElementsHidden={true}
+            importantForAccessibility="no-hide-descendants"
           >
-            {label}
-          </Text>
+            <Text style={[styles.label, error && styles.errorLabel]}>
+              {label}
+            </Text>
+          </View>
         )}
         {secure && (
           <Touchable
@@ -227,8 +229,9 @@ const SparkLightInput = React.forwardRef(({
           accessibilityLabel={formatInputA11yReadout({
             label: accessibilityLabel || label || placeholder,
             required,
-            value,
             errorHint: error ? (errorHint || error) : undefined,
+          })}
+          accessibilityValue={formatInputA11yValue(value, {
             isSecure: secure,
             isPhoneNumber: getKeyboardType() === "phone-pad",
           })}
