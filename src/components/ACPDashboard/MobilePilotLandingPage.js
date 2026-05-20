@@ -226,7 +226,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
           <PilotServiceStatus currentStage={2} />
         </View>
 
-        {isMobileServiceActive &&  <MobilePromo />}
+        {isMobileServiceActive && <MobilePromo />}
         <PilotFaqs />
       </ScrollView>
     </View>

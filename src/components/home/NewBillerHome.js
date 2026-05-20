@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Platform,
-} from "react-native";
+import { View, StyleSheet, ScrollView, Platform, } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
@@ -20,7 +15,6 @@ import Config from "react-native-config";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
-import InfoBanner from "../ACPDashboard/InfoBanner";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PostApiReqZendeskToken } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
@@ -31,22 +25,12 @@ import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
 import MobilePilotLandingPage from "../../components/ACPDashboard/MobilePilotLandingPage";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from "../../firebase/FirebaseUtils";
+import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
 import VersionCheck from "react-native-version-check";
 import DeviceInfo from "react-native-device-info";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
-
-import {
-  loginWithJWT,
-  setConversationalFields,
-} from "../utility/RNZendeskChat";
-
-
-
+import { loginWithJWT, setConversationalFields, } from "../utility/RNZendeskChat";
 
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
@@ -63,6 +47,7 @@ const NewBillerHome = ({ navigation }) => {
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(undefined);
   const [loadingAutoPay, setloadingAutoPay] = useState(true);
+  const [alertsHeight, setAlertsHeight] = useState(0);
   const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
@@ -166,7 +151,6 @@ const NewBillerHome = ({ navigation }) => {
         email: getPrimaryEmail(accountDetails),
       });
       DeviceInfo.getUserAgent().then((userAgent) => {
-        // UA samples: iOS Safari Mobile / tvOS n/a / Android Chrome WebView / Windows ?
         loginWithToken(userAgent);
       });
     }
@@ -457,13 +441,7 @@ const NewBillerHome = ({ navigation }) => {
               accessibilityElementsHidden={isWalkthroughActive}
             >
               <View style={styles.overlayStack}>
-                {hasAnyAlert && (
-                  <View style={styles.alertsGroup}>
-                    {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
-                    {isOutageAlert && renderOutageAlert()}
-                    {showBanner && bannerConfig && renderMaintenanceAlert()}
-                  </View>
-                )}
+                {hasAnyAlert && <View style={{ height: alertsHeight }} />}
                 {isMobilePilotEnabled ? (
                   <View style={[styles.card, styles.shadowProp]}>
                     <View
@@ -480,6 +458,18 @@ const NewBillerHome = ({ navigation }) => {
                 )}
               </View>
             </View>
+            {hasAnyAlert && (
+              <View
+                style={styles.alertsAbsolute}
+                onLayout={(e) => setAlertsHeight(e.nativeEvent.layout.height)}
+              >
+                <View style={styles.alertsGroup}>
+                  {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+                  {isOutageAlert && renderOutageAlert()}
+                  {showBanner && bannerConfig && renderMaintenanceAlert()}
+                </View>
+              </View>
+            )}
           </ScrollView>
         </SafeAreaView>
       </View>
@@ -537,6 +527,13 @@ const styles = StyleSheet.create({
   },
   alertsGroup: {
     width: "100%",
+    alignItems: "center",
+  },
+  alertsAbsolute: {
+    position: "absolute",
+    top: 10,
+    left: 0,
+    right: 0,
     alignItems: "center",
   },
   alertWrapper: {

@@ -441,7 +441,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
   >
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
-        <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
+        <View style={{ flexDirection: "column", flex: 1, marginRight: 10 }}>
           <Text
             style={styles.appointments}
             accessible={true}
@@ -463,7 +463,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
           </Text>
         </View>
 
-        <View style={{ flex: 0.2 }}>
+        <View>
           <Toggle
             name={name}
             initialValue={value}

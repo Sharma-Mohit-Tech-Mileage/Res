@@ -6,7 +6,7 @@ import {
     Image,
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../GlobalStyles';
-import { formatInputA11yReadout, formatInputA11yValue } from '../../utils/a11y';
+import { formatInputA11yReadout } from '../../utils/a11y';
 import Phone from '../../res/svgIcons/Phone';
 import EmailIcon from '../../res/svgIcons/EmailIcone';
 
@@ -31,8 +31,7 @@ const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconI
             enterKeyHint="done"
             accessibilityLabel={formatInputA11yReadout({
                 label: placeholder,
-            })}
-            accessibilityValue={formatInputA11yValue(input, {
+                value: input,
                 isPhoneNumber: keyboardType === 'phone-pad',
             })}
             accessibilityRole="text"

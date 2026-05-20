@@ -1,37 +1,41 @@
 import { useState, useEffect } from 'react';
 import { AccessibilityInfo, Platform, findNodeHandle } from 'react-native';
 
-// AC1 order: Label → Required → Field type → Error → Hint. Value is supplied via accessibilityValue, not the label, to avoid double-announcement (label + native value readout).
+// AC1 label only; OS adds role/value/hint. iOS auto-reads text as AX value (omit here); Android needs value embedded since contentDescription suppresses auto-value. Errors go on accessibilityHint at the call site.
 
 const DIGIT_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
 
-export const digitsToWords = (s) =>
-  String(s || '')
-    .split('')
-    .map((c) => DIGIT_WORDS[+c] ?? c)
-    .join(' ');
+export const digitsToWords = (s) => {
+  const digits = String(s || '').replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.split('').map((d) => DIGIT_WORDS[Number(d)]).join(' ');
+};
 
 export function formatInputA11yReadout({
   label,
   required = false,
-  errorHint,
-  fieldType = 'text field',
-  actionHint = 'Double tap to edit',
+  value,
+  isPhoneNumber = false,
+  isSecure = false,
 }) {
   const cleanLabel = (label || '').replace(/\s*\*\s*$/, '').trim() || 'Input';
   const parts = [cleanLabel];
   if (required) parts.push('required');
-  parts.push(fieldType);
-  let result = parts.join(', ');
-  if (errorHint) result += `. ${errorHint}`;
-  result += `. ${actionHint}.`;
-  return result;
+  const includeValue =
+    Platform.OS === 'android' &&
+    !isSecure &&
+    value !== undefined &&
+    value !== null &&
+    value !== '';
+  if (includeValue) {
+    parts.push(isPhoneNumber ? digitsToWords(value) : String(value));
+  }
+  return parts.join(', ');
 }
 
-// Build the accessibilityValue prop for a TextInput. Pass the result directly: <TextInput accessibilityValue={formatInputA11yValue(value, { isPhoneNumber })} />
-export function formatInputA11yValue(value, { isSecure = false, isPhoneNumber = false } = {}) {
-  if (isSecure || value === undefined || value === null || value === '') return undefined;
-  return { text: isPhoneNumber ? digitsToWords(value) : String(value) };
+// Deprecated — value now goes through formatInputA11yReadout's value param. Kept as a no-op for legacy callers.
+export function formatInputA11yValue() {
+  return undefined;
 }
 
 // React hook — true while a screen reader (TalkBack/VoiceOver) is active.

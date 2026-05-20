@@ -20,6 +20,7 @@ import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
+import Touchable from "./Touchable";
 
 
 const TYPE_CONFIG = {
@@ -647,7 +648,7 @@ const NotificationAlert = ({
 
           {resentemail && (
             <A11y.Index index={3}>
-            <Pressable
+            <Touchable
               ref={resendRef}
               onPress={() => dispatch(resentEmailVerifiction(navigation))}
               accessible={true}
@@ -657,14 +658,14 @@ const NotificationAlert = ({
               style={styles.resendButton}
             >
               <Text style={styles.resendText}>Resend Confirmation Email</Text>
-            </Pressable>
+            </Touchable>
             </A11y.Index>
           )}
         </View>
 
         {showCloseIcon && (
           <A11y.Index index={4} style={styles.closeBtn}>
-            <Pressable
+            <Touchable
               ref={closeRef}
               onPress={onClose}
               style={styles.closeBtnPressable}
@@ -672,14 +673,13 @@ const NotificationAlert = ({
               accessibilityLabel="Close notification"
               accessibilityRole="button"
               accessibilityHint="Double tap to dismiss"
-              hitSlop={A11Y.hitSlop}
             >
               <CloseIcon
                 width={24}
                 height={24}
                 color={config.closeButtonColor}
               />
-            </Pressable>
+            </Touchable>
           </A11y.Index>
         )}
       </View>

@@ -19,7 +19,7 @@ import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
 import MaskInput,{ formatWithMask,Masks  } from 'react-native-mask-input'
-import { formatInputA11yReadout, formatInputA11yValue } from "../../../utils/a11y";
+import { formatInputA11yReadout } from "../../../utils/a11y";
 import Touchable from "./Touchable";
 
 const MyPassIcon = (passwordVisible) => {
@@ -144,7 +144,6 @@ const SparklightMobileInput = React.forwardRef(({
             accessibilityRole="button"
             accessible={true}
             onPress={togglePasswordVisibility}
-            minSize={0}
             style={styles.eyeButton}
           >
             <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
@@ -201,12 +200,11 @@ const SparklightMobileInput = React.forwardRef(({
           accessibilityLabel={formatInputA11yReadout({
             label: accessibilityLabel || label || placeholder,
             required,
-            errorHint: error ? (errorHint || error) : undefined,
-          })}
-          accessibilityValue={formatInputA11yValue(value, {
-            isSecure: secure,
+            value: unmasked,
             isPhoneNumber: getKeyboardType() === "phone-pad",
+            isSecure: secure,
           })}
+          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : undefined}
           accessibilityRole="text"
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
@@ -218,20 +216,25 @@ const SparklightMobileInput = React.forwardRef(({
       </View>
 
       {error && (
-        <View style={styles.errorContainer} ref={errorRef}>
+        <View
+          style={styles.errorContainer}
+          ref={errorRef}
+          accessible={true}
+          accessibilityLabel={errorHint || error}
+          accessibilityRole="alert"
+          accessibilityLiveRegion="assertive"
+        >
           <View
             style={styles.errorIcon}
-            accessible={true}
-            accessibilityLabel="Warning Icon"
+            accessible={false}
+            importantForAccessibility="no"
           >
             <WarningIcon />
           </View>
           <Text
             style={styles.errorText}
-            accessible={true}
-            accessibilityLabel={error}
-            accessibilityRole="text"
-            accessibilityHint="Please enter valid password"
+            accessible={false}
+            importantForAccessibility="no"
           >
             {error}
           </Text>

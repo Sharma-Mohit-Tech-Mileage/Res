@@ -15,7 +15,7 @@ import {
   Border,
 } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
-import { formatInputA11yReadout, formatInputA11yValue } from "../../../utils/a11y";
+import { formatInputA11yReadout } from "../../../utils/a11y";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
@@ -174,7 +174,6 @@ const SparkLightInput = React.forwardRef(({
               passwordVisible ? "Hide password" : "Show password"
             }
             onPress={togglePasswordVisibility}
-            minSize={0}
             style={styles.eyeButton}
           >
             <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
@@ -229,12 +228,11 @@ const SparkLightInput = React.forwardRef(({
           accessibilityLabel={formatInputA11yReadout({
             label: accessibilityLabel || label || placeholder,
             required,
-            errorHint: error ? (errorHint || error) : undefined,
-          })}
-          accessibilityValue={formatInputA11yValue(value, {
-            isSecure: secure,
+            value,
             isPhoneNumber: getKeyboardType() === "phone-pad",
+            isSecure: secure,
           })}
+          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : undefined}
           accessibilityRole="text"
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}

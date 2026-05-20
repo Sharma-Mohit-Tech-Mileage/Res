@@ -34,7 +34,7 @@ const WelcomeCard = () => {
             style={styles.offerEyebrow}
             accessible={true}
             accessibilityLabel="Sparklight Internet plus Mobile"
-            allowFontScaling={true}
+            maxFontSizeMultiplier={1.2}
           >
             Sparklight Internet
             <Text style={styles.offerEyebrowPlus}> + </Text>
@@ -45,7 +45,7 @@ const WelcomeCard = () => {
             accessible={true}
             accessibilityRole="header"
             accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
-            allowFontScaling={true}
+            maxFontSizeMultiplier={1.2}
           >
             SAVE with FREE Unlimited Mobile for 1 year*
           </Text>
@@ -66,7 +66,7 @@ const WelcomeCard = () => {
             accessibilityHint="Opens Sparklight mobile offer"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text style={styles.getOfferButton} importantForAccessibility="no">
+            <Text style={styles.getOfferButton} importantForAccessibility="no" maxFontSizeMultiplier={1.2}>
               Get Offer
             </Text>
           </Touchable>
@@ -80,7 +80,7 @@ const WelcomeCard = () => {
       <>
         <ImageBackground
           source={require("../../../assets/welcome-banner-home.png")}
-          style={styles.videoContainer}
+          style={[styles.videoContainer, { aspectRatio: 2 }]}
           imageStyle={styles.welcomeBannerImage}
           accessible={false}
           importantForAccessibility="no"
@@ -91,6 +91,7 @@ const WelcomeCard = () => {
             accessibilityRole="header"
             accessibilityLevel={1}
             accessibilityLabel="We’re excited to get you connected!"
+            maxFontSizeMultiplier={1.2}
           >
             We’re excited to get you connected!
           </Text>
@@ -107,7 +108,7 @@ const WelcomeCard = () => {
               accessibilityLabel="Watch our welcome video"
               accessibilityHint="Double tap to watch on YouTube"
             >
-              <Text style={styles.watchVideoButton}>
+              <Text style={styles.watchVideoButton} maxFontSizeMultiplier={1.2}>
                 Watch our welcome video
               </Text>
               <View
@@ -130,6 +131,7 @@ const WelcomeCard = () => {
             style={[styles.offerDesclaimer]}
             accessible={true}
             accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
+            maxFontSizeMultiplier={1.2}
           >
             *Offer not available for FlexConnect or LIFT customers. Certain
             taxes & fees do not apply.
@@ -155,7 +157,6 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     overflow: "hidden",
-    height: 200,
   },
   welcomeBannerImage: {
     width: "100%",
@@ -168,7 +169,6 @@ const styles = StyleSheet.create({
   },
   welcomeOverlay: {
     position: "absolute",
-    top: 170,
     width: "100%",
     bottom: 0,
     backgroundColor: "rgba(255, 255, 255, 0.8)",

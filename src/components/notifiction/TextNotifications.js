@@ -414,9 +414,7 @@ const TextNotifications = ({ navigation }) => {
                   <SparkLightInput
                     placeholder="Mobile Number"
                     label={"Mobile Number *"}
-                    accessible={true}
-                    accessibilityRole="text"
-                    accessibilityLabel="Mobile Number required"
+                    required={true}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     keyboardType="number-pad"
@@ -574,7 +572,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
   <View style={[styles.frameContainer, styles.frameBorder]}>
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
-        <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
+        <View style={{ flexDirection: "column", flex: 1, marginRight: 10 }}>
           <Text
             style={styles.appointments}
             accessible={true}
@@ -596,7 +594,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
           </Text>
         </View>
 
-        <View style={{ flex: 0.2 }}>
+        <View>
           <Toggle
             name={name}
             initialValue={value}
