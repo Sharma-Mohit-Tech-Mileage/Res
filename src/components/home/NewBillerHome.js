@@ -300,7 +300,7 @@ const NewBillerHome = ({ navigation }) => {
             firstName: firstName || "",
             lastName: lastName || "",
             name: '',
-            phone: "",
+            phone: user?.userInfo.phoneNumber || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
@@ -309,18 +309,18 @@ const NewBillerHome = ({ navigation }) => {
             jwtId: jwtToken,
             source: "mobileApp",
           };
-        
-          loginWithJWT(jwtToken)
-            .then(() => {
-              console.log("Logged in to Zendesk Chat with JWT");
-              // Now set conversational fields
-              setConversationalFields(fields);
-            })
-            .catch((error) => {
-              console.log("conversational fields error", JSON.stringify(fields));
-              setConversationalFields(fields);
-              console.error("Error logging in to Zendesk Chat:", error);
-            });
+         setConversationalFields(fields);
+          // loginWithJWT(jwtToken)
+          //   .then(() => {
+          //     console.log("Logged in to Zendesk Chat with JWT");
+          //     // Now set conversational fields
+          //     setConversationalFields(fields);
+          //   })
+          //   .catch((error) => {
+          //     console.log("conversational fields error", JSON.stringify(fields));
+          //     setConversationalFields(fields);
+          //     console.error("Error logging in to Zendesk Chat:", error);
+          //   });
         }
       },
       (error) => {
