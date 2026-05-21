@@ -55,9 +55,9 @@ variables:
   - name: IOS_ASC_API_KEY_SECUREFILE
     value: 'AuthKey_WH2L3V82PA.p8'
   - name: IOS_REQUIRED_XCODE_MAJOR
-    value: '36'
+    value: '26'
   - name: iosBuildNumber
-    value: $[counter('iosBuildNumberStore', 20)]
+    value: $[counter('iosBuildNumberStore', 40)]
   # Email notification variables
   # Set NOTIFICATION_EMAILS as a comma-separated list of recipient addresses.
   # Set SMTP_SERVER, SMTP_USERNAME, and SMTP_PASSWORD as secret pipeline variables
