@@ -46,6 +46,7 @@ import {
   loginWithJWT,
   setConversationalFields,
 } from "../utility/RNZendeskChat";
+import { get } from "node_modules/axios/index.cjs";
 
 
 
@@ -66,6 +67,7 @@ const NewBillerHome = ({ navigation }) => {
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
   const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
+  const [phoneNumber, setPhoneNumber] = useState(undefined);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
@@ -153,6 +155,7 @@ const NewBillerHome = ({ navigation }) => {
           dispatch(fetchACPUserAccountDetails());
           getStatus();
           //getInAppNotificationsData();
+          getTextNotificationsData();
           setIsNotificationEnable(true);
         } catch (error) {
           console.error("Error refreshing data on focus", error);
@@ -186,6 +189,31 @@ const NewBillerHome = ({ navigation }) => {
       });
     }
   }, [accountDetails]);
+
+  const getTextNotificationsData = () => {
+      
+      getUser().then((res1) => {
+        const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
+          accountNumber: res1.userInfo?.accountNumber,
+        });
+        
+        GetApiRequest(
+          endpointUrl,
+          (res) => {
+            if (res) {
+              let phoneNum = res[0]?.phoneNum || "";
+              setPhoneNumber(phoneNum);
+            }
+            
+          },
+          (error) => {
+            
+            console.error("Error on retrying getTextNotificationsData", error);
+          },
+        );
+      });
+    };
+  
 
   // const getInAppNotificationsData = () => {
   //   getUser().then((res1) => {
@@ -277,6 +305,7 @@ const NewBillerHome = ({ navigation }) => {
       accountNumber: user?.userInfo.accountNumber,
       userName: user?.userInfo.userName,
     };
+    console.log("Request data for Zendesk token:", JSON.stringify(user));
 
     const IPAddress = await getIPAddress();
 
@@ -300,7 +329,7 @@ const NewBillerHome = ({ navigation }) => {
             firstName: firstName || "",
             lastName: lastName || "",
             name: '',
-            phone: user?.userInfo.phoneNumber || "",
+            phone: phoneNumber || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,

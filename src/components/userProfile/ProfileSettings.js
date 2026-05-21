@@ -47,6 +47,7 @@ const ProfileSettings = () => {
   useEffect(() => { 
     if(emailAddress) {
       setShowEmailLoading(false);
+      
     }
   }, [profile, emailAddress]);
 

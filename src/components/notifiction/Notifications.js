@@ -212,6 +212,7 @@ const Notifications = () => {
             });
             let phoneNum = res[0]?.phoneNum || "";
             setPhoneNumber(phoneNum);
+            
           }
           setTextNotificationLoading(false);
         },
