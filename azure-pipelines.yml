@@ -55,7 +55,7 @@ variables:
   - name: IOS_ASC_API_KEY_SECUREFILE
     value: 'AuthKey_WH2L3V82PA.p8'
   - name: IOS_REQUIRED_XCODE_MAJOR
-    value: '26'
+    value: '36'
   - name: iosBuildNumber
     value: $[counter('iosBuildNumberStore', 20)]
   # Email notification variables
