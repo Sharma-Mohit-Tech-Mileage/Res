@@ -31,6 +31,7 @@ import VersionCheck from "react-native-version-check";
 import DeviceInfo from "react-native-device-info";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import { loginWithJWT, setConversationalFields, } from "../utility/RNZendeskChat";
+import { get } from "node_modules/axios/index.cjs";
 
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
@@ -49,6 +50,7 @@ const NewBillerHome = ({ navigation }) => {
   const [loadingAutoPay, setloadingAutoPay] = useState(true);
   const [alertsHeight, setAlertsHeight] = useState(0);
   const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
+  const [phoneNumber, setPhoneNumber] = useState(undefined);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
@@ -121,6 +123,7 @@ const NewBillerHome = ({ navigation }) => {
           setUpdateStatus(status);
           dispatch(fetchACPUserAccountDetails());
           getStatus();
+          getTextNotificationsData();
           setIsNotificationEnable(true);
         } catch (error) {
           console.warn("Error refreshing data on focus", error);
@@ -155,6 +158,31 @@ const NewBillerHome = ({ navigation }) => {
       });
     }
   }, [accountDetails]);
+
+  const getTextNotificationsData = () => {
+      
+      getUser().then((res1) => {
+        const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
+          accountNumber: res1.userInfo?.accountNumber,
+        });
+        
+        GetApiRequest(
+          endpointUrl,
+          (res) => {
+            if (res) {
+              let phoneNum = res[0]?.phoneNum || "";
+              setPhoneNumber(phoneNum);
+            }
+            
+          },
+          (error) => {
+            
+            console.error("Error on retrying getTextNotificationsData", error);
+          },
+        );
+      });
+    };
+  
 
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
@@ -245,7 +273,7 @@ const NewBillerHome = ({ navigation }) => {
             firstName: firstName || "",
             lastName: lastName || "",
             name: '',
-            phone: "",
+             phone: phoneNumber || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
