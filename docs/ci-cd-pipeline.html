@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CI/CD Pipeline Documentation</title>
+  <style>
+    :root {
+      --g1: rgba(53, 48, 145, 1);
+      --g2: rgba(141, 59, 144, 1);
+      --bg: #f4f6fb;
+      --panel: rgba(255,255,255,0.94);
+      --text: #1d2330;
+      --muted: #5a6478;
+      --line: #d8ddec;
+      --shadow: 0 20px 45px rgba(30, 34, 70, 0.12);
+      --radius: 22px;
+      --navW: 296px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(53,48,145,0.10), transparent 24%),
+        radial-gradient(circle at 100% 0%, rgba(141,59,144,0.12), transparent 20%),
+        linear-gradient(180deg, #fafbff 0%, var(--bg) 100%);
+    }
+
+    a { color: inherit; }
+    .app {
+      display: grid;
+      grid-template-columns: var(--navW) 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      background: linear-gradient(180deg, rgba(53,48,145,1), rgba(141,59,144,1));
+      color: white;
+      padding: 22px 18px;
+      box-shadow: var(--shadow);
+      z-index: 10;
+    }
+
+    .brand {
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      margin-bottom: 18px;
+    }
+
+    .brand h1 {
+      margin: 0 0 8px;
+      font-size: 1.18rem;
+      line-height: 1.2;
+    }
+
+    .brand p {
+      margin: 0;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.9rem;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .nav a {
+      display: block;
+      text-decoration: none;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 12px 14px;
+      transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+      opacity: 0.88;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      opacity: 1;
+      transform: translateX(4px);
+      background: rgba(255,255,255,0.16);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.15);
+    }
+
+    .nav small { display: block; color: rgba(255,255,255,0.78); margin-top: 2px; }
+
+    .nav-note {
+      margin-top: 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.14);
+      padding: 14px;
+      color: rgba(255,255,255,0.9);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .content {
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    .hero {
+      background: linear-gradient(90deg, var(--g1), var(--g2));
+      color: white;
+      border-radius: 28px;
+      padding: 28px 28px 26px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: -120px;
+      top: -120px;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      filter: blur(2px);
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h2 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 3vw, 3.2rem);
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 880px;
+      color: rgba(255,255,255,0.92);
+      line-height: 1.6;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.13);
+      border: 1px solid rgba(255,255,255,0.16);
+      font-size: 0.88rem;
+    }
+
+    .slide {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 18px;
+      scroll-margin-top: 18px;
+      transform: translateY(10px);
+      opacity: 0;
+      transition: opacity 500ms ease, transform 500ms ease, box-shadow 220ms ease;
+    }
+
+    .slide.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .slide h3 {
+      margin: 0 0 14px;
+      font-size: 1.4rem;
+      color: var(--g1);
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    .slide h3::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 132px;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--g1), var(--g2));
+    }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+
+    .card {
+      background: linear-gradient(180deg, #ffffff 0%, #fcfcff 100%);
+      border: 1px solid #e2e7f4;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 10px 24px rgba(33, 38, 76, 0.06);
+      min-width: 0;
+    }
+
+    .card .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--g1);
+      background: rgba(53,48,145,0.08);
+      border: 1px solid rgba(53,48,145,0.12);
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid #e1e6f3;
+      box-shadow: 0 10px 24px rgba(33, 38, 76, 0.05);
+      background: white;
+    }
+
+    .table th,
+    .table td {
+      padding: 14px 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid #edf1f8;
+      font-size: 0.95rem;
+    }
+
+    .table th {
+      color: var(--g1);
+      background: linear-gradient(90deg, rgba(53,48,145,0.08), rgba(141,59,144,0.08));
+    }
+
+    .muted { color: var(--muted); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .pill {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #e2e7f4;
+      font-size: 0.88rem;
+      color: var(--text);
+      box-shadow: 0 8px 18px rgba(30, 34, 70, 0.05);
+    }
+
+    .highlight {
+      background: linear-gradient(90deg, rgba(53,48,145,0.08), rgba(141,59,144,0.08));
+      border: 1px solid rgba(53,48,145,0.14);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .flow {
+      display: grid;
+      gap: 12px;
+    }
+
+    .flow-row {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .flow-node {
+      background: linear-gradient(180deg, rgba(53,48,145,0.10), rgba(141,59,144,0.08));
+      border: 1px solid rgba(53,48,145,0.22);
+      border-radius: 16px;
+      padding: 14px 12px;
+      min-height: 92px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flow-node::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.28), transparent 60%);
+      pointer-events: none;
+    }
+
+    .flow-node strong { display: block; color: #fff; background: linear-gradient(90deg, var(--g1), var(--g2)); padding: 8px 10px; border-radius: 10px; font-size: 0.86rem; margin-bottom: 8px; }
+    .flow-node span { display: block; color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+    .flow-arrow { text-align: center; color: var(--g1); font-size: 1.35rem; line-height: 1; padding-top: 28px; }
+
+    .screenshot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .shot {
+      border-radius: 18px;
+      border: 1px solid #e2e7f4;
+      background: white;
+      box-shadow: 0 12px 28px rgba(30, 34, 70, 0.08);
+      overflow: hidden;
+    }
+
+    .shot-top {
+      height: 40px;
+      background: linear-gradient(90deg, rgba(53,48,145,0.95), rgba(141,59,144,0.95));
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      color: white;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .shot-body {
+      padding: 16px;
+    }
+
+    .shot-frame {
+      border-radius: 16px;
+      border: 1px solid #e5eaf6;
+      background:
+        linear-gradient(180deg, rgba(245,247,255,1), rgba(255,255,255,1));
+      min-height: 220px;
+      padding: 14px;
+    }
+
+    .mini-stage-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .mini-stage {
+      border: 1px solid #d8dded;
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 8px 18px rgba(30,34,70,0.05);
+      min-height: 88px;
+      position: relative;
+    }
+
+    .mini-stage .dot {
+      width: 12px; height: 12px; border-radius: 50%; background: #39b54a; display: inline-block; margin-right: 8px; vertical-align: middle;
+    }
+
+    .mini-stage h4 { margin: 0 0 10px; font-size: 0.84rem; color: var(--text); display: flex; align-items: center; }
+    .mini-stage p { margin: 0; font-size: 0.74rem; color: var(--muted); line-height: 1.4; }
+    .mini-legend { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .mini-legend span { border-radius: 999px; padding: 7px 10px; border: 1px solid #e2e7f4; background: #fff; font-size: 0.8rem; color: var(--muted); }
+
+    .terminal {
+      border-radius: 16px;
+      background: #10172b;
+      color: #dbe4ff;
+      border: 1px solid #233155;
+      overflow: hidden;
+      box-shadow: 0 12px 28px rgba(30,34,70,0.12);
+    }
+
+    .terminal .bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: linear-gradient(90deg, rgba(53,48,145,1), rgba(141,59,144,1));
+      color: white;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .terminal .lights { display: flex; gap: 6px; margin-right: 8px; }
+    .terminal .lights i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; background: rgba(255,255,255,0.8); }
+    .terminal pre {
+      margin: 0;
+      padding: 14px 16px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+    .ok { color: #5bff98; }
+    .warn { color: #ffc44d; }
+    .err { color: #ff7d91; }
+
+    .footer {
+      margin-top: 20px;
+      padding: 16px 4px 32px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .back-top {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(90deg, var(--g1), var(--g2));
+      color: white;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 180ms ease, transform 180ms ease;
+      font-size: 18px;
+    }
+    .back-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: relative;
+        height: auto;
+        width: 100%;
+      }
+      .nav { flex-direction: row; flex-wrap: wrap; }
+      .nav a { flex: 1 1 240px; }
+      .content { padding: 16px; }
+      .grid-2, .grid-3, .grid-4, .screenshot-grid { grid-template-columns: 1fr; }
+      .flow-row { grid-template-columns: 1fr; }
+      .flow-arrow { display: none; }
+      .mini-stage-row { min-width: 0; grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>CI/CD Pipeline Documentation</h1>
+        <p>Repository-grounded HTML package for the Sparklight React Native app.</p>
+      </div>
+
+      <nav class="nav" id="nav">
+        <a href="#overview" data-target="overview">Pipeline Overview<small>How the pipeline moves from commit to release</small></a>
+        <a href="#flow" data-target="flow">Pipeline Flow<small>Visual stage path with only repo-found steps</small></a>
+        <a href="#build" data-target="build">Build Process<small>Android / iOS build behavior</small></a>
+        <a href="#lint" data-target="lint">Lint Usage<small>ESLint, Prettier, Android lint</small></a>
+        <a href="#tests" data-target="tests">Unit Test Cases using Jest/JTest<small>Actual test commands from package and YAML</small></a>
+        <a href="#artifacts" data-target="artifacts">Artifact Generation<small>Build, test, lint, and security outputs</small></a>
+        <a href="#release" data-target="release">Deployment / Release Flow<small>Internal Testing and TestFlight only</small></a>
+        <a href="#benefits" data-target="benefits">Benefits of Pipeline<small>Why the pipeline matters</small></a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <section class="hero">
+        <div class="hero-top">
+          <div>
+            <h2>Modern CI/CD Pipeline Package</h2>
+            <p>
+              This HTML document summarizes the repository's actual CI/CD behavior in a presentation-style layout. It uses only the stages, commands, and build settings present in the repo and marks missing items clearly instead of inventing any deployment flow.
+            </p>
+            <div class="chips">
+              <span class="chip">Azure DevOps</span>
+              <span class="chip">Android Build</span>
+              <span class="chip">iOS Build</span>
+              <span class="chip">Jest Coverage</span>
+              <span class="chip">ESLint / Prettier</span>
+              <span class="chip">Internal Testing</span>
+              <span class="chip">TestFlight</span>
+            </div>
+          </div>
+          <div class="highlight" style="min-width: 290px; max-width: 360px;">
+            <div class="pill-row">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="overview">
+        <h3>Pipeline Overview</h3>
+        <div class="grid-2">
+          <div class="card">
+            <div class="eyebrow">What the repo actually does</div>
+            <p>
+              The main Azure pipeline starts with an initial commit validation stage, then splits into Android and iOS build paths. After build, the pipeline runs unit tests, lint and security checks, code review gates, and then platform-specific release steps.
+            </p>
+            <p>
+              Android ends with a Google Play internal testing release. iOS ends with IPA staging validation and a TestFlight upload when the branch and parameter conditions match the values in the YAML.
+            </p>
+          </div>
+          <div class="card">
+            <div class="eyebrow">Simple flow summary</div>
+            <ul style="margin: 0; padding-left: 18px; line-height: 1.7;">
+              <li>Commit or PR triggers the pipeline.</li>
+              <li>InitialCommit validates branch and commit context.</li>
+              <li>Android and iOS build jobs run in their own paths.</li>
+              <li>Tests, lint, and security checks run before release.</li>
+              <li>Artifacts are published for Android AAB and iOS IPA.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="flow">
+        <h3>Pipeline Flow</h3>
+        <div class="card">
+          <div class="flow">
+            <div class="flow-row">
+              <div class="flow-node"><strong>Code Commit</strong><span>Branches: Dev, Demo, main, main-dev, Sparklight</span></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node"><strong>Checkout</strong><span>self checkout with clean workspace</span></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node"><strong>Install Dependencies</strong><span>npm install --legacy-peer-deps</span></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node"><strong>Lint</strong><span>ESLint, Prettier, Android lint</span></div>
+              <div class="flow-arrow">→</div>
+            </div>
+            <div class="flow-row">
+              <div class="flow-node"><strong>Unit Tests</strong><span>Jest + Android Gradle unit tests</span></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node"><strong>Build</strong><span>Android AAB + iOS IPA archive</span></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node"><strong>Artifact Publish</strong><span>Build, coverage, lint, security artifacts</span></div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-node"><strong>Deployment</strong><span>Google Play internal testing / TestFlight</span></div>
+              <div class="flow-arrow">→</div>
+            </div>
+          </div>
+          <div class="highlight" style="margin-top: 16px;">
+            <strong>Only repo-found stages are shown.</strong> If a production release step is not visible in the YAML, it is not included here.
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="build">
+        <h3>Build Process</h3>
+        <div class="grid-2">
+          <div class="card">
+            <div class="eyebrow">Android build</div>
+            <p>
+              The main pipeline installs JDK 17, installs Node 20.6.1, cleans npm cache, runs <code>npm install --legacy-peer-deps</code>, downloads the Android keystore, validates the SHA1 fingerprint, and runs <code>clean bundleDemoRelease</code> in Gradle.
+            </p>
+            <p class="muted">
+              The Android Gradle file shows product flavors <code>Dev</code>, <code>Demo</code>, and <code>Prod</code>, with the main pipeline building the <code>DemoRelease</code> variant.
+            </p>
+          </div>
+          <div class="card">
+            <div class="eyebrow">iOS build</div>
+            <p>
+              The iOS path selects the installed Xcode version, installs Node, runs <code>pod install</code>, patches the code signing identity, installs the certificate and provisioning profile, disables Pods code signing, sets the build number, and archives/exports an IPA.
+            </p>
+            <p class="muted">
+              The YAML contains explicit release and signing variables such as team ID, bundle ID, provisioning profile, and API key identifiers.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="lint">
+        <h3>Lint Usage</h3>
+        <div class="grid-2">
+          <div class="card">
+            <div class="eyebrow">What lint does here</div>
+            <p>
+              Linting checks code quality, formatting, syntax, and maintainability before release. The ESLint configuration also restricts raw React Native touchable imports outside the shared <code>Touchable.js</code> primitive.
+            </p>
+            <p class="muted">
+              That guardrail helps enforce a consistent accessibility pattern for interactive elements.
+            </p>
+          </div>
+          <div class="card">
+            <div class="eyebrow">Actual lint commands found</div>
+            <ul style="margin: 0; padding-left: 18px; line-height: 1.7;">
+              <li><code>npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json</code></li>
+              <li><code>npx prettier --check src/ 2>&amp;1 | tee prettier-report.txt</code></li>
+              <li><code>cd android &amp;&amp; ./gradlew lintDemoRelease --no-daemon</code></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="tests">
+        <h3>Unit Test Cases using Jest / JTest</h3>
+        <div class="grid-2">
+          <div class="card">
+            <div class="eyebrow">What the tests are for</div>
+            <p>
+              The repository uses Jest to validate screen behavior, hooks, reducers, helper functions, and navigation flows before build or deployment. The repo does not show a separate JTest tool; the actual tool present is Jest, with <code>jest-junit</code> used for CI test reporting.
+            </p>
+            <p>
+              The main pipeline runs Jest with coverage, and the iOS path runs Jest with <code>--runInBand</code> and coverage as well.
+            </p>
+          </div>
+          <div class="card">
+            <div class="eyebrow">Actual commands found</div>
+            <table class="table">
+              <thead>
+                <tr><th>Location</th><th>Command</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>package.json</td><td><code>jest</code></td></tr>
+                <tr><td>Main pipeline</td><td><code>npx jest --ci --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit</code></td></tr>
+                <tr><td>iOS unit tests</td><td><code>npx jest --ci --runInBand --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="highlight" style="margin-top: 16px;">
+          <strong>Coverage gate found in the repo:</strong> <a href="../jest.config.js">jest.config.js</a> enforces a 90% global threshold for statements, branches, functions, and lines.
+        </div>
+      </section>
+
+      <section class="slide" id="artifacts">
+        <h3>Artifact Generation</h3>
+        <div class="grid-3">
+          <div class="card"><div class="eyebrow">Android artifacts</div><p>Android build outputs are published from <code>android/app/build/outputs</code> after the AAB build completes.</p></div>
+          <div class="card"><div class="eyebrow">iOS artifacts</div><p>The iOS pipeline publishes the exported IPA from the build artifact staging directory.</p></div>
+          <div class="card"><div class="eyebrow">Reports</div><p>Jest coverage, lint reports, and security reports are staged and published as pipeline artifacts.</p></div>
+        </div>
+      </section>
+
+      <section class="slide" id="release">
+        <h3>Deployment / Release Flow</h3>
+        <div class="grid-2">
+          <div class="card">
+            <div class="eyebrow">Android release</div>
+            <p>
+              The internal testing deployment stage downloads the Android artifact, resolves the AAB path, generates release notes, and uploads the bundle to Google Play internal testing using <code>GooglePlayRelease@4</code>.
+            </p>
+            <p class="muted">An email notification step is present if SMTP variables are configured in Azure DevOps.</p>
+          </div>
+          <div class="card">
+            <div class="eyebrow">iOS release</div>
+            <p>
+              The iOS staging stage validates the IPA, then the TestFlight stage uploads the IPA with <code>xcrun altool</code> using an App Store Connect API key. A notification email step is also present if SMTP variables exist.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="benefits">
+        <h3>Benefits of Pipeline</h3>
+        <div class="grid-4">
+          <div class="card"><div class="eyebrow">Automation</div><p>Builds, tests, linting, and artifact publication happen the same way every time.</p></div>
+          <div class="card"><div class="eyebrow">Early detection</div><p>Coverage gates, lint rules, and security checks catch issues before release.</p></div>
+          <div class="card"><div class="eyebrow">Consistency</div><p>Android and iOS use explicit versions, signing inputs, and repeatable commands.</p></div>
+          <div class="card"><div class="eyebrow">Faster release</div><p>Artifacts are ready for internal testing or TestFlight without manual rebuild steps.</p></div>
+        </div>
+      </section>
+
+      <section class="slide" id="screens">
+        <h3>Assumed Screenshot Generated from Repository Code</h3>
+        <div class="screenshot-grid">
+          <div class="shot">
+            <div class="shot-top">Pipeline stages</div>
+            <div class="shot-body">
+              <div class="shot-frame">
+                <div class="mini-stage-row">
+                  <div class="mini-stage"><h4><span class="dot"></span>Initial Commit</h4><p>1 job completed<br/>40s</p></div>
+                  <div class="mini-stage"><h4><span class="dot"></span>Android Build</h4><p>1 job completed<br/>1 artifact</p></div>
+                  <div class="mini-stage"><h4><span class="dot"></span>Unit Tests</h4><p>1 job completed<br/>coverage passed</p></div>
+                  <div class="mini-stage"><h4><span class="dot"></span>Security & Quality</h4><p>3 jobs completed<br/>lint + audit</p></div>
+                  <div class="mini-stage"><h4><span class="dot"></span>Code Review</h4><p>1 job completed<br/>quality gate</p></div>
+                  <div class="mini-stage"><h4><span class="dot"></span>Internal Testing</h4><p>1 job completed<br/>Play upload</p></div>
+                  <div class="mini-stage"><h4><span class="dot"></span>iOS TestFlight</h4><p>1 job completed<br/>IPA upload</p></div>
+                </div>
+                <div class="mini-legend">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="shot">
+            <div class="shot-top">Lint / Jest / Build execution</div>
+            <div class="shot-body">
+              <div class="terminal">
+                <div class="bar"><span class="lights"><i></i><i></i><i></i></span>Assumed screenshot generated from repository code</div>
+                <pre>
+<span class="ok">$ npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json</span>
+✓ ESLint: reports staged
+
+<span class="ok">$ npx jest --ci --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit</span>
+✓ Test suites passed
+✓ Coverage artifact published
+
+<span class="ok">$ cd android && ./gradlew lintDemoRelease --no-daemon</span>
+✓ Android lint report staged
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div class="shot">
+            <div class="shot-top">Build artifact generation</div>
+            <div class="shot-body">
+              <div class="terminal">
+                <div class="bar"><span class="lights"><i></i><i></i><i></i></span>Assumed screenshot generated from repository code</div>
+                <pre>
+Build completed successfully
+Version: 26.1.0
+Build Code: androidVersionCode
+
+Android:
+- AAB published from android/app/build/outputs
+- Internal testing release prepared
+
+iOS:
+- IPA exported from Xcode archive
+- TestFlight upload prepared
+                </pre>
+              </div>
+            </div>
+          </div>
+          <div class="shot">
+            <div class="shot-top">Timeline view</div>
+            <div class="shot-body">
+              <div class="highlight">
+                <div class="pill-row">
+                  <span class="pill">Code Commit</span>
+                  <span class="pill">Checkout</span>
+                  <span class="pill">Install Dependencies</span>
+                  <span class="pill">Lint</span>
+                  <span class="pill">Unit Tests</span>
+                  <span class="pill">Build</span>
+                  <span class="pill">Artifact Publish</span>
+                  <span class="pill">Deployment</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+     
+    </main>
+  </div>
+
+  <button class="back-top" id="backTop" aria-label="Back to top">↑</button>
+
+  <script>
+    const navLinks = Array.from(document.querySelectorAll('.nav a'));
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const backTop = document.getElementById('backTop');
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.15 });
+
+    slides.forEach((slide) => io.observe(slide));
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      let visible = entries.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      const id = visible.target.id;
+      navLinks.forEach((link) => link.classList.toggle('active', link.dataset.target === id));
+    }, { threshold: [0.25, 0.5, 0.75] });
+
+    slides.forEach((slide) => sectionObserver.observe(slide));
+
+    window.addEventListener('scroll', () => {
+      backTop.classList.toggle('show', window.scrollY > 500);
+    });
+
+    backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  </script>
+</body>
+</html>

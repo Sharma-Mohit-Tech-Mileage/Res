@@ -113,12 +113,13 @@ jest.mock('react-native-responsive-screen', () => ({ widthPercentageToDP: () => 
 jest.mock('../src/components/utility/RNZendeskChat', () => ({ logoutZendesk: () => mockLogoutZendesk() }));
 jest.mock('../src/components/utility/NativeCookieManager', () => ({ clearAuthCookies: jest.fn() }));
 
-const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
+const flushPromises = () => Promise.resolve().then(() => Promise.resolve());
 
 describe('AccountOverview behavior', () => {
   let AccountOverview;
 
   beforeEach(() => {
+    jest.useRealTimers();
     jest.clearAllMocks();
     mockSetUserProperty.mockResolvedValue(undefined);
     mockGetUser.mockResolvedValue({

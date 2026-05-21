@@ -280,6 +280,7 @@ const NewBillerHome = ({ navigation }) => {
             authLevel: user?.userInfo.authLevel,
             mobileApp: "mobileApp",
             jwtId: jwtToken,
+            source: "Mobile",
           };
 
           loginWithJWT(jwtToken)
