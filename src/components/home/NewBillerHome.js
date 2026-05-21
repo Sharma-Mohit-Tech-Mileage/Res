@@ -4,6 +4,7 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
@@ -45,6 +46,7 @@ import {
   loginWithJWT,
   setConversationalFields,
 } from "../utility/RNZendeskChat";
+import { get } from "node_modules/axios/index.cjs";
 
 
 
@@ -62,9 +64,10 @@ const NewBillerHome = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
-  const [isAutoPayStatus, setIsAutoPayStatus] = useState(undefined);
-  const [loadingAutoPay, setloadingAutoPay] = useState(true);
+  const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const [loadingAutoPay, setloadingAutoPay] = useState(false);
   const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
+  const [phoneNumber, setPhoneNumber] = useState(undefined);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
@@ -84,10 +87,9 @@ const NewBillerHome = ({ navigation }) => {
   const paperlessStatusAcp = useSelector(
     (state) => state.profile?.paperlessStatusAcp
   );
-  const paperlessLoadingFromStore = useSelector(
+  const paperlessLoading = useSelector(
     (state) => state.profile?.isPaperLessStatusLoading
   );
-  const paperlessLoading = paperlessLoadingFromStore || paperlessStatusAcp === undefined;
   const userInfo = useSelector((state) => state.user?.userData?.userInfo);
   const isMobilePilotEnabled = useSelector(
     (state) => state.user.userData?.userInfo?.pending_activation === true
@@ -102,7 +104,7 @@ const NewBillerHome = ({ navigation }) => {
 
   
 
-  // Sync outage banner with Redux outage state from servicesSaga.
+  /* Sync outage banner with Redux outage state from servicesSaga */
   useEffect(() => {
     if (outageData?.hasOutage) {
       setIsOutageAlert(true);
@@ -129,7 +131,7 @@ const NewBillerHome = ({ navigation }) => {
           setloadingAutoPay(false);
         },
         (error) => {
-          console.warn("error", error);
+          console.log("error", error);
           setloadingAutoPay(false);
         }
       );
@@ -152,18 +154,18 @@ const NewBillerHome = ({ navigation }) => {
       }
           dispatch(fetchACPUserAccountDetails());
           getStatus();
+          //getInAppNotificationsData();
+          getTextNotificationsData();
           setIsNotificationEnable(true);
         } catch (error) {
-          console.warn("Error refreshing data on focus", error);
+          console.error("Error refreshing data on focus", error);
         }
       };
 
+      
+      
+     
       refreshData();
-
-      return () => {
-        setIsAutoPayStatus(undefined);
-        setloadingAutoPay(true);
-      };
     }, [dispatch])
   );
 
@@ -182,11 +184,57 @@ const NewBillerHome = ({ navigation }) => {
         email: getPrimaryEmail(accountDetails),
       });
       DeviceInfo.getUserAgent().then((userAgent) => {
-        // UA samples: iOS Safari Mobile / tvOS n/a / Android Chrome WebView / Windows ?
+       
         loginWithToken(userAgent);
       });
     }
   }, [accountDetails]);
+
+  const getTextNotificationsData = () => {
+      
+      getUser().then((res1) => {
+        const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
+          accountNumber: res1.userInfo?.accountNumber,
+        });
+        
+        GetApiRequest(
+          endpointUrl,
+          (res) => {
+            if (res) {
+              let phoneNum = res[0]?.phoneNum || "";
+              setPhoneNumber(phoneNum);
+            }
+            
+          },
+          (error) => {
+            
+            console.error("Error on retrying getTextNotificationsData", error);
+          },
+        );
+      });
+    };
+  
+
+  // const getInAppNotificationsData = () => {
+  //   getUser().then((res1) => {
+  //     let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
+  //     GetApiRequest(
+  //       requestUrl,
+  //       (res) => {
+  //         if (res) {
+  //           res[0]?.pushMessageType.forEach((value, index) => {
+  //             if (!value?.optOutFlag) {
+  //               setIsNotificationEnable(true);
+  //             }
+  //           });
+  //         }
+  //       },
+  //       (error) => {
+  //         console.error("Error on retrying getInAppNotificationsData", error);
+  //       }
+  //     );
+  //   });
+  // };
 
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
@@ -208,6 +256,7 @@ const NewBillerHome = ({ navigation }) => {
         permanentSkip: false,
       };
       storePushNotificationStatus(localData);
+      //await dispatch(updatePushNotificationsv2(data, null));
     } else {
       const token = await getFcmToken();
       const dataWithoutPermission = {
@@ -226,6 +275,7 @@ const NewBillerHome = ({ navigation }) => {
         permanentSkip: true,
       };
       storePushNotificationStatus(localData);
+      //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
     }
   };
 
@@ -239,9 +289,10 @@ const NewBillerHome = ({ navigation }) => {
       }
 
       const data = await response.json();
+      console.log("IP Address:", data.ip);
       return data.ip; // The IP address
     } catch (error) {
-      console.warn("Error fetching IP address:", error);
+      console.error("Error fetching IP address:", error);
       return null;
     }
   };
@@ -254,6 +305,7 @@ const NewBillerHome = ({ navigation }) => {
       accountNumber: user?.userInfo.accountNumber,
       userName: user?.userInfo.userName,
     };
+    console.log("Request data for Zendesk token:", JSON.stringify(user));
 
     const IPAddress = await getIPAddress();
 
@@ -277,30 +329,38 @@ const NewBillerHome = ({ navigation }) => {
             firstName: firstName || "",
             lastName: lastName || "",
             name: '',
-            phone: "",
+            phone: phoneNumber || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
             authLevel: user?.userInfo.authLevel,
             mobileApp: "mobileApp",
             jwtId: jwtToken,
+            source: "mobileApp",
           };
-        
-          loginWithJWT(jwtToken)
-            .then(() => {
-              // Now set conversational fields
-              setConversationalFields(fields);
-            })
-            .catch((error) => {
-              setConversationalFields(fields);
-              console.warn("Error logging in to Zendesk Chat:", error);
-            });
+         setConversationalFields(fields);
+          // loginWithJWT(jwtToken)
+          //   .then(() => {
+          //     console.log("Logged in to Zendesk Chat with JWT");
+          //     // Now set conversational fields
+          //     setConversationalFields(fields);
+          //   })
+          //   .catch((error) => {
+          //     console.log("conversational fields error", JSON.stringify(fields));
+          //     setConversationalFields(fields);
+          //     console.error("Error logging in to Zendesk Chat:", error);
+          //   });
         }
       },
       (error) => {
-        console.warn("error in fetching JWT reponse for zendesk", error);
+        console.log("error in fetching JWT reponse for zendesk", error);
       }
     );
+
+    // setTimeout(() => {
+    //   //console.log("Setting conversational fields", fields);
+    //   setConversationalFields(fields);
+    // }, 1000);
   };
 
   const renderHeader = () => (
@@ -348,6 +408,7 @@ const NewBillerHome = ({ navigation }) => {
         ) : (
           <WelcomeCard />
         )}
+        {/* <MenuGrid /> */}
          <View style={styles.contentWrapper}>
         <PromoBanner
           title="Sign up and save with Auto Pay and Paperless Billing"
@@ -381,6 +442,10 @@ const NewBillerHome = ({ navigation }) => {
             navigation.navigate("account", { screen: "Notifications" })
           }
         />
+        {/* <InfoBanner
+          message="We are working diligently to enhance your experience"
+          icon="megaphone"
+        /> */}
         </View>
       </View>
     </View>
@@ -404,7 +469,17 @@ const NewBillerHome = ({ navigation }) => {
           }
           accessibilityElementsHidden={isWalkthroughActive}
         >
-           {renderHeader()}
+           {renderHeader()}  
+           {/* <View
+            accessibilityLabel="SparkLight"
+            style={styles.headerContainer}
+            importantForAccessibility={
+              isWalkthroughActive ? "no-hide-descendants" : "auto"
+            }
+            accessibilityElementsHidden={isWalkthroughActive}
+          >
+            <Logo width={120} height={33.32} />
+          </View>   */}
           <ScrollView style={styles.scrollContainer}>
             <View
               style={styles.mainContentContainer}
