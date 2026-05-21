@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   View,
   Text,
   StyleSheet,
   Linking,
+  AccessibilityInfo,
 } from "react-native";
 import { FontFamily, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
@@ -110,32 +111,62 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
   const errorConfig =
     ERROR_MESSAGES[errorType] || ERROR_MESSAGES[ErrorType.UNKNOWN_ERROR];
   const displayMessage = customMessage || errorConfig.message;
+  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
-  // Helper to render message with hyperlinked phone numbers
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setIsScreenReaderEnabled);
+    const sub = AccessibilityInfo.addEventListener(
+      "screenReaderChanged",
+      setIsScreenReaderEnabled
+    );
+    return () => sub?.remove?.();
+  }, []);
+
+  const PHONE_REGEX = /(\d{3}-\d{3}-\d{4})/g;
+
   const renderMessage = (message) => {
-    const phoneRegex = /(\d{3}-\d{3}-\d{4})/g;
-    const parts = message.split(phoneRegex);
-
-    return (
+    const matches = message.match(PHONE_REGEX) || [];
+    const phone = matches[0];
+    if (!phone) {
+      return <Text style={styles.message}>{message}</Text>;
+    }
+    const parts = message.split(PHONE_REGEX);
+    const visibleText = (
       <Text style={styles.message}>
-        {parts.map((part, index) => {
-          if (phoneRegex.test(part)) {
-            return (
-              <Text
-                key={index}
-                style={[styles.message, styles.phoneLink]}
-                onPress={() => Linking.openURL(`tel:${part}`)}
-                accessibilityRole="button"
-                accessibilityLabel={`Call ${part}`}
-                accessibilityHint="Double tap to call this number"
-              >
-                {part}
-              </Text>
-            );
-          }
-          return part;
-        })}
+        {parts.map((part, index) =>
+          PHONE_REGEX.test(part) ? (
+            <Text
+              key={index}
+              style={[styles.message, styles.phoneLink]}
+              onPress={isScreenReaderEnabled ? undefined : () => Linking.openURL(`tel:${part}`)}
+            >
+              {part}
+            </Text>
+          ) : (
+            part
+          )
+        )}
       </Text>
+    );
+    if (!isScreenReaderEnabled) {
+      return visibleText;
+    }
+    return (
+      <Touchable
+        minSize={0}
+        onPress={() => Linking.openURL(`tel:${phone}`)}
+        accessible={true}
+        accessibilityRole="link"
+        accessibilityLabel={message}
+        accessibilityHint="Double tap to call"
+      >
+        <View
+          accessibilityElementsHidden={true}
+          importantForAccessibility="no-hide-descendants"
+        >
+          {visibleText}
+        </View>
+      </Touchable>
     );
   };
 

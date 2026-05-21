@@ -7,12 +7,12 @@ import WarningIcon from "../../../assets/svgs/Alerttriangle";
 import {
   ScrollView,
   StyleSheet,
-  Pressable,
   View,
   Text,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -281,6 +281,7 @@ const Feedback = () => {
                     <SparkLightInput
                       ref={feedbackTextRef}
                       label="Additional Feedback *"
+                      required={true}
                       textAlignVertical="top"
                       onChangeText={handleChange}
                       onBlur={onBlur}
@@ -289,7 +290,6 @@ const Feedback = () => {
                       maxLength={500}
                       height={130}
                       error={errors.feedbackText?.message}
-                      accessibilityLabel="Additional Feedback required"
                     />
                     <Text
                       style={styles.charCount}
@@ -319,13 +319,13 @@ const Feedback = () => {
                 <SparkLightInput
                   ref={emailFieldRef}
                   label="Email *"
+                  required={true}
                   onChangeText={onChange}
                   onBlur={onBlur}
                   value={value ? value.toLowerCase() : ""}
                   error={errors.feedbackEmail?.message}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  accessibilityLabel="Email required"
                 />
               )}
             />
@@ -335,7 +335,7 @@ const Feedback = () => {
             entering={FadeInDown.delay(700).springify()}
             style={styles.buttonContainer}
           >
-            <Pressable
+            <Touchable
               accessibilityLabel={
                 isSubmitting ? "Feedback Submitting in progress" : "Submit Feedback"
               }
@@ -351,14 +351,14 @@ const Feedback = () => {
               <Text style={styles.submitButtonText}>
                 {isSubmitting ? "Submitting..." : "Submit Feedback"}
               </Text>
-            </Pressable>
+            </Touchable>
           </Animated.View>
 
           <Animated.View
             entering={FadeInDown.delay(800).springify()}
             style={styles.cancelWrapper}
           >
-            <Pressable
+            <Touchable
               accessibilityLabel="Cancel"
               accessibilityRole="button"
               accessible={true}
@@ -366,7 +366,7 @@ const Feedback = () => {
               disabled={isSubmitting}
             >
               <Text style={styles.cancelText}>Cancel</Text>
-            </Pressable>
+            </Touchable>
           </Animated.View>
         </Animated.View>
       </ScrollView>

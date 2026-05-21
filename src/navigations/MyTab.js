@@ -29,8 +29,6 @@ const TAB_BAR_HEIGHT = {
   ANDROID_PADDING: 60,
 };
 
-// Hardcoded walkthrough mode for testing.
-// Set to false to restore normal Redux-driven behavior.
 const HARD_CODE_WALKTHROUGH_FOR_TESTING = false;
 const HARD_CODE_WALKTHROUGH_STEP_FOR_TESTING = 0;
 
@@ -45,36 +43,36 @@ const MyTabs = ({ route }) => {
 
 
 
-const COMPONENT_MAP = {
-  HomeStackScreen: HomeStackScreen,
-  BillingStackScreen,
-  MyServicesStack,
-  SupportStack,
-  AccountStackScreen,
-};
+  const COMPONENT_MAP = {
+    HomeStackScreen: HomeStackScreen,
+    BillingStackScreen,
+    MyServicesStack,
+    SupportStack,
+    AccountStackScreen,
+  };
 
-const ICON_MAP = {
-  home: HomeIcon,
-  billing: BillingIcon,
-  services: SupportIcon,
-  support: NewSupportIcon,
-  account: HomeAccountIcon,
-};
+  const ICON_MAP = {
+    home: HomeIcon,
+    billing: BillingIcon,
+    services: SupportIcon,
+    support: NewSupportIcon,
+    account: HomeAccountIcon,
+  };
 
 
-const getComponent = (componentName) => {
-  return COMPONENT_MAP[componentName] || HomeStackScreen;
-};
+  const getComponent = (componentName) => {
+    return COMPONENT_MAP[componentName] || HomeStackScreen;
+  };
 
-const getIconComponent = (tabId, focused) => {
-  const IconComponent = ICON_MAP[tabId] || HomeIcon;
-  const iconColor = focused 
-    ? Color.colorMidnightblue 
-    : Color.sparklightDarkGray;
-  
-  return <IconComponent color={iconColor} filled={focused} />;
-};
-  
+  const getIconComponent = (tabId, focused) => {
+    const IconComponent = ICON_MAP[tabId] || HomeIcon;
+    const iconColor = focused
+      ? Color.colorMidnightblue
+      : Color.sparklightDarkGray;
+
+    return <IconComponent color={iconColor} filled={focused} />;
+  };
+
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
   const visibleTabs = useVisibleTabs();
@@ -118,12 +116,12 @@ const getIconComponent = (tabId, focused) => {
     [isWalkthroughActive, walkthroughStep]
   );
 
- 
+
   const handleWalkthroughFinish = useCallback(() => {
     setShowWalkthrough(false);
   }, []);
 
-  
+
   const renderTabIcon = useCallback(
     (tab, focused) => (
       <View style={styles.tabIcon}>
@@ -133,48 +131,48 @@ const getIconComponent = (tabId, focused) => {
     []
   );
 
-const createTabBarButton = useCallback(
-  (props, tab, tabPosition, tabCount) => {
-    if (!tab) {
-      return <Touchable {...props} minSize={0} accessibilityRole="tab" />;
-    }
+  const createTabBarButton = useCallback(
+    (props, tab, tabPosition, tabCount) => {
+      if (!tab) {
+        return <Touchable {...props} minSize={0} accessibilityRole="tab" />;
+      }
 
-    const isAccessible = isTabAccessible(tab.index);
-    const hideFromAccessibility =
-      isScreenReaderEnabled && isWalkthroughActive && !isAccessible;
-    const shouldPreventPress = isWalkthroughActive && !isAccessible;
+      const isAccessible = isTabAccessible(tab.index);
+      const hideFromAccessibility =
+        isScreenReaderEnabled && isWalkthroughActive && !isAccessible;
+      const shouldPreventPress = isWalkthroughActive && !isAccessible;
 
-    return (
-      <Touchable
-        {...props}
-        minSize={0}
-        accessible={!hideFromAccessibility}
-        importantForAccessibility={hideFromAccessibility ? "no-hide-descendants" : "yes"}
-        accessibilityElementsHidden={hideFromAccessibility}
-        accessibilityLabel={`${tab.name}, ${tabPosition} of ${tabCount}, tab`}
-        accessibilityRole="tab"
-        accessibilityState={{
-          ...props.accessibilityState,
-          disabled: shouldPreventPress || props.accessibilityState?.disabled,
-        }}
-        style={[
-          props.style,
-          { alignItems: "stretch" },
-          shouldPreventPress && styles.disabledTab,
-        ]}
-        pointerEvents={shouldPreventPress ? "none" : "auto"}
-        onPress={(e) => {
-          if (shouldPreventPress) {
-            e.preventDefault();
-            return;
-          }
-          props.onPress?.(e);
-        }}
-      />
-    );
-  },
-  [isTabAccessible, isScreenReaderEnabled, isWalkthroughActive]
-);
+      return (
+        <Touchable
+          {...props}
+          minSize={0}
+          accessible={!hideFromAccessibility}
+          importantForAccessibility={hideFromAccessibility ? "no-hide-descendants" : "yes"}
+          accessibilityElementsHidden={hideFromAccessibility}
+          accessibilityLabel={`${tab.name}, ${tabPosition} of ${tabCount}, tab`}
+          accessibilityRole="tab"
+          accessibilityState={{
+            ...props.accessibilityState,
+            disabled: shouldPreventPress || props.accessibilityState?.disabled,
+          }}
+          style={[
+            props.style,
+            { alignItems: "stretch" },
+            shouldPreventPress && styles.disabledTab,
+          ]}
+          pointerEvents={shouldPreventPress ? "none" : "auto"}
+          onPress={(e) => {
+            if (shouldPreventPress) {
+              e.preventDefault();
+              return;
+            }
+            props.onPress?.(e);
+          }}
+        />
+      );
+    },
+    [isTabAccessible, isScreenReaderEnabled, isWalkthroughActive]
+  );
 
 
   const createTabListeners = useCallback(
@@ -185,7 +183,7 @@ const createTabBarButton = useCallback(
           return;
         }
 
-        if (["billing", "support", "services","account"].includes(tab.id)) {
+        if (["billing", "support", "services", "account"].includes(tab.id)) {
           e.preventDefault();
           navigation.reset({
             index: 0,
@@ -208,7 +206,7 @@ const createTabBarButton = useCallback(
     );
   }, [home.walkThroughStep]);
 
- 
+
   useEffect(() => {
     const checkScreenReader = async () => {
       const enabled = await AccessibilityInfo.isScreenReaderEnabled();
@@ -258,6 +256,7 @@ const createTabBarButton = useCallback(
       },
       tabBarActiveTintColor: Color.colorMidnightblue,
       tabBarInactiveTintColor: Color.sparklightDarkGray,
+      tabBarLabelPosition: "below-icon",
       tabBarLabelStyle: {
         fontSize: FontSize.size_xs,
         fontFamily: FontFamily.openSansRegular,
@@ -276,8 +275,6 @@ const createTabBarButton = useCallback(
     <>
       <View
         style={{ flex: 1 }}
-        // When walkthrough is active, keep background out of the SR tree.
-        // Walkthrough overlay renders outside this wrapper, so it stays accessible.
         accessibilityElementsHidden={isWalkthroughActive && isScreenReaderEnabled}
         importantForAccessibility={
           isWalkthroughActive && isScreenReaderEnabled
@@ -287,26 +284,26 @@ const createTabBarButton = useCallback(
         pointerEvents={isWalkthroughActive ? "none" : "auto"}
       >
         <Tab.Navigator
-            initialRouteName="Home"
-            screenOptions={screenOptions}
-          >
-            {visibleTabs.map((tab,index) => (
-              <Tab.Screen
-                key={tab.id}
-                name={tab.screenName}
-                component={getComponent(tab.component)}
-                initialParams={{ data: route }}
-                options={{      
-                  tabBarLabel: tab.name,
-                  tabBarAccessibilityLabel: `${tab.name}, ${index + 1} of ${visibleTabs.length}, tab`,
-                  tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
-                  tabBarButton: (props) =>
-                    createTabBarButton(props, tab, index + 1, visibleTabs.length),
-                }}
-                listeners={createTabListeners(tab)}
-              />
-            ))}
-          </Tab.Navigator>
+          initialRouteName="Home"
+          screenOptions={screenOptions}
+        >
+          {visibleTabs.map((tab, index) => (
+            <Tab.Screen
+              key={tab.id}
+              name={tab.screenName}
+              component={getComponent(tab.component)}
+              initialParams={{ data: route }}
+              options={{
+                tabBarLabel: tab.name,
+                tabBarAccessibilityLabel: `${tab.name}, ${index + 1} of ${visibleTabs.length}, tab`,
+                tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
+                tabBarButton: (props) =>
+                  createTabBarButton(props, tab, index + 1, visibleTabs.length),
+              }}
+              listeners={createTabListeners(tab)}
+            />
+          ))}
+        </Tab.Navigator>
       </View>
 
       {showWalkthrough && (

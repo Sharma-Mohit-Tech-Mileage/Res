@@ -7,15 +7,13 @@ const MaintenanceWrapper = ({ children }) => {
   const { 
     showMaintenancePage, 
     pageConfig, 
-    blockingState,  //NEW: Get enhanced blocking state
-    clearBlockingState  //NEW: Get function to clear blocking state
+    blockingState, 
+    clearBlockingState
   } = useMaintenance();
   
   
-  // If maintenance page should be shown, return only the maintenance page
   if (showMaintenancePage && (pageConfig || blockingState.wasBlocked)) {
     
-    //  NEW: Use blocking config if available, otherwise use page config
     const activeConfig =  pageConfig;
     const isCurrentlyBlocking = blockingState.wasBlocked;
     
@@ -26,10 +24,10 @@ const MaintenanceWrapper = ({ children }) => {
         estimatedTime={activeConfig?.estimatedTime}
         contactInfo={activeConfig?.contactInfo}
          contactLink={activeConfig?.contactLink} 
-        showLoginButton={activeConfig?.showLoginButton}  // Always show for blocked users
-        isBlockingUser={isCurrentlyBlocking}                                    // Pass current blocking status
-        pageType={activeConfig?.type || "NORMAL"}                              // Pass page type
-        onClearBlocking={clearBlockingState}                                   // NEW: Allow manual clear
+        showLoginButton={activeConfig?.showLoginButton} 
+        isBlockingUser={isCurrentlyBlocking} 
+        pageType={activeConfig?.type || "NORMAL"}  
+        onClearBlocking={clearBlockingState} 
         blockingInfo={{
           blockingTimestamp: blockingState.blockingTimestamp,
           wasBlocked: blockingState.wasBlocked
@@ -38,7 +36,6 @@ const MaintenanceWrapper = ({ children }) => {
     );
   }
   
-  // Otherwise, show regular app content
   return <View style={{ flex: 1 }}>{children}</View>;
 };
 

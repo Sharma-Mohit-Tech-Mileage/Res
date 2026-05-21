@@ -34,7 +34,7 @@ const MobilePromo = () => {
             style={styles.offerEyebrow}
             accessible={true}
             accessibilityLabel="Sparklight Internet plus Mobile"
-            allowFontScaling={true}
+            maxFontSizeMultiplier={1.2}
           >
             Sparklight Internet
             <Text style={styles.offerEyebrowPlus}> + </Text>
@@ -45,7 +45,7 @@ const MobilePromo = () => {
             accessible={true}
             accessibilityRole="header"
             accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
-            allowFontScaling={true}
+            maxFontSizeMultiplier={1.2}
           >
             SAVE with FREE Unlimited Mobile for 1 year*
           </Text>
@@ -62,7 +62,7 @@ const MobilePromo = () => {
             accessibilityHint="Opens Sparklight mobile offer"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text style={styles.getOfferButton} importantForAccessibility="no">
+            <Text style={styles.getOfferButton} importantForAccessibility="no" maxFontSizeMultiplier={1.2}>
               Get Offer
             </Text>
           </Touchable>
@@ -118,7 +118,8 @@ const MobilePromo = () => {
     </View>
     {showSparklightMobile && <Text style={[styles.offerDesclaimer]}
               accessible={true}
-              accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply.">
+              accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
+              maxFontSizeMultiplier={1.2}>
              *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
             </Text>}
       </>

@@ -1,37 +1,41 @@
 import { useState, useEffect } from 'react';
 import { AccessibilityInfo, Platform, findNodeHandle } from 'react-native';
 
-// AC1 order: Label → Required → Value → Field type → Error → Hint. Use as accessibilityLabel only.
+// AC1 label only; OS adds role/value/hint. iOS auto-reads text as AX value (omit here); Android needs value embedded since contentDescription suppresses auto-value. Errors go on accessibilityHint at the call site.
 
 const DIGIT_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
 
-export const digitsToWords = (s) =>
-  String(s || '')
-    .split('')
-    .map((c) => DIGIT_WORDS[+c] ?? c)
-    .join(' ');
+export const digitsToWords = (s) => {
+  const digits = String(s || '').replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.split('').map((d) => DIGIT_WORDS[Number(d)]).join(' ');
+};
 
 export function formatInputA11yReadout({
   label,
   required = false,
   value,
-  errorHint,
-  fieldType = 'text field',
-  actionHint = 'Double tap to edit',
-  isSecure = false,
   isPhoneNumber = false,
+  isSecure = false,
 }) {
   const cleanLabel = (label || '').replace(/\s*\*\s*$/, '').trim() || 'Input';
   const parts = [cleanLabel];
   if (required) parts.push('required');
-  if (value && !isSecure) {
+  const includeValue =
+    Platform.OS === 'android' &&
+    !isSecure &&
+    value !== undefined &&
+    value !== null &&
+    value !== '';
+  if (includeValue) {
     parts.push(isPhoneNumber ? digitsToWords(value) : String(value));
   }
-  parts.push(fieldType);
-  let result = parts.join(', ');
-  if (errorHint) result += `. ${errorHint}`;
-  result += `. ${actionHint}.`;
-  return result;
+  return parts.join(', ');
+}
+
+// Deprecated — value now goes through formatInputA11yReadout's value param. Kept as a no-op for legacy callers.
+export function formatInputA11yValue() {
+  return undefined;
 }
 
 // React hook — true while a screen reader (TalkBack/VoiceOver) is active.

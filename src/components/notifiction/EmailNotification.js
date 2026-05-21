@@ -349,14 +349,12 @@ const AddNotificationScreen = () => {
                     value={value ? value.toLowerCase() : ""}
                     error={errors.email?.message}
                     label="Email Address *"
-                    accessibilityLabel="Email address Required"
-                    accessibilityHint={"required text field. double tap to edit"}
+                    required={true}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
                     style={styles.emailInput}
                     ref={inputRef}
-                    
                   />
                 )}
               />
@@ -366,8 +364,8 @@ const AddNotificationScreen = () => {
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
               <View style={styles.toggleHeader}>
-                <Text style={[styles.toggleTitle, { flex: 0.86 }]} accessibilityRole="text" 
-                accessible={true}  
+                <Text style={styles.toggleTitle} accessibilityRole="text"
+                accessible={true}
                 accessibilityLabel={`Critical Notifications, ${
                 primaryEmail ? "enabled" : "disabled"
               }, cannot be changed`}
@@ -375,7 +373,7 @@ const AddNotificationScreen = () => {
                 updates.">
                   Critical Notifications
                 </Text>
-                <View style={[styles.iconContainer, { flex: 0.14 }]}>
+                <View style={styles.iconContainer}>
                   <View style={styles.icon} accessible={false}>
                     {primaryEmail ? (
                       <SuccessIcon />
@@ -399,7 +397,7 @@ const AddNotificationScreen = () => {
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
               <View style={styles.toggleHeader}>
-                <A11y.Index index={0} style={[styles.toggleTitle, { flex: 0.9 }]}>
+                <A11y.Index index={0} style={styles.toggleTitle}>
                 <Text
                   style={[styles.toggleTitle]}
                   accessible={true}
@@ -412,7 +410,7 @@ const AddNotificationScreen = () => {
                   Paperless Billing
                 </Text>
                 </A11y.Index>
-                <View style={{ flex: 0.1 }} accessible={false} importantForAccessibility="no">
+                <View style={{ minWidth: A11Y.minTouch, minHeight: A11Y.minTouch }} accessible={false} importantForAccessibility="no">
                   <A11y.Index index={1}>
                   <Toggle
                     name="paperlessBilling"
@@ -434,7 +432,6 @@ const AddNotificationScreen = () => {
             {isCheckboxVisible && (
               <View style={styles.checkBoxArea}>
                 <Touchable
-                  minSize={0}
                   style={[styles.checkboxTouchable, { justifyContent: 'flex-start' }]}
                   onPress={handleCheckboxToggle}
                   accessibilityRole="checkbox"
@@ -467,7 +464,6 @@ const AddNotificationScreen = () => {
                   </View>
                 </Touchable>
                 <Touchable
-                  minSize={0}
                   onPress={handleTermsLinkPress}
                   accessibilityRole="link"
                   accessibilityLabel="View Paperless Billing Terms and Conditions"
@@ -585,6 +581,7 @@ const styles = StyleSheet.create({
   },
   toggleHeader: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
   },
   toggleTitle: {

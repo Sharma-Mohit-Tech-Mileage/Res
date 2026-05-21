@@ -406,36 +406,26 @@ const TextNotifications = ({ navigation }) => {
               </Text>
             </View>
 
-            <View style={styles.frameGroup}>
-              <View style={[styles.frameParent3,{width:widthPercentageToDP('82%')}]}>
-                <View
-                  style={{
-                    paddingVertical: 4,
-                  }}
-                >
-                  <Controller
-                    control={control}
-                    name="phoneNumber"
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <SparkLightInput
-                        placeholder="Mobile Number"
-                        label={"Mobile Number *"}
-                        accessible={true}
-                        accessibilityRole="text"
-                        accessibilityLabel="Mobile Number required"
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        keyboardType="number-pad"
-                        value={value}
-                        error={errors.phoneNumber?.message}
-                        maxLength={16}
-                        isVisible={false}
-                        autoFocusTitle={true}
-                      />
-                    )}
+            <View style={{ marginHorizontal: 20, paddingVertical: Padding.p_base }}>
+              <Controller
+                control={control}
+                name="phoneNumber"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <SparkLightInput
+                    placeholder="Mobile Number"
+                    label={"Mobile Number *"}
+                    required={true}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    keyboardType="number-pad"
+                    value={value}
+                    error={errors.phoneNumber?.message}
+                    maxLength={16}
+                    isVisible={false}
+                    autoFocusTitle={true}
                   />
-                </View>
-              </View>
+                )}
+              />
             </View>
             <View style={styles.frameChild} />
             <NotificationSetting
@@ -582,7 +572,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
   <View style={[styles.frameContainer, styles.frameBorder]}>
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
-        <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
+        <View style={{ flexDirection: "column", flex: 1, marginRight: 10 }}>
           <Text
             style={styles.appointments}
             accessible={true}
@@ -604,7 +594,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
           </Text>
         </View>
 
-        <View style={{ flex: 0.2 }}>
+        <View>
           <Toggle
             name={name}
             initialValue={value}
