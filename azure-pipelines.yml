@@ -28,7 +28,7 @@ variables:
   - name: jarsignerKeyPassword
     value: sparklight_123
   - name: androidVersionCode
-    value: $[counter('androidBuildVersionStore425', 438)]
+    value: $[counter('androidBuildVersionStore438', 438)]
   - name: androidVersionName
     value: '26.1.0'
   - name: ANDROID_UPLOAD_CERT_SHA1
