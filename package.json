@@ -8,7 +8,7 @@
     "env:development": "react-native-config .env.development",
     "env:staging": "react-native-config .env.staging",
     "env:production": "react-native-config .env.production",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "start": "react-native start",
     "test": "jest"
   },

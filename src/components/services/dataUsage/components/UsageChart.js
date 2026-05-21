@@ -4,7 +4,7 @@ import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
 import { G, Rect, Text as SvgText, Path, Line } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { theme } from "../../../../styles/theme";
+import { theme, A11Y } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 import { cardHeader, dataUsageTabs } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
@@ -462,7 +462,7 @@ const UsageChart = ({
               width={bandwidth + dynamicSpacing}
               height={CHART_TOTAL_HEIGHT}
               fill="transparent"
-              onPress={() => handlePressBar(item, index)}
+              pointerEvents="none"
             />
 
             {isActive && (

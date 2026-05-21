@@ -144,7 +144,6 @@ const SparklightMobileInput = React.forwardRef(({
             accessibilityRole="button"
             accessible={true}
             onPress={togglePasswordVisibility}
-            minSize={0}
             style={styles.eyeButton}
           >
             <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
@@ -201,11 +200,11 @@ const SparklightMobileInput = React.forwardRef(({
           accessibilityLabel={formatInputA11yReadout({
             label: accessibilityLabel || label || placeholder,
             required,
-            value,
-            errorHint: error ? (errorHint || error) : undefined,
-            isSecure: secure,
+            value: unmasked,
             isPhoneNumber: getKeyboardType() === "phone-pad",
+            isSecure: secure,
           })}
+          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : undefined}
           accessibilityRole="text"
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
@@ -217,20 +216,25 @@ const SparklightMobileInput = React.forwardRef(({
       </View>
 
       {error && (
-        <View style={styles.errorContainer} ref={errorRef}>
+        <View
+          style={styles.errorContainer}
+          ref={errorRef}
+          accessible={true}
+          accessibilityLabel={errorHint || error}
+          accessibilityRole="alert"
+          accessibilityLiveRegion="assertive"
+        >
           <View
             style={styles.errorIcon}
-            accessible={true}
-            accessibilityLabel="Warning Icon"
+            accessible={false}
+            importantForAccessibility="no"
           >
             <WarningIcon />
           </View>
           <Text
             style={styles.errorText}
-            accessible={true}
-            accessibilityLabel={error}
-            accessibilityRole="text"
-            accessibilityHint="Please enter valid password"
+            accessible={false}
+            importantForAccessibility="no"
           >
             {error}
           </Text>

@@ -20,6 +20,7 @@ import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
+import Touchable from "./Touchable";
 
 
 const TYPE_CONFIG = {
@@ -398,6 +399,13 @@ const NotificationAlert = ({
         return;
       }
 
+      if (actionConfig.action === "url" && actionConfig.value) {
+        Linking.openURL(actionConfig.value).catch((error) => {
+          console.warn("Failed to open URL:", error);
+        });
+        return;
+      }
+
       navigation.navigate("Support", { isContactUs: true });
     },
     [navigation]
@@ -423,8 +431,13 @@ const NotificationAlert = ({
   const renderBlock = useCallback(
     (block, index) => {
       const { segments: blockSegments, key } = block;
-      const actionSegments = blockSegments.filter((s) => s.type === "styled");
+      const actionSegments = blockSegments.filter(
+        (s) => s.type === "styled" && s.action?.action
+      );
       const hasActions = actionSegments.length > 0;
+      const hasBoldOnly = blockSegments.some(
+        (s) => s.type === "styled" && s.action?.bold && !s.action?.action
+      );
       const plainText = buildPlainText(blockSegments);
 
       if (!hasActions) {
@@ -437,9 +450,26 @@ const NotificationAlert = ({
             accessibilityLabel={plainText}
             style={styles.blockWrapper}
           >
-            <Text style={[styles.messageText, { color: config.textColor }]}>
-              {plainText}
-            </Text>
+            {hasBoldOnly ? (
+              <Text>
+                {blockSegments.map((segment) => (
+                  <Text
+                    key={segment.key}
+                    style={[
+                      styles.messageText,
+                      { color: config.textColor },
+                      segment.type === "styled" && segment.action?.bold && styles.boldText,
+                    ]}
+                  >
+                    {segment.content}
+                  </Text>
+                ))}
+              </Text>
+            ) : (
+              <Text style={[styles.messageText, { color: config.textColor }]}>
+                {plainText}
+              </Text>
+            )}
           </View>
         );
       }
@@ -618,7 +648,7 @@ const NotificationAlert = ({
 
           {resentemail && (
             <A11y.Index index={3}>
-            <Pressable
+            <Touchable
               ref={resendRef}
               onPress={() => dispatch(resentEmailVerifiction(navigation))}
               accessible={true}
@@ -628,14 +658,14 @@ const NotificationAlert = ({
               style={styles.resendButton}
             >
               <Text style={styles.resendText}>Resend Confirmation Email</Text>
-            </Pressable>
+            </Touchable>
             </A11y.Index>
           )}
         </View>
 
         {showCloseIcon && (
           <A11y.Index index={4} style={styles.closeBtn}>
-            <Pressable
+            <Touchable
               ref={closeRef}
               onPress={onClose}
               style={styles.closeBtnPressable}
@@ -643,14 +673,13 @@ const NotificationAlert = ({
               accessibilityLabel="Close notification"
               accessibilityRole="button"
               accessibilityHint="Double tap to dismiss"
-              hitSlop={A11Y.hitSlop}
             >
               <CloseIcon
                 width={24}
                 height={24}
                 color={config.closeButtonColor}
               />
-            </Pressable>
+            </Touchable>
           </A11y.Index>
         )}
       </View>
@@ -691,9 +720,8 @@ const styles = StyleSheet.create({
   blockWrapper: {
     marginTop: 8,
   },
-  // Pressable variants only — text-only blocks stay at natural height.
+  // Inline actionable links keep natural text height; hitSlop provides 48dp tap target (WCAG 2.5.5 inline-text exception).
   actionableBlock: {
-    minHeight: A11Y.minTouch,
     justifyContent: "center",
   },
   messageText: {
@@ -704,6 +732,10 @@ const styles = StyleSheet.create({
     color: Color.colorMidnightblue,
     fontWeight: "700",
     textDecorationLine: "underline",
+  },
+  boldText: {
+    fontFamily: FontFamily.openSansBold || FontFamily.openSansSemiBold,
+    fontWeight: "700",
   },
   resendButton: {
     marginTop: 8,

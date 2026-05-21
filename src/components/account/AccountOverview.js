@@ -255,7 +255,6 @@ const AccountOverview = () => {
                           style={[
                             styles.rightActionableGroup,
                             styles.tabsFlexBox,
-                            { alignItems: 'stretch' },
                           ]}
                           onPress={item.onPress}
                           accessibilityLabel={item.name}
@@ -324,7 +323,6 @@ const AccountOverview = () => {
                 }}
               >
                 <Touchable
-                  minSize={0}
                   accessible={true}
                   accessibilityRole="link"
                   hitSlop={A11Y.hitSlop}
@@ -347,7 +345,6 @@ const AccountOverview = () => {
                 <Text style={styles.linkStyle} accessible={false} importantForAccessibility="no"> | </Text>
 
                 <Touchable
-                  minSize={0}
                   accessible={true}
                   accessibilityRole="link"
                   hitSlop={A11Y.hitSlop}
@@ -369,7 +366,6 @@ const AccountOverview = () => {
               </View>
             </View>
             <Touchable
-              minSize={0}
               onPress={() =>
                 navigation.navigate("ArticleWindowUtility", {
                   url: "https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true",

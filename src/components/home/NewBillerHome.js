@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Platform,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, ScrollView, Platform, } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
@@ -17,39 +11,27 @@ import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
-import { AlertUtils } from "../utility/AlertUtils";
 import Config from "react-native-config";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
-import InfoBanner from "../ACPDashboard/InfoBanner";
+import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PostApiReqZendeskToken } from "../../network/RestApiClient";
-import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
 import { useOutageStatus } from "../services/hooks/useOutageStatus";
-import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
 import MobilePilotLandingPage from "../../components/ACPDashboard/MobilePilotLandingPage";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from "../../firebase/FirebaseUtils";
+import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
 import VersionCheck from "react-native-version-check";
 import DeviceInfo from "react-native-device-info";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
-
-import {
-  loginWithJWT,
-  setConversationalFields,
-} from "../utility/RNZendeskChat";
+import { loginWithJWT, setConversationalFields, } from "../utility/RNZendeskChat";
 import { get } from "node_modules/axios/index.cjs";
-
-
-
 
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
@@ -64,8 +46,9 @@ const NewBillerHome = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
-  const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
-  const [loadingAutoPay, setloadingAutoPay] = useState(false);
+  const [isAutoPayStatus, setIsAutoPayStatus] = useState(undefined);
+  const [loadingAutoPay, setloadingAutoPay] = useState(true);
+  const [alertsHeight, setAlertsHeight] = useState(0);
   const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
   const [phoneNumber, setPhoneNumber] = useState(undefined);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
@@ -87,9 +70,10 @@ const NewBillerHome = ({ navigation }) => {
   const paperlessStatusAcp = useSelector(
     (state) => state.profile?.paperlessStatusAcp
   );
-  const paperlessLoading = useSelector(
+  const paperlessLoadingFromStore = useSelector(
     (state) => state.profile?.isPaperLessStatusLoading
   );
+  const paperlessLoading = paperlessLoadingFromStore || paperlessStatusAcp === undefined;
   const userInfo = useSelector((state) => state.user?.userData?.userInfo);
   const isMobilePilotEnabled = useSelector(
     (state) => state.user.userData?.userInfo?.pending_activation === true
@@ -97,25 +81,17 @@ const NewBillerHome = ({ navigation }) => {
 
   const showDisconnectedBanner = userInfo
     ? isAccountDisconnected(
-        userInfo.acctStatus,
-        userInfo.daysSinceDisconnectDate
-      )
+      userInfo.acctStatus,
+      userInfo.daysSinceDisconnectDate
+    )
     : false;
 
-  
-
-  /* Sync outage banner with Redux outage state from servicesSaga */
   useEffect(() => {
     if (outageData?.hasOutage) {
       setIsOutageAlert(true);
       setEstimatedRestoreTime(outageData.estimatedRestoreTime || "");
     } else {
       setIsOutageAlert(false);
-    }
-    // hardcoded test override
-    if (userInfo?.accountNumber === "8160110010005227") {
-      setIsOutageAlert(true);
-      setEstimatedRestoreTime(moment().add(2, 'hours').format("LT"));
     }
   }, [outageData, userInfo?.accountNumber]);
 
@@ -131,7 +107,7 @@ const NewBillerHome = ({ navigation }) => {
           setloadingAutoPay(false);
         },
         (error) => {
-          console.log("error", error);
+          console.warn("error", error);
           setloadingAutoPay(false);
         }
       );
@@ -145,27 +121,21 @@ const NewBillerHome = ({ navigation }) => {
           checkOutageStatus();
           const status = await checkForMinorUpdate();
           setUpdateStatus(status);
-// hardcode for testing update app feature
-          if(userInfo?.accountNumber=="8160110010005227"){
-        setUpdateStatus({
-          isMinorUpdateAvailable: true,
-          
-        });
-      }
           dispatch(fetchACPUserAccountDetails());
           getStatus();
-          //getInAppNotificationsData();
           getTextNotificationsData();
           setIsNotificationEnable(true);
         } catch (error) {
-          console.error("Error refreshing data on focus", error);
+          console.warn("Error refreshing data on focus", error);
         }
       };
 
-      
-      
-     
       refreshData();
+
+      return () => {
+        setIsAutoPayStatus(undefined);
+        setloadingAutoPay(true);
+      };
     }, [dispatch])
   );
 
@@ -184,7 +154,6 @@ const NewBillerHome = ({ navigation }) => {
         email: getPrimaryEmail(accountDetails),
       });
       DeviceInfo.getUserAgent().then((userAgent) => {
-       
         loginWithToken(userAgent);
       });
     }
@@ -215,27 +184,6 @@ const NewBillerHome = ({ navigation }) => {
     };
   
 
-  // const getInAppNotificationsData = () => {
-  //   getUser().then((res1) => {
-  //     let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
-  //     GetApiRequest(
-  //       requestUrl,
-  //       (res) => {
-  //         if (res) {
-  //           res[0]?.pushMessageType.forEach((value, index) => {
-  //             if (!value?.optOutFlag) {
-  //               setIsNotificationEnable(true);
-  //             }
-  //           });
-  //         }
-  //       },
-  //       (error) => {
-  //         console.error("Error on retrying getInAppNotificationsData", error);
-  //       }
-  //     );
-  //   });
-  // };
-
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
     if (enabledPermission) {
@@ -256,7 +204,6 @@ const NewBillerHome = ({ navigation }) => {
         permanentSkip: false,
       };
       storePushNotificationStatus(localData);
-      //await dispatch(updatePushNotificationsv2(data, null));
     } else {
       const token = await getFcmToken();
       const dataWithoutPermission = {
@@ -275,7 +222,6 @@ const NewBillerHome = ({ navigation }) => {
         permanentSkip: true,
       };
       storePushNotificationStatus(localData);
-      //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
     }
   };
 
@@ -289,10 +235,9 @@ const NewBillerHome = ({ navigation }) => {
       }
 
       const data = await response.json();
-      console.log("IP Address:", data.ip);
       return data.ip; // The IP address
     } catch (error) {
-      console.error("Error fetching IP address:", error);
+      console.warn("Error fetching IP address:", error);
       return null;
     }
   };
@@ -305,7 +250,6 @@ const NewBillerHome = ({ navigation }) => {
       accountNumber: user?.userInfo.accountNumber,
       userName: user?.userInfo.userName,
     };
-    console.log("Request data for Zendesk token:", JSON.stringify(user));
 
     const IPAddress = await getIPAddress();
 
@@ -329,38 +273,30 @@ const NewBillerHome = ({ navigation }) => {
             firstName: firstName || "",
             lastName: lastName || "",
             name: '',
-            phone: phoneNumber || "",
+             phone: phoneNumber || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
             authLevel: user?.userInfo.authLevel,
             mobileApp: "mobileApp",
             jwtId: jwtToken,
-            source: "mobileApp",
           };
-         setConversationalFields(fields);
-          // loginWithJWT(jwtToken)
-          //   .then(() => {
-          //     console.log("Logged in to Zendesk Chat with JWT");
-          //     // Now set conversational fields
-          //     setConversationalFields(fields);
-          //   })
-          //   .catch((error) => {
-          //     console.log("conversational fields error", JSON.stringify(fields));
-          //     setConversationalFields(fields);
-          //     console.error("Error logging in to Zendesk Chat:", error);
-          //   });
+
+          loginWithJWT(jwtToken)
+            .then(() => {
+              // Now set conversational fields
+              setConversationalFields(fields);
+            })
+            .catch((error) => {
+              setConversationalFields(fields);
+              console.warn("Error logging in to Zendesk Chat:", error);
+            });
         }
       },
       (error) => {
-        console.log("error in fetching JWT reponse for zendesk", error);
+        console.warn("error in fetching JWT reponse for zendesk", error);
       }
     );
-
-    // setTimeout(() => {
-    //   //console.log("Setting conversational fields", fields);
-    //   setConversationalFields(fields);
-    // }, 1000);
   };
 
   const renderHeader = () => (
@@ -380,27 +316,86 @@ const NewBillerHome = ({ navigation }) => {
         <Logo width={120} height={33.32} />
       </View>
 
-      
+
     </View>
   );
 
-  const renderOutageAlert = () =>
-    AlertUtils.createOutageAlert(estimatedRestoreTime, () =>
-      setIsOutageAlert(false)
+  const renderOutageAlert = () => {
+    const baseMessage = "Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible.";
+    const restoreLine = estimatedRestoreTime
+      ? `Estimated Time to Restore: ${estimatedRestoreTime}.`
+      : null;
+    return (
+      <View style={styles.alertWrapper}>
+        <NotificationAlert
+          type="warning"
+          title="Outage Notification"
+          message={restoreLine ? `${baseMessage}\n${restoreLine}` : baseMessage}
+          splitKey={restoreLine ? [{ text: restoreLine, bold: true }] : ""}
+          showCloseIcon={true}
+          onClose={() => setIsOutageAlert(false)}
+        />
+      </View>
     );
+  };
 
-  const renderAppUpdateAlert = () =>
-    AlertUtils.createAppUpdateAlert(() =>
-      setUpdateStatus({
-        isMinorUpdateAvailable: false,
-        currentVersion: "",
-        latestVersion: "",
-      })
+  const renderAppUpdateAlert = () => {
+    const storeUrl = Platform.OS === "android"
+      ? "https://play.google.com/store/apps/details?id=com.sparklight"
+      : "https://apps.apple.com/us/app/mysparklight/6469003880";
+    return (
+      <View style={styles.alertWrapper}>
+        <NotificationAlert
+          type="info"
+          title="What's New"
+          message={"Enhance your app experience with the latest version for improved performance and reliability.\nUpdate Now"}
+          splitKey={[{ text: "Update Now", action: "url", value: storeUrl }]}
+          showCloseIcon={true}
+          onClose={() =>
+            setUpdateStatus({
+              isMinorUpdateAvailable: false,
+              currentVersion: "",
+              latestVersion: "",
+            })
+          }
+        />
+      </View>
     );
+  };
+
+  const renderMaintenanceAlert = () => {
+    if (!bannerConfig) return null;
+    const severityToType = { critical: "error", warning: "warning", info: "info" };
+    const splitKeys = [];
+    let messageText = bannerConfig.message || "";
+    if (bannerConfig.link && bannerConfig.linkText) {
+      messageText = `${messageText}\n${bannerConfig.linkText}`;
+      splitKeys.push({ text: bannerConfig.linkText, action: "url", value: bannerConfig.link });
+    }
+    if (bannerConfig.showPhoneNumber && bannerConfig.phoneNumber) {
+      messageText = `${messageText}\nCall ${bannerConfig.phoneNumber}`;
+      splitKeys.push({ text: bannerConfig.phoneNumber, action: "call", value: bannerConfig.phoneNumber });
+    }
+    return (
+      <View style={styles.alertWrapper}>
+        <NotificationAlert
+          type={severityToType[bannerConfig.severity] || "info"}
+          title={bannerConfig.title}
+          message={messageText}
+          splitKey={splitKeys.length > 0 ? splitKeys : ""}
+          showCloseIcon={!!bannerConfig.dismissible}
+          onClose={bannerConfig.dismissible ? dismissBanner : undefined}
+        />
+      </View>
+    );
+  };
+
+  const hasAnyAlert =
+    updateStatus.isMinorUpdateAvailable || isOutageAlert || (showBanner && bannerConfig);
 
   const renderWelcomeCard = () => (
-    <View style={[styles.card, styles.shadowProp, styles.welcomeCard,{paddingTop:0}]}>
-      <View >
+    <View style={[styles.card, styles.shadowProp]}>
+      <View>
         {showDisconnectedBanner ? (
           <View style={styles.contentWrapper}>
             <DisconnectedBanner navigation={navigation} />
@@ -408,44 +403,39 @@ const NewBillerHome = ({ navigation }) => {
         ) : (
           <WelcomeCard />
         )}
-        {/* <MenuGrid /> */}
-         <View style={styles.contentWrapper}>
-        <PromoBanner
-          title="Sign up and save with Auto Pay and Paperless Billing"
-          showBonus={true}
-        />
-        <FeatureCard
-          title="Auto Pay"
-          isLoading={loadingAutoPay}
-          features={["Convenient", "Timely Payments", "Peace of Mind"]}
-          buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
-          buttonVariant={isAutoPayStatus ? "success" : "primary"}
-          isActive={isAutoPayStatus}
-          onButtonPress={() => {
-            navigation.navigate("AutoPayPCIConnector", {
-              url: `${Config.URL}/billing`,
-              name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-              useNewPayment: true,
-              status: isAutoPayStatus,
-              paymentDetails: defaultPaymentDetails,
-            });
-          }}
-        />
-        <FeatureCard
-          isLoading={paperlessLoading}
-          title="Paperless Billing"
-          features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
-          buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
-          buttonVariant={paperlessStatusAcp ? "success" : "primary"}
-          isActive={paperlessStatusAcp}
-          onButtonPress={() =>
-            navigation.navigate("account", { screen: "Notifications" })
-          }
-        />
-        {/* <InfoBanner
-          message="We are working diligently to enhance your experience"
-          icon="megaphone"
-        /> */}
+        <View style={[styles.contentWrapper, styles.featuresWrapper]}>
+          <PromoBanner
+            title="Sign up and save with Auto Pay and Paperless Billing"
+            showBonus={true}
+          />
+          <FeatureCard
+            title="Auto Pay"
+            isLoading={loadingAutoPay}
+            features={["Convenient", "Timely Payments", "Peace of Mind"]}
+            buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
+            buttonVariant={isAutoPayStatus ? "success" : "primary"}
+            isActive={isAutoPayStatus}
+            onButtonPress={() => {
+              navigation.navigate("AutoPayPCIConnector", {
+                url: `${Config.URL}/billing`,
+                name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+                useNewPayment: true,
+                status: isAutoPayStatus,
+                paymentDetails: defaultPaymentDetails,
+              });
+            }}
+          />
+          <FeatureCard
+            isLoading={paperlessLoading}
+            title="Paperless Billing"
+            features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
+            buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
+            buttonVariant={paperlessStatusAcp ? "success" : "primary"}
+            isActive={paperlessStatusAcp}
+            onButtonPress={() =>
+              navigation.navigate("account", { screen: "Notifications" })
+            }
+          />
         </View>
       </View>
     </View>
@@ -459,7 +449,7 @@ const NewBillerHome = ({ navigation }) => {
       style={styles.container}
     >
       <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-      <ZendeskChatIcon />
+        <ZendeskChatIcon />
       </View>
       <View style={{ flex: 1 }}>
         <SafeAreaView
@@ -469,17 +459,7 @@ const NewBillerHome = ({ navigation }) => {
           }
           accessibilityElementsHidden={isWalkthroughActive}
         >
-           {renderHeader()}  
-           {/* <View
-            accessibilityLabel="SparkLight"
-            style={styles.headerContainer}
-            importantForAccessibility={
-              isWalkthroughActive ? "no-hide-descendants" : "auto"
-            }
-            accessibilityElementsHidden={isWalkthroughActive}
-          >
-            <Logo width={120} height={33.32} />
-          </View>   */}
+          {renderHeader()}
           <ScrollView style={styles.scrollContainer}>
             <View
               style={styles.mainContentContainer}
@@ -488,39 +468,36 @@ const NewBillerHome = ({ navigation }) => {
               }
               accessibilityElementsHidden={isWalkthroughActive}
             >
-              {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
-              {isOutageAlert && renderOutageAlert()}
-              {showBanner && bannerConfig && (
-                <MaintenanceBanner
-                  title={bannerConfig.title}
-                  message={bannerConfig.message}
-                  link={bannerConfig.link}
-                  linkText={bannerConfig.linkText}
-                  showPhoneNumber={bannerConfig.showPhoneNumber}
-                  phoneNumber={bannerConfig.phoneNumber}
-                  onDismiss={
-                    bannerConfig.dismissible ? dismissBanner : undefined
-                  }
-                  severity={bannerConfig.severity || "info"}
-                />
-              )}
-              {isMobilePilotEnabled ? (
-                <View
-                  style={[styles.card, styles.shadowProp, styles.welcomeCard]}
-                >
-                  <View
-                    style={[
-                      styles.contentWrapper,
-                      { paddingHorizontal: Padding.p_base},
-                    ]}
-                  >
-                    <MobilePilotLandingPage />
+              <View style={styles.overlayStack}>
+                {hasAnyAlert && <View style={{ height: alertsHeight }} />}
+                {isMobilePilotEnabled ? (
+                  <View style={[styles.card, styles.shadowProp]}>
+                    <View
+                      style={[
+                        styles.contentWrapper,
+                        { paddingHorizontal: Padding.p_base },
+                      ]}
+                    >
+                      <MobilePilotLandingPage />
+                    </View>
                   </View>
-                </View>
-              ) : (
-                renderWelcomeCard()
-              )}
+                ) : (
+                  renderWelcomeCard()
+                )}
+              </View>
             </View>
+            {hasAnyAlert && (
+              <View
+                style={styles.alertsAbsolute}
+                onLayout={(e) => setAlertsHeight(e.nativeEvent.layout.height)}
+              >
+                <View style={styles.alertsGroup}>
+                  {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+                  {isOutageAlert && renderOutageAlert()}
+                  {showBanner && bannerConfig && renderMaintenanceAlert()}
+                </View>
+              </View>
+            )}
           </ScrollView>
         </SafeAreaView>
       </View>
@@ -552,14 +529,15 @@ const styles = StyleSheet.create({
     marginTop: 50,
     paddingBottom: 50,
   },
+  overlayStack: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: -40,
+  },
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    paddingTop: 20,
     width: wp("92%"),
-  },
-  welcomeCard: {
-    marginTop: -40,
   },
   shadowProp: {
     shadowColor: "#171717",
@@ -571,7 +549,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.sparklightWhite,
     paddingHorizontal: Padding.p_5xl,
+  },
+  featuresWrapper: {
     paddingTop: 8,
+  },
+  alertsGroup: {
+    width: "100%",
+    alignItems: "center",
+  },
+  alertsAbsolute: {
+    position: "absolute",
+    top: 10,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+  alertWrapper: {
+    width: wp("92%"),
   },
 });
 

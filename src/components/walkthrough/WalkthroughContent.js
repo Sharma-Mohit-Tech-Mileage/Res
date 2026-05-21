@@ -110,7 +110,6 @@ const WalkthroughContent = ({
         <Touchable
           onPress={onSkip}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          minSize={0}
           accessibilityRole="button"
           accessibilityLabel="Skip walkthrough"
         >

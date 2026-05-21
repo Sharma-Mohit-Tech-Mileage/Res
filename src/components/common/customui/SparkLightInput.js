@@ -158,13 +158,15 @@ const SparkLightInput = React.forwardRef(({
     >
       <View style={[styles.labelContainer, secure && styles.labelContainerSecure]}>
         {label && (
-          <Text
-            style={[styles.label, error && styles.errorLabel]}
+          <View
             accessible={false}
-            importantForAccessibility="no"
+            accessibilityElementsHidden={true}
+            importantForAccessibility="no-hide-descendants"
           >
-            {label}
-          </Text>
+            <Text style={[styles.label, error && styles.errorLabel]}>
+              {label}
+            </Text>
+          </View>
         )}
         {secure && (
           <Touchable
@@ -172,7 +174,6 @@ const SparkLightInput = React.forwardRef(({
               passwordVisible ? "Hide password" : "Show password"
             }
             onPress={togglePasswordVisibility}
-            minSize={0}
             style={styles.eyeButton}
           >
             <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
@@ -228,10 +229,10 @@ const SparkLightInput = React.forwardRef(({
             label: accessibilityLabel || label || placeholder,
             required,
             value,
-            errorHint: error ? (errorHint || error) : undefined,
-            isSecure: secure,
             isPhoneNumber: getKeyboardType() === "phone-pad",
+            isSecure: secure,
           })}
+          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : undefined}
           accessibilityRole="text"
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
