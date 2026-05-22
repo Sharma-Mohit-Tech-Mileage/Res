@@ -259,7 +259,7 @@ const PostApiReqZendeskToken = async (endpoint, body, onSuccess, onError) => {
     try {
         const user = await getUser();
         const res = await _axios.post(endpoint, body, {
-            baseURL: 'https://customer.uat.cableone.net/apiWrapper/',
+            baseURL: API_ACP_BASEURL,
             headers: { Authorization: `Bearer ${user.token}` },
         });
         handleResponse(res, onSuccess, onError, endpoint);
