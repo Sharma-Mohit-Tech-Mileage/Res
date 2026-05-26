@@ -306,7 +306,18 @@ const ProfileSettings = () => {
 
                 <View style={styles.firstNameParent}>
                   <Text style={styles.firstName}>Account Number</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                  <Text
+                    style={[styles.melissa, styles.melissaTypo]}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel={`Account Number ${
+                      profileDetails.accountNumber
+                        ? numberToWordsForAccessibility(
+                            profileDetails.accountNumber.toString(),
+                          )
+                        : "N/A"
+                    }`}
+                  >
                     {profileDetails.accountNumber}
                   </Text>
                 </View>
@@ -388,7 +399,9 @@ const ProfileSettings = () => {
                         accessible={true}
                         accessibilityRole="text"
                         accessibilityLabel={`Mobile Number: ${
-                          phoneNumber || "N/A"
+                          phoneNumber
+                            ? numberToWordsForAccessibility(phoneNumber.toString())
+                            : "N/A"
                         }`}
                       >
                         {phoneNumber || "N/A"}
