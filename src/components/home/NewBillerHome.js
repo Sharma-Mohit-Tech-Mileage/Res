@@ -275,7 +275,7 @@ const NewBillerHome = ({ navigation }) => {
             firstName: firstName || "",
             lastName: lastName || "",
             name: `${firstName || ""} ${lastName || ""}`.trim(),
-             phone: phoneNumber || "",
+            phone: phoneNumber || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
