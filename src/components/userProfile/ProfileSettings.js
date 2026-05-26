@@ -8,7 +8,11 @@ import {
   Platform,
   Pressable,
 } from "react-native";
-import { useNavigation, useRoute, useFocusEffect } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
 import {
   Padding,
   Color,
@@ -43,11 +47,9 @@ const ProfileSettings = () => {
 
   const emailAddress = getPrimaryEmail(accountDetails);
 
-
   useEffect(() => { 
     if(emailAddress) {
       setShowEmailLoading(false);
-      
     }
   }, [profile, emailAddress]);
 
@@ -77,9 +79,9 @@ const ProfileSettings = () => {
     // Add your callback logic here
     if (fieldType === "email") {
       navigation.navigate("EmailNotifications", {
-          email: emailAddress,
-          //isPaperLess: isPaperLess,
-        });;
+        email: emailAddress,
+        //isPaperLess: isPaperLess,
+      });
     } else if (fieldType === "mobile") {
       navigation.navigate("TextNotifications", {
         additionalData: {
@@ -92,7 +94,6 @@ const ProfileSettings = () => {
       });
     }
   };
-  
 
   const customerFirstName =
     accountDetails.first_name ||
@@ -138,8 +139,12 @@ const ProfileSettings = () => {
     const formattedState = formatStatePart(state);
     const rawZip = (zip || postal_code || "").toString().trim();
     const formattedZip = rawZip ? rawZip.slice(0, 5) : "";
-    const firstLine = `${formattedLine1}${formattedLine2 ? " " + formattedLine2 : ""}`.trim();
-    const secondLine = `${formattedCity}${formattedState ? ", " + formattedState : ""}${formattedZip ? " " + formattedZip : ""}`.trim();
+    const firstLine = `${formattedLine1}${
+      formattedLine2 ? " " + formattedLine2 : ""
+    }`.trim();
+    const secondLine = `${formattedCity}${
+      formattedState ? ", " + formattedState : ""
+    }${formattedZip ? " " + formattedZip : ""}`.trim();
 
     return `${firstLine}${secondLine ? "\n" + secondLine : ""}`;
   };
@@ -153,8 +158,12 @@ const ProfileSettings = () => {
     const formattedState = formatStatePart(state);
     const rawZip = (zip || postal_code || "").toString().trim();
     const formattedZip = rawZip ? rawZip.slice(0, 5) : "";
-    const firstLine = `${formattedLine1}${formattedLine2 ? " " + formattedLine2 : ""}`.trim();
-    const secondLine = `${formattedCity}${formattedState ? ", " + formattedState : ""}${formattedZip ? " " + formattedZip : ""}`.trim();
+    const firstLine = `${formattedLine1}${
+      formattedLine2 ? " " + formattedLine2 : ""
+    }`.trim();
+    const secondLine = `${formattedCity}${
+      formattedState ? ", " + formattedState : ""
+    }${formattedZip ? " " + formattedZip : ""}`.trim();
 
     return `${firstLine}${secondLine ? "\n" + secondLine : ""}`;
   };
@@ -183,7 +192,9 @@ const ProfileSettings = () => {
     const addressText = (address || "").toString();
     if (!addressText) return "N/A";
 
-    return addressText.replace(/\d+/g, (match) => numberToWordsForAccessibility(match));
+    return addressText.replace(/\d+/g, (match) =>
+      numberToWordsForAccessibility(match),
+    );
   };
 
   const getTextNotificationsData = () => {
@@ -225,22 +236,22 @@ const ProfileSettings = () => {
 
   useEffect(() => {
     if (accountDetails?.bill_to_address) {
-      console.log("Billing Address API response:", accountDetails.bill_to_address);
+      console.log(
+        "Billing Address API response:",
+        accountDetails.bill_to_address,
+      );
     }
   }, [accountDetails?.bill_to_address]);
-  
-
-  
 
   useEffect(() => {
-  const unsubscribe = navigation.addListener('focus', () => {
-    // Call your API here
-    dispatch(fetchProfileDetails());
-    setShowEmailLoading(true);
-    getTextNotificationsData();
-  });
-  return unsubscribe;
-}, [navigation]);
+    const unsubscribe = navigation.addListener("focus", () => {
+      // Call your API here
+      dispatch(fetchProfileDetails());
+      setShowEmailLoading(true);
+      getTextNotificationsData();
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const makeCall = (number) => {
     let phoneNumber = "";
@@ -264,7 +275,6 @@ const ProfileSettings = () => {
         <View style={{ flexDirection: "column", marginBottom: 300 }}>
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup]}>
-              
               <View
                 style={[
                   styles.generalInformationParent,
@@ -281,57 +291,75 @@ const ProfileSettings = () => {
                 </Text>
               </View>
               <View style={styles.frameContainer}>
-                <View style={styles.firstNameParent} >
+                <View style={styles.firstNameParent}>
                   <Text style={styles.firstName}>{"Customer Name"}</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {customerName}
                   </Text>
                 </View>
                 <View style={styles.firstNameParent}>
-                <Text style={styles.firstName}>Username</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.userName}
-                </Text>
-              </View>
+                  <Text style={styles.firstName}>Username</Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                    {profileDetails.userName}
+                  </Text>
+                </View>
 
-              <View style={styles.firstNameParent}>
-                <Text style={styles.firstName}>Account Number</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.accountNumber}
-                </Text>
-              </View>
-                {emailAddress !== undefined && (
+                <View style={styles.firstNameParent}>
+                  <Text style={styles.firstName}>Account Number</Text>
+                  <Text
+                    style={[styles.melissa, styles.melissaTypo]}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel={`Account Number ${
+                      profileDetails.accountNumber
+                        ? numberToWordsForAccessibility(
+                            profileDetails.accountNumber.toString(),
+                          )
+                        : "N/A"
+                    }`}
+                  >
+                    {profileDetails.accountNumber}
+                  </Text>
+                </View>
+                {showEmailLoading ? (
+                  <SkeletonPlaceholder>
+                    <View style={styles.profileFieldSkeleton} />
+                  </SkeletonPlaceholder>
+                ) : (
                   <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
+                    style={styles.editableRow}
                     accessible={false}
                     importantForAccessibility="no"
                   >
                     <View
-                      style={{flexDirection: "column", paddingVertical: Padding.p_5xs, justifyContent: "center", paddingHorizontal: Padding.p_xl, alignSelf: "stretch", marginBottom: Padding.p_base }}
-                     accessible={false}
-                     importantForAccessibility="no"
+                      style={[
+                        styles.editableContent,
+                        { marginBottom: Padding.p_9xs },
+                      ]}
+                      accessible={false}
+                      importantForAccessibility="no"
                     >
-                      <Text style={styles.firstName} accessible={true} accessibilityRole="text" accessibilityLabel="Email Address">Email Address</Text>
-                      {showEmailLoading ? (
-                        <SkeletonPlaceholder>
-                          <View style={{ width: 200, height: 20, borderRadius: 4 }} />
-                        </SkeletonPlaceholder>
-                      ) : (
-                        <Text style={[styles.melissa, styles.melissaTypo]} accessible={true} accessibilityRole="text" accessibilityLabel={`Email Address: ${emailAddress || "N/A"}`}>
-                          {emailAddress || "N/A"}
-                        </Text>
-                      )}
-                      
+                      <Text
+                        style={styles.firstName}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel="Email Address"
+                      >
+                        Email Address
+                      </Text>
+                      <Text
+                        style={[styles.melissa, styles.melissaTypo]}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel={`Email Address: ${
+                          emailAddress || "N/A"
+                        }`}
+                      >
+                        {emailAddress || "N/A"}
+                      </Text>
                     </View>
                     <Pressable
-                      style={{
-                        justifyContent: "flex-end",
-                        paddingRight: Padding.p_base,
-                      }}
+                      style={styles.editButton}
                       onPress={() => handleArrowPress("email")}
                       accessible={true}
                       accessibilityRole="button"
@@ -343,63 +371,59 @@ const ProfileSettings = () => {
                   </View>
                 )}
 
-                {showPhoneLoading && (
-                  <SkeletonPlaceholder
-                    style={{ paddingVertical: Padding.p_base }}
-                  >
-                    <View
-                      style={{
-                        margin: Padding.p_base,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <View
-                        style={{ width: 320, height: 40, borderRadius: 4 }}
-                      />
-                    </View>
-                  </SkeletonPlaceholder>
-                )}
-                {phoneNumber && (
+                {phoneNumber ? (
                   <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
+                    style={styles.editableRow}
+                    accessible={false}
+                    importantForAccessibility="no"
                   >
                     <View
                       style={[
-                        styles.firstNameParent,
-                        { marginBottom: Padding.p_base },
+                        styles.editableContent,
+                        { marginBottom: Padding.p_9xs },
                       ]}
-                      
+                      accessible={false}
+                      importantForAccessibility="no"
                     >
-                      <Text style={styles.firstName}>Mobile Number</Text>
-                      <Text style={[styles.melissa, styles.melissaTypo]} accessible={true}
-                      accessibilityLabel={`Mobile number ${
-                        phoneNumber
-                          ? numberToWordsForAccessibility(phoneNumber)
-                          : "N/A"
-                      }`}
-                       accessibilityRole="text">
-                        {phoneNumber}
+                      <Text
+                        style={styles.firstName}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel="Mobile Number"
+                      >
+                        Mobile Number
+                      </Text>
+
+                      <Text
+                        style={[styles.melissa, styles.melissaTypo]}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel={`Mobile Number: ${
+                          phoneNumber
+                            ? numberToWordsForAccessibility(phoneNumber.toString())
+                            : "N/A"
+                        }`}
+                      >
+                        {phoneNumber || "N/A"}
                       </Text>
                     </View>
                     <Pressable
-                      style={{
-                        justifyContent: "flex-end",
-                        paddingRight: Padding.p_base,
-                      }}
+                      style={styles.editButton}
                       onPress={() => handleArrowPress("mobile")}
                       accessible={true}
                       accessibilityRole="button"
                       accessibilityLabel="Edit mobile number"
+                      accessibilityHint="Double tap to edit your mobile number"
                     >
                       <Vector />
                     </Pressable>
                   </View>
+                ) : (
+                  showPhoneLoading && (
+                    <SkeletonPlaceholder>
+                      <View style={styles.profileFieldSkeleton} />
+                    </SkeletonPlaceholder>
+                  )
                 )}
               </View>
             </View>
@@ -422,25 +446,37 @@ const ProfileSettings = () => {
                 </Text>
               </View>
               <View style={styles.frameContainer}>
-                <View style={styles.firstNameParent} >
+                <View style={styles.firstNameParent}>
                   <Text style={styles.firstName}>{"Service Address"}</Text>
                   <Text
-                    style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}
+                    style={[
+                      styles.melissa,
+                      styles.melissaTypo,
+                      { lineHeight: 20, marginTop: 4 },
+                    ]}
                     accessible={true}
                     accessibilityRole="text"
-                    accessibilityLabel={` ${formatAddressForAccessibility(serviceAddress())}`}
-                  > 
+                    accessibilityLabel={` ${formatAddressForAccessibility(
+                      serviceAddress(),
+                    )}`}
+                  >
                     {serviceAddress() || "N/A"}
                   </Text>
                 </View>
-                <View style={styles.firstNameParent} >
+                <View style={styles.firstNameParent}>
                   <Text style={styles.firstName}>Billing Address</Text>
                   <Text
-                    style={[styles.melissa, styles.melissaTypo, { lineHeight: 20, marginTop: 4 }]}
+                    style={[
+                      styles.melissa,
+                      styles.melissaTypo,
+                      { lineHeight: 20, marginTop: 4 },
+                    ]}
                     accessible={true}
                     accessibilityRole="text"
-                    accessibilityLabel={` ${formatAddressForAccessibility(billingAddress())}`}
-                  > 
+                    accessibilityLabel={` ${formatAddressForAccessibility(
+                      billingAddress(),
+                    )}`}
+                  >
                     {billingAddress() || "N/A"}
                   </Text>
                 </View>
@@ -655,6 +691,32 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: Padding.p_xl,
     alignSelf: "stretch",
+  },
+  editableRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  editableContent: {
+    flex: 1,
+    minWidth: 0,
+    paddingVertical: Padding.p_5xs,
+    justifyContent: "center",
+    paddingHorizontal: Padding.p_xl,
+  },
+  editButton: {
+    width: 44,
+    height: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: Padding.p_base,
+  },
+  profileFieldSkeleton: {
+    height: 40,
+    width: "90%",
+    marginHorizontal: Padding.p_base,
+    marginBottom: Padding.p_base,
+    borderRadius: 5,
   },
   text: {
     color: Color.success700,

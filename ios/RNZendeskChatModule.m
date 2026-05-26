@@ -163,10 +163,10 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
     } else {
       // Prod mapping (existing behavior)
       if (metadata[@"userAgent"])        {fields[@"29542407930903"] = metadata[@"userAgent"];}
-      if (metadata[@"appVersion"])       {fields[@"29542536141335"] = metadata[@"appVersion"];}
+      if (metadata[@"appVersion"])       {fields[@"35417538078103"] = metadata[@"appVersion"];}
       if (metadata[@"timezoneOffsetId"]) {fields[@"29542663925271"] = metadata[@"timezoneOffsetId"];}
       if (metadata[@"platform"])         {fields[@"29542734993559"] = metadata[@"platform"];}
-      if (metadata[@"locationHrefId"])   {fields[@"29230394216983"] = metadata[@"locationHrefId"];}
+      if (metadata[@"locationHrefId"])   {fields[@"29542765557655"] = metadata[@"locationHrefId"];}
       if (metadata[@"ipAddress"])        {fields[@"29542809023767"] = metadata[@"ipAddress"];}
       if (metadata[@"firstName"])        {fields[@"360004035014"] = metadata[@"firstName"];}
       if (metadata[@"lastName"])         {fields[@"360003976113"] = metadata[@"lastName"];}
@@ -176,8 +176,9 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
       if (metadata[@"userName"])         {fields[@"29542395738007"] = metadata[@"userName"];}
       if (metadata[@"customerType"])     {fields[@"29542894274711"] = metadata[@"customerType"];}
       if (metadata[@"authLevel"])        {fields[@"29542032223895"] = metadata[@"authLevel"];}
-      if (metadata[@"mobileApp"])        {fields[@"29542765557655"] = metadata[@"mobileApp"];}
+      //if (metadata[@"mobileApp"])        {fields[@"29542765557655"] = metadata[@"mobileApp"];}
       if (metadata[@"jwtId"])            {fields[@"29542045878167"] = metadata[@"jwtId"];}
+      if (metadata[@"source"])          { fields[@"40559477171223"] = metadata[@"source"]; }
     }
     [[Zendesk instance].messaging setConversationFields:fields];
     NSError *jsonError = nil;

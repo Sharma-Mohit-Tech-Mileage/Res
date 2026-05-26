@@ -31,7 +31,8 @@ import VersionCheck from "react-native-version-check";
 import DeviceInfo from "react-native-device-info";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import { loginWithJWT, setConversationalFields, } from "../utility/RNZendeskChat";
-import { get } from "node_modules/axios/index.cjs";
+import { useFeatureFlag } from "../../contexts/Featureflagscontext";
+import FeatureFlags from "../../config/Featureflags";
 
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
@@ -78,6 +79,7 @@ const NewBillerHome = ({ navigation }) => {
   const isMobilePilotEnabled = useSelector(
     (state) => state.user.userData?.userInfo?.pending_activation === true
   );
+  const showChatIcon = useFeatureFlag(FeatureFlags.DASHBOARD_CHAT_ICON, true);
 
   const showDisconnectedBanner = userInfo
     ? isAccountDisconnected(
@@ -153,8 +155,10 @@ const NewBillerHome = ({ navigation }) => {
         pastPaymentDue: accountDetails.past_due_amount,
         email: getPrimaryEmail(accountDetails),
       });
+      const firstName = accountDetails.first_name || "";
+      const lastName = accountDetails.last_name || "";
       DeviceInfo.getUserAgent().then((userAgent) => {
-        loginWithToken(userAgent);
+        loginWithToken(userAgent, firstName, lastName);
       });
     }
   }, [accountDetails]);
@@ -272,15 +276,15 @@ const NewBillerHome = ({ navigation }) => {
             email: defaultPaymentDetails.email || "",
             firstName: firstName || "",
             lastName: lastName || "",
-            name: '',
-             phone: phoneNumber || "",
+            name: `${firstName || ""} ${lastName || ""}`.trim(),
+            phone: phoneNumber || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
             authLevel: user?.userInfo.authLevel,
             mobileApp: "mobileApp",
             jwtId: jwtToken,
-            source: "Mobile",
+            source: "Mobile App",
           };
 
           loginWithJWT(jwtToken)
@@ -449,9 +453,11 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
-      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-        <ZendeskChatIcon />
-      </View>
+      {showChatIcon && (
+        <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+          <ZendeskChatIcon />
+        </View>
+      )}
       <View style={{ flex: 1 }}>
         <SafeAreaView
           style={{ flex: 1 }}

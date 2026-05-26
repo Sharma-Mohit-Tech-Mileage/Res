@@ -26,6 +26,9 @@ const DEFAULT_MAINTENANCE = {
 
 const DEFAULT_FEATURES = {
   dashboard: {
+    all_users: {
+      chat_icon: true,
+    },
     pending_activation: {
       show_sparklight_mobile_section: true
     }
