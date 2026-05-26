@@ -153,8 +153,10 @@ const NewBillerHome = ({ navigation }) => {
         pastPaymentDue: accountDetails.past_due_amount,
         email: getPrimaryEmail(accountDetails),
       });
+      const firstName = accountDetails.first_name || "";
+      const lastName = accountDetails.last_name || "";
       DeviceInfo.getUserAgent().then((userAgent) => {
-        loginWithToken(userAgent);
+        loginWithToken(userAgent, firstName, lastName);
       });
     }
   }, [accountDetails]);
@@ -272,7 +274,7 @@ const NewBillerHome = ({ navigation }) => {
             email: defaultPaymentDetails.email || "",
             firstName: firstName || "",
             lastName: lastName || "",
-            name: '',
+            name: `${firstName || ""} ${lastName || ""}`.trim(),
              phone: phoneNumber || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
@@ -280,7 +282,7 @@ const NewBillerHome = ({ navigation }) => {
             authLevel: user?.userInfo.authLevel,
             mobileApp: "mobileApp",
             jwtId: jwtToken,
-            source: "Mobile",
+            source: "Mobile App",
           };
 
           loginWithJWT(jwtToken)
