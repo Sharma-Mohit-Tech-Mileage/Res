@@ -13,8 +13,12 @@ import {
   initChat,
   startChat,
 } from "../utility/RNZendeskChat";
+import { useFeatureFlag } from "../../contexts/Featureflagscontext";
+import FeatureFlags from "../../config/Featureflags";
 
 const ZendeskChatIcon = () => {
+
+  const isChatFeatureEnabled = useFeatureFlag(FeatureFlags.DASHBOARD_CHAT_ICON);
   const handleChatPress = () => {
     if (Platform.OS === "ios") {
       startChat();
@@ -23,15 +27,14 @@ const ZendeskChatIcon = () => {
     }
   };
 
-  return (
+  return isChatFeatureEnabled ? (
     <Pressable
-      style={[styles.pressable ]}
+      style={[styles.pressable]}
       onPress={handleChatPress}
       accessible={true}
       accessibilityLabel="Chat with support"
       accessibilityHint="Opens the chat support screen"
       accessibilityRole="button"
-      
     >
       <LottieView
         source={animationSource}
@@ -40,8 +43,7 @@ const ZendeskChatIcon = () => {
         style={{ width: 40, height: 30 }}
       />
     </Pressable>
-    
-  );
+  ) : null;
 };
 
 const styles = StyleSheet.create({

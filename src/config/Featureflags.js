@@ -3,6 +3,7 @@ import Config from 'react-native-config';
 export const FeatureFlags = {
   DASHBOARD_SPARKLIGHT_MOBILE_SECTION: 'dashboard.pending_activation.show_sparklight_mobile_section',
   DASHBOARD_NEW_LAYOUT: 'dashboard.all_users.show_new_dashboard',
+  DASHBOARD_CHAT_ICON: 'dashboard.all_users.chat_icon',
   TABS_SERVICES_VISIBLE: 'tabs.services.visible',
   TABS_BILLING_HIDDEN: 'tabs.billing.hidden',
   BILLING_AUTOPAY: 'tabs.billing.enable_autopay',
@@ -20,6 +21,11 @@ export const FeatureFlagMetadata = {
   [FeatureFlags.DASHBOARD_NEW_LAYOUT]: {
     description: 'Enable new dashboard layout for all users',
     defaultValue: false,
+    affectedUsers: ['ALL'],
+  },
+  [FeatureFlags.DASHBOARD_CHAT_ICON]: {
+    description: 'Show chat icon in dashboard',
+    defaultValue: true,
     affectedUsers: ['ALL'],
   },
   [FeatureFlags.TABS_SERVICES_VISIBLE]: {
