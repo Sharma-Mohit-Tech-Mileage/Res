@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback } from "react";
 import {
   Platform,
   StyleSheet,
@@ -13,12 +13,26 @@ import {
   initChat,
   startChat,
 } from "../utility/RNZendeskChat";
-import { useFeatureFlag } from "../../contexts/Featureflagscontext";
+import {
+  useFeatureFlag,
+  useFeatureRefresh,
+} from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import { useFocusEffect } from "@react-navigation/native";
 
 const ZendeskChatIcon = () => {
-
+  const refreshFeatureFlags = useFeatureRefresh();
   const isChatFeatureEnabled = useFeatureFlag(FeatureFlags.DASHBOARD_CHAT_ICON);
+
+  useFocusEffect(
+    useCallback(() => {
+      // Re-check remote config whenever the current tab/screen is focused.
+      refreshFeatureFlags().catch((error) => {
+        console.warn("Error refreshing feature flags for chat icon", error);
+      });
+    }, [refreshFeatureFlags])
+  );
+
   const handleChatPress = () => {
     if (Platform.OS === "ios") {
       startChat();
