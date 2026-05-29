@@ -13,7 +13,7 @@ import LoadingSpinner from './LoadingSpinner';
 import { getUser } from '../../redux/utils/LocalStorage';
 import NetInfo from '@react-native-community/netinfo';
 import { setAuthCookiesOnAllDomains, clearAuthCookies } from './NativeCookieManager';
-import { logError, logWarn, logDiag } from '../../utils/logger';
+import { logError } from '../../utils/logger';
 import { getPrimaryEmail } from './constant';
 import analytics from '@react-native-firebase/analytics';
 import CryptoJS from 'crypto-js';
@@ -47,6 +47,15 @@ const toBillingAddress = (a) => {
         State:         a.state || '',
         ZipCode1:      a.zip || a.postal_code || a.zip_code || '',
     };
+};
+
+// Portal code reads `userInfoAny?.service_address || userInfoAny?.serviceAddress` off the parsed
+// `user_info` localStorage value (the Orbipay widget host's fallback path). Our app's `userInfo`
+// doesn't carry it, so we merge `accountDetails.service_address` in just before injection.
+// Aliased to both keys (snake_case + camelCase) so whichever name the portal reads, it lands.
+const userInfoWithServiceAddress = (userInfo, ad) => {
+    const sa = ad?.service_address || null;
+    return { ...(userInfo || {}), service_address: sa, serviceAddress: sa };
 };
 
 // Once the user lands on a success/confirmation page, the next navigation away (e.g., the portal's
@@ -89,19 +98,24 @@ const isLoginUrl = (u) => {
 // Utf8.parse(atob(pci_keyVal)), which equals the decoded ENCRYPT_VAL_PASSWORD here. A key mismatch
 // makes the portal's decrypt throw "Malformed UTF-8 data", so we self-check via a decrypt round-trip.
 const PORTAL_FORM_KEY = Config.ENCRYPT_VAL_PASSWORD;
-const buildEncryptedAccountBlob = (accountNo, form) => {
+const buildEncryptedAccountBlob = (accountNo, form, custInfo) => {
     if (!accountNo) return '';
     try {
         const key = CryptoJS.enc.Utf8.parse(PORTAL_FORM_KEY);
         const cfg = { keySize: 16, iv: key, mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 };
-        const plain = JSON.stringify({ Form: form });
+        // Encrypted blob shape mirrors what the portal expects: { Form, CustInfo }.
+        // CustInfo is a Form-sibling the portal reads as a fallback (e.g. PaymentMethodsComponent's
+        // `localAccountInfo?.CustInfo?.email` chain). Sourced from the same paymentObj so the two
+        // stay in sync without a second data fetch.
+        const payload = custInfo ? { Form: form, CustInfo: custInfo } : { Form: form };
+        const plain = JSON.stringify(payload);
         const blob = CryptoJS.AES.encrypt(plain, key, cfg).toString();
         let roundtripOk = false;
         try {
             roundtripOk = CryptoJS.AES.decrypt(blob, key, cfg).toString(CryptoJS.enc.Utf8) === plain;
         } catch (_) {}
         if (!roundtripOk) {
-            logError(`${TAG} buildEncryptedAccountBlob`, 'round-trip FAILED — check ENCRYPT_VAL_PASSWORD vs portal pci_keyVal');
+            logError(`${TAG} buildEncryptedAccountBlob`, 'roundtrip failed; verify ENCRYPT_VAL_PASSWORD');
         }
         return blob;
     } catch (e) {
@@ -182,7 +196,7 @@ const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp, paymentObj
         } catch(e) {}
         try { ${buildCookieJS(idToken, accountNo)} } catch(e) {}
 
-        // Statement PDFs arrive as base64 fileBinary in an XHR JSON response — hand it to the native viewer.
+        // Statement PDFs arrive as base64 fileBinary in an XHR JSON response — hand to native viewer.
         var _xs = XMLHttpRequest.prototype.send;
         XMLHttpRequest.prototype.send = function() {
             var self = this;
@@ -320,20 +334,20 @@ const ArticleWindowUtility = ({ navigation, route }) => {
             };
             // Same fields feed both read-paths; customer_type alias matches SubNavComponent's Form shape.
             accountNoRef.current = userInfo.accountNumber || '';
-            accountBlobRef.current = buildEncryptedAccountBlob(accountNoRef.current, { ...paymentObj, customer_type: paymentObj.CustomerType });
-            // One-shot diag for the autopay fields specifically — easypayacc in ManageAutopay
-            // requires Form.EasyPayId to be non-empty AND to match an acc.id in getFundingAccounts.
-            // Showing both the Redux source (ep) and what we end up injecting so a mismatch is obvious.
-            // Also surfaces the mapped BillingAddress so you can confirm the ACP API sub-field names
-            // mapped through correctly (empty strings = mapper missed the source field name).
-            logDiag(`${TAG} autopayFields`, {
-                accountNo: accountNoRef.current,
-                ep_isEasyPay: ep.isEasyPay,
-                ep_easyPayId: ep.easyPayId,
-                injected_EasyPayId: paymentObj.EasyPayId,
-                injected_EasyPayEnabled: paymentObj.EasyPayEnabled,
-                injected_BillingAddress: paymentObj.BillingAddress,
-            });
+            // CustInfo: Form-sibling the portal reads as a fallback (PaymentMethodsComponent does
+            // `localAccountInfo?.CustInfo?.email` ?? ...). Mirrors what Form already has so the
+            // portal can pick whichever side it prefers without us re-fetching anything.
+            const custInfo = {
+                email:     paymentObj.Email,
+                firstName: paymentObj.FirstName,
+                lastName:  paymentObj.LastName,
+                address:   paymentObj.BillingAddress,
+            };
+            accountBlobRef.current = buildEncryptedAccountBlob(
+                accountNoRef.current,
+                { ...paymentObj, customer_type: paymentObj.CustomerType },
+                custInfo,
+            );
             return JSON.stringify(paymentObj);
         } catch (e) {
             logError(`${TAG} buildPaymentObjJson`, e.message);
@@ -353,7 +367,8 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const refreshInjectionScript = useCallback(async () => {
         const cu = await getUser();
         const accountNo = injectPaymentObj ? (accountNoRef.current || cu?.userInfo?.accountNumber || '') : '';
-        setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp, paymentObjJsonRef.current || '', easyPayInfoJsonRef.current || '', accountNo, accountBlobRef.current || ''));
+        const userInfoOut = userInfoWithServiceAddress(cu?.userInfo, accountDetailsRef.current);
+        setInjectionScript(buildInjectionScript(cu?.token || '', userInfoOut, cu?.idToken || '', cu?.jwtTimestamp, paymentObjJsonRef.current || '', easyPayInfoJsonRef.current || '', accountNo, accountBlobRef.current || ''));
     }, [injectPaymentObj]);
 
     const prepareInjectionScript = useCallback(async () => {
@@ -372,7 +387,8 @@ const ArticleWindowUtility = ({ navigation, route }) => {
             const paymentObjJson = await ensurePaymentObjJson();
             const accountNo = injectPaymentObj ? (accountNoRef.current || cu?.userInfo?.accountNumber || '') : '';
             await setAuthCookiesOnAllDomains(cu?.idToken || '', accountNo);
-            setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp, paymentObjJson, easyPayInfoJsonRef.current || '', accountNo, accountBlobRef.current || ''));
+            const userInfoOut = userInfoWithServiceAddress(cu?.userInfo, accountDetailsRef.current);
+            setInjectionScript(buildInjectionScript(cu?.token || '', userInfoOut, cu?.idToken || '', cu?.jwtTimestamp, paymentObjJson, easyPayInfoJsonRef.current || '', accountNo, accountBlobRef.current || ''));
             setWebViewReady(true);
         } catch (e) {
             logError(`${TAG} prepareInjectionScript`, e.message);
@@ -584,7 +600,6 @@ const ArticleWindowUtility = ({ navigation, route }) => {
 
     const onShouldStartLoadWithRequest = useCallback((request) => {
         const reqUrl = request.url || '';
-        logDiag(`${TAG}`, { event: 'nav', url: reqUrl, isTopFrame: request.isTopFrame });
 
         // Only act on top-frame navigation. Subframe (iframe) loads — e.g. the Orbipay funding-
         // account widget embedded in manage-autopay — must pass through; otherwise our exit
@@ -634,7 +649,6 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         const u = navState?.url || '';
         // navState.url is the top-document URL — iframe loads (Orbipay widget) don't update it,
         // so this hook is naturally safe from the subframe issue that onShouldStartLoadWithRequest had.
-        if (u) logDiag(`${TAG}`, { event: 'navState', url: u, loading: !!navState?.loading });
         // Same exit rules as onShouldStartLoadWithRequest, for Angular SPA pushState/routerLink navs
         // that don't trigger the shouldStartLoad hook.
         if (u && (isOverviewPage(u) || isLoginUrl(u))) {
@@ -675,14 +689,14 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     }, [isPortalUrl, injectIdTokenOnly, isOnPaymentDomain]);
 
     const onError = useCallback(({ nativeEvent }) => {
-        logError(`${TAG} WebView error`, `${nativeEvent.description || 'Unknown'} | ${currentUrlRef.current}`);
+        logError(`${TAG} WebView error`, nativeEvent.description || 'unknown');
         setIsError(true);
         setContentLoaded(true);
         setErrorMessage(`Loading error: ${nativeEvent.description || 'Unknown error'}`);
     }, []);
 
     const onHttpError = useCallback(({ nativeEvent }) => {
-        logError(`${TAG} HTTP error`, `${nativeEvent.statusCode} | ${nativeEvent.url}`);
+        logError(`${TAG} HTTP error`, String(nativeEvent.statusCode));
         if (nativeEvent.statusCode === 404) {
             setIsError(true); setContentLoaded(true);
             setErrorMessage('Page not found. Please verify your account has access to this feature.');
