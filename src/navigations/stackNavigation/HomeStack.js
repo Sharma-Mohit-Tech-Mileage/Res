@@ -2,7 +2,6 @@ import React, { Suspense } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NewBillerHome from "../../components/home/NewBillerHome";
 import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
-import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
 import { ActivityIndicator } from "react-native";
 
 const HomeStack = createNativeStackNavigator();
@@ -32,11 +31,6 @@ function HomeStackScreen() {
         }}
       />
 
-      <HomeStack.Screen
-        name="AutoPayPCIConnector"
-        component={AutoPayPCIConnector}
-        options={{ headerShown: false }}
-      />
     </HomeStack.Navigator>
   );
 }

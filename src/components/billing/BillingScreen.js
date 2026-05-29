@@ -228,13 +228,10 @@ const BillingScreen = ({ navigation }) => {
                       minSize={0}
                       style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
                       onPress={() => {
-                        navigation.navigate("AutoPayPCIConnector", {
-                          url: Config.PAY_METHOD,
+                        navigation.navigate("ArticleWindowUtility", {
+                          url: `${Config.PORTAL_BASE_URL}/portals/billing-payment`,
                           name: "Manage Payment Method",
-                          useNewPayment: true,
-                          status: isAutoPayStatus,
-                          paymentDetails: defaultPaymentDetails,
-                          customPaymentUrl: Config.PAY_METHOD,
+                          injectPaymentObj: true,
                         });
                       }}
                       accessible={true}

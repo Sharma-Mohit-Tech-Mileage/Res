@@ -5,8 +5,7 @@ const TAG = '[NativeCookieManager]';
 
 const COOKIE_DOMAIN = Config.COOKIE_DOMAIN;
 const PORTAL_URL = Config.PORTAL_BASE_URL;
-const PCI_URL = Config.PAYMENT_BASE_URL;
-const COOKIE_URLS = [PORTAL_URL, PCI_URL];
+const COOKIE_URLS = [PORTAL_URL];
 
 const longExpiry = () => new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
 const shortExpiry = () => new Date(Date.now() + 5 * 60 * 1000).toISOString();
@@ -14,9 +13,9 @@ const shortExpiry = () => new Date(Date.now() + 5 * 60 * 1000).toISOString();
 const setCookie = (url, name, value, expires) =>
     CookieManager.set(url, { name, value, domain: COOKIE_DOMAIN, path: '/', expires, secure: true, sameSite: 'lax' });
 
-export const dumpCookies = async () => {};
-
-export const setAuthCookiesOnAllDomains = async (idToken) => {
+// idToken expires in ~5 min; AccountNo is long-lived and doubles as the localStorage key for the
+// encrypted Form blob. AccountNo must be JS-readable (the portal reads it via cookieService.get).
+export const setAuthCookiesOnAllDomains = async (idToken, accountNumber = '') => {
     try {
         const long = longExpiry();
         const short = shortExpiry();
@@ -26,6 +25,7 @@ export const setAuthCookiesOnAllDomains = async (idToken) => {
             promises.push(setCookie(url, 'CustomerType', 'Residential', long));
             promises.push(setCookie(url, 'LatestVersion', 'true', long));
             if (idToken) promises.push(setCookie(url, 'IdToken', idToken, short));
+            if (accountNumber) promises.push(setCookie(url, 'AccountNo', String(accountNumber), long));
         }
         await Promise.all(promises);
     } catch (e) {

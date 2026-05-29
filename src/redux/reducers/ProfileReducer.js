@@ -14,6 +14,7 @@ import {
   SAVE_USER_ACCOUNT_SERVICE,
   SET_PAPERLESS_STATUS,
   GET_PAPERLESS_STATUS,
+  SAVE_EASYPAY_STATUS,
 } from "../constants/index";
 
 const initialState = {
@@ -29,6 +30,7 @@ const initialState = {
   paperlessStatusAcp: undefined,
   accountDetails: {},
   accountDetailsFetchedAt: null,
+  easyPay: { isEasyPay: false, easyPayId: "", fetchedAt: 0 },
   erro: "",
 };
 
@@ -107,6 +109,11 @@ const ProfileReducer = (state = initialState, action) => {
         isLoading: false,
         accountDetails: action.payload,
         accountDetailsFetchedAt: Date.now(),
+      };
+    case SAVE_EASYPAY_STATUS:
+      return {
+        ...state,
+        easyPay: { ...action.payload, fetchedAt: Date.now() },
       };
     case INVALIDATE_ACCOUNT_CACHE:
       return {

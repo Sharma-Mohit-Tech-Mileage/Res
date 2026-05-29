@@ -388,12 +388,10 @@ const NewBillerHome = ({ navigation }) => {
             buttonVariant={isAutoPayStatus ? "success" : "primary"}
             isActive={isAutoPayStatus}
             onButtonPress={() => {
-              navigation.navigate("AutoPayPCIConnector", {
-                url: `${Config.URL}/billing`,
+              navigation.navigate("ArticleWindowUtility", {
+                url: `${Config.PORTAL_BASE_URL}/portals/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
                 name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-                useNewPayment: true,
-                status: isAutoPayStatus,
-                paymentDetails: defaultPaymentDetails,
+                injectPaymentObj: true,
               });
             }}
           />

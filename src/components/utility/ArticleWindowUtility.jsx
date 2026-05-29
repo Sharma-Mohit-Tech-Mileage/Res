@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, Platform, AppState, Animated, Alert } from 'react-native';
+import { View, Text, StyleSheet, Platform, AppState, Alert } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchACPUserAccountDetails } from '../../redux/actions/ProfileActionSuite';
+import { fetchACPUserAccountDetails, fetchEasyPayStatus } from '../../redux/actions/ProfileActionSuite';
 import { RefreshToken } from '../user/Session';
 import Config from 'react-native-config';
 import PDFViewModal from './PDFViewModal';
@@ -12,69 +12,166 @@ import LoadingOverlay from '../common/customui/LoadingOverlay';
 import LoadingSpinner from './LoadingSpinner';
 import { getUser } from '../../redux/utils/LocalStorage';
 import NetInfo from '@react-native-community/netinfo';
-import { setAuthCookiesOnAllDomains, dumpCookies, clearAuthCookies } from './NativeCookieManager';
-import { logError, logWarn } from '../../utils/logger';
-import { Border } from '../../../GlobalStyles';
+import { setAuthCookiesOnAllDomains, clearAuthCookies } from './NativeCookieManager';
+import { logError, logWarn, logDiag } from '../../utils/logger';
+import { getPrimaryEmail } from './constant';
+import analytics from '@react-native-firebase/analytics';
+import CryptoJS from 'crypto-js';
 
 const TAG = '[ArticalWindow]';
 const JS_COOKIE_DOMAIN = Config.COOKIE_DOMAIN;
-const REFRESH_INTERVAL_MS = 4 * 60 * 1000; 
+// localStorage key the portal reads the (unencrypted) payment object from on billing pages.
+const PAYMENT_OBJ_STORAGE_KEY = 'paymentObj';
+// localStorage key SubNavComponent reads EasyPay status from (autopay routing + EasyPayId/EasyPayEnabled).
+const EASYPAY_INFO_STORAGE_KEY = 'easyPayInfo';
+const REFRESH_INTERVAL_MS = 4 * 60 * 1000;
+
+// Session/billing data is ONLY ever injected on these hosts (the portal + payment domains).
+// Article/support/legal links share this WebView but must never receive the session.
+const hostOf = (u) => { const m = /^https?:\/\/([^/]+)/i.exec(u || ''); return m ? m[1].toLowerCase() : ''; };
+const TRUSTED_HOSTS = [hostOf(Config.PORTAL_BASE_URL), hostOf(Config.PAYMENT_BASE_URL)].filter(Boolean);
+const TRUSTED_HOSTS_JS = JSON.stringify(TRUSTED_HOSTS);
+
 const safeForJS = (val) => JSON.stringify(String(val || '')).slice(1, -1);
 
-const tokenPreview = (t) => {
-    if (!t) return '(none)';
-    const s = String(t);
-    if (s.length <= 16) return s.substring(0, 4) + '…';
-    return s.substring(0, 8) + '…' + s.substring(s.length - 4);
+// Maps the ACP API's address shape (whatever variant it returns) into the PascalCase shape the
+// portal's UtilsService.formatAddress(addressInfo) expects:
+//   Address_line1 + Address_line2 + City + State + ZipCode1.
+// We accept several source-field naming variants so a small API rename doesn't silently empty this.
+const toBillingAddress = (a) => {
+    if (!a || typeof a !== 'object') return {};
+    return {
+        Address_line1: a.address_line_1 || a.addressLine1 || a.line1 || a.address1 || '',
+        Address_line2: a.address_line_2 || a.addressLine2 || a.line2 || a.address2 || '',
+        City:          a.city || '',
+        State:         a.state || '',
+        ZipCode1:      a.zip || a.postal_code || a.zip_code || '',
+    };
 };
 
-const logStorageSnapshot = async (caller) => {
+// Once the user lands on a success/confirmation page, the next navigation away (e.g., the portal's
+// "Back to Billing" link) closes the WebView and returns to the mobile app instead of dropping them
+// on the portal overview. Matched broadly by substring because the exact path varies by env (UAT vs
+// prod), profile (Residential vs Business), and flow (payment-confirmation, deactivate-confirmation,
+// activate-confirmation, thankyou). Both branches share "confirmation" / "thankyou" in the path.
+const isSuccessPage = (u) => {
+    if (!u) return false;
+    const s = u.toLowerCase();
+    return s.includes('confirmation') || s.includes('thankyou');
+};
+
+// The portal's billing overview (e.g. /portals/billing, /portals/app-secure/billing) is owned by
+// the mobile app — the WebView only handles action pages (make-payment, billing-payment, *-autopay).
+// Any navigation that lands on the overview (the destination of Cancel and of any "Back to Billing"
+// link) means the user is exiting the flow, so close the WebView instead of letting the portal load
+// the overview and run its own login/auth logic. Path ends with /billing exactly — won't match
+// /billing-payment or /billing-statement.
+const isOverviewPage = (u) => {
+    if (!u) return false;
+    const path = u.split('?')[0].split('#')[0].toLowerCase();
+    return /\/billing\/?$/.test(path);
+};
+
+// Any login URL — the portal's own `/SecureLoginSSO` entry, the SSO IdP at any host
+// (login.* / canary-login.*), or the configured Config.SSO_LOGIN — means the user is being asked
+// to re-authenticate. That happens when the portal's Cancel button clears state and its `/billing`
+// route guard synchronously redirects (so the overview guard never sees `/billing`). Bring them
+// back to the mobile app; the next opening will inject fresh tokens and load directly.
+const isLoginUrl = (u) => {
+    if (!u) return false;
+    const s = u.toLowerCase();
+    return s.includes('/secureloginsso')
+        || s.includes('/auth/realms/external-sso-realm')
+        || (Config.SSO_LOGIN && s.includes(Config.SSO_LOGIN.toLowerCase()));
+};
+
+// Mirrors the portal's UtilsService.encryptWithCryptoJS EXACTLY: AES-ECB / Pkcs7 with key = iv =
+// Utf8.parse(atob(pci_keyVal)), which equals the decoded ENCRYPT_VAL_PASSWORD here. A key mismatch
+// makes the portal's decrypt throw "Malformed UTF-8 data", so we self-check via a decrypt round-trip.
+const PORTAL_FORM_KEY = Config.ENCRYPT_VAL_PASSWORD;
+const buildEncryptedAccountBlob = (accountNo, form) => {
+    if (!accountNo) return '';
     try {
-        const cu = await getUser();
-        const jwtAge = cu?.jwtTimestamp ? Date.now() - cu.jwtTimestamp : '?';
-        const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?';
+        const key = CryptoJS.enc.Utf8.parse(PORTAL_FORM_KEY);
+        const cfg = { keySize: 16, iv: key, mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 };
+        const plain = JSON.stringify({ Form: form });
+        const blob = CryptoJS.AES.encrypt(plain, key, cfg).toString();
+        let roundtripOk = false;
+        try {
+            roundtripOk = CryptoJS.AES.decrypt(blob, key, cfg).toString(CryptoJS.enc.Utf8) === plain;
+        } catch (_) {}
+        if (!roundtripOk) {
+            logError(`${TAG} buildEncryptedAccountBlob`, 'round-trip FAILED — check ENCRYPT_VAL_PASSWORD vs portal pci_keyVal');
+        }
+        return blob;
     } catch (e) {
-        logWarn(`${TAG} STORAGE [${caller}] read failed:`, e.message);
+        logError(`${TAG} buildEncryptedAccountBlob`, e.message);
+        return '';
     }
 };
 
-const WEBVIEW_STORAGE_DUMP_JS = `(function() {
-    try {
-        var snap = {
-            jwt_token: localStorage.getItem('jwt_token') || null,
-            user_info: localStorage.getItem('user_info') || null,
-            tokenIssuedAt: localStorage.getItem('tokenIssuedAt') || null,
-            cookies: document.cookie || '',
-            origin: location.origin,
-            href: location.href,
-            ts: new Date().toISOString()
-        };
-        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'storageSnapshot', data: snap }));
-    } catch(e) {}
-})(); true;`;
-
-const buildCookieJS = (idToken) => {
+const buildCookieJS = (idToken, accountNo = '') => {
     const safe = safeForJS(idToken);
+    const acct = safeForJS(accountNo);
     return `var _long = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
 var _short = new Date(Date.now() + 5*60*1000).toUTCString();
 var _dom = '; domain=${JS_COOKIE_DOMAIN}';
 document.cookie = 'Source=MobileApp; path=/' + _dom + '; expires=' + _long + '; Secure; SameSite=Lax;';
 document.cookie = 'CustomerType=Residential; path=/' + _dom + '; expires=' + _long + '; Secure; SameSite=Lax;';
 document.cookie = 'LatestVersion=true; path=/' + _dom + '; expires=' + _long + '; Secure; SameSite=Lax;';
-if ('${safe}') document.cookie = 'IdToken=${safe}; path=/' + _dom + '; expires=' + _short + '; Secure; SameSite=Lax;';`;
+if ('${safe}') document.cookie = 'IdToken=${safe}; path=/' + _dom + '; expires=' + _short + '; Secure; SameSite=Lax;';
+if ('${acct}') document.cookie = 'AccountNo=${acct}; path=/' + _dom + '; expires=' + _long + '; Secure; SameSite=Lax;';`;
 };
 
-const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp) => {
+const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp, paymentObjJson = '', easyPayInfoJson = '', accountNo = '', accountBlob = '') => {
     const safeToken = safeForJS(token);
     const safeUserInfo = safeForJS(typeof userInfo === 'string' ? userInfo : JSON.stringify(userInfo || {}));
+    // paymentObjJson is already a JSON string; JSON.stringify wraps it in a safely-escaped JS literal.
+    const paymentObjLine = paymentObjJson
+        ? `try { localStorage.setItem('${PAYMENT_OBJ_STORAGE_KEY}', ${JSON.stringify(paymentObjJson)}); } catch(e) {}`
+        : '';
+    // SubNavComponent reads easyPayInfo for autopay routing + EasyPayId/EasyPayEnabled.
+    const easyPayInfoLine = easyPayInfoJson
+        ? `try { localStorage.setItem('${EASYPAY_INFO_STORAGE_KEY}', ${JSON.stringify(easyPayInfoJson)}); } catch(e) {}`
+        : '';
+    // "Form way": encrypted blob keyed by account number — ManageAutopayComponent reads it (no fallback).
+    const accountBlobLine = (accountNo && accountBlob)
+        ? `try { localStorage.setItem(${JSON.stringify(String(accountNo))}, ${JSON.stringify(accountBlob)}); } catch(e) {}`
+        : '';
 
     return `(function() {
     try {
+        // Never write the session/billing data on untrusted (external) hosts.
+        if (${TRUSTED_HOSTS_JS}.indexOf(location.hostname) === -1) return;
+
         if ('${safeToken}') {
             localStorage.setItem('jwt_token', '${safeToken}');
             localStorage.setItem('user_info', '${safeUserInfo}');
             localStorage.setItem('tokenIssuedAt', '${jwtTimestamp || Date.now()}');
         }
+        ${paymentObjLine}
+        ${easyPayInfoLine}
+        ${accountBlobLine}
+
+        // Some portal flows (e.g. SelectPaymentOptionComponent.handleCancel) call localStorage.clear(),
+        // which would wipe the auth tokens we just injected and bounce the user to the login form.
+        // Override clear() so it preserves the keys we need; portal code can still selectively removeItem.
+        try {
+            var _origClear = localStorage.clear.bind(localStorage);
+            localStorage.clear = function() {
+                var _keep = ['jwt_token', 'user_info', 'tokenIssuedAt', 'easyPayInfo'];
+                var _acct = (document.cookie.match(/(?:^|; )AccountNo=([^;]+)/) || [])[1];
+                if (_acct) _keep.push(_acct);
+                var _saved = {};
+                _keep.forEach(function(k) {
+                    try { var v = localStorage.getItem(k); if (v != null) _saved[k] = v; } catch(e) {}
+                });
+                _origClear();
+                Object.keys(_saved).forEach(function(k) {
+                    try { localStorage.setItem(k, _saved[k]); } catch(e) {}
+                });
+            };
+        } catch(e) {}
 
         try {
             var _expire = 'Thu, 01 Jan 1970 00:00:00 GMT';
@@ -83,26 +180,25 @@ const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp) => {
             document.cookie = 'CustomerType=; path=/; expires=' + _expire + ';';
             document.cookie = 'LatestVersion=; path=/; expires=' + _expire + ';';
         } catch(e) {}
-        try { ${buildCookieJS(idToken)} } catch(e) {}
+        try { ${buildCookieJS(idToken, accountNo)} } catch(e) {}
 
-        var _xo = XMLHttpRequest.prototype.open, _xs = XMLHttpRequest.prototype.send;
-        XMLHttpRequest.prototype.open = function(m, u) {
-            this._url = u;
-            return _xo.apply(this, arguments);
-        };
-        XMLHttpRequest.prototype.send = function(body) {
+        // Statement PDFs arrive as base64 fileBinary in an XHR JSON response — hand it to the native viewer.
+        var _xs = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.send = function() {
             var self = this;
             this.addEventListener('load', function() {
-                if ((self._url.includes('/statements/') || self._url.includes('Statement')) && self.status === 200) {
-                    try {
+                try {
+                    var u = self.responseURL || '';
+                    if ((u.indexOf('/statements/') !== -1 || u.indexOf('Statement') !== -1) && self.status === 200) {
                         var d = JSON.parse(self.response);
-                        if (d.fileBinary) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'pdf', data: d.fileBinary }));
-                    } catch(e) {}
-                }
+                        if (d && d.fileBinary) window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'pdf', data: d.fileBinary }));
+                    }
+                } catch(e) {}
             });
             return _xs.apply(this, arguments);
         };
 
+        // Native pings to confirm the WebView is alive (drives recreation after a long background).
         window.addEventListener('message', function(e) {
             if (e.data === 'PING') {
                 window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'pong' }));
@@ -111,6 +207,7 @@ const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp) => {
             }
         });
 
+        // Preserve in-progress form input across app backgrounding / WebView recreation.
         window.saveFormState = function() {
             var fd = {};
             document.querySelectorAll('input, select, textarea').forEach(function(el, i) {
@@ -122,36 +219,20 @@ const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp) => {
         window.restoreFormState = function() {
             try {
                 var s = localStorage.getItem('formState');
-                if (s) {
-                    var fd = JSON.parse(s);
-                    document.querySelectorAll('input, select, textarea').forEach(function(el, i) {
-                        var sf = fd['field_' + i];
-                        if (sf && el.type !== 'password') el.value = sf.value;
-                    });
-                    var sp = localStorage.getItem('scrollPosition');
-                    if (sp) window.scrollTo(0, parseInt(sp));
-                }
+                if (!s) return;
+                var fd = JSON.parse(s);
+                document.querySelectorAll('input, select, textarea').forEach(function(el, i) {
+                    var sf = fd['field_' + i];
+                    if (sf && el.type !== 'password') el.value = sf.value;
+                });
+                var sp = localStorage.getItem('scrollPosition');
+                if (sp) window.scrollTo(0, parseInt(sp));
             } catch(e) {}
         };
         setInterval(window.saveFormState, 5000);
         if (document.readyState === 'complete') window.restoreFormState();
         else window.addEventListener('load', window.restoreFormState);
-
-        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'injectionComplete' }));
-        // Post back localStorage + cookies immediately after injection for comparison with portal
-        var snap = {
-            jwt_token: localStorage.getItem('jwt_token') || null,
-            user_info: localStorage.getItem('user_info') || null,
-            tokenIssuedAt: localStorage.getItem('tokenIssuedAt') || null,
-            cookies: document.cookie || '',
-            origin: location.origin,
-            href: location.href,
-            ts: new Date().toISOString()
-        };
-        window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'storageSnapshot_postInjection', data: snap }));
-    } catch(e) {
-        console.error('${TAG} Injection error:', e.message);
-    }
+    } catch(e) {}
 })();
 true;`;
 };
@@ -162,151 +243,180 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [url] = useState(route.params?.url);
+    // Only billing pages (make-payment, activate/manage autopay, billing-payment) pass this.
+    const [injectPaymentObj] = useState(route.params?.injectPaymentObj === true);
     const [showPDFModal, setShowPDFModal] = useState(false);
     const [showPDFUrl, setShowPDFUrl] = useState('');
     const [contentLoaded, setContentLoaded] = useState(false);
     const [webViewKey, setWebViewKey] = useState(Date.now());
-    const [showToast, setShowToast] = useState(false);
     const [webViewReady, setWebViewReady] = useState(false);
     const [injectionScript, setInjectionScript] = useState('');
+    // Safety net: if accountDetails / easyPay never hydrate (network failure, slow API),
+    // proceed with whatever's there after 5s so the WebView can't hang forever.
+    const [proceedAfterTimeout, setProceedAfterTimeout] = useState(false);
+
+    // Portal/payment pages get the session + token-refresh machinery; external links get a plain WebView.
+    const isPortalUrl = TRUSTED_HOSTS.includes(hostOf(url));
 
     const user = useSelector(state => state.user.userData);
+    const accountDetails = useSelector(state => state.profile?.accountDetails);
+    const accountDetailsFetchedAt = useSelector(state => state.profile?.accountDetailsFetchedAt);
+    const easyPay = useSelector(state => state.profile?.easyPay);
     const dispatch = useDispatch();
     const webViewRef = useRef();
+    // Read in async callbacks without re-subscribing; avoids stale closures over Redux state.
+    const accountDetailsRef = useRef(accountDetails);
+    accountDetailsRef.current = accountDetails;
+    const easyPayRef = useRef(easyPay);
+    easyPayRef.current = easyPay;
+    // Cached so silent refresh / WebView recreation re-injects without rebuilding.
+    const paymentObjJsonRef = useRef(null);
+    const easyPayInfoJsonRef = useRef(null);
+    const accountNoRef = useRef('');
+    const accountBlobRef = useRef('');
     const aliveCheckResolver = useRef(null);
     const aliveCheckTimeout = useRef(null);
     const backgroundTimestamp = useRef(0);
-    const toastOpacity = useRef(new Animated.Value(0)).current;
     const initialLoadComplete = useRef(false);
     const silentRefreshTimer = useRef(null);
     const pendingOfflineRefresh = useRef(false);
     const lastIdTokenRefresh = useRef(0);
     const currentUrlRef = useRef('');
-    const ssoRedirectInFlight = useRef(false);
-    // Fires once per WebView session on payment/AutoPay confirmation to force-refresh the backend account cache before the user navigates back.
+    // Fires once per session on payment/AutoPay confirmation to refresh the backend account cache.
     const cacheUpdateFiredRef = useRef(false);
+    // True once the user lands on a success/confirmation page — the next navigation away closes the WebView.
+    const onSuccessPageRef = useRef(false);
 
     const isLoading = !contentLoaded || progress < 1;
 
-    const refreshInjectionScript = useCallback(async () => {
-        const cu = await getUser();
-        setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp));
+    // Builds the unencrypted payment object + the encrypted { Form } blob the billing portal pages read.
+    const buildPaymentObjJson = useCallback(async () => {
+        try {
+            const cu = await getUser();
+            const userInfo = cu?.userInfo || {};
+            const ad = accountDetailsRef.current || {};
+            const ep = easyPayRef.current || {};
+            // Clamp to ≥ 0 — a credit-balance account returns negative payment_due_amount, which
+            // the portal would otherwise render as e.g. "$-52,732.10" on the payment-amount screen.
+            const toNum = (v) => Math.max(0, v != null && v !== '' ? Number(v) : 0);
+            easyPayInfoJsonRef.current = JSON.stringify({ isEasyPay: ep.isEasyPay || false, easyPayId: ep.easyPayId || '' });
+            const paymentObj = {
+                AccountNumber: userInfo.accountNumber || '',
+                FirstName: userInfo.firstName || '',
+                LastName: userInfo.lastName || '',
+                TotalDue: toNum(ad.payment_due_amount),
+                CustomerType: 'Residential',
+                PastDue: toNum(ad.past_due_amount),
+                DueDate: ad.payment_due_date || '',
+                PastDueAmount: toNum(ad.past_due_amount),
+                PaymentDueDate: ad.payment_due_date || '',
+                Email: getPrimaryEmail(ad) || '',
+                EasyPayId: ep.easyPayId || '',
+                EasyPayEnabled: ep.isEasyPay || false,
+                IsWithinDisconnectGracePeriod: false,
+                // Mapped to the portal's PascalCase shape so UtilsService.formatAddress(Form.BillingAddress)
+                // works directly. Sourced from accountDetails.bill_to_address (ACP API).
+                BillingAddress: toBillingAddress(ad.bill_to_address),
+            };
+            // Same fields feed both read-paths; customer_type alias matches SubNavComponent's Form shape.
+            accountNoRef.current = userInfo.accountNumber || '';
+            accountBlobRef.current = buildEncryptedAccountBlob(accountNoRef.current, { ...paymentObj, customer_type: paymentObj.CustomerType });
+            // One-shot diag for the autopay fields specifically — easypayacc in ManageAutopay
+            // requires Form.EasyPayId to be non-empty AND to match an acc.id in getFundingAccounts.
+            // Showing both the Redux source (ep) and what we end up injecting so a mismatch is obvious.
+            // Also surfaces the mapped BillingAddress so you can confirm the ACP API sub-field names
+            // mapped through correctly (empty strings = mapper missed the source field name).
+            logDiag(`${TAG} autopayFields`, {
+                accountNo: accountNoRef.current,
+                ep_isEasyPay: ep.isEasyPay,
+                ep_easyPayId: ep.easyPayId,
+                injected_EasyPayId: paymentObj.EasyPayId,
+                injected_EasyPayEnabled: paymentObj.EasyPayEnabled,
+                injected_BillingAddress: paymentObj.BillingAddress,
+            });
+            return JSON.stringify(paymentObj);
+        } catch (e) {
+            logError(`${TAG} buildPaymentObjJson`, e.message);
+            return '';
+        }
     }, []);
 
+    // Builds the payment object once (billing pages only) and caches it for later re-injections.
+    const ensurePaymentObjJson = useCallback(async () => {
+        if (!injectPaymentObj) return '';
+        if (paymentObjJsonRef.current) return paymentObjJsonRef.current;
+        const json = await buildPaymentObjJson();
+        paymentObjJsonRef.current = json;
+        return json;
+    }, [injectPaymentObj, buildPaymentObjJson]);
+
+    const refreshInjectionScript = useCallback(async () => {
+        const cu = await getUser();
+        const accountNo = injectPaymentObj ? (accountNoRef.current || cu?.userInfo?.accountNumber || '') : '';
+        setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp, paymentObjJsonRef.current || '', easyPayInfoJsonRef.current || '', accountNo, accountBlobRef.current || ''));
+    }, [injectPaymentObj]);
 
     const prepareInjectionScript = useCallback(async () => {
         try {
             let cu = await getUser();
             const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : Infinity;
             if (idTokenAge > 240000) {
-                logWarn(`${TAG} prepareInjectionScript | IdToken stale (${idTokenAge}ms old) — refreshing before injection | ts=${new Date().toISOString()}`);
                 try {
                     await RefreshToken();
                     cu = await getUser();
                 } catch (refreshErr) {
-                    logError(`${TAG} prepareInjectionScript | refresh failed, using existing token | error=${refreshErr.message}`);
+                    logError(`${TAG} prepareInjectionScript`, `token refresh failed: ${refreshErr.message}`);
                 }
             }
-
             lastIdTokenRefresh.current = cu?.idTokenTimestamp || Date.now();
-            await setAuthCookiesOnAllDomains(cu?.idToken || '');
-            setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp));
+            const paymentObjJson = await ensurePaymentObjJson();
+            const accountNo = injectPaymentObj ? (accountNoRef.current || cu?.userInfo?.accountNumber || '') : '';
+            await setAuthCookiesOnAllDomains(cu?.idToken || '', accountNo);
+            setInjectionScript(buildInjectionScript(cu?.token || '', cu?.userInfo || {}, cu?.idToken || '', cu?.jwtTimestamp, paymentObjJson, easyPayInfoJsonRef.current || '', accountNo, accountBlobRef.current || ''));
             setWebViewReady(true);
-            await dumpCookies('prepareInjection');
         } catch (e) {
-            logError(`${TAG} prepareInjectionScript FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
+            logError(`${TAG} prepareInjectionScript`, e.message);
             setWebViewReady(true);
         }
-    }, []);
-
-    const injectAuth = useCallback(async () => {
-        if (!webViewRef.current) return;
-        try {
-            const cu = await getUser();
-            const idToken = cu?.idToken || '';
-            const jwtTs = cu?.jwtTimestamp || Date.now();
-            if (idToken) await setAuthCookiesOnAllDomains(idToken);
-
-            const safeToken = safeForJS(cu?.token);
-            const safeUserInfo = safeForJS(typeof cu?.userInfo === 'string' ? cu.userInfo : JSON.stringify(cu?.userInfo || {}));
-
-            webViewRef.current.injectJavaScript(`(function() {
-    try {
-        var _ae = document.activeElement;
-        var _wasInput = _ae && (_ae.tagName === 'INPUT' || _ae.tagName === 'TEXTAREA' || _ae.tagName === 'SELECT');
-        if (_wasInput) _ae.blur();
-        var h = document.location.hostname;
-        if (!h || h === 'localhost') return;
-        ${buildCookieJS(idToken)}
-        if ('${safeToken}') {
-            localStorage.setItem('jwt_token', '${safeToken}');
-            localStorage.setItem('user_info', '${safeUserInfo}');
-            localStorage.setItem('tokenIssuedAt', '${jwtTs}');
-        }
-        if (_wasInput && _ae) { _ae.focus(); }
-    } catch(e) {}
-})(); true;`);
-            await dumpCookies('injectAuth');
-            dumpWebViewStorage('injectAuth');
-        } catch (e) {
-            logError(`${TAG} injectAuth FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
-        }
-    }, []);
-
+    }, [ensurePaymentObjJson, injectPaymentObj]);
 
     const injectIdTokenOnly = useCallback(async () => {
         if (!webViewRef.current) return;
         try {
             const cu = await getUser();
             const idToken = cu?.idToken || '';
-            const idTokenAge = cu?.idTokenTimestamp ? Date.now() - cu.idTokenTimestamp : '?';
-            if (idToken) await setAuthCookiesOnAllDomains(idToken);
-
+            const accountNo = injectPaymentObj ? (accountNoRef.current || cu?.userInfo?.accountNumber || '') : '';
+            if (idToken) await setAuthCookiesOnAllDomains(idToken, accountNo);
             webViewRef.current.injectJavaScript(`(function() {
     try {
+        if (${TRUSTED_HOSTS_JS}.indexOf(location.hostname) === -1) return;
         var _ae = document.activeElement;
         var _wasInput = _ae && (_ae.tagName === 'INPUT' || _ae.tagName === 'TEXTAREA' || _ae.tagName === 'SELECT');
         if (_wasInput) _ae.blur();
-        var h = document.location.hostname;
-        if (!h || h === 'localhost') return;
-        ${buildCookieJS(idToken)}
+        ${buildCookieJS(idToken, accountNo)}
         if (_wasInput && _ae) { _ae.focus(); }
     } catch(e) {}
 })(); true;`);
-            dumpWebViewStorage('injectIdTokenOnly');
         } catch (e) {
-            logError(`${TAG} injectIdTokenOnly FAILED | error=${e.message} | ts=${new Date().toISOString()}`);
+            logError(`${TAG} injectIdTokenOnly`, e.message);
         }
-    }, [dumpWebViewStorage]);
-
-    const dumpWebViewStorage = useCallback((caller) => {
-        if (!webViewRef.current) return;
-        webViewRef.current.injectJavaScript(
-            WEBVIEW_STORAGE_DUMP_JS.replace('storageSnapshot', 'storageSnapshot_' + caller)
-        );
-    }, []);
+    }, [injectPaymentObj]);
 
     const isOnPaymentDomain = useCallback(() => {
         const cur = currentUrlRef.current || '';
         return cur.includes('payment.sparklight.com') || cur.includes('payment.uat.sparklight.com');
     }, []);
 
-
     const silentRefreshIdToken = useCallback(async () => {
         if (!webViewRef.current) return;
-        const refreshStartTs = Date.now();
-        const lastRefreshAge = lastIdTokenRefresh.current ? refreshStartTs - lastIdTokenRefresh.current : '?';
         try {
             const netState = await NetInfo.fetch();
             if (!netState.isConnected || !netState.isInternetReachable) {
-                logWarn(`${TAG} silentRefresh SKIP — offline | ts=${new Date().toISOString()}`);
                 pendingOfflineRefresh.current = true;
                 return;
             }
-            await logStorageSnapshot('silentRefresh-before');
             const newToken = await RefreshToken();
             if (!newToken) {
-                logWarn(`${TAG} silentRefresh — RefreshToken returned null | ts=${new Date().toISOString()}`);
                 pendingOfflineRefresh.current = true;
                 return;
             }
@@ -314,17 +424,13 @@ const ArticleWindowUtility = ({ navigation, route }) => {
             lastIdTokenRefresh.current = Date.now();
             await refreshInjectionScript();
             const cu = await getUser();
-            if (cu?.idToken) {
-                await setAuthCookiesOnAllDomains(cu.idToken);
-            }
+            if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken, accountNoRef.current || '');
             await injectIdTokenOnly();
-            await logStorageSnapshot('silentRefresh-after');
-            await dumpCookies('silentRefresh-after');
         } catch (e) {
-            logError(`${TAG} silentRefresh FAILED | duration=${Date.now() - refreshStartTs}ms | error=${e.message} | ts=${new Date().toISOString()}`);
+            logError(`${TAG} silentRefresh`, e.message);
             pendingOfflineRefresh.current = true;
         }
-    }, [injectIdTokenOnly, isOnPaymentDomain, refreshInjectionScript]);
+    }, [injectIdTokenOnly, refreshInjectionScript]);
 
     const stopSilentRefresh = useCallback(() => {
         if (silentRefreshTimer.current) {
@@ -361,39 +467,61 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         setWebViewKey(Date.now());
     }, [prepareInjectionScript]);
 
-    const showToastMessage = useCallback(() => {
-        setShowToast(true);
-        Animated.sequence([
-            Animated.timing(toastOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-            Animated.delay(2000),
-            Animated.timing(toastOpacity, { toValue: 0, duration: 300, useNativeDriver: true }),
-        ]).start(() => setShowToast(false));
-    }, [toastOpacity]);
+    // Billing pages need fresh accountDetails + EasyPay before building the payment object —
+    // kick off both saga fetches on mount and arm a 5s safety net so a slow API can't hang the WebView.
+    const mountTs = useRef(Date.now());
+    useEffect(() => {
+        if (!injectPaymentObj) return undefined;
+        dispatch(fetchEasyPayStatus());
+        dispatch(fetchACPUserAccountDetails({})); // saga skips if data is < 60s old
+        const t = setTimeout(() => setProceedAfterTimeout(true), 5000);
+        return () => clearTimeout(t);
+    }, [injectPaymentObj, dispatch]);
 
-    useEffect(() => { prepareInjectionScript(); }, [prepareInjectionScript]);
+    // Prepare injection once. External (non-portal) links render immediately with no injection.
+    // Billing pages wait for both accountDetails (so TotalDue/PastDue/Email are populated, not zeroed)
+    // and a fresh EasyPay fetch — or for the 5s safety-net timeout — before the portal page loads.
+    const injectionPreparedRef = useRef(false);
+    useEffect(() => {
+        if (injectionPreparedRef.current) return;
+        if (!isPortalUrl) {
+            injectionPreparedRef.current = true;
+            setInjectionScript('');
+            setWebViewReady(true);
+            return;
+        }
+        const dataReady = !!accountDetailsFetchedAt && easyPay?.fetchedAt > mountTs.current;
+        if (injectPaymentObj && !proceedAfterTimeout && !dataReady) return;
+        injectionPreparedRef.current = true;
+        prepareInjectionScript();
+    }, [isPortalUrl, injectPaymentObj, accountDetailsFetchedAt, easyPay?.fetchedAt, proceedAfterTimeout, prepareInjectionScript]);
 
     useEffect(() => {
+        if (!isPortalUrl) return undefined;
         return () => {
             webViewRef.current?.injectJavaScript(`
                 try { localStorage.removeItem('formState'); localStorage.removeItem('scrollPosition'); } catch(e) {}
                 true;
             `);
         };
-    }, []);
+    }, [isPortalUrl]);
 
     useEffect(() => {
+        if (!isPortalUrl) return undefined;
         startSilentRefresh();
         return stopSilentRefresh;
-    }, [startSilentRefresh, stopSilentRefresh]);
+    }, [isPortalUrl, startSilentRefresh, stopSilentRefresh]);
 
     useEffect(() => {
+        if (!isPortalUrl) return undefined;
         const unsub = NetInfo.addEventListener((state) => {
             if (state.isConnected && state.isInternetReachable && pendingOfflineRefresh.current) silentRefreshIdToken();
         });
         return () => unsub();
-    }, [silentRefreshIdToken]);
+    }, [isPortalUrl, silentRefreshIdToken]);
 
     useEffect(() => {
+        if (!isPortalUrl) return undefined;
         const handleAppState = async (nextAppState) => {
             if (nextAppState === 'background' || nextAppState === 'inactive') {
                 backgroundTimestamp.current = Date.now();
@@ -404,19 +532,15 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                 const idTokenAge = Date.now() - lastIdTokenRefresh.current;
                 const netState = await NetInfo.fetch();
                 const isOnline = netState.isConnected && netState.isInternetReachable;
-                await logStorageSnapshot('appState-resume');
-                await dumpCookies('appState-resume');
 
                 if (dur > 600000) {
-                    if (!isOnline) { logWarn(`${TAG} AppState | offline, deferring refresh`); pendingOfflineRefresh.current = true; }
+                    if (!isOnline) { pendingOfflineRefresh.current = true; }
                     else {
                         const alive = await checkWebViewAlive();
                         if (!alive) { recreateWebView(); }
                         else {
-                            try {
-                                await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly();
-                            }
-                            catch (_) { logWarn(`${TAG} AppState | refresh failed, recreating WebView`); recreateWebView(); }
+                            try { await RefreshToken(); lastIdTokenRefresh.current = Date.now(); await refreshInjectionScript(); await injectIdTokenOnly(); }
+                            catch (_) { recreateWebView(); }
                         }
                     }
                 } else if (idTokenAge > 240000) {
@@ -427,7 +551,6 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                     }
                 } else if (dur > 60000) {
                     await injectIdTokenOnly();
-                } else {
                 }
                 backgroundTimestamp.current = 0;
                 startSilentRefresh();
@@ -435,7 +558,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         };
         const sub = AppState.addEventListener('change', handleAppState);
         return () => sub?.remove();
-    }, [checkWebViewAlive, recreateWebView, injectIdTokenOnly, refreshInjectionScript, startSilentRefresh, stopSilentRefresh]);
+    }, [isPortalUrl, checkWebViewAlive, recreateWebView, injectIdTokenOnly, refreshInjectionScript, startSilentRefresh, stopSilentRefresh]);
 
     const authChecked = useRef(false);
     useEffect(() => {
@@ -448,17 +571,52 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         }
     }, [user]);
 
-    const onShouldStartLoadWithRequest = useCallback((request) => {
+    // Fire one screen_view per opening with the real label ("Make a Payment", "Privacy Policy", etc.)
+    // so analytics can tell each flow apart instead of collapsing them all under "ArticleWindowUtility".
+    // injectPaymentObj separates billing flows from external article/support/legal pages.
+    useEffect(() => {
+        if (!name) return;
+        analytics().logEvent('screen_view', {
+            screen_name: name,
+            screen_class: injectPaymentObj ? 'BillingFlow' : 'ArticleView',
+        }).catch(() => {});
+    }, []);   // mount-only
 
-        if (request.url.includes('/postlogout')) {
+    const onShouldStartLoadWithRequest = useCallback((request) => {
+        const reqUrl = request.url || '';
+        logDiag(`${TAG}`, { event: 'nav', url: reqUrl, isTopFrame: request.isTopFrame });
+
+        // Only act on top-frame navigation. Subframe (iframe) loads — e.g. the Orbipay funding-
+        // account widget embedded in manage-autopay — must pass through; otherwise our exit
+        // guards would close the WebView the moment the widget loads.
+        if (request.isTopFrame === false) return true;
+
+        // After the user has been on a success page, the next navigation away from it
+        // (e.g., "Back to Billing") closes the WebView instead of going to the portal overview.
+        if (onSuccessPageRef.current && !isSuccessPage(reqUrl) && !reqUrl.includes('/postlogout')) {
+            onSuccessPageRef.current = false;
+            navigation.goBack();
+            return false;
+        }
+
+        if (reqUrl.includes('/postlogout')) {
             stopSilentRefresh();
             clearAuthCookies();
             navigation.goBack();
             return false;
         }
 
-        // Payment / AutoPay confirmation page: force-refresh once so Redux has fresh balance/past-due/email when BillingScreen regains focus.
-        if (request.url.includes('/portals/app-secure/payment-confirmation') || request.url.includes('/portals/thankyou/')) {
+        // The portal overview is the mobile app's territory — Cancel and "Back to Billing" both
+        // land here. Close the WebView so the portal never tries to load its overview / login.
+        if (isOverviewPage(reqUrl) || isLoginUrl(reqUrl)) {
+            navigation.goBack();
+            return false;
+        }
+
+        // Payment / AutoPay confirmation: refresh once so Redux has fresh balance/email on return,
+        // and arm the post-success → back-to-mobile guard.
+        if (isSuccessPage(reqUrl)) {
+            onSuccessPageRef.current = true;
             if (!cacheUpdateFiredRef.current) {
                 cacheUpdateFiredRef.current = true;
                 dispatch(fetchACPUserAccountDetails({ force: true }));
@@ -466,46 +624,40 @@ const ArticleWindowUtility = ({ navigation, route }) => {
             return true;
         }
 
-        if (request.url.includes(Config.SSO_LOGIN)) {
-            logWarn(`${TAG} NAV | SSO redirect detected — session expired on portal | ssoInFlight=${ssoRedirectInFlight.current}`);
-
-            if (!ssoRedirectInFlight.current) {
-                ssoRedirectInFlight.current = true;
-                (async () => {
-                    try {
-                        await RefreshToken();
-                        lastIdTokenRefresh.current = Date.now();
-                        await refreshInjectionScript();
-                        await injectAuth();
-                        webViewRef.current?.injectJavaScript(`window.location.href = '${url}'; true;`);
-                    } catch (e) {
-                        logError(`${TAG} NAV SSO | refresh failed, recreating WebView | error=${e.message}`);
-                        recreateWebView();
-                    } finally {
-                        ssoRedirectInFlight.current = false;
-                    }
-                })();
-            }
-            return false;
-        }
-
-        if (!request.url.startsWith('https://') && !request.url.startsWith('http://')) return false;
+        if (!reqUrl.startsWith('https://') && !reqUrl.startsWith('http://')) return false;
         return true;
-    }, [showToastMessage, navigation, url, injectAuth, recreateWebView, refreshInjectionScript, dispatch]);
+    }, [navigation, dispatch, stopSilentRefresh]);
+
+    // Catches Angular client-side ("SPA") navigation that onShouldStartLoadWithRequest doesn't fire for —
+    // specifically a routerLink from a success page to the portal overview.
+    const onNavigationStateChange = useCallback((navState) => {
+        const u = navState?.url || '';
+        // navState.url is the top-document URL — iframe loads (Orbipay widget) don't update it,
+        // so this hook is naturally safe from the subframe issue that onShouldStartLoadWithRequest had.
+        if (u) logDiag(`${TAG}`, { event: 'navState', url: u, loading: !!navState?.loading });
+        // Same exit rules as onShouldStartLoadWithRequest, for Angular SPA pushState/routerLink navs
+        // that don't trigger the shouldStartLoad hook.
+        if (u && (isOverviewPage(u) || isLoginUrl(u))) {
+            navigation.goBack();
+            return;
+        }
+        if (onSuccessPageRef.current && u && !isSuccessPage(u) && !u.includes('/postlogout')) {
+            onSuccessPageRef.current = false;
+            navigation.goBack();
+        }
+    }, [navigation]);
 
     const onLoadStart = useCallback(({ nativeEvent }) => {
-        const prevUrl = currentUrlRef.current;
         if (nativeEvent?.url) currentUrlRef.current = nativeEvent.url;
-        const domainChanged = prevUrl && nativeEvent?.url && new URL(prevUrl).hostname !== new URL(nativeEvent.url).hostname;
         if (!initialLoadComplete.current) { setProgress(0); setContentLoaded(false); }
         setIsError(false);
         setErrorMessage('');
+        // Refresh cookies when entering the payment domain (Orbipay / eBillPay).
         if (nativeEvent?.url && (nativeEvent.url.includes('payment.sparklight.com') || nativeEvent.url.includes('payment.uat.sparklight.com'))) {
             (async () => {
                 try {
                     const cu = await getUser();
-                    if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken);
-                    await dumpCookies('onLoadStart-payment');
+                    if (cu?.idToken) await setAuthCookiesOnAllDomains(cu.idToken, accountNoRef.current || '');
                 } catch (_) {}
             })();
         }
@@ -515,31 +667,22 @@ const ArticleWindowUtility = ({ navigation, route }) => {
 
     const onLoadEnd = useCallback(async () => {
         setProgress(1);
-        const onPayment = isOnPaymentDomain();
-
-        if (!onPayment) {
+        // Re-assert the IdToken cookie after load on portal pages (not on the payment domain mid-transaction).
+        if (isPortalUrl && !isOnPaymentDomain()) {
             await injectIdTokenOnly();
-        } else {
         }
-        await logStorageSnapshot('onLoadEnd');
-        await dumpCookies('onLoadEnd');
-        dumpWebViewStorage('onLoadEnd');
         setTimeout(() => { setContentLoaded(true); initialLoadComplete.current = true; }, 300);
-    }, [injectIdTokenOnly, isOnPaymentDomain, dumpWebViewStorage]);
+    }, [isPortalUrl, injectIdTokenOnly, isOnPaymentDomain]);
 
     const onError = useCallback(({ nativeEvent }) => {
-        logError(`${TAG} WebView ERROR | description=${nativeEvent.description} | url=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
+        logError(`${TAG} WebView error`, `${nativeEvent.description || 'Unknown'} | ${currentUrlRef.current}`);
         setIsError(true);
         setContentLoaded(true);
         setErrorMessage(`Loading error: ${nativeEvent.description || 'Unknown error'}`);
     }, []);
 
     const onHttpError = useCallback(({ nativeEvent }) => {
-        logError(`${TAG} HTTP ERROR | status=${nativeEvent.statusCode} | url=${nativeEvent.url} | currentUrl=${currentUrlRef.current} | ts=${new Date().toISOString()}`);
-        (async () => {
-            await logStorageSnapshot('httpError-' + nativeEvent.statusCode);
-            await dumpCookies('httpError-' + nativeEvent.statusCode);
-        })();
+        logError(`${TAG} HTTP error`, `${nativeEvent.statusCode} | ${nativeEvent.url}`);
         if (nativeEvent.statusCode === 404) {
             setIsError(true); setContentLoaded(true);
             setErrorMessage('Page not found. Please verify your account has access to this feature.');
@@ -555,33 +698,14 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const onMessage = useCallback(({ nativeEvent }) => {
         try {
             const data = JSON.parse(nativeEvent.data);
-            switch (data.type) {
-                case 'pong':
-                    if (aliveCheckTimeout.current) { clearTimeout(aliveCheckTimeout.current); aliveCheckTimeout.current = null; }
-                    if (aliveCheckResolver.current) { aliveCheckResolver.current(true); aliveCheckResolver.current = null; }
-                    break;
-                case 'pdf':
-                    setShowPDFUrl(data.data);
-                    setShowPDFModal(true);
-                    break;
-                case 'injectionComplete':
-                    break;
-                default:
-                    if (data.type && data.type.startsWith('storageSnapshot') && data.data) {
-                        const s = data.data;
-                        const caller = data.type.replace('storageSnapshot_', '');
-                        const cookiePairs = (s.cookies || '').split(';').map(c => c.trim()).filter(Boolean);
-                        const cookieObj = {};
-                        cookiePairs.forEach(pair => {
-                            const idx = pair.indexOf('=');
-                            if (idx > 0) cookieObj[pair.substring(0, idx)] = pair.substring(idx + 1);
-                        });
-                    } else {
-                    }
-                    break;
+            if (data.type === 'pong') {
+                if (aliveCheckTimeout.current) { clearTimeout(aliveCheckTimeout.current); aliveCheckTimeout.current = null; }
+                if (aliveCheckResolver.current) { aliveCheckResolver.current(true); aliveCheckResolver.current = null; }
+            } else if (data.type === 'pdf') {
+                setShowPDFUrl(data.data);
+                setShowPDFModal(true);
             }
-        } catch {
-        }
+        } catch (_) {}
     }, []);
 
     return (
@@ -611,6 +735,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                         onError={onError}
                         onHttpError={onHttpError}
                         onMessage={onMessage}
+                        onNavigationStateChange={onNavigationStateChange}
                         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
                         javaScriptEnabled={true}
                         domStorageEnabled={true}
@@ -645,11 +770,6 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                         }}>Tap to Retry</Text>
                     </View>
                 )}
-                {showToast && (
-                    <Animated.View style={[styles.toast, { opacity: toastOpacity }]}>
-                        <Text style={styles.toastText}>Session expired</Text>
-                    </Animated.View>
-                )}
             </View>
             {showPDFModal && <PDFViewModal url={showPDFUrl} onClose={() => setShowPDFModal(false)} />}
         </View>
@@ -671,12 +791,6 @@ const styles = StyleSheet.create({
     errorTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 10 },
     errorText: { fontSize: 16, color: '#666', textAlign: 'center', marginBottom: 20, lineHeight: 24 },
     retryText: { fontSize: 16, color: '#8D3B90', fontWeight: '600', textDecorationLine: 'underline' },
-    toast: {
-        position: 'absolute', bottom: 100, left: 20, right: 20,
-        backgroundColor: 'rgba(0,0,0,0.8)', paddingVertical: 12, paddingHorizontal: 20,
-        borderRadius: Border.br_5xs, alignItems: 'center', zIndex: 2000,
-    },
-    toastText: { color: '#ffffff', fontSize: 14, fontWeight: '500' },
 });
 
 export default ArticleWindowUtility;

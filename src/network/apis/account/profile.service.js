@@ -88,6 +88,24 @@ const fetchBillingStatus = async () => {
     });
 };
 
+const fetchEasyPayStatus = async () => {
+  let data = await getUser();
+  const accountNumber = data.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + data.token,
+    },
+  };
+
+  return _axios
+    .get(getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber }), { ...config })
+    .then((res) => res.data)
+    .catch((error) => {
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber })}`, error);
+      throw error;
+    });
+};
+
 const fetchPaperLessDetails = async () => {
   let data = await getUser();
   const accountNumber = data.userInfo?.accountNumber || null;
@@ -737,6 +755,7 @@ const fetchACPUserAccountDetails = async (signal, force = false) => {
       "last_name",
       "current_balance",
       "past_due_amount",
+      "payment_due_amount",
       "payment_due_date",
       "services",
       "email",
@@ -773,6 +792,7 @@ export {
   postProfileInfo,
   postTextNotifictionInfo,
   fetchBillingStatus,
+  fetchEasyPayStatus,
   fetchPaperLessDetails,
   putEmailNotification,
   postEmailNotification,

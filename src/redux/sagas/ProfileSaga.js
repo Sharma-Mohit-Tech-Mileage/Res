@@ -20,6 +20,7 @@ import {
   fetchUserList,
   fetchSmsSubscription,
   fetchBillingStatus,
+  fetchEasyPayStatus,
   postProfileInfo,
   postTextNotifictionInfo,
   fetchPaperLessDetails,
@@ -73,9 +74,11 @@ import {
   MANAGE_EMAIL_REQUEST,
   UPDATE_EMAIL_ASSOCIATIONS,
   GET_PAPERLESS_STATUS,
+  FETCH_EASYPAY_STATUS,
 } from "../constants";
 import {
   saveACPUserAccountDetails,
+  saveEasyPayStatus,
   fetchProfileSuccess,
   fetchUserListSuccess,
   saveSMSSelection,
@@ -138,6 +141,20 @@ function* getPushNotifications(action) {
     const response = yield call(fetchPushNotifications, action.payload);
     yield put(savePushNotifications(response));
   } catch (error) {}
+}
+
+function* fetchEasyPayStatusSaga() {
+  try {
+    const response = yield call(fetchEasyPayStatus);
+    yield put(
+      saveEasyPayStatus({
+        isEasyPay: response?.isEasyPay || false,
+        easyPayId: response?.easyPayId || "",
+      })
+    );
+  } catch (error) {
+    yield put(saveEasyPayStatus({ isEasyPay: false, easyPayId: "" }));
+  }
 }
 
 function* updateNewEmail(action) {
@@ -739,5 +756,6 @@ function* ProfileSagas() {
     FETCH_ACP_USER_ACCOUNT_DETAILS,
     fetchACPUserAccountDetailsSaga
   );
+  yield takeLatest(FETCH_EASYPAY_STATUS, fetchEasyPayStatusSaga);
 }
 export default ProfileSagas;

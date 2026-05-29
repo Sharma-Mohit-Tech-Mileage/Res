@@ -41,13 +41,18 @@ const UserNavigations = (props) => {
     const currentRouteName = currentRoute?.name;
 
     if (previousRouteName !== currentRouteName && currentRouteName && currentRouteName.trim() !== "") {
-      try {
-        await analytics().logEvent('screen_view', {
-          screen_name: currentRouteName,
-          screen_class: currentRouteName
-        });
-      } catch (error) {
-        console.warn('Analytics error:', error);
+      // ArticleWindowUtility fires its own screen_view with the real page label
+      // ("Make a Payment", "Privacy Policy", etc.) — skip the generic one here to avoid
+      // double-counting and to keep the route-named bucket out of the dashboard.
+      if (currentRouteName !== 'ArticleWindowUtility') {
+        try {
+          await analytics().logEvent('screen_view', {
+            screen_name: currentRouteName,
+            screen_class: currentRouteName
+          });
+        } catch (error) {
+          console.warn('Analytics error:', error);
+        }
       }
 
       routeNameRef.current = currentRouteName;
