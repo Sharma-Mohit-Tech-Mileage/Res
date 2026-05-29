@@ -66,7 +66,8 @@ export const ENDPOINTS = {
     SV_EMAIL_ADD_MKT_FLAG: 'api/email/:accountNumber/:email/AddSVEmailMktFlag',
 
     // Account details
-    ACCOUNTS_DETAILS: 'api/Accounts/GetAccountDetails',
+    //ACCOUNTS_DETAILS: 'api/Accounts/GetAccountDetails',
+    ACCOUNTS_DETAILS: 'api/Accounts/GetAccountDetailsCache',
      ACCT_MGR_GET_BY_USER: 'api/Profile/AcctMgrGetByAcct/:accountNumber',
 
     // Payments

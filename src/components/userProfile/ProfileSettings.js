@@ -31,8 +31,7 @@ import Vector from "../../../src/res/svgIcons/Vector";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-import { set } from "react-hook-form";
-import { use } from "react";
+
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -46,6 +45,8 @@ const ProfileSettings = () => {
   const accountDetails = profile.accountDetails || {};
 
   const emailAddress = getPrimaryEmail(accountDetails);
+
+  console.log("Profile details from Redux:", profile);
 
   useEffect(() => { 
     if(emailAddress) {
