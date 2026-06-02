@@ -20,24 +20,16 @@ import CryptoJS from 'crypto-js';
 
 const TAG = '[ArticalWindow]';
 const JS_COOKIE_DOMAIN = Config.COOKIE_DOMAIN;
-// localStorage key the portal reads the (unencrypted) payment object from on billing pages.
 const PAYMENT_OBJ_STORAGE_KEY = 'paymentObj';
-// localStorage key SubNavComponent reads EasyPay status from (autopay routing + EasyPayId/EasyPayEnabled).
 const EASYPAY_INFO_STORAGE_KEY = 'easyPayInfo';
 const REFRESH_INTERVAL_MS = 4 * 60 * 1000;
 
-// Session/billing data is ONLY ever injected on these hosts (the portal + payment domains).
-// Article/support/legal links share this WebView but must never receive the session.
 const hostOf = (u) => { const m = /^https?:\/\/([^/]+)/i.exec(u || ''); return m ? m[1].toLowerCase() : ''; };
 const TRUSTED_HOSTS = [hostOf(Config.PORTAL_BASE_URL), hostOf(Config.PAYMENT_BASE_URL)].filter(Boolean);
 const TRUSTED_HOSTS_JS = JSON.stringify(TRUSTED_HOSTS);
 
 const safeForJS = (val) => JSON.stringify(String(val || '')).slice(1, -1);
 
-// Maps the ACP API's address shape (whatever variant it returns) into the PascalCase shape the
-// portal's UtilsService.formatAddress(addressInfo) expects:
-//   Address_line1 + Address_line2 + City + State + ZipCode1.
-// We accept several source-field naming variants so a small API rename doesn't silently empty this.
 const toBillingAddress = (a) => {
     if (!a || typeof a !== 'object') return {};
     return {
@@ -49,43 +41,23 @@ const toBillingAddress = (a) => {
     };
 };
 
-// Portal code reads `userInfoAny?.service_address || userInfoAny?.serviceAddress` off the parsed
-// `user_info` localStorage value (the Orbipay widget host's fallback path). Our app's `userInfo`
-// doesn't carry it, so we merge `accountDetails.service_address` in just before injection.
-// Aliased to both keys (snake_case + camelCase) so whichever name the portal reads, it lands.
 const userInfoWithServiceAddress = (userInfo, ad) => {
     const sa = ad?.service_address || null;
     return { ...(userInfo || {}), service_address: sa, serviceAddress: sa };
 };
 
-// Once the user lands on a success/confirmation page, the next navigation away (e.g., the portal's
-// "Back to Billing" link) closes the WebView and returns to the mobile app instead of dropping them
-// on the portal overview. Matched broadly by substring because the exact path varies by env (UAT vs
-// prod), profile (Residential vs Business), and flow (payment-confirmation, deactivate-confirmation,
-// activate-confirmation, thankyou). Both branches share "confirmation" / "thankyou" in the path.
 const isSuccessPage = (u) => {
     if (!u) return false;
     const s = u.toLowerCase();
     return s.includes('confirmation') || s.includes('thankyou');
 };
 
-// The portal's billing overview (e.g. /portals/billing, /portals/app-secure/billing) is owned by
-// the mobile app — the WebView only handles action pages (make-payment, billing-payment, *-autopay).
-// Any navigation that lands on the overview (the destination of Cancel and of any "Back to Billing"
-// link) means the user is exiting the flow, so close the WebView instead of letting the portal load
-// the overview and run its own login/auth logic. Path ends with /billing exactly — won't match
-// /billing-payment or /billing-statement.
 const isOverviewPage = (u) => {
     if (!u) return false;
     const path = u.split('?')[0].split('#')[0].toLowerCase();
     return /\/billing\/?$/.test(path);
 };
 
-// Any login URL — the portal's own `/SecureLoginSSO` entry, the SSO IdP at any host
-// (login.* / canary-login.*), or the configured Config.SSO_LOGIN — means the user is being asked
-// to re-authenticate. That happens when the portal's Cancel button clears state and its `/billing`
-// route guard synchronously redirects (so the overview guard never sees `/billing`). Bring them
-// back to the mobile app; the next opening will inject fresh tokens and load directly.
 const isLoginUrl = (u) => {
     if (!u) return false;
     const s = u.toLowerCase();
@@ -94,19 +66,12 @@ const isLoginUrl = (u) => {
         || (Config.SSO_LOGIN && s.includes(Config.SSO_LOGIN.toLowerCase()));
 };
 
-// Mirrors the portal's UtilsService.encryptWithCryptoJS EXACTLY: AES-ECB / Pkcs7 with key = iv =
-// Utf8.parse(atob(pci_keyVal)), which equals the decoded ENCRYPT_VAL_PASSWORD here. A key mismatch
-// makes the portal's decrypt throw "Malformed UTF-8 data", so we self-check via a decrypt round-trip.
 const PORTAL_FORM_KEY = Config.ENCRYPT_VAL_PASSWORD;
 const buildEncryptedAccountBlob = (accountNo, form, custInfo) => {
     if (!accountNo) return '';
     try {
         const key = CryptoJS.enc.Utf8.parse(PORTAL_FORM_KEY);
         const cfg = { keySize: 16, iv: key, mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 };
-        // Encrypted blob shape mirrors what the portal expects: { Form, CustInfo }.
-        // CustInfo is a Form-sibling the portal reads as a fallback (e.g. PaymentMethodsComponent's
-        // `localAccountInfo?.CustInfo?.email` chain). Sourced from the same paymentObj so the two
-        // stay in sync without a second data fetch.
         const payload = custInfo ? { Form: form, CustInfo: custInfo } : { Form: form };
         const plain = JSON.stringify(payload);
         const blob = CryptoJS.AES.encrypt(plain, key, cfg).toString();
@@ -140,15 +105,12 @@ if ('${acct}') document.cookie = 'AccountNo=${acct}; path=/' + _dom + '; expires
 const buildInjectionScript = (token, userInfo, idToken, jwtTimestamp, paymentObjJson = '', easyPayInfoJson = '', accountNo = '', accountBlob = '') => {
     const safeToken = safeForJS(token);
     const safeUserInfo = safeForJS(typeof userInfo === 'string' ? userInfo : JSON.stringify(userInfo || {}));
-    // paymentObjJson is already a JSON string; JSON.stringify wraps it in a safely-escaped JS literal.
     const paymentObjLine = paymentObjJson
         ? `try { localStorage.setItem('${PAYMENT_OBJ_STORAGE_KEY}', ${JSON.stringify(paymentObjJson)}); } catch(e) {}`
         : '';
-    // SubNavComponent reads easyPayInfo for autopay routing + EasyPayId/EasyPayEnabled.
     const easyPayInfoLine = easyPayInfoJson
         ? `try { localStorage.setItem('${EASYPAY_INFO_STORAGE_KEY}', ${JSON.stringify(easyPayInfoJson)}); } catch(e) {}`
         : '';
-    // "Form way": encrypted blob keyed by account number — ManageAutopayComponent reads it (no fallback).
     const accountBlobLine = (accountNo && accountBlob)
         ? `try { localStorage.setItem(${JSON.stringify(String(accountNo))}, ${JSON.stringify(accountBlob)}); } catch(e) {}`
         : '';
@@ -257,7 +219,6 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [url] = useState(route.params?.url);
-    // Only billing pages (make-payment, activate/manage autopay, billing-payment) pass this.
     const [injectPaymentObj] = useState(route.params?.injectPaymentObj === true);
     const [showPDFModal, setShowPDFModal] = useState(false);
     const [showPDFUrl, setShowPDFUrl] = useState('');
@@ -265,11 +226,8 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const [webViewKey, setWebViewKey] = useState(Date.now());
     const [webViewReady, setWebViewReady] = useState(false);
     const [injectionScript, setInjectionScript] = useState('');
-    // Safety net: if accountDetails / easyPay never hydrate (network failure, slow API),
-    // proceed with whatever's there after 5s so the WebView can't hang forever.
     const [proceedAfterTimeout, setProceedAfterTimeout] = useState(false);
 
-    // Portal/payment pages get the session + token-refresh machinery; external links get a plain WebView.
     const isPortalUrl = TRUSTED_HOSTS.includes(hostOf(url));
 
     const user = useSelector(state => state.user.userData);
@@ -278,12 +236,10 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const easyPay = useSelector(state => state.profile?.easyPay);
     const dispatch = useDispatch();
     const webViewRef = useRef();
-    // Read in async callbacks without re-subscribing; avoids stale closures over Redux state.
     const accountDetailsRef = useRef(accountDetails);
     accountDetailsRef.current = accountDetails;
     const easyPayRef = useRef(easyPay);
     easyPayRef.current = easyPay;
-    // Cached so silent refresh / WebView recreation re-injects without rebuilding.
     const paymentObjJsonRef = useRef(null);
     const easyPayInfoJsonRef = useRef(null);
     const accountNoRef = useRef('');
@@ -296,22 +252,17 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const pendingOfflineRefresh = useRef(false);
     const lastIdTokenRefresh = useRef(0);
     const currentUrlRef = useRef('');
-    // Fires once per session on payment/AutoPay confirmation to refresh the backend account cache.
     const cacheUpdateFiredRef = useRef(false);
-    // True once the user lands on a success/confirmation page — the next navigation away closes the WebView.
     const onSuccessPageRef = useRef(false);
 
     const isLoading = !contentLoaded || progress < 1;
 
-    // Builds the unencrypted payment object + the encrypted { Form } blob the billing portal pages read.
     const buildPaymentObjJson = useCallback(async () => {
         try {
             const cu = await getUser();
             const userInfo = cu?.userInfo || {};
             const ad = accountDetailsRef.current || {};
             const ep = easyPayRef.current || {};
-            // Clamp to ≥ 0 — a credit-balance account returns negative payment_due_amount, which
-            // the portal would otherwise render as e.g. "$-52,732.10" on the payment-amount screen.
             const toNum = (v) => Math.max(0, v != null && v !== '' ? Number(v) : 0);
             easyPayInfoJsonRef.current = JSON.stringify({ isEasyPay: ep.isEasyPay || false, easyPayId: ep.easyPayId || '' });
             const paymentObj = {
@@ -328,15 +279,9 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                 EasyPayId: ep.easyPayId || '',
                 EasyPayEnabled: ep.isEasyPay || false,
                 IsWithinDisconnectGracePeriod: false,
-                // Mapped to the portal's PascalCase shape so UtilsService.formatAddress(Form.BillingAddress)
-                // works directly. Sourced from accountDetails.bill_to_address (ACP API).
                 BillingAddress: toBillingAddress(ad.bill_to_address),
             };
-            // Same fields feed both read-paths; customer_type alias matches SubNavComponent's Form shape.
             accountNoRef.current = userInfo.accountNumber || '';
-            // CustInfo: Form-sibling the portal reads as a fallback (PaymentMethodsComponent does
-            // `localAccountInfo?.CustInfo?.email` ?? ...). Mirrors what Form already has so the
-            // portal can pick whichever side it prefers without us re-fetching anything.
             const custInfo = {
                 email:     paymentObj.Email,
                 firstName: paymentObj.FirstName,
@@ -355,7 +300,6 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         }
     }, []);
 
-    // Builds the payment object once (billing pages only) and caches it for later re-injections.
     const ensurePaymentObjJson = useCallback(async () => {
         if (!injectPaymentObj) return '';
         if (paymentObjJsonRef.current) return paymentObjJsonRef.current;
@@ -483,20 +427,15 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         setWebViewKey(Date.now());
     }, [prepareInjectionScript]);
 
-    // Billing pages need fresh accountDetails + EasyPay before building the payment object —
-    // kick off both saga fetches on mount and arm a 5s safety net so a slow API can't hang the WebView.
     const mountTs = useRef(Date.now());
     useEffect(() => {
         if (!injectPaymentObj) return undefined;
         dispatch(fetchEasyPayStatus());
-        dispatch(fetchACPUserAccountDetails({})); // saga skips if data is < 60s old
+        dispatch(fetchACPUserAccountDetails({})); 
         const t = setTimeout(() => setProceedAfterTimeout(true), 5000);
         return () => clearTimeout(t);
     }, [injectPaymentObj, dispatch]);
 
-    // Prepare injection once. External (non-portal) links render immediately with no injection.
-    // Billing pages wait for both accountDetails (so TotalDue/PastDue/Email are populated, not zeroed)
-    // and a fresh EasyPay fetch — or for the 5s safety-net timeout — before the portal page loads.
     const injectionPreparedRef = useRef(false);
     useEffect(() => {
         if (injectionPreparedRef.current) return;
@@ -587,27 +526,18 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         }
     }, [user]);
 
-    // Fire one screen_view per opening with the real label ("Make a Payment", "Privacy Policy", etc.)
-    // so analytics can tell each flow apart instead of collapsing them all under "ArticleWindowUtility".
-    // injectPaymentObj separates billing flows from external article/support/legal pages.
     useEffect(() => {
         if (!name) return;
         analytics().logEvent('screen_view', {
             screen_name: name,
             screen_class: injectPaymentObj ? 'BillingFlow' : 'ArticleView',
         }).catch(() => {});
-    }, []);   // mount-only
+    }, []); 
 
     const onShouldStartLoadWithRequest = useCallback((request) => {
         const reqUrl = request.url || '';
 
-        // Only act on top-frame navigation. Subframe (iframe) loads — e.g. the Orbipay funding-
-        // account widget embedded in manage-autopay — must pass through; otherwise our exit
-        // guards would close the WebView the moment the widget loads.
         if (request.isTopFrame === false) return true;
-
-        // After the user has been on a success page, the next navigation away from it
-        // (e.g., "Back to Billing") closes the WebView instead of going to the portal overview.
         if (onSuccessPageRef.current && !isSuccessPage(reqUrl) && !reqUrl.includes('/postlogout')) {
             onSuccessPageRef.current = false;
             navigation.goBack();
@@ -621,15 +551,10 @@ const ArticleWindowUtility = ({ navigation, route }) => {
             return false;
         }
 
-        // The portal overview is the mobile app's territory — Cancel and "Back to Billing" both
-        // land here. Close the WebView so the portal never tries to load its overview / login.
         if (isOverviewPage(reqUrl) || isLoginUrl(reqUrl)) {
             navigation.goBack();
             return false;
         }
-
-        // Payment / AutoPay confirmation: refresh once so Redux has fresh balance/email on return,
-        // and arm the post-success → back-to-mobile guard.
         if (isSuccessPage(reqUrl)) {
             onSuccessPageRef.current = true;
             if (!cacheUpdateFiredRef.current) {
@@ -643,14 +568,8 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         return true;
     }, [navigation, dispatch, stopSilentRefresh]);
 
-    // Catches Angular client-side ("SPA") navigation that onShouldStartLoadWithRequest doesn't fire for —
-    // specifically a routerLink from a success page to the portal overview.
     const onNavigationStateChange = useCallback((navState) => {
         const u = navState?.url || '';
-        // navState.url is the top-document URL — iframe loads (Orbipay widget) don't update it,
-        // so this hook is naturally safe from the subframe issue that onShouldStartLoadWithRequest had.
-        // Same exit rules as onShouldStartLoadWithRequest, for Angular SPA pushState/routerLink navs
-        // that don't trigger the shouldStartLoad hook.
         if (u && (isOverviewPage(u) || isLoginUrl(u))) {
             navigation.goBack();
             return;
@@ -666,7 +585,6 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         if (!initialLoadComplete.current) { setProgress(0); setContentLoaded(false); }
         setIsError(false);
         setErrorMessage('');
-        // Refresh cookies when entering the payment domain (Orbipay / eBillPay).
         if (nativeEvent?.url && (nativeEvent.url.includes('payment.sparklight.com') || nativeEvent.url.includes('payment.uat.sparklight.com'))) {
             (async () => {
                 try {
@@ -681,7 +599,6 @@ const ArticleWindowUtility = ({ navigation, route }) => {
 
     const onLoadEnd = useCallback(async () => {
         setProgress(1);
-        // Re-assert the IdToken cookie after load on portal pages (not on the payment domain mid-transaction).
         if (isPortalUrl && !isOnPaymentDomain()) {
             await injectIdTokenOnly();
         }

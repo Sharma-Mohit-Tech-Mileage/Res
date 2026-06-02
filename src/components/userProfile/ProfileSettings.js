@@ -80,9 +80,6 @@ const ProfileSettings = () => {
   const dispatch = useDispatch();
   const [smsRequested, setSmsRequested] = useState(false);
   const [smsFetchTimedOut, setSmsFetchTimedOut] = useState(false);
-
-  // Narrow per-slice selectors: this screen no longer re-renders when unrelated
-  // profile slices (easyPay, paperless, etc.) update.
   const profileDetails = useSelector((s) => s.profile?.profileDetails || {});
   const accountDetails = useSelector((s) => s.profile?.accountDetails || {});
   const smsSubscription = useSelector((s) => s.profile?.smsSubscription || []);
@@ -90,9 +87,6 @@ const ProfileSettings = () => {
 
   const emailAddress = getPrimaryEmail(accountDetails);
 
-  // Safety net: fetchSMSSubs saga only publishes on success, so a failed/empty
-  // response leaves smsSubscription untouched. Time out the phone skeleton
-  // after 5s so the row collapses instead of spinning forever.
   useEffect(() => {
     if (!smsRequested) {
       return undefined;
@@ -116,8 +110,6 @@ const ProfileSettings = () => {
 
   const handleArrowPress = (fieldType) => {
     if (fieldType === "email") {
-      // EmailNotifications reads the primary email from state.profile.accountDetails
-      // directly via getPrimaryEmail(); no route param needed.
       navigation.navigate("EmailNotifications");
     } else if (fieldType === "mobile") {
       navigation.navigate("TextNotifications", {
@@ -197,10 +189,6 @@ const ProfileSettings = () => {
       )
     : false;
 
-  // accountDetails is primed once-per-session by NewBillerHome's focus effect
-  // (60s ACP cache covers tab-back), so we don't need to dispatch it here.
-  // SMS is only auto-primed in Terms (first-login only), so we DO need to ask
-  // for it on this screen — returning users skip Terms entirely.
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       dispatch(fetchSMSSelection());
