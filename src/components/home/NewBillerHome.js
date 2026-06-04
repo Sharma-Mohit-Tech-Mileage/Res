@@ -49,6 +49,7 @@ const NewBillerHome = ({ navigation }) => {
   const [loadingAutoPay, setloadingAutoPay] = useState(true);
   const [alertsHeight, setAlertsHeight] = useState(0);
   const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
+  const [phoneNumber, setPhoneNumber] = useState(undefined);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
@@ -76,6 +77,7 @@ const NewBillerHome = ({ navigation }) => {
   const isMobilePilotEnabled = useSelector(
     (state) => state.user.userData?.userInfo?.pending_activation === true
   );
+  
 
   const showDisconnectedBanner = userInfo
     ? isAccountDisconnected(
@@ -121,6 +123,7 @@ const NewBillerHome = ({ navigation }) => {
           setUpdateStatus(status);
           dispatch(fetchACPUserAccountDetails());
           getStatus();
+          getTextNotificationsData();
           setIsNotificationEnable(true);
         } catch (error) {
           console.warn("Error refreshing data on focus", error);
@@ -150,11 +153,38 @@ const NewBillerHome = ({ navigation }) => {
         pastPaymentDue: accountDetails.past_due_amount,
         email: getPrimaryEmail(accountDetails),
       });
+      const firstName = accountDetails.first_name || "";
+      const lastName = accountDetails.last_name || "";
       DeviceInfo.getUserAgent().then((userAgent) => {
-        loginWithToken(userAgent);
+        loginWithToken(userAgent, firstName, lastName);
       });
     }
   }, [accountDetails]);
+
+  const getTextNotificationsData = () => {
+      
+      getUser().then((res1) => {
+        const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
+          accountNumber: res1.userInfo?.accountNumber,
+        });
+        
+        GetApiRequest(
+          endpointUrl,
+          (res) => {
+            if (res) {
+              let phoneNum = res[0]?.phoneNum || "";
+              setPhoneNumber(phoneNum);
+            }
+            
+          },
+          (error) => {
+            
+            console.error("Error on retrying getTextNotificationsData", error);
+          },
+        );
+      });
+    };
+  
 
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
@@ -244,14 +274,15 @@ const NewBillerHome = ({ navigation }) => {
             email: defaultPaymentDetails.email || "",
             firstName: firstName || "",
             lastName: lastName || "",
-            name: '',
-            phone: "",
+            name: `${firstName || ""} ${lastName || ""}`.trim(),
+            phone: phoneNumber || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
             authLevel: user?.userInfo.authLevel,
             mobileApp: "mobileApp",
             jwtId: jwtToken,
+            source: "Mobile App",
           };
 
           loginWithJWT(jwtToken)
@@ -388,10 +419,12 @@ const NewBillerHome = ({ navigation }) => {
             buttonVariant={isAutoPayStatus ? "success" : "primary"}
             isActive={isAutoPayStatus}
             onButtonPress={() => {
-              navigation.navigate("ArticleWindowUtility", {
-                url: `${Config.PORTAL_BASE_URL}/portals/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
+              navigation.navigate("AutoPayPCIConnector", {
+                url: `${Config.URL}/billing`,
                 name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-                injectPaymentObj: true,
+                useNewPayment: true,
+                status: isAutoPayStatus,
+                paymentDetails: defaultPaymentDetails,
               });
             }}
           />
@@ -418,9 +451,11 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
-      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-        <ZendeskChatIcon />
-      </View>
+     
+        <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+          <ZendeskChatIcon />
+        </View>
+      
       <View style={{ flex: 1 }}>
         <SafeAreaView
           style={{ flex: 1 }}

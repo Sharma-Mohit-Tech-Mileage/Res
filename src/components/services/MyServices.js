@@ -24,6 +24,7 @@ import {
   selectCurrentUsage,
   selectCurrentUsageLoading,
 } from "../../redux/selectors/servicesSelectors";
+ import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
 const MyServicesContent = ({ route }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
@@ -113,6 +114,9 @@ const MyServicesContent = ({ route }) => {
 
       <View style={{ paddingTop: insets.top + 27 }}>
         <ServiceHeader />
+        <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+      <ZendeskChatIcon />
+      </View>
       </View>
 
       <ScrollView

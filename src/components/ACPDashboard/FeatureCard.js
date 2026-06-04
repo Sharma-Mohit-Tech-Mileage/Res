@@ -4,6 +4,7 @@ import { FontFamily, FontSize, Color, Padding, } from "../../../GlobalStyles";
 import Icon from "../common/Icon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../common/customui/Touchable";
+
 const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primary", isActive = false, onButtonPress, isLoading, }) => {
   const getButtonStyle = () => {
     switch (buttonVariant) {
@@ -96,9 +97,9 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_xl,
     shadowColor: "#000000",
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2, // #00000040 is approximately 25% opacity
+    shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 4, // for Android shadow effect
+    elevation: 4,
   },
   header: {
     paddingHorizontal: Padding.p_base,

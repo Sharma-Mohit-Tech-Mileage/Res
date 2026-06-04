@@ -1,123 +1,96 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { StyleSheet, Text, View, ScrollView, Linking, Platform, } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { Padding, Color, FontFamily, FontSize, } from "../../../GlobalStyles";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Linking,
+  Platform,
+  Pressable,
+} from "react-native";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
+import {
+  Padding,
+  Color,
+  FontFamily,
+  Border,
+  FontSize,
+} from "../../../GlobalStyles";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSMSSelection } from "../../redux/actions/ProfileActionSuite";
+import NotificationAlert from "../common/customui/NotificationAlert";
+import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../utility/constant";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
-import { digitsToWords } from "../../utils/a11y";
-import Touchable from "../common/customui/Touchable";
-import RightArrow from "../../res/svgIcons/RightArrow";
-
-const SUPPORT_PHONE = "833-807-1020";
-const SUPPORT_HOURS_TRAILER = " Monday-Friday 9:00 AM-6:00 PM CST.";
-const SUPPORT_CALL_A11Y_LABEL =
-  "Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time";
-const SUPPORT_CALL_A11Y_HINT = "Double tap to call customer service 833 807 1020";
-const SUPPORT_HOURS_A11Y_LABEL =
-  "Monday to Friday 9:00 AM to 6:00 PM Central Standard Time";
-
-const dialSupport = () => {
-  const dialUrl =
-    Platform.OS === "android"
-      ? `tel:${SUPPORT_PHONE}`
-      : `telprompt:${SUPPORT_PHONE}`;
-  Linking.openURL(dialUrl);
-};
-
-const CallSupportBlock = ({ showReconnectMessage }) => {
-  const leadIn = showReconnectMessage
-    ? "To reconnect your service, please call us at "
-    : "To cancel or change service, please call us at ";
-
-  const hoursText = (extraA11y) => (
-    <Text
-      style={styles.manageHoursText}
-      accessibilityLabel={SUPPORT_HOURS_A11Y_LABEL}
-      {...extraA11y}
-    >
-      {SUPPORT_HOURS_TRAILER}
-    </Text>
-  );
-
-  const phoneLink = (extraHoursA11y) => (
-    <Text
-      style={styles.manageLinkText}
-      onPress={dialSupport}
-      accessibilityRole="link"
-      accessibilityLabel={SUPPORT_CALL_A11Y_LABEL}
-      accessibilityHint={SUPPORT_CALL_A11Y_HINT}
-    >
-      {SUPPORT_PHONE}
-      {hoursText(extraHoursA11y)}
-    </Text>
-  );
-
-  if (Platform.OS === "android") {
-    return (
-      <View style={styles.manageBlockAndroid}>
-        <Text style={styles.manageBodyText}>
-          {leadIn}
-          {phoneLink({ accessible: true, importantForAccessibility: "yes" })}
-        </Text>
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.manageBlockIOS}>
-      <Text style={styles.manageBodyText}>{leadIn}</Text>
-      {phoneLink()}
-    </View>
-  );
-};
+import EditIcon from "../../../assets/svgs/EditIcon";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const dispatch = useDispatch();
-  const [smsRequested, setSmsRequested] = useState(false);
-  const [smsFetchTimedOut, setSmsFetchTimedOut] = useState(false);
-  const profileDetails = useSelector((s) => s.profile?.profileDetails || {});
-  const accountDetails = useSelector((s) => s.profile?.accountDetails || {});
-  const smsSubscription = useSelector((s) => s.profile?.smsSubscription || []);
-  const userInfo = useSelector((s) => s.user?.userData?.userInfo);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState(undefined);
+  const [showPhoneLoading, setShowPhoneLoading] = useState(false);
+  const [showEmailLoading, setShowEmailLoading] = useState(false);
+  const profile = useSelector((state) => state.profile || {});
+  const profileDetails = profile.profileDetails || {};
+  const accountDetails = profile.accountDetails || {};
 
   const emailAddress = getPrimaryEmail(accountDetails);
 
+  console.log("Profile details from Redux:", profile);
+
   useEffect(() => {
-    if (!smsRequested) {
-      return undefined;
+    if (emailAddress) {
+      setShowEmailLoading(false);
     }
-    const t = setTimeout(() => setSmsFetchTimedOut(true), 5000);
-    return () => clearTimeout(t);
-  }, [smsRequested]);
+  }, [profile, emailAddress]);
 
-  const smsRow = smsSubscription[0];
-  const phoneNumber = smsRow?.phoneNum || "";
-  const showPhoneLoading = smsRequested && !smsRow && !smsFetchTimedOut;
-
-  const TextNotifSettings = useMemo(() => {
-    const statusFor = (i) => (smsRow?.smsMessageType?.[i]?.optOutFlag ? "Off" : "On");
-    return [
-      { id: "Appointment", type: "Appointments", status: smsRow ? statusFor(0) : "Off" },
-      { id: "outage", type: "Outage", status: smsRow ? statusFor(1) : "Off" },
-      { id: "billing", type: "Billing", status: smsRow ? statusFor(2) : "Off" },
-    ];
-  }, [smsRow]);
+  const TextNotifSettings = useMemo(
+    () => [
+      {
+        id: "Appointment",
+        type: "Appointments",
+        status: "Off",
+      },
+      {
+        id: "outage",
+        type: "Outage",
+        status: "Off",
+      },
+      {
+        id: "billing",
+        type: "Billing",
+        status: "Off",
+      },
+    ],
+    [],
+  );
 
   const handleArrowPress = (fieldType) => {
+    console.log(`Arrow pressed for: ${fieldType}`);
+    // Add your callback logic here
     if (fieldType === "email") {
-      navigation.navigate("EmailNotifications");
+      navigation.navigate("EmailNotifications", {
+        email: emailAddress,
+        //isPaperLess: isPaperLess,
+      });
     } else if (fieldType === "mobile") {
       navigation.navigate("TextNotifications", {
         additionalData: {
-          optOut: TextNotifSettings[0].status === "On",
-          outageOptOut: TextNotifSettings[1].status === "On",
-          billingOptOutStatus: TextNotifSettings[2].status === "On",
-          phoneNumber,
+          optOut: TextNotifSettings[0].status == "On" ? true : false,
+          outageOptOut: TextNotifSettings[1].status == "On" ? true : false,
+          billingOptOutStatus:
+            TextNotifSettings[2].status == "On" ? true : false,
+          phoneNumber: phoneNumber,
         },
       });
     }
@@ -138,6 +111,8 @@ const ProfileSettings = () => {
     profileDetails.fullName ||
     "";
 
+  const userInfo = useSelector((state) => state.user.userData.userInfo);
+
   const formatAddressPart = (value) => {
     const input = (value || "").trim();
     if (!input) return "";
@@ -156,30 +131,101 @@ const ProfileSettings = () => {
     return input.toUpperCase();
   };
 
-  const formatAddress = (addr) => {
-    const { line1, line2, city, state, zip, postal_code } = addr || {};
+  const serviceAddress = () => {
+    const serviceAddr = accountDetails.service_address || {};
+    const { line1, line2, city, state, zip, postal_code } = serviceAddr;
     const formattedLine1 = formatAddressPart(line1);
     const formattedLine2 = formatAddressPart(line2);
     const formattedCity = formatAddressPart(city);
     const formattedState = formatStatePart(state);
     const rawZip = (zip || postal_code || "").toString().trim();
     const formattedZip = rawZip ? rawZip.slice(0, 5) : "";
-    const firstLine = `${formattedLine1}${formattedLine2 ? " " + formattedLine2 : ""}`.trim();
-    const secondLine = `${formattedCity}${formattedState ? ", " + formattedState : ""}${
-      formattedZip ? " " + formattedZip : ""
+    const firstLine = `${formattedLine1}${
+      formattedLine2 ? " " + formattedLine2 : ""
     }`.trim();
+    const secondLine = `${formattedCity}${
+      formattedState ? ", " + formattedState : ""
+    }${formattedZip ? " " + formattedZip : ""}`.trim();
 
     return `${firstLine}${secondLine ? "\n" + secondLine : ""}`;
   };
 
-  const serviceAddress = () => formatAddress(accountDetails.service_address);
-  const billingAddress = () => formatAddress(accountDetails.bill_to_address);
+  const billingAddress = () => {
+    const billingAddr = accountDetails.bill_to_address || {};
+    const { line1, line2, city, state, zip, postal_code } = billingAddr;
+    const formattedLine1 = formatAddressPart(line1);
+    const formattedLine2 = formatAddressPart(line2);
+    const formattedCity = formatAddressPart(city);
+    const formattedState = formatStatePart(state);
+    const rawZip = (zip || postal_code || "").toString().trim();
+    const formattedZip = rawZip ? rawZip.slice(0, 5) : "";
+    const firstLine = `${formattedLine1}${
+      formattedLine2 ? " " + formattedLine2 : ""
+    }`.trim();
+    const secondLine = `${formattedCity}${
+      formattedState ? ", " + formattedState : ""
+    }${formattedZip ? " " + formattedZip : ""}`.trim();
+
+    return `${firstLine}${secondLine ? "\n" + secondLine : ""}`;
+  };
+
+  const numberToWordsForAccessibility = (numStr) => {
+    if (!numStr) return "";
+    const digitsMap = {
+      0: "zero",
+      1: "one",
+      2: "two",
+      3: "three",
+      4: "four",
+      5: "five",
+      6: "six",
+      7: "seven",
+      8: "eight",
+      9: "nine",
+    };
+    return numStr
+      .split("")
+      .map((digit) => digitsMap[digit] || digit)
+      .join(" ");
+  };
 
   const formatAddressForAccessibility = (address) => {
     const addressText = (address || "").toString();
     if (!addressText) return "N/A";
 
-    return addressText.replace(/\d+/g, (match) => digitsToWords(match));
+    return addressText.replace(/\d+/g, (match) =>
+      numberToWordsForAccessibility(match),
+    );
+  };
+
+  const getTextNotificationsData = () => {
+    setShowPhoneLoading(true);
+    getUser().then((res1) => {
+      const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
+        accountNumber: res1.userInfo?.accountNumber,
+      });
+      console.log("REQUEST", endpointUrl);
+      GetApiRequest(
+        endpointUrl,
+        (res) => {
+          if (res) {
+            res[0]?.smsMessageType.forEach((value, index) => {
+              console.log(`Index: ${index}, Value: ${value}`);
+              TextNotifSettings[index].status = value?.optOutFlag
+                ? "Off"
+                : "On";
+            });
+            let phoneNum = res[0]?.phoneNum || "";
+            setPhoneNumber(phoneNum);
+          }
+          setShowPhoneLoading(false);
+        },
+        (error) => {
+          setShowPhoneLoading(false);
+          console.error("Error on retrying getTextNotificationsData", error);
+        },
+      );
+    });
   };
 
   const showReconnectMessage = userInfo
@@ -190,27 +236,54 @@ const ProfileSettings = () => {
     : false;
 
   useEffect(() => {
+    if (accountDetails?.bill_to_address) {
+      console.log(
+        "Billing Address API response:",
+        accountDetails.bill_to_address,
+      );
+    }
+  }, [accountDetails?.bill_to_address]);
+
+  useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      dispatch(fetchSMSSelection());
-      setSmsRequested(true);
-      setSmsFetchTimedOut(false);
+      // Call your API here
+      dispatch(fetchProfileDetails());
+      setShowEmailLoading(true);
+      getTextNotificationsData();
     });
     return unsubscribe;
-  }, [navigation, dispatch]);
+  }, [navigation]);
+
+  const makeCall = (number) => {
+    let phoneNumber = "";
+
+    if (Platform.OS === "android") {
+      phoneNumber = `tel:${number}`;
+    } else {
+      phoneNumber = `telprompt:${number}`;
+    }
+
+    Linking.openURL(phoneNumber);
+  };
 
   return (
-    <View>
+    <View style={{ zIndex: 1 }}>
       <ProfileSettingsHeader
         title="Profile"
         onPressBack={() => navigation.goBack()}
       />
       <ScrollView accessibilityLabel="Profile settings page.">
-        <View style={styles.scrollColumn}>
-          <View style={styles.cardWrapper}>
-            <View style={styles.card}>
-              <View style={[styles.sectionHeader, styles.sectionHeaderTopGap]}>
+        <View style={{ flexDirection: "column", marginBottom: 300 }}>
+          <View style={styles.frameParent}>
+            <View style={[styles.frameGroup]}>
+              <View
+                style={[
+                  styles.generalInformationParent,
+                  { marginTop: Padding.p_base },
+                ]}
+              >
                 <Text
-                  style={[styles.sectionTitle, styles.bodyText]}
+                  style={[styles.generalInformation, styles.melissaTypo]}
                   accessible={true}
                   accessibilityRole="header"
                   accessibilityLevel={2}
@@ -218,72 +291,86 @@ const ProfileSettings = () => {
                   General Information
                 </Text>
               </View>
-              <View style={styles.rowGroup}>
-                <View style={styles.row}>
-                  <Text style={styles.rowLabel}>{"Customer Name"}</Text>
-                  <Text style={[styles.rowValue, styles.bodyText]}>
+              <View style={styles.frameContainer}>
+                <View style={styles.firstNameParent}>
+                  <Text style={styles.firstName}>{"Customer Name"}</Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>
                     {customerName}
                   </Text>
                 </View>
-                <View style={styles.row}>
-                  <Text style={styles.rowLabel}>Username</Text>
-                  <Text style={[styles.rowValue, styles.bodyText]}>
+                <View style={styles.firstNameParent}>
+                  <Text style={styles.firstName}>Username</Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>
                     {profileDetails.userName}
                   </Text>
                 </View>
 
-                <View style={styles.row}>
-                  <Text style={styles.rowLabel}>Account Number</Text>
+                <View style={styles.firstNameParent}>
+                  <Text style={styles.firstName}>Account Number</Text>
                   <Text
-                    style={[styles.rowValue, styles.bodyText]}
+                    style={[styles.melissa, styles.melissaTypo]}
                     accessible={true}
                     accessibilityRole="text"
                     accessibilityLabel={`Account Number ${
                       profileDetails.accountNumber
-                        ? digitsToWords(profileDetails.accountNumber.toString())
+                        ? numberToWordsForAccessibility(
+                            profileDetails.accountNumber.toString(),
+                          )
                         : "N/A"
                     }`}
                   >
                     {profileDetails.accountNumber}
                   </Text>
                 </View>
-
-                <View
-                  style={styles.editableRow}
-                  accessible={false}
-                  importantForAccessibility="no"
-                >
+                {showEmailLoading ? (
+                  <SkeletonPlaceholder>
+                    <View style={styles.profileFieldSkeleton} />
+                  </SkeletonPlaceholder>
+                ) : (
                   <View
-                    style={styles.editableContent}
+                    style={styles.editableRow}
                     accessible={false}
                     importantForAccessibility="no"
                   >
-                    <Text
-                      style={styles.rowLabel}
-                      accessible={true}
-                      accessibilityRole="text"
-                      accessibilityLabel="Email Address"
+                    <View
+                      style={[
+                        styles.editableContent,
+                        { marginBottom: Padding.p_9xs },
+                      ]}
+                      accessible={false}
+                      importantForAccessibility="no"
                     >
-                      Email Address
-                    </Text>
-                    <Text
-                      style={[styles.rowValue, styles.bodyText]}
+                      <Text
+                        style={styles.firstName}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel="Email Address"
+                      >
+                        Email Address
+                      </Text>
+                      <Text
+                        style={[styles.melissa, styles.melissaTypo]}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel={`Email Address: ${
+                          emailAddress || "N/A"
+                        }`}
+                      >
+                        {emailAddress || "N/A"}
+                      </Text>
+                    </View>
+                    <Pressable
+                      style={styles.editButton}
+                      onPress={() => handleArrowPress("email")}
                       accessible={true}
-                      accessibilityRole="text"
-                      accessibilityLabel={`Email Address: ${emailAddress || "N/A"}`}
+                      accessibilityRole="button"
+                      accessibilityLabel="Edit email address"
+                      accessibilityHint="Double tap to edit your email address"
                     >
-                      {emailAddress || "N/A"}
-                    </Text>
+                      <EditIcon />
+                    </Pressable>
                   </View>
-                  <Touchable
-                    style={styles.editButton}
-                    onPress={() => handleArrowPress("email")}
-                    accessibilityLabel="Edit email address"
-                    accessibilityHint="Double tap to edit your email address"
-                  >
-                    <RightArrow />
-                  </Touchable>
-                </View>
+                )}
 
                 {phoneNumber ? (
                   <View
@@ -292,39 +379,47 @@ const ProfileSettings = () => {
                     importantForAccessibility="no"
                   >
                     <View
-                      style={styles.editableContent}
+                      style={[
+                        styles.editableContent,
+                        { marginBottom: Padding.p_9xs },
+                      ]}
                       accessible={false}
                       importantForAccessibility="no"
                     >
                       <Text
-                        style={styles.rowLabel}
+                        style={styles.firstName}
                         accessible={true}
                         accessibilityRole="text"
                         accessibilityLabel="Mobile Number"
                       >
                         Mobile Number
                       </Text>
+
                       <Text
-                        style={[styles.rowValue, styles.bodyText]}
+                        style={[styles.melissa, styles.melissaTypo]}
                         accessible={true}
                         accessibilityRole="text"
                         accessibilityLabel={`Mobile Number: ${
                           phoneNumber
-                            ? digitsToWords(phoneNumber.toString())
+                            ? numberToWordsForAccessibility(
+                                phoneNumber.toString(),
+                              )
                             : "N/A"
                         }`}
                       >
                         {phoneNumber || "N/A"}
                       </Text>
                     </View>
-                    <Touchable
+                    <Pressable
                       style={styles.editButton}
                       onPress={() => handleArrowPress("mobile")}
+                      accessible={true}
+                      accessibilityRole="button"
                       accessibilityLabel="Edit mobile number"
                       accessibilityHint="Double tap to edit your mobile number"
                     >
-                      <RightArrow />
-                    </Touchable>
+                      <EditIcon />
+                    </Pressable>
                   </View>
                 ) : (
                   showPhoneLoading && (
@@ -337,14 +432,14 @@ const ProfileSettings = () => {
             </View>
           </View>
 
-          <View style={styles.cardWrapper}>
-            <View style={styles.card}>
-              <View style={styles.sectionHeader}>
+          <View style={styles.frameParent}>
+            <View style={[styles.frameGroup]}>
+              <View style={[styles.generalInformationParent]}>
                 <Text
                   style={[
-                    styles.sectionTitle,
-                    styles.bodyText,
-                    styles.sectionHeaderTopGap,
+                    styles.generalInformation,
+                    styles.melissaTypo,
+                    { marginTop: Padding.p_base },
                   ]}
                   accessible={true}
                   accessibilityRole="header"
@@ -353,51 +448,174 @@ const ProfileSettings = () => {
                   Addresses
                 </Text>
               </View>
-              <View style={styles.rowGroup}>
-                <View style={styles.row}>
-                  <Text style={styles.rowLabel}>{"Service Address"}</Text>
+              <View style={styles.frameContainer}>
+                <View style={styles.firstNameParent}>
+                  <Text style={styles.firstName}>{"Service Address"}</Text>
                   <Text
-                    style={[styles.rowValue, styles.bodyText, styles.addressValue]}
+                    style={[
+                      styles.melissa,
+                      styles.melissaTypo,
+                      { lineHeight: 20, marginTop: 4 },
+                    ]}
                     accessible={true}
                     accessibilityRole="text"
-                    accessibilityLabel={formatAddressForAccessibility(
+                    accessibilityLabel={` ${formatAddressForAccessibility(
                       serviceAddress(),
-                    )}
+                    )}`}
                   >
                     {serviceAddress() || "N/A"}
                   </Text>
                 </View>
-                <View style={styles.row}>
-                  <Text style={styles.rowLabel}>Billing Address</Text>
+                <View style={styles.firstNameParent}>
+                  <Text style={styles.firstName}>Billing Address</Text>
                   <Text
-                    style={[styles.rowValue, styles.bodyText, styles.addressValue]}
+                    style={[
+                      styles.melissa,
+                      styles.melissaTypo,
+                      { lineHeight: 20, marginTop: 4 },
+                    ]}
                     accessible={true}
                     accessibilityRole="text"
-                    accessibilityLabel={formatAddressForAccessibility(
+                    accessibilityLabel={` ${formatAddressForAccessibility(
                       billingAddress(),
-                    )}
+                    )}`}
                   >
                     {billingAddress() || "N/A"}
                   </Text>
                 </View>
               </View>
-              <View style={styles.dividerWrapper}>
-                <View style={styles.divider} />
+              <View
+                style={[
+                  { paddingHorizontal: Padding.p_5xl },
+                  styles.frameParentSpaceBlock,
+                ]}
+              >
+                <View style={styles.frameChild} />
               </View>
             </View>
           </View>
-
-          <View style={[styles.card, styles.manageCardSpacing]}>
-            <View style={styles.manageInner}>
+          <View
+            style={[styles.frameGroup, { marginHorizontal: Padding.p_base }]}
+          >
+            <View style={{ padding: Padding.p_xl, flexDirection: "column" }}>
               <Text
-                style={[styles.sectionTitle, styles.bodyText]}
+                style={[styles.generalInformation, styles.melissaTypo]}
                 accessible={true}
                 accessibilityRole="header"
                 accessibilityLevel={2}
               >
                 Manage My Service
               </Text>
-              <CallSupportBlock showReconnectMessage={showReconnectMessage} />
+              {showReconnectMessage ? (
+                // Show reconnect message, no link
+                Platform.OS === "android" ? (
+                  <View style={{ marginTop: 20 }}>
+                    <Text style={styles.manageSerTxt1}>
+                      To reconnect your service, please call us at{" "}
+                      <Text
+                        style={styles.manageSerTxt2}
+                        onPress={() => makeCall("833-807-1020")}
+                        accessibilityRole="link"
+                        accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
+                        accessibilityHint="Double tap to call customer service 833 807 1020"
+                      >
+                        833-807-1020
+                        <Text
+                          style={styles.manageSerTxt3}
+                          accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                          accessible={true}
+                          importantForAccessibility="yes"
+                        >
+                          {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                        </Text>
+                      </Text>
+                    </Text>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      marginTop: 20,
+                    }}
+                  >
+                    <Text style={styles.manageSerTxt1}>
+                      To reconnect your service, please call us at{" "}
+                    </Text>
+                    <Text
+                      style={styles.manageSerTxt2}
+                      onPress={() => makeCall("833-807-1020")}
+                      accessibilityRole="link"
+                      accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
+                      accessibilityHint="Double tap to call customer service 833 807 1020"
+                    >
+                      833-807-1020
+                      <Text
+                        style={styles.manageSerTxt3}
+                        accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                      >
+                        {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                      </Text>
+                    </Text>
+                  </View>
+                )
+              ) : (
+                <>
+                  {Platform.OS === "android" ? (
+                    <View style={{ marginTop: 20 }}>
+                      <Text style={styles.manageSerTxt1}>
+                        To cancel or change service, please call us at{" "}
+                        <Text
+                          style={styles.manageSerTxt2}
+                          onPress={() => makeCall("833-807-1020")}
+                          accessibilityRole="link"
+                          accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
+                          accessibilityHint="Double tap to call customer service 833 807 1020"
+                        >
+                          833-807-1020
+                          <Text
+                            style={styles.manageSerTxt3}
+                            accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                            accessible={true}
+                            importantForAccessibility="yes"
+                          >
+                            {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                          </Text>
+                        </Text>
+                      </Text>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        marginTop: 20,
+                      }}
+                    >
+                      <Text style={styles.manageSerTxt1}>
+                        To cancel or change service, please call us at{" "}
+                      </Text>
+                      <Text
+                        style={styles.manageSerTxt2}
+                        onPress={() => makeCall("833-807-1020")}
+                        accessibilityRole="link"
+                        accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
+                        accessibilityHint="Double tap to call customer service 833 807 1020"
+                      >
+                        833-807-1020
+                        <Text
+                          style={styles.manageSerTxt3}
+                          accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                        >
+                          {" Monday-Friday 9:00 AM-6:00 PM CST."}
+                        </Text>
+                      </Text>
+                    </View>
+                  )}
+                </>
+              )}
             </View>
           </View>
         </View>
@@ -407,60 +625,58 @@ const ProfileSettings = () => {
 };
 
 const styles = StyleSheet.create({
-  scrollColumn: {
-    flexDirection: "column",
-    marginBottom: 300,
-  },
-  cardWrapper: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
-    width: "100%",
-  },
-  card: {
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: Color.sparklightGray,
-    backgroundColor: Color.sparklightWhite,
-    overflow: "hidden",
-  },
-  manageCardSpacing: {
-    marginHorizontal: Padding.p_base,
-  },
-  manageInner: {
-    padding: Padding.p_xl,
-    flexDirection: "column",
-  },
-  sectionHeader: {
-    paddingHorizontal: Padding.p_xl,
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  sectionHeaderTopGap: {
-    marginTop: Padding.p_base,
-  },
-  sectionTitle: {
-    flex: 1,
-    fontSize: FontSize.size_3xl,
-    textAlign: "left",
-    fontWeight: "400",
-  },
-  bodyText: {
+  melissaTypo: {
     color: Color.sparklightGray1,
     lineHeight: 28,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
   },
-  rowGroup: {
-    alignSelf: "stretch",
-    marginTop: Padding.p_base,
-  },
-  row: {
-    paddingVertical: Padding.p_5xs,
+  buttonsLayout: {
+    paddingHorizontal: Padding.p_base,
+    height: 32,
     justifyContent: "center",
-    paddingHorizontal: Padding.p_xl,
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+  },
+  text1Clr: {
+    color: Color.colorWhitesmoke_200,
+    textAlign: "center",
+  },
+  badgeBorder: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderRadius: Border.br_11xs,
+  },
+  textTypo: {
+    lineHeight: 18,
+    fontSize: FontSize.size_xs,
+    fontWeight: "600",
+  },
+  frameParentSpaceBlock: {
+    marginTop: Padding.p_base,
     alignSelf: "stretch",
   },
-  rowLabel: {
+  generalInformation: {
+    flex: 1,
+    fontSize: FontSize.size_3xl,
+    textAlign: "left",
+    fontWeight: "400",
+  },
+  makePayment: {
+    textAlign: "center",
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.openSansRegular,
+  },
+  buttons: {
+    marginLeft: Padding.p_3xs,
+    backgroundColor: Color.colorMidnightblue,
+  },
+  generalInformationParent: {
+    paddingHorizontal: Padding.p_xl,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  firstName: {
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
     fontSize: FontSize.size_sm,
@@ -468,14 +684,16 @@ const styles = StyleSheet.create({
     color: Color.colorGray_100,
     lineHeight: 28,
   },
-  rowValue: {
+  melissa: {
     fontSize: FontSize.size_base,
     textAlign: "left",
     fontWeight: "400",
   },
-  addressValue: {
-    lineHeight: 20,
-    marginTop: Padding.p_9xs,
+  firstNameParent: {
+    paddingVertical: Padding.p_5xs,
+    justifyContent: "center",
+    paddingHorizontal: Padding.p_xl,
+    alignSelf: "stretch",
   },
   editableRow: {
     flexDirection: "row",
@@ -486,10 +704,12 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
     paddingVertical: Padding.p_5xs,
+    justifyContent: "center",
     paddingHorizontal: Padding.p_xl,
-    marginBottom: Padding.p_9xs,
   },
   editButton: {
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Padding.p_base,
@@ -501,40 +721,71 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_base,
     borderRadius: 5,
   },
-  dividerWrapper: {
-    paddingHorizontal: Padding.p_5xl,
-    marginTop: Padding.p_base,
+  text: {
+    color: Color.success700,
+    fontFamily: FontFamily.openSansSemiBold,
+    textAlign: "center",
+  },
+  badge: {
+    borderColor: Color.colorAquamarine,
+    backgroundColor: Color.success50,
+    paddingHorizontal: Padding.p_5xs,
+    paddingVertical: Padding.p_11xs,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  badgeWrapper: {
+    marginTop: 6,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  notificationsWrapper: {
+    paddingTop: Padding.p_base,
+    paddingBottom: Padding.p_5xs,
+    paddingHorizontal: Padding.p_xl,
     alignSelf: "stretch",
   },
-  divider: {
+  infoWrapper: {
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
+  },
+  frameContainer: {
+    alignSelf: "stretch",
+    marginTop: Padding.p_base,
+  },
+  frameChild: {
     height: 1,
     backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
   },
-  manageBlockAndroid: {
-    marginTop: Padding.p_xl,
+  frameGroup: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: Color.sparklightGray,
+    backgroundColor: Color.sparklightWhite,
+    overflow: "hidden",
   },
-  manageBlockIOS: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    marginTop: Padding.p_xl,
+  frameParent: {
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: Padding.p_base,
+    width: "100%",
   },
-  manageBodyText: {
+  manageSerTxt1: {
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "400",
     fontSize: FontSize.size_base,
     textAlign: "left",
-    color: Color.colorblack_100,
-    marginTop: Padding.p_8xs,
+    color: "#000000",
+    marginTop: 5,
   },
-  manageLinkText: {
+  manageSerTxt2: {
     fontFamily: FontFamily.openSansSemiBold,
     color: Color.colorMidnightblue,
     fontWeight: "700",
     fontSize: FontSize.size_base,
   },
-  manageHoursText: {
+  manageSerTxt3: {
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     color: Color.colorGray_100,
