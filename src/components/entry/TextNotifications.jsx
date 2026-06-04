@@ -29,6 +29,7 @@ import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import NavigationUtils from "./NavigationUtils";
 import { requiredField } from "../../styles/utilities";
+import { A11Y } from "../../styles/theme";
 const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
@@ -414,6 +415,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginRight: 0,
+    minHeight: A11Y.minTouch,
   },
   checkBoxAreaViewText: {
     fontSize: 14,

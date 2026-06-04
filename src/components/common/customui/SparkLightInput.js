@@ -5,7 +5,6 @@ import {
   Text,
   StyleSheet,
   AccessibilityInfo,
-  findNodeHandle,
 } from "react-native";
 import {
   FontFamily,
@@ -15,7 +14,7 @@ import {
   Border,
 } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
-import { formatInputA11yReadout } from "../../../utils/a11y";
+import { formatInputA11yReadout, setFocusToRef } from "../../../utils/a11y";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
@@ -71,11 +70,8 @@ const SparkLightInput = React.forwardRef(({
           inputRef.current?.setNativeProps({ text: currentValue });
         }, 50);
       }
-      // Delay accessibility focus to allow re-render with error state
-      setTimeout(() => {
-        const handle = findNodeHandle(inputRef.current);
-        if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-      }, 350);
+      // Move screen-reader focus to the input (platform-aware) after error re-render
+      setFocusToRef(inputRef, { delay: 350 });
     },
   }));
 

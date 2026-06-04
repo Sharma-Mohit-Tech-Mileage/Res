@@ -113,7 +113,9 @@ const SparkLightDropdown = ({
       <Modal
         visible={visible}
         transparent
-        animationType="slide"
+        statusBarTranslucent
+        hardwareAccelerated
+        animationType="fade"
         onRequestClose={closePicker}
         onDismiss={closePicker}
       >
