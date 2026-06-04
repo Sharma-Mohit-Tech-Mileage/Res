@@ -4,11 +4,13 @@ import {
   View,
   Text,
   Modal,
-  SafeAreaView,
+  ScrollView,
   findNodeHandle,
   AccessibilityInfo,
   Platform,
+  Dimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Box } from 'native-base';
 import { Padding, Color, FontFamily, FontSize } from '../../../../GlobalStyles';
 import DownArrow from '../../../res/svgIcons/DownArrow';
@@ -29,6 +31,7 @@ const SparkLightDropdown = ({
   const validItems = useMemo(() => (Array.isArray(items) ? items : []), [items]);
   const [visible, setVisible] = useState(false);
   const dropdownRef = useRef(null);
+  const insets = useSafeAreaInsets();
 
   const getAccessibilityLabel = useCallback(() => {
     return selectedValue ? `Currently selected: ${selectedValue}` : 'No option selected';
@@ -149,7 +152,21 @@ const SparkLightDropdown = ({
               </View>
             </View>
 
-            <SafeAreaView style={styles.optionsList}>
+            <ScrollView
+              style={styles.optionsList}
+              contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+              bounces={false}
+            >
+              {validItems.length === 0 && (
+                <View
+                  style={[styles.option, styles.lastOption]}
+                  accessible
+                  accessibilityRole="text"
+                  accessibilityLabel="No options available"
+                >
+                  <Text style={styles.optionText} accessible={false}>No options available</Text>
+                </View>
+              )}
               {validItems.map((item, index) => {
                 const isSelected = selectedValue === item;
                 return (
@@ -192,7 +209,7 @@ const SparkLightDropdown = ({
                   </Touchable>
                 );
               })}
-            </SafeAreaView>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -244,15 +261,17 @@ const styles = StyleSheet.create({
   },
 
   pickerContainer: {
+    width: '100%',
     backgroundColor: '#F2F2F7',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    maxHeight: '80%',
+    maxHeight: Math.round(Dimensions.get('window').height * 0.8),
+    zIndex: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 5,
+    elevation: 24,
   },
 
   header: {
@@ -304,6 +323,7 @@ const styles = StyleSheet.create({
 
   optionsList: {
     backgroundColor: '#F2F2F7',
+    flexShrink: 1,
   },
 
   option: {

@@ -209,7 +209,6 @@ const EmailNotifications = ({ navigation }) => {
               }
               onPress={handleSubmit(enableEmailNotifications, (errors) => {
                 if (errors.email) {
-                  AccessibilityInfo.announceForAccessibility(errors.email.message);
                   setTimeout(() => {
                     emailRef.current?.focus();
                   }, 300);

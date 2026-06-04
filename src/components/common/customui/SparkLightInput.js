@@ -62,16 +62,8 @@ const SparkLightInput = React.forwardRef(({
   useImperativeHandle(ref, () => ({
     focus: () => {
       hasBlurred.current = true;
-      inputRef.current?.focus();
-      // Workaround: secureTextEntry may clear text on programmatic focus
-      if (secure && valueRef.current) {
-        const currentValue = valueRef.current;
-        setTimeout(() => {
-          inputRef.current?.setNativeProps({ text: currentValue });
-        }, 50);
-      }
-      // Move screen-reader focus to the input (platform-aware) after error re-render
-      setFocusToRef(inputRef, { delay: 350 });
+      // Move only the screen-reader cursor (not input focus) so TalkBack reads the field without entering edit mode.
+      setFocusToRef(inputRef, { delay: 200 });
     },
   }));
 
@@ -228,7 +220,7 @@ const SparkLightInput = React.forwardRef(({
             isPhoneNumber: getKeyboardType() === "phone-pad",
             isSecure: secure,
           })}
-          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : undefined}
+          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : 'Double tap to edit'}
           accessibilityRole="text"
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}

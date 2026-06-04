@@ -88,7 +88,6 @@ const TextNotifications = ({ navigation }) => {
   const handleValidationError = useCallback((errors) => {
     scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     if (errors?.phoneNumber) {
-      AccessibilityInfo.announceForAccessibility(errors.phoneNumber.message);
       setTimeout(() => {
         phoneInputRef.current?.focus();
       }, 300);
@@ -205,7 +204,7 @@ const TextNotifications = ({ navigation }) => {
                     <SparkLightInput
                       ref={phoneInputRef}
                       placeholder="Mobile Number"
-                      keyboardType="number-pad"
+                      keyboardType="phone-pad"
                       accessibilityLabel="Mobile Number"
                       required={true}
                       onBlur={onBlur}
