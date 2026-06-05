@@ -164,13 +164,14 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
                 if (metadata.hasKey("authLevel"))       fields.put("29230167813271", metadata.getString("authLevel"));
                 if (metadata.hasKey("mobileApp"))       fields.put("29542765557655", metadata.getString("mobileApp"));
                 if (metadata.hasKey("jwtId"))           fields.put("29230180962071", metadata.getString("jwtId"));
+                if (metadata.hasKey("source"))           fields.put("40313200914455", metadata.getString("source"));
             } else {
                 // Prod mapping
                 if (metadata.hasKey("userAgent"))       fields.put("29542407930903", metadata.getString("userAgent"));
-                if (metadata.hasKey("appVersion"))      fields.put("29542536141335", metadata.getString("appVersion"));
+                if (metadata.hasKey("appVersion"))      fields.put("35417538078103", metadata.getString("appVersion"));
                 if (metadata.hasKey("timezoneOffsetId")) fields.put("29542663925271", metadata.getString("timezoneOffsetId"));
                 if (metadata.hasKey("platform"))        fields.put("29542734993559", metadata.getString("platform"));
-                if (metadata.hasKey("locationHrefId"))  fields.put("29230394216983", metadata.getString("locationHrefId"));
+                if (metadata.hasKey("locationHrefId"))  fields.put("29542765557655", metadata.getString("locationHrefId"));
                 if (metadata.hasKey("ipAddress"))       fields.put("29542809023767", metadata.getString("ipAddress"));
                 if (metadata.hasKey("firstName"))       fields.put("360004035014", metadata.getString("firstName"));
                 if (metadata.hasKey("lastName"))        fields.put("360003976113", metadata.getString("lastName"));
@@ -180,8 +181,9 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
                 if (metadata.hasKey("userName"))        fields.put("29542395738007", metadata.getString("userName"));
                 if (metadata.hasKey("customerType"))    fields.put("29542894274711", metadata.getString("customerType"));
                 if (metadata.hasKey("authLevel"))       fields.put("29542032223895", metadata.getString("authLevel"));
-                if (metadata.hasKey("mobileApp"))       fields.put("29542765557655", metadata.getString("mobileApp"));
+                //if (metadata.hasKey("mobileApp"))       fields.put("29542765557655", metadata.getString("mobileApp"));
                 if (metadata.hasKey("jwtId"))           fields.put("29542045878167", metadata.getString("jwtId"));
+                if (metadata.hasKey("source"))          fields.put("40559477171223", metadata.getString("source"));
             }
 
             Zendesk.getInstance().getMessaging().setConversationFields(fields);
