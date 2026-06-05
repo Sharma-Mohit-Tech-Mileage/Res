@@ -1,91 +1,101 @@
-import React, { useRef } from 'react';
-import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser, storeUser } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
-import { storeUser } from "../../redux/utils/LocalStorage";
-import { PostAuthApiRequest } from "../../network/APIClient";
+import store from "../../redux/configureStore";
 import { saveUserInfo } from "../../redux/actions/UserAction";
+import { PostAuthApiRequest } from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import { INVALIDATE_ACCOUNT_CACHE } from "../../redux/constants/index";
+import Config from "react-native-config";
+import { Platform } from "react-native";
 
+const TAG = "[Session]";
 
-// import { getUser } from "../redux/utils/LocalStorage";
-
-//const [refresh, setRefresh] = useState();
+let _refreshPromise = null;
 
 const config = {
-    issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
-    clientId: "sparklight-customer-mobile-app",
-    redirectUrl:
-        "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
-    scopes: ["openid", "profile", "email", "phone", "address"],
-    iosPrefersEphemeralSession: false,
-    additionalParameters: { prompt: "login" },
+  issuer: Config.SSO_LOGIN,
+  clientId: Config.SSO_CLIENT_ID,
+  redirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
+  scopes: ["openid", "profile", "email", "phone", "address"],
+  iosPrefersEphemeralSession: true,
 };
 
-let loop;
-let loopContinue;
+const onSuccess = async (res, idToken = null) => {
+  if (!res) throw new Error("No token received from API");
 
-let timer = 0;
+  const { jwtToken: token, userInfo, idTokenGuid, refreshToken } = res;
+  if (!token) throw new Error("API response missing jwtToken");
 
-const renewToken = async () => {
-    loop = setTimeout(async () => {
-        await RefreshToken();
-    }, 900000);
-}
+  const now = Date.now();
+  const user = {
+    userInfo,
+    token,
+    tokenGuid: idTokenGuid,
+    refreshToken,
+    idToken,
+    jwtTimestamp: now,
+    idTokenTimestamp: now,
+  };
 
-const onSuccess = async (res) => {
-    if (res) {
-        let token = res.jwtToken;
-        let userInfo = res.userInfo;
-        let user = {
-            userInfo: userInfo,
-            token: token,
-            tokenGuid: res.idTokenGuid,
-            refreshToken: res.refreshToken
-        };
-
-        if (token) {
-            storeUser(user);
-        }
-
-        saveUserInfo(user);
-
-        console.log('setTimeout: ', timer);
-        timer = timer + 900000;
-        if (loopContinue) {
-            renewToken();
-        }        
-    }
+  await storeUser(user);
+  store.dispatch(saveUserInfo(user));
+  return token;
 };
 
 const onError = (error) => {
-    console.log("PostAuthApiRequest error", error);
+  console.warn(`${TAG} Session error:`, error.message || error);
+  throw error;
 };
 
-export const SetRenewTokenTimer = () => {
-    loopContinue = true;
-    renewToken();
-}
-
-export const SetClearTimer = () => {
-    loopContinue = false;
-    clearTimeout(loop);
-}
+const retryRequest = async (data, retries = 2) => {
+  try {
+    const endpointUrl = getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN);
+    return await new Promise((resolve, reject) => {
+      PostAuthApiRequest(endpointUrl, data, resolve, reject);
+    });
+  } catch (error) {
+    if (retries > 0) {
+      return retryRequest(data, retries - 1);
+    }
+    console.warn(`${TAG} Token refresh retries exhausted:`, error.message);
+    throw error;
+  }
+};
 
 export const RefreshToken = async () => {
+  if (_refreshPromise) return _refreshPromise;
+
+  const refreshStartTs = Date.now();
+
+  _refreshPromise = (async () => {
     try {
-        const user = await getUser();
-        const result = await refresh(config, {
-            refreshToken: user.refreshToken,
-        });
-        const data = { 
-            idToken: result.idToken,
-            accessToken: result.accessToken,
-            idTokenGuid: result.additionalParameters.session_state,
-            refreshToken: result.refreshToken
-        };
-        PostAuthApiRequest("/mobile/api/gettoken", data, onSuccess, onError);
+      const user = await getUser();
+      if (!user?.refreshToken) throw new Error("No refresh token in storage");
+
+      const result = await refresh(config, { refreshToken: user.refreshToken });
+
+      const data = {
+        idToken: result.idToken,
+        accessToken: result.accessToken,
+        idTokenGuid: result.additionalParameters?.session_state || "",
+        refreshToken: result.refreshToken,
+      };
+
+      const apiResponse = await retryRequest(data, 2);
+      const token = await onSuccess(apiResponse, result.idToken);
+      store.dispatch({ type: INVALIDATE_ACCOUNT_CACHE });
+      return token;
     } catch (error) {
-        console.error("Error fetching data", error);
+      console.warn(
+        `${TAG} RefreshToken FAILED | duration=${Date.now() - refreshStartTs}ms | error=${error.message}`
+      );
+      return onError(error);
     }
-}
-    
+  })();
+
+  try {
+    return await _refreshPromise;
+  } finally {
+    _refreshPromise = null;
+  }
+};

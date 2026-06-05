@@ -1,59 +1,67 @@
 import React from 'react';
-import { Text, Pressable, StyleSheet ,View} from 'react-native';
+import { Text, StyleSheet, View } from 'react-native';
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../../GlobalStyles";
+import { A11Y } from "../../../styles/theme";
+import { interaction } from "../../../styles/utilities";
+import Touchable from "./Touchable";
 
-const PrimaryButtom = ({ title, onPress, buttonType }) => {
-  const buttonStyles = [buttonType === 'submit' ? styles.button : styles.canbutton, buttonType === 'submit' ? styles.submitButton : styles.cancelButton];
+const PrimaryButton = ({ title, onPress, buttonType, accessibilityLabel }) => {
   const textStyles = [buttonType === 'submit' ? styles.submitText : styles.cancelText];
 
   return (
     <View style={styles.margin}>
-    <Pressable style={buttonStyles} onPress={onPress}>
-      <Text style={textStyles}>{title}</Text>
-    </Pressable>
+      <Touchable
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel !== undefined ? accessibilityLabel : undefined}
+        style={({ pressed }) => [
+          buttonType === 'submit' ? styles.button : styles.canbutton,
+          buttonType === 'submit' ? styles.submitButton : null,
+          pressed && interaction.pressed,
+        ]}
+        onPress={onPress}
+      >
+        <Text style={textStyles}>{title}</Text>
+      </Touchable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    //marginTop: Border.p_base,
     alignSelf: "stretch",
     paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
-    borderRadius: Border.br_11xs, // Adjust as needed
-    elevation: Padding.p_5xs, // For Android shadow
+    borderRadius: Border.br_11xs,
+    elevation: Padding.p_5xs,
+    minHeight: A11Y.minTouch,
+    justifyContent: "center",
   },
   canbutton: {
-    //marginTop: Border.p_base,
     alignSelf: "stretch",
     paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
-    //borderRadius: Border.br_11xs, // Adjust as needed
-    //elevation: Padding.p_5xs, // For Android shadow
+    minHeight: A11Y.minTouch,
+    justifyContent: "center",
   },
-  margin:{
+  margin: {
     marginTop: Padding.p_base,
   },
-
   submitButton: {
     backgroundColor: Color.colorMidnightblue,
-  },
-  cancelButton: {
-    backgroundColor: Color.colorWhitesmoke_200, // Adjust color as needed
   },
   submitText: {
     textAlign: "center",
     color: Color.sparklightWhite,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "700",
   },
   cancelText: {
     textAlign: "center",
-    color: Color.colorMidnightblue, // Adjust color as needed
+    color: Color.colorMidnightblue,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
   },
 });
 
-export default PrimaryButtom
+export default PrimaryButton;

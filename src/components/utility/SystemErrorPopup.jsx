@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Modal,
-  Linking
 } from "react-native";
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
@@ -46,20 +44,26 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
             <Text style={styles.message}>{message}</Text>
-            <TouchableOpacity
+             <TouchableOpacity
               style={styles.openBtn}
               onPress={onAction}
+              accessible={true}
+              accessibilityLabel={onActionTxt}
+              accessibilityRole="button"
             >
               <Text
                 style={styles.openPortaltxt}
               >
                {onActionTxt}
               </Text>
-            </TouchableOpacity>
-
+            </TouchableOpacity> 
+           {onClose!=undefined && (
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={onClose}
+              accessible={true}
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
             >
               <Text
                 style={styles.closeAlertTxt}
@@ -67,6 +71,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
                 Cancel
               </Text>
             </TouchableOpacity>
+           )}
           </View>
         </View>
       </Modal>
@@ -127,7 +132,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.sparklight_grey,
+    color: colors.black,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
     textAlign:'center',

@@ -1,98 +1,39 @@
 // SupportStack.js
 
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import supportScreen from "../../components/support/supportScreen";
 import Search from "../../components/support/Search";
-import CreateTicket from "../../components/support/CreateTicket";
-import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
-import TicketSupport from "../../components/support/TicketSupport";
-import TicketView from "../../components/support/TicketView";
-import ManageEquipment from "../../components/support/ManageEquipment";
-import { useTabBarVisibility } from "../TabBarVisibilityContext";
-import LiveSupportChat from "../../components/support/LiveSupportChat";
-import ModemStackScreen from "./ManageEquepmentStack";
+import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 
-const SupportStack = createStackNavigator();
+const SupportStack = createNativeStackNavigator();
 
-function SupportStackScreen() {
-  const { setTabBarVisible } = useTabBarVisibility();
+function SupportStackScreen({ route }) {
   return (
-    <SupportStack.Navigator initialRouteName="supportScreen">
+    <SupportStack.Navigator
+      initialRouteName={
+        route.params?.isManagementEquipment ? "ManageEquipment" : "support"
+      }
+      defaultNavigationOptions={{ gestureEnabled: true }}
+    >
       <SupportStack.Screen
         name="support"
         component={supportScreen}
+        initialParams={route.params}
         options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
       />
       <SupportStack.Screen
         name="searchArticals"
         component={Search}
         options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      <SupportStack.Screen
-        name="CreateTicket"
-        component={CreateTicket}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      <SupportStack.Screen
-        name="ManageEquipment"
-        component={ModemStackScreen}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      <SupportStack.Screen
-        name="TicketView"
-        component={TicketView}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      <SupportStack.Screen
-        name="ArticalWindowUtility"
-        component={ArticalWindowUtility}
-        options={{
-          headerBackVisible: false,
-          headerShown: false,
-        }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      <SupportStack.Screen
-        name="TicketSupport"
-        component={TicketSupport}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
       />
 
       <SupportStack.Screen
-        name="LiveChatTicketSupport"
-        component={LiveSupportChat}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
+        name="ArticleWindowUtility"
+        component={ArticleWindowUtility}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
         }}
       />
     </SupportStack.Navigator>

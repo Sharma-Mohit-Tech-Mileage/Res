@@ -1,49 +1,38 @@
-// HomeStack.js
+import React, { Suspense } from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import NewBillerHome from "../../components/home/NewBillerHome";
+import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
+import { ActivityIndicator } from "react-native";
 
-import React from 'react'; 
-import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from '../../components/home/Home';
-import OklaSpeedTest from '../../components/home/OklaSpeedTest';
-import ArticalWindowUtility from '../../components/utility/ArticalWindowUtility';
-import { useTabBarVisibility } from '../TabBarVisibilityContext';
-
-const HomeStack = createStackNavigator();
+const HomeStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
+  return (
+    <HomeStack.Navigator
+      initialRouteName="Dashboard"
+      defaultNavigationOptions={{ gestureEnabled: true }}
+    >
+      <HomeStack.Screen name="Dashboard" options={{ headerShown: false }}>
+        {({ navigation }) => (
+          <Suspense
+            fallback={<ActivityIndicator size="large" color="#0000ff" />}
+          >
+            <NewBillerHome navigation={navigation} />
+          </Suspense>
+        )}
+      </HomeStack.Screen>
 
-    const { setTabBarVisible } = useTabBarVisibility();
-    
-    return (
-        <HomeStack.Navigator initialRouteName="Dashboard" 
-        defaultNavigationOptions= {{
-            gestureEnabled: false
-          }}
-        >
-            <HomeStack.Screen
-                name="Dashboard"
-                component={HomeScreen}
-                options={{ headerShown: false}}
-            />
-            <HomeStack.Screen
-                name="OklaSpeedTest"
-                component={OklaSpeedTest}
-                options={{ headerShown: false }}
-            />
-            <HomeStack.Screen
-                name="ArticalWindowUtility"
-                component={ArticalWindowUtility}
-                options={{
-                    headerBackVisible: false,
-                    headerShown: false
-                }}
-                listeners={{
-                    focus: () => setTabBarVisible(true),
-                    blur: () => setTabBarVisible(true)
-                }}
-            />
-            
-        </HomeStack.Navigator>
-    );
+      <HomeStack.Screen
+        name="ArticleWindowUtility"
+        component={ArticleWindowUtility}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
+        }}
+      />
+
+    </HomeStack.Navigator>
+  );
 }
 
 export default HomeStackScreen;

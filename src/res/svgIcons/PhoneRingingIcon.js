@@ -1,5 +1,5 @@
 import * as React from "react"
-import {Svg, Circle, G, Path, Line, Rect, LinearGradient, Stop, Defs} from 'react-native-svg';
+import {Svg, Path, LinearGradient, Stop, Defs} from 'react-native-svg';
 const BellRingingIcon = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
@@ -7,6 +7,9 @@ const BellRingingIcon = (props) => (
     height={74}
     fill="none"
     {...props}
+    accessible={true}
+    accessibilityRole="text"
+    accessibilityLabel="Bell Ringing Icon"
   >
     <Path
       stroke="url(#paint0_linear_927_4956)"

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bill Explainer - Implementation and API Rendering Report</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Open Sans', 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #fff;
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: linear-gradient(135deg, rgba(53, 48, 145, 1) 0%, rgba(141, 59, 144, 1) 100%);
+      color: #fff;
+      padding: 40px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 34px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .header p {
+      font-size: 17px;
+      opacity: 0.95;
+    }
+
+    .toc {
+      background: #f9fafb;
+      border: 2px solid rgba(141, 59, 144, 0.25);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+
+    .toc h2 {
+      color: rgba(53, 48, 145, 1);
+      margin-bottom: 12px;
+      font-size: 24px;
+    }
+
+    .toc ol {
+      margin-left: 20px;
+    }
+
+    .toc a {
+      color: rgba(141, 59, 144, 1);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    .section {
+      margin-bottom: 30px;
+      background: #fff;
+      border-left: 5px solid rgba(53, 48, 145, 1);
+      border-right: 5px solid rgba(53, 48, 145, 1);
+      border-top: 5px solid rgba(53, 48, 145, 1);
+      border-bottom: 5px solid rgba(53, 48, 145, 1);
+      border-radius: 8px;
+      padding: 26px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+    }
+
+    h2 {
+      color: rgba(53, 48, 145, 1);
+      font-size: 28px;
+      margin-bottom: 16px;
+      border-bottom: 2px solid rgba(141, 59, 144, 0.3);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      color: rgba(141, 59, 144, 1);
+      font-size: 21px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-left: 24px;
+      margin-bottom: 14px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .feature-box {
+      background: linear-gradient(135deg, rgba(53, 48, 145, 0.05) 0%, rgba(141, 59, 144, 0.05) 100%);
+      border: 1px solid rgba(141, 59, 144, 0.22);
+      border-radius: 6px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+
+    .feature-title {
+      color: rgba(53, 48, 145, 1);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .highlight {
+      background: linear-gradient(135deg, rgba(53, 48, 145, 0.1) 0%, rgba(141, 59, 144, 0.1) 100%);
+      border-left: 4px solid rgba(141, 59, 144, 1);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 14px 0;
+    }
+
+    .code-block {
+      background: #f5f5f5;
+      border: 1px solid rgba(141, 59, 144, 0.3);
+      border-radius: 5px;
+      padding: 14px;
+      margin: 10px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      background: #fff;
+    }
+
+    th {
+      background: linear-gradient(135deg, rgba(53, 48, 145, 1) 0%, rgba(141, 59, 144, 1) 100%);
+      color: #fff;
+      text-align: left;
+      padding: 12px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(141, 59, 144, 0.15);
+      vertical-align: top;
+    }
+
+    .status-ok {
+      color: #16a34a;
+      font-weight: 700;
+    }
+
+    .status-info {
+      color: #0369a1;
+      font-weight: 700;
+    }
+
+    .diagram-wrap {
+      border: 1px solid rgba(141, 59, 144, 0.3);
+      border-radius: 8px;
+      padding: 12px;
+      margin: 12px 0;
+      background: #fff;
+      overflow-x: auto;
+    }
+
+    .screenshot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .shot {
+      border: 2px dashed rgba(141, 59, 144, 0.4);
+      border-radius: 8px;
+      background: #fcfcff;
+      min-height: 230px;
+      padding: 14px;
+    }
+
+    .shot h4 {
+      color: rgba(53, 48, 145, 1);
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .shot p {
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .shot.has-visual {
+      border-style: solid;
+      background: linear-gradient(135deg, rgba(53, 48, 145, 0.04) 0%, rgba(141, 59, 144, 0.03) 100%);
+    }
+
+    .mock-window {
+      margin-top: 12px;
+      border: 1px solid rgba(141, 59, 144, 0.25);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(53, 48, 145, 0.08);
+    }
+
+    .mock-window-bar {
+      padding: 8px 12px;
+      background: linear-gradient(135deg, rgba(53, 48, 145, 1) 0%, rgba(141, 59, 144, 1) 100%);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .mock-window-body {
+      padding: 12px;
+      background: #fff;
+    }
+
+    .json-shot {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #1f2a37;
+      background: #f8faff;
+      border: 1px solid rgba(53, 48, 145, 0.12);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .mobile-mock {
+      margin-top: 12px;
+      border: 1px solid rgba(53, 48, 145, 0.2);
+      border-radius: 18px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 10px 24px rgba(53, 48, 145, 0.1);
+    }
+
+    .mobile-header {
+      padding: 10px 14px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      background: linear-gradient(135deg, rgba(53, 48, 145, 1) 0%, rgba(141, 59, 144, 1) 100%);
+    }
+
+    .mobile-body {
+      padding: 14px;
+      background: #f8fafc;
+    }
+
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(141, 59, 144, 0.14);
+      font-size: 13px;
+    }
+
+    .bill-footer {
+      margin-top: 12px;
+      border-radius: 10px;
+      background: #fff;
+      padding: 14px;
+      border: 1px solid rgba(53, 48, 145, 0.14);
+    }
+
+    .bill-footer-title {
+      font-size: 13px;
+      color: #344054;
+      margin-bottom: 6px;
+    }
+
+    .bill-link {
+      color: rgba(141, 59, 144, 1);
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      margin-top: 10px;
+      padding: 18px 12px;
+      text-align: center;
+      color: #6b7280;
+      border: 1px dashed rgba(141, 59, 144, 0.3);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .browser-shot {
+      margin-top: 12px;
+      border: 1px solid rgba(53, 48, 145, 0.18);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(53, 48, 145, 0.08);
+    }
+
+    .browser-bar {
+      padding: 8px 10px;
+      background: #eef2f7;
+      border-bottom: 1px solid #d7deea;
+      font-size: 12px;
+      color: #344054;
+    }
+
+    .browser-url {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 6px 10px;
+      width: 100%;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #d7deea;
+      color: rgba(53, 48, 145, 1);
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+    }
+
+    .browser-body {
+      padding: 16px 12px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      font-size: 13px;
+      color: #344054;
+    }
+
+    .small-caption {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #667085;
+      text-align: left;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 18px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(53, 48, 145, 0.1);
+      color: rgba(53, 48, 145, 1);
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding: 24px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(53, 48, 145, 0.08) 0%, rgba(141, 59, 144, 0.08) 100%);
+      text-align: center;
+      color: rgba(53, 48, 145, 1);
+      font-weight: 600;
+    }
+
+    @media print {
+      body { padding: 16px; }
+      .section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Sparklight Residential - Bill Explainer</h1>
+    <p>Implementation, API Usage, Rendering Flow, and Evidence Pack</p>
+    <p style="font-size: 14px; margin-top: 8px;">Generated: March 18, 2026</p>
+  </div>
+
+  <div class="toc">
+    <h2>Table of Contents</h2>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#architecture">Architecture and File Map</a></li>
+      <li><a href="#flowchart">Bill Explainer Flow Chart Diagram</a></li>
+      <li><a href="#api">API Contract and Usage</a></li>
+      <li><a href="#rendering">How API Response is Rendered</a></li>
+      <li><a href="#screenshots">API Screenshot Section</a></li>
+      <li><a href="#qa">Validation Checklist</a></li>
+      <li><a href="#appendix">Appendix: Source Snippets</a></li>
+    </ol>
+  </div>
+
+  <div class="section" id="overview">
+    <h2>1. Overview</h2>
+    <div class="highlight">
+      <p><strong>Purpose:</strong> This document explains how Bill Explainer is fetched, gated, rendered in Billing Breakdown, and opened from the app.</p>
+      <p><strong>Primary Screen:</strong> Billing Breakdown screen.</p>
+      <p><strong>Primary Endpoint:</strong> <code>api/GetBillExplainer/Get</code>.</p>
+      <p><strong>User Outcome:</strong> If eligible, user sees a "Bill Explainer" link and opens the target URL.</p>
+    </div>
+
+    <h3>Key Functional Summary</h3>
+    <ul>
+      <li>Screen builds request body from account and user context.</li>
+      <li>App calls POST API for bill explainer eligibility and URL.</li>
+      <li>UI displays CTA only when <code>eligibility === true</code>.</li>
+      <li>On click, app navigates to web utility route with Bill Explainer payload.</li>
+      <li>Web utility opens Bill Explainer URL externally and returns to previous screen.</li>
+    </ul>
+  </div>
+
+  <div class="section" id="architecture">
+    <h2>2. Architecture and File Map</h2>
+
+    <table>
+      <tr>
+        <th>Layer</th>
+        <th>File</th>
+        <th>Role</th>
+      </tr>
+      <tr>
+        <td>UI + Render Decision</td>
+        <td>src/components/billing/BillingBreakDownScreen.js</td>
+        <td>Creates request body, calls API helper, toggles CTA visibility, handles link click.</td>
+      </tr>
+      <tr>
+        <td>HTTP Utility</td>
+        <td>src/network/APIClient.js</td>
+        <td>Defines <code>PostApiRequest</code>, bearer token auth, token refresh, response handling.</td>
+      </tr>
+      <tr>
+        <td>Service Layer (Alternative/Redux path)</td>
+        <td>src/network/apis/account/billingBreakdown.service.js</td>
+        <td>Defines <code>fetchBillExplainer</code> via axios (POST).</td>
+      </tr>
+      <tr>
+        <td>Saga Layer (Alternative/Redux path)</td>
+        <td>src/redux/sagas/billExplainerSaga.js</td>
+        <td>Consumes action, calls service API, emits success/failure actions.</td>
+      </tr>
+      <tr>
+        <td>Reducer / Selectors</td>
+        <td>src/redux/reducers/billingBreakdownReducer.js and selectors</td>
+        <td>Stores explainer state when saga path is used.</td>
+      </tr>
+      <tr>
+        <td>Navigation Web Utility</td>
+        <td>src/components/utility/ArticalWindowUtility.jsx</td>
+        <td>For Bill Explainer, opens URL in external browser and closes utility screen.</td>
+      </tr>
+    </table>
+
+    <div class="feature-box">
+      <div class="feature-title">Current Runtime Path in BillingBreakDownScreen</div>
+      <p>Current implementation uses direct <code>PostApiRequest</code> callback style from screen logic. Redux action dispatch for bill explainer is present but currently commented out in this screen path.</p>
+    </div>
+  </div>
+
+  <div class="section" id="flowchart">
+    <h2>3. Bill Explainer Flow Chart Diagram</h2>
+
+    <p>This is the end-to-end functional flow from screen load to rendering and navigation.</p>
+
+    <div class="diagram-wrap">
+      <pre class="mermaid">flowchart TD
+  A[Screen opens BillingBreakDownScreen] --> B{accountDetails present}
+  B -- No --> C[Wait for accountDetails]
+  B -- Yes --> D[Build requestBody]
+  D --> E[Call POST api/GetBillExplainer/Get]
+  E --> F{API call successful}
+  F -- No --> G[Set showBillExplainer false and stop loading]
+  F -- Yes --> H[Store API response in state]
+  H --> I{eligibility is true}
+  I -- Yes --> J[Set showBillExplainer true]
+  I -- No --> K[Set showBillExplainer false]
+  J --> L[Render Bill Explainer CTA in footer]
+  L --> M[User taps Bill Explainer link]
+  M --> N{be_url exists}
+  N -- No --> O[Log link not available error]
+  N -- Yes --> P[Navigate to ArticalWindowUtility]
+  P --> Q[Open be_url in external browser]
+  Q --> R[Go back to app screen]
+      </pre>
+    </div>
+
+    <div class="feature-box">
+      <div class="feature-title">Diagram Notes</div>
+      <ul>
+        <li><span class="status-info">Loading state:</span> While API is running, CTA area shows skeleton placeholder.</li>
+        <li><span class="status-ok">Eligibility gate:</span> CTA is shown only when <code>res.eligibility</code> is true.</li>
+        <li><span class="status-info">Navigation behavior:</span> Bill Explainer URL is opened externally (device browser), not kept inside embedded WebView.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="api">
+    <h2>4. API Contract and Usage</h2>
+
+    <h3>4.1 Endpoint</h3>
+    <table>
+      <tr><th>Property</th><th>Value</th></tr>
+      <tr><td>Method</td><td>POST</td></tr>
+      <tr><td>Path</td><td>api/GetBillExplainer/Get</td></tr>
+      <tr><td>Auth</td><td>Bearer token (Authorization header)</td></tr>
+      <tr><td>Caller</td><td>PostApiRequest from BillingBreakDownScreen</td></tr>
+    </table>
+
+    <h3>4.2 Request Payload Mapping</h3>
+    <table>
+      <tr>
+        <th>Request Field</th>
+        <th>Source in App State</th>
+      </tr>
+      <tr><td>customer_type</td><td>accountDetails.customer_type</td></tr>
+      <tr><td>hierarchy_id</td><td>accountDetails.hierarchy.hierarchy_id</td></tr>
+      <tr><td>account</td><td>user.userInfo.accountNumber</td></tr>
+      <tr><td>utmMedium</td><td>"web" (hardcoded)</td></tr>
+      <tr><td>utmSource</td><td>"selfcare_mobile" (hardcoded)</td></tr>
+      <tr><td>video</td><td>accountDetails.services.video</td></tr>
+      <tr><td>homesPassedId</td><td>accountDetails.homes_passed_id || null</td></tr>
+    </table>
+
+    <h3>4.3 Expected Response Fields Used by UI</h3>
+    <table>
+      <tr><th>Response Field</th><th>Usage</th></tr>
+      <tr><td>eligibility</td><td>Controls visibility of Bill Explainer CTA.</td></tr>
+      <tr><td>be_url</td><td>Used as target URL for Bill Explainer navigation.</td></tr>
+    </table>
+
+    <h3>4.4 API Call Snippet (as implemented)</h3>
+    <div class="code-block">PostApiRequest("api/GetBillExplainer/Get", requestBody, (res) =&gt; {
+  setBillExplainerData(res);
+  if (res?.eligibility) {
+    setShowBillExplainer(true);
+  } else {
+    setShowBillExplainer(false);
+  }
+  setExplainerLoading(false);
+}, (error) =&gt; {
+  setShowBillExplainer(false);
+  setExplainerLoading(false);
+});</div>
+  </div>
+
+  <div class="section" id="rendering">
+    <h2>5. How API Response is Rendered</h2>
+
+    <h3>5.1 Rendering Logic</h3>
+    <ol>
+      <li>Footer checks <code>explainerLoading</code> and shows skeleton while request is in-flight.</li>
+      <li>If not loading and <code>showBillExplainer === true</code>, footer renders CTA text + Bill Explainer link.</li>
+      <li>When user taps link, app validates <code>be_url</code> and navigates with params.</li>
+      <li>ArticalWindowUtility detects Bill Explainer and opens URL in external browser.</li>
+    </ol>
+
+    <h3>5.2 CTA Render Snippet</h3>
+    <div class="code-block">{showBillExplainer ? (
+  &lt;Text onPress={() =&gt; renderBillExplainerLink(navigation)}&gt;
+    Bill Explainer
+  &lt;/Text&gt;
+) : null}</div>
+
+    <h3>5.3 Navigation Snippet</h3>
+    <div class="code-block">navigation.navigate('ArticalWindowUtility', {
+  name: "Bill Explainer",
+  url: data.be_url,
+});</div>
+
+    <h3>5.4 External Open Behavior Snippet</h3>
+    <div class="code-block">if (name === 'Bill Explainer' && url) {
+  Linking.openURL(url)
+    .finally(() =&gt; navigation.goBack());
+}</div>
+  </div>
+
+  <div class="section" id="screenshots">
+    <h2>6. API Screenshot Section</h2>
+
+    <p>This section now includes code-derived visual evidence based on the implemented Bill Explainer request, response, footer rendering, and external browser navigation flow.</p>
+
+    <div class="screenshot-grid">
+      <div class="shot has-visual">
+        <h4>Screenshot A: Request Payload</h4>
+        <p><span class="badge">Required</span> Capture payload sent to <code>api/GetBillExplainer/Get</code>.</p>
+        <div class="mock-window">
+          <div class="mock-window-bar">POST api/GetBillExplainer/Get</div>
+          <div class="mock-window-body">
+            <pre class="json-shot">{
+  "customer_type": "RESIDENTIAL",
+  "hierarchy_id": "<from accountDetails.hierarchy.hierarchy_id>",
+  "account": "<user.userInfo.accountNumber>",
+  "utmMedium": "web",
+  "utmSource": "selfcare_mobile",
+  "video": true,
+  "homesPassedId": null
+}</pre>
+          </div>
+        </div>
+        <p class="small-caption">Derived from requestBody construction in BillingBreakDownScreen and mirrored by the service POST call.</p>
+      </div>
+
+      <div class="shot has-visual">
+        <h4>Screenshot B: API Success Response</h4>
+        <p><span class="badge">Required</span> Capture response containing <code>eligibility</code> and <code>be_url</code>.</p>
+        <div class="mock-window">
+          <div class="mock-window-bar">200 OK</div>
+          <div class="mock-window-body">
+            <pre class="json-shot">{
+  "eligibility": true,
+  "be_url": "https://.../bill-explainer",
+  "message": "Bill Explainer available"
+}</pre>
+          </div>
+        </div>
+        <p class="small-caption">UI only consumes <code>eligibility</code> and <code>be_url</code> to decide CTA visibility and navigation target.</p>
+      </div>
+
+      <div class="shot has-visual">
+        <h4>Screenshot C: UI Rendering (Eligible)</h4>
+        <p><span class="badge">Required</span> Billing Breakdown footer showing Bill Explainer CTA.</p>
+        <div class="mobile-mock">
+          <div class="mobile-header">Billing Breakdown</div>
+          <div class="mobile-body">
+            <div class="bill-row"><span>Total Balance Due</span><strong>$142.58</strong></div>
+            <div class="bill-footer">
+              <div class="bill-footer-title">Still have questions about your bill?</div>
+              <div>Try our new <span class="bill-link">Bill Explainer</span>!</div>
+            </div>
+          </div>
+        </div>
+        <p class="small-caption">Derived from <code>TotalBalanceFooter</code> when <code>explainerLoading === false</code> and <code>showBillExplainer === true</code>.</p>
+      </div>
+
+      <div class="shot has-visual">
+        <h4>Screenshot D: UI Rendering (Not Eligible)</h4>
+        <p><span class="badge">Optional</span> Same screen without Bill Explainer CTA.</p>
+        <div class="mobile-mock">
+          <div class="mobile-header">Billing Breakdown</div>
+          <div class="mobile-body">
+            <div class="bill-row"><span>Total Balance Due</span><strong>$142.58</strong></div>
+            <div class="empty-state">Bill Explainer CTA is hidden because eligibility is false.</div>
+          </div>
+        </div>
+        <p class="small-caption">Derived from the <code>showBillExplainer ? ... : null</code> branch when API returns ineligible.</p>
+      </div>
+
+      <div class="shot has-visual">
+        <h4>Screenshot E: Navigation/Open URL</h4>
+        <p><span class="badge">Required</span> Event showing external browser open for Bill Explainer URL.</p>
+        <div class="browser-shot">
+          <div class="browser-bar">
+            Mobile Browser
+            <div class="browser-url">https://.../bill-explainer</div>
+          </div>
+          <div class="browser-body">
+            Bill Explainer opens outside the app via <code>Linking.openURL(url)</code>, then the app navigates back.
+          </div>
+        </div>
+        <p class="small-caption">Derived from <code>ArticalWindowUtility</code> where screen name is Bill Explainer and URL is opened externally.</p>
+      </div>
+    </div>
+
+    <h3>6.1 Example Evidence Captions</h3>
+    <div class="feature-box">
+      <ul>
+        <li><strong>Figure A:</strong> Bill Explainer request payload from BillingBreakDownScreen.</li>
+        <li><strong>Figure B:</strong> API response shows eligibility=true and be_url.</li>
+        <li><strong>Figure C:</strong> Footer renders Bill Explainer link after successful eligible response.</li>
+        <li><strong>Figure D:</strong> Link tap navigates to ArticalWindowUtility and opens external browser.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section" id="qa">
+    <h2>7. Validation Checklist</h2>
+
+    <table>
+      <tr>
+        <th>Test</th>
+        <th>Expected</th>
+      </tr>
+      <tr>
+        <td>API returns eligibility=true</td>
+        <td>Bill Explainer CTA appears in footer.</td>
+      </tr>
+      <tr>
+        <td>API returns eligibility=false</td>
+        <td>CTA remains hidden.</td>
+      </tr>
+      <tr>
+        <td>be_url missing</td>
+        <td>No navigation; console error logged.</td>
+      </tr>
+      <tr>
+        <td>User taps Bill Explainer</td>
+        <td>External browser opens URL; app returns back.</td>
+      </tr>
+      <tr>
+        <td>API call fails</td>
+        <td>CTA hidden and loading state ends.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section" id="appendix">
+    <h2>8. Appendix: Source Snippets and References</h2>
+
+    <div class="feature-box">
+      <div class="feature-title">Primary Source References</div>
+      <ul>
+        <li>src/components/billing/BillingBreakDownScreen.js</li>
+        <li>src/network/APIClient.js</li>
+        <li>src/components/utility/ArticalWindowUtility.jsx</li>
+        <li>src/network/apis/account/billingBreakdown.service.js</li>
+        <li>src/redux/sagas/billExplainerSaga.js</li>
+      </ul>
+    </div>
+
+    <div class="feature-box">
+      <div class="feature-title">Alternative Redux Path (Documented)</div>
+      <p>The project contains a full Redux action/saga/reducer pipeline for bill explainer. In the current BillingBreakDownScreen flow, direct API callback style is used; Redux dispatch line for bill explainer is present but commented.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Bill Explainer documentation package generated in attachment-style format for handoff and audit use.</p>
+  </div>
+
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+</body>
+</html>

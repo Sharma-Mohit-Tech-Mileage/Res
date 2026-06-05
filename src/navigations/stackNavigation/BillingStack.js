@@ -1,0 +1,57 @@
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
+import BillingScreen from "../../components/billing/BillingScreen";
+import BillingStatements from "../../components/billing/BillingStatements";
+import PaymentHistoryScreen from "../../components/billing/PaymentHistory";
+import BillingBreakDownScreen from "../../components/billing/BillingBreakDownScreen";
+const BillingStack = createNativeStackNavigator();
+
+function BillingStackScreen({ route }) {
+  return (
+    <BillingStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
+      <BillingStack.Screen
+        name="Billing"
+        initialParams={{ isWeb: route?.params?.isWeb }}
+        component={BillingScreen}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
+        }}
+      />
+      <BillingStack.Screen
+        name="BillingStatements"
+        component={BillingStatements}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
+        }}
+      />
+      <BillingStack.Screen
+        name="PaymentHistory"
+        component={PaymentHistoryScreen}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
+        }}
+      />
+
+      <BillingStack.Screen
+        name="BillingBreakDown"
+        component={BillingBreakDownScreen}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
+        }}
+      />
+      <BillingStack.Screen
+        name="ArticleWindowUtility"
+        component={ArticleWindowUtility}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+
+    </BillingStack.Navigator>
+  );
+}
+
+export default BillingStackScreen;

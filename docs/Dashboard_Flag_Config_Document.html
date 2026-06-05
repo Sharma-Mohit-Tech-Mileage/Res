@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sparklight Dashboard Flag Configuration - Detailed Image Mapping</title>
+    <style>
+      :root {
+        --sparklight-purple-blue: #353091;
+        --sparklight-bright-purple: #8d3b90;
+        --sparklight-blue: #00b8d8;
+        --sparklight-green: #2ba948;
+        --sparklight-red: #ef4e3e;
+        --sparklight-grey: #4c5458;
+        --sparklight-bg: #ebeef1;
+        --snow-white: #ffffff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(0, 184, 216, 0.18), transparent 28%),
+          radial-gradient(circle at top right, rgba(141, 59, 144, 0.2), transparent 30%),
+          linear-gradient(135deg, #e8edf7 0%, #f8fbff 48%, #f7f2fb 100%);
+        color: var(--sparklight-grey);
+      }
+
+      .container {
+        max-width: 980px;
+        margin: 32px auto;
+        padding: 0 20px 56px;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.96);
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow:
+          0 24px 60px rgba(53, 48, 145, 0.16),
+          0 8px 20px rgba(0, 24, 40, 0.06);
+        backdrop-filter: blur(8px);
+      }
+
+      .header {
+        background: linear-gradient(
+          120deg,
+          #1e85cc 0%,
+          var(--sparklight-purple-blue) 38%,
+          var(--sparklight-bright-purple) 100%
+        );
+        color: var(--snow-white);
+        padding: 32px 28px;
+        position: relative;
+      }
+
+      .header::after {
+        content: "";
+        position: absolute;
+        right: -40px;
+        top: -30px;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.22), transparent 70%);
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.3;
+        letter-spacing: 0.01em;
+      }
+
+      .header p {
+        margin: 10px 0 0;
+        font-size: 15px;
+        opacity: 0.95;
+        max-width: 620px;
+      }
+
+      .content {
+        padding: 28px;
+      }
+
+      .meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .meta-item {
+        border-left: 4px solid var(--sparklight-blue);
+        background: linear-gradient(135deg, rgba(0, 184, 216, 0.08), rgba(141, 59, 144, 0.06));
+        border-radius: 14px;
+        padding: 14px 16px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      }
+
+      .meta-label {
+        font-size: 12px;
+        color: #6a7276;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .meta-value {
+        margin-top: 6px;
+        font-weight: 600;
+        color: var(--sparklight-purple-blue);
+      }
+
+      .section-title {
+        margin: 28px 0 12px;
+        color: var(--sparklight-purple-blue);
+        font-size: 20px;
+        position: relative;
+        padding-left: 14px;
+      }
+
+      .section-title::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 5px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--sparklight-blue), var(--sparklight-bright-purple));
+      }
+
+      pre {
+        margin: 0;
+        background: linear-gradient(180deg, #111936 0%, #1a2350 100%);
+        color: #eaf2ff;
+        border-radius: 16px;
+        padding: 20px;
+        overflow: auto;
+        border-top: 4px solid var(--sparklight-green);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .truth-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #d8e0eb;
+        border-radius: 16px;
+        overflow: hidden;
+        margin-top: 12px;
+        box-shadow: 0 10px 22px rgba(53, 48, 145, 0.08);
+      }
+
+      .truth-table thead th {
+        background: linear-gradient(90deg, #edf4ff 0%, #f5efff 100%);
+        color: var(--sparklight-purple-blue);
+        font-size: 13px;
+        text-align: left;
+        padding: 14px 12px;
+        border-bottom: 1px solid #d9e0e8;
+      }
+
+      .truth-table td {
+        padding: 14px 12px;
+        font-size: 14px;
+        border-bottom: 1px solid #edf1f5;
+        vertical-align: top;
+        background: rgba(255, 255, 255, 0.88);
+      }
+
+      .truth-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .pill-true {
+        background: rgba(43, 169, 72, 0.12);
+        color: #1a7d33;
+      }
+
+      .pill-false {
+        background: rgba(239, 78, 62, 0.12);
+        color: #b3362b;
+      }
+
+      .note {
+        margin-top: 12px;
+        border-left: 4px solid var(--sparklight-green);
+        background: linear-gradient(135deg, #f3fbf5 0%, #f9fffb 100%);
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-size: 14px;
+        box-shadow: 0 8px 20px rgba(43, 169, 72, 0.08);
+      }
+
+      .note-blue {
+        border-left-color: var(--sparklight-blue);
+        background: linear-gradient(135deg, #eefbff 0%, #f7fdff 100%);
+        box-shadow: 0 8px 20px rgba(0, 184, 216, 0.08);
+      }
+
+      .note-red {
+        border-left-color: var(--sparklight-red);
+        background: linear-gradient(135deg, #fff4f1 0%, #fff9f7 100%);
+        box-shadow: 0 8px 20px rgba(239, 78, 62, 0.08);
+      }
+
+      .list {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+
+      .list li {
+        margin: 6px 0;
+      }
+
+      .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+        margin-top: 12px;
+      }
+
+      .image-card {
+        border: 1px solid #dce5ef;
+        border-radius: 18px;
+        overflow: hidden;
+        background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+        box-shadow: 0 14px 28px rgba(53, 48, 145, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+      }
+
+      .image-card img {
+        width: 100%;
+        display: block;
+        max-height: 210px;
+        object-fit: cover;
+        background: #f3f6f9;
+      }
+
+      .image-card .caption {
+        padding: 14px 14px 16px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .image-card-hidden {
+        border-style: dashed;
+        background: linear-gradient(180deg, #fffdfd 0%, #fff7f5 100%);
+      }
+
+      .image-card-hidden::after {
+        content: "Hidden In Phase 2";
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(239, 78, 62, 0.92);
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        box-shadow: 0 8px 18px rgba(239, 78, 62, 0.28);
+      }
+
+      .image-card-hidden img {
+        filter: none;
+      }
+
+      .footer {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid #e7ebef;
+        font-size: 13px;
+        color: #6f777c;
+      }
+
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 6px;
+        background: var(--sparklight-green);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <section class="card">
+        <header class="header">
+          <h1>Sparklight Dashboard Configuration</h1>
+          <p>Detailed image behavior for requested flag values.</p>
+        </header>
+
+        <div class="content">
+          <div class="meta">
+            <div class="meta-item">
+              <div class="meta-label">Module</div>
+              <div class="meta-value">Dashboard</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Environment Scope</div>
+              <div class="meta-value">All Users + Pending Activation</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">Document Type</div>
+              <div class="meta-value">Flag Behavior + Image Mapping</div>
+            </div>
+          </div>
+
+          <h2 class="section-title">Configuration Payload</h2>
+          <pre>{
+  "dashboard": {
+    "pending_activation": {
+      "show_sparklight_mobile_section": true
+    },
+    "all_users": {
+      "show_new_dashboard": false
+    }
+  }
+}</pre>
+
+          <h2 class="section-title">Requested Values</h2>
+          <table class="truth-table" aria-label="Requested flag values">
+            <thead>
+              <tr>
+                <th>Flag</th>
+                <th>Value</th>
+                <th>Scope</th>
+                <th>Primary Component</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>dashboard.pending_activation.show_sparklight_mobile_section</td>
+                <td><span class="pill pill-true">true</span></td>
+                <td>Pending activation path</td>
+                <td>MobilePromo</td>
+              </tr>
+              <tr>
+                <td>dashboard.all_users.show_new_dashboard</td>
+                <td><span class="pill pill-false">false</span></td>
+                <td>All users welcome section</td>
+                <td>WelcomeCard</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2 class="section-title">Exactly Which Image Is Shown</h2>
+          <div class="note">
+            With show_new_dashboard = false, the WelcomeCard uses the legacy welcome banner image.
+          </div>
+          <ul class="list">
+            <li>Shown image: <strong>welcome-banner-home.png</strong></li>
+            <li>Component path: WelcomeCard -> renderWelcomeBanner()</li>
+            <li>Offer banner image offer-banner-home.jpg is not used in WelcomeCard for this flag value.</li>
+          </ul>
+
+          <div class="note note-blue" style="margin-top: 14px;">
+            With show_sparklight_mobile_section = true, MobilePromo uses the offer banner image when MobilePromo is rendered.
+          </div>
+          <ul class="list">
+            <li>Shown image: <strong>offer-banner-home.jpg</strong></li>
+            <li>Component path: MobilePromo -> renderOfferBanner()</li>
+            <li>Fallback image man-on-mobile-phone-app.jpg is not used while this flag is true.</li>
+            <li>MobilePromo appears in pending activation flow when user is mobile-eligible and not yet on mobile.</li>
+          </ul>
+
+          <div class="note note-red" style="margin-top: 14px;">
+            With show_sparklight_mobile_section = false, MobilePromo switches to the legacy promo image and feature-card layout.
+          </div>
+          <ul class="list">
+            <li>Shown image: <strong>man-on-mobile-phone-app.jpg</strong></li>
+            <li>Component path: MobilePromo -> ImageBackground with PromoImage</li>
+            <li>Offer banner image offer-banner-home.jpg is not used while this flag is false.</li>
+          </ul>
+
+          <h2 class="section-title">Visual Preview</h2>
+          <div class="image-grid">
+            <article class="image-card">
+              <img src="../assets/welcome-banner-home.png" alt="Welcome banner shown when show_new_dashboard is false" />
+              <div class="caption">
+                <strong>WelcomeCard image for show_new_dashboard = false:</strong>
+                welcome-banner-home.png
+              </div>
+            </article>
+
+            <article class="image-card">
+              <img src="../assets/offer-banner-home.jpg" alt="Offer banner shown when show_sparklight_mobile_section is true" />
+              <div class="caption">
+                <strong>MobilePromo image for show_sparklight_mobile_section = true:</strong>
+                offer-banner-home.jpg
+              </div>
+            </article>
+
+            <article class="image-card">
+              <img src="../assets/man-on-mobile-phone-app.jpg" alt="Legacy mobile promo image shown when show_sparklight_mobile_section is false" />
+              <div class="caption">
+                <strong>MobilePromo image for show_sparklight_mobile_section = false:</strong>
+                man-on-mobile-phone-app.jpg
+              </div>
+            </article>
+          </div>
+
+          <h2 class="section-title">Execution Notes</h2>
+          <ul class="list">
+            <li>The two flags are evaluated in different components and can both be active in the same app session depending on user path.</li>
+            <li>show_new_dashboard controls image selection in WelcomeCard (all users area).</li>
+            <li>show_sparklight_mobile_section controls image selection inside MobilePromo (pending activation flow).</li>
+          </ul>
+
+          <h2 class="section-title">Phase 2 Behavior</h2>
+          <div class="note note-red">
+            In the Phase 2 rollout, all marketing banner creatives are completely hidden.
+          </div>
+          <ul class="list">
+            <li>Hidden image: <strong>man-on-mobile-phone-app.jpg</strong></li>
+            <li>Hidden image: <strong>offer-banner-home.jpg</strong></li>
+            <li>Expected behavior: users should not see any marketing banner images in Phase 2.</li>
+          </ul>
+
+          <div class="image-grid">
+            <article class="image-card image-card-hidden">
+              <img src="../assets/man-on-mobile-phone-app.jpg" alt="Smiley man and mobile phone creative hidden in Phase 2" />
+              <div class="caption">
+                <strong>Hidden in Phase 2:</strong>
+                man-on-mobile-phone-app.jpg
+              </div>
+            </article>
+
+            <article class="image-card image-card-hidden">
+              <img src="../assets/offer-banner-home.jpg" alt="Offer banner creative hidden in Phase 2" />
+              <div class="caption">
+                <strong>Hidden in Phase 2:</strong>
+                offer-banner-home.jpg
+              </div>
+            </article>
+          </div>
+
+          <div class="footer">
+            <span class="dot"></span>
+            Sparklight branded detailed document generated from current dashboard component behavior.
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

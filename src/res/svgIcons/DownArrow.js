@@ -1,9 +1,10 @@
 import * as React from "react"
-import {Svg, Circle, G, Path, Line, Rect} from 'react-native-svg';
+import{ Svg ,Path} from "react-native-svg";
+
 const DownArrow = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
-    width={12}
+    width={13}
     height={8}
     fill="none"
     {...props}
@@ -13,8 +14,9 @@ const DownArrow = (props) => (
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}
-      d="m1 1.5 5 5 5-5"
+      d="m1.922 1.422 5.079 5.23 4.92-5.38"
     />
   </Svg>
 )
 export default DownArrow
+

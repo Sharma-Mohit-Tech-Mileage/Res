@@ -4,14 +4,14 @@
 # https://aka.ms/yaml
 
 trigger:
-- Sparklight
+- Dev-B
 
 pool:
   vmImage: ubuntu-latest
 
 variables:
   - group: AndroidBuildConfig
-  
+
 steps:
 - task: NodeTool@0
   displayName: 'Install Node'
@@ -20,11 +20,15 @@ steps:
 
 - script: npm cache clean --force 
   workingDirectory: src
-  displayName: 'Cleaning npm modules '
+  displayName: 'Cleaning npm modules'
 
 - script: npm install --legacy-peer-deps
   workingDirectory: src
   displayName: 'Install node dependencies'
+
+- script: ./gradlew clean build --refresh-dependencies
+  workingDirectory: 'android'
+  displayName: 'Clean and Refresh Gradle Dependencies'
 
 - task: Gradle@2
   inputs:
@@ -37,6 +41,7 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'assembleRelease'
+
 - task: AndroidSigning@2
   inputs:
     apkFiles: '**/*.apk'
@@ -46,3 +51,12 @@ steps:
     jarsignerKeystoreAlias: 'sparklight'
     jarsignerKeyPassword: '$(jarsignerKeyPassword)'
     zipalign: true
+- task: CopyFiles@2
+  inputs:
+    Contents: '**/*.apk'
+    TargetFolder: '$(build.artifactstagingdirectory)'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'SparklightResiApp'
+    publishLocation: 'Container'

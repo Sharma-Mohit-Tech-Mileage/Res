@@ -1,340 +1,817 @@
-import { _axios, _axios_cableone } from "../../RestApiClient";
+import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-import axios from 'axios'; // Make sure to import axios
-
+import axios from "axios";
+import moment from "moment";
+import { getEndpoint,ENDPOINTS } from "../endpoints/Endpoints";
+import Config from "react-native-config";
+import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
+import { getDeviceMetadata } from "../../../components/utility/DeviceInfo";
+import * as appLogger from "../../../utils/logger";
+import base64 from "react-native-base64";
 const getProfileDetails = async () => {
-    let data = await getUser();
-    const accountNumber = data.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + data.token
-        }
-    };
+  let data = await getUser();
+  const userName = data.userInfo?.userName || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + data.token,
+    },
+  };
 
-    return _axios.get(`/users/api/profile/${accountNumber}`, { ...config }).then(res => res.data).catch(error => { throw error })
+  return _axios
+    .get(getEndpoint(ENDPOINTS.ACCT_MGR_GET_BY_USER, { accountNumber: data?.userInfo?.accountNumber }), { ...config })
+    .then((res) => res.data)
+    .catch((error) => {
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.ACCT_MGR_GET_BY_USER, { accountNumber: data?.userInfo?.accountNumber })}`, error);
+      throw error;
+    });
 };
 
 const fetchUserList = async () => {
-    let data = await getUser();
-    const accountNumber = data.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + data.token
-        }
-    };
+  let data = await getUser();
+  const accountNumber = data.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + data.token,
+    },
+  };
 
-    return _axios.get(`/users/api/account/${accountNumber}/users`, { ...config })
-        .then(res => {
-            // Log the stringified data for debugging
-            console.log(JSON.stringify(res.data, null, 2)); // null and 2 are for formatting
-            return res.data;  // Return the actual data, not the stringified version
-        })
-        .catch(error => {
-            // Log and throw the error
-            console.error('Error fetching user list:', JSON.stringify(error, null, 2));
-            throw error;
-        });
+  return _axios
+    .get(getEndpoint(ENDPOINTS.PROFILE_USERS, { accountNumber }), { ...config })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((error) => {
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.PROFILE_USERS, { accountNumber })}`, error);
+      throw error;
+    });
 };
 
 const fetchSmsSubscription = async () => {
-    let data = await getUser();
-    const accountNumber = data.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + data.token
-        }
-    };
+  let data = await getUser();
+  const accountNumber = data.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + data.token,
+    },
+  };
 
-    return _axios.get(`/users/api/SMS/sms?AccountNumber=${accountNumber}`, { ...config })
-        .then(res => {
-            console.log('fetching SMS subscription list:', JSON.stringify(res.data, null, 2));
-            return res.data;  // Return the actual data, not the stringified version
-        })
-        .catch(error => {
-            console.error('Error fetching SMS subscription list:', error);
-            throw error;
-        });
+  return _axios
+    .get(getEndpoint(ENDPOINTS.SMS_SUBSCRIPTION, { accountNumber }), { ...config })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((error) => {
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.SMS_SUBSCRIPTION, { accountNumber })}`, error);
+      throw error;
+    });
 };
 
 const fetchBillingStatus = async () => {
-    let data = await getUser();
-    const accountNumber = data.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + data.token
-        }
-    };
+  let data = await getUser();
+  const accountNumber = data.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + data.token,
+    },
+  };
 
-    return _axios.get(`/account/api/account/${accountNumber}/paperless/status`, { ...config })
-        .then(res => {
-            console.log('fetching fetching /account/api/account/`${accountNumber}`/paperless/status', JSON.stringify(res.data, null, 2));
-            return res.data;  // Return the actual data, not the stringified version
-        })
-        .catch(error => {
-            console.error('Error fetching /account/api/account/`${accountNumber}`/paperless/status', error);
-            throw error;
-        });
+  return _axios
+    .get(getEndpoint(ENDPOINTS.BILLING_STATUS, { accountNumber }), {
+      ...config,
+    })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((error) => {
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.BILLING_STATUS, { accountNumber })}`, error);
+      throw error;
+    });
+};
+
+const fetchEasyPayStatus = async () => {
+  let data = await getUser();
+  const accountNumber = data.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + data.token,
+    },
+  };
+
+  return _axios
+    .get(getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber }), { ...config })
+    .then((res) => res.data)
+    .catch((error) => {
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber })}`, error);
+      throw error;
+    });
 };
 
 const fetchPaperLessDetails = async () => {
-    let data = await getUser();
-    const accountNumber = data.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + data.token
-        }
-    };
+  let data = await getUser();
+  const accountNumber = data.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + data.token,
+    },
+  };
 
-    return _axios.get(`/account/api/account/${accountNumber}/paperless`, { ...config })
-        .then(res => {
-            console.log('fetching fetchPaperLessDetails /account/api/account/`${accountNumber}`/paperless', JSON.stringify(res.data, null, 2));
-            return res.data;  // Return the actual data, not the stringified version
-        })
-        .catch(error => {
-            console.error('Error fetching fetchPaperLessDetails /account/api/account/`${accountNumber}`/paperless', error);
-            throw error;
-        });
+  return _axios
+    .get(getEndpoint(ENDPOINTS.PAPERLESS_DETAILS, { accountNumber }), { ...config })
+    .then((res) => {
+      return res.data;
+    })
+    .catch((error) => {
+      appLogger.logError("Error fetching fetchPaperLessDetails:", error);
+      throw error;
+    });
 };
 
 const fetchPushNotifications = async () => {
-    let user = await getUser();
-    const userName = user.userInfo?.userName || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
-
-    //https://customer.uat.cableone.net/apiWrapper/mobile/api/mobilenotificationpreferences/{UserName}/mobilepreferences
-
-    // Log the request endpoint and data
-    console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`);
-
-    try {
-        const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, { ...config });
-
-        // Log the successful response
-        console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:;;;;;;;;;;;;;;;;;`, JSON.stringify(response.data));
-        return response.data;
-    } catch (error) {
-        // Log the error with a descriptive message
-        console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
-        throw error;
-    }
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+  try {
+    const response = await _axios.get(
+      getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS_ACCOUNT, { userName: user.userInfo?.userName, accountNumber }),
+      { ...config }
+    );
+    return response.data;
+  } catch (error) {
+    appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS_ACCOUNT, { userName: user.userInfo?.userName, accountNumber })}:`, error);
+    throw error;
+  }
 };
 
+
+const updateProfileSecurity = async (data) => {
+  const user = await getUser();
+  const userName = user.userInfo?.userName || user.userName || null;
+  const endpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTION_UPDATE, { userName ,accountNumber: user.userInfo?.accountNumber});
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+
+  try {
+    const response = await _axios.patch(endpoint, data, config);
+    return response.data;
+  } catch (error) {
+    appLogger.logError(`Error updating ${endpoint}:`, error);
+    throw error;
+  }
+};
+
+
 const postProfileInfo = async (data) => {
-    let user = await getUser();
+  try {
+    const user = await getUser();
 
     const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
     };
 
-    console.log('Making API Call to /users/api/profile with data:', data); // Log the request data
+    const response = await _axios.put(getEndpoint(ENDPOINTS.PROFILE_INFO_UPDATE), data, config);
 
-    try {
-        const response = await _axios.put(`/users/api/profile`, data, config);
-        console.log('API Call Successful, Response:', response.data); // Log the successful response
-        return response.data;
-    } catch (error) {
-        console.error('API Call Failed, Error:', error); // Log the error
-        throw error;
-    }
+    return response.data;
+  } catch (error) {
+    appLogger.logError("API Call Failed:", error.message);
+    throw error;
+  }
 };
 
 const postTextNotifictionInfo = async (data) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    data['accountNumber'] = accountNumber;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
-    console.log('Making API Call to /users/api/SMS with data:', data); // Log the request data
-    try {
-        const response = await _axios.post(`/users/api/SMS`, data, config);
-        console.log('API Call Successful, Response:', response.data); // Log the successful response
-        return response.data;
-    } catch (error) {
-        console.error('API Call Failed, Error:', error); // Log the error
-        throw error;
-    }
+  let user = await getUser();
+
+  const accountNumber = user.userInfo?.accountNumber || null;
+  data["accountNumber"] = accountNumber;
+  const postData = {
+    accountNumber: accountNumber,
+    phoneNumber: data.phoneNumber,
+    optOut: !data.optOut,
+    outageOptOut: !data.outageOptOut,
+    billingOptOutStatus: !data.billingOptOutStatus,
+  };
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+  try {
+    const response = await _axios.post(getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION), postData, config);
+    return response.data;
+  } catch (error) {
+    appLogger.logError(`Error in API Call to ${getEndpoint(ENDPOINTS.UPDATE_TEXT_NOTIFICATION)}:`, error); // Log the error
+    throw error;
+  }
 };
 
 const putEmailNotification = async (email) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  };
 
-    // Log the request endpoint and data
-    console.log(`Making API putEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
+  try {
+    const response = await _axios.put(
+      getEndpoint(ENDPOINTS.PAPERLESS_EMAIL_NOTIFICATION, { accountNumber, email }),
+      {},
+      config
+    );
 
-    try {
-        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
+    return response;
+  } catch (error) {
+    appLogger.logError(
+      `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_EMAIL_NOTIFICATION, { accountNumber, email })}:`,
+      error
+    );
+    throw error;
+  }
+};
 
-        // Log the successful response
-        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
-        return response;
-    } catch (error) {
-        // Log the error with a descriptive message
-        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless:`, error);
-        throw error;
-    }
+const resendEmailVerification = async () => {
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  };
+
+  try {
+    const response = await _axios.post(
+      getEndpoint(ENDPOINTS.PAPERLESS_RESEND_VERIFICATION, { accountNumber }),
+      {},
+      config
+    );
+
+    return response;
+  } catch (error) {
+    appLogger.logError(
+      `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_RESEND_VERIFICATION, { accountNumber })}:`,
+      error
+    );
+    throw error;
+  }
 };
 
 const postEmailNotification = async (email) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  };
 
-    // Log the request endpoint and data
-    console.log(`Making API  postEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
+  try {
+    const response = await _axios.post(
+      getEndpoint(ENDPOINTS.PAPERLESS_ENROLL, { accountNumber, emailAddress: email }),
+      {},
+      config
+    );
 
-    try {
-        const response = await _axios.post(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
-
-        // Log the successful response
-        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
-        return response;
-    } catch (error) {
-        // Log the error with a descriptive message
-        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless:`, error);
-        throw error;
-    }
+    return response;
+  } catch (error) {
+    appLogger.logError(
+      `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_ENROLL, { accountNumber, emailAddress: email })}:`,
+      error
+    );
+    throw error;
+  }
 };
 
 const postTermsAndConditions = async (flag) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const userName = user.userInfo?.userName || null;
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const userName = user.userInfo?.userName || null;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  };
 
-    // Log the request endpoint and data
-    console.log(`Making API Call to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`);
+  try {
+    const response = await _axios.put(
+      getEndpoint(ENDPOINTS.MOBILE_TC_FLAG, { accountNumber, userName, flag }),
+      {},
+      config
+    );
 
-    try {
-        const response = await _axios_cableone.put(`/mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}`, {}, config);
+    return response;
+  } catch (error) {
+    appLogger.logError(
+      `Error in API Call to ${getEndpoint(ENDPOINTS.MOBILE_TC_FLAG, { accountNumber, userName, flag })}:`,
+      error
+    );
+    throw error;
+  }
+};
 
-        // Log the successful response
-        console.log(`API Call Successful to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}, Response:`, response);
-        return response;
-    } catch (error) {
-        // Log the error with a descriptive message
-        console.error(`Error in API Call to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`, error);
-        throw error;
-    }
+const postTermsAndConditionsv2 = async (flag) => {
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber;
+  const userName = user.userInfo?.userName;
+  const mobileTCAcceptanceFlag = flag;
+  const tcAccpetanceDate = moment().format();
+  const customerType = "Residential";
+
+  const payload = {
+    accountNumber,
+    userName,
+    mobileTCAcceptanceFlag,
+    tcAccpetanceDate,
+    customerType,
+  };
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  };
+  try {
+    const response = await _axios.put(
+      getEndpoint(ENDPOINTS.MOBILE_TC_UPDATE_USERDATA),
+      payload,
+      config
+    );
+    return response;
+  } catch (error) {
+    appLogger.logError(
+      `Error in API Call to ${getEndpoint(ENDPOINTS.MOBILE_TC_UPDATE_USERDATA)}:`,
+      error
+    );
+    throw error;
+  }
 };
 
 const postPushNotifications = async (data) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const userName = user.userInfo?.userName || null;
-    // Update data object with accountNumber and userName
-    data.accountNumber = accountNumber;
-    data.userName = userName;
+  let user = await getUser();
+  let deviceToken = await getDeviceUniqueId();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const userName = user.userInfo?.userName || null;
+  data.accountNumber = accountNumber;
+  data.userName = userName;
 
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
+  data["id"] = 0;
+  data["DeviceId"] = deviceToken;
+  data["customerType"] = "Residential";
+  data["optOut"] = !data.optOut;
+  data["outageOptOut"] = !data.outageOptOut;
+  data["billingOptOutStatus"] = !data.billingOptOutStatus;
 
-    //https://customer.uat.cableone.net/apiWrapper/mobile/api/mobilenotificationpreferences/{UserName}/mobilepreferences
+  const config = { headers: { Authorization: `Bearer ${user.token}` } };
 
-    // Log the request endpoint and data
-    console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences with payload`, data);
+  try {
+    const response = await _axios.post(
+      getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName, accountNumber }),
+      data,
+      config
+    );
 
-    try {
-        const response = await _axios_cableone.post(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
-
-        // Log the successful response
-        console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:`, response);
-        return response;
-    } catch (error) {
-        // Log the error with a descriptive message
-        console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
-        throw error;
-    }
+    return response;
+  } catch (error) {
+    appLogger.logError(
+      `Error in API Call to ${getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName, accountNumber })}`,
+      error
+    );
+    throw error;
+  }
 };
 
 const unsubscribPaperLess = async () => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
 
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
-
-    // Log the request endpoint and data
-    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless/ with accountNumber:`, accountNumber);
-
-    try {
-        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/unsubscribe`, {}, config);
-
-        // Log the successful response
-        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless/unsubscribe, Response:`, response);
-        return response;
-    } catch (error) {
-        // Log the error with a descriptive message
-        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless/unsubscribe:`, error);
-        throw error;
-    }
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  };
+  try {
+    const response = await _axios.put(
+      getEndpoint(ENDPOINTS.PAPERLESS_UNENROLL, { accountNumber, email: user.userInfo?.email }),
+      {},
+      config
+    );
+    return response;
+  } catch (error) {
+    appLogger.logError(
+      `Error in API Call to ${getEndpoint(ENDPOINTS.PAPERLESS_UNENROLL, { accountNumber, email: user.userInfo?.email })}:`,
+      error
+    );
+    throw error;
+  }
 };
 
 const handleSubmitFeedback = async (obj) => {
-    const zendeskRequestApiUrl = 'https://cableone.zendesk.com/api/v2/requests.json';
-    let user = await getUser();
-    const fullName = user.userInfo?.fullName;
-    const payload = {
-        request: {
-            ticket_form_id: "360000052934",
-            requester: {
-                name: fullName,
-                email: obj.email
-            },
-            recipient: "400018994093",
-            assignee_id: "400018994093",
-            group_id: "360000672214",
-            type: null,
-            custom_fields: [
-                { id: "360022798993", value: obj.category },
-                { id: "1900000846365", value: obj.feedbackValue },
-                { id: "36003617614", value: obj.email }
-            ],
-            subject: "Residential MobileApp Feedback",
-            comment: {
-                body: obj.feedbackText,
-                uploads: null
-            },
-            tags: ["Feedback", "Residential", "MobileApp"],
-            via: { channel: "MobileApp" }
-        }
+  const zendeskRequestApiUrl = Config.ZENDESK_FEEDBACK_URL;
+  const user = await getUser();
+  const deviceMetadata = await getDeviceMetadata();
+  const fullName = user.userInfo?.fullName;
+  const authToken = `${Config.ZENDESK_AUTH_EMAIL}/token:${Config.ZENDESK_AUTH_API_TOKEN}`;
+
+  const base64Auth = base64.encode(authToken);
+
+  const concernLabels = (obj.areaOfConcern || []).map((id) => {
+    const labels = {
+      service_issue: "Service Issue",
+      speed_concern: "Speed Concern",
+      bug: "Bug",
+      pricing_plans: "Pricing & Plans",
+      billing_payments: "Billing & Payments",
+      customer_support: "Customer Support",
+      feature_request: "Feature Request",
+      equipment_issue: "Equipment Issue",
+      other_issues: "Other Issues",
     };
-    console.log('PAYLOAD====================', payload);
-    try {
-        const response = await axios.post(zendeskRequestApiUrl, payload);
-        return response;
-    } catch (error) {
-        throw error;
-    }
+    return labels[id] || id;
+  });
+
+  const payload = {
+    request: {
+      ticket_form_id: Config.ZENDESK_FEEDBACK_TICKET_FORM_ID,
+      requester: {
+        name: fullName,
+        email: obj.feedbackEmail,
+      },
+      recipient: Config.ZENDESK_FEEDBACK_RECIPIENT,
+      assignee_id: Config.ZENDESK_FEEDBACK_ASSIGNEE_ID,
+      group_id: Config.ZENDESK_FEEDBACK_GROUP_ID,
+      type: null,
+      custom_fields: [
+        { id: Config.ZENDESK_FEEDBACK_CATEGORY_ID, value: obj.category },
+        { id: Config.ZENDESK_FEEDBACK_VALUE_ID, value: obj.feedbackValue },
+        { id: Config.ZENDESK_FEEDBACK_EMAIL_ID, value: obj.feedbackEmail },
+        {
+          id: Config.ZENDESK_FEEDBACK_APP_VERSION_ID,
+          value: deviceMetadata.appVersion,
+        },
+        {
+          id: Config.ZENDESK_FEEDBACK_PLATFORM_ID,
+          value: deviceMetadata.platform,
+        },
+        {
+          id: Config.ZENDESK_FEEDBACK_OS_VERSION_ID,
+          value: deviceMetadata.osVersion,
+        },
+        {
+          id: Config.ZENDESK_FEEDBACK_DEVICE_MODEL_ID,
+          value: deviceMetadata.deviceModel,
+        },
+        {
+          id: Config.ZENDESK_FEEDBACK_ACCOUNT_NO,
+          value: user?.userInfo?.accountNumber,
+        },
+        {
+          id: Config.ZENDESK_FEEDBACK_AREA_OF_CONCERN_ID,
+          value: concernLabels.map((label) =>
+            label
+              .toLowerCase()
+              .replace(/\s*&\s*/g, "_and_")
+              .replace(/\s+/g, "_")
+          ),
+        },
+      ],
+      subject: "Residential MobileApp Feedback",
+      comment: {
+        body: obj.feedbackText || "No additional feedback provided.",
+        uploads: null,
+      },
+      tags: [
+        "Feedback",
+        "Residential",
+        "resimobileapp",
+        `pid_${user.userInfo.accountNumber}`,
+        deviceMetadata.platform.toLowerCase(),
+        ...concernLabels.map((label) =>
+          label
+            .toLowerCase()
+            .replace(/\s*&\s*/g, "_and_")
+            .replace(/\s+/g, "_")
+        ),
+      ],
+      via: { channel: "MobileApp" },
+    },
+  };
+
+  try {
+    const response = await axios.post(zendeskRequestApiUrl, payload, {
+      headers: {
+        Authorization: `Basic ${base64Auth}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    appLogger.logError("Zendesk API Error:", error.response?.data || error.message);
+    throw error;
+  }
 };
 
+const logError = async (errorData) => {
+  try {
+    await _axios.post(getEndpoint(ENDPOINTS.LOG_ERROR), errorData);
+  } catch (logErr) {
+    appLogger.logError("Failed to log error:", logErr);
+  }
+};
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback }
+const logInfo = async (infoData) => {
+  try {
+    await _axios.post(getEndpoint(ENDPOINTS.LOG_INFO), infoData);
+  } catch (logErr) {
+    appLogger.logError("Failed to log info:", logErr);
+  }
+};
+
+const addUserAction = async (data) => {
+  let user = await getUser();
+
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+
+  try {
+    const response = await _axios.post(getEndpoint(ENDPOINTS.USERS_BASE), data, config);
+    return response.data;
+  } catch (error) {
+    appLogger.logError("API Call Failed, Error:", error);
+    throw error;
+  }
+};
+
+const editUserAction = async (data) => {
+  let user = await getUser();
+
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+
+  try {
+    const response = await _axios.put(
+      getEndpoint(ENDPOINTS.USERS_BY_USERNAME, { userName: data.userName }),
+      data,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    appLogger.logError("API Call Failed, Error:", error);
+    throw error;
+  }
+};
+
+const removeUser = async (data) => {
+  let user = await getUser();
+
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+
+  try {
+    const response = await _axios.put(
+      getEndpoint(ENDPOINTS.USERS_REMOVE, { accountNumber: data.accountNumber, userName: data.userName }),
+      data,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    appLogger.logError("API Call Failed, Error:", error);
+    throw error;
+  }
+};
+const fetchAllSvEmails = async (data) => {
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+  const requestUrl = getEndpoint(ENDPOINTS.SV_EMAILS_GET_ALL, { accountNumber });
+   try {
+     const response = await _axios.get(requestUrl, config);
+     return response.data;
+   } catch (error) {
+     appLogger.logError("API Call Failed, Error:", error);
+     throw error;
+     }
+};
+
+const addSVEmailNoFlags = async (email) => {
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+
+  try {
+    const response = await _axios.post(
+      getEndpoint(ENDPOINTS.SV_EMAIL_ADD_NO_FLAGS, { accountNumber, email }),
+      {},
+      config
+    );
+    return response.data;
+  } catch (error) {
+    appLogger.logError(
+      `Error in API Call to add SV email without flags: ${email}`,
+      error
+    );
+    throw error;
+  }
+};
+
+const deleteSVEmail = async (email) => {
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+
+  try {
+    const response = await _axios.post(
+      getEndpoint(ENDPOINTS.SV_EMAIL_DELETE, { accountNumber, email }),
+      {},
+      config
+    );
+    return response.data;
+  } catch (error) {
+    appLogger.logError(`Error in API Call to delete SV email: ${email}`, error);
+    throw error;
+  }
+};
+
+const updateSVEmails = async (emailList) => {
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  };
+
+  const body = emailList.map((email) => ({ EmailAddress: email }));
+
+  try {
+    const response = await _axios.post(
+      getEndpoint(ENDPOINTS.SV_EMAIL_UPDATE, { accountNumber }),
+      body,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const manageSVEmails = async (emailList) => {
+  try {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+    const requestUrl = getEndpoint(ENDPOINTS.SV_EMAIL_UPDATE, { accountNumber });
+    const response = await _axios.post(requestUrl, emailList, config);
+    return response.data;
+  } catch (error) {
+    appLogger.logError("Error managing SV emails:", error);
+    throw error;
+  }
+};
+const addSVEmailMktFlag = async (email) => {
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+  };
+  try {
+    const requestUrl = getEndpoint(ENDPOINTS.SV_EMAIL_ADD_MKT_FLAG, { accountNumber, email });
+    const response = await _axios.post(requestUrl, {}, config);
+    return response.data;
+  } catch (error) {
+    appLogger.logError(
+      `Error in API Call to add SV email marketing flag: ${email}`,
+      error
+    );
+    throw error;
+  }
+};
+
+const isPaperlessEnabled = async (email, signal) => {
+  const user = await getUser();
+  const emailParam = encodeURIComponent(email);
+  const requestUrl = getEndpoint(ENDPOINTS.PAPERLESS_IS_ENABLED, { accountNumber: user.userInfo?.accountNumber, email: emailParam });
+  const response = await _axios.get(
+    requestUrl,
+    {
+      headers: { Authorization: `Bearer ${user.token}` },
+      signal, 
+    }
+  );
+  return response.data;
+};
+
+const fetchACPUserAccountDetails = async (signal, force = false) => {
+  let user = await getUser();
+  const accountNumber = user.userInfo?.accountNumber || null;
+
+  const config = {
+    headers: {
+      Authorization: "Bearer " + user.token,
+    },
+    signal: signal,
+  };
+
+  const requestUrl = getEndpoint(ENDPOINTS.ACCOUNTS_DETAILS);
+  const data = {
+    accountNumber: accountNumber,
+    UpdateCache: !!force,
+    fieldList: [
+      "first_name",
+      "last_name",
+      "current_balance",
+      "past_due_amount",
+      "payment_due_amount",
+      "payment_due_date",
+      "services",
+      "email",
+      "customer_type",
+      "account_status",
+      "days_since_disconnect_date",
+      "legacy_brand_by_spa",
+      "bill_to_address",
+      "service_address",
+      "homes_passed_id",
+      "hierarchy"
+    ],
+  };
+
+  try {
+    const response = await _axios.post(requestUrl, data, config);
+    return response.data;
+  } catch (error) {
+    if (error?.name === "CanceledError" || error?.code === "ERR_CANCELED") {
+      throw error;
+    }
+    appLogger.logError("Error in fetchACPUserAccountDetails:", error);
+    throw error;
+  }
+};
+
+export {
+  fetchACPUserAccountDetails,
+  logError,
+  logInfo,
+  fetchUserList,
+  getProfileDetails,
+  fetchSmsSubscription,
+  postProfileInfo,
+  postTextNotifictionInfo,
+  fetchBillingStatus,
+  fetchEasyPayStatus,
+  fetchPaperLessDetails,
+  putEmailNotification,
+  postEmailNotification,
+  postTermsAndConditions,
+  postTermsAndConditionsv2,
+  postPushNotifications,
+  unsubscribPaperLess,
+  fetchPushNotifications,
+  handleSubmitFeedback,
+  manageSVEmails,
+  isPaperlessEnabled,
+  resendEmailVerification,
+  addUserAction,
+  removeUser,
+  editUserAction,
+  fetchAllSvEmails,
+  addSVEmailNoFlags,
+  deleteSVEmail,
+  updateSVEmails,
+  addSVEmailMktFlag,
+  updateProfileSecurity
+};

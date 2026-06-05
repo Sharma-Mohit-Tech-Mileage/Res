@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple500">#353091</color>
+    <color name="my_color_primary">#8D3B90</color>
+    <color name="my_color_primary_dark">#353091</color>
+    <color name="my_color_accent">#001321</color>
+
+</resources>
