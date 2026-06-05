@@ -155,13 +155,19 @@ const NewBillerHome = ({ navigation }) => {
         pastPaymentDue: accountDetails.past_due_amount,
         email: getPrimaryEmail(accountDetails),
       });
+ 
+      // Wait until phone resolution completes so Zendesk receives phone reliably.
+      if (phoneNumber === undefined) {
+        return;
+      }
+
       const firstName = accountDetails.first_name || "";
       const lastName = accountDetails.last_name || "";
       DeviceInfo.getUserAgent().then((userAgent) => {
-        loginWithToken(userAgent, firstName, lastName);
+        loginWithToken(userAgent, firstName, lastName, phoneNumber || "");
       });
     }
-  }, [accountDetails]);
+  }, [accountDetails, phoneNumber]);
 
   const getTextNotificationsData = () => {
       
@@ -173,14 +179,17 @@ const NewBillerHome = ({ navigation }) => {
         GetApiRequest(
           endpointUrl,
           (res) => {
+            console.log("SMS Notification Prefs Response", res);
             if (res) {
               let phoneNum = res[0]?.phoneNum || "";
               setPhoneNumber(phoneNum);
+            } else {
+              setPhoneNumber("");
             }
             
           },
           (error) => {
-            
+            setPhoneNumber("");
             console.error("Error on retrying getTextNotificationsData", error);
           },
         );
@@ -248,7 +257,7 @@ const NewBillerHome = ({ navigation }) => {
 
   // zendesk chat login
 
-  const loginWithToken = async (userAgent, firstName, lastName) => {
+  const loginWithToken = async (userAgent, firstName, lastName, zendeskPhone) => {
     const user = await getUser();
     let requestData = {
       accountNumber: user?.userInfo.accountNumber,
@@ -277,7 +286,7 @@ const NewBillerHome = ({ navigation }) => {
             firstName: firstName || "",
             lastName: lastName || "",
             name: `${firstName || ""} ${lastName || ""}`.trim(),
-            phone: phoneNumber || "",
+            phone: zendeskPhone || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
@@ -286,16 +295,19 @@ const NewBillerHome = ({ navigation }) => {
             jwtId: jwtToken,
             source: "Mobile App",
           };
-
-          loginWithJWT(jwtToken)
-            .then(() => {
-              // Now set conversational fields
+               console.log("Setting Zendesk Chat Conversational Fields:", fields);
               setConversationalFields(fields);
-            })
-            .catch((error) => {
-              setConversationalFields(fields);
-              console.warn("Error logging in to Zendesk Chat:", error);
-            });
+          // loginWithJWT(jwtToken)
+          //   .then(() => {
+          //     // Now set conversational fields
+          //     console.log("Setting Zendesk Chat Conversational Fields:", fields);
+          //     setConversationalFields(fields);
+          //   })
+          //   .catch((error) => {
+          //     console.warn("Error logging in to Zendesk Chat:", error);
+          //     setConversationalFields(fields);
+          //     console.warn("Error logging in to Zendesk Chat:", error);
+          //   });
         }
       },
       (error) => {
