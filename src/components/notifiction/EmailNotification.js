@@ -234,7 +234,14 @@ const AddNotificationScreen = () => {
     ]
   );
 
-  const handleValidationError = useCallback(() => {}, [animateNotification]);
+  const handleValidationError = useCallback((formErrors) => {
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    if (formErrors?.email) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 400);
+    }
+  }, []);
 
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);

@@ -53,6 +53,7 @@ const validationSchema = yup.object().shape({
 });
 const TextNotifications = ({ navigation }) => {
   const scrollViewRef = useRef(null);
+  const phoneInputRef = useRef(null);
   const route = useRoute();
   const dispatch = useDispatch();
   const animatedValue = useRef(new Animated.Value(-100)).current;
@@ -192,9 +193,14 @@ const TextNotifications = ({ navigation }) => {
     }
   }, [route.params?.updateFailed, navigation, dispatch]);
 
-  const handleValidationError = () => {
+  const handleValidationError = (formErrors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setErrorText("Please enter valid information to continue.");
+    if (formErrors?.phoneNumber) {
+      setTimeout(() => {
+        phoneInputRef.current?.focus();
+      }, 400);
+    }
   };
 
 
@@ -412,12 +418,13 @@ const TextNotifications = ({ navigation }) => {
                 name="phoneNumber"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <SparkLightInput
+                    ref={phoneInputRef}
                     placeholder="Mobile Number"
                     label={"Mobile Number *"}
                     required={true}
                     onBlur={onBlur}
                     onChangeText={onChange}
-                    keyboardType="number-pad"
+                    keyboardType="phone-pad"
                     value={value}
                     error={errors.phoneNumber?.message}
                     maxLength={16}

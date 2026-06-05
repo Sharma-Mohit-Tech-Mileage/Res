@@ -94,6 +94,12 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+// Release signing values (set in ~/.gradle/gradle.properties locally, or injected by CI)
+def keystorePath = project.findProperty("KEYSTORE_PATH")
+def keystorePassword = project.findProperty("KEYSTORE_PASSWORD")
+def keyAliasValue = project.findProperty("KEY_ALIAS")
+def keyPasswordValue = project.findProperty("KEY_PASSWORD")
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -108,7 +114,7 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode 446
+        versionCode 451
         versionName "26.2.0"
     }
 
@@ -138,15 +144,19 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            storeFile keystorePath ? file(keystorePath) : null
+            storePassword keystorePassword
+            keyAlias keyAliasValue
+            keyPassword keyPasswordValue
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             //noinspection ProguardAndroidTxtUsage
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"

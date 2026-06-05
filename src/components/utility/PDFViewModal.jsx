@@ -14,6 +14,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Pdf from 'react-native-pdf';
 import sharePDF from 'react-native-share-pdf';
 import { Padding, Color, FontFamily, Border, FontSize } from '../../../GlobalStyles';
+import { A11Y } from '../../styles/theme';
 import Xclose from "../../../src/res/svgIcons/Xclose";
 import Share from "../../../src/res/svgIcons/Share";
 
@@ -175,8 +176,8 @@ const styles = StyleSheet.create({
   chevronLayout: {
       justifyContent: 'center',
       alignItems: 'center',
-      height: 24,
-      width: 24,
+      minHeight: A11Y.minTouch,
+      minWidth: A11Y.minTouch,
       zIndex: 1
   },
   chevronLeftLayout: {
