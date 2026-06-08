@@ -2,7 +2,7 @@ import { all, call, put, takeLatest } from "redux-saga/effects";
 import {
   UPDATE_PRIMARY_AND_PAPERLESS_REQUEST, ADD_PRIMARY_EMAIL_REQUEST
 } from "../constants/notificationConstants";
-import { FETCH_ACP_USER_ACCOUNT_DETAILS } from "../constants";
+import { FETCH_ACP_USER_ACCOUNT_DETAILS, GET_PAPERLESS_STATUS } from "../constants";
 
 import {
   setLoading,
@@ -43,7 +43,8 @@ const getNavigationConfig = (type, isSuccess, details = {}) => {
 function* handleUpdatePrimaryAndPaperless(action) {
   const { newEmail, oldEmail, paperlessBilling, account } = action.payload;
   const { navigation } = action;
-
+  // Force-refresh account cache only when the email changed; paperless-only toggle leaves account details untouched.
+  const accountDetailsChanged = !oldEmail || newEmail !== oldEmail;
 
   try {
     yield put(setLoading());
@@ -98,10 +99,17 @@ function* handleUpdatePrimaryAndPaperless(action) {
       }
       
     }
-    yield put({
-      type: FETCH_ACP_USER_ACCOUNT_DETAILS,
-      payload: { force: true },
-    });
+    if (accountDetailsChanged) {
+      console.log("[AcctCache][Resi] paperless flow: email changed → account fetch force=true");
+      yield put({
+        type: FETCH_ACP_USER_ACCOUNT_DETAILS,
+        payload: { force: true },
+      });
+    } else {
+      console.log("[AcctCache][Resi] paperless flow: paperless-only toggle → GET_PAPERLESS_STATUS, no account force-fetch");
+      // Paperless-only toggle: account details unchanged, so refresh just the paperless badge (ungated by account freshness).
+      yield put({ type: GET_PAPERLESS_STATUS, payload: { email: newEmail } });
+    }
     yield put(updatePrimaryAndPaperlessSuccess(result));
   } catch (error) {
     console.warn("Combined update failed:", error);
