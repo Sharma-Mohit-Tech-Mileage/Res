@@ -155,7 +155,7 @@ const NewBillerHome = ({ navigation }) => {
         pastPaymentDue: accountDetails.past_due_amount,
         email: getPrimaryEmail(accountDetails),
       });
- 
+
       // Wait until phone resolution completes so Zendesk receives phone reliably.
       if (phoneNumber === undefined) {
         return;
@@ -170,32 +170,32 @@ const NewBillerHome = ({ navigation }) => {
   }, [accountDetails, phoneNumber]);
 
   const getTextNotificationsData = () => {
-      
-      getUser().then((res1) => {
-        const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
-          accountNumber: res1.userInfo?.accountNumber,
-        });
-        
-        GetApiRequest(
-          endpointUrl,
-          (res) => {
-            console.log("SMS Notification Prefs Response", res);
-            if (res) {
-              let phoneNum = res[0]?.phoneNum || "";
-              setPhoneNumber(phoneNum);
-            } else {
-              setPhoneNumber("");
-            }
-            
-          },
-          (error) => {
-            setPhoneNumber("");
-            console.error("Error on retrying getTextNotificationsData", error);
-          },
-        );
+
+    getUser().then((res1) => {
+      const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
+        accountNumber: res1.userInfo?.accountNumber,
       });
-    };
-  
+
+      GetApiRequest(
+        endpointUrl,
+        (res) => {
+          console.log("SMS Notification Prefs Response", res);
+          if (res) {
+            let phoneNum = res[0]?.phoneNum || "";
+            setPhoneNumber(phoneNum);
+          } else {
+            setPhoneNumber("");
+          }
+
+        },
+        (error) => {
+          setPhoneNumber("");
+          console.error("Error on retrying getTextNotificationsData", error);
+        },
+      );
+    });
+  };
+
 
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
@@ -295,8 +295,8 @@ const NewBillerHome = ({ navigation }) => {
             jwtId: jwtToken,
             source: "Mobile App",
           };
-               console.log("Setting Zendesk Chat Conversational Fields:", fields);
-              setConversationalFields(fields);
+          console.log("Setting Zendesk Chat Conversational Fields:", fields);
+          setConversationalFields(fields);
           // loginWithJWT(jwtToken)
           //   .then(() => {
           //     // Now set conversational fields
@@ -433,12 +433,10 @@ const NewBillerHome = ({ navigation }) => {
             buttonVariant={isAutoPayStatus ? "success" : "primary"}
             isActive={isAutoPayStatus}
             onButtonPress={() => {
-              navigation.navigate("AutoPayPCIConnector", {
-                url: `${Config.URL}/billing`,
+              navigation.navigate("ArticleWindowUtility", {
+                url: `${Config.PORTAL_BASE_URL}/portals/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
                 name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-                useNewPayment: true,
-                status: isAutoPayStatus,
-                paymentDetails: defaultPaymentDetails,
+                injectPaymentObj: true,
               });
             }}
           />
