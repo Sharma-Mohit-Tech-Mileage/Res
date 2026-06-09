@@ -49,9 +49,9 @@ const ProfileSettings = () => {
   console.log("Profile details from Redux:", profile);
 
   useEffect(() => {
-    if (emailAddress) {
+    
       setShowEmailLoading(false);
-    }
+    
   }, [profile, emailAddress]);
 
   const TextNotifSettings = useMemo(
@@ -208,7 +208,10 @@ const ProfileSettings = () => {
       GetApiRequest(
         endpointUrl,
         (res) => {
+          setShowPhoneLoading(false);
+          console.log("RESPONSE", res);
           if (res) {
+            if(res[0]?.smsMessageType) {
             res[0]?.smsMessageType.forEach((value, index) => {
               console.log(`Index: ${index}, Value: ${value}`);
               TextNotifSettings[index].status = value?.optOutFlag
@@ -218,6 +221,7 @@ const ProfileSettings = () => {
             let phoneNum = res[0]?.phoneNum || "";
             setPhoneNumber(phoneNum);
           }
+        }
           setShowPhoneLoading(false);
         },
         (error) => {
@@ -326,7 +330,7 @@ const ProfileSettings = () => {
                   <SkeletonPlaceholder>
                     <View style={styles.profileFieldSkeleton} />
                   </SkeletonPlaceholder>
-                ) : (
+                ) : emailAddress && (
                   <View
                     style={styles.editableRow}
                     accessible={false}
@@ -372,7 +376,13 @@ const ProfileSettings = () => {
                   </View>
                 )}
 
-                {phoneNumber ? (
+
+                {showPhoneLoading ? (
+                    <SkeletonPlaceholder>
+                      <View style={styles.profileFieldSkeleton} />
+                    </SkeletonPlaceholder>
+                  )
+              : phoneNumber && (
                   <View
                     style={styles.editableRow}
                     accessible={false}
@@ -421,13 +431,8 @@ const ProfileSettings = () => {
                       <EditIcon />
                     </Pressable>
                   </View>
-                ) : (
-                  showPhoneLoading && (
-                    <SkeletonPlaceholder>
-                      <View style={styles.profileFieldSkeleton} />
-                    </SkeletonPlaceholder>
-                  )
-                )}
+                ) 
+              }
               </View>
             </View>
           </View>
