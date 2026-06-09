@@ -178,7 +178,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
           <Touchable
             onPress={() => {
               navigation.navigate("ArticleWindowUtility", {
-                url: `${Config.PORTAL_BASE_URL}/portals/make-payment`,
+                url: `${Config.PORTAL_BASE_URL}/portals/app-secure/make-payment`,
                 name: "Make a Payment",
                 injectPaymentObj: true,
               });

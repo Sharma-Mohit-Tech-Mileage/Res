@@ -18,7 +18,7 @@ const AutoPayCard = ({
   const handleCardPress = () => {
     if (!showSkeleton) {
       navigation.navigate("ArticleWindowUtility", {
-        url: `${Config.PORTAL_BASE_URL}/portals/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
+        url: `${Config.PORTAL_BASE_URL}/portals/app-secure/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
         name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
         injectPaymentObj: true,
       });

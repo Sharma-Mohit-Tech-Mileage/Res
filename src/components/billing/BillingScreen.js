@@ -229,7 +229,7 @@ const BillingScreen = ({ navigation }) => {
                       style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
                       onPress={() => {
                         navigation.navigate("ArticleWindowUtility", {
-                          url: `${Config.PORTAL_BASE_URL}/portals/billing-payment`,
+                          url: `${Config.PORTAL_BASE_URL}/portals/app-secure/billing-payment`,
                           name: "Manage Payment Method",
                           injectPaymentObj: true,
                         });
