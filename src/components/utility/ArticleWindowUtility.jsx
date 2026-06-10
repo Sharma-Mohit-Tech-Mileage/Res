@@ -263,13 +263,13 @@ const ArticleWindowUtility = ({ navigation, route }) => {
             const userInfo = cu?.userInfo || {};
             const ad = accountDetailsRef.current || {};
             const ep = easyPayRef.current || {};
-            const toNum = (v) => Math.max(0, v != null && v !== '' ? Number(v) : 0);
+            const toNum = (v) => (v != null && v !== '' ? Number(v) : 0);
             easyPayInfoJsonRef.current = JSON.stringify({ isEasyPay: ep.isEasyPay || false, easyPayId: ep.easyPayId || '' });
             const paymentObj = {
                 AccountNumber: userInfo.accountNumber || '',
                 FirstName: userInfo.firstName || '',
                 LastName: userInfo.lastName || '',
-                TotalDue: toNum(ad.payment_due_amount),
+                TotalDue: toNum(ad.current_balance),
                 CustomerType: 'Residential',
                 PastDue: toNum(ad.past_due_amount),
                 DueDate: ad.payment_due_date || '',

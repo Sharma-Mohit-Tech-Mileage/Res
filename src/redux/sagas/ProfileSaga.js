@@ -635,6 +635,7 @@ let inFlightNonForceController = null;
 
 function* fetchACPUserAccountDetailsSaga(action) {
   const force = action?.payload?.force === true;
+  console.log("[AcctCache][Resi] fetch dispatched — force =", force);
 
   if (inFlightForceController) {
     return;
@@ -658,6 +659,7 @@ function* fetchACPUserAccountDetailsSaga(action) {
       lastFetchedAt &&
       Date.now() - lastFetchedAt < ACCOUNT_DETAILS_FRESHNESS_WINDOW_MS
     ) {
+      console.log("[AcctCache][Resi] fresh (<60s) → served from cache, API skipped — force =", force);
       return;
     }
   }
@@ -671,6 +673,7 @@ function* fetchACPUserAccountDetailsSaga(action) {
 
   yield put(setLoading(true));
   try {
+    console.log("[AcctCache][Resi] calling GetAccountDetailsCache — UpdateCache =", force);
     const accountData = yield call(
       fetchACPUserAccountDetails,
       controller.signal,

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import RemoteConfigManager from '../config/Remoteconfigmanager';
 import { validateFeatureFlag } from '../config/Featureflags';
 
@@ -22,16 +22,21 @@ export const FeatureFlagsProvider = ({ children }) => {
     };
   }, []);
 
+  // Stable identities so consumers' effects don't re-fire on every version bump (was an infinite refresh loop).
+  const getFlag = useCallback((path, defaultValue = false) => {
+    validateFeatureFlag(path);
+    return RemoteConfigManager.getFeatureFlag(path, defaultValue);
+  }, []);
+
+  const refresh = useCallback(async () => {
+    await RemoteConfigManager.refresh();
+  }, []);
+
   const contextValue = useMemo(() => ({
-    getFlag: (path, defaultValue = false) => {
-      validateFeatureFlag(path);
-      return RemoteConfigManager.getFeatureFlag(path, defaultValue);
-    },
-    refresh: async () => {
-      await RemoteConfigManager.refresh();
-    },
+    getFlag,
+    refresh,
     version
-  }), [version]);
+  }), [getFlag, refresh, version]);
 
   return (
     <FeatureFlagsContext.Provider value={contextValue}>

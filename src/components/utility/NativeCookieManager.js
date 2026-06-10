@@ -13,8 +13,6 @@ const shortExpiry = () => new Date(Date.now() + 5 * 60 * 1000).toISOString();
 const setCookie = (url, name, value, expires) =>
     CookieManager.set(url, { name, value, domain: COOKIE_DOMAIN, path: '/', expires, secure: true, sameSite: 'lax' });
 
-// idToken expires in ~5 min; AccountNo is long-lived and doubles as the localStorage key for the
-// encrypted Form blob. AccountNo must be JS-readable (the portal reads it via cookieService.get).
 export const setAuthCookiesOnAllDomains = async (idToken, accountNumber = '') => {
     try {
         const long = longExpiry();

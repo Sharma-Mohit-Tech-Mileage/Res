@@ -191,8 +191,13 @@ class RemoteConfigManager {
         AsyncStorage.setItem(CACHE_KEY_LAST_FETCH, this._lastFetchTime.toString())
       ]);
 
-      this._notifyMaintenanceSubscribers();
-      this._notifyFeatureSubscribers();
+      // Notify only on actual change so a refresh that returns identical config doesn't churn version/re-renders.
+      if (maintenanceChanged) {
+        this._notifyMaintenanceSubscribers();
+      }
+      if (featuresChanged) {
+        this._notifyFeatureSubscribers();
+      }
 
       return { maintenanceChanged, featuresChanged };
 
