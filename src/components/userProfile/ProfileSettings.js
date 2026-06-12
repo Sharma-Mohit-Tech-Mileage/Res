@@ -77,11 +77,10 @@ const ProfileSettings = () => {
 
   const handleArrowPress = (fieldType) => {
     console.log(`Arrow pressed for: ${fieldType}`);
-    // Add your callback logic here
     if (fieldType === "email") {
       navigation.navigate("EmailNotifications", {
+        is_enrolled: emailAddress,
         email: emailAddress,
-        //isPaperLess: isPaperLess,
       });
     } else if (fieldType === "mobile") {
       navigation.navigate("TextNotifications", {

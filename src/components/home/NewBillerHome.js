@@ -88,14 +88,28 @@ const NewBillerHome = ({ navigation }) => {
     )
     : false;
 
+  const isForceBannerAccount =
+    userInfo?.accountNumber === "8160360660005361" ||
+    accountDetails?.accountNumber === "8160360660005361";
+
+  const forcedMaintenanceBannerConfig = {
+    title: "Service Error",
+    message:
+      "We are currently experiencing a service error. Our team is working to restore full functionality as soon as possible.",
+    severity: "critical",
+    dismissible: true,
+  };
+
   useEffect(() => {
-    if (outageData?.hasOutage) {
+    if (outageData?.hasOutage || isForceBannerAccount) {
       setIsOutageAlert(true);
-      setEstimatedRestoreTime(outageData.estimatedRestoreTime || "");
+      setEstimatedRestoreTime(
+        isForceBannerAccount ? "" : outageData.estimatedRestoreTime || ""
+      );
     } else {
       setIsOutageAlert(false);
     }
-  }, [outageData, userInfo?.accountNumber]);
+  }, [outageData, userInfo?.accountNumber, isForceBannerAccount]);
 
   const getStatus = () => {
     setloadingAutoPay(true);
@@ -381,34 +395,38 @@ const NewBillerHome = ({ navigation }) => {
   };
 
   const renderMaintenanceAlert = () => {
-    if (!bannerConfig) return null;
+    const effectiveBannerConfig =
+      isForceBannerAccount ? forcedMaintenanceBannerConfig : bannerConfig;
+
+    if (!effectiveBannerConfig) return null;
     const severityToType = { critical: "error", warning: "warning", info: "info" };
     const splitKeys = [];
-    let messageText = bannerConfig.message || "";
-    if (bannerConfig.link && bannerConfig.linkText) {
-      messageText = `${messageText}\n${bannerConfig.linkText}`;
-      splitKeys.push({ text: bannerConfig.linkText, action: "url", value: bannerConfig.link });
+    let messageText = effectiveBannerConfig.message || "";
+    if (effectiveBannerConfig.link && effectiveBannerConfig.linkText) {
+      messageText = `${messageText}\n${effectiveBannerConfig.linkText}`;
+      splitKeys.push({ text: effectiveBannerConfig.linkText, action: "url", value: effectiveBannerConfig.link });
     }
-    if (bannerConfig.showPhoneNumber && bannerConfig.phoneNumber) {
-      messageText = `${messageText}\nCall ${bannerConfig.phoneNumber}`;
-      splitKeys.push({ text: bannerConfig.phoneNumber, action: "call", value: bannerConfig.phoneNumber });
+    if (effectiveBannerConfig.showPhoneNumber && effectiveBannerConfig.phoneNumber) {
+      messageText = `${messageText}\nCall ${effectiveBannerConfig.phoneNumber}`;
+      splitKeys.push({ text: effectiveBannerConfig.phoneNumber, action: "call", value: effectiveBannerConfig.phoneNumber });
     }
     return (
       <View style={styles.alertWrapper}>
         <NotificationAlert
-          type={severityToType[bannerConfig.severity] || "info"}
-          title={bannerConfig.title}
+          type={severityToType[effectiveBannerConfig.severity] || "info"}
+          title={effectiveBannerConfig.title}
           message={messageText}
           splitKey={splitKeys.length > 0 ? splitKeys : ""}
-          showCloseIcon={!!bannerConfig.dismissible}
-          onClose={bannerConfig.dismissible ? dismissBanner : undefined}
+          showCloseIcon={!!effectiveBannerConfig.dismissible}
+          onClose={effectiveBannerConfig.dismissible ? dismissBanner : undefined}
         />
       </View>
     );
   };
 
-  const hasAnyAlert =
-    updateStatus.isMinorUpdateAvailable || isOutageAlert || (showBanner && bannerConfig);
+  const showWhatsNewAlert = updateStatus.isMinorUpdateAvailable || isForceBannerAccount;
+  const showServiceErrorAlert = (isForceBannerAccount || (!!bannerConfig && showBanner)) && !showDisconnectedBanner;
+  const hasAnyAlert = showWhatsNewAlert || isOutageAlert || showServiceErrorAlert;
 
   const renderWelcomeCard = () => (
     <View style={[styles.card, styles.shadowProp]}>
@@ -509,9 +527,9 @@ const NewBillerHome = ({ navigation }) => {
                 onLayout={(e) => setAlertsHeight(e.nativeEvent.layout.height)}
               >
                 <View style={styles.alertsGroup}>
-                  {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+                  {(updateStatus.isMinorUpdateAvailable || isForceBannerAccount) && renderAppUpdateAlert()}
                   {isOutageAlert && renderOutageAlert()}
-                  {showBanner && bannerConfig && renderMaintenanceAlert()}
+                  {(showBanner && bannerConfig) || isForceBannerAccount ? renderMaintenanceAlert() : null}
                 </View>
               </View>
             )}
