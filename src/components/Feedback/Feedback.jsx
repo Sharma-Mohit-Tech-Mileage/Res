@@ -34,6 +34,7 @@ import { saveUserFeedback } from "../../redux/actions/ProfileActionSuite";
 import useUserEmailPrefill from "../../hooks/useUserEmailPrefill";
 import FeedbackRatingSelector from "./FeedbackRatingSelector";
 import AreaOfConcernSelector from "./AreaOfConcernSelector";
+import { Radio } from "native-base";
 
 const Feedback = () => {
   const navigation = useNavigation();
@@ -44,6 +45,8 @@ const Feedback = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState("facehappy");
   const [selectedConcerns, setSelectedConcerns] = useState([]);
+  const [selectedOption, setSelectedOption] = useState("yes");
+  const [isError, setIsError] = useState(false);
   const [errormsg, setErrormsg] = useState(
     "Please enter valid information to continue."
   );
@@ -118,6 +121,11 @@ const Feedback = () => {
       shouldDirty: true,
       shouldValidate: true,
     });
+  };
+
+  const onChangeValue = (value) => {
+    setSelectedOption(value);
+    setIsError(false);
   };
 
   const onSubmit = (data) => {
@@ -308,6 +316,88 @@ const Feedback = () => {
             />
           </Animated.View>
 
+          <View style={{ padding: 24 }}>
+
+              <Text
+                style={[
+                  styles.optionTxt,
+                  {  marginBottom: 24 },
+                ]}
+              >
+                May Sparklight Contant you about your Feedback?
+              </Text>
+              <Radio.Group
+                name="surveyOptions"
+                value={selectedOption}
+                onChange={onChangeValue}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}
+              >
+                {isError && (
+                  <Text
+                    style={[styles.labelStyle, { color: Color.sparkLightRed, marginRight: 16 }]}
+                  >
+                    Please choose Yes or No.
+                  </Text>
+                )}
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginRight: 4,
+                  }}
+                >
+                  <Radio
+                    value="yes"
+                    accessibilityLabel="Yes"
+                    accessibilityHint="Select this option if Sparklight may contact you about your feedback"
+                    accessibilityRole="radio"
+                    style={{
+                      marginTop: 0,
+                      marginRight: 4,
+                      transform: [{ scale: 0.9 }],
+                    }}
+                  />
+                  <Text
+                    style={[
+                      styles.optionTxt,
+                      { marginBottom: 0, marginTop: 0 },
+                    ]}
+                  >
+                    Yes
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Radio
+                    value="no"
+                    accessibilityLabel="No"
+                    accessibilityHint="Select this option if Sparklight may not contact you about your feedback"
+                    accessibilityRole="radio"
+                    style={{
+                      marginTop: 0,
+                      marginRight: 5,
+                      transform: [{ scale: 0.9 }],
+                    }}
+                  />
+                  <Text
+                    style={[
+                      styles.optionTxt,
+                      { marginBottom: 0, marginTop: 0 },
+                    ]}
+                  >
+                    No
+                  </Text>
+                </View>
+              </Radio.Group>
+            </View>
+              
+
           <Animated.View
             entering={FadeInDown.delay(600).springify()}
             style={styles.inputWrapper}
@@ -480,6 +570,13 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     marginTop: Padding.p_5xs,
+  },optionTxt: {
+    fontSize: FontSize.size_base,
+    color: Color.colorGray_200,
+    fontFamily: FontFamily.openSansRegular,
+    marginBottom: 4,
+    marginTop: 4,
+    
   },
 });
 
