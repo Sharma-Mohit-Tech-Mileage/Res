@@ -693,6 +693,7 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   container: {
+    flex: 1,
     flexDirection: "row",
     padding: 16,
     borderWidth: 1,

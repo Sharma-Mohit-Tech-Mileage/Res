@@ -1,16 +1,18 @@
-import React from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { FontFamily, FontSize, Color, Padding } from '../../../GlobalStyles';
 import Icon from '../common/Icon';
 import { useNavigation } from '@react-navigation/native';
 import Touchable from '../common/customui/Touchable';
+import InfoDialog from '../common/customui/InfoDialog';
 
 const MenuCard = ({ item, style }) => {
   const navigation = useNavigation();
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   const handlePress = () => {
     if (item.id === 'service') {
-      Alert.alert("Coming Soon", "This feature is not yet available.", [{ text: "Close", style: "cancel" }]);
+      setShowComingSoon(true);
     } else if (item.screenName) {
       navigation.reset({
         index: 0,
@@ -20,25 +22,34 @@ const MenuCard = ({ item, style }) => {
   };
 
   return (
-    <Touchable
-      style={[styles.container, style]}
-      onPress={handlePress}
-      accessibilityRole="button"
-      accessibilityLabel={item.title}
-      accessibilityHint={`Navigate to ${item.title} screen`}
-    >
-      <View style={styles.content}>
-        <Icon name={item.icon} size={30} color={ Color.sparklightBrightPurple} />
-        <Text
-          style={[
-            styles.title,
-            item.id === 'service' && styles.disabledText
-          ]}
-        >
-          {item.title}
-        </Text>
-      </View>
-    </Touchable>
+    <>
+      <Touchable
+        style={[styles.container, style]}
+        onPress={handlePress}
+        accessibilityRole="button"
+        accessibilityLabel={item.title}
+        accessibilityHint={`Navigate to ${item.title} screen`}
+      >
+        <View style={styles.content}>
+          <Icon name={item.icon} size={30} color={ Color.sparklightBrightPurple} />
+          <Text
+            style={[
+              styles.title,
+              item.id === 'service' && styles.disabledText
+            ]}
+          >
+            {item.title}
+          </Text>
+        </View>
+      </Touchable>
+      <InfoDialog
+        visible={showComingSoon}
+        title="Coming Soon"
+        message="This feature is not yet available."
+        buttonText="Close"
+        onClose={() => setShowComingSoon(false)}
+      />
+    </>
   );
 };
 

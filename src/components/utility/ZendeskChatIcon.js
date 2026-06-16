@@ -61,10 +61,6 @@ const ZendeskChatIcon = () => {
 };
 
 const styles = StyleSheet.create({
-  perusable: {
-    //flex: 1,
-    width: "100%",
-  },
   
 });
 

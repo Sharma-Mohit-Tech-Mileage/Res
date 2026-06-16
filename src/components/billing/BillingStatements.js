@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, FlatList } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import { Border, Color, FontFamily, FontSize, Layout, Padding } from "../../../GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
@@ -12,7 +12,7 @@ import Icon from "../common/Icon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
-import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
 import SmallLoader from "../common/customui/SmallLoader";
@@ -285,11 +285,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     paddingLeft: 5,
   },
-  controlsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+  controlsRow: Layout.rowBetween,
   dropdownContainer: {
     flex: 1,
     marginRight: 32,
@@ -335,40 +331,13 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },
-  iconButtonsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  uploadButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 5,
-    marginLeft: 15,
-  },
+  iconButtonsContainer: Layout.rowCenter,
   uploadText: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansSemiBold,
     color: Color.sparklightBrightPurple,
     marginRight: 5,
     textDecorationLine: 'underline', // Add underline to the text
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_5xs,
-  },
-  errorContainer: {
-    padding: 10,
-    backgroundColor: "#FFDDDD",
-    borderRadius: Border.br_5xs,
-    marginBottom: 10,
-  },
-  errorText: {
-    color: "#FF0000",
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
   },
   emptyContainer: {
     backgroundColor: Color.sparklightWhite,

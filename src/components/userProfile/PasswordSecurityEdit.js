@@ -17,7 +17,7 @@ import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
-import { requiredField } from "../../styles/utilities";
+import { container, requiredField } from "../../styles/utilities";
 import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
 const announceForAccessibility = (message) => {
@@ -359,19 +359,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
-  bulletPoiint: {
-    color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_xs,
-    fontStyle: 'normal',
-    fontWeight: '400',
-    lineHeight: 19,
-  },
-  bulletPointContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 5,
-  },
   passwordFlexBox: {
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
@@ -382,11 +369,6 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
-  },
-  wrapperSpaceBlock: {
-    paddingVertical: 0,
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
   },
   buttonsLayout: {
     width: '100%',
@@ -408,42 +390,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_3xl,
     lineHeight: 28,
   },
-  passwordWrapper: {
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: Padding.p_5xl,
-  },
-  bullet: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    marginRight: 10,
-  },
-  firstName: {
-    color: Color.sparklightGray1,
-    fontSize: FontSize.textXsSemibold_size,
-    flex: 1,
-  },
-  eyeIcon: {
-    width: 16,
-    height: 16,
-    overflow: "hidden",
-  },
-  show: {
-    marginLeft: 6,
-    color: Color.colorMidnightblue,
-    lineHeight: 28,
-  },
-  eyeParent: {
-    marginLeft: 8,
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  firstNameParent: {
-    alignItems: "center",
-    flexDirection: "row",
-    alignSelf: "stretch",
-  },
   textinput: {
     justifyContent: "center",
     alignSelf: "stretch",
@@ -452,20 +398,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: Padding.p_5xl,
   },
-  itMustBe: {
-    lineHeight: 19,
-    fontSize: FontSize.size_xs,
-  },
   frameParent: {
     alignSelf: "stretch",
-  },
-  frameChild: {
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
-  },
-  rectangleWrapper: {
-    marginTop: Padding.p_base,
   },
   securityQuestionWrapper: {
     paddingBottom: Padding.p_5xs,
@@ -513,20 +447,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 300
   },
-  passwordSecurityEdit: {
-    flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
-  }, BtnContainer: {
-    backgroundColor: colors.sparklight_purple_blue,
-    justifyContent: "center",
-  },
-  Btn: {
-    color: colors.snow_white,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "center",
-    padding: 16,
-    fontSize: 16,
-  },
+  passwordSecurityEdit: container.page,
 });
 
 export default PasswordSecurityEdit;

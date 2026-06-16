@@ -7,10 +7,7 @@ import {
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { wp, hp } from "../../utils/responsive";
 import moment from "moment";
 import { navigationRef } from "../../navigations/UserNavigations";
 import Icon from "../common/Icon";
@@ -214,13 +211,6 @@ const styles = StyleSheet.create({
     maxHeight: 90,
     marginBottom: 10,
   },
-  versionText: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    color: "#FFFFFF",
-    fontWeight: "400",
-    opacity: 0.8,
-  },
   cardOuterContainer: {
     borderRadius: 20,
     borderWidth: 10,
@@ -314,14 +304,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp("5%"),
     alignItems: "center",
   },
-  copyrightText: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
-    fontWeight: "400",
-    color: "#FFFFFF",
-    textAlign: "center",
-    opacity: 0.8,
-  },
   loginButton: {
     backgroundColor: Color.colorMidnightblue,
     borderRadius: Border.br_xs,
@@ -336,22 +318,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     color: Color.sparklightWhite,
     textAlign: "center",
-  },
-  blockingInfoContainer: {
-    backgroundColor: "#FFF3CD",
-    borderColor: "#FFEAA7",
-    borderWidth: 1,
-    borderRadius: Border.br_5xs,
-    padding: Padding.p_base,
-    marginTop: Padding.p_base,
-    width: "100%",
-  },
-  blockingInfoText: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    color: "#856404",
-    textAlign: "center",
-    fontStyle: "italic",
   },
 });
 

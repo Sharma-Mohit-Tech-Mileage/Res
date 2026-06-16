@@ -16,7 +16,7 @@ import moment from "moment";
 import Icon from "../common/Icon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
 import {
   fetchPaymentHistory,
   downloadPaymentReceipt,
@@ -400,13 +400,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_5xs,
   },
   emptyContainer: {
     backgroundColor: Color.sparklightWhite,

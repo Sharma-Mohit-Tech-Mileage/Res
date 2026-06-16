@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StyleSheet, Text, View, ScrollView, Animated, Platform, AccessibilityInfo, findNodeHandle} from "react-native";
 import Touchable from "../common/customui/Touchable";
-import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Layout, Padding } from "../../../GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -575,19 +575,12 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#E0E0E0",
   },
-  iconContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  iconContainer: Layout.rowCenter,
   icon: {
     width: 18,
     height: 18,
   },
-  toggleHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+  toggleHeader: Layout.rowBetween,
   toggleTitle: {
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: FontSize.size_base,
@@ -648,10 +641,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: Padding.p_5xs,
   },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  checkboxContainer: Layout.rowCenter,
   checkBoxAreaViewText: {
     fontSize: 14,
     fontFamily: FontFamily.openSansRegular,

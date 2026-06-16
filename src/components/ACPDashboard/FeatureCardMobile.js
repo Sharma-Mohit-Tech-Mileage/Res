@@ -95,13 +95,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.sparklightWhite,
   },
-  header: {
-    paddingHorizontal: Padding.p_base,
-    paddingVertical: Padding.p_xs,
-    borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_200,
-    backgroundColor: Color.colorWhitesmoke_100,
-  },
   title: {
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: 20,

@@ -1,12 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
 import { card } from "../../styles/utilities";
 import { useNavigation } from "@react-navigation/native";
-
-// Card has wp("92%") width minus its own marginHorizontal:8 — give the image the same span.
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const IMAGE_WIDTH = SCREEN_WIDTH - 16;
 
 const PromoImage = require("../../../assets/sparklight-tech-app.jpg");
 
@@ -97,12 +93,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   imageContainer: {
-    width: IMAGE_WIDTH,
+    width: "100%",
     overflow: "hidden",
   },
   promoImage: {
-    width: IMAGE_WIDTH,
-    height: IMAGE_WIDTH / 1.92,
+    width: "100%",
+    aspectRatio: 1.92,
     borderRadius: Border.br_11xs,
     resizeMode: "cover",
   },

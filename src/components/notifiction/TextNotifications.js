@@ -26,17 +26,12 @@ import { PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 
-import {
-  Color,
-  FontFamily,
-  FontSize,
-  Padding,
-  Border,
-} from "../../../GlobalStyles";
+import { Border, Color, FontFamily, FontSize, Layout, Padding } from "../../../GlobalStyles";
 
 import Toggle from "../common/Toggle";
 import AlertIcon from "../../../assets/svgs/Alerttriangle";
-import { widthPercentageToDP } from "react-native-responsive-screen";
+import { divider } from "../../styles/utilities";
+
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
@@ -624,10 +619,6 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     backgroundColor: Color.sparklightWhite,
   },
-  containerTypo: {
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-  },
   mobilePhoneTypo: {
     color: Color.colorblack_100,
     fontSize: FontSize.size_base,
@@ -667,26 +658,6 @@ const styles = StyleSheet.create({
     color: Color.colorMidnightblue,
     textAlign: "center",
   },
-  infoCircleIcon: {
-    width: 16,
-    height: 16,
-    overflow: "hidden",
-  },
-  infoCircleWrapper: {
-    paddingVertical: Padding.p_5xs,
-    flexDirection: "row",
-  },
-  youAreSubscribed: {
-    lineHeight: 22,
-  },
-  youAreSubscribedContainer: {
-    marginLeft: 8,
-    color: Color.colorGray_200,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    flex: 1,
-  },
   frameView: {
     borderRadius: Border.br_5xs,
     backgroundColor: Color.colorWhitesmoke_100,
@@ -700,54 +671,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
     borderRadius: 0,
   },
-  frameChild: {
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
-  },
-  text: {
-    fontSize: FontSize.size_base,
-    lineHeight: 22,
-    textAlign: "left",
-    color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
-  },
-  frameParent3: {
-    justifyContent: "center",
-    flex: 1,
-  },
-  frameParent4: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "stretch",
-  },
-  frameWrapper2: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
-  receiveTextNotifications1: {
-    color: Color.sparklightDarkGray,
-    lineHeight: 22,
-    fontWeight: "400",
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "left",
-    alignSelf: "stretch",
-    fontSize: FontSize.size_sm,
-  },
-  byOptingInContainer: {
-    fontSize: FontSize.textXsSemibold_size,
-    color: Color.sparklightDarkGray,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "left",
-    alignSelf: "stretch",
-  },
-  frameWrapper10: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Color.sparklightWhite,
-    alignSelf: "stretch",
-  },
+  frameChild: divider,
   spaceBottom: {
     marginTop: 16,
   },
@@ -786,10 +710,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 0,
   },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  checkboxContainer: Layout.rowCenter,
   checkBoxAreaViewText: {
     fontSize: 14,
     fontFamily: FontFamily.openSansRegular,

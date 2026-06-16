@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Modal, Animated, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Modal, Animated, ScrollView, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import AnnouncementStep from './AnnouncementStep';
 import AnnouncementProgress from './AnnouncementProgress';
@@ -7,15 +7,16 @@ import { theme } from '../../styles/theme';
 import { button } from '../../styles/utilities';
 import { trackStepViewed } from '../../utils/announcementHelpers';
 import Touchable from '../common/customui/Touchable';
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+import { CONTENT_MAX_WIDTH } from '../../utils/responsive';
 
 const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDismiss, onLearnMoreNavigate, navigationRef }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [startTime] = useState(Date.now());
 
+  const { height: windowHeight } = useWindowDimensions();
+
   const overlayFade = useRef(new Animated.Value(0)).current;
-  const modalSlide = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const modalSlide = useRef(new Animated.Value(windowHeight)).current;
 
   // Safe getters
   const steps = campaign?.content?.steps || [];
@@ -119,7 +120,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
   const exitAnimation = (callback) => {
     Animated.parallel([
       Animated.timing(overlayFade, { toValue: 0, duration: 200, useNativeDriver: true }),
-      Animated.timing(modalSlide, { toValue: SCREEN_HEIGHT, duration: 250, useNativeDriver: true }),
+      Animated.timing(modalSlide, { toValue: windowHeight, duration: 250, useNativeDriver: true }),
     ]).start(() => {
       setCurrentStep(0);
       if (callback && typeof callback === 'function') {
@@ -149,7 +150,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
       </Animated.View>
 
       <Animated.View style={[styles.modalContainer, { transform: [{ translateY: modalSlide }] }]}>
-        <View style={styles.modal}>
+        <View style={[styles.modal, { maxHeight: windowHeight * 0.85 }]}>
           {/* Header with NEW FEATURE badge on left and Skip on right */}
           <View style={styles.header}>
             <LinearGradient
@@ -166,7 +167,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
             </Touchable>
           </View>
 
-          <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <ScrollView style={[styles.scrollView, { maxHeight: windowHeight * 0.5 }]} showsVerticalScrollIndicator={false}>
             <AnnouncementStep
               step={currentStepData}
               currentIndex={currentStep}
@@ -215,13 +216,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    alignItems: 'center',
   },
   modal: {
+    width: '100%',
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: theme.spacing.xl,
-    maxHeight: SCREEN_HEIGHT * 0.85,
     ...theme.shadows.lg,
   },
   header: {
@@ -254,7 +258,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   scrollView: {
-    maxHeight: SCREEN_HEIGHT * 0.5,
   },
   footer: {
     flexDirection: 'row',

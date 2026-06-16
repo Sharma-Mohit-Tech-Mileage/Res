@@ -34,7 +34,7 @@ import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { passwordSchema } from "../utility/validationSchema"; 
 import colors from "../../res/Colors";
-import { requiredField } from "../../styles/utilities";
+import { container, requiredField } from "../../styles/utilities";
 const ChangePassword = () => {
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
@@ -469,10 +469,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 300,
   },
-  passwordSecurityEdit: {
-    flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
-  },
+  passwordSecurityEdit: container.page,
 });
 
 export default ChangePassword;

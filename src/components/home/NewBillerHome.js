@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View, StyleSheet, ScrollView, Platform, } from "react-native";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { useResponsive, wp } from "../../utils/responsive"; // [51768] tablet: gutter + full-width cards
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -28,13 +28,14 @@ import MobilePilotLandingPage from "../../components/ACPDashboard/MobilePilotLan
 import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
 import VersionCheck from "react-native-version-check";
-import DeviceInfo from "react-native-device-info";
+import { getUserAgent } from "../../utils/deviceInfo";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import { loginWithJWT, setConversationalFields, } from "../utility/RNZendeskChat";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 
 const NewBillerHome = ({ navigation }) => {
+  const { isTablet, gutterStyle } = useResponsive(); // [51768] tablet: 16dp gutter + full-width cards (null/false on phones)
   const { triggerOnScreenEntry } = useAnnouncement();
   const { outageData, checkStatus: checkOutageStatus } = useOutageStatus('dashboard');
 
@@ -163,7 +164,7 @@ const NewBillerHome = ({ navigation }) => {
 
       const firstName = accountDetails.first_name || "";
       const lastName = accountDetails.last_name || "";
-      DeviceInfo.getUserAgent().then((userAgent) => {
+      getUserAgent().then((userAgent) => {
         loginWithToken(userAgent, firstName, lastName, phoneNumber || "");
       });
     }
@@ -343,7 +344,7 @@ const NewBillerHome = ({ navigation }) => {
       ? `Estimated Time to Restore: ${estimatedRestoreTime}.`
       : null;
     return (
-      <View style={styles.alertWrapper}>
+      <View style={[styles.alertWrapper, isTablet && styles.cardFill]}>
         <NotificationAlert
           type="warning"
           title="Outage Notification"
@@ -361,7 +362,7 @@ const NewBillerHome = ({ navigation }) => {
       ? "https://play.google.com/store/apps/details?id=com.sparklight"
       : "https://apps.apple.com/us/app/mysparklight/6469003880";
     return (
-      <View style={styles.alertWrapper}>
+      <View style={[styles.alertWrapper, isTablet && styles.cardFill]}>
         <NotificationAlert
           type="info"
           title="What's New"
@@ -394,7 +395,7 @@ const NewBillerHome = ({ navigation }) => {
       splitKeys.push({ text: bannerConfig.phoneNumber, action: "call", value: bannerConfig.phoneNumber });
     }
     return (
-      <View style={styles.alertWrapper}>
+      <View style={[styles.alertWrapper, isTablet && styles.cardFill]}>
         <NotificationAlert
           type={severityToType[bannerConfig.severity] || "info"}
           title={bannerConfig.title}
@@ -411,7 +412,7 @@ const NewBillerHome = ({ navigation }) => {
     updateStatus.isMinorUpdateAvailable || isOutageAlert || (showBanner && bannerConfig);
 
   const renderWelcomeCard = () => (
-    <View style={[styles.card, styles.shadowProp]}>
+    <View style={[styles.card, styles.shadowProp, isTablet && styles.cardFill]}>
       <View>
         {showDisconnectedBanner ? (
           <View style={styles.contentWrapper}>
@@ -479,7 +480,7 @@ const NewBillerHome = ({ navigation }) => {
           {renderHeader()}
           <ScrollView style={styles.scrollContainer}>
             <View
-              style={styles.mainContentContainer}
+              style={[styles.mainContentContainer, gutterStyle]}
               importantForAccessibility={
                 isWalkthroughActive ? "no-hide-descendants" : "auto"
               }
@@ -488,7 +489,7 @@ const NewBillerHome = ({ navigation }) => {
               <View style={styles.overlayStack}>
                 {hasAnyAlert && <View style={{ height: alertsHeight }} />}
                 {isMobilePilotEnabled ? (
-                  <View style={[styles.card, styles.shadowProp]}>
+                  <View style={[styles.card, styles.shadowProp, isTablet && styles.cardFill]}>
                     <View
                       style={[
                         styles.contentWrapper,
@@ -505,7 +506,7 @@ const NewBillerHome = ({ navigation }) => {
             </View>
             {hasAnyAlert && (
               <View
-                style={styles.alertsAbsolute}
+                style={[styles.alertsAbsolute, gutterStyle]}
                 onLayout={(e) => setAlertsHeight(e.nativeEvent.layout.height)}
               >
                 <View style={styles.alertsGroup}>
@@ -555,6 +556,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 2,
     width: wp("92%"),
+  },
+  // [51768] tablet: fill the gutter-padded container instead of wp("92%")
+  cardFill: {
+    width: "100%",
   },
   shadowProp: {
     shadowColor: "#171717",

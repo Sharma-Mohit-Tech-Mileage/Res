@@ -199,24 +199,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: "100%",
   },
-  scrollViewContainer: {
-    padding: 20,
-    marginBottom: 0,
-  },
-  scrollViewContentContainer: {
-    paddingBottom: 30,
-  },
-  sparklightImageView: {
-    width: 100,
-    height: 25,
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  sparklightImage: {
-    tintColor: "#CCC",
-    width: "100%",
-    height: "100%",
-  },
   headerIconViewContainer: {
     alignItems: "center",
   },

@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DeviceInfo from 'react-native-device-info';
+import { getAppVersion } from '../utils/deviceInfo';
 import { logError } from '../utils/logger';
 
 const STORAGE_KEY = 'FEATURE_ANNOUNCEMENTS_STATE';
@@ -32,7 +32,7 @@ class AnnouncementPersistence {
       allStates[campaignId] = {
         ...allStates[campaignId],
         ...state,
-        version: DeviceInfo.getVersion(),
+        version: getAppVersion(),
       };
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allStates));
     } catch (error) {
@@ -100,7 +100,7 @@ class AnnouncementPersistence {
   static async hasAppVersionChanged(mobileTCAcceptanceFlag = false) {
     try {
       const lastVersion = await AsyncStorage.getItem(VERSION_KEY);
-      const currentVersion = DeviceInfo.getVersion();
+      const currentVersion = getAppVersion();
 
       if (!lastVersion) {
         await AsyncStorage.setItem(VERSION_KEY, currentVersion);
@@ -130,7 +130,7 @@ class AnnouncementPersistence {
   }
 
   static getCurrentAppVersion() {
-    return DeviceInfo.getVersion();
+    return getAppVersion();
   }
 }
 

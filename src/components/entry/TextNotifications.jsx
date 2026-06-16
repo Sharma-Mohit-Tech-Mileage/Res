@@ -10,13 +10,7 @@ import {
   Linking,
   AccessibilityInfo,
 } from "react-native";
-import {
-  Color,
-  FontFamily,
-  FontSize,
-  Padding,
-  Border,
-} from "../../../GlobalStyles";
+import { Border, Color, FontFamily, FontSize, Layout, Padding } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
 import { useForm, Controller } from "react-hook-form";
@@ -395,10 +389,7 @@ const styles = StyleSheet.create({
     height: 12,
     backgroundColor: Color.colorWhitesmoke_100,
   },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  checkboxContainer: Layout.rowCenter,
   checkBox: {
     width: 12,
     height: 12,

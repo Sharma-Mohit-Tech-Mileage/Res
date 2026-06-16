@@ -18,7 +18,7 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { interaction } from "../../styles/utilities";
+import { divider, interaction } from "../../styles/utilities";
 import { useDispatch, useSelector } from "react-redux";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
@@ -270,11 +270,7 @@ const styles = StyleSheet.create({
   frameGroup: {
     alignSelf: "stretch",
   },
-  frameChild: {
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
-  },
+  frameChild: divider,
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",

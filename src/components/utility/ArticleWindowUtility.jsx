@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, Platform, AppState, Alert } from 'react-native';
+import { View, Text, StyleSheet, Platform, AppState } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,6 +9,7 @@ import Config from 'react-native-config';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
 import LoadingOverlay from '../common/customui/LoadingOverlay';
+import InfoDialog from '../common/customui/InfoDialog';
 import LoadingSpinner from './LoadingSpinner';
 import { getUser } from '../../redux/utils/LocalStorage';
 import NetInfo from '@react-native-community/netinfo';
@@ -224,6 +225,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const [showPDFUrl, setShowPDFUrl] = useState('');
     const [contentLoaded, setContentLoaded] = useState(false);
     const [webViewKey, setWebViewKey] = useState(Date.now());
+    const [showAuthRequired, setShowAuthRequired] = useState(false);
     const [webViewReady, setWebViewReady] = useState(false);
     const [injectionScript, setInjectionScript] = useState('');
     const [proceedAfterTimeout, setProceedAfterTimeout] = useState(false);
@@ -520,9 +522,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         if (authChecked.current) return;
         authChecked.current = true;
         if (!user?.token) {
-            Alert.alert('Authentication Required', 'Please log in to continue.', [
-                { text: 'OK', onPress: () => navigationRef.current?.navigate('Splash') },
-            ]);
+            setShowAuthRequired(true);
         }
     }, [user]);
 
@@ -703,6 +703,15 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                 )}
             </View>
             {showPDFModal && <PDFViewModal url={showPDFUrl} onClose={() => setShowPDFModal(false)} />}
+            <InfoDialog
+                visible={showAuthRequired}
+                title="Authentication Required"
+                message="Please log in to continue."
+                onClose={() => {
+                    setShowAuthRequired(false);
+                    navigationRef.current?.navigate('Splash');
+                }}
+            />
         </View>
     );
 };

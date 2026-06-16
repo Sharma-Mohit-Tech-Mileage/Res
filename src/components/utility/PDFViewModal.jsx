@@ -6,7 +6,6 @@ import {
   Text,
   SafeAreaView,
   Pressable,
-  Dimensions,
   Image,
   StatusBar,
 } from "react-native";
@@ -114,35 +113,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  closeButton: {
-    alignSelf:'flex-end',
-    color: "white",
-    fontSize: 16,
-    backgroundColor: Color.colorMidnightblue,
-  },
-  closeBtn: {
-    textAlign: "center",
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
-  },
-  buttons: {
-    marginLeft: 10,
-    backgroundColor: Color.colorMidnightblue,
-  }, buttonsLayout: {
-    paddingHorizontal: Padding.p_base,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-  },
-  text1Clr: {
-    color: Color.colorWhitesmoke_200,
-    textAlign: "center",
-  },
   pdf: {
     flex:1,
-    width:Dimensions.get('window').width,
-    height:Dimensions.get('window').height,
+    width:'100%',
+    height:'100%',
   },
   profileSettingsChild: {
     overflow: "hidden",
@@ -165,24 +139,12 @@ const styles = StyleSheet.create({
       fontFamily: FontFamily.openSansSemiBold,
       padding: 8,
   },
-  chevronLeft: {
-      position: 'absolute',
-      left: 18,
-  },
-  chevronRight: {
-      position: 'absolute',
-      right: 18,
-  },
   chevronLayout: {
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: A11Y.minTouch,
       minWidth: A11Y.minTouch,
       zIndex: 1
-  },
-  chevronLeftLayout: {
-      height: 24,
-      width: 24,
   },
   icon: {
       height: 24,

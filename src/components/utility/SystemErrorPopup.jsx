@@ -9,6 +9,9 @@ import {
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
+import { modalOverlay } from "../../styles/utilities";
+import { MODAL_MAX_WIDTH } from "../../utils/responsive";
+
 
 
 const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClose }) => {
@@ -79,33 +82,13 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.splash_bg,
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
+  overlay: modalOverlay,
   alertContainer: {
     backgroundColor: "white",
     padding: 20,
     borderRadius: 5,
     width: "85%",
-  },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 5,
-  },
-  closeText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "black",
-    fontFamily: FontFamily.openSansRegular,
+    maxWidth: MODAL_MAX_WIDTH,
   },
   message: {
     color: colors.darkest_grey,
@@ -114,22 +97,6 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     lineHeight: 24,
     marginTop: 10,
-  },
-  buttonContainer: {
-    alignItems: "center",
-  },
-  buttons: {
-    backgroundColor: Color.colorWhitesmoke_300,
-  },
-  buttonsLayout: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    height: 50,
-    width: "45%",
-    marginTop: 20,
   },
   alertTitle: {
     color: colors.black,

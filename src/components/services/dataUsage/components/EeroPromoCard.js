@@ -1,11 +1,10 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Linking,
   Platform,
-  Alert,
   Animated,
   Easing,
 } from "react-native";
@@ -13,6 +12,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { Svg, Circle, Path } from "react-native-svg";
 import { theme } from "../../../../styles/theme";
 import Touchable from "../../../common/customui/Touchable";
+import InfoDialog from "../../../common/customui/InfoDialog";
 
 
 // ── Wi-Fi icon (bottom-right watermark) ──
@@ -68,6 +68,7 @@ const EeroPromoCard = ({ promoData }) => {
   }, []);
 
   const storeName = Platform.OS === "ios" ? "App Store" : "Play Store";
+  const [showError, setShowError] = useState(false);
 
   const handleDownload = async () => {
     const url =
@@ -80,10 +81,10 @@ const EeroPromoCard = ({ promoData }) => {
       if (canOpen) {
         await Linking.openURL(url);
       } else {
-        Alert.alert("Error", `Unable to open ${storeName}`);
+        setShowError(true);
       }
     } catch {
-      Alert.alert("Error", `Unable to open ${storeName}`);
+      setShowError(true);
     }
   };
 
@@ -134,6 +135,12 @@ const EeroPromoCard = ({ promoData }) => {
           </View>
         </LinearGradient>
       </Touchable>
+      <InfoDialog
+        visible={showError}
+        title="Error"
+        message={`Unable to open ${storeName}`}
+        onClose={() => setShowError(false)}
+      />
     </View>
   );
 };

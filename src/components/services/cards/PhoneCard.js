@@ -1,23 +1,25 @@
-import React from "react";
-import { View, Text, StyleSheet, Linking, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Linking } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getPhonePortalURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
+import InfoDialog from "../../common/customui/InfoDialog";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   const phonePortalURL = getPhonePortalURL(legacyBrand);
   const showManageButton = phonePortalURL !== null;
+  const [showError, setShowError] = useState(false);
 
   const handleManagePhone = async () => {
     if (!phonePortalURL) return;
     try {
       const supported = await Linking.canOpenURL(phonePortalURL);
       if (supported) await Linking.openURL(phonePortalURL);
-      else Alert.alert("Error", "Unable to open phone portal.");
+      else setShowError(true);
     } catch (error) {
-      Alert.alert("Error", "Unable to open phone portal.");
+      setShowError(true);
     }
   };
 
@@ -91,6 +93,12 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
           />
         )}
       </View>
+      <InfoDialog
+        visible={showError}
+        title="Error"
+        message="Unable to open phone portal."
+        onClose={() => setShowError(false)}
+      />
     </View>
   );
 };

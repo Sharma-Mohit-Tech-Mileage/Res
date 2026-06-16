@@ -31,6 +31,8 @@ import EditIcon from "../../../assets/svgs/EditIcon";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import { divider } from "../../styles/utilities";
+
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -636,27 +638,6 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
   },
-  buttonsLayout: {
-    paddingHorizontal: Padding.p_base,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-  },
-  text1Clr: {
-    color: Color.colorWhitesmoke_200,
-    textAlign: "center",
-  },
-  badgeBorder: {
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderRadius: Border.br_11xs,
-  },
-  textTypo: {
-    lineHeight: 18,
-    fontSize: FontSize.size_xs,
-    fontWeight: "600",
-  },
   frameParentSpaceBlock: {
     marginTop: Padding.p_base,
     alignSelf: "stretch",
@@ -666,15 +647,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_3xl,
     textAlign: "left",
     fontWeight: "400",
-  },
-  makePayment: {
-    textAlign: "center",
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
-  },
-  buttons: {
-    marginLeft: Padding.p_3xs,
-    backgroundColor: Color.colorMidnightblue,
   },
   generalInformationParent: {
     paddingHorizontal: Padding.p_xl,
@@ -726,44 +698,11 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_base,
     borderRadius: 5,
   },
-  text: {
-    color: Color.success700,
-    fontFamily: FontFamily.openSansSemiBold,
-    textAlign: "center",
-  },
-  badge: {
-    borderColor: Color.colorAquamarine,
-    backgroundColor: Color.success50,
-    paddingHorizontal: Padding.p_5xs,
-    paddingVertical: Padding.p_11xs,
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  badgeWrapper: {
-    marginTop: 6,
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  notificationsWrapper: {
-    paddingTop: Padding.p_base,
-    paddingBottom: Padding.p_5xs,
-    paddingHorizontal: Padding.p_xl,
-    alignSelf: "stretch",
-  },
-  infoWrapper: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
-  },
   frameContainer: {
     alignSelf: "stretch",
     marginTop: Padding.p_base,
   },
-  frameChild: {
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
-  },
+  frameChild: divider,
   frameGroup: {
     borderWidth: 1,
     borderStyle: "solid",

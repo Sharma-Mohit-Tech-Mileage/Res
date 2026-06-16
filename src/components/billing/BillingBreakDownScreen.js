@@ -19,7 +19,6 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { card } from "../../styles/utilities";
 import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActions";
 import {
@@ -389,18 +388,6 @@ const styles = StyleSheet.create({
   alertContainer: {
     margin: Padding.p_5xl,
   },
-  listContainer: {
-    paddingBottom: hp("45%"),
-  },
-  header: {
-    backgroundColor: Color.white,
-    paddingTop: hp(5),
-  },
-  headerText: {
-    fontSize: FontSize.size_3xl,
-    fontFamily: FontFamily.poppinsBold,
-    color: Color.black,
-  },
   errorTxt: {
     color: "#001321",
     fontSize: FontSize.size_base,
@@ -482,9 +469,6 @@ const styles = StyleSheet.create({
   detailItemBorder: {
     borderBlockColor: Color.colorWhitesmoke_100,
     borderBottomWidth: 1.5,
-  },
-  detailDescriptionContainer: {
-    flexDirection: "column",
   },
   detailLabel: {
     fontSize: FontSize.size_base,
@@ -572,12 +556,6 @@ const styles = StyleSheet.create({
   makePayment: {
     color: Color.sparklightWhite,
     width: 282,
-  },
-  buttons1: {
-    marginTop: Padding.p_base,
-    backgroundColor: Color.colorWhitesmoke_200,
-    paddingHorizontal: 0,
-    width: 382,
   },
   buttonsParent: {
     marginTop: Padding.p_base,

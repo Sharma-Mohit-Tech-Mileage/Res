@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Pressable, Dimensions, Platform, } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, Pressable, Platform, } from "react-native";
 import WebView from "react-native-webview";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -13,8 +13,6 @@ import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import Config from "react-native-config";
 import NavigationUtils from "./NavigationUtils";
 const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true };
-
-const { width, height } = Dimensions.get("window");
 
 const Terms = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -138,7 +136,7 @@ const Terms = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   progressBar: {
-    height: height * 0.004, // 0.4% of screen height
+    height: 3,
     backgroundColor: "lightgrey",
   },
   progress: {
@@ -149,11 +147,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: width * 0.05, // 5% of screen width
+    padding: 20,
   },
   errorText: {
-    fontSize: width * 0.04, // 4% of screen width
-    marginBottom: height * 0.02, // 2% of screen height
+    fontSize: 16,
+    marginBottom: 16,
   },
   bottomBar: {
     height: 150,

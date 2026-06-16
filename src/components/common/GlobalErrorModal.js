@@ -10,6 +10,9 @@ import AlertIcon from "../../res/svgIcons/AlertIconV2";
 import { FontFamily } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import Touchable from "./customui/Touchable";
+import { modalOverlay } from "../../styles/utilities";
+import { MODAL_MAX_WIDTH } from "../../utils/responsive";
+
 
 // Simple error manager
 class ErrorManager {
@@ -97,18 +100,14 @@ export const GlobalErrorModal = () => {
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
+  overlay: modalOverlay,
   alertContainer: {
     backgroundColor: "white",
     padding: 24,
     borderRadius: 1,
     alignItems: "center",
     width: "90%",
+    maxWidth: MODAL_MAX_WIDTH,
     alignSelf: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

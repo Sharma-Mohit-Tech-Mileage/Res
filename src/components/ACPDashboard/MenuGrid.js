@@ -1,9 +1,8 @@
 // components/MenuGrid.js
 import React from 'react';
-import { View, StyleSheet,Dimensions } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Padding ,Color} from '../../../GlobalStyles';
 import MenuCard from './MenuCard';
-const { width } = Dimensions.get('window');
 const MenuGrid = () => {
   const menuItems = [
     {
@@ -53,7 +52,7 @@ const MenuGrid = () => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: Padding.p_5xl,
-    paddingHorizontal: width*.04,
+    paddingHorizontal: "4%",
   },
   row: {
     flexDirection: 'row',

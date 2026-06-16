@@ -6,6 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
+import { useResponsive, TABLET_GUTTER } from "../../utils/responsive"; // [51768] tablet: consistent gutter
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
@@ -37,6 +38,7 @@ import RightIcon from "../../../assets/svgs/Chevonright";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
 const BillingScreen = ({ navigation }) => {
+  const { isTablet } = useResponsive(); // [51768] tablet: 20 -> standard 16 gutter on tablets only
   const dispatch = useDispatch();
   const { triggerOnScreenEntry } = useAnnouncement();
 
@@ -173,7 +175,7 @@ const BillingScreen = ({ navigation }) => {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ marginHorizontal: 20 }}
+          style={[{ marginHorizontal: 20 }, isTablet && { marginHorizontal: TABLET_GUTTER }]}
         >
           <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
             {isContentLoading ? (

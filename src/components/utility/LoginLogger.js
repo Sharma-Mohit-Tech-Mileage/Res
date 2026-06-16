@@ -1,9 +1,9 @@
-import DeviceInfo from "react-native-device-info";
+import { getSystemName } from "../../utils/deviceInfo";
 
 class LoginLogger {
   static createBaseLog() {
     return {
-      host: DeviceInfo.getSystemName(),
+      host: getSystemName(),
       application: "Sparklight Residential Mobile App",
       className: "AuthenticationService",
     };

@@ -34,6 +34,22 @@ export const card = {
   },
 };
 
+// Consolidated shared styles (previously duplicated inline across many screens).
+// 1px hairline divider.
+export const divider = {
+  height: 1,
+  backgroundColor: Color.sparklightGray,
+  alignSelf: "stretch",
+};
+
+// Standard centered modal / popup backdrop.
+export const modalOverlay = {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+};
+
 // Required-field text style (form helper)
 export const requiredField = {
   marginVertical: 5,

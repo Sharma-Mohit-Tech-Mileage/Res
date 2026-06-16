@@ -12,6 +12,8 @@ import { FontFamily } from "../../../GlobalStyles";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
 
 import logo from "../../../assets/sparklightlogo-01.png";
+import { modalOverlay } from "../../styles/utilities";
+
 
 const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
   const [msg1] = useState(
@@ -74,12 +76,7 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
+  overlay: modalOverlay,
   alertContainer: {
     backgroundColor: "white",
     padding: 20,

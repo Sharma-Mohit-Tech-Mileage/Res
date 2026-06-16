@@ -339,11 +339,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 50,
   },
-  notificationAlert: {
-    paddingTop: Padding.p_base,
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
-  },
   bottomBar: {
     backgroundColor: "#FFF",
     justifyContent: "center",

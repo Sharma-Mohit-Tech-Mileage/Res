@@ -1,9 +1,9 @@
-import { Alert, Linking, PermissionsAndroid, Platform } from 'react-native';
+import { PermissionsAndroid, Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import * as Keychain from 'react-native-keychain';
 import { v4 as uuidv4 } from 'uuid';
 import 'react-native-get-random-values';
-import DeviceInfo from 'react-native-device-info';
+import { getAndroidId } from '../utils/deviceInfo';
 
 const requestUserPermission = async () => {
   let granted;
@@ -49,30 +49,7 @@ const notifyPermission = async () => {
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-  if (authStatus === messaging.AuthorizationStatus.DENIED) {
-    Alert.alert(
-      'Sparklight Would Like to Send You Notifications',
-      'Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.',
-      [
-        {
-          text: 'Go to Settings',
-          style: 'cancel',
-          onPress: () => {
-            if (Platform.OS === 'ios') {
-              Linking.openURL('app-settings:');
-            } else {
-              Linking.openSettings();
-            }
-          },
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ],
-    );
-  }
-
+  // UI (settings nudge on denial) is owned by the caller; this stays pure logic.
   return enabled;
 };
 
@@ -120,7 +97,7 @@ const getDeviceUniqueId = async () => {
     }
   } else if (Platform.OS === 'android') {
     try {
-      uniqueId = await DeviceInfo.getAndroidId();
+      uniqueId = await getAndroidId();
     } catch (error) {
       console.warn("Encrypted Storage couldn't be accessed!", error);
     }

@@ -273,7 +273,6 @@ const styles = StyleSheet.create({
   },
 
   // ── Skeleton ──
-  skeleton: skeletonLoader.skeleton,
   skeletonHeader: skeletonLoader.skeletonHeader,
   skeletonTitle: skeletonLoader.skeletonTitle,
   skeletonSpeedContainer: skeletonLoader.skeletonSpeedContainer,

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { wp } from "../../../utils/responsive";
 import { FontFamily, Color } from "../../../../GlobalStyles";
 import Config from "react-native-config";
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
@@ -107,14 +107,6 @@ const AutoPayCard = ({
 };
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: "row",
-    backgroundColor: "white",
-    borderRadius: 10,
-    alignSelf: "center",
-    overflow: "hidden",
-    width: wp("92%"),
-  },
 
   leftTitle: {
     color: colors.sp_black,

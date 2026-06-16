@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, Dimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
 import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
 import { G, Rect, Text as SvgText, Path, Line } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
@@ -9,8 +9,8 @@ import { card } from "../../../../styles/utilities";
 import { cardHeader, dataUsageTabs } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 import Touchable from "../../../common/customui/Touchable";
+import { Layout } from "../../../../../GlobalStyles";
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const CHART_HEIGHT = 205;
 const X_LABEL_HEIGHT = 34;
@@ -116,6 +116,7 @@ const UsageChart = ({
   onPeriodChange,
   loading = false,
 }) => {
+  const { width: windowWidth } = useWindowDimensions();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showList, setShowList] = useState(false);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
@@ -235,7 +236,7 @@ const UsageChart = ({
   }, [chartData]);
 
   const { contentWidth, dynamicSpacing } = useMemo(() => {
-    const availableWidth = SCREEN_WIDTH - 80;
+    const availableWidth = windowWidth - 80;
     const totalBarsWidth = chartData.length * BAR_WIDTH;
     const totalSpacingNeeded = (chartData.length + 1) * MIN_SPACING;
     const minWidth = totalBarsWidth + totalSpacingNeeded;
@@ -244,7 +245,7 @@ const UsageChart = ({
     const spacing = (finalWidth - totalBarsWidth) / (chartData.length + 1);
 
     return { contentWidth: finalWidth, dynamicSpacing: spacing };
-  }, [chartData.length]);
+  }, [chartData.length, windowWidth]);
 
   const formatLabels = useCallback(
     (item) => {
@@ -975,6 +976,9 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.borderLight,
     alignItems: "center",
     justifyContent: "center",
+    // [51768] always pin the toggle to the right, even when no dropdown/spacer sibling
+    // is rendered (otherwise it falls to the left on wide tablet rows).
+    marginLeft: "auto",
   },
 
   chartScrollWrapper: {
@@ -1042,10 +1046,7 @@ const styles = StyleSheet.create({
   listItemRow: {
     marginBottom: 4,
   },
-  detailItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  detailItem: Layout.rowCenter,
   detailDot: {
     width: 8,
     height: 8,

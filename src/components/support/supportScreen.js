@@ -450,19 +450,6 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     alignItems: "center",
   },
-  supportIcon: {
-    height: 24,
-    width: 24,
-  },
-  icon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    borderColor: "#F4F4F5",
-    backgroundColor: "#F4F4F5",
-  },
   iconStyle: {
     width: 20,
     height: 20,
@@ -481,14 +468,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_lg,
     fontFamily: FontFamily.openSansRegular,
     flex: 1,
-  },
-  supportingTypo: {
-    lineHeight: 14,
-    marginTop: 10,
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-    color: Color.colorGray_100,
-    alignSelf: "stretch",
   },
   featuredIcon: {
     backgroundColor: Color.colorMidnightblue,
@@ -547,9 +526,6 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     borderTopRightRadius: Border.br_11xs,
     borderTopLeftRadius: Border.br_11xs,
-  },
-  content: {
-    paddingVertical: Padding.p_xl,
   },
   mainContainer: {
     paddingVertical: Padding.p_base,

@@ -3,11 +3,11 @@ import {
   StyleSheet,
   Text,
   View,
-  Alert,
   ScrollView,
   Platform,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
+import ConfirmDialog from "../common/customui/ConfirmDialog";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
@@ -44,7 +44,7 @@ import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
 import analytics from "@react-native-firebase/analytics";
 import RightIcon from "../../../assets/svgs/Chevonright";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { wp } from "../../utils/responsive";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
@@ -52,29 +52,6 @@ import {
   logoutZendesk,
 } from "../utility/RNZendeskChat";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
-
-const logoutConfirmationPopup = (dispatch, navigation) => {
-  Alert.alert(
-    "Confirm Logout",
-    "Are you sure you want to logout?",
-    [
-      {
-        text: "Cancel",
-        onPress: () => null,
-        style: "cancel",
-      },
-      {
-        text: "OK",
-        style: "cancel",
-        onPress: () => {
-          logoutAction(dispatch, navigation);
-        },
-        style: "default", // ok button (right)
-      },
-    ],
-    { cancelable: true }
-  );
-};
 
 const logoutAction = (dispatch, navigation) => {
   getSsoToken().then((res) => {
@@ -116,6 +93,7 @@ const AccountOverview = () => {
   const [fullName, setFullName] = useState("");
   const [initials, setInitials] = useState("");
   const [menues, setMenues] = useState([]);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {};
@@ -305,13 +283,24 @@ const AccountOverview = () => {
                   accessibilityRole="button"
                   accessibilityLabel="Logout"
                   style={[styles.button, styles.buttonsLayout]}
-                  onPress={() => {
-                    logoutConfirmationPopup(dispatch, navigation);
-                  }}
+                  onPress={() => setShowLogoutConfirm(true)}
                 >
                   <Text style={[styles.accept]}>Logout</Text>
                 </Touchable>
               </View>
+
+              <ConfirmDialog
+                visible={showLogoutConfirm}
+                title="Confirm Logout"
+                message="Are you sure you want to logout?"
+                confirmText="OK"
+                cancelText="Cancel"
+                onCancel={() => setShowLogoutConfirm(false)}
+                onConfirm={() => {
+                  setShowLogoutConfirm(false);
+                  logoutAction(dispatch, navigation);
+                }}
+              />
 
               <View
                 style={{
@@ -451,10 +440,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 5,
   },
-  title: {
-    marginLeft: -35,
-    fontSize: FontSize.size_lg,
-  },
   button: {
     backgroundColor: Color.colorMidnightblue,
     width: "100%",
@@ -478,12 +463,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  text: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: Color.sparklightWhite,
-    fontFamily: FontFamily.openSansSemiBold,
-  },
 
   melissaSmith: {
     fontSize: FontSize.size_3xl,
@@ -516,11 +495,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xl,
     height: 1,
     backgroundColor: Color.sparklightGray,
-  },
-  makePayment: {
-    width: 282,
-    color: Color.colorMidnightblue,
-    textAlign: "center",
   },
   buttons: {
     width: "100%",

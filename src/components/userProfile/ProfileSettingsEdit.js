@@ -18,6 +18,8 @@ import { updateProfileRequest } from "../../redux/actions/ProfileActionSuite";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { profileSchema } from "../utility/validationSchema";
 import { isPrimaryAdmin } from "../utility/constant";
+import { container } from "../../styles/utilities";
+
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
@@ -262,22 +264,6 @@ const styles = StyleSheet.create({
   frameParent: {
     alignSelf: "stretch",
   },
-  frameItem: {
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
-  },
-  rectangleWrapper: {
-    paddingVertical: 0,
-    marginTop: Padding.p_base,
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
-  },
-  contactInformationWrapper: {
-    paddingBottom: Padding.p_5xs,
-    alignItems: "center",
-    paddingHorizontal: Padding.p_5xl,
-  },
   frameGroup: {
     paddingHorizontal: 0,
     borderWidth: 1,
@@ -299,10 +285,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
-  profileSettingsEdit: {
-    flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
-  },
+  profileSettingsEdit: container.page,
 });
 
 export default ProfileSettingsEdit;

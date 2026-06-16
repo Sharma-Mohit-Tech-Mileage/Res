@@ -12,7 +12,7 @@ import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "../common/Icon";
 import WalkthroughProgress from "./WalkthroughProgress";
-import { FontFamily, Color, Border, Padding } from "../../../GlobalStyles";
+import { Border, Color, FontFamily, Layout, Padding } from "../../../GlobalStyles";
 
 const WalkthroughContent = ({
   tab,
@@ -188,10 +188,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: Padding.p_base,
   },
-  stepInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  stepInfo: Layout.rowCenter,
   iconCircle: {
     width: 40,
     height: 40,
@@ -236,11 +233,7 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     fontWeight: "400",
   },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+  footer: Layout.rowBetween,
   actions: {
     flexDirection: "row",
     gap: Padding.p_xs,

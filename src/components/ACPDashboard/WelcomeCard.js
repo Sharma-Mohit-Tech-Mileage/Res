@@ -10,7 +10,7 @@ import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
 import PlayIcon from "../../../assets/svgs/PlayIcon";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { wp } from "../../utils/responsive";
 import Touchable from "../common/customui/Touchable";
 
 const WelcomeCard = () => {

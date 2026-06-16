@@ -6,13 +6,7 @@ import {
   StyleSheet,
   AccessibilityInfo,
 } from "react-native";
-import {
-  FontFamily,
-  Padding,
-  Color,
-  FontSize,
-  Border,
-} from "../../../../GlobalStyles";
+import { Border, Color, FontFamily, FontSize, Layout, Padding } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import { formatInputA11yReadout, setFocusToRef } from "../../../utils/a11y";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
@@ -268,10 +262,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "relative",
   },
-  container: {
-    height: 40,
-    justifyContent: "center",
-  },
   textInput: {
     height: 48,
     color: Color.colorGray_200,
@@ -321,11 +311,7 @@ const styles = StyleSheet.create({
   errorLabel: {
     color: "red",
   },
-  labelContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+  labelContainer: Layout.rowBetween,
   // Only password fields grow this row; non-password inputs unchanged.
   labelContainerSecure: {
     minHeight: A11Y.minTouch,

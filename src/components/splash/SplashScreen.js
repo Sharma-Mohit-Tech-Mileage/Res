@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { View, StyleSheet, Text, Linking, Platform, Animated, Easing, Dimensions, } from "react-native";
+import { View, StyleSheet, Text, Linking, Platform, Animated, Easing, useWindowDimensions, } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { logout } from "react-native-app-auth";
@@ -8,7 +8,10 @@ import { saveUserInfo, logInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/RestApiClient";
 import { getEndpoint ,ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import { wp, hp, getVerticalSizeTier } from "../../utils/responsive";
+import { useFeatureFlag } from "../../contexts/Featureflagscontext";
+import FeatureFlags from "../../config/Featureflags";
+import WebViewLoginModal from "../auth/WebViewLoginModal";
 import { FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import VersionCheck from "react-native-version-check";
@@ -36,14 +39,6 @@ const config = {
 const ANIMATION_DURATION = 2000;
 const SESSION_CHECK_TIMEOUT = 10000;
 
-const getDeviceSize = () => {
-  const screenHeight = Dimensions.get("window").height;
-  if (screenHeight < 550) return "tiny";
-  if (screenHeight < 600) return "verySmall";
-  if (screenHeight < 700) return "small";
-  return "normal";
-};
-
 const ANIMATION_CONFIG = {
   tiny: { logoStart: 200 },
   verySmall: { logoStart: 250 },
@@ -64,7 +59,10 @@ const SplashScreen = ({ navigation, route }) => {
   const [loginEnable, setLoginEnable] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [deviceSize, setDeviceSize] = useState(getDeviceSize());
+  const useWebViewLogin = useFeatureFlag(FeatureFlags.LOGIN_WEBVIEW, true);
+  const [webLoginVisible, setWebLoginVisible] = useState(false);
+  const { height: windowHeight } = useWindowDimensions();
+  const deviceSize = getVerticalSizeTier(windowHeight);
   const [networkState, setNetworkState] = useState({ isConnected: true, type: "unknown", });
   const [showConnectedBanner, setShowConnectedBanner] = useState(false);
 
@@ -143,18 +141,8 @@ const SplashScreen = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    const updateDimensions = () => {
-      const newSize = getDeviceSize();
-      setDeviceSize(newSize);
-      logoMovement.setValue(ANIMATION_CONFIG[newSize].logoStart);
-    };
-
-    const subscription = Dimensions.addEventListener(
-      "change",
-      updateDimensions
-    );
-    return () => subscription?.remove();
-  }, []);
+    logoMovement.setValue(ANIMATION_CONFIG[deviceSize].logoStart);
+  }, [deviceSize]);
 
   const startAnimations = () => {
     Animated.parallel([
@@ -453,6 +441,12 @@ const SplashScreen = ({ navigation, route }) => {
     setLoadingState(LoadingState.OPENING_BROWSER);
     setLoginEnable(false);
 
+    // Flagged full-screen in-app login; modal callbacks drive success/error from here.
+    if (useWebViewLogin) {
+      setWebLoginVisible(true);
+      return;
+    }
+
     try {
       const result = await AuthenticationManager.authorizeWithTimeout(config);
       if (!result.success) {
@@ -545,6 +539,46 @@ const SplashScreen = ({ navigation, route }) => {
       authLockRef.current = false;
       setAuthInProgress(false);
     }
+  };
+
+  const handleWebLoginSuccess = (data) => {
+    setWebLoginVisible(false);
+    authLockRef.current = false;
+    setAuthInProgress(false);
+    storeSsoToken(data);
+    setLoadingState(LoadingState.AUTHENTICATING);
+    callSSOLoginApi(data);
+  };
+
+  const handleWebLoginCancel = () => {
+    setWebLoginVisible(false);
+    authLockRef.current = false;
+    setAuthInProgress(false);
+    setLoadingState(LoadingState.NONE);
+    setLoginEnable(true);
+  };
+
+  const handleWebLoginError = (result) => {
+    setWebLoginVisible(false);
+    authLockRef.current = false;
+    setAuthInProgress(false);
+    setLoadingState(LoadingState.NONE);
+    setLoginEnable(true);
+
+    if (result?.code === "AUTH_TIMEOUT") {
+      setErrorState({ visible: true, type: ErrorType.AUTH_TIMEOUT, message: null });
+    } else if (result?.code === "NETWORK_ERROR") {
+      setErrorState({ visible: true, type: ErrorType.NETWORK_ERROR, message: null });
+    } else {
+      setErrorState({ visible: true, type: ErrorType.UNKNOWN_ERROR, message: null });
+    }
+
+    LoginLogger.logFailedLogin(
+      dispatch,
+      logInfo,
+      { message: "Authorization failed", code: 30801 },
+      { authMethod: "webview", errorDetails: result?.error, errorCode: result?.code }
+    );
   };
 
   const logoutAction = (postLogoutCallback) => {
@@ -773,6 +807,14 @@ const SplashScreen = ({ navigation, route }) => {
         errorType={errorState.type}
         customMessage={errorState.message}
         onAction={handleErrorAction}
+      />
+
+      <WebViewLoginModal
+        visible={webLoginVisible}
+        config={config}
+        onSuccess={handleWebLoginSuccess}
+        onError={handleWebLoginError}
+        onCancel={handleWebLoginCancel}
       />
 
       <CustomerDisconnectPage

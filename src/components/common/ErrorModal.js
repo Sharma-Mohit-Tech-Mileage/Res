@@ -11,6 +11,8 @@ import { FontFamily, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "./customui/Touchable";
+import { modalOverlay } from "../../styles/utilities";
+
 
 export const ErrorType = {
   NETWORK_ERROR: "NETWORK_ERROR",
@@ -228,12 +230,7 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
+  overlay: modalOverlay,
   container: {
     backgroundColor: "white",
     padding: 20,

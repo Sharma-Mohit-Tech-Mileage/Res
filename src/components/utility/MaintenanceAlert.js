@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import MaintenaceIcon from "../../res/svgIcons/MaintenanceIcon";
 import { card } from "../../styles/utilities";
+import { CONTENT_MAX_WIDTH } from "../../utils/responsive";
 
 import {
   Color,
@@ -19,7 +20,7 @@ const MaintenanceAlert = ({
 }) => {
   return (
     <View style={{ flexDirection: "column" }}>
-      <View style={[card.elevated, { margin: 16 }]}>
+      <View style={[card.elevated, { margin: 16, maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center", width: "100%" }]}>
         <View
           style={{
             flexDirection: "column",
@@ -47,42 +48,6 @@ const MaintenanceAlert = ({
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonsLayout: {
-    paddingHorizontal: 0,
-    marginHorizontal: 16,
-    marginTop: 16,
-    paddingVertical: Padding.p_base,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    height: 56,
-  },
-  makeTypo: {
-    width: 282,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    textAlign: "center",
-  },
-  makePayment: {
-    color: Color.sparklightWhite,
-    width: 282,
-  },
-  buttons1: {
-    marginTop: Padding.p_base,
-    backgroundColor: Color.colorWhitesmoke_200,
-    paddingHorizontal: 0,
-    width: 382,
-  },
-  buttonsParent: {
-    marginTop: Padding.p_base,
-    alignSelf: "stretch",
-  },
   errorTxt: {
     color: "#001321",
     fontSize: FontSize.size_base,

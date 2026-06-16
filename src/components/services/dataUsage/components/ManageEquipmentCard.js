@@ -4,6 +4,8 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
+import { Layout } from "../../../../../GlobalStyles";
+
 const safeText = (v, fallback = "\u2014") =>
   v === null || v === undefined || String(v).trim() === "" ? fallback : String(v);
 
@@ -167,10 +169,7 @@ const styles = StyleSheet.create({
   },
   equipmentDetails: { gap: 2 },
 
-  detailRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  detailRow: Layout.rowCenter,
   detailText: {
     fontWeight:'700',
     fontSize: theme.typography.size.base,

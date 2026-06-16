@@ -10,6 +10,8 @@ import { getPrimaryEmail } from "../utility/constant";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
+import { container } from "../../styles/utilities";
+
 
 const Notifications = () => {
   const navigation = useNavigation();
@@ -250,10 +252,7 @@ const Notifications = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
-  },
+  container: container.page,
   content: { flex: 1 },
 
   sectionsContainer: {

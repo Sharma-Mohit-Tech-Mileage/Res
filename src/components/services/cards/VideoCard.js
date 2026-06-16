@@ -1,20 +1,22 @@
-import React from "react";
-import { View, Text, StyleSheet, Linking, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Linking } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getChannelLineupURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
+import InfoDialog from "../../common/customui/InfoDialog";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 const VideoCard = ({ planName, zipCode, loading = false }) => {
+  const [showError, setShowError] = useState(false);
   const handleChannelLineup = async () => {
     const url = getChannelLineupURL(zipCode);
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) await Linking.openURL(url);
-      else Alert.alert("Error", "Unable to open channel lineup.");
+      else setShowError(true);
     } catch (error) {
-      Alert.alert("Error", "Unable to open channel lineup.");
+      setShowError(true);
     }
   };
 
@@ -86,6 +88,12 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
           accessibilityRole="button"
         />
       </View>
+      <InfoDialog
+        visible={showError}
+        title="Error"
+        message="Unable to open channel lineup."
+        onClose={() => setShowError(false)}
+      />
     </View>
   );
 };

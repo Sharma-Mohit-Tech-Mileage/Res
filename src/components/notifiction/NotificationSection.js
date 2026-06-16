@@ -1,13 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
 import Touchable from "../common/customui/Touchable";
-import {
-  Color,
-  Padding,
-  FontSize,
-  FontFamily,
-  Border,
-} from "../../../GlobalStyles";
+import { Border, Color, FontFamily, FontSize, Layout, Padding } from "../../../GlobalStyles";
 import InfoICon from "../../../assets/svgs/InfoIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
@@ -280,9 +274,6 @@ const styles = StyleSheet.create({
     minWidth: 70,
     alignItems: "center",
   },
-  editButtonPressed: {
-    opacity: 0.8,
-  },
   editButtonText: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
@@ -354,10 +345,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },
-  statusContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
+  statusContainer: Layout.rowCenter,
   statusText: {
     marginLeft: Padding.p_5xs,
     fontSize: FontSize.size_base,

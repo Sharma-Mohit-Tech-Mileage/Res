@@ -8,7 +8,6 @@ import {
   Platform,
   AppState,
   Linking,
-  Alert,
   AccessibilityInfo,
   findNodeHandle,
 } from "react-native";
@@ -24,8 +23,8 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { widthPercentageToDP } from "react-native-responsive-screen";
 import NotificationAlert from "../common/customui/NotificationAlert";
+import ConfirmDialog from "../common/customui/ConfirmDialog";
 import moment from "moment";
 import Toggle from "../common/Toggle";
 import { getUser } from "../../redux/utils/LocalStorage";
@@ -41,6 +40,8 @@ import {
   requestUserPermission,
 } from "../../firebase/FirebaseUtils";
 import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
+import { container } from "../../styles/utilities";
+
 
 const InAppNotifications = ({ navigation }) => {
   const route = useRoute();
@@ -48,6 +49,7 @@ const InAppNotifications = ({ navigation }) => {
     route.params?.additionalData,
   );
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showNotifPermission, setShowNotifPermission] = useState(false);
   const additionalData = route.params?.additionalData;
   const dispatch = useDispatch();
   const scrollViewRef = useRef(null);
@@ -183,37 +185,18 @@ const InAppNotifications = ({ navigation }) => {
     if (value) {
       const pushNotification = await getPushNotificationStatus();
       if (pushNotification?.permanentSkip) {
-        await notifyPermission();
+        const enabled = await notifyPermission();
+        if (!enabled) {
+          setIsNotificationRequired(true);
+          setShowNotifPermission(true);
+        }
       } else {
         const enabledPermission = await requestUserPermission();
         if (enabledPermission) {
           setIsNotificationRequired(false);
         } else {
           setIsNotificationRequired(true);
-          Alert.alert(
-            "Sparklight Would Like to Send You Notifications",
-            "Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.",
-            [
-              {
-                text: "Go to Settings",
-                style: "cancel",
-                onPress: () => {
-                  if (Platform.OS === "ios") {
-                    Linking.openURL("app-settings:");
-                  } else {
-                    Linking.openSettings();
-                  }
-                },
-              },
-              {
-                text: "Cancel",
-                style: "cancel",
-                onPress: () => {
-                  setIsNotificationRequired(false);
-                },
-              },
-            ],
-          );
+          setShowNotifPermission(true);
         }
       }
     } else {
@@ -300,6 +283,26 @@ const InAppNotifications = ({ navigation }) => {
         onPressBack={() => navigation.navigate("Notifications")}
       />
 
+      <ConfirmDialog
+        visible={showNotifPermission}
+        title="Sparklight Would Like to Send You Notifications"
+        message="Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications."
+        confirmText="Go to Settings"
+        cancelText="Cancel"
+        onConfirm={() => {
+          setShowNotifPermission(false);
+          if (Platform.OS === "ios") {
+            Linking.openURL("app-settings:");
+          } else {
+            Linking.openSettings();
+          }
+        }}
+        onCancel={() => {
+          setShowNotifPermission(false);
+          setIsNotificationRequired(false);
+        }}
+      />
+
       {isLoading && (
         <LoadingOverlay
           loading={isLoading}
@@ -317,6 +320,7 @@ const InAppNotifications = ({ navigation }) => {
                   style={{
                     transform: [{ translateY }],
                     paddingHorizontal: Padding.p_5xl,
+                    alignSelf: "stretch",
                   }}
                   accessible={false}
                   importantForAccessibility="yes"
@@ -487,20 +491,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderStyle: "solid",
   },
-  tabsParentFlexBox: {
-    justifyContent: "center",
-  },
-  frameParent3: {
-    justifyContent: "center",
-    flex: 1,
-  },
-  mobilePhoneTypo: {
-    color: Color.sparklightGray1,
-    fontSize: FontSize.size_base,
-    lineHeight: 22,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-  },
   receiveTypo: {
     fontSize: FontSize.textXsSemibold_size,
     color: Color.sparklightaddGray,
@@ -566,7 +556,7 @@ const styles = StyleSheet.create({
   },
   spaceBottom: {
     marginVertical: 16,
-    width: widthPercentageToDP("85%"),
+    alignSelf: "stretch",
   },
   buttons1: {
     marginTop: 16,
@@ -584,47 +574,7 @@ const styles = StyleSheet.create({
     width: "100%",
     overflow: "hidden",
   },
-  inAppNotifications: {
-    flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
-  },
-  infoCircleIcon: {
-    width: 16,
-    height: 16,
-    overflow: "hidden",
-  },
-  infoCircleWrapper: {
-    paddingVertical: Padding.p_8xs,
-    flexDirection: "row",
-  },
-  youAreSubscribed: {
-    lineHeight: 22,
-  },
-  youAreSubscribedContainer: {
-    marginLeft: 8,
-    color: Color.colorGray_200,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    flex: 1,
-  },
-  containerTypo: {
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-  },
-  receiveTextNotifications1: {
-    color: Color.sparklightaddGray,
-    lineHeight: 22,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "left",
-    alignSelf: "stretch",
-    fontSize: FontSize.size_sm,
-  },
-  frameChild: {
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
-  },
+  inAppNotifications: container.page,
 });
 
 export default InAppNotifications;

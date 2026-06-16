@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { wp } from "../../../utils/responsive";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import Config from "react-native-config";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
@@ -259,7 +259,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 5,
     alignSelf: "center",
-    marginLeft: wp("9%"),
   },
   paymentButtonText: {
     color: colors.snow_white,
@@ -276,6 +275,7 @@ const styles = StyleSheet.create({
   },
   cardFooter: {
     flexDirection: "row",
+    justifyContent: "center",
     backgroundColor: "#F8F8F8",
     width: "100%",
     padding: 10,

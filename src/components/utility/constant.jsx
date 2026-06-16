@@ -1,4 +1,4 @@
-import DeviceInfo from "react-native-device-info";
+import { getAppVersion } from "../../utils/deviceInfo";
 import VersionCheck from "react-native-version-check";
 import { Color } from "../../../GlobalStyles";
 export const ROLE_COLORS = {
@@ -130,7 +130,7 @@ export const getRoleBasedMessage = (input) => {
 };
 
 export const checkForMinorUpdate = async () => {
-  const currentVersion = DeviceInfo.getVersion();
+  const currentVersion = getAppVersion();
   const latestVersion = await VersionCheck.getLatestVersion();
 
   const currentParts = currentVersion.split(".");

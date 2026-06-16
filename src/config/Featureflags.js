@@ -10,6 +10,7 @@ export const FeatureFlags = {
   BILLING_PAYMENT_PLANS: 'tabs.billing.show_payment_plans',
   SUPPORT_CHAT: 'support.show_chat_widget',
   SUPPORT_FAQ: 'support.show_faq',
+  LOGIN_WEBVIEW: 'auth.login.use_webview',
 };
 
 export const FeatureFlagMetadata = {

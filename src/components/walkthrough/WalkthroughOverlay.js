@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, Animated, Easing, Dimensions, Platform } from "react-native";
+import { StyleSheet, Animated, Easing, useWindowDimensions, Platform } from "react-native";
 import { useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import WalkthroughContent from "./WalkthroughContent";
@@ -11,14 +11,13 @@ import {
   calculateTabWidth,
 } from "../utility/walkthroughHelpers";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-
 const WalkthroughOverlay = ({
   visibleTabs,
   currentStep,
   onFinish,
   tabBarHeight,
 }) => {
+  const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = useWindowDimensions();
   const dispatch = useDispatch();
   const [localStep, setLocalStep] = useState(currentStep);
 

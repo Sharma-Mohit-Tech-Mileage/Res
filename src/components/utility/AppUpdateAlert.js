@@ -11,6 +11,9 @@ import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import { Color, Padding, FontFamily, Border } from "../../../GlobalStyles";
 import Touchable from "../common/customui/Touchable";
+import { modalOverlay } from "../../styles/utilities";
+import { MODAL_MAX_WIDTH } from "../../utils/responsive";
+
 
 const AppUpdateAlert = ({ visible, onClose }) => {
   return (
@@ -63,21 +66,14 @@ const AppUpdateAlert = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
+  overlay: modalOverlay,
   alertContainer: {
     backgroundColor: "white",
     padding: 20,
     borderRadius: 5,
     alignItems: 'center',
     width: '90%',
+    maxWidth: MODAL_MAX_WIDTH,
     alignSelf: 'center',
   },
   message: {
@@ -100,22 +96,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FontFamily.openSansRegular,
     textAlign: 'center',
-  },
-  buttonContainer: {
-    alignItems: "center",
-  },
-  buttons: {
-    backgroundColor: Color.colorWhitesmoke_300,
-  },
-  buttonsLayout: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    height: 50,
-    width: "45%",
-    marginTop: 20,
   },
   alertTitle: {
     color: colors.black,
