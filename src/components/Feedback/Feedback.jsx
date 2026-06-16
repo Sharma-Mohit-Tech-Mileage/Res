@@ -72,6 +72,7 @@ const Feedback = () => {
       areaOfConcern: [],
       feedbackText: "",
       feedbackEmail: "",
+      cosentContactUs: true,
     },
   });
 
@@ -125,6 +126,8 @@ const Feedback = () => {
 
   const onChangeValue = (value) => {
     setSelectedOption(value);
+    console.log("Selected option:", value);
+    setValue("cosentContactUs", value === "yes");
     setIsError(false);
   };
 
@@ -316,15 +319,14 @@ const Feedback = () => {
             />
           </Animated.View>
 
-          <View style={{ padding: 24 }}>
+          <View style={{ paddingHorizontal: 16 }}>
 
               <Text
                 style={[
                   styles.optionTxt,
-                  {  marginBottom: 24 },
                 ]}
               >
-                May Sparklight Contant you about your Feedback?
+              May Sparklight Contact you about your Feedback?
               </Text>
               <Radio.Group
                 name="surveyOptions"
@@ -353,7 +355,7 @@ const Feedback = () => {
                     accessibilityHint="Select this option if Sparklight may contact you about your feedback"
                     accessibilityRole="radio"
                     style={{
-                      marginTop: 0,
+                      marginTop: 4,
                       marginRight: 4,
                       transform: [{ scale: 0.9 }],
                     }}
@@ -361,7 +363,7 @@ const Feedback = () => {
                   <Text
                     style={[
                       styles.optionTxt,
-                      { marginBottom: 0, marginTop: 0 },
+                      { marginBottom: 0, marginTop: 4 },
                     ]}
                   >
                     Yes
@@ -379,16 +381,18 @@ const Feedback = () => {
                     accessibilityLabel="No"
                     accessibilityHint="Select this option if Sparklight may not contact you about your feedback"
                     accessibilityRole="radio"
+                    
                     style={{
-                      marginTop: 0,
-                      marginRight: 5,
+                      marginTop: 4,
+                      alignItems: "center",
+                      marginRight:4 ,
                       transform: [{ scale: 0.9 }],
                     }}
                   />
                   <Text
                     style={[
                       styles.optionTxt,
-                      { marginBottom: 0, marginTop: 0 },
+                      { marginBottom: 0, marginTop: 4},
                     ]}
                   >
                     No
@@ -574,9 +578,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     color: Color.colorGray_200,
     fontFamily: FontFamily.openSansRegular,
-    marginBottom: 4,
-    marginTop: 4,
-    
   },
 });
 
