@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -12,6 +12,7 @@ import Terrible from "../../../assets/svgs/SmileyVeryUnsatisfiedsel";
 import Faceneutral from "../../../assets/svgs/Smileyneutralsel";
 import Facesmile from "../../../assets/svgs/SmileySatisfiedsel";
 import Facehappy from "../../../assets/svgs/SmileyverySatisfiedsel";
+import Touchable from "../common/customui/Touchable";
 
 const feedbackOptions = [
   { value: 1, category: "complaint", name: "facesad", text: "Terrible", Icon: Terrible },
@@ -65,10 +66,10 @@ const RatingOption = ({ option, isSelected, onPress, disabled, index }) => {
 
   return (
     <Animated.View style={[styles.optionWrapper, animatedStyle]}>
-      <Pressable
+      {/* minSize 0: 5-across rating row uses flex:1 options; forcing 48 min width could distort the tight row. */}
+      <Touchable
+        minSize={0}
         accessibilityLabel={option.text}
-        accessibilityRole="button"
-        accessible={true}
         style={[
           styles.option,
           isSelected && styles.selectedOption,
@@ -89,7 +90,7 @@ const RatingOption = ({ option, isSelected, onPress, disabled, index }) => {
         >
           {option.text}
         </Text>
-      </Pressable>
+      </Touchable>
     </Animated.View>
   );
 };

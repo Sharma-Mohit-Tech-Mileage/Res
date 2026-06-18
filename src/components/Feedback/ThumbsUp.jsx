@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -13,8 +13,9 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalStyles";
 import ThumbsupIcon from "../../../assets/svgs/Thumbsup";
+import Touchable from "../common/customui/Touchable";
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const AnimatedTouchable = Animated.createAnimatedComponent(Touchable);
 
 const ThumbsUp = () => {
   const navigation = useNavigation();
@@ -83,17 +84,16 @@ const ThumbsUp = () => {
             </Animated.View>
           </Animated.View>
 
-          <AnimatedPressable
+          <AnimatedTouchable
             entering={FadeInDown.delay(700).springify()}
             style={[styles.button, animatedButtonStyle]}
             onPress={handlePress}
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
-            accessibilityRole="button"
             accessibilityLabel="Done button. Return to Account screen"
           >
             <Text style={styles.buttonText}>Done</Text>
-          </AnimatedPressable>
+          </AnimatedTouchable>
         </View>
       </ScrollView>
     </View>

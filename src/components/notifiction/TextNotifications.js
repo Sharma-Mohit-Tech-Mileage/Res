@@ -25,6 +25,7 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
+import { A11Y } from "../../styles/theme";
 
 import {
   Color,
@@ -507,6 +508,8 @@ const TextNotifications = ({ navigation }) => {
                     accessibilityRole="link"
                     accessibilityLabel="View Text Messaging Terms and Conditions"
                     accessibilityHint="Opens Text Messaging Terms and Conditions in a new window"
+                    hitSlop={A11Y.hitSlop}
+                    style={styles.termsLinkTouchable}
                   >
                     <Text
                       style={[
@@ -780,11 +783,20 @@ const styles = StyleSheet.create({
   },
   checkBoxArea: {
     flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
   },
   checkboxTouchable: {
     flexDirection: "row",
     alignItems: "center",
     marginRight: 0,
+    minHeight: A11Y.minTouch,
+    paddingVertical: Padding.p_5xs,
+  },
+  termsLinkTouchable: {
+    minHeight: A11Y.minTouch,
+    justifyContent: "center",
+    paddingVertical: Padding.p_5xs,
   },
   checkboxContainer: {
     flexDirection: "row",

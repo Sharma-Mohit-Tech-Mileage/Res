@@ -5,7 +5,6 @@ import {
   TextInput,
   FlatList,
   Text,
-  TouchableOpacity,
   Keyboard,
 } from "react-native";
 import { Padding, Color, FontSize, FontFamily, Border } from "../../../../GlobalStyles";
@@ -16,6 +15,7 @@ import {
 import SearchIcon from "../../../../assets/svgs/SearchIcon";
 import Rightactionable from "../../../res/svgIcons/RightArrow";
 import File05 from "../../../../assets/svgs/File05";
+import Touchable from "./Touchable";
 const SearchSuggestions = memo(
   ({ placeholder, onChangeInput, suggestions, navigation, onEndReached }) => {
     const inputRef = useRef(null);
@@ -61,10 +61,9 @@ const SearchSuggestions = memo(
     };
 
     const renderSuggestion = ({ item, index }) => (
-      <TouchableOpacity
+      <Touchable
         onPress={() => handleSuggestionClick(item)}
         style={styles.suggestionItem}
-        accessible={true}
         accessibilityRole="link"
         accessibilityHint="Double tap to open in a new window."
         accessibilityLabel={`Result ${index+1} of ${suggestions.length} ,${item.title}`}
@@ -82,7 +81,7 @@ const SearchSuggestions = memo(
         ) : (
           <></>
         )}
-      </TouchableOpacity>
+      </Touchable>
     );
 
     return (

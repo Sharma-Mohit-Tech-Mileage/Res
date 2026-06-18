@@ -2,8 +2,6 @@ import React, { useCallback } from "react";
 import {
   Platform,
   StyleSheet,
-  View,
-  Pressable,
 } from "react-native";
 
 import LottieView from "lottie-react-native";
@@ -19,6 +17,7 @@ import {
 } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import { useFocusEffect } from "@react-navigation/native";
+import Touchable from "../common/customui/Touchable";
 
 const ZendeskChatIcon = () => {
   const refreshFeatureFlags = useFeatureRefresh();
@@ -42,10 +41,9 @@ const ZendeskChatIcon = () => {
   };
 
   return isChatFeatureEnabled ? (
-    <Pressable
-      style={[styles.pressable]}
+    <Touchable
+      style={styles.pressable}
       onPress={handleChatPress}
-      accessible={true}
       accessibilityLabel="Chat with support"
       accessibilityHint="Opens the chat support screen"
       accessibilityRole="button"
@@ -56,16 +54,14 @@ const ZendeskChatIcon = () => {
         loop
         style={{ width: 40, height: 30 }}
       />
-    </Pressable>
+    </Touchable>
   ) : null;
 };
 
 const styles = StyleSheet.create({
-  perusable: {
-    //flex: 1,
+  pressable: {
     width: "100%",
   },
-  
 });
 
 export default ZendeskChatIcon;

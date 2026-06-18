@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   AccessibilityInfo,
   findNodeHandle,
   Linking,
@@ -479,10 +478,11 @@ const NotificationAlert = ({
         const actionType = action?.action;
 
         return (
-          <Pressable
+          // minSize 0: inline-text link keeps natural text height (WCAG 2.5.5 inline exception); hitSlop provides tap target.
+          <Touchable
             key={key}
             ref={(el) => (blockRefs.current[index] = el)}
-            accessible={true}
+            minSize={0}
             accessibilityRole="link"
             accessibilityLabel={buildAccessibilityLabel(
               blockSegments,
@@ -514,7 +514,7 @@ const NotificationAlert = ({
                 </Text>
               ))}
             </Text>
-          </Pressable>
+          </Touchable>
         );
       }
 
@@ -541,11 +541,11 @@ const NotificationAlert = ({
       };
 
       return (
-        <Pressable
+        // minSize 0: inline-text actions block keeps natural text height (WCAG 2.5.5 inline exception); hitSlop provides tap target.
+        <Touchable
           key={key}
           ref={(el) => (blockRefs.current[index] = el)}
-          accessible={true}
-          accessibilityRole="button"
+          minSize={0}
           accessibilityLabel={buildAccessibilityLabel(
             blockSegments,
             config,
@@ -572,7 +572,7 @@ const NotificationAlert = ({
               </Text>
             ))}
           </Text>
-        </Pressable>
+        </Touchable>
       );
     },
     [config, executeAction, showActionSelection]

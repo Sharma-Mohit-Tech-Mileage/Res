@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Pressable, Dimensions, Platform, } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, Dimensions, Platform, } from "react-native";
 import WebView from "react-native-webview";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import Touchable from "../common/customui/Touchable";
 import { useSelector, useDispatch } from "react-redux";
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser, } from "../../redux/utils/LocalStorage";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
@@ -106,29 +107,26 @@ const Terms = ({ navigation }) => {
       )}
       <View style={styles.bottomBar}>
         <View style={styles.buttonsParent} accessibilityLabel="Buttons Section">
-          <Pressable
+          <Touchable
             style={[styles.buttonDecline, styles.buttonsLayout]}
             onPress={termsCanceled}
-            //accessibilityLabel="Decline Button"
             accessibilityHint="Decline Terms and Conditions"
-            accessibilityRole="button"
           >
             <Text style={styles.decline}>Decline</Text>
-          </Pressable>
+          </Touchable>
           {loading ? (
             <View style={[styles.buttons, styles.buttonsLayout]}>
               <ActivityIndicator size="small" color={"white"} />
             </View>
           ) : (
-            <Pressable
+            <Touchable
               style={[styles.buttons, styles.buttonsLayout]}
               onPress={termsAccepted}
-              accessibilityRole="button"
               accessibilityLabel="Accept terms and conditions"
               accessibilityHint="tap to accept the terms and conditions"
             >
               <Text style={styles.accept}>Accept</Text>
-            </Pressable>
+            </Touchable>
           )}
         </View>
       </View>

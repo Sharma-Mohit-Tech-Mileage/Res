@@ -578,6 +578,8 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "flex-end",
+    minWidth: A11Y.minTouch,
   },
   icon: {
     width: 18,

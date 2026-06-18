@@ -63,7 +63,7 @@ export function announceA11y(message, { delay = 0 } = {}) {
   if (delay > 0) setTimeout(fire, delay); else fire();
 }
 
-// Move screen-reader focus to a ref via setAccessibilityFocus, retried at escalating delays to win against focus stealing on Android.
+// Move screen-reader focus to a ref via setAccessibilityFocus, fired once — repeated focus sets re-read the field (double/multiple readout on iOS/Android).
 export function setFocusToRef(ref, { delay = 0 } = {}) {
   const fire = () => {
     try {
@@ -73,9 +73,5 @@ export function setFocusToRef(ref, { delay = 0 } = {}) {
       if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
     } catch (_) { /* no-op */ }
   };
-  const offsets = Platform.OS === 'android' ? [0, 150, 350, 700, 1100, 1600, 2200] : [0, 300];
-  offsets.forEach((ms) => {
-    const t = delay + ms;
-    if (t > 0) setTimeout(fire, t); else fire();
-  });
+  if (delay > 0) setTimeout(fire, delay); else fire();
 }
