@@ -82,7 +82,7 @@ const App = () => {
           _icon: {
             color: "custom.500", // Default color for the icon
             _checked: {
-              color: "custom.500", // Color when checked
+              color: "#8D3B90", // Color when checked
             },
           },
         },

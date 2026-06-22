@@ -319,6 +319,8 @@ const Feedback = () => {
             />
           </Animated.View>
 
+
+
           <View style={{ paddingHorizontal: 16 }}>
 
               <Text
@@ -326,7 +328,7 @@ const Feedback = () => {
                   styles.optionTxt,
                 ]}
               >
-              May Sparklight Contact you about your Feedback?
+              May Sparklight contact you about your feedback?*
               </Text>
               <Radio.Group
                 name="surveyOptions"
