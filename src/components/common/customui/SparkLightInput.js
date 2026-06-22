@@ -47,6 +47,7 @@ const SparkLightInput = React.forwardRef(({
   const [isFocused, setIsFocused] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(!secure);
   const inputRef = useRef(null);
+  const fieldRef = useRef(null);
   const hasBlurred = useRef(false);
   const isFocusedRef = useRef(false);
   const valueRef = useRef(value);
@@ -59,8 +60,8 @@ const SparkLightInput = React.forwardRef(({
   useImperativeHandle(ref, () => ({
     focus: () => {
       hasBlurred.current = true;
-      // Move only the screen-reader cursor (not input focus) so TalkBack reads the field without entering edit mode; the error is carried in the field's accessibilityHint.
-      setFocusToRef(inputRef, { delay: 200 });
+      // Move the screen-reader cursor to the accessible wrapper (single node) so the field is read once; the live TextInput is hidden from a11y to avoid the double readout.
+      setFocusToRef(fieldRef, { delay: 200 });
     },
   }));
 
@@ -141,6 +142,18 @@ const SparkLightInput = React.forwardRef(({
       </View>
 
       <View
+        ref={fieldRef}
+        accessible={true}
+        accessibilityRole="text"
+        accessibilityLabel={`${formatInputA11yReadout({
+          label: accessibilityLabel || label || placeholder,
+          required,
+          value,
+          isPhoneNumber: getKeyboardType() === "phone-pad",
+          isSecure: secure,
+        })}${editable ? ", double tap to edit" : ""}`}
+        accessibilityHint={error ? (errorHint || error) : undefined}
+        importantForAccessibility="yes"
         style={[
           styles.textInputContainer,
           {
@@ -181,16 +194,8 @@ const SparkLightInput = React.forwardRef(({
                 : Color.sparklightDarkGray,
             },
           ]}
-          accessibilityLabel={formatInputA11yReadout({
-            label: accessibilityLabel || label || placeholder,
-            required,
-            value,
-            isPhoneNumber: getKeyboardType() === "phone-pad",
-            isSecure: secure,
-          })}
-          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : 'Double tap to edit'}
-          accessibilityRole="text"
-          importantForAccessibility="yes"
+          accessible={false}
+          importantForAccessibility="no"
           keyboardType={getKeyboardType()}
           returnKeyType="done"
           keyboardAppearance="default"

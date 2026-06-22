@@ -89,7 +89,6 @@ const Support = ({ route }) => {
         if (group_id == "1500003312422") {
           setisAgentAvailable(false);
           if (data) {
-            //PromptForAgentOffline()
             setIsAgentNotAvailable(true);
           }
         } else if (group_id == "1500003304341") {

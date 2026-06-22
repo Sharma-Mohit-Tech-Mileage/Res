@@ -311,17 +311,6 @@ const NewBillerHome = ({ navigation }) => {
           };
           console.log("Setting Zendesk Chat Conversational Fields:", fields);
           setConversationalFields(fields);
-          // loginWithJWT(jwtToken)
-          //   .then(() => {
-          //     // Now set conversational fields
-          //     console.log("Setting Zendesk Chat Conversational Fields:", fields);
-          //     setConversationalFields(fields);
-          //   })
-          //   .catch((error) => {
-          //     console.warn("Error logging in to Zendesk Chat:", error);
-          //     setConversationalFields(fields);
-          //     console.warn("Error logging in to Zendesk Chat:", error);
-          //   });
         }
       },
       (error) => {
