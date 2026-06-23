@@ -723,6 +723,7 @@ const styles = StyleSheet.create({
   // Inline actionable links keep natural text height; hitSlop provides 48dp tap target (WCAG 2.5.5 inline-text exception).
   actionableBlock: {
     justifyContent: "center",
+    alignItems: "flex-start",
   },
   messageText: {
     fontSize: FontSize.size_sm,

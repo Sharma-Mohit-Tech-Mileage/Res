@@ -10,7 +10,7 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
 
 
 
-+ (void) init {
++ (void) configure {
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *channelKey = [NSBundle mainBundle].infoDictionary[@"ZENDESK_CHANNEL_KEY_IOS"];
 
