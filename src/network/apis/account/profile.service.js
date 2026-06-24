@@ -88,6 +88,24 @@ const fetchBillingStatus = async () => {
     });
 };
 
+const fetchEasyPayStatus = async () => {
+  let data = await getUser();
+  const accountNumber = data.userInfo?.accountNumber || null;
+  const config = {
+    headers: {
+      Authorization: "Bearer " + data.token,
+    },
+  };
+
+  return _axios
+    .get(getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber }), { ...config })
+    .then((res) => res.data)
+    .catch((error) => {
+      appLogger.logError(`Error fetching ${getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber })}`, error);
+      throw error;
+    });
+};
+
 const fetchPaperLessDetails = async () => {
   let data = await getUser();
   const accountNumber = data.userInfo?.accountNumber || null;
@@ -434,6 +452,7 @@ const handleSubmitFeedback = async (obj) => {
         { id: Config.ZENDESK_FEEDBACK_CATEGORY_ID, value: obj.category },
         { id: Config.ZENDESK_FEEDBACK_VALUE_ID, value: obj.feedbackValue },
         { id: Config.ZENDESK_FEEDBACK_EMAIL_ID, value: obj.feedbackEmail },
+        { id: Config.ZENDESK_COSENT_CONTACT_US_ID, value: obj.cosentContactUs ? "Yes" : "No" },
         {
           id: Config.ZENDESK_FEEDBACK_APP_VERSION_ID,
           value: deviceMetadata.appVersion,
@@ -487,12 +506,14 @@ const handleSubmitFeedback = async (obj) => {
   };
 
   try {
+    console.log("Submitting feedback with payload:", payload);
     const response = await axios.post(zendeskRequestApiUrl, payload, {
       headers: {
         Authorization: `Basic ${base64Auth}`,
         "Content-Type": "application/json",
       },
     });
+    console.log("Feedback submitted successfully:", response.data);
     return response;
   } catch (error) {
     appLogger.logError("Zendesk API Error:", error.response?.data || error.message);
@@ -737,6 +758,7 @@ const fetchACPUserAccountDetails = async (signal, force = false) => {
       "last_name",
       "current_balance",
       "past_due_amount",
+      "payment_due_amount",
       "payment_due_date",
       "services",
       "email",
@@ -773,6 +795,7 @@ export {
   postProfileInfo,
   postTextNotifictionInfo,
   fetchBillingStatus,
+  fetchEasyPayStatus,
   fetchPaperLessDetails,
   putEmailNotification,
   postEmailNotification,

@@ -177,10 +177,10 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
         <View style={styles.cardFooter}>
           <Touchable
             onPress={() => {
-              let billingURL = `${Config.ACP_BILLING}/billing`;
               navigation.navigate("ArticleWindowUtility", {
-                url: billingURL,
-                name: "Billing Details",
+                url: `${Config.PORTAL_BASE_URL}/portals/app-secure/make-payment`,
+                name: "Make a Payment",
+                injectPaymentObj: true,
               });
             }}
             accessible={true}

@@ -5,7 +5,6 @@ import {
   Text,
   StyleSheet,
   AccessibilityInfo,
-  findNodeHandle,
 } from "react-native";
 import {
   FontFamily,
@@ -15,7 +14,7 @@ import {
   Border,
 } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
-import { formatInputA11yReadout } from "../../../utils/a11y";
+import { formatInputA11yReadout, setFocusToRef } from "../../../utils/a11y";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
@@ -63,19 +62,8 @@ const SparkLightInput = React.forwardRef(({
   useImperativeHandle(ref, () => ({
     focus: () => {
       hasBlurred.current = true;
-      inputRef.current?.focus();
-      // Workaround: secureTextEntry may clear text on programmatic focus
-      if (secure && valueRef.current) {
-        const currentValue = valueRef.current;
-        setTimeout(() => {
-          inputRef.current?.setNativeProps({ text: currentValue });
-        }, 50);
-      }
-      // Delay accessibility focus to allow re-render with error state
-      setTimeout(() => {
-        const handle = findNodeHandle(inputRef.current);
-        if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-      }, 350);
+      // Move only the screen-reader cursor (not input focus) so TalkBack reads the field without entering edit mode.
+      setFocusToRef(inputRef, { delay: 200 });
     },
   }));
 
@@ -232,7 +220,7 @@ const SparkLightInput = React.forwardRef(({
             isPhoneNumber: getKeyboardType() === "phone-pad",
             isSecure: secure,
           })}
-          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : undefined}
+          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : 'Double tap to edit'}
           accessibilityRole="text"
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}

@@ -27,12 +27,11 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../utility/constant";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
-import Vector from "../../../src/res/svgIcons/Vector";
+import EditIcon from "../../../assets/svgs/EditIcon";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-import { set } from "react-hook-form";
-import { use } from "react";
+
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -47,10 +46,12 @@ const ProfileSettings = () => {
 
   const emailAddress = getPrimaryEmail(accountDetails);
 
-  useEffect(() => { 
-    if(emailAddress) {
+  console.log("Profile details from Redux:", profile);
+
+  useEffect(() => {
+    
       setShowEmailLoading(false);
-    }
+    
   }, [profile, emailAddress]);
 
   const TextNotifSettings = useMemo(
@@ -76,11 +77,10 @@ const ProfileSettings = () => {
 
   const handleArrowPress = (fieldType) => {
     console.log(`Arrow pressed for: ${fieldType}`);
-    // Add your callback logic here
     if (fieldType === "email") {
       navigation.navigate("EmailNotifications", {
+        is_enrolled: emailAddress,
         email: emailAddress,
-        //isPaperLess: isPaperLess,
       });
     } else if (fieldType === "mobile") {
       navigation.navigate("TextNotifications", {
@@ -207,7 +207,10 @@ const ProfileSettings = () => {
       GetApiRequest(
         endpointUrl,
         (res) => {
+          setShowPhoneLoading(false);
+          console.log("RESPONSE", res);
           if (res) {
+            if(res[0]?.smsMessageType) {
             res[0]?.smsMessageType.forEach((value, index) => {
               console.log(`Index: ${index}, Value: ${value}`);
               TextNotifSettings[index].status = value?.optOutFlag
@@ -217,6 +220,7 @@ const ProfileSettings = () => {
             let phoneNum = res[0]?.phoneNum || "";
             setPhoneNumber(phoneNum);
           }
+        }
           setShowPhoneLoading(false);
         },
         (error) => {
@@ -325,7 +329,7 @@ const ProfileSettings = () => {
                   <SkeletonPlaceholder>
                     <View style={styles.profileFieldSkeleton} />
                   </SkeletonPlaceholder>
-                ) : (
+                ) : emailAddress && (
                   <View
                     style={styles.editableRow}
                     accessible={false}
@@ -366,12 +370,18 @@ const ProfileSettings = () => {
                       accessibilityLabel="Edit email address"
                       accessibilityHint="Double tap to edit your email address"
                     >
-                      <Vector />
+                      <EditIcon />
                     </Pressable>
                   </View>
                 )}
 
-                {phoneNumber ? (
+
+                {showPhoneLoading ? (
+                    <SkeletonPlaceholder>
+                      <View style={styles.profileFieldSkeleton} />
+                    </SkeletonPlaceholder>
+                  )
+              : phoneNumber && (
                   <View
                     style={styles.editableRow}
                     accessible={false}
@@ -400,7 +410,9 @@ const ProfileSettings = () => {
                         accessibilityRole="text"
                         accessibilityLabel={`Mobile Number: ${
                           phoneNumber
-                            ? numberToWordsForAccessibility(phoneNumber.toString())
+                            ? numberToWordsForAccessibility(
+                                phoneNumber.toString(),
+                              )
                             : "N/A"
                         }`}
                       >
@@ -415,16 +427,11 @@ const ProfileSettings = () => {
                       accessibilityLabel="Edit mobile number"
                       accessibilityHint="Double tap to edit your mobile number"
                     >
-                      <Vector />
+                      <EditIcon />
                     </Pressable>
                   </View>
-                ) : (
-                  showPhoneLoading && (
-                    <SkeletonPlaceholder>
-                      <View style={styles.profileFieldSkeleton} />
-                    </SkeletonPlaceholder>
-                  )
-                )}
+                ) 
+              }
               </View>
             </View>
           </View>

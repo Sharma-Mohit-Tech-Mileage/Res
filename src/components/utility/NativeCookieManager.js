@@ -5,8 +5,7 @@ const TAG = '[NativeCookieManager]';
 
 const COOKIE_DOMAIN = Config.COOKIE_DOMAIN;
 const PORTAL_URL = Config.PORTAL_BASE_URL;
-const PCI_URL = Config.PAYMENT_BASE_URL;
-const COOKIE_URLS = [PORTAL_URL, PCI_URL];
+const COOKIE_URLS = [PORTAL_URL];
 
 const longExpiry = () => new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
 const shortExpiry = () => new Date(Date.now() + 5 * 60 * 1000).toISOString();
@@ -14,9 +13,7 @@ const shortExpiry = () => new Date(Date.now() + 5 * 60 * 1000).toISOString();
 const setCookie = (url, name, value, expires) =>
     CookieManager.set(url, { name, value, domain: COOKIE_DOMAIN, path: '/', expires, secure: true, sameSite: 'lax' });
 
-export const dumpCookies = async () => {};
-
-export const setAuthCookiesOnAllDomains = async (idToken) => {
+export const setAuthCookiesOnAllDomains = async (idToken, accountNumber = '') => {
     try {
         const long = longExpiry();
         const short = shortExpiry();
@@ -26,10 +23,11 @@ export const setAuthCookiesOnAllDomains = async (idToken) => {
             promises.push(setCookie(url, 'CustomerType', 'Residential', long));
             promises.push(setCookie(url, 'LatestVersion', 'true', long));
             if (idToken) promises.push(setCookie(url, 'IdToken', idToken, short));
+            if (accountNumber) promises.push(setCookie(url, 'AccountNo', String(accountNumber), long));
         }
         await Promise.all(promises);
     } catch (e) {
-        console.warn(`${TAG} setAuthCookies FAILED | error=${e.message}`);
+        console.warn(`${TAG} setAuthCookies error: ${e.message}`);
     }
 };
 
@@ -41,7 +39,7 @@ export const refreshIdTokenOnAllDomains = async (idToken) => {
         const expiry = shortExpiry();
         await Promise.all(COOKIE_URLS.map(url => setCookie(url, 'IdToken', idToken, expiry)));
     } catch (e) {
-        console.warn(`${TAG} refreshIdToken FAILED | error=${e.message}`);
+        console.warn(`${TAG} refreshIdToken error: ${e.message}`);
     }
 };
 
@@ -49,6 +47,6 @@ export const clearAuthCookies = async () => {
     try {
         await CookieManager.clearAll();
     } catch (e) {
-        console.warn(`${TAG} clearAuthCookies FAILED | error=${e.message}`);
+        console.warn(`${TAG} clearAuthCookies error: ${e.message}`);
     }
 };

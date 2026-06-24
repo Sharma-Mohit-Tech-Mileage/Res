@@ -3,7 +3,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 import BillingScreen from "../../components/billing/BillingScreen";
 import BillingStatements from "../../components/billing/BillingStatements";
-import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
 import PaymentHistoryScreen from "../../components/billing/PaymentHistory";
 import BillingBreakDownScreen from "../../components/billing/BillingBreakDownScreen";
 const BillingStack = createNativeStackNavigator();
@@ -51,11 +50,6 @@ function BillingStackScreen({ route }) {
         options={{ headerBackVisible: false, headerShown: false }}
       />
 
-      <BillingStack.Screen
-        name="AutoPayPCIConnector"
-        component={AutoPayPCIConnector}
-        options={{ headerShown: false }}
-      />
     </BillingStack.Navigator>
   );
 }

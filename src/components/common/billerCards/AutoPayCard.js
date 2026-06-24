@@ -17,12 +17,10 @@ const AutoPayCard = ({
   const showSkeleton = isStatusLoading || isAutoPayStatus === undefined;
   const handleCardPress = () => {
     if (!showSkeleton) {
-      navigation.navigate("AutoPayPCIConnector", {
-        url: `${Config.URL}/billing`,
+      navigation.navigate("ArticleWindowUtility", {
+        url: `${Config.PORTAL_BASE_URL}/portals/app-secure/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
         name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-        useNewPayment: true,
-        status: isAutoPayStatus,
-        paymentDetails: paymentDetails,
+        injectPaymentObj: true,
       });
     }
   };

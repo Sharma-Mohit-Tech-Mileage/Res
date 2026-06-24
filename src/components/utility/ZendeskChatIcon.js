@@ -22,7 +22,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 const ZendeskChatIcon = () => {
   const refreshFeatureFlags = useFeatureRefresh();
-  const isChatFeatureEnabled = useFeatureFlag(FeatureFlags.DASHBOARD_CHAT_ICON);
+  const isChatFeatureEnabled = useFeatureFlag(FeatureFlags.DASHBOARD_CHAT_ICON, true);
 
   useFocusEffect(
     useCallback(() => {

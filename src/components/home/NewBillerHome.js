@@ -88,14 +88,28 @@ const NewBillerHome = ({ navigation }) => {
     )
     : false;
 
+  const isForceBannerAccount =
+    userInfo?.accountNumber === "8160360660005361" ||
+    accountDetails?.accountNumber === "8160360660005361";
+
+  const forcedMaintenanceBannerConfig = {
+    title: "Service Error",
+    message:
+      "We are currently experiencing a service error. Our team is working to restore full functionality as soon as possible.",
+    severity: "critical",
+    dismissible: true,
+  };
+
   useEffect(() => {
-    if (outageData?.hasOutage) {
+    if (outageData?.hasOutage || isForceBannerAccount) {
       setIsOutageAlert(true);
-      setEstimatedRestoreTime(outageData.estimatedRestoreTime || "");
+      setEstimatedRestoreTime(
+        isForceBannerAccount ? "" : outageData.estimatedRestoreTime || ""
+      );
     } else {
       setIsOutageAlert(false);
     }
-  }, [outageData, userInfo?.accountNumber]);
+  }, [outageData, userInfo?.accountNumber, isForceBannerAccount]);
 
   const getStatus = () => {
     setloadingAutoPay(true);
@@ -155,38 +169,47 @@ const NewBillerHome = ({ navigation }) => {
         pastPaymentDue: accountDetails.past_due_amount,
         email: getPrimaryEmail(accountDetails),
       });
+
+      // Wait until phone resolution completes so Zendesk receives phone reliably.
+      if (phoneNumber === undefined) {
+        return;
+      }
+
       const firstName = accountDetails.first_name || "";
       const lastName = accountDetails.last_name || "";
       DeviceInfo.getUserAgent().then((userAgent) => {
-        loginWithToken(userAgent, firstName, lastName);
+        loginWithToken(userAgent, firstName, lastName, phoneNumber || "");
       });
     }
-  }, [accountDetails]);
+  }, [accountDetails, phoneNumber]);
 
   const getTextNotificationsData = () => {
-      
-      getUser().then((res1) => {
-        const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
-          accountNumber: res1.userInfo?.accountNumber,
-        });
-        
-        GetApiRequest(
-          endpointUrl,
-          (res) => {
-            if (res) {
-              let phoneNum = res[0]?.phoneNum || "";
-              setPhoneNumber(phoneNum);
-            }
-            
-          },
-          (error) => {
-            
-            console.error("Error on retrying getTextNotificationsData", error);
-          },
-        );
+
+    getUser().then((res1) => {
+      const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
+        accountNumber: res1.userInfo?.accountNumber,
       });
-    };
-  
+
+      GetApiRequest(
+        endpointUrl,
+        (res) => {
+          console.log("SMS Notification Prefs Response", res);
+          if (res) {
+            let phoneNum = res[0]?.phoneNum || "";
+            setPhoneNumber(phoneNum);
+          } else {
+            setPhoneNumber("");
+          }
+
+        },
+        (error) => {
+          setPhoneNumber("");
+          console.error("Error on retrying getTextNotificationsData", error);
+        },
+      );
+    });
+  };
+
 
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
@@ -248,7 +271,7 @@ const NewBillerHome = ({ navigation }) => {
 
   // zendesk chat login
 
-  const loginWithToken = async (userAgent, firstName, lastName) => {
+  const loginWithToken = async (userAgent, firstName, lastName, zendeskPhone) => {
     const user = await getUser();
     let requestData = {
       accountNumber: user?.userInfo.accountNumber,
@@ -277,7 +300,7 @@ const NewBillerHome = ({ navigation }) => {
             firstName: firstName || "",
             lastName: lastName || "",
             name: `${firstName || ""} ${lastName || ""}`.trim(),
-            phone: phoneNumber || "",
+            phone: zendeskPhone || "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
@@ -286,16 +309,19 @@ const NewBillerHome = ({ navigation }) => {
             jwtId: jwtToken,
             source: "Mobile App",
           };
-
-          loginWithJWT(jwtToken)
-            .then(() => {
-              // Now set conversational fields
-              setConversationalFields(fields);
-            })
-            .catch((error) => {
-              setConversationalFields(fields);
-              console.warn("Error logging in to Zendesk Chat:", error);
-            });
+          console.log("Setting Zendesk Chat Conversational Fields:", fields);
+          setConversationalFields(fields);
+          // loginWithJWT(jwtToken)
+          //   .then(() => {
+          //     // Now set conversational fields
+          //     console.log("Setting Zendesk Chat Conversational Fields:", fields);
+          //     setConversationalFields(fields);
+          //   })
+          //   .catch((error) => {
+          //     console.warn("Error logging in to Zendesk Chat:", error);
+          //     setConversationalFields(fields);
+          //     console.warn("Error logging in to Zendesk Chat:", error);
+          //   });
         }
       },
       (error) => {
@@ -369,34 +395,38 @@ const NewBillerHome = ({ navigation }) => {
   };
 
   const renderMaintenanceAlert = () => {
-    if (!bannerConfig) return null;
+    const effectiveBannerConfig =
+      isForceBannerAccount ? forcedMaintenanceBannerConfig : bannerConfig;
+
+    if (!effectiveBannerConfig) return null;
     const severityToType = { critical: "error", warning: "warning", info: "info" };
     const splitKeys = [];
-    let messageText = bannerConfig.message || "";
-    if (bannerConfig.link && bannerConfig.linkText) {
-      messageText = `${messageText}\n${bannerConfig.linkText}`;
-      splitKeys.push({ text: bannerConfig.linkText, action: "url", value: bannerConfig.link });
+    let messageText = effectiveBannerConfig.message || "";
+    if (effectiveBannerConfig.link && effectiveBannerConfig.linkText) {
+      messageText = `${messageText}\n${effectiveBannerConfig.linkText}`;
+      splitKeys.push({ text: effectiveBannerConfig.linkText, action: "url", value: effectiveBannerConfig.link });
     }
-    if (bannerConfig.showPhoneNumber && bannerConfig.phoneNumber) {
-      messageText = `${messageText}\nCall ${bannerConfig.phoneNumber}`;
-      splitKeys.push({ text: bannerConfig.phoneNumber, action: "call", value: bannerConfig.phoneNumber });
+    if (effectiveBannerConfig.showPhoneNumber && effectiveBannerConfig.phoneNumber) {
+      messageText = `${messageText}\nCall ${effectiveBannerConfig.phoneNumber}`;
+      splitKeys.push({ text: effectiveBannerConfig.phoneNumber, action: "call", value: effectiveBannerConfig.phoneNumber });
     }
     return (
       <View style={styles.alertWrapper}>
         <NotificationAlert
-          type={severityToType[bannerConfig.severity] || "info"}
-          title={bannerConfig.title}
+          type={severityToType[effectiveBannerConfig.severity] || "info"}
+          title={effectiveBannerConfig.title}
           message={messageText}
           splitKey={splitKeys.length > 0 ? splitKeys : ""}
-          showCloseIcon={!!bannerConfig.dismissible}
-          onClose={bannerConfig.dismissible ? dismissBanner : undefined}
+          showCloseIcon={!!effectiveBannerConfig.dismissible}
+          onClose={effectiveBannerConfig.dismissible ? dismissBanner : undefined}
         />
       </View>
     );
   };
 
-  const hasAnyAlert =
-    updateStatus.isMinorUpdateAvailable || isOutageAlert || (showBanner && bannerConfig);
+  const showWhatsNewAlert = updateStatus.isMinorUpdateAvailable || isForceBannerAccount;
+  const showServiceErrorAlert = (isForceBannerAccount || (!!bannerConfig && showBanner)) && !showDisconnectedBanner;
+  const hasAnyAlert = showWhatsNewAlert || isOutageAlert || showServiceErrorAlert;
 
   const renderWelcomeCard = () => (
     <View style={[styles.card, styles.shadowProp]}>
@@ -421,12 +451,10 @@ const NewBillerHome = ({ navigation }) => {
             buttonVariant={isAutoPayStatus ? "success" : "primary"}
             isActive={isAutoPayStatus}
             onButtonPress={() => {
-              navigation.navigate("AutoPayPCIConnector", {
-                url: `${Config.URL}/billing`,
+              navigation.navigate("ArticleWindowUtility", {
+                url: `${Config.PORTAL_BASE_URL}/portals/app-secure/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
                 name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-                useNewPayment: true,
-                status: isAutoPayStatus,
-                paymentDetails: defaultPaymentDetails,
+                injectPaymentObj: true,
               });
             }}
           />
@@ -499,9 +527,9 @@ const NewBillerHome = ({ navigation }) => {
                 onLayout={(e) => setAlertsHeight(e.nativeEvent.layout.height)}
               >
                 <View style={styles.alertsGroup}>
-                  {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+                  {(updateStatus.isMinorUpdateAvailable || isForceBannerAccount) && renderAppUpdateAlert()}
                   {isOutageAlert && renderOutageAlert()}
-                  {showBanner && bannerConfig && renderMaintenanceAlert()}
+                  {(showBanner && bannerConfig) || isForceBannerAccount ? renderMaintenanceAlert() : null}
                 </View>
               </View>
             )}

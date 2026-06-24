@@ -342,7 +342,7 @@ const AccountOverview = () => {
                   </Text>
                 </Touchable>
 
-                <Text style={styles.linkStyle} accessible={false} importantForAccessibility="no"> | </Text>
+                <Text style={styles.separator} accessible={false} importantForAccessibility="no"> | </Text>
 
                 <Touchable
                   accessible={true}
@@ -425,6 +425,11 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "600",
     textDecorationLine: "underline", // added underscore for linkStyle
+  },
+  separator: {
+    color: Color.colorMidnightblue,
+    alignSelf: "center",
+    fontWeight: "600",
   },
   footerLink: {
     paddingHorizontal: Padding.p_5xs,

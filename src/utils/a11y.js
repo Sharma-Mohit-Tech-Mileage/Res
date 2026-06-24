@@ -11,6 +11,12 @@ export const digitsToWords = (s) => {
   return digits.split('').map((d) => DIGIT_WORDS[Number(d)]).join(' ');
 };
 
+// Spell out digit characters individually while keeping non-digits, so numbers embedded in a value (e.g. in an email) are read digit-by-digit, not as a cardinal ("million").
+export const spellOutDigits = (s) => {
+  if (s === undefined || s === null) return '';
+  return String(s).replace(/[0-9]/g, (d) => ` ${DIGIT_WORDS[Number(d)]} `).replace(/\s{2,}/g, ' ').trim();
+};
+
 export function formatInputA11yReadout({
   label,
   required = false,
@@ -18,17 +24,15 @@ export function formatInputA11yReadout({
   isPhoneNumber = false,
   isSecure = false,
 }) {
+  // Field is static text (role="text") so the OS won't add value/type on Android — compose the full readout (label, required, value, "text field"); OS adds these on iOS.
   const cleanLabel = (label || '').replace(/\s*\*\s*$/, '').trim() || 'Input';
   const parts = [cleanLabel];
   if (required) parts.push('required');
-  const includeValue =
-    Platform.OS === 'android' &&
-    !isSecure &&
-    value !== undefined &&
-    value !== null &&
-    value !== '';
-  if (includeValue) {
-    parts.push(isPhoneNumber ? digitsToWords(value) : String(value));
+  if (Platform.OS === 'android') {
+    if (!isSecure && value !== undefined && value !== null && value !== '') {
+      parts.push(isPhoneNumber ? digitsToWords(value) : spellOutDigits(value));
+    }
+    parts.push('text field');
   }
   return parts.join(', ');
 }
@@ -59,20 +63,19 @@ export function announceA11y(message, { delay = 0 } = {}) {
   if (delay > 0) setTimeout(fire, delay); else fire();
 }
 
-// Move screen-reader focus to a ref; uses sendAccessibilityEvent on Android, setAccessibilityFocus on iOS.
+// Move screen-reader focus to a ref via setAccessibilityFocus, retried at escalating delays to win against focus stealing on Android.
 export function setFocusToRef(ref, { delay = 0 } = {}) {
   const fire = () => {
     try {
       const node = ref?.current;
       if (!node) return;
       const handle = findNodeHandle(node);
-      if (!handle) return;
-      if (Platform.OS === 'android') {
-        AccessibilityInfo.sendAccessibilityEvent(handle, 'focus');
-      } else {
-        AccessibilityInfo.setAccessibilityFocus(handle);
-      }
+      if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
     } catch (_) { /* no-op */ }
   };
-  if (delay > 0) setTimeout(fire, delay); else fire();
+  const offsets = Platform.OS === 'android' ? [0, 150, 350, 700, 1100, 1600, 2200] : [0, 300];
+  offsets.forEach((ms) => {
+    const t = delay + ms;
+    if (t > 0) setTimeout(fire, t); else fire();
+  });
 }
