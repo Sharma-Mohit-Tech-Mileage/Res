@@ -7,6 +7,7 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
+import { A11Y } from "../../styles/theme";
 
 const ConfimationPopup = ({
   visible,
@@ -116,11 +117,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sparklight_purple_blue,
     justifyContent: "center",
     width: "100%",
+    minHeight: A11Y.minTouch,
     marginTop: 20,
   },
   closeBtn: {
     justifyContent: "center",
     width: "100%",
+    minHeight: A11Y.minTouch,
     marginTop: 15,
   },
   openPortaltxt: {

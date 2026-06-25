@@ -2,10 +2,10 @@ import React, { useCallback } from "react";
 import {
   Platform,
   StyleSheet,
-  View,
   Pressable,
 } from "react-native";
 
+import { A11Y } from "../../styles/theme";
 import LottieView from "lottie-react-native";
 import animationSource from "../../../assets/animations/chatbot-animation.json";
 import {
@@ -27,9 +27,7 @@ const ZendeskChatIcon = () => {
   useFocusEffect(
     useCallback(() => {
       // Re-check remote config whenever the current tab/screen is focused.
-      refreshFeatureFlags().catch((error) => {
-        console.warn("Error refreshing feature flags for chat icon", error);
-      });
+      refreshFeatureFlags().catch(() => {});
     }, [refreshFeatureFlags])
   );
 
@@ -61,11 +59,11 @@ const ZendeskChatIcon = () => {
 };
 
 const styles = StyleSheet.create({
-  perusable: {
-    //flex: 1,
+  pressable: {
     width: "100%",
+    minHeight: A11Y.minTouch,
+    justifyContent: "center",
   },
-  
 });
 
 export default ZendeskChatIcon;

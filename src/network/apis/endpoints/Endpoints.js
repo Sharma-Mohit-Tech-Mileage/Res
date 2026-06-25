@@ -86,6 +86,7 @@ export const ENDPOINTS = {
     INTERNET_SPEED_GET: 'internet/api/internet/:accountNumber/speedTest/Get',
     INTERNET_SPEED_POST: 'internet/api/internet/:accountNumber/speedTest/Post',
     INTERNET_USAGE: 'api/Internet/Usage',
+    EQUIPMENT_BY_ACCOUNT: 'get-equipment-by-account?Account=:account&IncludeServiceCode=false',
 
     // Security / Password
     SECURITY_QUESTIONS: 'api/Security/GetSecurityQuestions',

@@ -29,11 +29,8 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
   };
 
   const loadAndSharePDF = async () => {
-    const showError = await sharePDF(url, 'billinghistory.pdf');
-    if (showError !== undefined) {
-      console.warn(showError);
-    }
-  };  
+    await sharePDF(url, 'billinghistory.pdf');
+  };
 
   return (
     <Modal

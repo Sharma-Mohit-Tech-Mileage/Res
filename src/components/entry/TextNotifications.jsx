@@ -238,22 +238,27 @@ const TextNotifications = ({ navigation }) => {
                 accessibilityState={{ checked: toggleCheckBox }}
               >
                 <View style={styles.checkboxContainer}>
-                  <CheckBox
-                    disabled={true}
-                    value={toggleCheckBox}
-                    onValueChange={onCheckBox.bind(null, !toggleCheckBox)}
-                    style={styles.checkBox}
-                    boxType="square"
-                    tintColor={
-                      isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
-                    }
-                    tintColors={{
-                      true: "#1B99FF",
-                      false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
-                    }}
-                    accessible={false}
-                    importantForAccessibility="no"
-                  />
+                  <View
+                    pointerEvents="none"
+                    importantForAccessibility="no-hide-descendants"
+                  >
+                    <CheckBox
+                      disabled={true}
+                      value={toggleCheckBox}
+                      onValueChange={onCheckBox.bind(null, !toggleCheckBox)}
+                      style={styles.checkBox}
+                      boxType="square"
+                      tintColor={
+                        isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
+                      }
+                      tintColors={{
+                        true: "#1B99FF",
+                        false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
+                      }}
+                      accessible={false}
+                      importantForAccessibility="no"
+                    />
+                  </View>
                   <Text
                     style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
                     allowFontScaling={true}
@@ -407,8 +412,9 @@ const styles = StyleSheet.create({
   },
   checkBoxArea: {
     flexDirection: "row",
-    marginLeft: 4,
-    alignSelf: "center",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
   },
   checkboxTouchable: {
     flexDirection: "row",

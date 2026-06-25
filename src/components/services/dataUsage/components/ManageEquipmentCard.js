@@ -9,21 +9,9 @@ const safeText = (v, fallback = "\u2014") =>
 
 const normalize = (v) => String(v ?? "").trim();
 
-const getEquipmentIcon = (item) => {
-  const blob = `${normalize(item?.type)} ${normalize(item?.name)}`.toLowerCase();
-
-  if (blob.includes("extender") || blob.includes("mesh")) return "wifi-plus";
-  if (blob.includes("modem")) return "access-point-network";
-  if (blob.includes("gateway")) return "router-network";
-  return "router-wireless"; 
-};
-
 const getIdentifier = (item) => {
-  if (normalize(item?.macAddress || item?.mac || item?.macId)) {
-    return { label: "MAC ID", value: safeText(item?.macAddress || item?.mac || item?.macId) };
-  }
-  if (normalize(item?.ipAddress || item?.ip)) {
-    return { label: "IP Address", value: safeText(item?.ipAddress || item?.ip) };
+  if (normalize(item?.identifierValue)) {
+    return { label: item?.identifierLabel || "Mac ID", value: safeText(item?.identifierValue) };
   }
   return null;
 };
@@ -32,7 +20,7 @@ const buildA11yLabel = (item) => {
   const parts = [];
   const name = normalize(item?.name);
   parts.push(name || "Provider equipment");
-  
+
   const model = normalize(item?.model);
   if (model) parts.push(`Model ${model}`);
 
@@ -89,15 +77,7 @@ const ManageEquipmentCard = ({ equipment }) => {
   if (!list.length) return null;
 
   const getKey = useCallback(
-    (item, index) =>
-      String(
-        item?.id ??
-          item?.macAddress ??
-          item?.mac ??
-          item?.ipAddress ??
-          item?.ip ??
-          `${index}`
-      ),
+    (item, index) => String(item?.id ?? index),
     []
   );
 

@@ -9,6 +9,7 @@ import {
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
+import { A11Y } from "../../styles/theme";
 
 
 const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClose }) => {
@@ -142,12 +143,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sparklight_purple_blue,
     justifyContent: "center",
     width: "100%",
+    minHeight: A11Y.minTouch,
     marginTop: 20,
   },
   closeBtn: {
     backgroundColor: colors.backgound_blue,
     justifyContent: "center",
     width: "100%",
+    minHeight: A11Y.minTouch,
     marginTop: 15,
   },
   openPortaltxt: {

@@ -28,6 +28,7 @@ import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../utility/constant";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import EditIcon from "../../../assets/svgs/EditIcon";
+import { A11Y } from "../../styles/theme";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
@@ -712,8 +713,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_xl,
   },
   editButton: {
-    width: 44,
-    height: 44,
+    width: A11Y.minTouch,
+    height: A11Y.minTouch,
     alignItems: "center",
     justifyContent: "center",
     marginRight: Padding.p_base,

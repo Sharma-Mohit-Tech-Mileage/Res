@@ -191,6 +191,20 @@ const dataUsageApi = {
       throw error;
     }
   },
+
+  getEquipment: async () => {
+    try {
+      const { config, body } = await buildRequest("equipment");
+      const url = getEndpoint(ENDPOINTS.EQUIPMENT_BY_ACCOUNT, { account: body.account });
+      const response = await _axios.get(url, config);
+      return response.data;
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        cachedUatJwtToken = null;
+      }
+      throw error;
+    }
+  },
 };
 
 export default dataUsageApi;
