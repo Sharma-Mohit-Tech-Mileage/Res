@@ -13,7 +13,7 @@ const _axios = axios.create({
     baseURL: API_ACP_BASEURL,
     withCredentials: false,
     timeout: 15000,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'CallingApp': 'MobileApp' },
 });
 
 let isRefreshing = false;
