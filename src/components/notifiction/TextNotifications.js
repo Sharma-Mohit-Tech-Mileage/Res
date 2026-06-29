@@ -477,21 +477,26 @@ const TextNotifications = ({ navigation }) => {
                     accessibilityState={{ checked: toggleCheckBoxTerm }}
                   >
                     <View style={styles.checkboxContainer}>
-                      <CheckBox
-                        disabled={true}
-                        value={toggleCheckBoxTerm}
-                        style={styles.checkBox}
-                        boxType="square"
-                        tintColor={
-                          isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
-                        }
-                        tintColors={{
-                          true: "#1B99FF",
-                          false: isTermRequired? "#EF4E3E": "#D0D5DD",
-                        }}
-                        accessible={false}
-                        importantForAccessibility="no"
-                      />
+                      <View
+                        pointerEvents="none"
+                        importantForAccessibility="no-hide-descendants"
+                      >
+                        <CheckBox
+                          disabled={true}
+                          value={toggleCheckBoxTerm}
+                          style={styles.checkBox}
+                          boxType="square"
+                          tintColor={
+                            isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
+                          }
+                          tintColors={{
+                            true: "#1B99FF",
+                            false: isTermRequired? "#EF4E3E": "#D0D5DD",
+                          }}
+                          accessible={false}
+                          importantForAccessibility="no"
+                        />
+                      </View>
                       <Text
                         style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
                         allowFontScaling={true}
