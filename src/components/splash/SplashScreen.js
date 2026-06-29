@@ -764,6 +764,9 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     marginTop: hp("25%"),
     paddingHorizontal: wp("10%"),
+    maxWidth: 480,
+    width: "100%",
+    alignSelf: "center",
   },
   version: {
     color: "white",

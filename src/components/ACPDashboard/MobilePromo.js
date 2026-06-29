@@ -80,7 +80,7 @@ const MobilePromo = () => {
       <View style={styles.imageContainer}>
          <ImageBackground
           source={PromoImage}
-          resizeMode="stretch"
+          resizeMode="cover"
           style={styles.promoImage}
           imageStyle={styles.promoImageBackground}
           accessible={false}
@@ -136,9 +136,13 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 20,
     width: "100%",
+    // Cap at native asset width (326px) so iPad never upscales/blurs.
+    maxWidth: 326,
   },
   promoImage: {
     width: "100%",
+    maxWidth: 326,
+    alignSelf: "center",
     aspectRatio: 1.1,
   },
   promoImageBackground: {
@@ -159,6 +163,9 @@ const styles = StyleSheet.create({
   },
   offerCard: {
     width: "100%",
+    // Cap at native asset width (354px) and center so iPad never upscales/blurs.
+    maxWidth: 354,
+    alignSelf: "center",
     aspectRatio: 354 / 225,
     overflow: "hidden",
     backgroundColor: Color.sparklightWhite,

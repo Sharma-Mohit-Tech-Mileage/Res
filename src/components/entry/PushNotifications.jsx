@@ -1,7 +1,8 @@
 import React from "react";
-import { View, StyleSheet, Text, ScrollView, Pressable, Platform, } from "react-native";
+import { View, StyleSheet, Text, ScrollView, Platform, } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import Touchable from "../common/customui/Touchable";
 import BellRingingIcon from "../../res/svgIcons/BellRingingIcon";
 import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import { useSelector, useDispatch } from "react-redux";
@@ -118,28 +119,24 @@ const PushNotifications = ({ navigation }) => {
             </View>
           </View>
           <View style={styles.bottomBar}>
-            <Pressable
+            <Touchable
               accessibilityLabel="Allow Notifications Button"
-              accessibilityRole="button"
-              //accessibilityHint="Allow Notifications"
               style={[styles.button, styles.buttonsLayout]}
               onPress={enableNotifications}
             >
               <Text style={styles.accept}>Allow Notifications</Text>
-            </Pressable>
+            </Touchable>
             <View
               style={styles.buttonsParent}
               accessibilityLabel="Buttons Section"
             >
-              <Pressable
+              <Touchable
                 style={[styles.buttonDecline, styles.buttonsLayout]}
                 onPress={skipNotifications}
                 accessibilityLabel="Skip for now"
-                accessibilityRole="button"
-                //accessibilityHint="Skip Push Notifications"
               >
                 <Text style={styles.decline}>Skip for now</Text>
-              </Pressable>
+              </Touchable>
             </View>
           </View>
         </>

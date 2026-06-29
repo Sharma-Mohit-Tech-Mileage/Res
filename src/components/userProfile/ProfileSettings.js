@@ -6,8 +6,8 @@ import {
   ScrollView,
   Linking,
   Platform,
-  Pressable,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import {
   useNavigation,
   useRoute,
@@ -363,16 +363,14 @@ const ProfileSettings = () => {
                         {emailAddress || "N/A"}
                       </Text>
                     </View>
-                    <Pressable
+                    <Touchable
                       style={styles.editButton}
                       onPress={() => handleArrowPress("email")}
-                      accessible={true}
-                      accessibilityRole="button"
                       accessibilityLabel="Edit email address"
                       accessibilityHint="Double tap to edit your email address"
                     >
                       <EditIcon />
-                    </Pressable>
+                    </Touchable>
                   </View>
                 )}
 
@@ -420,16 +418,14 @@ const ProfileSettings = () => {
                         {phoneNumber || "N/A"}
                       </Text>
                     </View>
-                    <Pressable
+                    <Touchable
                       style={styles.editButton}
                       onPress={() => handleArrowPress("mobile")}
-                      accessible={true}
-                      accessibilityRole="button"
                       accessibilityLabel="Edit mobile number"
                       accessibilityHint="Double tap to edit your mobile number"
                     >
                       <EditIcon />
-                    </Pressable>
+                    </Touchable>
                   </View>
                 ) 
               }

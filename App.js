@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AppState, Text ,Appearance } from 'react-native';
+import { AppState, Text, TextInput, Appearance } from 'react-native';
 import UserNavigations from "./src/navigations/UserNavigations";
 import { Provider } from "react-redux";
 import store from "./src/redux/configureStore.js";
@@ -16,6 +16,7 @@ import { GlobalErrorModal } from "./src/components/common/GlobalErrorModal";
 import RemoteConfigManager from "./src/config/Remoteconfigmanager";
 import { FeatureFlagsProvider } from "./src/contexts/Featureflagscontext";
 Text.defaultProps = { ...Text.defaultProps, maxFontSizeMultiplier: 1.25 };
+TextInput.defaultProps = { ...TextInput.defaultProps, maxFontSizeMultiplier: 1.25 };
 
 const App = () => {
   const [appState, setAppState] = useState(AppState.currentState);

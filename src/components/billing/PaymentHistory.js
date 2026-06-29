@@ -240,7 +240,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         <View style={styles.controlsContainer}>
           <View style={styles.searchContainer}>
             <Icon name="search" size={20} color={Color.sparklightWhite} style={styles.searchIcon} />
-            <View accessible={true}
+            <View style={{ flex: 1 }} accessible={true}
               accessibilityRole="text"
               accessibilityLabel="Search by Confirmation ID, text field, double tap to edit">
             <TextInput

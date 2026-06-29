@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -12,6 +12,7 @@ import {
   Padding,
   Border,
 } from "../../../GlobalStyles";
+import Touchable from "../common/customui/Touchable";
 
 const concernOptions = [
   { id: "service_issue", label: "Service Issue" },
@@ -81,10 +82,10 @@ const ConcernChip = ({ option, isSelected, onPress, disabled }) => {
 
   return (
     <Animated.View style={[styles.chipWrapper, animatedStyle]}>
-      <Pressable
+      {/* minSize 0: small inline chips in a wrapped row; forcing 48x48 would distort chip sizing. */}
+      <Touchable
+        minSize={0}
         accessibilityLabel={option.label}
-        accessibilityRole="button"
-        accessible={true}
         style={[styles.chip, isSelected && styles.selectedChip]}
         onPress={handlePress}
         onPressIn={handlePressIn}
@@ -94,7 +95,7 @@ const ConcernChip = ({ option, isSelected, onPress, disabled }) => {
         <Text style={[styles.chipText, isSelected && styles.selectedChipText]}>
           {option.label}
         </Text>
-      </Pressable>
+      </Touchable>
     </Animated.View>
   );
 };

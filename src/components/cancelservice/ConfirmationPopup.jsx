@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet,Modal,TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet,Modal } from "react-native";
 import {
   Color,
   Padding,
@@ -7,7 +7,7 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
-import { A11Y } from "../../styles/theme";
+import Touchable from "../common/customui/Touchable";
 
 const ConfimationPopup = ({
   visible,
@@ -28,24 +28,20 @@ const ConfimationPopup = ({
         <View style={styles.alertContainer}>
           <Text style={{textAlign:'center',alignSelf:'center',fontFamily:FontFamily.openSansRegular, color:colors.sparklight_grey,fontSize:22,fontWeight:'500'}}> {title} </Text>
           <Text style={styles.message}>{message}</Text>
-          <TouchableOpacity
+          <Touchable
             style={styles.openBtn}
             onPress={onAction}
-            accessible={true}
             accessibilityLabel={onActionTxt}
-            accessibilityRole="button"
           >
             <Text style={styles.openPortaltxt}>{onActionTxt}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Touchable>
+          <Touchable
             style={styles.closeBtn}
             onPress={onClose}
-            accessible={true}
             accessibilityLabel="Cancel"
-            accessibilityRole="button"
           >
             <Text style={styles.closeAlertTxt}>Update Info</Text>
-          </TouchableOpacity>
+          </Touchable>
         </View>
       </View>
     </Modal>
@@ -117,13 +113,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sparklight_purple_blue,
     justifyContent: "center",
     width: "100%",
-    minHeight: A11Y.minTouch,
     marginTop: 20,
   },
   closeBtn: {
     justifyContent: "center",
     width: "100%",
-    minHeight: A11Y.minTouch,
     marginTop: 15,
   },
   openPortaltxt: {

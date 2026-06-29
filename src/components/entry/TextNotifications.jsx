@@ -4,12 +4,11 @@ import {
   StyleSheet,
   Text,
   ScrollView,
-  Pressable,
   Platform,
-  TouchableOpacity,
   Linking,
   AccessibilityInfo,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import {
   Color,
   FontFamily,
@@ -230,35 +229,31 @@ const TextNotifications = ({ navigation }) => {
             }}
           >
             <View style={styles.checkBoxArea}>
-              <TouchableOpacity
+              <Touchable
                 style={styles.checkboxTouchable}
                 onPress={onCheckBox.bind(null, !toggleCheckBox)}
                 accessibilityRole="checkbox"
                 accessibilityLabel="I agree to Text Messaging Terms and Conditions"
                 accessibilityState={{ checked: toggleCheckBox }}
+                minSize={0}
               >
                 <View style={styles.checkboxContainer}>
-                  <View
-                    pointerEvents="none"
-                    importantForAccessibility="no-hide-descendants"
-                  >
-                    <CheckBox
-                      disabled={true}
-                      value={toggleCheckBox}
-                      onValueChange={onCheckBox.bind(null, !toggleCheckBox)}
-                      style={styles.checkBox}
-                      boxType="square"
-                      tintColor={
-                        isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
-                      }
-                      tintColors={{
-                        true: "#1B99FF",
-                        false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
-                      }}
-                      accessible={false}
-                      importantForAccessibility="no"
-                    />
-                  </View>
+                  <CheckBox
+                    disabled={true}
+                    value={toggleCheckBox}
+                    onValueChange={onCheckBox.bind(null, !toggleCheckBox)}
+                    style={styles.checkBox}
+                    boxType="square"
+                    tintColor={
+                      isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
+                    }
+                    tintColors={{
+                      true: "#1B99FF",
+                      false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
+                    }}
+                    accessible={false}
+                    importantForAccessibility="no"
+                  />
                   <Text
                     style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
                     allowFontScaling={true}
@@ -267,12 +262,15 @@ const TextNotifications = ({ navigation }) => {
                     I agree to{" "}
                   </Text>
                 </View>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </Touchable>
+              <Touchable
                 onPress={handleTermsLinkPress}
                 accessibilityRole="link"
                 accessibilityLabel="View Text Messaging Terms and Conditions"
                 accessibilityHint="Opens Text Messaging Terms and Conditions in a new window"
+                hitSlop={A11Y.hitSlop}
+                style={styles.termsLinkTouchable}
+                minSize={0}
               >
                 <Text
                   style={[
@@ -287,7 +285,7 @@ const TextNotifications = ({ navigation }) => {
                 >
                   Text Messaging Terms & Conditions
                 </Text>
-              </TouchableOpacity>
+              </Touchable>
             </View>
             {isTermRequired && (
               <View
@@ -313,9 +311,8 @@ const TextNotifications = ({ navigation }) => {
             )}
           </View>
           <View style={styles.bottomBar}>
-            <Pressable
+            <Touchable
               disabled={!enableButton}
-              accessibilityRole="button"
               accessibilityState={{ disabled: !enableButton }}
               accessibilityLabel="Enable Text Notifications"
               accessibilityHint="Activates text message notifications for your account."
@@ -335,20 +332,19 @@ const TextNotifications = ({ navigation }) => {
               >
                 Enable Text Notifications
               </Text>
-            </Pressable>
+            </Touchable>
             <View
               style={styles.buttonsParent}
               accessibilityLabel="Buttons Section"
             >
-              <Pressable
+              <Touchable
                 style={[styles.buttonDecline, styles.buttonsLayout]}
                 onPress={handleSkip}
                 accessibilityLabel="Skip Button"
-                accessibilityRole="button"
                 accessibilityHint="Skip Terms and Conditions"
               >
                 <Text style={styles.decline}>Skip for now</Text>
-              </Pressable>
+              </Touchable>
             </View>
           </View>
           {!keyboardHidden && <View style={styles.textBottomHeight} />}
@@ -393,13 +389,6 @@ const styles = StyleSheet.create({
   buttonsParent: {
     width: "90%",
   },
-  checkBox: {
-    marginLeft: 10,
-    marginRight: 20,
-    width: 12,
-    height: 12,
-    backgroundColor: Color.colorWhitesmoke_100,
-  },
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -408,19 +397,23 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     marginRight: Platform.OS === "ios" ? 2 : 16,
-    backgroundColor: Color.colorWhitesmoke_100,
   },
   checkBoxArea: {
     flexDirection: "row",
-    flexWrap: "wrap",
     alignItems: "center",
-    justifyContent: "center",
+    flexWrap: "wrap",
   },
   checkboxTouchable: {
     flexDirection: "row",
     alignItems: "center",
     marginRight: 0,
     minHeight: A11Y.minTouch,
+    paddingVertical: Padding.p_5xs,
+  },
+  termsLinkTouchable: {
+    minHeight: A11Y.minTouch,
+    justifyContent: "center",
+    paddingVertical: Padding.p_5xs,
   },
   checkBoxAreaViewText: {
     fontSize: 14,

@@ -3,13 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Modal,
 } from "react-native";
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import { A11Y } from "../../styles/theme";
+import Touchable from "../common/customui/Touchable";
 
 
 const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClose }) => {
@@ -45,33 +44,29 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
             <Text style={styles.message}>{message}</Text>
-             <TouchableOpacity
+             <Touchable
               style={styles.openBtn}
               onPress={onAction}
-              accessible={true}
               accessibilityLabel={onActionTxt}
-              accessibilityRole="button"
             >
               <Text
                 style={styles.openPortaltxt}
               >
                {onActionTxt}
               </Text>
-            </TouchableOpacity> 
+            </Touchable>
            {onClose!=undefined && (
-            <TouchableOpacity
+            <Touchable
               style={styles.closeBtn}
               onPress={onClose}
-              accessible={true}
               accessibilityLabel="Cancel"
-              accessibilityRole="button"
             >
               <Text
                 style={styles.closeAlertTxt}
               >
                 Cancel
               </Text>
-            </TouchableOpacity>
+            </Touchable>
            )}
           </View>
         </View>
@@ -143,14 +138,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sparklight_purple_blue,
     justifyContent: "center",
     width: "100%",
-    minHeight: A11Y.minTouch,
     marginTop: 20,
   },
   closeBtn: {
     backgroundColor: colors.backgound_blue,
     justifyContent: "center",
     width: "100%",
-    minHeight: A11Y.minTouch,
     marginTop: 15,
   },
   openPortaltxt: {

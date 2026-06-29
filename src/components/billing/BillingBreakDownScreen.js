@@ -5,9 +5,9 @@ import {
   View,
   FlatList,
   ScrollView,
-  Pressable,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import Touchable from "../common/customui/Touchable";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Color,
@@ -66,23 +66,17 @@ const renderErrorMessage = (errorCode, navigation) => {
           </Text>
         </View>
       </View>
-      <Pressable
-        style={({ pressed }) => [
-          { backgroundColor: Color.colorMidnightblue },
-          styles.buttonsLayout,
-          { opacity: pressed ? 0.7 : 1 },
-        ]}
+      <Touchable
+        style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]}
         onPress={() => {
-          console.log("Return to Billing Services button pressed");
           navigation.goBack();
         }}
-        accessibilityRole="button"
         accessibilityLabel="Return to Billing Services"
       >
         <Text style={[styles.makePayment, styles.makeTypo]}>
           {"Return to Billing Services"}
         </Text>
-      </Pressable>
+      </Touchable>
       <View style={styles.buttonsParent}>
         <SecondaryButton
           title="Cancel"
