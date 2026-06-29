@@ -4,7 +4,7 @@ import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
-import { saveUserInfo, logInfo } from "../../redux/actions/UserAction";
+import { saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/RestApiClient";
 import { getEndpoint ,ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
@@ -14,7 +14,6 @@ import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import moment from "moment";
-import LoginLogger from "../../components/utility/LoginLogger";
 import analytics from "@react-native-firebase/analytics";
 import { shouldBlockLogin } from "../utility/disconnectHelpers";
 import Logo from "../../res/images/SpalshLogo";
@@ -223,19 +222,6 @@ const SplashScreen = ({ navigation, route }) => {
       if (!result.success) {
         setLoadingState(LoadingState.NONE);
         setLoginEnable(true);
-
-        LoginLogger.logFailedLogin(
-          dispatch,
-          logInfo,
-          {
-            message: "Refresh token failed",
-            code: 30802,
-          },
-          {
-            authMethod: "refresh",
-            errorDetails: result.error,
-          }
-        );
         return;
       }
 
@@ -246,7 +232,6 @@ const SplashScreen = ({ navigation, route }) => {
         refreshToken: result.data.refreshToken,
       };
 
-      console.log("[SplashScreen] Token Refresh - idToken:", data.idToken);
       setLoadingState(LoadingState.LOADING_DATA);
       storeSsoToken(data);
       callSSOLoginApi(data);
@@ -254,19 +239,6 @@ const SplashScreen = ({ navigation, route }) => {
       clearTimeout(sessionCheckTimeout.current);
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
-
-      LoginLogger.logFailedLogin(
-        dispatch,
-        logInfo,
-        {
-          message: "Refresh token failed",
-          code: 30802,
-        },
-        {
-          authMethod: "refresh",
-          errorDetails: error?.message,
-        }
-      );
     }
   };
 
@@ -279,12 +251,6 @@ const SplashScreen = ({ navigation, route }) => {
 
   const onSuccess = useCallback(
     async (res) => {
-      if (res && res.userInfo) {
-        LoginLogger.logSuccessfulLogin(dispatch, logInfo, res.userInfo, {
-          hasJwtToken: !!res.jwtToken,
-          userHasServices: !!res.custServices,
-        });
-      }
       handleLogin(res);
     },
     [dispatch]
@@ -323,18 +289,6 @@ const SplashScreen = ({ navigation, route }) => {
         type: ErrorType.API_ERROR,
         message: null,
       });
-
-      LoginLogger.logFailedLogin(
-        dispatch,
-        logInfo,
-        {
-          message: "API login failed",
-          code: 30803,
-        },
-        {
-          errorDetails: error?.message || "Unknown API error",
-        }
-      );
     },
     [dispatch]
   );
@@ -493,20 +447,6 @@ const SplashScreen = ({ navigation, route }) => {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
         }
-
-        LoginLogger.logFailedLogin(
-          dispatch,
-          logInfo,
-          {
-            message: "Authorization failed",
-            code: 30801,
-          },
-          {
-            authMethod: "authorize",
-            errorDetails: result.error,
-            errorCode: result.code,
-          }
-        );
         return;
       }
 
@@ -517,7 +457,6 @@ const SplashScreen = ({ navigation, route }) => {
         refreshToken: result.data.refreshToken,
       };
 
-      console.log("[SplashScreen] Authorization - idToken:", data.idToken);
       storeSsoToken(data);
       setLoadingState(LoadingState.AUTHENTICATING);
       callSSOLoginApi(data);
@@ -530,19 +469,6 @@ const SplashScreen = ({ navigation, route }) => {
         type: ErrorType.UNKNOWN_ERROR,
         message: error.message,
       });
-
-      LoginLogger.logFailedLogin(
-        dispatch,
-        logInfo,
-        {
-          message: "Authorization failed",
-          code: 30801,
-        },
-        {
-          authMethod: "authorize",
-          errorDetails: error?.message,
-        }
-      );
     } finally {
       authLockRef.current = false;
       setAuthInProgress(false);
@@ -555,10 +481,6 @@ const SplashScreen = ({ navigation, route }) => {
         const token = res?.idToken;
 
         getUser().then((user) => {
-          if (user && user.userInfo) {
-            LoginLogger.logLogout(dispatch, logInfo, user.userInfo);
-          }
-
           if (token) {
             logout(config, {
               idToken: token,
