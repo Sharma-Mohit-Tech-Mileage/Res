@@ -74,12 +74,12 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
 
 const ManageEquipmentCard = ({ equipment }) => {
   const list = useMemo(() => (Array.isArray(equipment) ? equipment : []), [equipment]);
-  if (!list.length) return null;
-
   const getKey = useCallback(
     (item, index) => String(item?.id ?? index),
     []
   );
+
+  if (!list.length) return null;
 
   return (
     <View style={styles.container}>
