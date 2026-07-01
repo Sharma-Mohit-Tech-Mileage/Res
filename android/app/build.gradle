@@ -115,7 +115,7 @@ android {
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
         versionCode 451
-        versionName "26.2.0"
+        versionName "27.3.0"
     }
 
 

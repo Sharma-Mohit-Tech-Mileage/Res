@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
-import { useResponsive, TABLET_GUTTER } from "../../utils/responsive"; // [51768] tablet: consistent gutter
+import { useResponsive, TABLET_GUTTER, CONTENT_MAX_WIDTH } from "../../utils/responsive"; // [51768] tablet: consistent gutter
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
@@ -176,8 +176,9 @@ const BillingScreen = ({ navigation }) => {
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={[{ marginHorizontal: 20 }, isTablet && { marginHorizontal: TABLET_GUTTER }]}
+          contentContainerStyle={isTablet && styles.tabletScrollContent}
         >
-          <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
+          <View style={[{ paddingBottom: 80, marginTop: Padding.p_5xl }, isTablet && styles.tabletContentColumn]}>
             {isContentLoading ? (
               <View style={styles.loadingContainer}>
                 <LoadingOverlay
@@ -342,6 +343,9 @@ const BillingScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  // [51768] tablet: center a max-width content column vertically so it isn't top-anchored with a large empty gap
+  tabletScrollContent: { flexGrow: 1, justifyContent: "center" },
+  tabletContentColumn: { width: "100%", maxWidth: CONTENT_MAX_WIDTH, alignSelf: "center" },
   linearGradientStyle: {
     position: "absolute",
     left: 0,
