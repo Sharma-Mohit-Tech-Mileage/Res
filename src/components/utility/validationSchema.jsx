@@ -141,6 +141,10 @@ export const phoneSchema = yup.object({
 export const feedbackSchema = yup.object().shape({
   category: yup.string().required("Please select a rating"),
   feedbackValue: yup.number().required("Please select a rating").min(1).max(5),
+  cosentContactUs: yup
+    .boolean()
+    .nullable()
+    .required("Please choose Yes or No to contact you ."),
   areaOfConcern: yup
     .array()
     .of(yup.string())

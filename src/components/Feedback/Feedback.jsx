@@ -28,7 +28,6 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import SparkLightInput from "../common/customui/SparkLightInput";
-import NotificationAlert from "../common/customui/NotificationAlert";
 import { useDispatch } from "react-redux";
 import { saveUserFeedback } from "../../redux/actions/ProfileActionSuite";
 import useUserEmailPrefill from "../../hooks/useUserEmailPrefill";
@@ -38,18 +37,14 @@ import { Radio } from "native-base";
 
 const Feedback = () => {
   const navigation = useNavigation();
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
   const route = useRoute();
   const dispatch = useDispatch();
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState("facehappy");
   const [selectedConcerns, setSelectedConcerns] = useState([]);
-  const [selectedOption, setSelectedOption] = useState("yes");
+  const [selectedOption, setSelectedOption] = useState(null);
   const [isError, setIsError] = useState(false);
-  const [errormsg, setErrormsg] = useState(
-    "Please enter valid information to continue."
-  );
   const scrollViewRef = useRef(null);
   const feedbackRemainingRef = useRef(500);
   const announcementTimerRef = useRef(null);
@@ -72,7 +67,7 @@ const Feedback = () => {
       areaOfConcern: [],
       feedbackText: "",
       feedbackEmail: "",
-      cosentContactUs: true,
+      cosentContactUs: null,
     },
   });
 
@@ -81,6 +76,12 @@ const Feedback = () => {
   const handleValidationError = (fieldErrors) => {
     isSubmittingRef.current = false;
     setIsSubmitting(false);
+
+    if (fieldErrors.cosentContactUs) {
+      setIsError(true);
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      return;
+    }
 
     // Scroll to and focus the first field with an error so inline error is visible
     if (fieldErrors.areaOfConcern || fieldErrors.feedbackText) {
@@ -126,8 +127,11 @@ const Feedback = () => {
 
   const onChangeValue = (value) => {
     setSelectedOption(value);
-    console.log("Selected option:", value);
-    setValue("cosentContactUs", value === "yes");
+    setValue("cosentContactUs", value === "yes", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    clearErrors("cosentContactUs");
     setIsError(false);
   };
 
@@ -140,10 +144,6 @@ const Feedback = () => {
 
   useEffect(() => {
     if (route.params?.updateFailed) {
-      setErrormsg(
-        "Feedback submission failed. Please try again later or contact support"
-      );
-      setShowErrorAlert(true);
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       isSubmittingRef.current = false;
       setIsSubmitting(false);
@@ -165,24 +165,6 @@ const Feedback = () => {
           entering={FadeInUp.delay(100).springify()}
           style={styles.content}
         >
-          {showErrorAlert && (
-            <Animated.View
-              entering={FadeInDown.springify()}
-              layout={Layout.springify()}
-              style={styles.alertWrapper}
-            >
-              <NotificationAlert
-                type="error"
-                title="Error"
-                message={errormsg}
-                showCloseIcon={true}
-                isVisible={showErrorAlert}
-                autoFocusTitle={true}
-                onClose={() => setShowErrorAlert(false)}
-              />
-            </Animated.View>
-          )}
-
           <Animated.View
             entering={FadeInDown.delay(200).springify()}
             style={styles.sectionWrapper}
@@ -328,7 +310,7 @@ const Feedback = () => {
                   styles.optionTxt,
                 ]}
               >
-              May Sparklight contact you about your feedback?*
+              May Sparklight contact you about your feedback? *
               </Text>
               <Radio.Group
                 name="surveyOptions"
@@ -336,14 +318,6 @@ const Feedback = () => {
                 onChange={onChangeValue}
                 style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}
               >
-                {isError && (
-                  <Text
-                    style={[styles.labelStyle, { color: Color.sparkLightRed, marginRight: 16 }]}
-                  >
-                    Please choose Yes or No.
-                  </Text>
-                )}
-
                 <View
                   style={{
                     flexDirection: "row",
@@ -368,7 +342,7 @@ const Feedback = () => {
                       { marginBottom: 0, marginTop: 4 },
                     ]}
                   >
-                    Yes
+                    Yes {"  "}
                   </Text>
                 </View>
 
@@ -401,6 +375,30 @@ const Feedback = () => {
                   </Text>
                 </View>
               </Radio.Group>
+              {(isError || errors.cosentContactUs) && (
+                <View
+                  style={styles.errorContainer}
+                  accessible={true}
+                  accessibilityLabel="Please choose Yes or No to contact you."
+                  accessibilityRole="alert"
+                  accessibilityLiveRegion="assertive"
+                >
+                  <View
+                    style={styles.errorIcon}
+                    accessible={false}
+                    importantForAccessibility="no"
+                  >
+                    <WarningIcon />
+                  </View>
+                  <Text
+                    style={styles.errorText}
+                    accessible={false}
+                    importantForAccessibility="no"
+                  >
+                    {errors.cosentContactUs?.message || "Please choose Yes or No to contact you."}
+                  </Text>
+                </View>
+              )}
             </View>
               
 
@@ -577,9 +575,9 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     marginTop: Padding.p_5xs,
   },optionTxt: {
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.textXsSemibold_size,
     color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansSemiBold,
   },
 });
 
