@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useSelector } from "react-redux";
+import {Title,MenuText, SectionTitle} from "../common/customui/Typography";
 import {
   Border,
   Padding,

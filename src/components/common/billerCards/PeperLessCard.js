@@ -8,6 +8,17 @@ import { card } from "../../../styles/utilities";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../customui/Touchable";
 import AppStyles from "../../../styles/AppStyles";
+import { SectionTitle, IndicatorText } from "../customui/Typography";
+import Checkcircle from "../../../../assets/svgs/Checkcircle";
+import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
+
+const StatusIcon = ({ status, style }) => {
+  return (
+    <View style={style}>
+      {status === "On" ? <Checkcircle /> : <Checkcircle1 />}
+    </View>
+  );
+};
 
 const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
   const showSkeleton = isStatusLoading || paperlessStatus === undefined;
@@ -20,12 +31,11 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
 
   return (
     <Touchable
-      style={[AppStyles.card, { alignItems: 'stretch', marginBottom: 16 }]}
+      style={[AppStyles.card, { alignItems: "stretch", marginBottom: 16 }]}
       minSize={0}
       onPress={handleCardPress}
       accessible={false}
       importantForAccessibility="no"
-
     >
       <View
         style={{
@@ -36,11 +46,19 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
           alignItems: "center",
         }}
       >
-        <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Paperless Billing Icon">
+        {/* <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Paperless Billing Icon">
           <PaperIconBg />
-        </View>
+        </View> */}
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Paperless Billing">Paperless Billing</Text>
+          <SectionTitle
+            style={styles.leftTitle}
+            accessible={true}
+            accessibilityRole="header"
+            accessibilityLevel={2}
+            accessibilityLabel="Paperless Billing"
+          >
+            Paperless Billing
+          </SectionTitle>
           {showSkeleton ? (
             <SkeletonPlaceholder>
               <View
@@ -67,7 +85,7 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
                 marginLeft: 10,
               }}
               accessible={true}
-              accessibilityRole='link'
+              accessibilityRole="link"
               accessibilityHint="Double tap to navigate to Paperless Billing management page."
               accessibilityLabel="Manage Paperless Billing"
             >
@@ -92,9 +110,29 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
           ) : (
             <>
               {paperlessStatus ? (
-                <Text style={styles.autoPayStatusText} accessible={true} accessibilityLabel="Paperless Billing is On">ON</Text>
+                <View style={{ flexDirection: "row" }}>
+                  <StatusIcon status="On" style={styles.statusIcon} />
+                  <IndicatorText
+                    style={{ marginLeft: 4, marginTop: 2 }}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel="Paperless Billing is On"
+                  >
+                    On
+                  </IndicatorText>
+                </View>
               ) : (
-                <Text style={styles.autoPayStatusTextInActive} accessible={true} accessibilityLabel="Paperless Billing is Off">OFF</Text>
+                <View style={{ flexDirection: "row" }}>
+                  <StatusIcon status="Off" style={styles.statusIcon} />
+                  <IndicatorText
+                    style={{ marginLeft: 4, marginTop: 2 }}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel="Paperless Billing is Off"
+                  >
+                    Off
+                  </IndicatorText>
+                </View>
               )}
             </>
           )}
@@ -106,42 +144,24 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
 
 const styles = StyleSheet.create({
   leftTitle: {
-    color: colors.sp_black,
-    fontSize: 18,
-    fontWeight: "600",
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "center",
     marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
   },
-  autoPayStatusText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.sp_black,
-    backgroundColor: Color.success50,
-    alignSelf: "center",
-    width: wp("16%"),
-    borderColor: colors.sparklight_green,
-    borderWidth: 1,
-    borderRadius: 3,
-    textAlign: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  
+  statusRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    marginVertical: 5,
   },
-  autoPayStatusTextInActive: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.sp_black,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "center",
-    width: wp("16%"),
-    textAlign: "center",
-    borderColor: colors.dark_grey,
-    borderWidth: 1,
-    borderRadius: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  iconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusIcon: {
+    marginTop: 4,
   },
   iconBg: {
     alignSelf: "center",

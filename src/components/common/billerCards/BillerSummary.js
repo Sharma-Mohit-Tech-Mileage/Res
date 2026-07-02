@@ -1,18 +1,15 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
-import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import Config from "react-native-config";
-import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
-import { card } from "../../../styles/utilities";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import Touchable from "../customui/Touchable";
 import AppStyles from "../../../styles/AppStyles";
 import PrimaryButton from "../customui/PrimaryButton";
+import { SectionTitle } from "../customui/Typography";
 const Card = ({ billAmt, dueDate, navigation, style }) => {
   const NotAvailable = () => {
     return (
@@ -64,7 +61,9 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             <WalletSummaryIcon />
           </View> */}
 
-          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2}>Bill Summary</Text>
+          <SectionTitle style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
+            Bill Summary
+          </SectionTitle>
         </View>
       </View>
 
@@ -217,10 +216,6 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
 
 const styles = StyleSheet.create({
   leftTitle: {
-    color: colors.sp_black,
-    fontSize: 18,
-    fontWeight: "400",
-    textAlign: "center",
     marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
@@ -256,9 +251,11 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   cardHreader: {
-    flexDirection: "row",
+   flexDirection: "row",
     backgroundColor: "#F8F8F8",
     width: "100%",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
     padding: 10,
   },
   cardFooter: {

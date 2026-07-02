@@ -36,6 +36,7 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import AppStyles from "../../styles/AppStyles";
+import { SectionTitle,Title } from "../common/customui/Typography";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -163,13 +164,13 @@ const BillingScreen = ({ navigation }) => {
           >
             <BillingIconWhite isSelected={false} />
           </View>
-          <Text style={styles.melissaSmith}
+          <Title style={styles.melissaSmith}
           accessibilityLabel="Billing Services" accessibilityRole='Header'
            accessibilityLevel={1} 
            nativeID="Billing Services-header"
            //accessibilityHint="Header"
            >
-          Billing Services</Text>
+          Billing Services</Title>
         </View>
 
         <ScrollView
@@ -193,6 +194,7 @@ const BillingScreen = ({ navigation }) => {
                   dueDate={dueDate}
                   navigation={navigation}
                   style={styles.card}
+                  
                 />
                 <AutoPayCard
                   isAutoPayStatus={isAutoPayStatus}
@@ -212,11 +214,12 @@ const BillingScreen = ({ navigation }) => {
                       styles.frameParentSpaceBlock1,
                     ]}
                   >
-                    <Text style={styles.leftTitle} 
+                    <SectionTitle style={styles.leftTitle} 
                     accessible={true}
                     accessibilityLabel="Billing Options"
                     accessibilityRole="header" accessibilityLevel={2}>
-                      Billing Options</Text>
+                      Billing Options
+                      </SectionTitle>
                   </View>
                   <View
                     style={[
@@ -321,11 +324,6 @@ const styles = StyleSheet.create({
     height: 150,
   },
   leftTitle: {
-    color: colors.sp_black,
-    fontSize: 18,
-    fontWeight: "600",
-    textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
     alignContent: "flex-start",
     alignSelf: "center",
   },
@@ -346,10 +344,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   melissaSmith: {
-    fontSize: FontSize.size_3xl,
     width: 210,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
     lineHeight: 28,
     textAlign: "center",
   },

@@ -33,8 +33,8 @@ const AppStyles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    fontWeight: "400",
+    fontFamily: FontFamily.RadioCanadaSemiBold,
+    fontWeight: "600",
     color: Color.Black_100,
   },
   sectionContent: {

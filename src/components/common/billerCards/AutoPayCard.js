@@ -1,14 +1,20 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
+import Checkcircle from "../../../../assets/svgs/Checkcircle";
+import Checkcircle1 from "../../../../assets/svgs/Checkcircle1"
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Color } from "../../../../GlobalStyles";
 import Config from "react-native-config";
-import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import { card } from "../../../styles/utilities";
 import Touchable from "../customui/Touchable";
 import AppStyles from "../../../styles/AppStyles";
+import {SectionTitle,IndicatorText } from "../customui/Typography";
+
+const StatusIcon = ({ status, style }) => {
+  return <View style={style}>{status === "On" ? <Checkcircle /> : <Checkcircle1 />}</View>;
+};
+
 const AutoPayCard = ({
   isAutoPayStatus,
   paymentDetails,
@@ -43,11 +49,13 @@ const AutoPayCard = ({
           alignItems: "center",
         }}
       >
-        <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Auto Pay Icon">
+        {/* <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Auto Pay Icon">
           <AutoPayIcon />
-        </View>
+        </View> */}
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Auto Pay" >Auto Pay</Text>
+          <SectionTitle style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Auto Pay" >
+            Auto Pay
+          </SectionTitle>
           {showSkeleton ? (
             <SkeletonPlaceholder>
               <View
@@ -96,10 +104,19 @@ const AutoPayCard = ({
                 }}
               />
             </SkeletonPlaceholder>
-          ) : isAutoPayStatus ? (
-            <Text style={styles.autoPayStatusText} accessible={true} accessibilityLabel="Auto Pay is On">ON</Text>
-          ) : (
-            <Text style={styles.autoPayStatusTextInActive} accessible={true} accessibilityLabel="Auto Pay is Off">OFF</Text>
+          ) :( <>
+              {isAutoPayStatus ? (
+                <View style={styles.iconContainer}>
+                  <StatusIcon status="On" style={styles.statusIcon} />
+                  <IndicatorText style={{marginLeft: 4, marginTop: 2}}  accessible={true} accessibilityRole='text' accessibilityLabel="Auto Pay is On">On</IndicatorText>
+                </View>
+              ) : (
+                <View style={styles.iconContainer}>
+                  <StatusIcon status="Off" style={styles.statusIcon} />
+                  <IndicatorText style={{marginLeft: 4, marginTop: 2}}  accessible={true} accessibilityRole='text' accessibilityLabel="Auto Pay is Off">Off</IndicatorText>
+                </View>
+              )}
+            </>
           )}
         </View>
       </View>
@@ -118,43 +135,11 @@ const styles = StyleSheet.create({
   },
 
   leftTitle: {
-    color: colors.sp_black,
-    fontSize: 18,
-    fontWeight: "600",
-    textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
     marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
   },
-  autoPayStatusText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.sp_black,
-    backgroundColor: Color.success50,
-    alignSelf: "center",
-    width: wp("16%"),
-    borderColor: colors.sparklight_green,
-    borderWidth: 1,
-    borderRadius: 3,
-    textAlign: "center",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  autoPayStatusTextInActive: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.sp_black,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "center",
-    width: wp("16%"),
-    textAlign: "center",
-    borderColor: colors.dark_grey,
-    borderWidth: 1,
-    borderRadius: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
+  
   iconBg: {
     alignSelf: "center",
     backgroundColor: "#8D3B901A",
@@ -163,6 +148,19 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
+  },statusRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    marginVertical: 5,
+  },
+  iconContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusIcon: {
+    marginTop: 4,
   },
 });
 
