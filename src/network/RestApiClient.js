@@ -13,7 +13,7 @@ const _axios = axios.create({
     baseURL: API_ACP_BASEURL,
     withCredentials: false,
     timeout: 15000,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'CallingApp': 'MobileApp' },
 });
 
 let isRefreshing = false;
@@ -259,7 +259,7 @@ const PostApiReqZendeskToken = async (endpoint, body, onSuccess, onError) => {
     try {
         const user = await getUser();
         const res = await _axios.post(endpoint, body, {
-            baseURL: 'https://customer.uat.cableone.net/apiWrapper/',
+            //baseURL: 'https://customer.uat.cableone.net/apiWrapper/',
             headers: { Authorization: `Bearer ${user.token}` },
         });
         handleResponse(res, onSuccess, onError, endpoint);

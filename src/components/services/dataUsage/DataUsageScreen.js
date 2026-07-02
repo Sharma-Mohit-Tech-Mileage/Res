@@ -37,6 +37,7 @@ const DataUsageContent = ({ navigation, route }) => {
     usagePeriodsLoading,
     fetchDailyForPeriod,
     refetchAll,
+    equipment,
   } = useDataUsage();
 
   // Default to last period (most recent) once loaded
@@ -130,7 +131,7 @@ const DataUsageContent = ({ navigation, route }) => {
           loading={activeTab === "monthly" ? monthlyUsageLoading : dailyUsageLoading}
         />
 
-        {/* Equipment - hidden for now */}
+        <ManageEquipmentCard equipment={equipment} />
 
         {/* eero Promo */}
         <EeroPromoCard

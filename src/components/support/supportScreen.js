@@ -89,7 +89,6 @@ const Support = ({ route }) => {
         if (group_id == "1500003312422") {
           setisAgentAvailable(false);
           if (data) {
-            //PromptForAgentOffline()
             setIsAgentNotAvailable(true);
           }
         } else if (group_id == "1500003304341") {
@@ -110,9 +109,10 @@ const Support = ({ route }) => {
   useFocusEffect(
     useCallback(() => {
       triggerOnScreenEntry('SupportStack');
-      checkAgentAvailibilty("1500003304341");
-      checkAgentAvailibilty("1500003312422");
-    }, [triggerOnScreenEntry])
+      const chatData = route?.params?.chatData;
+      checkAgentAvailibilty("1500003304341", chatData);
+      checkAgentAvailibilty("1500003312422", chatData);
+    }, [triggerOnScreenEntry, route?.params?.chatData])
   );
 
   React.useEffect(() => {

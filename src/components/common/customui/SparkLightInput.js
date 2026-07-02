@@ -4,7 +4,6 @@ import {
   TextInput,
   Text,
   StyleSheet,
-  AccessibilityInfo,
 } from "react-native";
 import {
   FontFamily,
@@ -48,11 +47,10 @@ const SparkLightInput = React.forwardRef(({
   const [isFocused, setIsFocused] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(!secure);
   const inputRef = useRef(null);
+  const fieldRef = useRef(null);
   const hasBlurred = useRef(false);
   const isFocusedRef = useRef(false);
-  const prevErrorRef = useRef(error);
   const valueRef = useRef(value);
-  const errorAnnouncedRef = useRef(false);
 
   // Keep valueRef in sync with current value prop
   useEffect(() => {
@@ -62,31 +60,10 @@ const SparkLightInput = React.forwardRef(({
   useImperativeHandle(ref, () => ({
     focus: () => {
       hasBlurred.current = true;
-      // Move only the screen-reader cursor (not input focus) so TalkBack reads the field without entering edit mode.
-      setFocusToRef(inputRef, { delay: 200 });
+      // Move the screen-reader cursor to the accessible wrapper (single node) so the field is read once; the live TextInput is hidden from a11y to avoid the double readout.
+      setFocusToRef(fieldRef, { delay: 200 });
     },
   }));
-
-  // Announce error on transition from falsy to truthy
-  useEffect(() => {
-    const hadError = prevErrorRef.current;
-    prevErrorRef.current = error;
-
-    if (!error) {
-      errorAnnouncedRef.current = false;
-      return;
-    }
-
-    // Announce if error is new and field has been interacted with
-    if (!hadError && error && hasBlurred.current) {
-      const hint = errorHint || error;
-      // Delay slightly to ensure the error view is rendered before announcing
-      setTimeout(() => {
-        AccessibilityInfo.announceForAccessibility(hint);
-      }, 150);
-      errorAnnouncedRef.current = true;
-    }
-  }, [error]);
 
   const handleInputChange = (text) => {
     if (onChangeText) {
@@ -116,14 +93,6 @@ const SparkLightInput = React.forwardRef(({
   const handleFocus = () => {
     setIsFocused(true);
     isFocusedRef.current = true;
-
-    // Announce error on focus only if useEffect hasn't already (covers re-focus of an unannounced error).
-    if (error && hasBlurred.current && !errorAnnouncedRef.current) {
-      setTimeout(() => {
-        const hint = errorHint || error;
-        AccessibilityInfo.announceForAccessibility(hint);
-      }, 500);
-    }
 
     if (parentOnFocus) parentOnFocus();
   };
@@ -173,6 +142,18 @@ const SparkLightInput = React.forwardRef(({
       </View>
 
       <View
+        ref={fieldRef}
+        accessible={true}
+        accessibilityRole="text"
+        accessibilityLabel={`${formatInputA11yReadout({
+          label: accessibilityLabel || label || placeholder,
+          required,
+          value,
+          isPhoneNumber: getKeyboardType() === "phone-pad",
+          isSecure: secure,
+        })}${editable ? ", double tap to edit" : ""}`}
+        accessibilityHint={error ? (errorHint || error) : undefined}
+        importantForAccessibility="yes"
         style={[
           styles.textInputContainer,
           {
@@ -213,16 +194,8 @@ const SparkLightInput = React.forwardRef(({
                 : Color.sparklightDarkGray,
             },
           ]}
-          accessibilityLabel={formatInputA11yReadout({
-            label: accessibilityLabel || label || placeholder,
-            required,
-            value,
-            isPhoneNumber: getKeyboardType() === "phone-pad",
-            isSecure: secure,
-          })}
-          accessibilityHint={error ? `${errorHint || error}. Double tap to edit` : 'Double tap to edit'}
-          accessibilityRole="text"
-          importantForAccessibility="yes"
+          accessible={false}
+          importantForAccessibility="no"
           keyboardType={getKeyboardType()}
           returnKeyType="done"
           keyboardAppearance="default"
@@ -234,10 +207,9 @@ const SparkLightInput = React.forwardRef(({
       {error && (
         <View
           style={styles.errorContainer}
-          accessible={true}
-          accessibilityLabel={errorHint || error}
-          accessibilityRole="alert"
-          accessibilityLiveRegion="assertive"
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
+          accessibilityLiveRegion="none"
         >
           <View
             style={styles.errorIcon}

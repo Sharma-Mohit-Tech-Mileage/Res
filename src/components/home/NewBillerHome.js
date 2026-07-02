@@ -193,7 +193,6 @@ const NewBillerHome = ({ navigation }) => {
       GetApiRequest(
         endpointUrl,
         (res) => {
-          console.log("SMS Notification Prefs Response", res);
           if (res) {
             let phoneNum = res[0]?.phoneNum || "";
             setPhoneNumber(phoneNum);
@@ -309,19 +308,7 @@ const NewBillerHome = ({ navigation }) => {
             jwtId: jwtToken,
             source: "Mobile App",
           };
-          console.log("Setting Zendesk Chat Conversational Fields:", fields);
           setConversationalFields(fields);
-          // loginWithJWT(jwtToken)
-          //   .then(() => {
-          //     // Now set conversational fields
-          //     console.log("Setting Zendesk Chat Conversational Fields:", fields);
-          //     setConversationalFields(fields);
-          //   })
-          //   .catch((error) => {
-          //     console.warn("Error logging in to Zendesk Chat:", error);
-          //     setConversationalFields(fields);
-          //     console.warn("Error logging in to Zendesk Chat:", error);
-          //   });
         }
       },
       (error) => {

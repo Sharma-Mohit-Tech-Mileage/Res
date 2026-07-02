@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo, useRef } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchCurrentUsageRequest,
@@ -19,6 +19,8 @@ import {
   selectUsagePeriodsLoading,
 } from "../../../redux/selectors/servicesSelectors";
 import moment from "moment";
+import dataUsageApi from "../../../network/apis/services/dataUsageService";
+import { transformEquipment } from "../dataUsage/transformEquipment";
 
 /**
  * Ensures a date string is in the exact ISO format the API expects:
@@ -72,6 +74,23 @@ export const useDataUsage = () => {
     dispatch(fetchMonthlyUsageRequest());
     dispatch(fetchUsagePeriodsRequest());
   }, [dispatch]);
+
+  // Equipment (GetEquipmentByAccount) — fetched directly and transformed for the card
+  const [equipment, setEquipment] = useState([]);
+  useEffect(() => {
+    let active = true;
+    dataUsageApi
+      .getEquipment()
+      .then((data) => {
+        if (active) setEquipment(transformEquipment(data));
+      })
+      .catch(() => {
+        if (active) setEquipment([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // Build dropdown items from periods
   const periodItems = useMemo(() => {
@@ -140,6 +159,9 @@ export const useDataUsage = () => {
     // Periods
     periodItems,
     usagePeriodsLoading,
+
+    // Equipment
+    equipment,
 
     // Actions
     fetchDailyForPeriod,

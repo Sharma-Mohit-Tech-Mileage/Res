@@ -793,23 +793,28 @@ const CancellationSummary = ({ navigation, route }) => {
             accessibilityState={{ checked: toggleCheckBoxTerm }}
           >
             <View style={styles.checkboxContainer}>
-              <CheckBox
-                disabled={true}
-                value={toggleCheckBoxTerm}
-                style={styles.checkBox}
-                boxType="square"
-                onCheckColor={Color.sparklightBrightPurple}
-                tintColor={Color.sparklightBrightPurple}
-                onTintColor={Color.sparklightBrightPurple}
-                tintColors={{
-                  true: Color.sparklightBrightPurple,
-                  false:
-                    Platform.OS === "ios"
-                      ? Color.colorWhitesmoke_300
-                      : "#D0D5DD",
-                }}
-                accessible={false}
-              />
+              <View
+                pointerEvents="none"
+                importantForAccessibility="no-hide-descendants"
+              >
+                <CheckBox
+                  disabled={true}
+                  value={toggleCheckBoxTerm}
+                  style={styles.checkBox}
+                  boxType="square"
+                  onCheckColor={Color.sparklightBrightPurple}
+                  tintColor={Color.sparklightBrightPurple}
+                  onTintColor={Color.sparklightBrightPurple}
+                  tintColors={{
+                    true: Color.sparklightBrightPurple,
+                    false:
+                      Platform.OS === "ios"
+                        ? Color.colorWhitesmoke_300
+                        : "#D0D5DD",
+                  }}
+                  accessible={false}
+                />
+              </View>
               <Text
                 style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
                 allowFontScaling={true}
