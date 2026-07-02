@@ -308,6 +308,7 @@ const Feedback = () => {
               <Text
                 style={[
                   styles.optionTxt,
+                  (isError || errors.cosentContactUs) && styles.optionTxtError,
                 ]}
               >
               May Sparklight contact you about your feedback? *
@@ -578,6 +579,9 @@ const styles = StyleSheet.create({
     fontSize: FontSize.textXsSemibold_size,
     color: Color.colorGray_200,
     fontFamily: FontFamily.openSansSemiBold,
+  },
+  optionTxtError: {
+    color: "red",
   },
 });
 
