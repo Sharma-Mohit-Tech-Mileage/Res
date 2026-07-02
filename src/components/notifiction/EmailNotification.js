@@ -23,6 +23,7 @@ import AlertIcon from "../../res/svgIcons/AlertIcon";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import { A11y } from "react-native-a11y-order";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
+import AppStyles from "../../styles/AppStyles";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({
@@ -281,7 +282,8 @@ const AddNotificationScreen = () => {
         />
       )}
       <ScrollView ref={scrollViewRef}>
-        <View style={styles.frameContainer}>
+      
+        <View style={[AppStyles.card,{margin: Padding.p_base}]}>
           <View style={{ paddingVertical: 16 }}>
             {notification && (
               <Animated.View

@@ -26,6 +26,8 @@ import { PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import { A11Y } from "../../styles/theme";
+import AppStyles from "../../styles/AppStyles";
+import SecondaryButton from "../common/customui/PrimaryButton";
 
 import {
   Color,
@@ -61,6 +63,7 @@ const TextNotifications = ({ navigation }) => {
   const timeoutRef = useRef(null);
   const [notification, setNotification] = useState(null);
   const successIconRef = useRef(null);
+   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [errorText, setErrorText] = useState(false);
@@ -276,6 +279,7 @@ const TextNotifications = ({ navigation }) => {
   };
 
   const postRequestTextNotification = async () => {
+    setIsSubmitting(true);
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
     formatedData["accountNumber"] = accountNumber;
@@ -295,6 +299,7 @@ const TextNotifications = ({ navigation }) => {
       (res) => {
         if (res) {
           setIsLoading(false);
+          setIsSubmitting(false);
           setShowSuccessAlert(true);
           setNotification({
             message: "Your text notification preferences have been updated successfully.",
@@ -304,6 +309,7 @@ const TextNotifications = ({ navigation }) => {
       },
       (error) => {
         setIsLoading(false);
+        setIsSubmitting(false);
         console.warn("Error on retrying postRequestTextNotification", error);
         setNotification({
           message: "Text Notifications update failed.",
@@ -333,7 +339,7 @@ const TextNotifications = ({ navigation }) => {
       )}
       <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always">
         <View style={styles.textNotificationsInner}>
-          <View style={[styles.navigationBorder]}>
+           <View style={[AppStyles.card]}>
             {notification && (
               <Animated.View
                 style={{
@@ -550,31 +556,27 @@ const TextNotifications = ({ navigation }) => {
               </View>
             )}
           </View>
-          <View style={[{ alignSelf: "stretch" }]}>
-            <Touchable
-              minSize={0}
-              accessible={true}
-              accessibilityLabel="Save"
-              accessibilityRole="button"
-              style={[
-                styles.buttons,
-                styles.buttonsLayout,
-              ]}
+         <View
+            style={styles.buttonContainer}
+            
+          >
+            <SecondaryButton
+              title="Save"
               onPress={handleSubmit(onSubmit, handleValidationError)}
-            >
-              <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
-            </Touchable>
-            <View style={{ padding: 8 }}></View>
-            <Touchable
-              minSize={0}
-              accessible={true}
+              accessibilityLabel="Save settings"
+              accessibilityHint="Double tap to save your notification preferences"
+              style={styles.saveButton}
+              buttonType={"submit"}
+              disabled={isSubmitting}
+            />
+            <SecondaryButton
+              title="Cancel"
+              onPress={() => navigation.goBack()}
               accessibilityLabel="Cancel"
-              accessibilityRole="button"
-              style={styles.buttonsLayout}
-              onPress={() => navigation.navigate("Notifications")}
-            >
-              <Text style={[styles.accountClr, styles.makeTypo]}>Cancel</Text>
-            </Touchable>
+              accessibilityHint="Double tap to cancel and go back"
+              style={styles.cancelButton}
+              disabled={isSubmitting}
+            />
           </View>
         </View>
       </ScrollView>
@@ -670,6 +672,10 @@ const styles = StyleSheet.create({
   makeTypo: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
+  },
+  buttonContainer: {
+    padding: Padding.p_base,
+    gap: 12,
   },
   accountClr: {
     color: Color.colorMidnightblue,

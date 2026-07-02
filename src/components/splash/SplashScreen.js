@@ -627,7 +627,7 @@ const SplashScreen = ({ navigation, route }) => {
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+      colors={["rgba(99, 41, 101, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
       <NetworkStatusBar />

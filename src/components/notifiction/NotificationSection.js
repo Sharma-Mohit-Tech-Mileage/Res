@@ -11,6 +11,8 @@ import {
 import InfoICon from "../../../assets/svgs/InfoIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
+import AppStyles from "../../styles/AppStyles";
+import EditActionButton from "../common/customui/EditActionButton";
 
 const digitToWord = {
   0: "zero",
@@ -40,22 +42,36 @@ const StatusIcon = ({ status }) => (
     {status === "On" ? <SuccessIcon /> : <SuccessIcon color={"#4C5458"} />}
   </View>
 );
+const getEditAccessibilityLabel = (id) => {
+    if (id === "text") {
+      return "Edit text notifications";
+    } else if (id === "email") {
+      return "Edit Email notifications";
+    } else if (id === "app") {
+      return "Edit In-app notifications";
+    }
+    return "Edit notifications";
+  };
 
 const EditButton = ({ onPress, isLoading, accessibilityLabel }) => (
-  <Touchable
-    style={[
-      styles.editButton,
-      isLoading && { backgroundColor: Color.sparklightGray },
-    ]}
-    accessible={true}
-    disabled={isLoading}
-    accessibilityRole="button"
-    accessibilityLabel={accessibilityLabel || "Edit Notifications"}
-    minSize={0}
-    onPress={onPress}
-  >
-    <Text style={styles.editButtonText}>Edit</Text>
-  </Touchable>
+  // <Touchable
+  //   style={[
+  //     styles.editButton,
+  //     isLoading && { backgroundColor: Color.sparklightGray },
+  //   ]}
+  //   accessible={true}
+  //   disabled={isLoading}
+  //   accessibilityRole="button"
+  //   accessibilityLabel={accessibilityLabel || "Edit Notifications"}
+  //   minSize={0}
+  //   onPress={onPress}
+  // >
+  //   <Text style={styles.editButtonText}>Edit</Text>
+  // </Touchable>
+         <EditActionButton
+              onPress={onPress}
+              accessibilityLabel={accessibilityLabel}
+            />
 );
 
 const ComingSoonBadge = () => (
@@ -203,7 +219,7 @@ const NotificationSection = ({
   })();
 
   return (
-    <View style={styles.sectionContainer}>
+    <View style={[AppStyles.card,{marginBottom: Padding.p_base}]}>
       <View style={styles.header}>
         <Text style={styles.title} accessibilityRole="header" accessibilityLevel={2}>{title}</Text>
         {isComingSoon ? (

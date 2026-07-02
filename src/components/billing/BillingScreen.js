@@ -35,6 +35,7 @@ import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
+import AppStyles from "../../styles/AppStyles";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -148,7 +149,7 @@ const BillingScreen = ({ navigation }) => {
       <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
-        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+        colors={["rgba(99, 41, 101, 1)", "rgba(141, 59, 144, 1)"]}
         useAngle={true}
         angle={90}
       />
@@ -204,7 +205,7 @@ const BillingScreen = ({ navigation }) => {
                   navigation={navigation}
                   isStatusLoading={paperlessLoading}
                 />
-                <View style={[card.elevated, styles.myModemSpaceBlock]}>
+                <View style={[AppStyles.card, { marginBottom: 16 }]}>
                   <View
                     style={[
                       styles.myModemWrapper,
@@ -238,14 +239,7 @@ const BillingScreen = ({ navigation }) => {
                       accessibilityRole="button"
                       accessibilityLabel="Manage Payment Method"
                     >
-                      {
-                        <Icon
-                          name="building-doc"
-                          color={Color.colorMidnightblue}
-                          size={20}
-                          style={{ marginRight: 16 }}
-                        />
-                      }
+                     
                       <Text style={styles.modemHealthSupport}>
                         Manage Payment Method
                       </Text>
@@ -264,14 +258,7 @@ const BillingScreen = ({ navigation }) => {
                         accessibilityRole="button"
                         accessibilityLabel="View Bill Breakdown"
                       >
-                        {
-                          <Icon
-                            name="search-book"
-                            color={Color.colorMidnightblue}
-                            size={20}
-                            style={{ marginRight: 16 }}
-                          />
-                        }
+                        
                         <Text style={styles.modemHealthSupport}>
                           {"View Bill Breakdown"}
                         </Text>
@@ -289,14 +276,7 @@ const BillingScreen = ({ navigation }) => {
                       accessibilityRole="button"
                       accessibilityLabel="View Payment History"
                     >
-                      {
-                        <Icon
-                          name="document"
-                          color={Color.colorMidnightblue}
-                          size={20}
-                          style={{ marginRight: 16 }}
-                        />
-                      }
+                      
 
                       <Text style={styles.modemHealthSupport}>
                         View Payment History
@@ -315,14 +295,7 @@ const BillingScreen = ({ navigation }) => {
                       accessibilityRole="button"
                       accessibilityLabel="View Billing Statements"
                     >
-                      {
-                        <Icon
-                          name="bill-paid"
-                          color={Color.colorMidnightblue}
-                          size={20}
-                          style={{ marginRight: 16 }}
-                        />
-                      }
+                      
                       <Text style={styles.modemHealthSupport}>
                         View Billing Statements
                       </Text>

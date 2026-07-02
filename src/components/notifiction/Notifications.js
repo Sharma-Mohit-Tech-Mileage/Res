@@ -10,6 +10,7 @@ import { getPrimaryEmail } from "../utility/constant";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
+import AppStyles from "../../styles/AppStyles";
 
 const Notifications = () => {
   const navigation = useNavigation();

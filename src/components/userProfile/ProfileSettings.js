@@ -32,6 +32,7 @@ import { A11Y } from "../../styles/theme";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import AppStyles from '../../styles/AppStyles';
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -279,7 +280,7 @@ const ProfileSettings = () => {
       <ScrollView accessibilityLabel="Profile settings page.">
         <View style={{ flexDirection: "column", marginBottom: 300 }}>
           <View style={styles.frameParent}>
-            <View style={[styles.frameGroup]}>
+            <View style={[AppStyles.card]}>
               <View
                 style={[
                   styles.generalInformationParent,
@@ -434,7 +435,7 @@ const ProfileSettings = () => {
           </View>
 
           <View style={styles.frameParent}>
-            <View style={[styles.frameGroup]}>
+            <View style={[AppStyles.card]}>
               <View style={[styles.generalInformationParent]}>
                 <Text
                   style={[
@@ -496,7 +497,7 @@ const ProfileSettings = () => {
             </View>
           </View>
           <View
-            style={[styles.frameGroup, { marginHorizontal: Padding.p_base }]}
+            style={[AppStyles.card, { marginHorizontal: Padding.p_base }]}
           >
             <View style={{ padding: Padding.p_xl, flexDirection: "column" }}>
               <Text

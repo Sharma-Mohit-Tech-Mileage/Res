@@ -11,6 +11,8 @@ import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../customui/Touchable";
+import AppStyles from "../../../styles/AppStyles";
+import PrimaryButton from "../customui/PrimaryButton";
 const Card = ({ billAmt, dueDate, navigation, style }) => {
   const NotAvailable = () => {
     return (
@@ -53,14 +55,14 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
   };
 
   return (
-    <View style={[card.elevated, style]}>
+    <View style={[AppStyles.card,{marginBottom: 16}]}>
       <View style={styles.cardHreader}>
         <View
           style={{ marginLeft: 10, flexDirection: "row", alignItems: "center" }}
         >
-          <View style={{ alignSelf: "center" }}>
+          {/* <View style={{ alignSelf: "center" }}>
             <WalletSummaryIcon />
-          </View>
+          </View> */}
 
           <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2}>Bill Summary</Text>
         </View>
@@ -175,7 +177,9 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
 
       {billAmt != undefined ? (
         <View style={styles.cardFooter}>
-          <Touchable
+          <PrimaryButton
+            title={"Make a Payment"}
+            buttonType='submit'
             onPress={() => {
               navigation.navigate("ArticleWindowUtility", {
                 url: `${Config.PORTAL_BASE_URL}/portals/app-secure/make-payment`,
@@ -187,17 +191,10 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             accessibilityLabel="Make a Payment"
             accessibilityRole="button"
             minSize={0}
-            style={styles.paymentButton}
+            style={{width:'100%'} }
           >
-            <Text style={styles.paymentButtonText}>Make a Payment</Text>
-            <View
-              style={{ marginLeft: 2, alignSelf: "center" }}
-              accessible={false}
-              importantForAccessibility="no-hide-descendants"
-            >
-              <RightArrow color={colors.snow_white} />
-            </View>
-          </Touchable>
+            
+          </PrimaryButton>
         </View>
       ) : (
         <>
@@ -250,17 +247,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: colors.gray600,
   },
-  paymentButton: {
-    flexDirection: "row",
-    backgroundColor: colors.sparklight_purple_blue,
-    width: wp("70%"),
-    paddingVertical: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 5,
-    alignSelf: "center",
-    marginLeft: wp("9%"),
-  },
+  
   paymentButtonText: {
     color: colors.snow_white,
     fontSize: 16,
@@ -275,10 +262,10 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   cardFooter: {
-    flexDirection: "row",
-    backgroundColor: "#F8F8F8",
-    width: "100%",
-    padding: 10,
+    width: "90%",
+    alignSelf: "center",
+    margin: 10,
+    paddingBottom: 10,
   },
 });
 

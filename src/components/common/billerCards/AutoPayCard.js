@@ -8,6 +8,7 @@ import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { card } from "../../../styles/utilities";
 import Touchable from "../customui/Touchable";
+import AppStyles from "../../../styles/AppStyles";
 const AutoPayCard = ({
   isAutoPayStatus,
   paymentDetails,
@@ -27,7 +28,7 @@ const AutoPayCard = ({
 
   return (
     <Touchable
-      style={[card.elevated, { alignItems: 'stretch' }]}
+      style={[AppStyles.card, { alignItems: 'stretch', marginBottom: 16 }]}
       minSize={0}
       onPress={handleCardPress}
      accessible={false}

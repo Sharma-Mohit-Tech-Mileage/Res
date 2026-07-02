@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
-import Touchable from "../common/customui/Touchable";
+import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import { securityQuestions } from "../utility/constant";
@@ -20,6 +20,7 @@ import colors from "../../res/Colors";
 import { requiredField } from "../../styles/utilities";
 import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
+import AppStyles from '../../styles/AppStyles'
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
@@ -64,6 +65,7 @@ const PasswordSecurityEdit = () => {
     setIsDropDownOpen(isOpen);
     setDropdownFocused(isOpen);
   };
+  
 
   useEffect(() => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
@@ -201,7 +203,7 @@ const PasswordSecurityEdit = () => {
       <ScrollView ref={scrollViewRef} >
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
-            <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
+            <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
               <View style={styles.infoWrapper}>
                 <NotificationAlert
                   type="error"
@@ -314,29 +316,17 @@ const PasswordSecurityEdit = () => {
               </View>
             </View>
           </View>
-          <View
-            style={styles.frameParent1}
-          >
-            <Touchable
-              minSize={0}
-              style={[styles.buttons, styles.buttonsLayout]}
+          <View style={styles.frameParent1} >
+            <PrimaryButton
+              title="Save"
               onPress={handleSubmit(handleSave, handleValidationError)}
-              accessibilityLabel="Save changes"
-              accessibilityRole="button"
-              accessible={!dropdownFocused}
-            >
-              <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
-            </Touchable>
-            <Touchable
-              minSize={0}
-              style={[styles.buttons1, styles.buttonsLayout]}
+              buttonType="submit"
+            />
+            <PrimaryButton
+              title="Cancel"
               onPress={() => navigation.navigate("PasswordSecurity")}
-              accessibilityLabel="Cancel and return"
-              accessibilityRole="button"
-              accessible={!dropdownFocused}
-            >
-              <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
-            </Touchable>
+              buttonType="cancel"
+            />
           </View>
 
           <LoadingOverlay

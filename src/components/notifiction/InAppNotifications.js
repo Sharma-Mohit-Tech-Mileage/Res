@@ -34,6 +34,8 @@ import { PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
+import AppStyles from "../../styles/AppStyles";
+import SecondaryButton from "../common/customui/PrimaryButton";
 
 import {
   getFcmToken,
@@ -41,6 +43,7 @@ import {
   requestUserPermission,
 } from "../../firebase/FirebaseUtils";
 import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
+
 
 const InAppNotifications = ({ navigation }) => {
   const route = useRoute();
@@ -61,6 +64,7 @@ const InAppNotifications = ({ navigation }) => {
   const [successRef, setSuccessFocus] = useAccessibilityFocus();
   const successIconRef = useRef(null);
   const formatedData = route.params?.additionalData || {};
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   // Android TalkBack: hide background elements only for error alerts, not for success banners.
   const isAndroidA11yModalActive =
@@ -387,40 +391,23 @@ const InAppNotifications = ({ navigation }) => {
               </View>
 
                 <View style={styles.buttonsParent}>
-                  <Touchable
-                    minSize={0}
-                    accessible={true}
-                    accessibilityLabel="Save"
-                    accessibilityRole="button"
-                    style={[
-                      { backgroundColor: Color.colorMidnightblue },
-                      styles.buttonsLayout,
-                    ]}
-                    onPress={handleSave}
-                  >
-                    <Text
-                      style={[{ color: Color.sparklightWhite }, styles.makeTypo]}
-                    >
-                      Save
-                    </Text>
-                  </Touchable>
-                  <Touchable
-                    minSize={0}
-                    accessible={true}
-                    accessibilityLabel="Cancel"
-                    accessibilityRole="button"
-                    style={[
-                      styles.buttons1,
-                      styles.buttonsLayout,
-                    ]}
-                    onPress={() => navigation.navigate("Notifications")}
-                  >
-                    <Text
-                      style={[{ color: Color.colorMidnightblue }, styles.makeTypo]}
-                    >
-                      Cancel
-                    </Text>
-                  </Touchable>
+            <SecondaryButton
+              title="Save"
+              onPress={handleSave}
+              accessibilityLabel={isSubmitting ? "Saving settings..." : "Save settings"}
+              accessibilityHint="Double tap to save your notification preferences"
+              style={styles.saveButton}
+              disabled={isSubmitting}
+              buttonType={"submit"}
+            />
+            <SecondaryButton
+              title="Cancel"
+              onPress={() => navigation.goBack()}
+              accessibilityLabel="Cancel"
+              accessibilityHint="Double tap to cancel and go back"
+              style={styles.cancelButton}
+              disabled={isSubmitting}
+            />
             </View>
           </View>
         </View>
@@ -552,13 +539,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   frameGroup: {
-    borderWidth: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    backgroundColor: Color.sparklightWhite,
-    alignSelf: "stretch",
-    overflow: "hidden",
+   ...AppStyles.card,
+    paddingVertical: Padding.p_5xl,
+    paddingHorizontal: Padding.p_5xl,
   },
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,

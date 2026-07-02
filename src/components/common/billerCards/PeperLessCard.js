@@ -7,6 +7,7 @@ import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../customui/Touchable";
+import AppStyles from "../../../styles/AppStyles";
 
 const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
   const showSkeleton = isStatusLoading || paperlessStatus === undefined;
@@ -19,7 +20,7 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
 
   return (
     <Touchable
-      style={[card.elevated, { alignItems: 'stretch' }]}
+      style={[AppStyles.card, { alignItems: 'stretch', marginBottom: 16 }]}
       minSize={0}
       onPress={handleCardPress}
       accessible={false}

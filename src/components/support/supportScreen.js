@@ -209,7 +209,7 @@ const Support = ({ route }) => {
         <LinearGradient
           style={[styles.linearGradientStyle, { paddingTop: insets.top + 88 }]}
           locations={[0, 1]}
-          colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+          colors={["rgba(99, 41, 101, 1)", "rgba(141, 59, 144, 1)"]}
           useAngle={true}
           angle={90}
         />
