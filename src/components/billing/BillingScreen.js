@@ -36,7 +36,7 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import AppStyles from "../../styles/AppStyles";
-import { SectionTitle,Title } from "../common/customui/Typography";
+import { SectionTitle,Title,MenuText } from "../common/customui/Typography";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -214,7 +214,7 @@ const BillingScreen = ({ navigation }) => {
                       styles.frameParentSpaceBlock1,
                     ]}
                   >
-                    <SectionTitle style={styles.leftTitle} 
+                    <SectionTitle style={[styles.leftTitle]} 
                     accessible={true}
                     accessibilityLabel="Billing Options"
                     accessibilityRole="header" accessibilityLevel={2}>
@@ -243,10 +243,15 @@ const BillingScreen = ({ navigation }) => {
                       accessibilityLabel="Manage Payment Method"
                     >
                      
-                      <Text style={styles.modemHealthSupport}>
+                      <MenuText style={styles.modemHealthSupport}>
                         Manage Payment Method
-                      </Text>
-                      <RightIcon />
+                      </MenuText>
+                      <View
+                        style={styles.rightIconLayout}
+                      >
+                        <RightIcon />
+                      </View>
+ 
                     </Touchable>
 
                     <View style={styles.frameLayout} />
@@ -262,10 +267,14 @@ const BillingScreen = ({ navigation }) => {
                         accessibilityLabel="View Bill Breakdown"
                       >
                         
-                        <Text style={styles.modemHealthSupport}>
+                        <MenuText style={styles.modemHealthSupport}>
                           {"View Bill Breakdown"}
-                        </Text>
-                        <RightIcon />
+                        </MenuText>
+                        <View
+                          style={styles.rightIconLayout}
+                        >
+                          <RightIcon />
+                        </View>
                       </Touchable>
                     }
                     <View style={styles.frameLayout} />
@@ -281,10 +290,15 @@ const BillingScreen = ({ navigation }) => {
                     >
                       
 
-                      <Text style={styles.modemHealthSupport}>
+                      <MenuText style={styles.modemHealthSupport}>
                         View Payment History
-                      </Text>
-                      <RightIcon />
+                      </MenuText>
+                      <View
+                        style={styles.rightIconLayout}
+                      >
+                        <RightIcon />
+                      </View>
+ 
                     </Touchable>
                     <View style={styles.frameLayout} />
 
@@ -299,10 +313,15 @@ const BillingScreen = ({ navigation }) => {
                       accessibilityLabel="View Billing Statements"
                     >
                       
-                      <Text style={styles.modemHealthSupport}>
+                      <MenuText style={styles.modemHealthSupport}>
                         View Billing Statements
-                      </Text>
-                      <RightIcon />
+                      </MenuText>
+                      <View
+                        style={styles.rightIconLayout}
+                      >
+                        <RightIcon />
+                      </View>
+ 
                     </Touchable>
                   </View>
                 </View>
@@ -372,14 +391,20 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   myModemWrapper: {
-    paddingTop: Padding.p_5xs,
+    paddingTop: Padding.p_base,
     alignItems: "center",
     flexDirection: "row",
     paddingHorizontal: Padding.p_5xl,
   },
   frameParentSpaceBlock1: {
-    paddingBottom: Padding.p_5xl,
+    paddingBottom: Padding.p_base,
     alignSelf: "stretch",
+  },
+  rightIconLayout: {
+    height: 24,
+    width: 24,
+    justifyContent: "center",
+    alignItems: "center",
   },
   frame9defaultSpaceBlock: {
     paddingVertical: Padding.p_base,
@@ -403,10 +428,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   modemHealthSupport: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.sparklight_purple_blue,
-    fontFamily: FontFamily.openSansRegular,
     textAlign: "left",
     lineHeight: 28,
     flex: 1,
