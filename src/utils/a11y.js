@@ -17,6 +17,12 @@ export const spellOutDigits = (s) => {
   return String(s).replace(/[0-9]/g, (d) => ` ${DIGIT_WORDS[Number(d)]} `).replace(/\s{2,}/g, ' ').trim();
 };
 
+// Spell out every alphanumeric character individually (letters by name, digits as words), comma-separated so the screen reader pauses per character — for IDs like model/MAC/serial that must not be read as words or cardinals.
+export const spellOutChars = (s) => {
+  if (s === undefined || s === null) return '';
+  return String(s).toUpperCase().split('').map((c) => (/[0-9]/.test(c) ? DIGIT_WORDS[Number(c)] : /[A-Z]/.test(c) ? c : '')).filter(Boolean).join(', ');
+};
+
 export function formatInputA11yReadout({
   label,
   required = false,
