@@ -121,8 +121,12 @@ const AccountOverview = () => {
 
   useFocusEffect(
     useCallback(() => {
-      const formatName = (name = "") =>
-        name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+      const formatName = (name = "") => {
+        if (typeof name !== 'string') return '';
+        const trimmed = name.trim();
+        if (trimmed.length === 0) return '';
+        return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+      };
 
       const firstName = profileDetails?.firstName ?? "";
       const lastName = profileDetails?.lastName ?? "";

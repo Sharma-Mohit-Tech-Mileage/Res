@@ -36,6 +36,7 @@ import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
 import SecondaryButton from "../common/customui/PrimaryButton";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import AppStyles from "../../styles/AppStyles";
 
 
 // Constants
@@ -470,6 +471,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
     }
 
     return (
+      <View style={AppStyles.card}>
       <FlatList
         data={billingData}
         renderItem={({ item, index }) => <BreakDownItem item={item} />}
@@ -483,6 +485,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={explainerLoading} />}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
+      </View>
     );
   };
 
@@ -499,7 +502,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         renderErrorMessage(errorCode, navigation)
       ) : (
         <View
-          style={[card, styles.cardContainer, { marginBottom: 32 }]}
+          style={[AppStyles.card, styles.cardContainer, { marginBottom: 32 }]}
         >
           <ScrollView
             contentContainerStyle={{ paddingBottom: 24 }}

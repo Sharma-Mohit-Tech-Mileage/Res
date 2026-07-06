@@ -30,6 +30,7 @@ import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 import RighIcon from "../../../assets/svgs/Chevonright";
 import Searchmd from "../../../assets/svgs/Searchmd";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
+import AppStyles from "../../styles/AppStyles";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -231,17 +232,9 @@ const Support = ({ route }) => {
             ref={scrollViewRef}
             style={{ paddingHorizontal: Padding.p_base }}
             contentContainerStyle={{ flexGrow: 1 }}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                title="Pull to refresh"
-                tintColor={Color.sparklightBrightPurple}
-                titleColor={Color.colorMidnightblue}
-              />
-            }
+            
           >
-            <View style={[card.elevated, { marginTop: Padding.p_5xs }]}>
+            <View style={[AppStyles.card]}>
               <View
                 style={[
                   styles.headingContainer,
@@ -322,11 +315,11 @@ const Support = ({ route }) => {
             </View>
 
             <>
-              <View style={[card.elevated, { marginBottom: 150 }]}>
+              <View style={[AppStyles.card, { marginBottom: 150, marginTop: 16 }]}>
                 <View
                   style={[
-                    styles.headingContainer,
-                    styles.headingContainerSpaceBlock,
+                    
+                    
                     { flexDirection: "column", paddingHorizontal: 0 },
                   ]}
                 >
@@ -546,8 +539,7 @@ const styles = StyleSheet.create({
     paddingBottom: Padding.p_base,
     flexDirection: "row",
     alignSelf: "stretch",
-    borderTopRightRadius: Border.br_11xs,
-    borderTopLeftRadius: Border.br_11xs,
+    
   },
   content: {
     paddingVertical: Padding.p_xl,
