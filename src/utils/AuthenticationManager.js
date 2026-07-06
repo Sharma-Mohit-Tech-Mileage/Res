@@ -1,5 +1,6 @@
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { Linking, Alert, Platform } from "react-native";
+import { logDebug, logWarn, logError } from "./logger";
 
 class AuthenticationManager {
   static AUTH_TIMEOUT = 120000;
@@ -21,14 +22,17 @@ class AuthenticationManager {
         Platform.OS === "android"
           ? { ...config, additionalParameters: { ...(config.additionalParameters || {}), prompt: "login" } }
           : config;
+      logDebug("AuthenticationManager", "Starting auth flow", { platform: Platform.OS });
       const authPromise = authorize(authConfig);
       const result = await Promise.race([authPromise, timeoutPromise]);
 
+      logDebug("AuthenticationManager", "Authorization completed successfully");
       return {
         success: true,
         data: result,
       };
     } catch (error) {
+      logError("AuthenticationManager", error);
       return this.handleAuthError(error);
     }
   }
@@ -42,14 +46,17 @@ class AuthenticationManager {
     );
 
     try {
+      logDebug("AuthenticationManager", "Starting token refresh");
       const refreshPromise = refresh(config, { refreshToken });
       const result = await Promise.race([refreshPromise, timeoutPromise]);
 
+      logDebug("AuthenticationManager", "Token refresh completed successfully");
       return {
         success: true,
         data: result,
       };
     } catch (error) {
+      logError("AuthenticationManager", error);
       return {
         success: false,
         error: error.message || "Token refresh failed",
@@ -72,7 +79,8 @@ class AuthenticationManager {
 
       return true;
     } catch (error) {
-      console.warn("Browser availability check failed:", error);
+      logWarn("AuthenticationManager", "Browser availability check failed");
+      logError("AuthenticationManager", error);
       return false;
     }
   }
