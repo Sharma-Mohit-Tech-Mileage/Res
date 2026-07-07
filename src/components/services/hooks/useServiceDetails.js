@@ -1,10 +1,10 @@
 import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchServiceDetailsRequest } from '../../../redux/actions/servicesActions';
-import { 
-  selectServiceData, 
-  selectServiceLoading, 
-  selectServiceError 
+import {
+  selectServiceData,
+  selectServiceLoading,
+  selectServiceError
 } from '../../../redux/selectors/servicesSelectors';
 
 export const useServiceDetails = (accountNumber) => {
