@@ -314,7 +314,7 @@ const InAppNotifications = ({ navigation }) => {
 
       <ScrollView>
         <View style={styles.inAppNotificationsInner}>
-          <View style={{ alignSelf: "stretch" }}>
+          <View style={{ alignSelf: "stretch",margin:16 }}>
             <View style={[styles.frameGroup, styles.frameBorder]}>
               {notification && (
                 <Animated.View
@@ -561,11 +561,8 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   inAppNotificationsInner: {
-    paddingTop: Padding.p_xl,
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
     width: "100%",
-    overflow: "hidden",
+    
   },
   inAppNotifications: {
     flex: 1,

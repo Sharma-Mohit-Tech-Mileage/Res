@@ -1,133 +1,48 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import {
   StyleSheet,
   View,
   ScrollView,
-  RefreshControl,
+  Linking,
   Platform,
   Text,
+  RefreshControl,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useSelector } from "react-redux";
-import {Title,MenuText, SectionTitle} from "../common/customui/Typography";
 import {
   Border,
   Padding,
   Color,
   FontSize,
   FontFamily,
+  Alert,
 } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
-import PubSub from "pubsub-js";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
+import {
+  startChatWithConfig,
+  startChat,
+} from "../utility/RNZendeskChat";
 import base64 from "react-native-base64";
-import { startChatWithConfig, startChat } from "../utility/RNZendeskChat";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
-import { card } from "../../styles/utilities";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 import RighIcon from "../../../assets/svgs/Chevonright";
 import Searchmd from "../../../assets/svgs/Searchmd";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
+import {Title,MenuText, SectionTitle} from "../common/customui/Typography";
 import AppStyles from "../../styles/AppStyles";
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
 
 const Support = ({ route }) => {
-  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const scrollViewRef = useRef(null);
-  const { triggerOnScreenEntry } = useAnnouncement();
-  const [isAgentAvailable, setisAgentAvailable] = useState(false);
-  const [istechAgentAvailable, setIstechAgentAvailable] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [isAgentNotAvailable, setIsAgentNotAvailable] = useState(false);
-
-  const checkAgentAvailibilty = async (group_id, data) => {
-    const username = "mobile-support@sparklight.biz/token";
-    const password = "ek20PJEI1zZd4sm1LJr3JuYw7ujt1F1ic82b4Jjc";
-    const auth = base64.encode(`${username}:${password}`);
-
-    try {
-      const response = await fetch(
-        `https://cableone.zendesk.com/api/v2/account_groups/availability/${group_id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Basic ${auth}`,
-          },
-        }
-      );
-      setRefreshing(false);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const json = await response.json();
-      if (json.channel_group_statuses.chat.state_counts.online > 0) {
-        if (group_id == "1500003312422") {
-          setisAgentAvailable(true);
-          if (data) {
-            if (Platform.OS === "ios") {
-              startChat(data);
-            } else {
-              startChatWithConfig(data);
-            }
-          }
-        } else if (group_id == "1500003304341") {
-          setIstechAgentAvailable(true);
-          if (data) {
-            if (Platform.OS === "ios") {
-              startChat(data);
-            } else {
-              startChatWithConfig(data);
-            }
-          }
-        }
-      } else {
-        if (group_id == "1500003312422") {
-          setisAgentAvailable(false);
-          if (data) {
-            setIsAgentNotAvailable(true);
-          }
-        } else if (group_id == "1500003304341") {
-          setIstechAgentAvailable(false);
-          if (data) {
-            //PromptForAgentOffline()
-            setIsAgentNotAvailable(true);
-          }
-        }
-      }
-      setRefreshing(false);
-    } catch (error) {
-      setRefreshing(false);
-      console.warn("Error fetching data:", error);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      triggerOnScreenEntry('SupportStack');
-      const chatData = route?.params?.chatData;
-      checkAgentAvailibilty("1500003304341", chatData);
-      checkAgentAvailibilty("1500003312422", chatData);
-    }, [triggerOnScreenEntry, route?.params?.chatData])
-  );
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      setTimeout(() => {
-        if (route.params?.isContactUs) {
-          scrollViewRef.current?.scrollTo({ y: 0, x: 0, animated: true });
-        }
-      }, 500);
-    });
-    return unsubscribe;
-  }, [navigation]);
-
+  const scrollViewRef = useRef(null);
+  
   const items = [
     {
       key: "searchIssues",
@@ -184,163 +99,154 @@ const Support = ({ route }) => {
     },
   ];
 
-  var mySubscriber = function (msg, data) {
-    scrollViewRef.current?.scrollToEnd({ animated: true });
-  };
+  
+   React.useEffect(() => {
+       const unsubscribe = navigation.addListener("focus", () => {
+         // The screen is focused
+         // Call any action
+         setTimeout(() => {
+           if (route.params?.isContactUs) {
+             scrollViewRef.current?.scrollTo({ y: 200, x: 0, animated: true });
+           }else{
+            scrollViewRef.current?.scrollTo({ y: 0, x: 0, animated: true });
+           }
+         }, 500);
+       });
+   
+       // Return the function to unsubscribe from the event so it gets removed on unmount
+       return unsubscribe;
+     }, [navigation]);
 
-  useEffect(() => {
-    if (route.params?.isContactUs) {
-      setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 500);
-    }
 
-    var token = PubSub.subscribe("event.contactUsEvent", mySubscriber);
-    return () => {
-      PubSub.unsubscribe(token);
-    };
-  }, []);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-  };
-
+  
   return (
-    <SafeAreaProvider>
-      <View style={[styles.support]}>
-        <LinearGradient
-          style={[styles.linearGradientStyle, { paddingTop: insets.top + 88 }]}
-          locations={[0, 1]}
-          colors={["rgba(99, 41, 101, 1)", "rgba(141, 59, 144, 1)"]}
-          useAngle={true}
-          angle={90}
-        />
-        <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-      <ZendeskChatIcon />
+    <View style={styles.support}>
+      <ProfileSettingsHeader
+        title=""
+        iconAlignment="right"
+        showIcon={false} // New prop to control icon visibility
+      />
+
+      <LinearGradient
+        style={styles.linearGradientStyle}
+        locations={[0, 1]}
+        colors={["rgba(141, 59, 144, 1)", "rgba(99, 41, 101, 1)"]}
+        useAngle={true}
+        angle={90}
+      />
+      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+        <ZendeskChatIcon />
       </View>
-        <View style={[styles.mainContainer]}>
-          <View style={[styles.header, { paddingTop: insets.top + 35 }]}>
+      <View style={[styles.mainContainer]}>
+        <View style={[styles.containerFlexBox]}>
+          <View style={styles.header}>
             <View style={styles.featuredIcon}>
-              <SupportIcon white={"#fff"} />
+              {/* <Image
+                style={[styles.lifeBuoy02IconLayout]}
+                resizeMode="contain"
+                tintColor={"#FFF"}
+                source={require("../../../assets/phone-outgoing-03.png")}
+              /> */}
+              <SupportIcon white={'#fff'}/>
             </View>
             <View
-              style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
-              <Text style={styles.wereHereTo} accessible={true} accessibilityRole="header" accessibilityLevel={1} accessibilityLabel="We're Here to Help" >We’re Here to Help</Text>
+              style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}
+            >
+              <Title style={styles.wereHereTo} accessible={true} accessibilityRole="header" accessibilityLevel={1} accessibilityLabel="Let's Connect!">Let's Connect!</Title>
             </View>
           </View>
           <ScrollView
+            style={{ width: "100%", padding: Padding.p_base,marginBottom:hp('42%') }}
             ref={scrollViewRef}
-            style={{ paddingHorizontal: Padding.p_base }}
-            contentContainerStyle={{ flexGrow: 1 }}
-            
+           
           >
-            <View style={[AppStyles.card]}>
-              <View
-                style={[
-                  styles.headingContainer,
-                  styles.headingContainerSpaceBlock,
-                ]}
-              >
-                <Text style={[styles.heading, styles.headingTypo]} accessible={true}accessibilityRole="header" accessibilityLevel={2}>
-                Knowledgebase
-                </Text>
-              </View>
-              <View style={styles.frameChild} />
-              {items.map((item, index) => (
-                <React.Fragment key={index}>
-                  <Touchable
-                    key={index}
-                    minSize={0}
-                    style={[styles.search, styles.navigationBorder, { alignItems: 'stretch' }]}
-                    accessible={true}
-                    accessibilityLabel={
-                      item.text == `More...` ? "More" : item.text
-                    }
-                    accessibilityRole="button"
-                    onPress={() => {
-                      if (item.iconAlignment === "left") {
-                        navigation.navigate(item.navigateTo);
-                      } else {
-                        navigation.navigate(item.navigateTo, {
-                          url: item.url,
-                          name: item.text,
-                        });
-                      }
-                    }}
-                  >
-                    <View
-                      style={[
-                        styles.pressableContent,
-                        item.iconAlignment === "right" && {
-                          flexDirection: "row-reverse",
-                        },
-                      ]}
-                    >
-                      <View
-                        style={[
-                          styles.iconStyle,
-                          item.iconAlignment === "right"
-                            ? styles.iconRight
-                            : styles.iconLeft,
-                        ]}
-                      >
-                        <item.icon />
-                      </View>
-                      {item.iconAlignment === "right" ? (
-                        <Text
-                          style={[styles.searchChild, styles.textTypoRight]}
-                        >
-                          {item.text}
-                        </Text>
-                      ) : (
-                        <Text
-                          style={[
-                            {
-                              paddingHorizontal: Padding.p_3xs,
-                              color: Color.sparklightGray1,
-                              fontSize: FontSize.size_base,
-                            },
-                          ]}
-                        >
-                          {item.text}
-                        </Text>
-                      )}
-                    </View>
-                  </Touchable>
-                  {index < items.length - 1 && (
-                    <View style={styles.frameChild} />
-                  )}
-                </React.Fragment>
-              ))}
-            </View>
-
-            <>
-              <View style={[AppStyles.card, { marginBottom: 150, marginTop: 16 }]}>
+          
+              <View style={styles.supportCard}>
                 <View
                   style={[
-                    
-                    
-                    { flexDirection: "column", paddingHorizontal: 0 },
+                    styles.headingContainer,
+                    styles.headingContainerSpaceBlock,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.heading,
-                      styles.headingTypo,
-                      { paddingHorizontal: Padding.p_base },
-                    ]}
-                    accessible={true}
-                    accessibilityRole="header"
-                    accessibilityLevel={2}
-                  >
+                  <SectionTitle style={{flex: 1}} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Knowledgebase">
+                    Knowledgebase
+                  </SectionTitle>
+                </View>
+                <View style={styles.frameChild} />
+                {items.map((item, index) => (
+                  <React.Fragment key={item.name}>
+                    <Touchable
+                      key={index+item.key}
+                      minSize={0}
+                      style={[styles.search, styles.navigationBorder, { alignItems: 'stretch' }]}
+                      accessibilityRole="button"
+                      accessibilityLabel={item.accessibilityLabel}
+                      onPress={() => {
+                        if (item.iconAlignment === "left") {
+                          navigation.navigate(item.navigateTo);
+                        } else {
+                          navigation.navigate(item.navigateTo, {
+                            url: item.url,
+                            name: item.text,
+                          });
+                        }
+                      }}
+                    >
+                      <View style={styles.pressableContent}>
+                        {item.iconAlignment === "left" && (
+                          <View
+                            style={[
+                              styles.iconStyle,
+                              styles.iconLeft,
+                            ]}
+                          >
+                            <item.icon />
+                          </View>
+                        )}
+                        <MenuText
+                          style={
+                            item.iconAlignment === "right"
+                              ? [styles.searchChild, styles.textTypoRight]
+                              : [
+                                  {
+                                    paddingHorizontal: Padding.p_3xs,
+                                  },
+                                ]
+                          }
+                        >
+                          {item.text}
+                        </MenuText>
+                        {item.iconAlignment === "right" && (
+                          <View style={styles.rightIconLayout}>
+                            <item.icon />
+                          </View>
+                        )}
+                      </View>
+                    </Touchable>
+                    {index < items.length - 1 && (
+                      <View key={index + 1} style={[styles.frameChild]} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </View>
+              
+            
+              <View style={[styles.supportCardWithSpacing]}>
+                <View
+                  style={[
+                    styles.headingContainer,
+                    styles.headingContainerSpaceBlock,
+                    { flexDirection: "column",paddingHorizontal:0 },
+                  ]}
+                >
+                  <SectionTitle style={[{  paddingHorizontal: Padding.p_5xl}]} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Contact Us">
                     Contact Us
-                  </Text>
-
+                  </SectionTitle>
                   <View style={styles.separator} />
-
                   <Touchable
                     minSize={0}
-                    style={{ alignItems: 'stretch' }}
+                    style={[styles.search, styles.navigationBorder, { alignItems: 'stretch' }]}
                     accessibilityLabel="Sparklight Customer Support"
                     accessibilityRole="button"
                     onPress={() => {
@@ -352,43 +258,36 @@ const Support = ({ route }) => {
                   >
                     <View
                       style={{
-                        flexDirection: "row-reverse",
+                        flexDirection: "row",
                         justifyContent: "space-between",
+                        alignItems: "center",
                         width: "100%",
-                        paddingHorizontal: Padding.p_base,
+                        marginTop: Padding.p_3xs,
                       }}
                     >
-                      <View
-                        style={[
-                          {
-                            width: 20,
-                            height: 20,
-                            alignSelf: "center",
-                            resizeMode: "contain",
-                            marginTop: 10,
-                          },
-                        ]}
-                      >
-                        <RighIcon />
-                      </View>
-                      <Text
+                      <MenuText
                         style={[
                           styles.textTypoRight,
-                          { paddingVertical: Padding.p_xs, marginTop: 10 },
+                          { paddingVertical: Padding.p_xs, paddingHorizontal: Padding.p_base },
                         ]}
                       >
                         {"Sparklight Customer Support"}
-                      </Text>
+                      </MenuText>
+                      <View style={[styles.rightIconLayout]}> 
+                        <RighIcon />
+                      </View>
                     </View>
                   </Touchable>
                 </View>
               </View>
-            </>
-
+           
+          
+            
+            
             <CustomerErrorPage
               visible={isAgentNotAvailable}
               message={
-                "Our agents are currently unavailable. Please reach out during our business hours, and we’ll be happy to assist you.Thank you for your understanding!"
+                "Our agents are currently unavailable. Please reach out during our business hours, and we’ll be happy to assist you. Thank you for your understanding!"
               }
               title={"Agent Unavailibity"}
               onActionTxt={"OK"}
@@ -400,7 +299,7 @@ const Support = ({ route }) => {
           </ScrollView>
         </View>
       </View>
-    </SafeAreaProvider>
+    </View>
   );
 };
 
@@ -411,78 +310,55 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   textTypoRight: {
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: 600,
-    fontSize: FontSize.size_base,
     lineHeight: 20,
-    color: Color.colorMidnightblue,
+  },rightIconLayout: {
+    height: 24,
+    width: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: Padding. p_13xl,
   },
   frameChild: {
     paddingHorizontal: Padding.p_5xl,
     height: 1,
+    width: "100%",
     backgroundColor: Color.sparklightGray,
   },
   navigationBorder: {
-    borderColor: Color.sparklightGray,
-    backgroundColor: Color.sparklightWhite,
+   
     borderStyle: "solid",
     justifyContent: "center",
   },
   iconLeft: {
     marginLeft: Padding.p_xs,
   },
-  separator: {
-    backgroundColor: Color.sparklightGray,
-    height: 1,
-    width: "100%",
-    marginTop: 16,
-  },
   iconRight: {
-    marginRight: Padding.p_xs,
+    marginRight: Padding.p_5xs,
   },
   containerFlexBox: {
     alignSelf: "stretch",
     alignItems: "center",
   },
-  supportIcon: {
-    height: 24,
-    width: 24,
-  },
-  icon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    borderColor: "#F4F4F5",
-    backgroundColor: "#F4F4F5",
+  lifeBuoy02IconLayout: {
+    height: 32,
+    width: 32,
   },
   iconStyle: {
-    width: 20,
-    height: 20,
-    resizeMode: "contain",
-    marginRight: 8,
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
   },
   headingContainerSpaceBlock: {
     paddingBottom: Padding.p_base,
-    backgroundColor: Color.sparklightWhite,
     alignItems: "flex-start",
   },
   headingTypo: {
     textAlign: "auto",
     color: Color.colorGray_100,
-    lineHeight: 18,
     fontSize: FontSize.size_lg,
     fontFamily: FontFamily.openSansRegular,
     flex: 1,
-  },
-  supportingTypo: {
-    lineHeight: 14,
-    marginTop: 10,
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-    color: Color.colorGray_100,
-    alignSelf: "stretch",
   },
   featuredIcon: {
     backgroundColor: Color.colorMidnightblue,
@@ -498,11 +374,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   wereHereTo: {
-    fontSize: FontSize.size_3xl,
     width: 210,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
     lineHeight: 28,
+    paddingBottom: Padding.p_5xs,
     textAlign: "center",
   },
   wereHereToHelpWrapper: {
@@ -512,15 +386,11 @@ const styles = StyleSheet.create({
   header: {
     alignSelf: "stretch",
     alignItems: "center",
-    paddingBottom: Padding.p_base,
   },
   searchChild: {
     flex: 1,
     paddingHorizontal: Padding.p_base,
     paddingVertical: Padding.p_base,
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "400",
   },
   search: {
     justifyContent: "center",
@@ -535,19 +405,16 @@ const styles = StyleSheet.create({
   },
   headingContainer: {
     paddingTop: Padding.p_5xl,
-    paddingHorizontal: Padding.p_base,
+    paddingHorizontal: Padding.p_5xl,
     paddingBottom: Padding.p_base,
     flexDirection: "row",
-    alignSelf: "stretch",
-    
-  },
-  content: {
-    paddingVertical: Padding.p_xl,
+   
+   
   },
   mainContainer: {
     paddingVertical: Padding.p_base,
-    alignSelf: "stretch",
-    marginBottom: 280,
+    alignItems: "center",
+    
   },
   support: {
     flex: 1,
@@ -559,6 +426,24 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
+    height: 150,
+  },
+  separator: {
+    backgroundColor: Color.sparklightGray,
+    height: 1,
+    width: '100%',
+    marginTop: 16,
+  },
+  supportCard: {
+    ...AppStyles.card,
+   
+  },
+  supportCardWithSpacing: {
+    ...AppStyles.card,
+    marginTop: 16,
+    marginBottom: 150,
+    
+
   },
 });
 

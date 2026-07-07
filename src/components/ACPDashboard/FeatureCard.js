@@ -1,11 +1,29 @@
+// components/FeatureCard.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { FontFamily, FontSize, Color, Padding, } from "../../../GlobalStyles";
+import {
+  FontFamily,
+  FontSize,
+  Color,
+  Padding,
+} from "../../../GlobalStyles";
 import Icon from "../common/Icon";
+import { card } from "../../styles/utilities";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../common/customui/Touchable";
+import {SectionTitle} from "../common/customui/Typography";
+import AppStyles from "../../styles/AppStyles";
+import { A11Y } from "../../styles/theme";
 
-const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primary", isActive = false, onButtonPress, isLoading, }) => {
+const FeatureCard = ({
+  title,
+  features = [],
+  buttonText,
+  buttonVariant = "primary",
+  isActive = false,
+  isLoading = false,
+  onButtonPress,
+}) => {
   const getButtonStyle = () => {
     switch (buttonVariant) {
       case "success":
@@ -27,13 +45,9 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
   };
 
   return (
-    <View style={styles.container}>
-      <View
-        style={styles.header}
-        accessible={true}
-        accessibilityRole="header" accessibilityLevel={2}
-      >
-      <Text style={styles.title}>{title}</Text>
+    <View style={[AppStyles.card, { marginBottom: 16 }]}>
+      <View style={styles.header} accessible={true} accessibilityLabel={`${title}`} accessibilityRole="header" accessibilityLevel={2}>
+        <SectionTitle>{title}</SectionTitle>
       </View>
 
       {
@@ -56,19 +70,18 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
                 //accessibilityRole="listitem"
                 accessibilityLabel={`${index + 1}. ${feature}`}
               >
-            <Icon
-              name="green-checkcircle"
-              size={18}
-              color={Color.sparklightWhite}
-              style={styles.checkIcon}
-            />
-            <Text style={styles.featureText}>{feature}</Text>
+                <Icon
+                  name="green-checkcircle"
+                  size={18}
+                  color={Color.sparklightGreen}
+                  style={styles.checkIcon}
+                />
+                <Text style={styles.featureText} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel={`${feature}`}>{feature}</Text>
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
         );
       })()}
-
       {isLoading ? (
         <SkeletonPlaceholder>
           <View style={[styles.button, { height: 100, paddingVertical: 24 }]} />
@@ -79,7 +92,7 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
           style={[styles.button, getButtonStyle()]}
           onPress={onButtonPress}
           accessibilityRole="button"
-          accessibilityLabel={isActive? `${title} status is ${buttonText}` :buttonText}
+          accessibilityLabel={isActive?`${title} status is ${buttonText}`:buttonText}
         >
           <Text style={[styles.buttonText, getButtonTextStyle()]}>
             {buttonText}
@@ -93,13 +106,12 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.sparklightWhite,
-    borderRadius: 1,
     marginBottom: Padding.p_xl,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 0 },
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowRadius: 2,
+    elevation: 1,
   },
   header: {
     paddingHorizontal: Padding.p_base,
@@ -135,13 +147,16 @@ const styles = StyleSheet.create({
   button: {
     marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
-    paddingVertical: Padding.p_xs,
-    borderRadius: 4,
+    paddingVertical: 8,
+    minHeight: A11Y.minTouch,
+    borderRadius: 100,
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "center",
+    width: "90%",
   },
   buttonPrimary: {
-    backgroundColor: Color.sparklightBrightPurple,
+    backgroundColor: Color.sparklightSecondaryPurple,
   },
   buttonSuccess: {
     backgroundColor: "#C8E9D0",
@@ -151,7 +166,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: FontSize.size_lg,
-    fontWeight: "400",
+    fontWeight: "700",
   },
   buttonTextPrimary: {
     color: Color.sparklightWhite,
