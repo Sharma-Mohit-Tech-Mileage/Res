@@ -135,7 +135,7 @@ const MyServicesContent = ({ route }) => {
         <View style={styles.servicesContainer}>
           {showInternet && (
             <InternetCard
-              planName={data?.internet?.planName}
+              planName={data?.internet?.planName?.toLowerCase()}
               downloadSpeed={data?.internet?.downloadSpeed}
               uploadSpeed={data?.internet?.uploadSpeed}
               loading={loading}
@@ -145,7 +145,7 @@ const MyServicesContent = ({ route }) => {
 
           {showVideo && (
             <VideoCard
-              planName={data?.video?.planName}
+              planName={data?.video?.planName?.toLowerCase()}
               zipCode={zipCodeFromAccount}
               legacySpa={legacySPA}
               loading={loading}
@@ -154,7 +154,7 @@ const MyServicesContent = ({ route }) => {
 
           {showPhone && (
             <PhoneCard
-              planName={data?.phone?.planName}
+              planName={data?.phone?.planName?.toLowerCase()}
               legacyBrand={legacySPA}
               loading={loading}
             />

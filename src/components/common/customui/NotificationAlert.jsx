@@ -25,8 +25,8 @@ import Touchable from "./Touchable";
 const TYPE_CONFIG = {
   info: {
     backgroundColor: "#F0F8FF",
-    borderColor: "#0060AE",
-    iconColor: "#0060AE",
+    borderColor: "#632965",
+    iconColor: "#632965",
     textColor: "#000000",
     titleColor: "#000000",
     closeButtonColor: "#000000",

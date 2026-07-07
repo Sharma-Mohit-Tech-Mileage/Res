@@ -13,6 +13,14 @@ const AppStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
+   cardHreader: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width: "100%",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    padding: 10,
+  },
   H1: {
     fontSize: FontSize.size_5xl,
     fontFamily: FontFamily.RadioCanadaBold,

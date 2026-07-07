@@ -207,7 +207,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
               accessible={true}
               accessibilityRole="text"
             >
-              <Infocircle color="#0060AE" style={styles.infoCircleIcon} />
+              <Infocircle color="#632965" style={styles.infoCircleIcon} />
             </View>
             <View style={styles.infoTextContainer}>
               <Text
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   infoBox: {
     flexDirection: "column",
     marginVertical: 20,
-    borderColor: "#0060AE",
+    borderColor: "#632965",
     backgroundColor: "#F0F8FF",
     borderRadius: Border.br_11xs,
     marginTop: 20,

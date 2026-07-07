@@ -1,11 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SecondaryButton from "../../common/customui/PrimaryButton";
+import {SectionTitle} from "../../common/customui/Typography";
+import AppStyles from "../../../styles/AppStyles";
 
 const SpeedBanner = ({ downloadSpeed, uploadSpeed }) => (
   <View style={styles.speedBanner}>
@@ -90,34 +91,34 @@ const InternetCard = ({
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
+      <View style={[AppStyles.card,{marginHorizontal: 16}]}>
         {/* Header */}
-        <View style={styles.serviceHeader}>
-          <View
+        <View style={styles.cardHreader}>
+          {/*<View
             style={styles.iconWrapper}
             accessible={false}
             importantForAccessibility="no"
             accessibilityElementsHidden={true}
           >
-            <MaterialCommunityIcons
+             <MaterialCommunityIcons
               name="web"
               size={16}
               color={theme.colors.primary}
               accessible={false}
               importantForAccessibility="no"
-            />
-          </View>
-          <Text
-            style={styles.serviceType}
+            /> 
+          </View> */}
+          <SectionTitle
+            style={{paddingLeft: 16}}
             accessible={true}
             accessibilityLabel="Internet"
             accessibilityLevel={2}
             accessibilityRole="header"
           >
-            INTERNET
-          </Text>
+            Internet
+          </SectionTitle>
         </View>
-
+      <View style={{ padding: 16 }}>
         {/* Plan Name */}
         <View style={styles.content}>
           <Text
@@ -125,7 +126,7 @@ const InternetCard = ({
             accessible={true}
             accessibilityLabel={`Plan Name - ${planName}`}
           >
-            {planName}
+            { planName && planName.charAt(0).toUpperCase() + planName.slice(1)}
           </Text>
         </View>
 
@@ -200,13 +201,14 @@ const InternetCard = ({
           </View>
         )}
       </View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: serviceCard.container,
-  card: serviceCard.card,
+  card: AppStyles.card,
   bottomButton: serviceCard.bottomButton,
   serviceHeader: serviceCard.serviceHeader,
   iconWrapper: serviceCard.iconWrapper,
@@ -226,6 +228,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: `${theme.colors.primary}20`,
   },
+   cardHreader: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width: "100%",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    padding: 10,
+  },
   speedColumn: {
     flex: 1,
     alignItems: "center",
@@ -234,7 +244,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
-    color: theme.colors.primaryDark,
+    color: theme.colors.Black_100,
     lineHeight: 40,
   },
   speedHeroUnit: {
@@ -263,7 +273,6 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
     color: theme.colors.primary,
-    textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   speedBannerDivider: {

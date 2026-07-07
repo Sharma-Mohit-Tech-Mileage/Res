@@ -6,6 +6,7 @@ import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getPhonePortalURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import AppStyles from "../../../styles/AppStyles";
 const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   const phonePortalURL = getPhonePortalURL(legacyBrand);
   const showManageButton = phonePortalURL !== null;
@@ -24,7 +25,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <View style={styles.card}>
+        <View style={AppStyles.card}>
           <SkeletonPlaceholder
             backgroundColor={theme.colors.skeleton.base}
             highlightColor={theme.colors.skeleton.highlight}
@@ -42,10 +43,10 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
+      <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          <View
+          {/* <View
             style={styles.iconWrapper}
             accessible={false}
             importantForAccessibility="no"
@@ -58,15 +59,15 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
               accessible={false}
               importantForAccessibility="no"
             />
-          </View>
+          </View> */}
           <Text
-            style={styles.serviceType}
+            style={{marginLeft: 16}}
             accessible={true}
             accessibilityLabel="Phone Service"
             accessibilityLevel={2}
             accessibilityRole="header"
           >
-            PHONE SERVICE
+            Phone Service
           </Text>
         </View>
 
@@ -98,7 +99,9 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
 const styles = StyleSheet.create({
   // Container & Card
   container: serviceCard.container,
-  card: serviceCard.card,
+  card: {
+    ...AppStyles.card,
+  },
   bottomButton: serviceCard.bottomButton,
   // Service Header
   serviceHeader: serviceCard.serviceHeader,
@@ -110,6 +113,7 @@ const styles = StyleSheet.create({
   planName: serviceCard.planName,
 
   // Skeleton Loader
+  skeleton: skeletonLoader.skeleton,
   skeletonHeader: skeletonLoader.skeletonHeader,
   skeletonTitle: skeletonLoader.skeletonTitle,
 });

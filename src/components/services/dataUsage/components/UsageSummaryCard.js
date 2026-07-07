@@ -12,6 +12,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
+import AppStyles from "../../../../styles/AppStyles";
 
 const CALLOUT_EPSILON = 0.5;
 
@@ -183,7 +184,7 @@ const UsageSummaryCard = ({ currentUsage, loading = false }) => {
   if (!currentUsage || loading) {
     return (
       <View style={styles.container}>
-        <View style={styles.card}>
+        <View style={AppStyles.card}>
           <View style={styles.header}>
             <View style={styles.iconWrapper} accessible={false} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden={true}>
               <MaterialCommunityIcons name="chart-donut" size={20} color={theme.colors.primary} />

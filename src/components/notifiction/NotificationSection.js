@@ -170,7 +170,7 @@ const BoldPhoneText = ({ phoneNum }) => {
 const InfoMessage = ({ message, phoneNumber, id }) => (
   <View style={styles.infoMessage}>
     <View style={styles.iconContainer}>
-      <InfoICon color="#0060AE" />
+      <InfoICon color="#632965" />
     </View>
     <View style={styles.textContainer}>
       {id == "text" ? (
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_base,
     borderRadius: Border.br_5xs,
     borderWidth: 1,
-    borderColor: "#0060AE",
+    borderColor: "#632965",
     backgroundColor: "#F0F8FF",
   },
   iconContainer: {

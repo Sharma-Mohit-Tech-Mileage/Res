@@ -6,6 +6,8 @@ import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getChannelLineupURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import AppStyles from "../../../styles/AppStyles";
+import { SectionTitle } from "../../common/customui/Typography";
 const VideoCard = ({ planName, zipCode, loading = false }) => {
   const handleChannelLineup = async () => {
     const url = getChannelLineupURL(zipCode);
@@ -38,11 +40,11 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
   if (!planName) return null;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
+    <View style={[styles.container]}>
+      <View style={[AppStyles.card, { marginHorizontal: 16 }]}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          <View
+          {/* <View
             style={styles.iconWrapper}
             accessible={false}
             importantForAccessibility="no"
@@ -55,36 +57,38 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
               accessible={false}
               importantForAccessibility="no"
             />
-          </View>
-          <Text
-            style={styles.serviceType}
+          </View> */}
+          <SectionTitle
             accessible={true}
+            style={{marginLeft: 16}}
             accessibilityLabel="TV & Video"
             accessibilityLevel={2}
             accessibilityRole="header"
           >
-            TV & VIDEO
-          </Text>
+            Tv & Video
+          </SectionTitle>
         </View>
 
         {/* Plan Name & Action */}
-        <View style={styles.content}>
+        <View style={[styles.content,{padding: 16}]}>
           <Text
             style={styles.planName}
             accessible={true}
             accessibilityLabel={`Plan Name - ${planName}`}
           >
-            {planName}
+            { planName && planName.charAt(0).toUpperCase() + planName.slice(1)}
           </Text>
         </View>
+        <View  style={styles.bottomButton}>
         <SecondaryButton
           title="View Channel Lineup"
           buttonType="submit"
           onPress={handleChannelLineup}
-          style={styles.bottomButton}
+         
           accessibilityLabel="View Channel Lineup, Opens in your browser"
           accessibilityRole="button"
         />
+        </View>
       </View>
     </View>
   );
@@ -93,10 +97,15 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
 const styles = StyleSheet.create({
   // Container & Card
   container: serviceCard.container,
-  card: serviceCard.card,
-  bottomButton: serviceCard.bottomButton,
+  card: {
+    ...AppStyles.card,
+  },
+  bottomButton: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
   // Service Header
-  serviceHeader: serviceCard.serviceHeader,
+  serviceHeader: AppStyles.cardHreader,
   iconWrapper: serviceCard.iconWrapper,
   serviceType: serviceCard.serviceType,
 
@@ -105,6 +114,7 @@ const styles = StyleSheet.create({
   planName: serviceCard.planName,
 
   // Skeleton Loader
+  skeleton: skeletonLoader.skeleton,
   skeletonHeader: skeletonLoader.skeletonHeader,
   skeletonTitle: skeletonLoader.skeletonTitle,
 });
