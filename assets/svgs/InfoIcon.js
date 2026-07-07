@@ -3,7 +3,7 @@ import Svg, { Path } from 'react-native-svg';
 
 const InfoIcon = ({ 
   size = 18, 
-  color = '#632965',
+  color = '#353091',
   strokeWidth = 2,
   accessible = true,
   accessibilityLabel = "Information icon",
