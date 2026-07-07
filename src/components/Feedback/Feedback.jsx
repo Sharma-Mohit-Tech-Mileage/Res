@@ -310,6 +310,7 @@ const Feedback = () => {
                   styles.optionTxt,
                   (isError || errors.cosentContactUs) && styles.optionTxtError,
                 ]}
+              accessibilityLabel={"May Sparklight contact you about your feedback? Required"}
               >
               May Sparklight contact you about your feedback? *
               </Text>
