@@ -4,7 +4,6 @@ import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
-import Config from "react-native-config";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import { card } from "../../../styles/utilities";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
@@ -177,11 +176,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
         <View style={styles.cardFooter}>
           <Touchable
             onPress={() => {
-              navigation.navigate("ArticleWindowUtility", {
-                url: `${Config.PORTAL_BASE_URL}/portals/app-secure/make-payment`,
-                name: "Make a Payment",
-                injectPaymentObj: true,
-              });
+              navigation.navigate("MakePayment");
             }}
             accessible={true}
             accessibilityLabel="Make a Payment"

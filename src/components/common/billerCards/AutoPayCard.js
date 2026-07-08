@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Color } from "../../../../GlobalStyles";
-import Config from "react-native-config";
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import { card } from "../../../styles/utilities";
@@ -17,11 +16,7 @@ const AutoPayCard = ({
   const showSkeleton = isStatusLoading || isAutoPayStatus === undefined;
   const handleCardPress = () => {
     if (!showSkeleton) {
-      navigation.navigate("ArticleWindowUtility", {
-        url: `${Config.PORTAL_BASE_URL}/portals/app-secure/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
-        name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-        injectPaymentObj: true,
-      });
+      navigation.navigate("AutoPay");
     }
   };
 
