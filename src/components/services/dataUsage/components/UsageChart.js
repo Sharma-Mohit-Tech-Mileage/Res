@@ -9,6 +9,7 @@ import { card } from "../../../../styles/utilities";
 import { cardHeader, dataUsageTabs } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 import Touchable from "../../../common/customui/Touchable";
+import AppStyles from "../../../../styles/AppStyles";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -929,7 +930,7 @@ const fadeStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   container: { marginHorizontal: theme.spacing.base, marginBottom: theme.spacing.base },
-  card: { ...card.base, padding: theme.spacing.base },
+  card: { ...AppStyles.card, padding: theme.spacing.base },
   header: cardHeader.container,
   iconWrapper: cardHeader.iconWrapper,
   chartTitle: cardHeader.title,

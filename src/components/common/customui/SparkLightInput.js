@@ -160,8 +160,6 @@ const SparkLightInput = React.forwardRef(({
             borderColor:
               isFocused && error != undefined
                 ? "red"
-                : isFocused
-                ? Color.sparklightBrightPurple
                 : Color.sparklightDarkGray,
           },
         ]}
@@ -189,8 +187,6 @@ const SparkLightInput = React.forwardRef(({
               borderWidth: error ? 0.5 : 0,
               borderColor: error
                 ? "red"
-                : isFocused
-                ? Color.sparklightBrightPurple
                 : Color.sparklightDarkGray,
             },
           ]}
@@ -234,7 +230,6 @@ const SparkLightInput = React.forwardRef(({
 const styles = StyleSheet.create({
   outerContainer: {
     minHeight: 48,
-    borderColor: Color.sparklightWhite,
     justifyContent: "center",
     position: "relative",
   },
@@ -244,16 +239,20 @@ const styles = StyleSheet.create({
   },
   textInput: {
     height: 48,
-    color: Color.Black_100,
+    color: Color.colorGray_200,
     fontSize: FontSize.size_base,
     paddingHorizontal: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
+    borderWidth: 1,
     paddingVertical: 12,
-    backgroundColor: "#FFFFFF",
+    borderRadius: Border.br_5xs,
+    backgroundColor: '#FFFFFF',
+    borderColor:'#C7C7CC',
   },
   textInputContainer: {
     borderWidth: 1,
     borderRadius: Border.br_5xs,
+
     borderColor: "#C7C7CC",
     flexDirection: "row",
     alignItems: "center",

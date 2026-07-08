@@ -184,7 +184,7 @@ const UsageSummaryCard = ({ currentUsage, loading = false }) => {
   if (!currentUsage || loading) {
     return (
       <View style={styles.container}>
-        <View style={AppStyles.card}>
+        <View style={styles.card}>
           <View style={styles.header}>
             <View style={styles.iconWrapper} accessible={false} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden={true}>
               <MaterialCommunityIcons name="chart-donut" size={20} color={theme.colors.primary} />
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.base,
   },
   card: {
-    ...card.base,
+     ...AppStyles.card,
     padding: theme.spacing.base,
   },
   header: cardHeader.container,

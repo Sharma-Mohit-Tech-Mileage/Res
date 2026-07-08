@@ -5,6 +5,7 @@ import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
 import { spellOutChars } from "../../../../utils/a11y";
+import AppStyles from "../../../../styles/AppStyles";
 const safeText = (v, fallback = "\u2014") =>
   v === null || v === undefined || String(v).trim() === "" ? fallback : String(v);
 
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.base,
   },
   card: {
-    ...card.base,
+    ...AppStyles.card,
     padding: theme.spacing.base,
   },
 
