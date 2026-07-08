@@ -13,12 +13,11 @@ export const NavigationUtils = {
 
   
   checkTextNotificationNeeded: (profile) => {
-    if (!profile?.smsSubscription?.length)
+    if (!profile?.smsSubscription?.length) 
       return true;
-    // normalize to digits so formatted numbers ("(555) 123-4567", "+1...") still count as on file
-    const phoneDigits = String(profile.smsSubscription[0].phoneNum ?? "").replace(/\D/g, "");
-
-    return !(phoneDigits.length === 10 || phoneDigits.length === 11);
+    const phoneNum = profile.smsSubscription[0].phoneNum;
+    
+    return !(phoneNum && (phoneNum.length === 10 || phoneNum.length === 11));
   },
 
 
