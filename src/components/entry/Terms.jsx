@@ -7,7 +7,9 @@ import Touchable from "../common/customui/Touchable";
 import { useSelector, useDispatch } from "react-redux";
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser, } from "../../redux/utils/LocalStorage";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
-import { updateTermsAndConditions, fetchSMSSelection, fetchPushNotifications, } from "../../redux/actions/ProfileActionSuite";
+import { updateTermsAndConditions, saveSMSSelection, savePushNotifications, } from "../../redux/actions/ProfileActionSuite";
+import { fetchSmsSubscription, fetchPushNotifications } from "../../network/apis/account/profile.service";
+import { logError } from "../../utils/logger";
 import { logout } from "react-native-app-auth";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
@@ -33,13 +35,16 @@ const Terms = ({ navigation }) => {
     const timer = setTimeout(() => setLoading(false), 10000);
     const fetchData = async () => {
       try {
-        await Promise.all([
-          dispatch(fetchPushNotifications()),
-          dispatch(fetchSMSSelection()),
+        // call services directly — dispatching the saga actions resolves immediately and never waited for the data
+        const [pushRes, smsRes] = await Promise.all([
+          fetchPushNotifications(),
+          fetchSmsSubscription(),
         ]);
+        dispatch(savePushNotifications(pushRes));
+        dispatch(saveSMSSelection(smsRes));
         setLoading(false);
       } catch (error) {
-        console.warn("Error fetching data:", error);
+        logError("Terms entry data fetch", error);
         setLoading(false);
       }
     };
