@@ -37,6 +37,7 @@ import colors from "../../res/Colors";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import { requiredField } from "../../styles/utilities";
 import AppStyles from '../../styles/AppStyles';
+import { SectionTitle,HintText } from "../common/customui/Typography";
 const ChangePassword = () => {
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
@@ -240,15 +241,14 @@ const ChangePassword = () => {
               </View>
               <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
                 <View style={{ flexDirection: "column" }}>
-                  <Text
-                    style={[styles.password, styles.passwordFlexBox]}
+                  <SectionTitle
                     accessibilityRole="header"
                     accessibilityLevel={2}
                   >
                     Password
-                  </Text>
-                  <Text
-                    style={[requiredField, { marginTop: 10 }]}
+                  </SectionTitle>
+                  <HintText
+                    style={[{ marginTop: 10, marginVertical: 5}]}
                     accessible={true}
                     importantForAccessibility="yes"
                     accessibilityRole="text"
@@ -256,7 +256,7 @@ const ChangePassword = () => {
                   >
                     {" "}
                     Fields marked with * are required.
-                  </Text>
+                  </HintText>
                 </View>
               </View>
               <View

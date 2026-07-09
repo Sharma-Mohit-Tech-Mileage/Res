@@ -12,6 +12,7 @@ import InfoICon from "../../../assets/svgs/InfoIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import AppStyles from "../../styles/AppStyles";
+import {SectionTitle,FieldContent, IndicatorText,BannerAlertText} from "../common/customui/Typography";
 import EditActionButton from "../common/customui/EditActionButton";
 
 const digitToWord = {
@@ -89,7 +90,9 @@ const NotificationToggle = ({ type, status, isLast, warn, loading, title }) => (
       warn && styles.warnBackground,
     ]}
   >
-    <Text style={styles.toggleText} >{type}</Text>
+    <FieldContent style={{flex: 1}} importantForAccessibility="no">
+        {type}
+      </FieldContent>
     <View style={styles.statusContainer}>
       {loading ? (
         <SkeletonPlaceholder>
@@ -105,7 +108,7 @@ const NotificationToggle = ({ type, status, isLast, warn, loading, title }) => (
       ) : (
         <>
           <StatusIcon status={status} />
-          <Text style={styles.statusText}>{status}</Text>
+          <IndicatorText style={styles.statusText}>{status}</IndicatorText>
         </>
       )}
     </View>
@@ -221,7 +224,12 @@ const NotificationSection = ({
   return (
     <View style={[AppStyles.card,{marginBottom: Padding.p_base}]}>
       <View style={styles.header}>
-        <Text style={styles.title} accessibilityRole="header" accessibilityLevel={2}>{title}</Text>
+        <SectionTitle
+          accessibilityRole="header"
+          accessibilityLevel={2}
+        >
+          {title}
+        </SectionTitle>
         {isComingSoon ? (
           <ComingSoonBadge />
         ) : (
@@ -376,9 +384,6 @@ const styles = StyleSheet.create({
   },
   statusText: {
     marginLeft: Padding.p_5xs,
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
   },
   adminMessage: {
     backgroundColor: Color.colorWhitesmoke_100,

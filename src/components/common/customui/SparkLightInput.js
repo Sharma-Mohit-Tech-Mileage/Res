@@ -19,6 +19,7 @@ import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
 import Touchable from "./Touchable";
+import {FieldTitle, Hyperlink} from "./Typography";
 
 const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
@@ -120,9 +121,9 @@ const SparkLightInput = React.forwardRef(({
             accessibilityElementsHidden={true}
             importantForAccessibility="no-hide-descendants"
           >
-            <Text style={[styles.label, error && styles.errorLabel]}>
+            <FieldTitle style={[styles.label, error && styles.errorLabel]}>
               {label}
-            </Text>
+            </FieldTitle>
           </View>
         )}
         {secure && (
@@ -134,9 +135,9 @@ const SparkLightInput = React.forwardRef(({
             style={styles.eyeButton}
           >
             <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
-            <Text style={styles.eyeText}>
+            <Hyperlink style={styles.eyeText}>
               {passwordVisible ? "Hide" : "Show"}
-            </Text>
+            </Hyperlink>
           </Touchable>
         )}
       </View>
@@ -280,11 +281,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   label: {
-    fontSize: FontSize.size_sm,
     textAlign: "left",
-    color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
     marginBottom: Padding.p_5xs,
     alignSelf: "stretch",
   },
@@ -312,7 +309,6 @@ const styles = StyleSheet.create({
   },
   eyeText: {
     marginLeft: 6,
-    color: Color.colorMidnightblue,
     lineHeight: 28,
   },
   lockIcon: {

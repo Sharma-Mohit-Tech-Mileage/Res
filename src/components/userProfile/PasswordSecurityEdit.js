@@ -21,6 +21,7 @@ import { requiredField } from "../../styles/utilities";
 import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
 import AppStyles from '../../styles/AppStyles'
+import { HintText, SectionTitle, FieldTitle } from "../common/customui/Typography";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
@@ -223,30 +224,29 @@ const PasswordSecurityEdit = () => {
                   accessibilityElementsHidden={dropdownFocused}
                 >
                   <View style={{flexDirection:'column'}}>
-                  <Text
-                    style={[styles.password, styles.passwordFlexBox]}
+                  <SectionTitle
+                    
                     accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
                   >
                     Security Question
-                  </Text>
-                  <Text style={[requiredField]} accessible={true} importantForAccessibility="yes" accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
+                  </SectionTitle>
+                  <HintText style={[{ marginVertical: 10}]} accessible={true} importantForAccessibility="yes" accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
                   {" "}
                   Fields marked with * are required.
-                </Text>
+                </HintText>
                 </View>
                 </View>
 
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
-                    <Text
-                      style={[styles.firstName1, styles.firstTypo]}
+                    <FieldTitle
                       accessible={true}
                       importantForAccessibility="yes"
                       accessibilityRole="text"
                       accessibilityLabel="Password Reset Question Required"
                     >
                       Password Reset Question *
-                    </Text>
+                    </FieldTitle>
                     <SparkLightDropdown
                       items={securityQuestionsNew}
                       selectedValue={customSecurityQuestion}
@@ -288,15 +288,15 @@ const PasswordSecurityEdit = () => {
                   style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
                 >
 
-                  <Text
-                      style={[styles.firstName1, styles.firstTypo,{marginBottom:8}]}
+                  <FieldTitle
+                      style={[{marginBottom:8}]}
                       accessible={true}
                       importantForAccessibility="yes"
                       accessibilityRole="text"
                       accessibilityLabel="Password Reset Answer Required"
                     >
                       Password Reset Answer *
-                    </Text>
+                    </FieldTitle>
                   <Controller
                     control={control}
                     name="securityAnswer"
