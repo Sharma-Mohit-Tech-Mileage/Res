@@ -69,7 +69,7 @@ const InternetCard = ({
   if (loading) {
     return (
       <View style={styles.container}>
-        <View style={styles.card}>
+        <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
           <SkeletonPlaceholder
             backgroundColor={theme.colors.skeleton.base}
             highlightColor={theme.colors.skeleton.highlight}
