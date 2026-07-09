@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, StyleSheet, Text, ActivityIndicator, Dimensions, Platform, } from "react-native";
 import WebView from "react-native-webview";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
@@ -7,7 +7,8 @@ import Touchable from "../common/customui/Touchable";
 import { useSelector, useDispatch } from "react-redux";
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser, } from "../../redux/utils/LocalStorage";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
-import { updateTermsAndConditions, fetchSMSSelection, fetchPushNotifications, } from "../../redux/actions/ProfileActionSuite";
+import { updateTermsAndConditions, saveSMSSelection, savePushNotifications, } from "../../redux/actions/ProfileActionSuite";
+import { fetchSmsSubscription, fetchPushNotifications } from "../../network/apis/account/profile.service";
 import { logout } from "react-native-app-auth";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
@@ -21,6 +22,9 @@ const Terms = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [isError, setIsError] = useState(false);
+  const fetchDoneRef = useRef(false);
+  const fetchPromiseRef = useRef(null);
+  const dataRef = useRef({ push: null, sms: null });
   const dispatch = useDispatch();
 
   const userData = useSelector((state) => state.user.userData);
@@ -29,22 +33,33 @@ const Terms = ({ navigation }) => {
   const url =
     "https://www.sparklight.com/legal/mobile-app-terms-and-conditions";
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 10000);
-    const fetchData = async () => {
-      try {
-        await Promise.all([
-          dispatch(fetchPushNotifications()),
-          dispatch(fetchSMSSelection()),
-        ]);
-        setLoading(false);
-      } catch (error) {
-        console.warn("Error fetching data:", error);
-        setLoading(false);
+  // fetch push/SMS via the services directly — awaiting the saga dispatch resolves before the data lands in redux
+  const runFetch = () => {
+    const promise = (async () => {
+      const [pushRes, smsRes] = await Promise.allSettled([
+        fetchPushNotifications(),
+        fetchSmsSubscription(),
+      ]);
+      if (pushRes.status === "fulfilled") {
+        dataRef.current.push = pushRes.value;
+        dispatch(savePushNotifications(pushRes.value));
       }
-    };
+      if (smsRes.status === "fulfilled") {
+        dataRef.current.sms = smsRes.value;
+        dispatch(saveSMSSelection(smsRes.value));
+      }
+      fetchDoneRef.current =
+        pushRes.status === "fulfilled" && smsRes.status === "fulfilled";
+      return fetchDoneRef.current;
+    })();
+    fetchPromiseRef.current = promise;
+    return promise;
+  };
 
-    fetchData();
+  useEffect(() => {
+    // failsafe so a hung request can't lock the Accept button forever
+    const timer = setTimeout(() => setLoading(false), 10000);
+    runFetch().finally(() => setLoading(false));
 
     return () => clearTimeout(timer);
   }, [dispatch]);
@@ -53,10 +68,24 @@ const Terms = ({ navigation }) => {
     await dispatch(updateTermsAndConditions(true, null));
     await dispatch(updateWalkThroughStep(0));
 
+    // never route on data that hasn't arrived — wait for the in-flight fetch, retry once if it failed
+    if (!fetchDoneRef.current) {
+      setLoading(true);
+      await fetchPromiseRef.current;
+      if (!fetchDoneRef.current) await runFetch();
+      setLoading(false);
+    }
+
+    const profileForNav = {
+      ...profile,
+      ...(dataRef.current.push != null && { pushNotifications: dataRef.current.push }),
+      ...(dataRef.current.sms != null && { smsSubscription: dataRef.current.sms }),
+    };
+
     await NavigationUtils.navigateToNext(
       navigation,
       "Terms",
-      profile,
+      profileForNav,
       accountNumber
     );
   };
