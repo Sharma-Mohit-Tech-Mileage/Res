@@ -24,6 +24,13 @@ import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import { A11y } from "react-native-a11y-order";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import AppStyles from "../../styles/AppStyles";
+import {
+  HintText,
+  IndicatorText,
+  SectionTitle,
+  SectionContent,
+} from "../common/customui/Typography";
+
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({
@@ -331,22 +338,22 @@ const AddNotificationScreen = () => {
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
               {isEnrolled && (
-                <Text style={styles.instructions}>{"Edit Email Address"}</Text>
+                <SectionTitle style={styles.instructions}>{"Edit Email Address"}</SectionTitle>
               )}
-              <Text style={styles.instructions}>
+              <SectionContent style={styles.instructions}>
                 {!isEnrolled
                   ? "Please enter your email address below and stay connected with us."
                   : "Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
-              </Text>
+              </SectionContent>
 
-              <Text
-               style={requiredField}
+              <HintText
+               style={{marginTop: 8, marginBottom: 4}}
                   accessibilityRole="text" 
                   accessible={true}
                   accessibilityLabel="Fields marked with asterisk are required.">
                 {" "}
                 Fields marked with * are required.
-              </Text>
+              </HintText>
               <Controller
                 control={control}
                 name="email"
@@ -373,7 +380,7 @@ const AddNotificationScreen = () => {
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
               <View style={styles.toggleHeader}>
-                <Text style={styles.toggleTitle} accessibilityRole="text"
+                <SectionTitle accessibilityRole="text"
                 accessible={true}
                 accessibilityLabel={`Critical Notifications, ${
                 primaryEmail ? "enabled" : "disabled"
@@ -381,7 +388,7 @@ const AddNotificationScreen = () => {
                 accessibilityHint="Receive critical information, account changes, and service
                 updates.">
                   Critical Notifications
-                </Text>
+                </SectionTitle>
                 <View style={styles.iconContainer}>
                   <View style={styles.icon} accessible={false}>
                     {primaryEmail ? (
@@ -391,15 +398,15 @@ const AddNotificationScreen = () => {
                     )}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
-                  <Text style={styles.toggleStatus} accessible={false} importantForAccessibility="no">
+                  <IndicatorText style={styles.toggleStatus} accessible={false} importantForAccessibility="no">
                     {primaryEmail ? "On" : "Off"}
-                  </Text>
+                  </IndicatorText>
                 </View>
               </View>
-              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
+              <SectionContent style={{marginVertical: 8}} accessible={false} importantForAccessibility="no">
                 Receive critical information, account changes, and service
                 updates.
-              </Text>
+              </SectionContent>
             </View>
             <View style={styles.divider} />
             <A11y.Order
@@ -407,8 +414,7 @@ const AddNotificationScreen = () => {
             >
               <View style={styles.toggleHeader}>
                 <A11y.Index index={0} style={styles.toggleTitle}>
-                <Text
-                  style={[styles.toggleTitle]}
+                <SectionTitle
                   accessible={true}
                   accessibilityRole="text"
                   accessibilityLabel="Paperless Billing for email notifications"
@@ -417,7 +423,7 @@ const AddNotificationScreen = () => {
                 fingertips."
                 >
                   Paperless Billing
-                </Text>
+                </SectionTitle>
                 </A11y.Index>
                 <View style={{ minWidth: A11Y.minTouch, minHeight: A11Y.minTouch }} accessible={false} importantForAccessibility="no">
                   <A11y.Index index={1}>
@@ -432,11 +438,11 @@ const AddNotificationScreen = () => {
                   </A11y.Index>
                 </View>
               </View>
-              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
+              <SectionContent style={{marginVertical: 8}} accessible={false} importantForAccessibility="no">
                 Opt for email statements and say goodbye to paper clutter. It's
                 convenient, eco-friendly, and keeps your information at your
                 fingertips.
-              </Text>
+              </SectionContent>
             </A11y.Order>
             {isCheckboxVisible && (
               <View style={styles.checkBoxArea}>
@@ -573,9 +579,6 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_base,
   },
   instructions: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    color: Color.colorGray_200,
     marginBottom: Padding.p_base,
   },
   emailInput: {

@@ -36,7 +36,7 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import AppStyles from "../../styles/AppStyles";
 import SecondaryButton from "../common/customui/PrimaryButton";
-
+import {SectionTitle, SectionContent } from "../common/customui/Typography";
 import {
   getFcmToken,
   notifyPermission,
@@ -314,8 +314,8 @@ const InAppNotifications = ({ navigation }) => {
 
       <ScrollView>
         <View style={styles.inAppNotificationsInner}>
-          <View style={{ alignSelf: "stretch",margin:16 }}>
-            <View style={[styles.frameGroup, styles.frameBorder]}>
+          <View style={[AppStyles.card, { margin: 16,padding: 16 }]}>
+            <View style={[ styles.frameBorder]}>
               {notification && (
                 <Animated.View
                   style={{
@@ -390,7 +390,8 @@ const InAppNotifications = ({ navigation }) => {
               </View>
               </View>
 
-                <View style={styles.buttonsParent}>
+          </View>
+          <View style={styles.buttonsParent}>
             <SecondaryButton
               title="Save"
               onPress={handleSave}
@@ -409,7 +410,7 @@ const InAppNotifications = ({ navigation }) => {
               disabled={isSubmitting}
             />
             </View>
-          </View>
+        
         </View>
       </ScrollView>
     </View>
@@ -429,25 +430,23 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
         <View style={{ flexDirection: "column", flex: 1, marginRight: 10 }}>
-          <Text
+          <SectionTitle
             style={styles.appointments}
             accessible={true}
             accessibilityRole="text"
             accessibilityLabel={`${title} for In-app notifications. ${description}`}
           >
             {title}
-          </Text>
-          <Text
+          </SectionTitle>
+          <SectionContent
             style={[
-              styles.receiveAppNotifications1,
-              styles.receiveTypo,
               { marginTop: 8 },
             ]}
             accessible={false}
             importantForAccessibility="no"
           >
             {description}
-          </Text>
+          </SectionContent>
         </View>
 
         <View>
@@ -511,10 +510,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   appointments: {
-    color: Color.colorGray_100,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
     lineHeight: 22,
     flex: 1,
   },
@@ -557,8 +552,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   buttonsParent: {
-    marginTop: 16,
-    alignSelf: "stretch",
+    margin: 16,
+    alignSelf: "center",
+    width: "90%",
   },
   inAppNotificationsInner: {
     width: "100%",

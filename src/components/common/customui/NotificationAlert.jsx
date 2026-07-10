@@ -20,6 +20,7 @@ import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
 import Touchable from "./Touchable";
+import {BannerAlertText} from "./Typography";
 
 
 const TYPE_CONFIG = {
@@ -450,9 +451,9 @@ const NotificationAlert = ({
             style={styles.blockWrapper}
           >
             {hasBoldOnly ? (
-              <Text>
+              <BannerAlertText>
                 {blockSegments.map((segment) => (
-                  <Text
+                  <BannerAlertText
                     key={segment.key}
                     style={[
                       styles.messageText,
@@ -461,13 +462,13 @@ const NotificationAlert = ({
                     ]}
                   >
                     {segment.content}
-                  </Text>
+                  </BannerAlertText>
                 ))}
-              </Text>
+              </BannerAlertText>
             ) : (
-              <Text style={[styles.messageText, { color: config.textColor }]}>
+              <BannerAlertText style={[{ color: config.textColor }]}>
                 {plainText}
-              </Text>
+              </BannerAlertText>
             )}
           </View>
         );
@@ -500,20 +501,19 @@ const NotificationAlert = ({
             style={[styles.blockWrapper, styles.actionableBlock]}
             hitSlop={A11Y.hitSlop}
           >
-            <Text>
+            <BannerAlertText>
               {blockSegments.map((segment) => (
-                <Text
+                <BannerAlertText
                   key={segment.key}
                   style={[
-                    styles.messageText,
                     { color: config.textColor },
                     segment.type === "styled" && styles.styledText,
                   ]}
                 >
                   {segment.content}
-                </Text>
+                </BannerAlertText>
               ))}
-            </Text>
+            </BannerAlertText>
           </Touchable>
         );
       }
@@ -558,20 +558,19 @@ const NotificationAlert = ({
           style={[styles.blockWrapper, styles.actionableBlock]}
           hitSlop={A11Y.hitSlop}
         >
-          <Text>
+          <BannerAlertText>
             {blockSegments.map((segment) => (
-              <Text
+              <BannerAlertText
                 key={segment.key}
                 style={[
-                  styles.messageText,
                   { color: config.textColor },
                   segment.type === "styled" && styles.styledText,
                 ]}
               >
                 {segment.content}
-              </Text>
+              </BannerAlertText>
             ))}
-          </Text>
+          </BannerAlertText>
         </Touchable>
       );
     },

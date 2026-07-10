@@ -27,6 +27,7 @@ import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import { A11Y } from "../../styles/theme";
 import AppStyles from "../../styles/AppStyles";
+
 import SecondaryButton from "../common/customui/PrimaryButton";
 
 import {
@@ -40,6 +41,8 @@ import {
 import Toggle from "../common/Toggle";
 import AlertIcon from "../../../assets/svgs/Alerttriangle";
 import { widthPercentageToDP } from "react-native-responsive-screen";
+
+import {SectionTitle,SectionContent,HintText} from "../common/customui/Typography";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
@@ -401,22 +404,21 @@ const TextNotifications = ({ navigation }) => {
             </View>
 
             <View style={{ marginHorizontal: 20 }}>
-              <Text
-                style={[styles.mobilePhoneTypo]}
+              <SectionContent
                 accessibilityRole="text"
                 accessible={true}
                 accessibilityLabel={message}
               >
                 {message}
-              </Text>
-              <Text
+              </SectionContent>
+              <HintText
                 style={styles.requiredFieldsText}
                 accessibilityRole="text"
                 accessible={true}
                 accessibilityLabel="Fields marked with an asterisk are required"
               >
                 Fields marked with * are required.
-              </Text>
+              </HintText>
             </View>
 
             <View style={{ marginHorizontal: 20, paddingVertical: Padding.p_base }}>
@@ -590,25 +592,24 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
         <View style={{ flexDirection: "column", flex: 1, marginRight: 10 }}>
-          <Text
+          <SectionTitle
             style={styles.appointments}
             accessible={true}
             accessibilityRole="text"
             accessibilityLabel={`${title} for text notifications ${description}`}
           >
             {title}
-          </Text>
-          <Text
+          </SectionTitle>
+          <SectionContent
             style={[
               styles.receiveAppNotifications1,
-              styles.receiveTypo,
               { marginTop: 8 },
             ]}
             accessible={false}
             importantForAccessibility="no"
           >
             {description}
-          </Text>
+          </SectionContent>
         </View>
 
         <View>
@@ -647,9 +648,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   requiredFieldsText: {
-    fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.gray600,
     marginTop: Padding.p_base,
     textAlign: "left",
   },
@@ -824,10 +822,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   appointments: {
-    color: Color.colorGray_100,
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
     lineHeight: 22,
     flex: 1,
   },
@@ -850,7 +845,6 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   receiveAppNotifications1: {
-    color: Color.colorGray_100,
     lineHeight: 22,
   },frameBorder: {
     borderColor: Color.sparklightGray,

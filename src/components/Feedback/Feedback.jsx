@@ -34,6 +34,7 @@ import useUserEmailPrefill from "../../hooks/useUserEmailPrefill";
 import FeedbackRatingSelector from "./FeedbackRatingSelector";
 import AreaOfConcernSelector from "./AreaOfConcernSelector";
 import { Radio } from "native-base";
+import {HintText} from "../common/customui/Typography";
 
 const Feedback = () => {
   const navigation = useNavigation();
@@ -172,14 +173,14 @@ const Feedback = () => {
             <Text style={styles.question}>
               How would you rate your experience using the MySparklight app?
             </Text>
-            <Text
-              style={styles.requiredFieldsText}
+            <HintText
+              style={{marginTop: Padding.p_base,}}
               accessibilityRole="text"
               accessible={true}
               accessibilityLabel="Fields marked with an asterisk are required"
             >
               Fields marked with * are required.
-            </Text>
+            </HintText>
           </Animated.View>
 
           <Animated.View
