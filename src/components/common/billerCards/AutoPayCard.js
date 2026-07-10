@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
 import Checkcircle from "../../../../assets/svgs/Checkcircle";
 import Checkcircle1 from "../../../../assets/svgs/Checkcircle1"
+import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Color } from "../../../../GlobalStyles";
 import Config from "react-native-config";
@@ -49,9 +50,9 @@ const AutoPayCard = ({
           alignItems: "center",
         }}
       >
-        {/* <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Auto Pay Icon">
+         <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Auto Pay Icon">
           <AutoPayIcon />
-        </View> */}
+        </View> 
         <View style={{ flexDirection: "column" }}>
           <SectionTitle style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Auto Pay" >
             Auto Pay
@@ -108,7 +109,7 @@ const AutoPayCard = ({
               {isAutoPayStatus ? (
                 <View style={styles.iconContainer}>
                   <StatusIcon status="On" style={styles.statusIcon} />
-                  <IndicatorText style={{marginLeft: 4, marginTop: 2}}  accessible={true} accessibilityRole='text' accessibilityLabel="Auto Pay is On">On</IndicatorText>
+                  <IndicatorText style={{marginLeft: 4, marginTop: 4}}  accessible={true} accessibilityRole='text' accessibilityLabel="Auto Pay is On">On</IndicatorText>
                 </View>
               ) : (
                 <View style={styles.iconContainer}>
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
   },
 
   leftTitle: {
-    marginLeft: 10,
+    marginLeft: 8,
     alignContent: "flex-start",
     alignSelf: "center",
   },
@@ -158,6 +159,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
   },
   statusIcon: {
     marginTop: 4,

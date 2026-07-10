@@ -109,7 +109,7 @@ const InternetCard = ({
             /> 
           </View> */}
           <SectionTitle
-            style={{paddingLeft: 16}}
+            style={{paddingLeft: 8}}
             accessible={true}
             accessibilityLabel="Internet"
             accessibilityLevel={2}

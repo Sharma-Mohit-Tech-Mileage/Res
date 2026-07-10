@@ -216,7 +216,6 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
 
 const styles = StyleSheet.create({
   leftTitle: {
-    marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
   },

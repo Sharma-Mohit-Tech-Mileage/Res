@@ -27,10 +27,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: Padding.p_base,
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: Border.br_11xs,
+        borderRadius: 25,
     },
     buttons: {
-        backgroundColor: Color.sparklight_yellow,
+        backgroundColor: Color.sparklightWhite,
     },
     buttonStyl: {
         fontSize: FontSize.size_sm,

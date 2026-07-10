@@ -10,6 +10,7 @@ import { cardHeader, dataUsageTabs } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 import Touchable from "../../../common/customui/Touchable";
 import AppStyles from "../../../../styles/AppStyles";
+import {SectionTitle} from "../../../common/customui/Typography";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -562,15 +563,15 @@ const UsageChart = ({
       <View style={styles.card}>
         {/* Header icon — decorative */}
         <View style={styles.header}>
-          <View
+          {/* <View
             style={styles.iconWrapper}
             accessible={false}
             importantForAccessibility="no-hide-descendants"
             accessibilityElementsHidden={true}
           >
             <MaterialCommunityIcons name="chart-bar" size={20} color={theme.colors.primary} />
-          </View>
-          <Text style={styles.chartTitle} accessibilityRole="header">Historical Usage</Text>
+          </View> */}
+          <SectionTitle accessibilityRole="header">Historical Usage</SectionTitle>
         </View>
         <View style={styles.tabsContainer} accessibilityRole="tablist">
           {tabs.map((tab) => {

@@ -207,7 +207,7 @@ const UsageSummaryCard = ({ currentUsage, loading = false }) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <View style={AppStyles.cardHreader}>
+        <View style={styles.header}>
           {/* <View
             style={styles.iconWrapper}
             accessible={false}
