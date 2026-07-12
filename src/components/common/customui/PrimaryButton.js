@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
 
   submitButton: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   cancelButton: {
    // backgroundColor: Color.colorWhitesmoke_200, // Adjust color as needed
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     textAlign: "center",
-    color: Color.colorMidnightblue, // Adjust color as needed
+    color: Color.sparklightPrimaryPurple, // Adjust color as needed
     fontSize: FontSize.size_lg,
     textDecorationLine: "underline",
     fontFamily: FontFamily.RadioCanadaRegular,

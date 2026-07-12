@@ -10,6 +10,8 @@ import moment from "moment";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
 import NavigationUtils from "./NavigationUtils";
+import PrimaryButton from "../common/customui/PrimaryButton";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const PushNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -62,7 +64,7 @@ const PushNotifications = ({ navigation }) => {
         permanentSkip: true,
       };
       storePushNotificationStatus(localData);
-      await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
+      await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));     
       await NavigationUtils.navigateToNext(
         navigation,
         "EntryPushNotifications",
@@ -88,18 +90,22 @@ const PushNotifications = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.inner}>
       <ProfileSettingsHeader showIcon={false} title={"Notifications"} />
-      <ScrollView
-        style={styles.inner}
-        contentContainerStyle={styles.innerContent}
-      >
-        <>
-          <View style={styles.headerTabView}>
-            <View style={styles.headerTabOne} />
-            <View style={styles.headerTabTwo} />
-            <View style={styles.headerTabThree} />
-          </View>
+
+        {/* <View style={styles.headerTabView}>
+          <View style={styles.headerTabOne} />
+          <View style={styles.headerTabTwo} />
+          <View style={styles.headerTabThree} />
+        </View> */}
+    <ScrollView
+      style={styles.inner}
+      contentContainerStyle={styles.innerContent}
+    >
+      
+       
+        <View style={styles.container}>
+
           <View style={styles.viewContainer}>
             <View>
               <View style={styles.headerIconViewContainer}>
@@ -118,58 +124,43 @@ const PushNotifications = ({ navigation }) => {
               </View>
             </View>
           </View>
-          <View style={styles.bottomBar}>
-            <Touchable
-              accessibilityLabel="Allow Notifications Button"
-              style={[styles.button, styles.buttonsLayout]}
-              onPress={enableNotifications}
-            >
-              <Text style={styles.accept}>Allow Notifications</Text>
-            </Touchable>
-            <View
-              style={styles.buttonsParent}
-              accessibilityLabel="Buttons Section"
-            >
-              <Touchable
-                style={[styles.buttonDecline, styles.buttonsLayout]}
-                onPress={skipNotifications}
-                accessibilityLabel="Skip for now"
-              >
-                <Text style={styles.decline}>Skip for now</Text>
-              </Touchable>
-            </View>
-          </View>
-        </>
-      </ScrollView>
+      
+        <View style={styles.bottomBar}>
+          <PrimaryButton
+            accessibilityLabel="Allow Notifications Button"
+            accessibilityRole="button"
+            accessibilityHint="Allow Notifications"
+            buttonType="submit"
+            title="Allow Notifications"
+            onPress={() => enableNotifications()}
+          ></PrimaryButton>
+
+          <PrimaryButton
+            buttonType="cancel"
+            onPress={() => skipNotifications()}
+            accessibilityLabel="Skip Button"
+            accessibilityRole="button"
+            title="Skip for now"
+            accessibilityHint="Skip Push Notifications"
+          ></PrimaryButton>
+        </View>
+        </View>
+      
+    </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   bottomBar: {
-    backgroundColor: "#FFF",
-    justifyContent: "center",
-    alignItems: "center",
+    marginHorizontal: 24,
+    marginBottom: hp("5%"),
+    
   },
   buttonDecline: {
-    marginBottom: 125, // was 100, reduce this value
+    marginBottom: 50,
   },
-  button: {
-    backgroundColor: Color.colorMidnightblue,
-    marginBottom: 20, // was 20, reduce this value
-    width: "90%",
-  },
-  buttonsLayout: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    minHeight: 50,
-  },
-  buttonsParent: {
-    width: "90%",
-  },
+  
   accept: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
@@ -179,40 +170,20 @@ const styles = StyleSheet.create({
   decline: {
     color: Color.colorMidnightblue,
     textAlign: "center",
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
   },
   inner: {
     flex: 1,
+    backgroundColor: Color.sparklightWhite,
   },
   innerContent: {
-    justifyContent: "space-around",
-    flex: 1,
+    flexGrow: 1,
+    backgroundColor: Color.sparklightWhite,
+    justifyContent: "space-between",
   },
   container: {
     flex: 1,
-    backgroundColor: "#FFF",
-    alignContent: "center",
-    justifyContent: "center",
-    height: "100%",
-  },
-  scrollViewContainer: {
-    padding: 20,
-    marginBottom: 0,
-  },
-  scrollViewContentContainer: {
-    paddingBottom: 30,
-  },
-  sparklightImageView: {
-    width: 100,
-    height: 25,
-    marginBottom: 10,
-    marginTop: 10,
-  },
-  sparklightImage: {
-    tintColor: "#CCC",
-    width: "100%",
-    height: "100%",
+    justifyContent: "space-between",
+    paddingBottom: hp("15%"),
   },
   headerIconViewContainer: {
     alignItems: "center",
@@ -230,24 +201,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   headerTabView: {
+    marginTop: 20,
     flexDirection: "row",
     width: "100%",
-    marginTop: 30,
+  
     justifyContent: "center",
   },
   headerTabOne: {
-    backgroundColor: Color.colorMidnightblue,
+    backgroundColor: Color.sparklightSecondaryPurple,
     width: 100,
     height: 5,
   },
   headerTabTwo: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.sparklightSecondaryPurple + "1A",
     width: 100,
     height: 5,
     marginLeft: 10,
   },
   headerTabThree: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.sparklightSecondaryPurple + "1A",
     width: 100,
     height: 5,
     marginLeft: 10,
@@ -256,27 +228,32 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   headerText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     textAlign: "center",
     color: Color.colorGray_100,
+    
   },
   subHeader: {
     paddingTop: 10,
   },
   subHeaderText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 16,
     lineHeight: 25,
-    textAlign: "center",
+    textAlign: 'center',
+    
     color: Color.colorGray_100,
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
   },
   viewContainer: {
-    flex: 1,
-    width: "100%",
-    alignItems: "center",
-    marginTop: 50,
+     paddingVertical: 16,
+     paddingHorizontal: 16,
+     width: "100%",
+     alignItems: "center",
+     justifyContent: "center",
+     flex: 1,
+   
   },
 });
 
