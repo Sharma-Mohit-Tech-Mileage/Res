@@ -5,41 +5,29 @@ import PaymentBrandIcon from "../../common/PaymentBrandIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { paymentMethodA11yLabel, paymentMethodTitle, maskedDigits, isMethodExpired } from "./paymentsShared";
 
-// Figma method card: radio variant for AutoPay selection, actions variant for the Payment Methods list
+// Figma method card: radio variant for payment selection, actions variant for the Payment Methods list
 const PaymentMethodCard = ({
   method,
   variant = "radio",
   selected = false,
   onPress,
   showAutoPayBadge = false,
-  showDefaultBadge = false,
   onEdit,
   onDelete,
-  onSetDefault,
   disabled = false,
   positionLabel = "",
 }) => {
   const expired = isMethodExpired(method);
-  const brandMark = (
-    <View style={styles.brandWrap} accessible={false} importantForAccessibility="no-hide-descendants">
-      <PaymentBrandIcon type={method?.type} brand={method?.brand} height={22} />
-    </View>
-  );
-
-  const badges = (
-    <View style={styles.badgeRow}>
-      {showAutoPayBadge && <Text style={styles.autoPayBadge}>Auto Pay</Text>}
-      {showDefaultBadge && !!method?.isDefault && <Text style={styles.defaultBadge}>Default</Text>}
-      {expired && <Text style={styles.expiredBadge}>Expired</Text>}
-    </View>
-  );
+  // Figma: the Auto Pay method swaps its Delete link for the green badge
+  const showEdit = !!onEdit && !expired;
+  const showDelete = !!onDelete && !showAutoPayBadge;
 
   const infoA11yLabel = `${paymentMethodA11yLabel(method)}${showAutoPayBadge ? ", used for Auto Pay" : ""}${
-    showDefaultBadge && method?.isDefault ? ", default" : ""
-  }${expired ? ", expired" : ""}${method?.expiry ? `, expires ${method.expiry}` : ""}`;
+    expired ? ", expired" : ""
+  }${method?.expiry ? `, expires ${method.expiry}` : ""}`;
 
-  const info = (
-    <View accessible={variant === "actions"} accessibilityLabel={variant === "actions" ? infoA11yLabel : undefined}>
+  const topContent = (
+    <>
       <View style={styles.topRow}>
         <View style={styles.titleWrap}>
           {variant === "radio" && (
@@ -49,128 +37,142 @@ const PaymentMethodCard = ({
           )}
           <Text style={[styles.titleText, expired && styles.textDisabled]}>{paymentMethodTitle(method)}</Text>
         </View>
-        {brandMark}
+        <View style={styles.brandWrap} accessible={false} importantForAccessibility="no-hide-descendants">
+          <PaymentBrandIcon type={method?.type} brand={method?.brand} height={22} />
+        </View>
       </View>
       <Text style={[styles.digitsText, expired && styles.textDisabled]}>{maskedDigits(method)}</Text>
-    </View>
-  );
-
-  const body = (
-    <>
-      {info}
-      <View style={styles.bottomRow}>
-        {variant === "actions" ? (
-          <View style={styles.actionsWrap}>
-            {!!onEdit && !expired && (
-              <Touchable
-                onPress={onEdit}
-                disabled={disabled}
-                accessibilityRole="link"
-                accessibilityLabel={`Edit ${paymentMethodA11yLabel(method)}`}
-                style={styles.actionLink}
-              >
-                <Text style={styles.actionText}>Edit</Text>
-              </Touchable>
-            )}
-            {!!onEdit && !!onDelete && !expired && <Text style={styles.actionDivider}>|</Text>}
-            {!!onDelete && (
-              <Touchable
-                onPress={onDelete}
-                disabled={disabled}
-                accessibilityRole="link"
-                accessibilityLabel={`Delete ${paymentMethodA11yLabel(method)}`}
-                style={styles.actionLink}
-              >
-                <Text style={styles.actionText}>Delete</Text>
-              </Touchable>
-            )}
-            {!!onSetDefault && !method?.isDefault && !expired && (
-              <>
-                <Text style={styles.actionDivider}>|</Text>
-                <Touchable
-                  onPress={onSetDefault}
-                  disabled={disabled}
-                  accessibilityRole="link"
-                  accessibilityLabel={`Set ${paymentMethodA11yLabel(method)} as default`}
-                  style={styles.actionLink}
-                >
-                  <Text style={styles.actionText}>Set as Default</Text>
-                </Touchable>
-              </>
-            )}
-            {badges}
-          </View>
-        ) : (
-          badges
-        )}
-        {!!method?.expiry && <Text style={styles.expiryText}>Exp {method.expiry}</Text>}
-      </View>
     </>
   );
 
+  const hasActions = showEdit || showDelete || showAutoPayBadge || expired || !!method?.expiry;
+  const actionsRow = hasActions ? (
+    <View style={styles.bottomRow}>
+      <View style={styles.actionsWrap}>
+        {showEdit && (
+          <Touchable
+            onPress={onEdit}
+            disabled={disabled}
+            accessibilityRole="link"
+            accessibilityLabel={`Edit ${paymentMethodA11yLabel(method)}`}
+            style={styles.actionLink}
+          >
+            <Text style={styles.actionText}>Edit</Text>
+          </Touchable>
+        )}
+        {showEdit && (showDelete || showAutoPayBadge) && (
+          <Text style={styles.actionDivider} accessible={false} importantForAccessibility="no">
+            |
+          </Text>
+        )}
+        {showDelete && (
+          <Touchable
+            onPress={onDelete}
+            disabled={disabled}
+            accessibilityRole="link"
+            accessibilityLabel={`Delete ${paymentMethodA11yLabel(method)}`}
+            style={styles.actionLink}
+          >
+            <Text style={styles.actionText}>Delete</Text>
+          </Touchable>
+        )}
+        {showAutoPayBadge && (
+          <Text style={styles.autoPayBadge} accessible={false} importantForAccessibility="no">
+            Auto Pay
+          </Text>
+        )}
+        {expired && (
+          <Text style={styles.expiredBadge} accessible={false} importantForAccessibility="no">
+            Expired
+          </Text>
+        )}
+      </View>
+      {!!method?.expiry && (
+        <Text style={styles.expiryText} accessible={false} importantForAccessibility="no">
+          Exp {method.expiry}
+        </Text>
+      )}
+    </View>
+  ) : null;
+
   if (variant === "radio") {
     return (
-      <Touchable
-        onPress={onPress}
-        disabled={disabled || expired}
-        accessibilityRole="radio"
-        accessibilityState={{ checked: selected, disabled: disabled || expired }}
-        accessibilityLabel={`${paymentMethodA11yLabel(method)}${showAutoPayBadge ? ", current Auto Pay method" : ""}${
-          expired ? ", expired, not eligible" : ""
-        }${positionLabel ? `, ${positionLabel}` : ""}`}
-        style={[styles.card, selected && styles.cardSelected, expired && styles.cardDisabled]}
-      >
-        {body}
-      </Touchable>
+      <View style={[styles.card, selected && styles.cardSelected, expired && styles.cardDisabled]}>
+        <Touchable
+          onPress={onPress}
+          disabled={disabled || expired}
+          accessibilityRole="radio"
+          accessibilityState={{ checked: selected, disabled: disabled || expired }}
+          accessibilityLabel={`${infoA11yLabel}${expired ? ", not eligible" : ""}${
+            positionLabel ? `, ${positionLabel}` : ""
+          }`}
+          style={styles.radioPress}
+        >
+          {topContent}
+        </Touchable>
+        {actionsRow}
+      </View>
     );
   }
 
-  return <View style={[styles.card, expired && styles.cardDisabled]}>{body}</View>;
+  return (
+    <View style={[styles.card, expired && styles.cardDisabled]}>
+      <View accessible accessibilityLabel={infoA11yLabel}>
+        {topContent}
+      </View>
+      {actionsRow}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 8,
+    borderRadius: 15,
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: "transparent",
     padding: 16,
     marginBottom: 12,
     alignItems: "stretch",
     alignSelf: "stretch",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    elevation: 2,
   },
   cardSelected: {
-    borderWidth: 2,
     borderColor: Color.colorMidnightblue,
-    backgroundColor: "#3530910D",
+    backgroundColor: "#F3F2FF",
   },
   cardDisabled: { opacity: 0.55 },
+  radioPress: { alignItems: "stretch", alignSelf: "stretch" },
   topRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   titleWrap: { flexDirection: "row", alignItems: "center", flexShrink: 1 },
   radioOuter: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#98A2B3",
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Color.sparklightGray1,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,
   },
   radioOuterSelected: { borderColor: Color.colorMidnightblue },
-  radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: Color.colorMidnightblue },
+  radioInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: Color.colorMidnightblue },
   titleText: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_100,
+    color: Color.colorGray_200,
     flexShrink: 1,
   },
   brandWrap: { marginLeft: 12 },
   digitsText: {
-    fontSize: FontSize.size_lg,
+    fontSize: FontSize.size_5xl,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
-    color: Color.colorGray_100,
+    color: Color.colorGray_200,
     letterSpacing: 1,
     marginTop: 8,
   },
@@ -185,49 +187,37 @@ const styles = StyleSheet.create({
   actionLink: { paddingVertical: 4, paddingHorizontal: 4 },
   actionText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
-    color: Color.colorMidnightblue,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightBrightPurple,
     textDecorationLine: "underline",
   },
   actionDivider: { color: "#98A2B3", marginHorizontal: 6 },
-  badgeRow: { flexDirection: "row", alignItems: "center", marginLeft: 4 },
   autoPayBadge: {
-    fontSize: FontSize.size_smi,
-    fontFamily: FontFamily.openSansSemiBold,
-    color: Color.colorMidnightblue,
-    backgroundColor: "#3530911A",
-    borderRadius: 3,
+    fontSize: FontSize.size_xs,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200,
+    backgroundColor: "#C8E9D0",
+    borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,
-    marginRight: 8,
-    overflow: "hidden",
-  },
-  defaultBadge: {
-    fontSize: FontSize.size_smi,
-    fontFamily: FontFamily.openSansSemiBold,
-    color: "#1D7832",
-    backgroundColor: Color.success50,
-    borderRadius: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    marginRight: 8,
+    marginLeft: 4,
     overflow: "hidden",
   },
   expiredBadge: {
-    fontSize: FontSize.size_smi,
+    fontSize: FontSize.size_xs,
     fontFamily: FontFamily.openSansSemiBold,
     color: "#B92A1C",
     backgroundColor: "#FEF3F2",
-    borderRadius: 3,
+    borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,
+    marginLeft: 4,
     overflow: "hidden",
   },
   expiryText: {
-    fontSize: FontSize.size_smi,
+    fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightGray1,
+    color: Color.colorGray_200,
   },
   textDisabled: { color: Color.sparklightGray1 },
 });

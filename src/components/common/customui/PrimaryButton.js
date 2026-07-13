@@ -19,6 +19,7 @@ const PrimaryButton = ({ title, onPress, buttonType, accessibilityLabel, disable
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel !== undefined ? accessibilityLabel : undefined}
         accessibilityState={{ disabled }}
+        disabled={disabled}
         style={({ pressed }) => [
           isSubmit || isOutline ? styles.button : styles.canbutton,
           isSubmit ? styles.submitButton : null,

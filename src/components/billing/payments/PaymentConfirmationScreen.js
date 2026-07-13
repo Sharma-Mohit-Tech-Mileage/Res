@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet } from "react-native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import NextActionCard from "./NextActionCard";
-import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
+import AnimatedSuccessIcon from "./AnimatedSuccessIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
 import { contentMaxWidth, formatCurrency } from "./paymentsShared";
@@ -45,6 +45,10 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
     setFocusToRef(titleRef, { delay: 600 });
   }, [message]);
 
+  // Figma: dollar amounts inside the success message render bold
+  const messageParts = message.split(/(\$[\d,]+\.?\d*)/g);
+  const showBackToBilling = kind !== "autopay-activated" && kind !== "autopay-updated";
+
   const followUp =
     nextAction?.type === "payBalance"
       ? {
@@ -80,12 +84,24 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
       <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
         <View style={[card.elevated, styles.successCard]}>
           <View style={styles.iconWrap} accessible={false} importantForAccessibility="no-hide-descendants">
-            <SuccessIcon width={64} height={64} />
+            <AnimatedSuccessIcon size={64} />
           </View>
           <Text ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={1}>
             {successTitle}
           </Text>
-          {!!message && <Text style={styles.message}>{message}</Text>}
+          {!!message && (
+            <Text style={styles.message}>
+              {messageParts.map((part, index) =>
+                /^\$[\d,]/.test(part) ? (
+                  <Text key={index} style={styles.messageAmount}>
+                    {part}
+                  </Text>
+                ) : (
+                  part
+                )
+              )}
+            </Text>
+          )}
           {!!confirmationNumber && (
             <View
               style={styles.detailBlock}
@@ -114,12 +130,14 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
           />
         )}
 
-        <PrimaryButton
-          title="Back to Billing"
-          buttonType="submit"
-          accessibilityLabel="Back to Billing"
-          onPress={() => navigation.popToTop()}
-        />
+        {showBackToBilling && (
+          <PrimaryButton
+            title="Back to Billing"
+            buttonType="submit"
+            accessibilityLabel="Back to Billing"
+            onPress={() => navigation.popToTop()}
+          />
+        )}
       </ScrollView>
     </View>
   );
@@ -131,7 +149,7 @@ const styles = StyleSheet.create({
   successCard: { padding: 24, alignItems: "center", marginTop: 16 },
   iconWrap: { marginBottom: 16 },
   title: {
-    fontSize: FontSize.size_lg,
+    fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
     color: Color.colorGray_100,
@@ -139,24 +157,25 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   message: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightGray1,
+    color: Color.colorGray_200,
     textAlign: "center",
-    lineHeight: 20,
+    lineHeight: 22,
   },
+  messageAmount: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
   detailBlock: { alignSelf: "stretch", marginTop: 16 },
   detailLabel: {
-    fontSize: FontSize.size_smi,
+    fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
     marginBottom: 2,
   },
   detailValue: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
-    color: Color.colorGray_100,
+    color: Color.colorGray_200,
   },
 });
 

@@ -12,6 +12,7 @@ const AgreeTermsRow = ({ value, onValueChange, onViewTerms }) => (
       accessibilityRole="checkbox"
       accessibilityState={{ checked: !!value }}
       accessibilityLabel="I agree to Terms & Conditions"
+      accessibilityHint="Double tap to toggle agreement."
       style={styles.agreePress}
     >
       <View pointerEvents="none" style={styles.checkboxBox}>
@@ -58,7 +59,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
-    color: Color.colorMidnightblue,
+    color: Color.sparklightBrightPurple,
     textDecorationLine: "underline",
   },
 });

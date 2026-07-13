@@ -100,7 +100,11 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[styles.content, contentMaxWidth]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -196,19 +200,19 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 80 },
+  content: { padding: 20, paddingBottom: 100 },
   heading: {
-    fontSize: FontSize.size_lg,
+    fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
-    color: Color.colorGray_100,
+    fontWeight: "700",
+    color: Color.sparklightGray1,
     marginBottom: 8,
   },
   introText: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
-    lineHeight: 20,
+    lineHeight: 22,
     marginBottom: 16,
   },
   introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
@@ -217,16 +221,16 @@ const styles = StyleSheet.create({
   fieldGroup: { paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: "#EAECF0", marginBottom: 12 },
   fieldGroupLast: { paddingBottom: 0, borderBottomWidth: 0, marginBottom: 0 },
   fieldLabel: {
-    fontSize: FontSize.size_smi,
+    fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
     marginBottom: 2,
   },
   fieldValue: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
-    color: Color.colorGray_100,
+    fontWeight: "700",
+    color: Color.colorGray_200,
   },
   emailCard: { padding: 16 },
 });

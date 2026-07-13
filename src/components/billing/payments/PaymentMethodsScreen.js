@@ -9,10 +9,10 @@ import PaymentMethodCard from "./PaymentMethodCard";
 import ConfirmActionModal from "./ConfirmActionModal";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
+import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
-  setDefaultPaymentMethod,
   deletePaymentMethod,
   addDemoPaymentMethod,
   isDemoPaymentData,
@@ -78,40 +78,6 @@ const PaymentMethodsScreen = ({ navigation }) => {
   // Orbipay cannot edit PCI fields natively; edits go through the secure capture page
   const onEditMethod = () => openOrbipaySecureCapture(navigation, "Edit Payment Method");
 
-  const onSetDefault = async (method) => {
-    setBusy(true);
-    try {
-      await setDefaultPaymentMethod(method.id);
-      setMethods((prev) => prev?.map((m) => ({ ...m, isDefault: m.id === method.id })));
-      setAlert({
-        type: "success",
-        message: `${describePaymentMethod(method)} is now your default payment method`,
-      });
-      announceA11y("Default payment method updated.");
-    } catch (error) {
-      setAlert({
-        type: "error",
-        title: "Something went wrong",
-        message: "We could not update your default payment method. Please try again.",
-      });
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const onRequestDelete = (method) => {
-    if (isAutoPayLinked(method)) {
-      setAlert({
-        type: "warning",
-        title: "This payment method is used for Auto Pay",
-        message: "Update Auto Pay to use another payment method before deleting this one.",
-      });
-      announceA11y("This payment method is used for Auto Pay and cannot be deleted yet.");
-      return;
-    }
-    setPendingDelete(method);
-  };
-
   const onConfirmDelete = async () => {
     const method = pendingDelete;
     setPendingDelete(null);
@@ -151,12 +117,16 @@ const PaymentMethodsScreen = ({ navigation }) => {
             Add payment method
           </Text>
           <LinkText
-            text="Add +"
             onPress={() => !busy && onAddMethod()}
             disabled={busy}
             accessibilityLabel="Add payment method"
             accessibilityHint="Opens a secure page to add a card or bank account."
-          />
+          >
+            <View style={styles.addLinkRow}>
+              <Text style={styles.addLinkText}>Add</Text>
+              <PlusCircleIcon />
+            </View>
+          </LinkText>
         </View>
 
         {methods === null ? (
@@ -180,11 +150,9 @@ const PaymentMethodsScreen = ({ navigation }) => {
               method={method}
               variant="actions"
               showAutoPayBadge={isAutoPayLinked(method)}
-              showDefaultBadge
               disabled={busy}
               onEdit={onEditMethod}
-              onDelete={() => onRequestDelete(method)}
-              onSetDefault={() => onSetDefault(method)}
+              onDelete={() => setPendingDelete(method)}
             />
           ))
         )}
@@ -214,14 +182,22 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   heading: {
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
-    color: Color.colorGray_100,
+    color: Color.sparklightGray1,
     flexShrink: 1,
     marginRight: 8,
   },
-  cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
+  addLinkRow: { flexDirection: "row", alignItems: "center" },
+  addLinkText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightBrightPurple,
+    textDecorationLine: "underline",
+    marginRight: 4,
+  },
+  cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyCard: { padding: 20, marginBottom: 16, alignItems: "flex-start" },
   emptyTitle: {
     fontSize: FontSize.size_base,

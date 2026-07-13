@@ -36,12 +36,9 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
     if (submitting || !agreed) return;
     setSubmitting(true);
     try {
-      const result = await cancelAutoPay();
-      navigation.replace("PaymentConfirmation", {
-        kind: "autopay-deactivated",
-        confirmationNumber: result?.confirmationNumber || "",
-        email: details?.email || "",
-      });
+      await cancelAutoPay();
+      // Figma: deactivation success shows no confirmation number or email section
+      navigation.replace("PaymentConfirmation", { kind: "autopay-deactivated" });
     } catch (error) {
       setErrorAlert("We could not deactivate Auto Pay right now. Please try again.");
       announceA11y("Error, Auto Pay was not deactivated.");
@@ -72,6 +69,7 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
         <NotificationAlert
           type="warning"
           message={`Your balance is due on the ${dueDayLabel} each month. By canceling Auto Pay, all future payments will need to be made manually.`}
+          splitKey={[{ text: dueDayLabel, bold: true }]}
           showCloseIcon={false}
         />
 
@@ -98,17 +96,17 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 80 },
   heading: {
-    fontSize: FontSize.size_lg,
+    fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
-    color: Color.colorGray_100,
+    fontWeight: "700",
+    color: Color.sparklightGray1,
     marginBottom: 8,
   },
   introText: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
-    lineHeight: 20,
+    lineHeight: 22,
     marginBottom: 8,
   },
   agreeBlock: { marginTop: 12, marginBottom: 8 },

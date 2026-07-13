@@ -7,6 +7,7 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import LinkText from "../../common/customui/LinkText";
 import PaymentMethodCard from "./PaymentMethodCard";
+import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import {
   fetchPaymentMethods,
@@ -103,11 +104,15 @@ const AutoPayScreen = ({ navigation }) => {
             {enrolled ? "Select new payment method." : "Select payment method."}
           </Text>
           <LinkText
-            text="Add +"
             onPress={onAddMethod}
             accessibilityLabel="Add payment method"
             accessibilityHint="Opens a secure page to add a card or bank account."
-          />
+          >
+            <View style={styles.addLinkRow}>
+              <Text style={styles.addLinkText}>Add</Text>
+              <PlusCircleIcon />
+            </View>
+          </LinkText>
         </View>
 
         {loading ? (
@@ -161,17 +166,17 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 80 },
   heading: {
-    fontSize: FontSize.size_lg,
+    fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
-    color: Color.colorGray_100,
+    fontWeight: "700",
+    color: Color.sparklightGray1,
     marginBottom: 8,
   },
   introText: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
-    lineHeight: 20,
+    lineHeight: 22,
     marginBottom: 20,
   },
   introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
@@ -182,14 +187,22 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   selectLabel: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
-    color: Color.colorGray_100,
+    color: Color.colorGray_200,
     flexShrink: 1,
     marginRight: 8,
   },
-  cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
+  addLinkRow: { flexDirection: "row", alignItems: "center" },
+  addLinkText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightBrightPurple,
+    textDecorationLine: "underline",
+    marginRight: 4,
+  },
+  cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyText: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,

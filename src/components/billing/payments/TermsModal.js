@@ -1,17 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, Modal, ScrollView, StyleSheet, Pressable } from "react-native";
-import PrimaryButton from "../../common/customui/PrimaryButton";
+import Touchable from "../../common/customui/Touchable";
+import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { setFocusToRef } from "../../../utils/a11y";
 
-// Placeholder copy until the portal team hands over the final AutoPay terms content
-const PLACEHOLDER_TERMS = `By enrolling in Sparklight Auto Pay, you authorize Sparklight to automatically charge your selected payment method for your full account balance on your bill due date each month.
-
-Payments will continue until you deactivate Auto Pay. You can update your payment method or deactivate Auto Pay at any time from the Billing section of the app.
-
-If a scheduled payment fails, you remain responsible for paying your balance by the due date to avoid late fees or service interruption. Changes made within 24 hours of your due date may not apply until the next billing cycle.
-
-Standard account terms, conditions, and privacy policies apply.`;
+const TERMS_COPY = `By clicking 'Submit,' I authorize Sparklight to charge the payment method I specified for the full amount due in my monthly billing statement, including monthly service fees, installation and equipment charges, and any applicable taxes or government fees. If I set up recurring payments, this authorization is to remain in effect until this authorization is canceled by me, my bank, or Sparklight. I may cancel this authorization, or change the payment method to be charged, via the online Bill Pay Center or by calling Sparklight customer service at 1-877-692-2253 (between the hours of 8 a.m. and 5 p.m., local time) at least three banking days before the due date on my billing statement. It is my responsibility to keep my payment method information current, and Sparklight may obtain updated information from my bank. In the event that a payment is returned for insufficient funds, I authorize Sparklight to electronically debit my bank account for the original amount of the transaction, as well as a returned item fee, up to the maximum amount allowed by law.`;
 
 const TermsModal = ({ visible, onClose }) => {
   const titleRef = useRef(null);
@@ -30,13 +24,23 @@ const TermsModal = ({ visible, onClose }) => {
           accessibilityLabel="Dismiss Terms and Conditions"
         />
         <View style={styles.sheet} accessibilityViewIsModal importantForAccessibility="yes">
-          <Text ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
-            Terms & Conditions
-          </Text>
+          <View style={styles.dragHandle} accessible={false} importantForAccessibility="no" />
+          <View style={styles.titleRow}>
+            <Text ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
+              Terms & Conditions
+            </Text>
+            <Touchable
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="Close Terms and Conditions"
+              style={styles.closePress}
+            >
+              <CloseIcon width={24} height={24} color={Color.colorGray_200} />
+            </Touchable>
+          </View>
           <ScrollView style={styles.scrollArea} showsVerticalScrollIndicator>
-            <Text style={styles.termsText}>{PLACEHOLDER_TERMS}</Text>
+            <Text style={styles.termsText}>{TERMS_COPY}</Text>
           </ScrollView>
-          <PrimaryButton title="Close" buttonType="submit" accessibilityLabel="Close Terms and Conditions" onPress={onClose} />
         </View>
       </View>
     </Modal>
@@ -51,26 +55,37 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 8,
     paddingBottom: 34,
-    maxHeight: 560,
+    maxHeight: 620,
     width: "100%",
     maxWidth: 640,
     alignSelf: "center",
   },
-  title: {
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
-    color: Color.colorGray_100,
+  dragHandle: {
+    alignSelf: "center",
+    width: 48,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#D0D5DD",
     marginBottom: 12,
   },
+  titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  title: {
+    fontSize: FontSize.size_20,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+    color: Color.colorGray_200,
+    flexShrink: 1,
+    marginRight: 8,
+  },
+  closePress: { padding: 4 },
   scrollArea: { flexGrow: 0, marginBottom: 8 },
   termsText: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
-    lineHeight: 21,
+    lineHeight: 24,
   },
 });
 
