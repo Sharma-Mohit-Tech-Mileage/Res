@@ -87,7 +87,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
               styles.label,
               {
                 fontWeight: "700",
-                color: colors.sparklight_purple_blue,
+                color: colors.darkest_grey,
                 fontSize: 18,
                 paddingBottom: 5,
                 alignSelf: "center",
@@ -141,7 +141,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
                   color:
                     dueDate == "Immediately"
                       ? colors.sparklight_red
-                      : colors.sparklight_purple_blue,
+                      : colors.darkest_grey,
                   fontWeight: dueDate == "Immediately" ? "400" : "700",
                 },
               ]}
@@ -163,7 +163,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
                     color:
                       dueDate == "Immediately"
                         ? colors.sparklight_red
-                        : colors.sparklight_purple_blue,
+                        : colors.darkest_grey,
                   },
                 ]}
               >
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.sparklight_purple_blue,
+    color: colors.darkest_grey,
     alignSelf: "center",
     paddingBottom: 5,
     fontFamily: FontFamily.openSansRegular,

@@ -195,10 +195,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   buttonDecline: {
-    backgroundColor: Color.sparklightSecondaryPurple + "1A",
+    backgroundColor: Color.sparklightPrimaryPurple + "1A",
   },
   buttons: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   decline: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaBold,
-    color: Color.sparklightSecondaryPurple,
+    color: Color.sparklightPrimaryPurple,
     textAlign: "center",
   },
   container: {

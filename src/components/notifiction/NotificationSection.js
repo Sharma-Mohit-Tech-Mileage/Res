@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_base,
     borderRadius: Border.br_5xs,
     borderWidth: 1,
-    borderColor: "#353091",
+    borderColor: "#632965",
     backgroundColor: "#F0F8FF",
   },
   iconContainer: {

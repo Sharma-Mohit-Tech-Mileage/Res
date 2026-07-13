@@ -270,7 +270,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     paddingHorizontal: Padding.p_5xl,
-
     marginBottom: hp("8%"),
   },
   notificationsContainer: {

@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   buttonPrimary: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   buttonSuccess: {
     backgroundColor: "#C8E9D0",

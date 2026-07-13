@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   termsLinkText: {
-    color: Color.colorMidnightblue,
+    color: Color.sparklightBrightPurple,
     textDecorationLine: "underline",
   },
   checkboxSection: {

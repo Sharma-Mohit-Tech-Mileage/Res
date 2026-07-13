@@ -31,8 +31,8 @@ const SignSaveResSvg = ({ width = "100%", height = 118, ...props }) => {
           y2="170.283582"
           gradientUnits="userSpaceOnUse"
         >
-          <Stop offset="0" stopColor="#353091" />
-          <Stop offset="1" stopColor="#8B3B90" />
+          <Stop offset="0" stopColor="#8B3B90" />
+          <Stop offset="1" stopColor="#353091" />
         </LinearGradient>
       </Defs>
 

@@ -35,6 +35,7 @@ import FeedbackRatingSelector from "./FeedbackRatingSelector";
 import AreaOfConcernSelector from "./AreaOfConcernSelector";
 import { Radio } from "native-base";
 import {HintText} from "../common/customui/Typography";
+import PrimaryButton from "../common/customui/PrimaryButton";
 
 const Feedback = () => {
   const navigation = useNavigation();
@@ -432,38 +433,31 @@ const Feedback = () => {
             entering={FadeInDown.delay(700).springify()}
             style={styles.buttonContainer}
           >
-            <Touchable
-              accessibilityLabel={
-                isSubmitting ? "Feedback Submitting in progress" : "Submit Feedback"
-              }
-              accessibilityRole="button"
-              accessible={true}
-              style={[
-                styles.submitButton,
-                isSubmitting && styles.submitButtonDisabled,
-              ]}
+            <PrimaryButton
+              title={isSubmitting ? "Submitting..." : "Submit Feedback"}
               onPress={handleSubmit(onSubmit, handleValidationError)}
               disabled={isSubmitting}
-            >
-              <Text style={styles.submitButtonText}>
-                {isSubmitting ? "Submitting..." : "Submit Feedback"}
-              </Text>
-            </Touchable>
+              accessibilityLabel={isSubmitting ? "Submitting feedback" : "Submit feedback"}
+              accessibilityRole="button"
+              buttonType="submit"
+              accessible={!isSubmitting}
+            />
           </Animated.View>
 
           <Animated.View
             entering={FadeInDown.delay(800).springify()}
             style={styles.cancelWrapper}
           >
-            <Touchable
-              accessibilityLabel="Cancel"
-              accessibilityRole="button"
-              accessible={true}
+            <PrimaryButton
+              title="Cancel"
+              buttonType="cancel"
               onPress={() => navigation.navigate("Account")}
               disabled={isSubmitting}
-            >
-              <Text style={styles.cancelText}>Cancel</Text>
-            </Touchable>
+              accessibilityLabel="Cancel feedback submission"
+              accessibilityRole="button"
+              accessible={!isSubmitting}
+            />
+            
           </Animated.View>
         </Animated.View>
       </ScrollView>
@@ -526,7 +520,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
   },
   submitButton: {
-    backgroundColor: Color.colorMidnightblue,
+    backgroundColor: Color.sparklightBrightPurple,
     padding: Padding.p_base,
     borderRadius: Border.br_11xs,
     alignItems: "center",
@@ -571,16 +565,15 @@ const styles = StyleSheet.create({
     height: 20,
     marginRight: Padding.p_xs,
   },
-  
   errorText: {
     color: "red",
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     marginTop: Padding.p_5xs,
   },optionTxt: {
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.size_base,
     color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
   },
   optionTxtError: {
     color: "red",

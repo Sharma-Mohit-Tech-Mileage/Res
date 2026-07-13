@@ -144,7 +144,7 @@ const WalkthroughContent = ({
 
         <View style={styles.actions} accessible={false}>
           <LinearGradient
-            colors={["#353091", "#353091"]}
+            colors={["#8D3B90", "#8D3B90"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.buttonNext}
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
   skipText: {
     fontFamily: FontFamily.openSansSemiBold,
-    color: "#353091",
+    color: "#8D3B90",
     fontWeight: "600",
     fontSize: 14,
     textDecorationLine: "underline",
@@ -246,8 +246,13 @@ const styles = StyleSheet.create({
     gap: Padding.p_xs,
   },
   buttonNext: {
-    borderRadius: 2,
-    shadowColor: "#353091",
+  borderRadius: 999,
+  overflow: "hidden",
+  shadowColor: "#8D3B90",
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.2,
+  shadowRadius: 8,
+  elevation: 4,
   },
   buttonNextInner: {
     paddingVertical: 8,

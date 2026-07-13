@@ -78,7 +78,7 @@ const AutoPayCard = ({
                 textDecorationLine: "underline",
                 fontSize: 14,
                 fontWeight: "400",
-                color: colors.sparklight_purple_blue,
+                color: colors.sparklight_bright_purple,
                 fontFamily: FontFamily.openSansRegular,
                 marginLeft: 10,
               }}

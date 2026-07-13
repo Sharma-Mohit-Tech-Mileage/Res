@@ -106,6 +106,14 @@ const SparkLightInput = React.forwardRef(({
     if (parentOnBlur) parentOnBlur();
   };
 
+  // Common input styles
+  const getInputStyles = () => [
+    styles.textInput,
+    !editable && styles.disabledInput,
+    error && { borderColor: "red" },
+    !isFocused && !error && { borderColor: Color.sparklightDarkGray },
+  ];
+
   return (
     <View
       style={[
@@ -180,17 +188,7 @@ const SparkLightInput = React.forwardRef(({
           onBlur={handleBlur}
           editable={editable}
           secureTextEntry={secure && !passwordVisible}
-          style={[
-            styles.textInput,
-            inputStyle,
-            !editable && styles.disabledInput,
-            {
-              borderWidth: error ? 0.5 : 0,
-              borderColor: error
-                ? "red"
-                : Color.sparklightDarkGray,
-            },
-          ]}
+          style={getInputStyles()}
           accessible={false}
           importantForAccessibility="no"
           keyboardType={getKeyboardType()}
@@ -249,9 +247,10 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_5xs,
     backgroundColor: '#FFFFFF',
     borderColor:'#C7C7CC',
+    width: "100%",
   },
   textInputContainer: {
-    borderWidth: 1,
+    borderWidth: 0,
     borderRadius: Border.br_5xs,
 
     borderColor: "#C7C7CC",
