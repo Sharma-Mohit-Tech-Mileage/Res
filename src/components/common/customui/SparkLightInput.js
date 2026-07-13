@@ -309,6 +309,9 @@ const styles = StyleSheet.create({
   eyeText: {
     marginLeft: 6,
     lineHeight: 28,
+    color: "#8D3B90",
+    textDecorationLine: "underline",
+    textDecorationColor: "#8D3B90",
   },
   lockIcon: {
     width: 20,

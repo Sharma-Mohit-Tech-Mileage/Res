@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
     backgroundColor: '#FFFFFF',
     borderRadius: Border.br_5xs,
-    borderColor:'#C7C7CC',
+    borderColor:'#767676',
     borderWidth: 1,
   },
   dropdownText: {

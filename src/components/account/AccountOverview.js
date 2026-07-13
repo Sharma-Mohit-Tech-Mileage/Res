@@ -182,6 +182,8 @@ const AccountOverview = () => {
       <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0.5 }}
         colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
         useAngle={true}
         angle={90}
@@ -281,7 +283,7 @@ const AccountOverview = () => {
               hitSlop={A11Y.hitSlop}
               style={styles.footerLink}
             >
-              <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center', textDecorationLine: 'underline' }}>
+              <Text style={{ color: Color.sparklightBrightPurple, alignSelf: 'center', textDecorationLine: 'underline',fontWeight: '600' }}>
                 Version:{VersionCheck.getCurrentVersion()}
               </Text>
             </Touchable>
@@ -336,13 +338,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xs,
   },
   linkStyle: {
-    color: Color.colorMidnightblue,
+    color: Color.sparklightBrightPurple,
     textDecorationLine: 'underline',
     alignSelf: 'center',
     fontWeight: '600'
   },
   separator: {
-    color: Color.colorMidnightblue,
+    color: Color.sparklightBrightPurple,
     alignSelf: 'center',
     fontWeight: '600'
   },

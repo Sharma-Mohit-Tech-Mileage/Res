@@ -217,12 +217,14 @@ const styles = StyleSheet.create({
   accept: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaBold,
+    fontWeight: "700",
     textAlign: "center",
     color: Color.sparklightWhite,
   },
   decline: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaBold,
+    fontWeight: "700",
     color: Color.sparklightPrimaryPurple,
     textAlign: "center",
   },

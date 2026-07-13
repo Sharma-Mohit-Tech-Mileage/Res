@@ -42,6 +42,8 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
       <LinearGradient
           style={[styles.profileSettingsChild, { paddingTop: 40 }]}
           locations={[0, 1]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0.5 }}
           colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
           useAngle={true}
           angle={90}
@@ -52,6 +54,8 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
             <LinearGradient
                 style={[styles.profileSettingsChild, { paddingTop: 40 }]}
                 locations={[0, 1]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0.5 }}
                 colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
                 useAngle={true}
                 angle={90}

@@ -150,9 +150,9 @@ const BillingScreen = ({ navigation }) => {
       <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
-        colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
-        useAngle={true}
-        angle={90}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0.5 }}
+        colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
       />
       <View style={styles.frameParent}>
         <View style={styles.rightActionableParent}>

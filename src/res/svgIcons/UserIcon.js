@@ -1,7 +1,7 @@
 import React from "react";
 import Svg, { Path } from "react-native-svg";
 
-const UserIcon = ({ width = 27, height = 26, fill = "#632965", ...props }) => {
+const UserIcon = ({ width = 27, height = 26, fill = "#8D3B90", ...props }) => {
   return (
     <Svg
       width={width}

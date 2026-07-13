@@ -4,7 +4,7 @@ import Svg, { Path } from "react-native-svg";
 const creditCard = ({
   width = 27,
   height = 27,
-  fill = "#632965",
+  fill = "#8D3B90",
   ...props
 }) => {
   return (
