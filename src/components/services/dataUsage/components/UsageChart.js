@@ -944,7 +944,7 @@ const styles = StyleSheet.create({
   tab: {
     ...dataUsageTabs.tab,
     paddingVertical: 10,
-    minHeight: 42,
+    minHeight: 44,
     justifyContent: "center",
   },
   activeTab: dataUsageTabs.activeTab,
@@ -966,11 +966,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceVariant,
     borderColor: theme.colors.borderLight,
     borderRadius: theme.radius.xs,
-    minHeight: 44,
+    height: 48,
   },
   listToggle: {
     width: 44,
-    height: 44,
+    height: 48,
     borderRadius: theme.radius.xs,
     backgroundColor: theme.colors.surfaceVariant,
     borderWidth: 1,

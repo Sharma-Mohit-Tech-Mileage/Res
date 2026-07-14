@@ -20,7 +20,7 @@ import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
 import Touchable from "./Touchable";
-import {BannerAlertText} from "./Typography";
+import {BannerAlertText,FieldTitle} from "./Typography";
 
 
 const TYPE_CONFIG = {
@@ -456,7 +456,7 @@ const NotificationAlert = ({
                   <BannerAlertText
                     key={segment.key}
                     style={[
-                      styles.messageText,
+                      
                       { color: config.textColor },
                       segment.type === "styled" && segment.action?.bold && styles.boldText,
                     ]}
@@ -629,13 +629,13 @@ const NotificationAlert = ({
           {title && (
             <A11y.Index index={1}>
             <View accessible={true} accessibilityRole="header">
-              <Text ref={titleRef} 
-              style={[styles.title, { color: config.titleColor }]}
+              <FieldTitle ref={titleRef} 
+              style={[ { color: config.titleColor }]}
               accessible={true}
               accessibilityRole="header" accessibilityLevel={2}
             >
                 {title}
-              </Text>
+              </FieldTitle>
             </View>
             </A11y.Index>
           )}
@@ -729,7 +729,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   styledText: {
-    color: Color.colorMidnightblue,
+    color: Color.sparklightBrightPurple,
     fontWeight: "700",
     textDecorationLine: "underline",
   },

@@ -34,7 +34,7 @@ import useUserEmailPrefill from "../../hooks/useUserEmailPrefill";
 import FeedbackRatingSelector from "./FeedbackRatingSelector";
 import AreaOfConcernSelector from "./AreaOfConcernSelector";
 import { Radio } from "native-base";
-import {HintText} from "../common/customui/Typography";
+import {HintText,FieldTitle} from "../common/customui/Typography";
 import PrimaryButton from "../common/customui/PrimaryButton";
 
 const Feedback = () => {
@@ -307,15 +307,14 @@ const Feedback = () => {
 
           <View style={{ paddingHorizontal: 16 }}>
 
-              <Text
+              <FieldTitle
                 style={[
-                  styles.optionTxt,
                   (isError || errors.cosentContactUs) && styles.optionTxtError,
                 ]}
               accessibilityLabel={"May Sparklight contact you about your feedback? Required"}
               >
               May Sparklight contact you about your feedback? *
-              </Text>
+              </FieldTitle>
               <Radio.Group
                 name="surveyOptions"
                 value={selectedOption}

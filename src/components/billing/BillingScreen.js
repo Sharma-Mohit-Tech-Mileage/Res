@@ -31,6 +31,10 @@ import Icon from "../common/Icon";
 import Config from "react-native-config";
 import colors from "../../res/Colors";
 import { card } from "../../styles/utilities";
+import {
+  widthPercentageToDP,
+  heightPercentageToDP,
+} from "react-native-responsive-screen";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import RightIcon from "../../../assets/svgs/Chevonright";
@@ -151,7 +155,7 @@ const BillingScreen = ({ navigation }) => {
         style={styles.linearGradientStyle}
         locations={[0, 1]}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0.5 }}
+        end={{ x: 3, y: 1}}
         colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
       />
       <View style={styles.frameParent}>
@@ -175,9 +179,9 @@ const BillingScreen = ({ navigation }) => {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ marginHorizontal: 20 }}
+          
         >
-          <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
+          <View style={styles.cardsContainer}>
             {isContentLoading ? (
               <View style={styles.loadingContainer}>
                 <LoadingOverlay
@@ -341,6 +345,10 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     height: 150,
+  },cardsContainer: {
+    paddingBottom: heightPercentageToDP("25%"),
+    marginTop: Padding.p_base,
+    marginHorizontal: 16,
   },
   leftTitle: {
     alignContent: "flex-start",
@@ -398,7 +406,7 @@ const styles = StyleSheet.create({
   },
   frameParentSpaceBlock1: {
     paddingBottom: Padding.p_base,
-    alignSelf: "stretch",
+    
   },
   rightIconLayout: {
     height: 24,

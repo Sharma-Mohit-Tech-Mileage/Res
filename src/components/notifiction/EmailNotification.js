@@ -467,7 +467,7 @@ const AddNotificationScreen = () => {
                           isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
                         }
                         tintColors={{
-                          true: "#1B99FF",
+                          true: "#00B8D8",
                           false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
                         }}
                         accessible={false}

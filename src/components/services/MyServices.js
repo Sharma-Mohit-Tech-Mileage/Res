@@ -107,9 +107,9 @@ const MyServicesContent = ({ route }) => {
       <LinearGradient
         style={[styles.gradientHeader, { height: 88 + insets.top }]}
         locations={[0, 1]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 3, y: 1 }}
         colors={SERVICE_HEADER_GRADIENT}
-        useAngle={true}
-        angle={90}
       />
 
       <View style={{ paddingTop: insets.top + 27 }}>
