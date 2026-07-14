@@ -34,10 +34,10 @@ const styles = StyleSheet.create({
     },
     buttonStyl: {
         fontSize: FontSize.size_sm,
-        fontFamily: FontFamily.openSansRegular,
+        fontFamily: FontFamily.RadioCanadaBold,
         textAlign: "center",
         fontWeight:'700',
-        color: Color.colorGray_200,
+        color: Color.sparklightBrightPurple,
         padding: 16,
         fontSize: 18,
     },

@@ -13,7 +13,7 @@ import LinearGradient from "react-native-linear-gradient";
 import Icon from "../common/Icon";
 import WalkthroughProgress from "./WalkthroughProgress";
 import { FontFamily, Color, Border, Padding } from "../../../GlobalStyles";
-
+import {Hyperlink} from "../common/customui/Typography";  
 const WalkthroughContent = ({
   tab,
   currentStep,
@@ -113,7 +113,7 @@ const WalkthroughContent = ({
           accessibilityRole="button"
           accessibilityLabel="Skip walkthrough"
         >
-          <Text style={styles.skipText}>Skip</Text>
+          <Hyperlink>Skip</Hyperlink>
         </Touchable>
       </View>
 
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   skipText: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaBold,
     color: "#8D3B90",
     fontWeight: "600",
     fontSize: 14,
@@ -259,9 +259,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   buttonNextText: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaBold,
     color: "#FFFFFF",
-    fontWeight: "600",
+    fontWeight: "700",
     fontSize: 14,
     textAlign: "center",
   },

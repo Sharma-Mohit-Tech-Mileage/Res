@@ -99,14 +99,14 @@ const AppStyles = StyleSheet.create({
     fontWeight: "600",
     color: Color.sparklightWhite,
   },hyperlink: {
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    color: Color.sparklightBrightPurple,
+    fontFamily: FontFamily.RadioCanadaBold,
     fontSize: FontSize.size_base,
     fontStyle: "normal",
-    fontWeight: "400",
+    fontWeight: "600",
     textDecorationLine: "underline",
     textDecorationStyle: "solid",
-    textDecorationColor: Color.colorMidnightblue,
+    textDecorationColor: Color.sparklightBrightPurple,
   },
 });
 

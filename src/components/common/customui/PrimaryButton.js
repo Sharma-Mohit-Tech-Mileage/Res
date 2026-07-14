@@ -67,9 +67,11 @@ const styles = StyleSheet.create({
   cancelText: {
     textAlign: "center",
     color: Color.sparklightPrimaryPurple, // Adjust color as needed
-    fontSize: FontSize.size_lg,
+    fontSize: FontSize.size_base,
     textDecorationLine: "underline",
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontWeight: "600",
+    fontStyle: "normal",
+    fontFamily: FontFamily.RadioCanadaBold,
   },
 });
 

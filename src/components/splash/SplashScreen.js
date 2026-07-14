@@ -669,7 +669,7 @@ const SplashScreen = ({ navigation, route }) => {
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0.5 }}
-      colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
+      colors={["rgba(141, 59, 144, 1))", "rgb(129, 63, 180)"]}
       style={styles.container}
     >
       <NetworkStatusBar />
@@ -712,6 +712,7 @@ const SplashScreen = ({ navigation, route }) => {
                 loginAuth();
               }
             }}
+          customStyle={{ color: colors.sparklight_bright_purple }}
             buttonText={"Login"}
             disabled={
               authLockRef.current ||

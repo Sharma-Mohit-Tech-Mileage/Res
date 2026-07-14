@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.colorMidnightblue,
+    color: Color.sparklightBrightPurple,
     flexWrap: "wrap",
     maxWidth: wp("90%"),
   },

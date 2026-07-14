@@ -95,17 +95,25 @@ const WelcomeCard = () => {
           >
             We’re excited to get you connected!
           </Text>
-          <View style={styles.welcomeOverlay}>
+          <View
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              paddingVertical: 6,
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+            }}
+          >
             <Touchable
               minSize={0}
-              style={styles.welcomeVideoLink}
+              style={{ flexDirection: "row", marginTop: 5, marginLeft: 20 }}
               onPress={() => {
                 Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
               }}
               accessible={true}
-              importantForAccessibility="yes"
               accessibilityRole="link"
-              accessibilityLabel="Watch our welcome video"
+              accessibilityLabel="Watch welcome video"
               accessibilityHint="Double tap to watch on YouTube"
             >
               <Text style={styles.watchVideoButton} maxFontSizeMultiplier={1.2}>
@@ -118,6 +126,7 @@ const WelcomeCard = () => {
               </View>
             </Touchable>
           </View>
+
         </ImageBackground>
       </>
     );
