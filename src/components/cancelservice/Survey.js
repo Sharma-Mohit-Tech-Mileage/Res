@@ -185,8 +185,6 @@ const Survey = ({ route }) => {
         start={{ x: 0, y: 0 }}
         end={{ x: 3, y: 1 }}
         colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
-        useAngle={true}
-        angle={90}
       />
       <ScrollView style={{ flex: 1, marginBottom: 100 }}>
         <View>
