@@ -89,8 +89,8 @@ const NewBillerHome = ({ navigation }) => {
     : false;
 
   const isForceBannerAccount =
-    userInfo?.accountNumber === "8160360660005361" ||
-    accountDetails?.accountNumber === "8160360660005361";
+    userInfo?.accountNumber === "8160110010005227" ||
+    accountDetails?.accountNumber === "8160110010005227";
 
   const forcedMaintenanceBannerConfig = {
     title: "Service Error",
@@ -464,7 +464,7 @@ const NewBillerHome = ({ navigation }) => {
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
-      end={{ x: 3, y: 1 }}
+      end={{ x: 1.3, y: 0 }}
       colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
       style={styles.container}
     >

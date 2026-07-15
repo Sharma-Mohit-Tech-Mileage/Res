@@ -17,6 +17,7 @@ const colors = {
     gray600: "#475467",
     backgroundGR: '#2BA948',
     black: '#000000',
+    Black_100: '#101828',
 
   }
   

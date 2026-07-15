@@ -155,7 +155,7 @@ const BillingScreen = ({ navigation }) => {
         style={styles.linearGradientStyle}
         locations={[0, 1]}
         start={{ x: 0, y: 0 }}
-        end={{ x: 3, y: 1}}
+        end={{ x:1.3, y: 0}}
         colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
       />
       <View style={styles.frameParent}>

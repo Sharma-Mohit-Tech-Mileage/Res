@@ -13,6 +13,7 @@ import LinearGradient from "react-native-linear-gradient";
 import Icon from "../common/Icon";
 import WalkthroughProgress from "./WalkthroughProgress";
 import { FontFamily, Color, Border, Padding } from "../../../GlobalStyles";
+import PrimaryButton from "../common/customui/PrimaryButton";
 import {Hyperlink} from "../common/customui/Typography";  
 const WalkthroughContent = ({
   tab,
@@ -143,8 +144,19 @@ const WalkthroughContent = ({
         />
 
         <View style={styles.actions} accessible={false}>
-          <LinearGradient
-            colors={["#8D3B90", "#8D3B90"]}
+          <PrimaryButton
+            buttonType="submit"
+            onPress={onNext}
+            accessibilityRole="button"
+             accessibilityLabel={
+                isLastStep ? "Finish walkthrough" : "Next step"
+              }
+            title={isLastStep ? "Let's Go!" : "Next"}
+          >
+            
+          </PrimaryButton>
+          {/* <LinearGradient
+            colors={["rgba(141, 59, 144, 1)", "rgba(99, 41, 101, 1)"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.buttonNext}
@@ -162,7 +174,7 @@ const WalkthroughContent = ({
                 {isLastStep ? "Let's Go!" : "Next"}
               </Text>
             </Touchable>
-          </LinearGradient>
+          </LinearGradient> */}
         </View>
       </View>
     </View>

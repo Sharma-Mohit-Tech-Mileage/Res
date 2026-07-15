@@ -108,7 +108,7 @@ const MyServicesContent = ({ route }) => {
         style={[styles.gradientHeader, { height: 88 + insets.top }]}
         locations={[0, 1]}
         start={{ x: 0, y: 0 }}
-        end={{ x: 3, y: 1 }}
+        end={{ x: 1.3, y: 0}}
         colors={SERVICE_HEADER_GRADIENT}
       />
 

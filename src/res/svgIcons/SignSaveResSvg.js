@@ -33,7 +33,7 @@ const SignSaveResSvg = ({ width = "100%", height = 118, ...props }) => {
         >
           <Stop offset="0" start={{ x: 0, y: 0 }}   stopColor="#8B3B90" />
 
-          <Stop offset="1" end={{ x: 1, y: 0.5 }}  stopColor="#353091" />
+          <Stop offset="1" end={{ x: 1.3, y: 0 }}  stopColor="#353091" />
         </LinearGradient>
       </Defs>
 
