@@ -414,7 +414,7 @@ const AddNotificationScreen = () => {
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
               <View style={styles.toggleHeader}>
-                <A11y.Index index={0} style={styles.toggleTitle}>
+                <A11y.Index index={0} >
                 <SectionTitle
                   accessible={true}
                   accessibilityRole="text"
@@ -426,7 +426,7 @@ const AddNotificationScreen = () => {
                   Paperless Billing
                 </SectionTitle>
                 </A11y.Index>
-                <View style={{ minWidth: A11Y.minTouch, minHeight: A11Y.minTouch }} accessible={false} importantForAccessibility="no">
+                <View  accessible={false} importantForAccessibility="no">
                   <A11y.Index index={1}>
                   <Toggle
                     name="paperlessBilling"

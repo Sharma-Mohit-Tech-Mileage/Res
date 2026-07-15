@@ -471,7 +471,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
     }
 
     return (
-      <View style={AppStyles.card}>
+      <View style={[ {borderTopLeftRadius: 0, borderTopRightRadius: 0, marginBottom: 32}]}>
       <FlatList
         data={billingData}
         renderItem={({ item, index }) => <BreakDownItem item={item} />}

@@ -79,7 +79,7 @@ const AppStyles = StyleSheet.create({
     fontSize: FontSize.size_lg,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "400",
-    color: Color.Black_100,
+    color: Color.sparklightGray1,
   },
   hintText: {
     fontSize: FontSize.size_sm,

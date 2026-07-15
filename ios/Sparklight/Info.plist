@@ -66,7 +66,7 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>$(PRODUCT_NAME) Authentication with TouchId or FaceID</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>MaterialCommunityIcons.ttf</string>
@@ -74,6 +74,13 @@
 		<string>RadioCanada-Medium</string>
 		<string>RadioCanada-Regular</string>
 		<string>RadioCanada-SemiBold</string>
+		<string>RadioCanada-Regular.ttf</string>
+		<string>RadioCanada-Bold.ttf</string>
+		<string>Effra_Std_Bd.ttf</string>
+		<string>RadioCanada-Medium.ttf</string>
+		<string>Effra_Std_Lt.ttf</string>
+		<string>RadioCanada-SemiBold.ttf</string>
+		<string>Effra_Std_Rg.ttf</string>
 	</array>
 	<key>UIDeviceFamily</key>
 	<array>
@@ -92,7 +99,7 @@
 		<string>arm64</string>
 	</array>
 	<key>UIStatusBarStyle</key>
-	<string></string>
+	<string/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

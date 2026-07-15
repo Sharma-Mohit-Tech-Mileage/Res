@@ -396,7 +396,7 @@ const SplashScreen = ({ navigation, route }) => {
         });
       }
 
-      if (!user.userInfo.mobileTCAcceptanceFlag) {
+      if (user.userInfo.mobileTCAcceptanceFlag) {
         navigation.reset({ index: 0, routes: [{ name: "MyTab" }] });
       } else {
         navigation.reset({ index: 0, routes: [{ name: "Terms" }] });
