@@ -38,6 +38,7 @@ import {
   IndicatorText,
   FieldTitle,
   FieldContent,
+  Hyperlink,
 } from "../common/customui/Typography";
 
 const ProfileSettings = () => {
@@ -546,7 +547,7 @@ const ProfileSettings = () => {
                         accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
                         accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
-                        <Text style={styles.phoneLinkText}>833-807-1020</Text>
+                        <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
                         <Text
                           style={styles.manageSerTxt3}
                           accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
@@ -577,7 +578,7 @@ const ProfileSettings = () => {
                       accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
                       accessibilityHint="Double tap to call customer service 833 807 1020"
                     >
-                      <Text style={styles.phoneLinkText}>833-807-1020</Text>
+                      <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
                       <Text
                         style={styles.manageSerTxt3}
                         accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
@@ -600,7 +601,7 @@ const ProfileSettings = () => {
                           accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
                           accessibilityHint="Double tap to call customer service 833 807 1020"
                         >
-                          <Text style={styles.phoneLinkText}>833-807-1020</Text>
+                          <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
                           <Text
                             style={styles.manageSerTxt3}
                             accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
@@ -631,7 +632,7 @@ const ProfileSettings = () => {
                         accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
                         accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
-                        <Text style={styles.phoneLinkText}>833-807-1020</Text>
+                        <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
                         <Text
                           style={styles.manageSerTxt3}
                           accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"

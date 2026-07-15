@@ -65,7 +65,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
             accessibilityLevel={2}
             accessibilityRole="header"
           >
-            Tv & Video
+            TV & Video
           </SectionTitle>
         </View>
 

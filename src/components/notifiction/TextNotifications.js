@@ -42,7 +42,7 @@ import Toggle from "../common/Toggle";
 import AlertIcon from "../../../assets/svgs/Alerttriangle";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 
-import {SectionTitle,SectionContent,HintText} from "../common/customui/Typography";
+import {SectionTitle,SectionContent,HintText,Hyperlink} from "../common/customui/Typography";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
@@ -524,19 +524,12 @@ const TextNotifications = ({ navigation }) => {
                     hitSlop={A11Y.hitSlop}
                     style={styles.termsLinkTouchable}
                   >
-                    <Text
-                      style={[
-                        styles.checkBoxAreaViewText,
-                        {
-                          color: Color.sparklightBrightPurple,
-                          textDecorationLine: "underline",
-                        },
-                      ]}
+                    <Hyperlink
                       allowFontScaling={true}
                       maxFontSizeMultiplier={1}
                     >
                       Text Messaging Terms & Conditions
-                    </Text>
+                    </Hyperlink>
                   </Touchable>
                 </View>
                 {isTermRequired && (
@@ -812,7 +805,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkBoxAreaViewText: {
-    fontSize: 14,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },makeTypo: {

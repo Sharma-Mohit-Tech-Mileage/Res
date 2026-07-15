@@ -90,7 +90,7 @@ const NotificationToggle = ({ type, status, isLast, warn, loading, title }) => (
       warn && styles.warnBackground,
     ]}
   >
-    <FieldContent style={{flex: 1}} importantForAccessibility="no">
+    <FieldContent importantForAccessibility="no">
         {type}
       </FieldContent>
     <View style={styles.statusContainer}>
@@ -106,10 +106,10 @@ const NotificationToggle = ({ type, status, isLast, warn, loading, title }) => (
           />
         </SkeletonPlaceholder>
       ) : (
-        <>
+        <View style={{flexDirection: "row", alignItems: "center", alignSelf: "flex-start"}}>
           <StatusIcon status={status} />
           <IndicatorText style={styles.statusText}>{status}</IndicatorText>
-        </>
+        </View>
       )}
     </View>
   </View>
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statusText: {
-    marginLeft: Padding.p_5xs,
+    marginLeft: Padding.p_9xs,
   },
   adminMessage: {
     backgroundColor: Color.colorWhitesmoke_100,

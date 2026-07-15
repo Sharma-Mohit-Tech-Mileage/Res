@@ -28,6 +28,7 @@ export const FontSize = {
 /* Colors */
 export const Color = {
     gray50: "#f9fafb",
+    Black_100: "#101828",
     colorWhitesmoke_100: "#f8f8f8",
     colorWhitesmoke_200: "#ebeef1",
     colorWhitesmoke_300: "#eaecf0",

@@ -7,7 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { requiredField } from "../../styles/utilities";
-import CheckBox from "@react-native-community/checkbox";
+import SparklightCheckBox from "../common/customui/SparklightCheckBox";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from "../common/Toggle";
 import SparkLightInput from "../common/customui/SparkLightInput";
@@ -29,6 +29,7 @@ import {
   IndicatorText,
   SectionTitle,
   SectionContent,
+  Hyperlink
 } from "../common/customui/Typography";
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -438,98 +439,71 @@ const AddNotificationScreen = () => {
                   </A11y.Index>
                 </View>
               </View>
-              <SectionContent style={{marginVertical: 8}} accessible={false} importantForAccessibility="no">
+              <SectionContent  accessible={false} importantForAccessibility="no">
                 Opt for email statements and say goodbye to paper clutter. It's
                 convenient, eco-friendly, and keeps your information at your
                 fingertips.
               </SectionContent>
             </A11y.Order>
-            {isCheckboxVisible && (
-              <View style={styles.checkBoxArea}>
-                <Touchable
-                  style={[styles.checkboxTouchable, { justifyContent: 'flex-start' }]}
-                  onPress={handleCheckboxToggle}
-                  accessibilityRole="checkbox"
-                  accessibilityLabel="I agree to Paperless Billing Terms and Conditions"
-                  accessibilityState={{ checked: toggleCheckBoxTerm }}
-                >
-                  <View style={styles.checkboxContainer}>
-                    <View
-                      pointerEvents="none"
-                      importantForAccessibility="no-hide-descendants"
-                    >
-                      <CheckBox
-                        disabled={true}
-                        value={toggleCheckBoxTerm}
-                        style={styles.checkBox}
-                        boxType="square"
-                        tintColor={
-                          isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
-                        }
-                        tintColors={{
-                          true: "#00B8D8",
-                          false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
-                        }}
-                        accessible={false}
-                        importantForAccessibility="no"
-                      />
-                    </View>
-                    <Text
-                      style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
-                      allowFontScaling={true}
-                      maxFontSizeMultiplier={1}
-                    >
-                      I agree to{" "}
-                    </Text>
-                  </View>
-                </Touchable>
-                <Touchable
-                  onPress={handleTermsLinkPress}
-                  accessibilityRole="link"
-                  accessibilityLabel="View Paperless Billing Terms and Conditions"
-                  accessibilityHint="Opens Paperless Billing Terms and Conditions in a new window"
-                  hitSlop={A11Y.hitSlop}
-                  style={styles.termsLinkTouchable}
-                >
-                  <Text
-                    style={[
-                      styles.checkBoxAreaViewText,
-                      {
-                        color: Color.sparklightBrightPurple,
-                        textDecorationLine: "underline",
-                      },
-                    ]}
-                    allowFontScaling={true}
-                    maxFontSizeMultiplier={1}
-                  >
-                    Paperless Billing Terms & Conditions
-                  </Text>
-                </Touchable>
-              </View>
-            )}
+           
+    {isCheckboxVisible && (
+      <View style={[styles.checkboxSection]}>
+          <View style={styles.checkBoxArea}>
+            <Touchable
+              style={styles.checkboxTouchable}
+              onPress={handleCheckboxToggle}
+              accessibilityRole="checkbox"
+              accessibilityLabel="I agree to Paperless Billing Terms and Conditions"
+              accessibilityState={{ checked: toggleCheckBoxTerm }}
+              minSize={0}
+            >
+              <SparklightCheckBox
+                disabled={true}
+                value={toggleCheckBoxTerm}
+                boxStyle={styles.checkBox}
+                accessible={false}
+                importantForAccessibility="no"
+              />
+            </Touchable>
+            <Text
+              style={[styles.checkBoxAreaViewText, styles.checkBoxTextWrapper]}
+              allowFontScaling={true}
+              maxFontSizeMultiplier={1}
+            >
+              I agree to{' '}
+              <Hyperlink
+                onPress={handleTermsLinkPress}
+                accessibilityRole="link"
+                accessibilityLabel="View Paperless Billing Terms and Conditions"
+                accessibilityHint="Opens Paperless Billing Terms and Conditions in a new window"
+                allowFontScaling={true}
+                maxFontSizeMultiplier={1}
+              >
+                Paperless Billing Terms & Conditions
+              </Hyperlink>
+            </Text>
           </View>
+        
+
+          {/* Add error message display */}
           {isTermRequired && (
             <View
-              style={{
-                flexDirection: "row",
-                marginHorizontal: Padding.p_5xl,
-                marginBottom: 16,
-              }}
+              style={styles.errorContainer}
+              accessible={true}
+              accessibilityRole="alert"
+              accessibilityLiveRegion="assertive"
+              accessibilityLabel="Error: Please agree to the Terms and Conditions to proceed"
             >
-              <View
-                style={{
-                  flexDirection: "row",
-
-                  alignItems: "center",
-                }}
-              >
-                <AlertIcon />
-                <Text style={styles.ErrorToggle}>
-                  Please agree to the Terms & Conditions to proceed.
-                </Text>
-              </View>
+              <AlertIcon />
+              <Text style={styles.errorText} importantForAccessibility="no">
+                Please agree to the Terms & Conditions to proceed.
+              </Text>
             </View>
           )}
+        </View>
+       )}
+       </View>
+          
         </View>
         <View style={styles.buttonContainer}>
           <SecondaryButton
@@ -640,16 +614,39 @@ const styles = StyleSheet.create({
   spaceBottom: {
     marginBottom: 16,
   },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   checkBox: {
-    width: 12,
-    height: 12,
-    marginRight: Platform.OS === "ios" ? 2 : 16,
+    width: 16,
+    height: 16,
+    marginTop: 0,
+    marginRight: Platform.OS === "ios" ? 8 : 8,
   },
   checkBoxArea: {
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
-    paddingHorizontal: Platform.OS === "android" ? 16 : Padding.p_5xl,
+    width: "100%",
+    minHeight: A11Y.minTouch,
+    paddingVertical: Padding.p_5xs,
+  },
+  checkBoxTextWrapper: {
+    flex: 1,
+    flexWrap: "wrap",
+    marginLeft: 8,
+  },
+  termsLinkText: {
+    color: Color.sparklightBrightPurple,
+    textDecorationLine: "underline",
+  },
+  checkboxSection: {
+    paddingHorizontal: 16,
+    alignSelf: "flex-start",
+    justifyContent: 'flex-start',
+    width: "95%",
+    marginTop: Padding.p_base,
   },
   checkboxTouchable: {
     flexDirection: "row",
@@ -657,6 +654,7 @@ const styles = StyleSheet.create({
     marginRight: 0,
     minHeight: A11Y.minTouch,
     paddingVertical: Padding.p_5xs,
+    marginLeft: 8,
   },
   termsLinkTouchable: {
     minHeight: A11Y.minTouch,
@@ -665,12 +663,26 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+    
   },
   checkBoxAreaViewText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    color: Color.sparklightGray1,
+    flexShrink: 1,
+    flexWrap: "wrap",
+  },
+  errorText: {
+    marginLeft: 8,
+    color: "red",
     fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
+    lineHeight: 20,
+  }, errorContainer: {
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 

@@ -297,16 +297,15 @@ const TextNotifications = ({ navigation }) => {
               maxFontSizeMultiplier={1}
             >
               I agree to{' '}
-              <Text
+              <Hyperlink
                 onPress={handleTermsLinkPress}
                 accessibilityRole="link"
                 accessibilityLabel="View Text Messaging Terms and Conditions"
-                style={styles.termsLinkText}
                 allowFontScaling={true}
                 maxFontSizeMultiplier={1}
               >
                 Text Messaging Terms & Conditions
-              </Text>
+              </Hyperlink>
             </Text>
           </View>
 
@@ -456,7 +455,7 @@ const styles = StyleSheet.create({
     
   },
   checkBoxAreaViewText: {
-    fontSize: 14,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     flexShrink: 1,

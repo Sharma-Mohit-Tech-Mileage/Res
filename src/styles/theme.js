@@ -17,6 +17,7 @@ export const theme = {
     background: Color.colorWhitesmoke_200,
     freedatabackground:Color.sparklight_blue,
     upload:Color.sparklight_blue,
+    Black_100: Color.Black_100,
 
     // Text colors
     text: {
