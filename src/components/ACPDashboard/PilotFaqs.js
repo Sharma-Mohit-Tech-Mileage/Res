@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
 import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
 import { card } from "../../styles/utilities";
 import { useNavigation } from "@react-navigation/native";
+import AppStyles from "../../styles/AppStyles";
 
 // Card has wp("92%") width minus its own marginHorizontal:8 — give the image the same span.
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -14,7 +15,7 @@ const PilotFaqs = () => {
   const navigation = useNavigation();
   
   return (
-    <View style={[card.elevated, styles.container]}>
+    <View style={[AppStyles.card, styles.container]}>
       <View
         accessible={true}
         accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"

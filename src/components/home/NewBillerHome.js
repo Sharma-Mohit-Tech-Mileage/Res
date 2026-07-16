@@ -33,6 +33,7 @@ import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import { loginWithJWT, setConversationalFields, } from "../utility/RNZendeskChat";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import AppStyles from "../../styles/AppStyles";
 
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
@@ -493,7 +494,7 @@ const NewBillerHome = ({ navigation }) => {
               <View style={styles.overlayStack}>
                 {hasAnyAlert && <View style={{ height: alertsHeight }} />}
                 {isMobilePilotEnabled ? (
-                  <View style={[styles.card, styles.shadowProp]}>
+                  <View style={[AppStyles.card,{ margin:16 , overflow: "hidden"}]}>
                     <View
                       style={[
                         styles.contentWrapper,

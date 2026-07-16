@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import AppStyles from "../../styles/AppStyles";
 
 const DEFAULT_DATE_FORMAT = "MM/DD/YYYY";
 
@@ -238,6 +239,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 30,
     backgroundColor: Color.sparklightWhite,
+    
   },
   infoBox: {
     flexDirection: "column",
@@ -287,9 +289,9 @@ const styles = StyleSheet.create({
   linkText: {
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: FontSize.size_sm,
-    color: "#353091",
+    color: "#8D3B90",
     textDecorationLine: "underline",
-    fontWeight: "600",
+    fontWeight: "700",
   },
   highlightText: {
     fontFamily: FontFamily.openSansSemiBold,
