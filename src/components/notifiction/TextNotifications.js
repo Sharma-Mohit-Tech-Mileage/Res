@@ -583,37 +583,33 @@ const TextNotifications = ({ navigation }) => {
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
   <View style={[styles.frameContainer, styles.frameBorder]}>
     <View style={styles.frameView}>
-      <View style={styles.appointmentsParent}>
-        <View style={{ flexDirection: "column", flex: 1, marginRight: 10 }}>
-          <SectionTitle
-            style={styles.appointments}
-            accessible={true}
-            accessibilityRole="text"
-            accessibilityLabel={`${title} for text notifications ${description}`}
-          >
-            {title}
-          </SectionTitle>
+      <View style={styles.rowContent}>
+        <View style={styles.textWrap}>
+          <View style={styles.titleRow}>
+            <SectionTitle
+              style={styles.appointments}
+              accessible={true}
+              accessibilityRole="text"
+              accessibilityLabel={`${title} for text notifications ${description}`}
+            >
+              {title}
+            </SectionTitle>
+            <Toggle
+              name={name}
+              initialValue={value}
+              section="textNotif"
+              label={title}
+              description={description}
+              onToggle={onChange}
+            />
+          </View>
           <SectionContent
-            style={[
-              styles.receiveAppNotifications1,
-              { marginTop: 8 },
-            ]}
+            style={[ styles.descriptionText]}
             accessible={false}
             importantForAccessibility="no"
           >
             {description}
           </SectionContent>
-        </View>
-
-        <View>
-          <Toggle
-            name={name}
-            initialValue={value}
-            section="textNotif"
-            label={title}
-            description={description}
-            onToggle={onChange}
-          />
         </View>
       </View>
     </View>
@@ -816,26 +812,41 @@ const styles = StyleSheet.create({
   },
   appointments: {
     textAlign: "left",
-    lineHeight: 22,
     flex: 1,
   },
-  appointmentsParent: {
+  rowContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  titleRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    width: "100%",
   },
   frameView: {
-    paddingVertical: Padding.p_base,
+    paddingVertical: 0,
+    paddingBottom: 12,
     flexDirection: "row",
-    //alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
-    //flex: 1,
+    width: "100%",
   },
   frameContainer: {
     borderBottomWidth: 1,
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "stretch",
+  },
+  textWrap: {
+    flexDirection: "column",
+    flex: 1,
+    marginRight: 10,
+  },
+  descriptionText: {
+    marginTop: 0,
+    marginBottom: Padding.p_9xs,
   },
   receiveAppNotifications1: {
     lineHeight: 22,

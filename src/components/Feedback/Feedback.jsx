@@ -305,7 +305,7 @@ const Feedback = () => {
 
 
 
-          <View style={{ paddingHorizontal: 16 }}>
+          <View style={{ paddingHorizontal: 16, paddingTop: 8}}>
 
               <FieldTitle
                 style={[
@@ -542,7 +542,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   cancelWrapper: {
-    marginTop: Padding.p_13xl,
+    marginTop: Padding.p_5xs,
     paddingHorizontal: Padding.p_base,
     alignItems: "center",
   },

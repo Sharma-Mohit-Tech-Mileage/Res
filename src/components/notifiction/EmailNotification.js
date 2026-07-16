@@ -60,6 +60,7 @@ const AddNotificationScreen = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const [paperlessStatus, setPaperlessStatus] = useState(true);
   const accountDetails = useSelector(
     (state) => state.profile?.accountDetails
   );
@@ -210,6 +211,7 @@ const AddNotificationScreen = () => {
     if (newValue.target.value === true) {
       setIsTermRequired(false);
     }
+    setPaperlessStatus(newValue.target.value);
   }, []);
 
   const handleSave = useCallback(
@@ -411,7 +413,7 @@ const AddNotificationScreen = () => {
             </View>
             <View style={styles.divider} />
             <A11y.Order
-              style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
+              style={[styles.section, { paddingHorizontal: Padding.p_5xl, paddingVertical: 0 }]}
             >
               <View style={styles.toggleHeader}>
                 <A11y.Index index={0} >
@@ -444,6 +446,23 @@ const AddNotificationScreen = () => {
                 convenient, eco-friendly, and keeps your information at your
                 fingertips.
               </SectionContent>
+             { !paperlessStatus && (
+              <View style={{ paddingVertical: Padding.p_5xs }}>
+              <NotificationAlert
+                type="warning"
+                title={undefined}
+                message={
+                  "By deactivating paperless billing, you will be charged a $3 paper statement fee where legally permitted."
+                }
+                showCloseIcon={false}
+                isVisible={true}
+                accessibilityLabel="By deactivating paperless billing, you will be charged a $3 paper statement fee where legally permitted."
+                accessibilityLiveRegion="polite"
+                accessibilityRole="alert"
+                customStyle={styles.warningAlert}
+              />
+            </View>
+              )}
             </A11y.Order>
            
     {isCheckboxVisible && (
@@ -550,7 +569,7 @@ const styles = StyleSheet.create({
     borderRadius: 0,
   },
   section: {
-    paddingVertical: Padding.p_base,
+    paddingVertical: Padding.p_xs,
   },
   instructions: {
     marginBottom: Padding.p_base,

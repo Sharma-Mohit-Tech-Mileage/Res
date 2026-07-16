@@ -88,9 +88,9 @@ const NewBillerHome = ({ navigation }) => {
     )
     : false;
 
-  const isForceBannerAccount =
-    userInfo?.accountNumber === "8160110010005227" ||
-    accountDetails?.accountNumber === "8160110010005227";
+    const isForceBannerAccount =
+    userInfo?.accountNumber === "8160116990081294" ||
+    accountDetails?.accountNumber === "8160116990081294";
 
   const forcedMaintenanceBannerConfig = {
     title: "Service Error",

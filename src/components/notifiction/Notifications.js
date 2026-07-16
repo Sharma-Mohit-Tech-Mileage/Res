@@ -65,7 +65,7 @@ const Notifications = () => {
       },
       {
         id: "outage",
-        type: "Outage",
+        type: "Outage Alerts",
         status: "Off",
       },
       {
@@ -86,7 +86,7 @@ const Notifications = () => {
       },
       {
         id: "outage",
-        type: "Outage",
+        type: "Outage Alerts",
         status: "Off",
       },
       {

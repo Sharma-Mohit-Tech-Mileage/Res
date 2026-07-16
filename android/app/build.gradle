@@ -115,7 +115,7 @@ android {
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
         versionCode 466
-        versionName "28.0.0"
+        versionName "29.0.0"
     }
 
 
@@ -199,5 +199,12 @@ dependencies {
     }
 }
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+// Force the browser library to 1.8.0 to resolve AGP 8.9.1 / SDK 36 requirement conflict
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.browser:browser:1.8.0'
+    }
+}
 
 //apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

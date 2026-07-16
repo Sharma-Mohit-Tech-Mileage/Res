@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   Animated,
   ScrollView,
@@ -10,20 +9,11 @@ import {
   Linking,
   Alert,
   AccessibilityInfo,
-  findNodeHandle,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
-import {
-  Color,
-  FontSize,
-  FontFamily,
-  Padding,
-  Border,
-} from "../../../GlobalStyles";
-
+import { Color, Padding } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
@@ -36,7 +26,7 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import AppStyles from "../../styles/AppStyles";
 import SecondaryButton from "../common/customui/PrimaryButton";
-import {SectionTitle, SectionContent } from "../common/customui/Typography";
+import { SectionTitle, SectionContent } from "../common/customui/Typography";
 import {
   getFcmToken,
   notifyPermission,
@@ -44,89 +34,53 @@ import {
 } from "../../firebase/FirebaseUtils";
 import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 
+const initialFormState = {
+  optOut: false,
+  outageOptOut: false,
+  billingOptOutStatus: false,
+};
 
 const InAppNotifications = ({ navigation }) => {
   const route = useRoute();
-  const [initialize, setInitializeSettings] = useState(
-    route.params?.additionalData,
-  );
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const additionalData = route.params?.additionalData;
-  const dispatch = useDispatch();
+  const [formData, setFormData] = useState(() => ({
+    ...initialFormState,
+    ...(route.params?.additionalData || {}),
+  }));
+  const [notification, setNotification] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isNotificationRequired, setIsNotificationRequired] = useState(false);
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+
   const scrollViewRef = useRef(null);
   const animatedValue = useRef(new Animated.Value(-100)).current;
   const timeoutRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
-  const [isNotificationRquired, setIsNotificationRequired] = useState(false);
-  const [notification, setNotification] = useState(null);
-  const [errorRef, setErrorFocus] = useAccessibilityFocus();
-  const [successRef, setSuccessFocus] = useAccessibilityFocus();
-  const successIconRef = useRef(null);
-  const formatedData = route.params?.additionalData || {};
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
-  // Android TalkBack: hide background elements only for error alerts, not for success banners.
+
   const isAndroidA11yModalActive =
-    Platform.OS === "android" && screenReaderEnabled && notification?.type === "error";
+    Platform.OS === "android" &&
+    screenReaderEnabled &&
+    notification?.type === "error";
 
   useEffect(() => {
-      AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
-    }, []);
-  
-  
-  
-    useEffect(() => {
-      if (notification && screenReaderEnabled) {
-        // Focus-only, mirror Text Notifications: prefer success icon; fallback to container refs. Retry once.
-        const t1 = setTimeout(() => {
-          try {
-            if (notification.type === "success" && successIconRef.current) {
-              const handle = findNodeHandle(successIconRef.current);
-              if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-            } else if (notification.type === "success") {
-              setSuccessFocus();
-            } else {
-              setErrorFocus();
-            }
-          } catch (e) {
-            console.warn("Accessibility focus error:", e);
-          }
-        }, 600);
-
-        const t2 = setTimeout(() => {
-          try {
-            if (notification.type === "success" && successIconRef.current) {
-              const handle = findNodeHandle(successIconRef.current);
-              if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
-            }
-          } catch (e) {
-            console.warn("Accessibility focus retry error:", e);
-          }
-        }, 1200);
-
-        return () => { clearTimeout(t1); clearTimeout(t2); };
-      }
-    }, [notification, screenReaderEnabled, setSuccessFocus, setErrorFocus]);
-  
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
 
   const translateY = animatedValue;
+
   const animateNotification = useCallback(() => {
-    // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
 
-    // Always animate in notification from off-screen
     animatedValue.setValue(-100);
-
     Animated.timing(animatedValue, {
       toValue: 0,
       duration: 500,
       useNativeDriver: true,
     }).start();
-  }, [animatedValue, notification]);
+  }, [animatedValue]);
 
   useEffect(() => {
     return () => {
@@ -145,18 +99,11 @@ const InAppNotifications = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
-      const initializedSettings = additionalData;
-      setInitializeSettings(initializedSettings);
+      const initializedSettings = route.params?.additionalData || {};
+      setFormData((prev) => ({ ...prev, ...initializedSettings }));
     }
+  }, [isFocused, route.params?.additionalData]);
 
-    return () => {
-      if (isFocused) {
-        setInitializeSettings({});
-      }
-    };
-  }, [isFocused]);
-
-  // Handle app state changes
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (nextAppState === "active") {
@@ -169,132 +116,155 @@ const InAppNotifications = ({ navigation }) => {
     };
   }, []);
 
-  const handleToggleChange = (e) => {
-    const { name, value } = e.target;
-    formatedData[name] = value;
-  };
-
-  const initialNotificationStatus = async () => {
-    const enabledPermission = await requestUserPermission();
-    if (enabledPermission) {
-      setIsNotificationRequired(false);
-    } else {
-      setIsNotificationRequired(true);
-    }
-  };
-
-  const checkNofif = async (value) => {
-    if (value) {
-      const pushNotification = await getPushNotificationStatus();
-      if (pushNotification?.permanentSkip) {
-        await notifyPermission();
-      } else {
-        const enabledPermission = await requestUserPermission();
-        if (enabledPermission) {
-          setIsNotificationRequired(false);
-        } else {
-          setIsNotificationRequired(true);
-          Alert.alert(
-            "Sparklight Would Like to Send You Notifications",
-            "Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.",
-            [
-              {
-                text: "Go to Settings",
-                style: "cancel",
-                onPress: () => {
-                  if (Platform.OS === "ios") {
-                    Linking.openURL("app-settings:");
-                  } else {
-                    Linking.openSettings();
-                  }
-                },
-              },
-              {
-                text: "Cancel",
-                style: "cancel",
-                onPress: () => {
-                  setIsNotificationRequired(false);
-                },
-              },
-            ],
-          );
-        }
-      }
-    } else {
-    }
-  };
-
   useEffect(() => {
     if (route.params?.updateFailed) {
-      setShowErrorAlert(true);
-      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-      navigation.setParams({ updateFailed: undefined });
+      setNotification({
+        message:
+          route.params.errorMessage || "In-App Notifications update failed.",
+        type: "error",
+      });
+      navigation.setParams({
+        updateFailed: undefined,
+        errorMessage: undefined,
+      });
     }
-  }, [route.params?.updateFailed, navigation, dispatch]);
+  }, [route.params?.updateFailed, route.params?.errorMessage, navigation]);
 
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setNotification({
-        message: route.params.successMessage,
+        message:
+          route.params.successMessage ||
+          "Your in-app notification preferences have been updated successfully.",
         type: "success",
       });
+      navigation.setParams({
+        updateSuccess: undefined,
+        successMessage: undefined,
+      });
     }
-  }, [route.params]);
+  }, [route.params?.updateSuccess, route.params?.successMessage, navigation]);
 
-  const handleSave = async () => {
+  const handleToggleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    await postRequestInAppNotification();
+  const initialNotificationStatus = async () => {
+    const enabledPermission = await requestUserPermission();
+    setIsNotificationRequired(!enabledPermission);
+  };
+
+  const checkNofif = async (value) => {
+    if (!value) return;
+
+    const pushNotification = await getPushNotificationStatus();
+    if (pushNotification?.permanentSkip) {
+      await notifyPermission();
+      return;
+    }
+
+    const enabledPermission = await requestUserPermission();
+    if (enabledPermission) {
+      setIsNotificationRequired(false);
+      return;
+    }
+
+    setIsNotificationRequired(true);
+    Alert.alert(
+      "Sparklight Would Like to Send You Notifications",
+      "Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.",
+      [
+        {
+          text: "Go to Settings",
+          style: "cancel",
+          onPress: () => {
+            if (Platform.OS === "ios") {
+              Linking.openURL("app-settings:");
+            } else {
+              Linking.openSettings();
+            }
+          },
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => {
+            setIsNotificationRequired(false);
+          },
+        },
+      ],
+    );
   };
 
   const postRequestInAppNotification = async () => {
     if (
-      formatedData.optOut ||
-      formatedData.outageOptOut ||
-      formatedData.billingOptOutStatus
+      formData.optOut ||
+      formData.outageOptOut ||
+      formData.billingOptOutStatus
     ) {
-      checkNofif(true);
+      await checkNofif(true);
     }
-    const token = await getFcmToken();
-    let user = await getUser();
-    let deviceId = await getDeviceUniqueId();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const userName = user.userInfo?.userName || null;
 
+    setIsSubmitting(true);
     setIsLoading(true);
-    const requestData = {
-      accountNumber: accountNumber,
-      deviceToken: token || deviceId,
-      DeviceId: deviceId,
-      deviceTokenTimestamp: moment().format(),
-      isAndroid: Platform.OS === "android",
-      optOut: !formatedData.optOut,
-      outageOptOut: !formatedData.outageOptOut,
-      userName: userName,
-      billingOptOutStatus: !formatedData.billingOptOutStatus,
-      customerType: "Residential",
-    };
-    PostApiRequest(
-      getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName }),
-      requestData,
-      (res) => {
-        setIsLoading(false);
-        if (res) {
+
+    try {
+      const token = await getFcmToken();
+      const user = await getUser();
+      const deviceId = await getDeviceUniqueId();
+      const accountNumber = user.userInfo?.accountNumber || null;
+      const userName = user.userInfo?.userName || null;
+
+      const requestData = {
+        accountNumber,
+        deviceToken: token || deviceId,
+        DeviceId: deviceId,
+        deviceTokenTimestamp: moment().format(),
+        isAndroid: Platform.OS === "android",
+        optOut: !formData.optOut,
+        outageOptOut: !formData.outageOptOut,
+        userName,
+        billingOptOutStatus: !formData.billingOptOutStatus,
+        customerType: "Residential",
+      };
+
+      PostApiRequest(
+        getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName }),
+        requestData,
+        (res) => {
+          setIsLoading(false);
+          setIsSubmitting(false);
+          if (res) {
+            setNotification({
+              message:
+                "Your in-app notification preferences have been updated successfully.",
+              type: "success",
+            });
+          }
+        },
+        (error) => {
+          setIsLoading(false);
+          setIsSubmitting(false);
+          console.warn("Error on retrying postRequestInAppNotification", error);
           setNotification({
-            message:
-              "Your in-app notification preferences have been updated successfully.",
-            type: "success",
+            message: "In-App Notifications update failed.",
+            type: "error",
           });
-        }
-      },
-      (error) => {
-        setIsLoading(false);
-        console.warn("Error on retrying postRequestInAppNotification", error);
-        setNotification({
-          message: "In-App Notifications update failed.",
-          type: "error",
-        });
-      },
-    );
+        },
+      );
+    } catch (error) {
+      setIsLoading(false);
+      setIsSubmitting(false);
+      console.warn("Permission error:", error);
+      setNotification({
+        message: "Failed to update notification preferences.",
+        type: "error",
+      });
+    }
+  };
+
+  const handleSave = async () => {
+    await postRequestInAppNotification();
   };
 
   return (
@@ -312,23 +282,20 @@ const InAppNotifications = ({ navigation }) => {
         />
       )}
 
-      <ScrollView>
+      <ScrollView ref={scrollViewRef}>
         <View style={styles.inAppNotificationsInner}>
-          <View style={[AppStyles.card, { margin: 16,padding: 16 }]}>
-            <View style={[ styles.frameBorder]}>
+          <View style={[AppStyles.card, styles.cardContainer]}>
+            <View style={styles.frameBorder}>
               {notification && (
                 <Animated.View
-                  style={{
-                    transform: [{ translateY }],
-                    paddingHorizontal: Padding.p_5xl,
-                  }}
+                  style={[
+                    styles.alertContainer,
+                    { transform: [{ translateY }] },
+                  ]}
                   accessible={false}
                   importantForAccessibility="yes"
                 >
-                  <View
-                    style={styles.spaceBottom}
-                    ref={notification.type === "error" ? errorRef : successRef}
-                  >
+                  <View style={styles.spaceBottom}>
                     <NotificationAlert
                       type={notification.type}
                       title={
@@ -342,64 +309,59 @@ const InAppNotifications = ({ navigation }) => {
                       accessibilityLabel={notification.message}
                       isVisible={true}
                       autoFocusTitle={false}
-                      iconRef={successIconRef}
                     />
                   </View>
                 </Animated.View>
               )}
 
-              {/* Hide background controls from TalkBack while the notification is visible */}
               <View
                 importantForAccessibility={
                   isAndroidA11yModalActive ? "no-hide-descendants" : "auto"
                 }
                 accessibilityElementsHidden={isAndroidA11yModalActive}
               >
-                <View style={styles.infoWrapper}>
-                  <NotificationAlert
-                    type="error"
-                    title="Error"
-                    message="Notifications updated failed."
-                    showCloseIcon={true}
-                    isVisible={showErrorAlert}
-                    autoFocusTitle={true}
-                    onClose={() => setShowErrorAlert(false)}
-                  />
-                </View>
                 <NotificationSetting
                   title="Appointments"
                   name="optOut"
-                  value={formatedData.optOut}
+                  value={formData.optOut}
                   description="Receive app notifications when your appointments have updates."
                   onChange={handleToggleChange}
                 />
+
+                <View style={styles.divider} />
+
                 <NotificationSetting
                   title="Outage Alerts"
                   name="outageOptOut"
-                  value={formatedData.outageOptOut}
-                  description="Receive app notifications when outage occur."
+                  value={formData.outageOptOut}
+                  description="Receive app notifications when outages occur."
                   onChange={handleToggleChange}
                 />
+
+                <View style={styles.divider} />
+
                 <NotificationSetting
                   title="Billing"
                   name="billingOptOutStatus"
-                  value={formatedData.billingOptOutStatus}
+                  value={formData.billingOptOutStatus}
                   description="Receive app notifications for billing."
                   onChange={handleToggleChange}
                 />
               </View>
-              </View>
-
+            </View>
           </View>
+
           <View style={styles.buttonsParent}>
             <SecondaryButton
               title="Save"
               onPress={handleSave}
-              accessibilityLabel={isSubmitting ? "Saving settings..." : "Save settings"}
+              accessibilityLabel={
+                isSubmitting ? "Saving settings..." : "Save settings"
+              }
               accessibilityHint="Double tap to save your notification preferences"
               style={styles.saveButton}
               disabled={isSubmitting}
-              buttonType={"submit"}
+              buttonType="submit"
             />
             <SecondaryButton
               title="Cancel"
@@ -409,8 +371,7 @@ const InAppNotifications = ({ navigation }) => {
               style={styles.cancelButton}
               disabled={isSubmitting}
             />
-            </View>
-        
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -420,46 +381,39 @@ const InAppNotifications = ({ navigation }) => {
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
   <Touchable
     minSize={0}
-    style={[styles.frameContainer, styles.frameBorder, { justifyContent: 'flex-start' }]}
+    style={styles.frameContainer}
     accessible={false}
     importantForAccessibility="no"
-    onPress={() =>
-      onChange({ target: { name, value: !value, type: "toggle" } })
-    }
+    onPress={() => onChange(name, !value)}
   >
     <View style={styles.frameView}>
-      <View style={styles.appointmentsParent}>
-        <View style={{ flexDirection: "column", flex: 1, marginRight: 10 }}>
-          <SectionTitle
-            style={styles.appointments}
-            accessible={true}
-            accessibilityRole="text"
-            accessibilityLabel={`${title} for In-app notifications. ${description}`}
-          >
-            {title}
-          </SectionTitle>
+      <View style={styles.rowContent}>
+        <View style={styles.textWrap}>
+          <View style={styles.titleRow}>
+            <SectionTitle
+              style={styles.appointments}
+              accessible={true}
+              accessibilityRole="text"
+              accessibilityLabel={`${title} for In-app notifications. ${description}`}
+            >
+              {title}
+            </SectionTitle>
+            <Toggle
+              name={name}
+              initialValue={value}
+              label={title}
+              description={description}
+              onToggle={() => onChange(name, !value)}
+              section="inAppNotif"
+            />
+          </View>
           <SectionContent
-            style={[
-              { marginTop: 8 },
-            ]}
+            style={styles.descriptionText}
             accessible={false}
             importantForAccessibility="no"
           >
             {description}
           </SectionContent>
-        </View>
-
-        <View>
-          <Toggle
-            name={name}
-            initialValue={value}
-            label={title}
-            description={description}
-            onToggle={(e) => {
-              onChange({ target: { name, value: !value, type: "toggle" } });
-            }}
-            section="inAppNotif"
-          />
         </View>
       </View>
     </View>
@@ -467,139 +421,84 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
 );
 
 const styles = StyleSheet.create({
+  cardContainer: {
+    margin: 16,
+    padding: 0,
+    overflow: "hidden",
+  },
   frameBorder: {
     borderColor: Color.sparklightGray,
     backgroundColor: Color.sparklightWhite,
     alignItems: "center",
     borderStyle: "solid",
   },
-  tabsParentFlexBox: {
-    justifyContent: "center",
+  alertContainer: {
+    paddingHorizontal: Padding.p_5xl,
+    paddingTop: Padding.p_base,
+    width: "100%",
   },
-  frameParent3: {
-    justifyContent: "center",
-    flex: 1,
-  },
-  mobilePhoneTypo: {
-    color: Color.sparklightGray1,
-    fontSize: FontSize.size_base,
-    lineHeight: 22,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-  },
-  receiveTypo: {
-    fontSize: FontSize.textXsSemibold_size,
-    color: Color.sparklightaddGray,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+  divider: {
+    height: 1,
+    backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
   },
-  buttonsLayout: {
-    paddingHorizontal: 0,
-    width: "100%",
-    paddingVertical: Padding.p_base,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    height: 56,
-  },
-  makeTypo: {
-    width: 282,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    textAlign: "center",
-  },
   appointments: {
-    lineHeight: 22,
     flex: 1,
   },
-  appointmentsParent: {
+  rowContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  titleRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    width: "100%",
   },
   frameView: {
-    paddingVertical: Padding.p_base,
+    paddingVertical: Padding.p_5xs,
     flexDirection: "row",
     paddingHorizontal: Padding.p_5xl,
+    width: "100%",
   },
   frameContainer: {
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "stretch",
   },
-  receiveAppNotifications1: {
-    color: Color.colorGray_100,
-    lineHeight: 22,
+  textWrap: {
+    flexDirection: "column",
+    flex: 1,
+    marginRight: 10,
   },
-  frameGroup: {
-   ...AppStyles.card,
-    paddingVertical: Padding.p_5xl,
-    paddingHorizontal: Padding.p_5xl,
-  },
-  infoWrapper: {
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
+  descriptionText: {
+    marginTop: 0,
+    marginBottom: Padding.p_9xs,
   },
   spaceBottom: {
     marginVertical: 16,
     width: widthPercentageToDP("85%"),
-  },
-  buttons1: {
-    marginTop: 16,
-    backgroundColor: Color.colorWhitesmoke_200,
-    paddingHorizontal: 0,
   },
   buttonsParent: {
     margin: 16,
     alignSelf: "center",
     width: "90%",
   },
+  saveButton: {
+    backgroundColor: Color.colorMidnightblue,
+  },
+  cancelButton: {
+    backgroundColor: Color.colorWhitesmoke_200,
+  },
   inAppNotificationsInner: {
     width: "100%",
-    
   },
   inAppNotifications: {
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
-  },
-  infoCircleIcon: {
-    width: 16,
-    height: 16,
-    overflow: "hidden",
-  },
-  infoCircleWrapper: {
-    paddingVertical: Padding.p_8xs,
-    flexDirection: "row",
-  },
-  youAreSubscribed: {
-    lineHeight: 22,
-  },
-  youAreSubscribedContainer: {
-    marginLeft: 8,
-    color: Color.colorGray_200,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    flex: 1,
-  },
-  containerTypo: {
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-  },
-  receiveTextNotifications1: {
-    color: Color.sparklightaddGray,
-    lineHeight: 22,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "left",
-    alignSelf: "stretch",
-    fontSize: FontSize.size_sm,
-  },
-  frameChild: {
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
   },
 });
 
