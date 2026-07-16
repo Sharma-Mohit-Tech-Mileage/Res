@@ -425,7 +425,7 @@ const SplashScreen = ({ navigation, route }) => {
 
     const networkManager = NetworkManager.getInstance();
     const connectivity = await networkManager.checkConnectivity();
-
+    console.log("Connectivity check:", connectivity);
     if (
       !connectivity.isConnected ||
       connectivity.isInternetReachable === false

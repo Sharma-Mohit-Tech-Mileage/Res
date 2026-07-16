@@ -109,12 +109,12 @@ const AutoPayCard = ({
               {isAutoPayStatus ? (
                 <View style={styles.iconContainer}>
                   <StatusIcon status="On" style={styles.statusIcon} />
-                  <IndicatorText style={{marginLeft: 4, marginTop: 4}}  accessible={true} accessibilityRole='text' accessibilityLabel="Auto Pay is On">On</IndicatorText>
+                  <IndicatorText style={styles.statusText} accessible={true} accessibilityRole='text' accessibilityLabel="Auto Pay is On">On</IndicatorText>
                 </View>
               ) : (
                 <View style={styles.iconContainer}>
                   <StatusIcon status="Off" style={styles.statusIcon} />
-                  <IndicatorText style={{marginLeft: 4, marginTop: 2}}  accessible={true} accessibilityRole='text' accessibilityLabel="Auto Pay is Off">Off</IndicatorText>
+                  <IndicatorText style={styles.statusText} accessible={true} accessibilityRole='text' accessibilityLabel="Auto Pay is Off">Off</IndicatorText>
                 </View>
               )}
             </>
@@ -162,7 +162,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   statusIcon: {
-    marginTop: 4,
+    marginTop: 0,
+    marginRight: 4,
+  },
+  statusText: {
+    marginLeft: 0,
+    marginTop: 0,
   },
 });
 

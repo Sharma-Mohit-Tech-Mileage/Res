@@ -7671,10 +7671,10 @@ react-native-a11y-order@^0.6.0:
   resolved "https://registry.npmjs.org/react-native-a11y-order/-/react-native-a11y-order-0.6.0.tgz"
   integrity sha512-aQksYoFPcK7B6qbxnZRSaniA+BPJIsB8DV4wTzIJXlyEpNEU+wJOcdJ5xWgpzWMe9ylVk17poJrDqZc/ahA6kw==
 
-react-native-app-auth@^8.4.0:
-  version "8.4.0"
-  resolved "https://registry.yarnpkg.com/react-native-app-auth/-/react-native-app-auth-8.4.0.tgz#815250fdd6b1c1bf9baad532ecc1764a67a9f7de"
-  integrity sha512-9MCjB2tUyEUVIoqfgxMRoYx5dUgiI15bHEAWi4LgZWPe6S3cqaxqgQ/V22hxirTVIpyufag6WCHISTYGKlm9Og==
+react-native-app-auth@7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-app-auth/-/react-native-app-auth-7.2.0.tgz#db42468018d1db42ead3a5ef8f00bb6c3e494fa7"
+  integrity sha512-Vw7td8oXklM0nXcerz/6E8Y6Ww+yDRMSohREllYceUe1570kNI7EIwGhzF3+yKjI4QADi8m/LGb7GdwkDxM4XQ==
   dependencies:
     invariant "2.2.4"
     react-native-base64 "0.0.2"

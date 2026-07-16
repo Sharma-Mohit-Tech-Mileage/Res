@@ -110,10 +110,10 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
           ) : (
             <>
               {paperlessStatus ? (
-                <View style={{ flexDirection: "row" }}>
+                <View style={styles.iconContainer}>
                   <StatusIcon status="On" style={styles.statusIcon} />
                   <IndicatorText
-                    style={{ marginLeft: 4, marginTop: 4 }}
+                    style={styles.statusText}
                     accessible={true}
                     accessibilityRole="text"
                     accessibilityLabel="Paperless Billing is On"
@@ -122,10 +122,10 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
                   </IndicatorText>
                 </View>
               ) : (
-                <View style={{ flexDirection: "row" }}>
+                <View style={styles.iconContainer}>
                   <StatusIcon status="Off" style={styles.statusIcon} />
                   <IndicatorText
-                    style={{ marginLeft: 4, marginTop: 2 }}
+                    style={styles.statusText}
                     accessible={true}
                     accessibilityRole="text"
                     accessibilityLabel="Paperless Billing is Off"
@@ -159,9 +159,15 @@ const styles = StyleSheet.create({
   iconContainer: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
   },
   statusIcon: {
-    marginTop: 4,
+    marginTop: 0,
+    marginRight: 4,
+  },
+  statusText: {
+    marginLeft: 0,
+    marginTop: 0,
   },
   iconBg: {
     alignSelf: "center",
