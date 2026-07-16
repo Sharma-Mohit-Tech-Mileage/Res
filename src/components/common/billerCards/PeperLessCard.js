@@ -8,7 +8,7 @@ import { card } from "../../../styles/utilities";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../customui/Touchable";
 import AppStyles from "../../../styles/AppStyles";
-import { SectionTitle, IndicatorText } from "../customui/Typography";
+import { SectionTitle, IndicatorText,Hyperlink } from "../customui/Typography";
 import Checkcircle from "../../../../assets/svgs/Checkcircle";
 import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
 
@@ -74,23 +74,15 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
               />
             </SkeletonPlaceholder>
           ) : (
-            <Text
-              style={{
-                textDecorationStyle: "solid",
-                textDecorationLine: "underline",
-                fontSize: 14,
-                fontWeight: "400",
-                color: colors.sparklight_bright_purple,
-                fontFamily: FontFamily.openSansRegular,
-                marginLeft: 10,
-              }}
+            <Hyperlink
+              style={styles.manageLink}
               accessible={true}
-              accessibilityRole="link"
+              accessibilityRole='link'
               accessibilityHint="Double tap to navigate to Paperless Billing management page."
-              accessibilityLabel="Manage Paperless Billing"
+              accessibilityLabel={"Manage Paperless Billing" }
             >
               Manage
-            </Text>
+            </Hyperlink>
           )}
         </View>
         <View style={{ position: "absolute", right: 10 }}>
@@ -147,6 +139,9 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     alignContent: "flex-start",
     alignSelf: "center",
+  },
+  manageLink: {
+    marginLeft: 10,
   },
   
   statusRow: {

@@ -18,6 +18,7 @@ import {
 } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
+import { Hyperlink } from "../common/customui/Typography";
 import moment from "moment";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import {card} from '../../styles/utilities'
@@ -264,7 +265,7 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
           Try our new{' '}
         </Text>
         <View style={{ flexDirection: "row" }}>
-          <Text
+          <Hyperlink
             accessibilityRole="link"
             accessibilityLabel="Open Bill Explainer"
             accessibilityHint="Double tap to open link"
@@ -273,7 +274,7 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
             onPress={() => renderBillExplainerLink(navigation)}
           >
             Bill Explainer
-          </Text>
+          </Hyperlink>
           <Text accessible={false} importantForAccessibility="no" style={[styles.billExplainerLinkText, { textDecorationLine: 'none' }]}>!</Text>
         </View>
         </View>

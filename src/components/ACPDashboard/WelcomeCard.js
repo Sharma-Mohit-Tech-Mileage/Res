@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   watchVideoButton: {
     marginVertical: Padding.p_sm,
     fontSize: FontSize.textXsSemibold_size,
-    color: Color.colorGray_200,
+    color: Color.sparklightaddGray,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   offerDesclaimer: {

@@ -5,12 +5,11 @@ import Checkcircle from "../../../../assets/svgs/Checkcircle";
 import Checkcircle1 from "../../../../assets/svgs/Checkcircle1"
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { FontFamily, Color } from "../../../../GlobalStyles";
 import Config from "react-native-config";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../customui/Touchable";
 import AppStyles from "../../../styles/AppStyles";
-import {SectionTitle,IndicatorText } from "../customui/Typography";
+import {SectionTitle,IndicatorText,Hyperlink } from "../customui/Typography";
 
 const StatusIcon = ({ status, style }) => {
   return <View style={style}>{status === "On" ? <Checkcircle /> : <Checkcircle1 />}</View>;
@@ -72,23 +71,15 @@ const AutoPayCard = ({
               />
             </SkeletonPlaceholder>
           ) : (
-            <Text
-              style={{
-                textDecorationStyle: "solid",
-                textDecorationLine: "underline",
-                fontSize: 14,
-                fontWeight: "400",
-                color: colors.sparklight_bright_purple,
-                fontFamily: FontFamily.openSansRegular,
-                marginLeft: 10,
-              }}
+            <Hyperlink
+              style={styles.manageLink}
               accessible={true}
               accessibilityRole='link'
               accessibilityHint="Double tap to navigate to Auto Pay management page."
               accessibilityLabel={"Manage Auto Pay" }
             >
               Manage
-            </Text>
+            </Hyperlink>
           )}
         </View>
         <View style={{ position: "absolute", right: 10 }}>
@@ -149,7 +140,11 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-  },statusRow: {
+  },
+  manageLink: {
+    marginLeft: 10,
+  },
+  statusRow: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",

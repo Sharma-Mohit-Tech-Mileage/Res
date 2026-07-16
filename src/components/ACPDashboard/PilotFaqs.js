@@ -4,6 +4,7 @@ import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
 import { card } from "../../styles/utilities";
 import { useNavigation } from "@react-navigation/native";
 import AppStyles from "../../styles/AppStyles";
+import { Hyperlink, SectionTitle } from "../common/customui/Typography";
 
 // Card has wp("92%") width minus its own marginHorizontal:8 — give the image the same span.
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -17,12 +18,13 @@ const PilotFaqs = () => {
   return (
     <View style={[AppStyles.card, styles.container]}>
       <View
+        style={styles.titleContainer}
         accessible={true}
         accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
       >
-        <Text style={styles.title} accessible={false} importantForAccessibility="no">
+        <SectionTitle accessible={false} importantForAccessibility="no">
           Service Activation
-        </Text>
+        </SectionTitle>
       </View>
       
       <Text
@@ -35,21 +37,22 @@ const PilotFaqs = () => {
         page by clicking the link below.
       </Text>
       
-      <Text
-        style={styles.link}
-        onPress={() => {
-          navigation.navigate("ArticleWindowUtility", {
-            url: "https://www.sparklight.com/Activation-faqs",
-            name: "Sparklight Service Activation FAQs",
-          });
-        }}
-        accessibilityRole="link"
-        accessible={true}
-        accessibilityLabel="Service Activation FAQs."
-        accessibilityHint="Opens the Service Activation FAQs page"
-      >
-        Service Activation FAQ's
-      </Text>
+      <View style={styles.linkWrapper}>
+        <Hyperlink
+          onPress={() => {
+            navigation.navigate("ArticleWindowUtility", {
+              url: "https://www.sparklight.com/Activation-faqs",
+              name: "Sparklight Service Activation FAQs",
+            });
+          }}
+          accessibilityRole="link"
+          accessible={true}
+          accessibilityLabel="Service Activation FAQs."
+          accessibilityHint="Opens the Service Activation FAQs page"
+        >
+          Service Activation FAQ's
+        </Hyperlink>
+      </View>
       
       <View style={styles.imageContainer}>
         <Image
@@ -71,11 +74,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     shadowOffset: { width: 0, height: -1 },
   },
-  title: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: 20,
-    color: Color.sparklightBrightPurple,
-    fontWeight: "500",
+  titleContainer: {
     marginHorizontal: 24,
     marginTop: 5,
   },
@@ -88,12 +87,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginTop: 12,
   },
-  link: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: 16,
-    fontWeight: "500",
-    color: Color.sparklightBrightPurple,
-    textDecorationLine: "underline",
+  linkWrapper: {
     marginHorizontal: 24,
     marginBottom: 24,
   },

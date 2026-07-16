@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   rectangleWrapper: {
     paddingVertical: 0,
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: 0,
   },
   securityQuestionWrapper: {
     alignItems: "center",

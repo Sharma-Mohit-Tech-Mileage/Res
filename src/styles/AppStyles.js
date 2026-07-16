@@ -103,7 +103,7 @@ const AppStyles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaBold,
     fontSize: FontSize.size_base,
     fontStyle: "normal",
-    fontWeight: "400",
+    fontWeight: "700",
     textDecorationLine: "underline",
     textDecorationStyle: "solid",
     textDecorationColor: Color.sparklightBrightPurple,

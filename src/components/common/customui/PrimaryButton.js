@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   cancelText: {
     textAlign: "center",
     color: Color.sparklightPrimaryPurple, // Adjust color as needed
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_lg,
     textDecorationLine: "underline",
     fontWeight: "600",
     fontStyle: "normal",

@@ -453,7 +453,7 @@ const ProfileSettings = () => {
             </View>
           </View>
 
-          <View style={styles.frameParent}>
+          <View style={[styles.frameParent, styles.frameParentReducedTop]}>
             <View style={[AppStyles.card]}>
               <View style={[styles.generalInformationParent]}>
                 <SectionTitle
@@ -793,6 +793,9 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     width: "100%",
+  },
+  frameParentReducedTop: {
+    marginTop: -15,
   },
   manageSerTxt1: {
     fontFamily: FontFamily.openSansRegular,

@@ -295,9 +295,9 @@ const styles = StyleSheet.create({
   },
   highlightText: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_sm,
-    color: "#353091",
-    fontWeight: "600",
+    fontSize: FontSize.size_lg,
+    color: "#8D3B90",
+    fontWeight: "700",
   },
   messageContainer: {
     marginTop: 0,
