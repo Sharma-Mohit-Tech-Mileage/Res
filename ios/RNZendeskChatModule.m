@@ -10,7 +10,7 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
 
 
 
-+ (void) init {
++ (void) configure {
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *channelKey = [NSBundle mainBundle].infoDictionary[@"ZENDESK_CHANNEL_KEY_IOS"];
 
@@ -181,10 +181,6 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
       if (metadata[@"source"])          { fields[@"40559477171223"] = metadata[@"source"]; }
     }
     [[Zendesk instance].messaging setConversationFields:fields];
-    NSError *jsonError = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:fields options:0 error:&jsonError];
-    NSString *jsonString = jsonData ? [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] : [NSString stringWithFormat:@"<serialization error: %@>", jsonError.localizedDescription];
-    NSLog(@"Zendesk metadata: %@", jsonString);
     resolve(@(YES));
   }
   @catch (NSException *exception) {

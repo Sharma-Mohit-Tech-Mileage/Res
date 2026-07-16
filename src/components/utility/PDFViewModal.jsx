@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Text,
   SafeAreaView,
-  Pressable,
   Dimensions,
   Image,
   StatusBar,
@@ -17,6 +16,7 @@ import { Padding, Color, FontFamily, Border, FontSize } from '../../../GlobalSty
 import { A11Y } from '../../styles/theme';
 import Xclose from "../../../src/res/svgIcons/Xclose";
 import Share from "../../../src/res/svgIcons/Share";
+import Touchable from "../common/customui/Touchable";
 
 const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
   const [modalVisible, setModalVisible] = useState(true);
@@ -29,11 +29,8 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
   };
 
   const loadAndSharePDF = async () => {
-    const showError = await sharePDF(url, 'billinghistory.pdf');
-    if (showError !== undefined) {
-      console.warn(showError);
-    }
-  };  
+    await sharePDF(url, 'billinghistory.pdf');
+  };
 
   return (
     <Modal
@@ -60,41 +57,37 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
                 angle={90}
             >
                 <View style={[styles.navBar]}>
-                    <Pressable
+                    <Touchable
                         style={[styles.navIcon, styles.chevronLayout]}
                         onPress={closeModal}
                         accessibilityLabel="Back"
                         accessibilityHint="Go back to the previous screen"
-                        accessibilityRole="button"
-                        accessible={true}
                         hitSlop={20}
                         onPressIn={() => setIconPressed(true)}
                         onPressOut={() => setIconPressed(false)}
                     >
-                      
+
                       <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                           accessible={false} importantForAccessibility="no">
                          <Xclose/>
                       </View>
-                    </Pressable>
+                    </Touchable>
                     <Text style={styles.title}>{title}</Text>
-                    <Pressable
+                    <Touchable
                         style={[styles.navIcon, styles.chevronLayout]}
                         onPress={loadAndSharePDF}
                         accessibilityLabel="Share"
                         accessibilityHint="Share your Billing History"
-                        accessibilityRole="button"
-                        accessible={true}
                         hitSlop={20}
                         onPressIn={() => setIconPressed(true)}
                         onPressOut={() => setIconPressed(false)}
                     >
-                        
+
                         <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                           accessible={false} importantForAccessibility="no">
                          <Share color={'#FFF'}/>
                       </View>
-                    </Pressable>                 
+                    </Touchable>                 
                 </View>
           </LinearGradient>      
           <View style={{width:'100%',height:'100%',}}>

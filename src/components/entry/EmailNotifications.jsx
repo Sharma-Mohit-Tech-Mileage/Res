@@ -4,10 +4,10 @@ import {
   StyleSheet,
   Text,
   ScrollView,
-  Pressable,
   Keyboard,
   AccessibilityInfo,
 } from "react-native";
+import Touchable from "../common/customui/Touchable";
 import {
   Color,
   FontFamily,
@@ -200,7 +200,7 @@ const EmailNotifications = ({ navigation }) => {
           </View>
           <View style={styles.bottomContainer} />
           <View style={styles.bottomBar}>
-            <Pressable
+            <Touchable
               disabled={!enableButton}
               style={
                 enableButton
@@ -214,7 +214,6 @@ const EmailNotifications = ({ navigation }) => {
                   }, 300);
                 }
               })}
-              accessibilityRole="button"
               accessibilityLabel={
                 enableButton
                   ? "Enable Email Notifications"
@@ -230,9 +229,9 @@ const EmailNotifications = ({ navigation }) => {
               >
                 Enable Email Notifications
               </Text>
-            </Pressable>
+            </Touchable>
             <View style={styles.buttonsParent}>
-              <Pressable
+              <Touchable
                 style={[styles.buttonDecline, styles.buttonsLayout]}
                 onPress={() => {
                   navigation.reset({
@@ -240,11 +239,10 @@ const EmailNotifications = ({ navigation }) => {
                     routes: [{ name: "MyTab"}],
                   });
                 }}
-                accessibilityRole="button"
                 accessibilityLabel="Skip for now"
               >
                 <Text style={styles.decline}>Skip for now</Text>
-              </Pressable>
+              </Touchable>
             </View>
           </View>
           {!keyboardHidden && <View style={styles.textBottomHeight} />}

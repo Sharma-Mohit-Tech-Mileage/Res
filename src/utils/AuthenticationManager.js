@@ -16,7 +16,12 @@ class AuthenticationManager {
         throw new Error("BROWSER_UNAVAILABLE");
       }
 
-      const authPromise = authorize(config);
+      // Force a fresh login on Android so the shared Custom Tab session (same SSO realm as the other app) can't bleed across apps and error out the second login.
+      const authConfig =
+        Platform.OS === "android"
+          ? { ...config, additionalParameters: { ...(config.additionalParameters || {}), prompt: "login" } }
+          : config;
+      const authPromise = authorize(authConfig);
       const result = await Promise.race([authPromise, timeoutPromise]);
 
       return {
