@@ -234,6 +234,7 @@ const NotificationAlert = ({
   autoFocusTitle = false,
   splitKey = "",
   iconRef = null,
+  contentStyle = {},
 }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -621,7 +622,7 @@ const NotificationAlert = ({
        
         <View 
           ref={contentRef}
-          style={styles.content}
+          style={[styles.content, contentStyle]}
           accessible={false}
           importantForAccessibility="yes"
         >

@@ -4,6 +4,7 @@ import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import Icon from "../common/Icon";
 import Touchable from "../common/customui/Touchable";
+import { Hyperlink } from "../common/customui/Typography";
 
 const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
@@ -103,6 +104,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
           isVisible={true}
           onClose={onClose}
           splitKey="contact our support team"
+          contentStyle={{ paddingRight: 10}}
         />
       </View>
 
@@ -116,7 +118,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
             "Double tap to navigate to Manage Services section",
             <>
               If you'd like to reconnect your service, please visit the{" "}
-              <Text style={styles.linkText}>Manage Services</Text>{" "}
+              <Hyperlink>Manage Services</Hyperlink>{" "}
               section in your account to explore available options.
             </>
           )
@@ -125,8 +127,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
             "green-checkcircle",
             <>
               If you'd like to reconnect your service, please visit the{" "}
-              <Text
-                style={styles.linkText}
+              <Hyperlink
                 onPress={handleManageServicesPress}
                 accessibilityRole="link"
                 accessibilityLabel="Manage Services link"
@@ -135,7 +136,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
                 importantForAccessibility="yes"
               >
                 Manage Services
-              </Text>{" "}
+              </Hyperlink>{" "}
               section in your account to explore available options.
             </>
           )
@@ -150,7 +151,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
             "Double tap to contact support",
             <>
               If you have any questions or need assistance, please{" "}
-              <Text style={styles.linkText}>contact our support team</Text>.
+              <Hyperlink>contact our support team</Hyperlink>.
             </>
           )
         ) : (
@@ -158,8 +159,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
             "green-checkcircle",
             <>
               If you have any questions or need assistance, please{" "}
-              <Text
-                style={styles.linkText}
+              <Hyperlink
                 onPress={handleContactSupportPress}
                 accessibilityRole="link"
                 accessibilityLabel="Contact our support team link"
@@ -168,7 +168,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
                 importantForAccessibility="yes"
               >
                 contact our support team
-              </Text>
+              </Hyperlink>
               .
             </>
           )
@@ -223,13 +223,6 @@ const styles = StyleSheet.create({
     color: Color.colorGray_100,
     lineHeight: 22,
     flexWrap: "wrap",
-  },
-  linkText: {
-    color: Color.sparklightBrightPurple,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_base,
-    textDecorationLine: "underline",
-    fontWeight: "400",
   },
   thankYouSection: {
     paddingTop: Padding.p_xs,
