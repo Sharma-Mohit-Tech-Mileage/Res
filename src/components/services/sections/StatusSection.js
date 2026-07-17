@@ -6,6 +6,7 @@ import { statusSection } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import SecondaryButton from "../../common/customui/PrimaryButton";
+import AppStyles from "../../../styles/AppStyles";
 
 // Sparklight brand purples
 const RING_OUTER = "#ba92bf";
@@ -145,8 +146,8 @@ const StatusSection = ({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
+    <View style={[styles.container]}>
+      <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
         {hasUserInitiatedCheck && outageData && (
           <View style={styles.alertInsideCard}>
             <NotificationAlert

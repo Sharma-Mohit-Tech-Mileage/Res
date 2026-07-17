@@ -155,7 +155,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
             <LinearGradient
               colors={['#8D3B90', '#353091']}
               start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+              end={{ x: 1.3, y: 0}}
               style={styles.newFeatureBadge}
             >
               <Text style={styles.badgeText}>NEW FEATURE</Text>

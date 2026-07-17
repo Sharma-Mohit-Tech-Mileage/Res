@@ -33,6 +33,7 @@ import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import { loginWithJWT, setConversationalFields, } from "../utility/RNZendeskChat";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import AppStyles from "../../styles/AppStyles";
 
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
@@ -88,9 +89,9 @@ const NewBillerHome = ({ navigation }) => {
     )
     : false;
 
-  const isForceBannerAccount =
-    userInfo?.accountNumber === "8160360660005361" ||
-    accountDetails?.accountNumber === "8160360660005361";
+    const isForceBannerAccount =
+    userInfo?.accountNumber === "8160116990081294" ||
+    accountDetails?.accountNumber === "8160116990081294";
 
   const forcedMaintenanceBannerConfig = {
     title: "Service Error",
@@ -464,8 +465,8 @@ const NewBillerHome = ({ navigation }) => {
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+      end={{ x: 1.3, y: 0 }}
+      colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
       style={styles.container}
     >
       {showChatIcon && (
@@ -493,11 +494,11 @@ const NewBillerHome = ({ navigation }) => {
               <View style={styles.overlayStack}>
                 {hasAnyAlert && <View style={{ height: alertsHeight }} />}
                 {isMobilePilotEnabled ? (
-                  <View style={[styles.card, styles.shadowProp]}>
+                  <View style={[AppStyles.card,{ margin:16 , overflow: "hidden", flexDirection:'column',flex:1, alignItems:'center', justifyContent:'center'}]}>
                     <View
                       style={[
-                        styles.contentWrapper,
-                        { paddingHorizontal: Padding.p_base },
+                        
+                        { paddingHorizontal: Padding.p_base},
                       ]}
                     >
                       <MobilePilotLandingPage />

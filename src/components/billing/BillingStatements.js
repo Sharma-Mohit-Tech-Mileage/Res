@@ -16,6 +16,8 @@ import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
 import SmallLoader from "../common/customui/SmallLoader";
+import { Hyperlink } from "../common/customui/Typography";
+import AppStyles from "../../styles/AppStyles";
 const CLEAR_BILLING_ERROR = 'CLEAR_BILLING_ERROR';
 const CLEAR_DOWNLOAD_ERROR = 'CLEAR_DOWNLOAD_ERROR';
 
@@ -149,7 +151,7 @@ const BillingStatementsScreen = ({ navigation }) => {
               <SmallLoader />
             </View>
           ) : (
-            <Text style={styles.uploadText}>Download</Text>
+            <Hyperlink  style={styles.hyperlink}>Download</Hyperlink >
           )}
         </View>
       </Touchable>
@@ -227,7 +229,7 @@ const BillingStatementsScreen = ({ navigation }) => {
             </Touchable>
           </View>
         </View>
-
+       <View style={{ flex: 1, marginBottom: 20,...AppStyles.card }}>
         {loading ? (
           <LoadingOverlay
             loading={loading}/>
@@ -246,6 +248,7 @@ const BillingStatementsScreen = ({ navigation }) => {
             </Text>
           </View>
         )}
+        </View>
       </View>
 
       {showPDFModal && (
@@ -268,7 +271,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     paddingHorizontal: Padding.p_5xl,
-
     marginBottom: hp("8%"),
   },
   notificationsContainer: {
@@ -356,13 +358,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_5xs,
+    ...AppStyles.card, // Use card style from AppStyles
   },
   errorContainer: {
     padding: 10,
     backgroundColor: "#FFDDDD",
-    borderRadius: Border.br_5xs,
+    ...AppStyles.card, // Use card style from AppStyles
     marginBottom: 10,
   },
   errorText: {
@@ -371,11 +372,10 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   emptyContainer: {
-    backgroundColor: Color.sparklightWhite,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    borderRadius: 4,
+    ...AppStyles.card, 
     height: 60,
     marginBottom: 20,
   },

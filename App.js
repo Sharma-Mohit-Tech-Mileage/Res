@@ -74,7 +74,7 @@ const App = () => {
     colors: {
       // Add a new color
       custom: {
-        500: "#8D3B90",
+        500: "#353091",
       },
     },
     components: {
@@ -83,7 +83,7 @@ const App = () => {
           _icon: {
             color: "custom.500", // Default color for the icon
             _checked: {
-              color: "#8D3B90", // Color when checked
+              color: "#353091", // Color when checked
             },
           },
         },

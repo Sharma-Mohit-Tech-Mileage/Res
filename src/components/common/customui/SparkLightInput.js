@@ -19,6 +19,7 @@ import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
 import Touchable from "./Touchable";
+import {FieldTitle, Hyperlink} from "./Typography";
 
 const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
@@ -105,6 +106,14 @@ const SparkLightInput = React.forwardRef(({
     if (parentOnBlur) parentOnBlur();
   };
 
+  // Common input styles
+  const getInputStyles = () => [
+    styles.textInput,
+    !editable && styles.disabledInput,
+    error && { borderColor: "red" },
+    !isFocused && !error && { borderColor: Color.sparklightDarkGray },
+  ];
+
   return (
     <View
       style={[
@@ -120,9 +129,9 @@ const SparkLightInput = React.forwardRef(({
             accessibilityElementsHidden={true}
             importantForAccessibility="no-hide-descendants"
           >
-            <Text style={[styles.label, error && styles.errorLabel]}>
+            <FieldTitle style={[styles.label, error && styles.errorLabel]}>
               {label}
-            </Text>
+            </FieldTitle>
           </View>
         )}
         {secure && (
@@ -134,9 +143,9 @@ const SparkLightInput = React.forwardRef(({
             style={styles.eyeButton}
           >
             <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
-            <Text style={styles.eyeText}>
+            <Hyperlink style={styles.eyeText}>
               {passwordVisible ? "Hide" : "Show"}
-            </Text>
+            </Hyperlink>
           </Touchable>
         )}
       </View>
@@ -160,8 +169,6 @@ const SparkLightInput = React.forwardRef(({
             borderColor:
               isFocused && error != undefined
                 ? "red"
-                : isFocused
-                ? Color.sparklightBrightPurple
                 : Color.sparklightDarkGray,
           },
         ]}
@@ -181,19 +188,7 @@ const SparkLightInput = React.forwardRef(({
           onBlur={handleBlur}
           editable={editable}
           secureTextEntry={secure && !passwordVisible}
-          style={[
-            styles.textInput,
-            inputStyle,
-            !editable && styles.disabledInput,
-            {
-              borderWidth: error ? 0.5 : 0,
-              borderColor: error
-                ? "red"
-                : isFocused
-                ? Color.sparklightBrightPurple
-                : Color.sparklightDarkGray,
-            },
-          ]}
+          style={getInputStyles()}
           accessible={false}
           importantForAccessibility="no"
           keyboardType={getKeyboardType()}
@@ -234,9 +229,6 @@ const SparkLightInput = React.forwardRef(({
 const styles = StyleSheet.create({
   outerContainer: {
     minHeight: 48,
-    borderColor: Color.sparklightWhite,
-    borderWidth: 1,
-    borderRadius: Border.br_11xs,
     justifyContent: "center",
     position: "relative",
   },
@@ -248,14 +240,20 @@ const styles = StyleSheet.create({
     height: 48,
     color: Color.colorGray_200,
     fontSize: FontSize.size_base,
+    paddingHorizontal: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
-    borderRadius: Border.br_11xs,
-    paddingHorizontal: 10,
-    flex: 1,
+    borderWidth: 1,
+    paddingVertical: 12,
+    borderRadius: Border.br_5xs,
+    backgroundColor: '#FFFFFF',
+    borderColor:'#C7C7CC',
+    width: "100%",
   },
   textInputContainer: {
-    borderWidth: 1,
-    borderRadius: Border.br_11xs,
+    borderWidth: 0,
+    borderRadius: Border.br_5xs,
+
+    borderColor: "#C7C7CC",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -282,11 +280,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   label: {
-    fontSize: FontSize.size_sm,
     textAlign: "left",
-    color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
     marginBottom: Padding.p_5xs,
     alignSelf: "stretch",
   },
@@ -314,8 +308,10 @@ const styles = StyleSheet.create({
   },
   eyeText: {
     marginLeft: 6,
-    color: Color.colorMidnightblue,
     lineHeight: 28,
+    color: "#8D3B90",
+    textDecorationLine: "underline",
+    textDecorationColor: "#8D3B90",
   },
   lockIcon: {
     width: 20,

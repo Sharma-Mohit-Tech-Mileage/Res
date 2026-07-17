@@ -3,6 +3,8 @@ import {
   View,
   Text,
   StyleSheet,
+  Image,
+  useWindowDimensions,
   Linking,
   ImageBackground,
 } from "react-native";
@@ -12,6 +14,7 @@ import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import Touchable from "../common/customui/Touchable";
+import { Title } from '../common/customui/Typography';
 
 const WelcomeCard = () => {
   const isNewDashboardEnabled = useFeatureFlag(
@@ -19,6 +22,8 @@ const WelcomeCard = () => {
     false,
   );
   const videoId = "C3cMQoWxv6I";
+  const { width: screenWidth } = useWindowDimensions();
+  const heroSource = require("../../../assets/generic-mobile-hero-woman.png");
 
   const renderOfferBanner = () => {
     return (
@@ -77,35 +82,40 @@ const WelcomeCard = () => {
 
   const renderWelcomeBanner = () => {
     return (
-      <>
-        <ImageBackground
-          source={require("../../../assets/welcome-banner-home.png")}
-          style={[styles.videoContainer, { aspectRatio: 2 }]}
-          imageStyle={styles.welcomeBannerImage}
-          accessible={false}
-          importantForAccessibility="no"
-        >
-          <Text
-            style={[styles.title, styles.welcomeTitle]}
-            accessible={true}
-            accessibilityRole="header"
-            accessibilityLevel={1}
-            accessibilityLabel="We’re excited to get you connected!"
-            maxFontSizeMultiplier={1.2}
+        <View style={styles.container}>
+      {/* <Text style={styles.title} >We're Excited to Connect with you!</Text> */}
+
+      <View style={[styles.videoContainer, { aspectRatio: 2 }]}>
+       {/*accessible={true}
+       accessibilityLabel="Welcome to Sparklight, video title."
+       accessibilityRole="link">*/}
+        {/* <VideoPlayer videoId={videoId} /> */}
+        <Image
+            source={heroSource}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+            accessible={false}
+            importantForAccessibility="no"
+          />
+          <View
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              paddingVertical: 6,
+              backgroundColor: "rgba(255, 255, 255, 0.8)",
+            }}
           >
-            We’re excited to get you connected!
-          </Text>
-          <View style={styles.welcomeOverlay}>
             <Touchable
               minSize={0}
-              style={styles.welcomeVideoLink}
+              style={{ flexDirection: "row", marginTop: 5, marginLeft: 20 }}
               onPress={() => {
                 Linking.openURL(`https://www.youtube.com/watch?v=${videoId}`);
               }}
               accessible={true}
-              importantForAccessibility="yes"
               accessibilityRole="link"
-              accessibilityLabel="Watch our welcome video"
+              accessibilityLabel="Watch welcome video"
               accessibilityHint="Double tap to watch on YouTube"
             >
               <Text style={styles.watchVideoButton} maxFontSizeMultiplier={1.2}>
@@ -114,14 +124,35 @@ const WelcomeCard = () => {
               <View
                 style={{ marginLeft: 5, alignSelf: "center", marginTop: 3 }}
               >
-                <PlayIcon />
+               <PlayIcon />
               </View>
             </Touchable>
           </View>
-        </ImageBackground>
-      </>
-    );
-  };
+          <View
+            style={[
+              styles.titleContainer,
+              { maxWidth: Math.max(195, screenWidth * 0.45) },
+            ]}
+            accessible={true}
+            accessibilityRole="header"
+            accessibilityLevel={1}
+            accessibilityLabel="We’re excited to get you connected!"
+          >
+            <Title
+              style={styles.title}
+              accessible={false}
+              importantForAccessibility="no"
+              maxFontSizeMultiplier={1.2}
+            >
+              We’re excited to get you connected!
+            </Title>
+          </View>
+        
+
+      </View>
+    </View>
+  );
+};
 
   return (
     <View style={styles.container}>
@@ -147,13 +178,18 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     marginBottom: Padding.p_base,
   },
+  titleContainer: {
+    position: "absolute",
+    top: 30,
+    left: 20,
+    right: 20,
+    maxWidth: 195,
+  },
   title: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_5xl,
     lineHeight: 26,
-    color: Color.colorMidnightblue,
     marginBottom: Padding.p_5xl,
-    fontWeight: "700",
+    flexWrap: "wrap",
+    flexShrink: 1,
   },
   videoContainer: {
     overflow: "hidden",
@@ -180,10 +216,9 @@ const styles = StyleSheet.create({
   },
   watchVideoButton: {
     marginVertical: Padding.p_sm,
-    fontSize: FontSize.size_base,
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
+    fontSize: FontSize.textXsSemibold_size,
+    color: Color.sparklightaddGray,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   offerDesclaimer: {
     color: Color.colorblack_100,

@@ -3,18 +3,20 @@ import { Svg, Path } from 'react-native-svg';
 
 const Home = ({ focused, width = 27, height = 27, ...props }) => {
   // Determine stroke color based on focused state
-  const strokeColor = "#8A3B90"; // Purple when focused, gray when not
+  const strokeColor = "#8D3B90"; // Purple when focused, gray when not
 
   return (
    <Svg
        xmlns="http://www.w3.org/2000/svg"
-       width={27}
-       height={27}
+       width={width}
+       height={height}
+       viewBox="0 0 27 27"
        fill="none"
        {...props}
      >
        <Path
-         stroke="#8A3B90"
+         stroke={strokeColor}
+         fill={strokeColor}
          strokeLinecap="round"
          strokeLinejoin="round"
          strokeWidth={2}

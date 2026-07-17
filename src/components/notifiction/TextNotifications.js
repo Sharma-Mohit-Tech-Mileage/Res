@@ -26,6 +26,9 @@ import { PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import { A11Y } from "../../styles/theme";
+import AppStyles from "../../styles/AppStyles";
+
+import SecondaryButton from "../common/customui/PrimaryButton";
 
 import {
   Color,
@@ -37,7 +40,9 @@ import {
 
 import Toggle from "../common/Toggle";
 import AlertIcon from "../../../assets/svgs/Alerttriangle";
-import { widthPercentageToDP } from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+
+import {SectionTitle,SectionContent,HintText,Hyperlink} from "../common/customui/Typography";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
@@ -61,6 +66,7 @@ const TextNotifications = ({ navigation }) => {
   const timeoutRef = useRef(null);
   const [notification, setNotification] = useState(null);
   const successIconRef = useRef(null);
+   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [errorText, setErrorText] = useState(false);
@@ -276,6 +282,7 @@ const TextNotifications = ({ navigation }) => {
   };
 
   const postRequestTextNotification = async () => {
+    setIsSubmitting(true);
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
     formatedData["accountNumber"] = accountNumber;
@@ -295,6 +302,7 @@ const TextNotifications = ({ navigation }) => {
       (res) => {
         if (res) {
           setIsLoading(false);
+          setIsSubmitting(false);
           setShowSuccessAlert(true);
           setNotification({
             message: "Your text notification preferences have been updated successfully.",
@@ -304,6 +312,7 @@ const TextNotifications = ({ navigation }) => {
       },
       (error) => {
         setIsLoading(false);
+        setIsSubmitting(false);
         console.warn("Error on retrying postRequestTextNotification", error);
         setNotification({
           message: "Text Notifications update failed.",
@@ -333,7 +342,7 @@ const TextNotifications = ({ navigation }) => {
       )}
       <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always">
         <View style={styles.textNotificationsInner}>
-          <View style={[styles.navigationBorder]}>
+           <View style={[AppStyles.card,{margin:16,paddingBottom:16}]}>
             {notification && (
               <Animated.View
                 style={{
@@ -395,22 +404,21 @@ const TextNotifications = ({ navigation }) => {
             </View>
 
             <View style={{ marginHorizontal: 20 }}>
-              <Text
-                style={[styles.mobilePhoneTypo]}
+              <SectionContent
                 accessibilityRole="text"
                 accessible={true}
                 accessibilityLabel={message}
               >
                 {message}
-              </Text>
-              <Text
+              </SectionContent>
+              <HintText
                 style={styles.requiredFieldsText}
                 accessibilityRole="text"
                 accessible={true}
                 accessibilityLabel="Fields marked with an asterisk are required"
               >
                 Fields marked with * are required.
-              </Text>
+              </HintText>
             </View>
 
             <View style={{ marginHorizontal: 20, paddingVertical: Padding.p_base }}>
@@ -443,6 +451,7 @@ const TextNotifications = ({ navigation }) => {
                 description="Receive text notifications when your appointments have updates."
                 onChange={handleToggleChange}
               />
+              <View style={styles.frameChild} />
               <NotificationSetting
                 title="Outage Alerts"
                 name="outageOptOut"
@@ -450,6 +459,7 @@ const TextNotifications = ({ navigation }) => {
                 description="Receive text notifications when outage occur."
                 onChange={handleToggleChange}
               />
+              <View style={styles.frameChild} />
               <NotificationSetting
                 title="Billing"
                 name="billingOptOutStatus"
@@ -458,7 +468,7 @@ const TextNotifications = ({ navigation }) => {
                 onChange={handleToggleChange}
               />
 
-            <View style={styles.frameChild} />
+          
             {isCheckboxVisible && (
               <View
                 style={{
@@ -516,19 +526,12 @@ const TextNotifications = ({ navigation }) => {
                     hitSlop={A11Y.hitSlop}
                     style={styles.termsLinkTouchable}
                   >
-                    <Text
-                      style={[
-                        styles.checkBoxAreaViewText,
-                        {
-                          color: Color.sparklightBrightPurple,
-                          textDecorationLine: "underline",
-                        },
-                      ]}
+                    <Hyperlink
                       allowFontScaling={true}
                       maxFontSizeMultiplier={1}
                     >
                       Text Messaging Terms & Conditions
-                    </Text>
+                    </Hyperlink>
                   </Touchable>
                 </View>
                 {isTermRequired && (
@@ -550,31 +553,27 @@ const TextNotifications = ({ navigation }) => {
               </View>
             )}
           </View>
-          <View style={[{ alignSelf: "stretch" }]}>
-            <Touchable
-              minSize={0}
-              accessible={true}
-              accessibilityLabel="Save"
-              accessibilityRole="button"
-              style={[
-                styles.buttons,
-                styles.buttonsLayout,
-              ]}
+         <View
+            style={styles.buttonContainer}
+            
+          >
+            <SecondaryButton
+              title="Save"
               onPress={handleSubmit(onSubmit, handleValidationError)}
-            >
-              <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
-            </Touchable>
-            <View style={{ padding: 8 }}></View>
-            <Touchable
-              minSize={0}
-              accessible={true}
+              accessibilityLabel="Save settings"
+              accessibilityHint="Double tap to save your notification preferences"
+              style={styles.saveButton}
+              buttonType={"submit"}
+              disabled={isSubmitting}
+            />
+            <SecondaryButton
+              title="Cancel"
+              onPress={() => navigation.goBack()}
               accessibilityLabel="Cancel"
-              accessibilityRole="button"
-              style={styles.buttonsLayout}
-              onPress={() => navigation.navigate("Notifications")}
-            >
-              <Text style={[styles.accountClr, styles.makeTypo]}>Cancel</Text>
-            </Touchable>
+              accessibilityHint="Double tap to cancel and go back"
+              style={styles.cancelButton}
+              disabled={isSubmitting}
+            />
           </View>
         </View>
       </ScrollView>
@@ -584,40 +583,35 @@ const TextNotifications = ({ navigation }) => {
 
 
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
-  <View style={[styles.frameContainer, styles.frameBorder]}>
+  <View style={[styles.frameContainer]}>
     <View style={styles.frameView}>
-      <View style={styles.appointmentsParent}>
-        <View style={{ flexDirection: "column", flex: 1, marginRight: 10 }}>
-          <Text
-            style={styles.appointments}
-            accessible={true}
-            accessibilityRole="text"
-            accessibilityLabel={`${title} for text notifications ${description}`}
-          >
-            {title}
-          </Text>
-          <Text
-            style={[
-              styles.receiveAppNotifications1,
-              styles.receiveTypo,
-              { marginTop: 8 },
-            ]}
+      <View style={styles.rowContent}>
+        <View style={styles.textWrap}>
+          <View style={styles.titleRow}>
+            <SectionTitle
+              style={styles.appointments}
+              accessible={true}
+              accessibilityRole="text"
+              accessibilityLabel={`${title} for text notifications ${description}`}
+            >
+              {title}
+            </SectionTitle>
+            <Toggle
+              name={name}
+              initialValue={value}
+              section="textNotif"
+              label={title}
+              description={description}
+              onToggle={onChange}
+            />
+          </View>
+          <SectionContent
+            style={[ styles.descriptionText]}
             accessible={false}
             importantForAccessibility="no"
           >
             {description}
-          </Text>
-        </View>
-
-        <View>
-          <Toggle
-            name={name}
-            initialValue={value}
-            section="textNotif"
-            label={title}
-            description={description}
-            onToggle={onChange}
-          />
+          </SectionContent>
         </View>
       </View>
     </View>
@@ -645,9 +639,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   requiredFieldsText: {
-    fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.gray600,
     marginTop: Padding.p_base,
     textAlign: "left",
   },
@@ -670,6 +661,10 @@ const styles = StyleSheet.create({
   makeTypo: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
+  },
+  buttonContainer: {
+    padding: Padding.p_base,
+    gap: 12,
   },
   accountClr: {
     color: Color.colorMidnightblue,
@@ -775,10 +770,10 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue,
   },
   textNotificationsInner: {
-    paddingTop: Padding.p_5xl,
     flex: 1,
-    paddingHorizontal: Padding.p_base,
-    marginBottom: 200,
+    paddingBottom: hp('20%'),
+  
+    overflow: "hidden",
   },
   checkBox: {
     width: 12,
@@ -808,7 +803,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkBoxAreaViewText: {
-    fontSize: 14,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },makeTypo: {
@@ -818,33 +813,44 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   appointments: {
-    color: Color.colorGray_100,
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    lineHeight: 22,
     flex: 1,
   },
-  appointmentsParent: {
+  rowContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  titleRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    width: "100%",
   },
   frameView: {
-    paddingVertical: Padding.p_base,
+    paddingVertical: 0,
+    paddingBottom: 12,
     flexDirection: "row",
-    //alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
-    //flex: 1,
+    width: "100%",
   },
   frameContainer: {
-    borderBottomWidth: 1,
+    
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "stretch",
   },
+  textWrap: {
+    flexDirection: "column",
+    flex: 1,
+    marginRight: 10,
+  },
+  descriptionText: {
+    marginTop: 0,
+    marginBottom: Padding.p_9xs,
+  },
   receiveAppNotifications1: {
-    color: Color.colorGray_100,
     lineHeight: 22,
   },frameBorder: {
     borderColor: Color.sparklightGray,
@@ -855,3 +861,4 @@ const styles = StyleSheet.create({
 });
 
 export default TextNotifications;
+

@@ -20,13 +20,14 @@ import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
 import Touchable from "./Touchable";
+import {BannerAlertText,FieldTitle} from "./Typography";
 
 
 const TYPE_CONFIG = {
   info: {
     backgroundColor: "#F0F8FF",
-    borderColor: "#0060AE",
-    iconColor: "#0060AE",
+    borderColor: "#353091",
+    iconColor: "#353091",
     textColor: "#000000",
     titleColor: "#000000",
     closeButtonColor: "#000000",
@@ -233,6 +234,7 @@ const NotificationAlert = ({
   autoFocusTitle = false,
   splitKey = "",
   iconRef = null,
+  contentStyle = {},
 }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -450,24 +452,24 @@ const NotificationAlert = ({
             style={styles.blockWrapper}
           >
             {hasBoldOnly ? (
-              <Text>
+              <BannerAlertText>
                 {blockSegments.map((segment) => (
-                  <Text
+                  <BannerAlertText
                     key={segment.key}
                     style={[
-                      styles.messageText,
+                      
                       { color: config.textColor },
                       segment.type === "styled" && segment.action?.bold && styles.boldText,
                     ]}
                   >
                     {segment.content}
-                  </Text>
+                  </BannerAlertText>
                 ))}
-              </Text>
+              </BannerAlertText>
             ) : (
-              <Text style={[styles.messageText, { color: config.textColor }]}>
+              <BannerAlertText style={[{ color: config.textColor }]}>
                 {plainText}
-              </Text>
+              </BannerAlertText>
             )}
           </View>
         );
@@ -500,20 +502,19 @@ const NotificationAlert = ({
             style={[styles.blockWrapper, styles.actionableBlock]}
             hitSlop={A11Y.hitSlop}
           >
-            <Text>
+            <BannerAlertText>
               {blockSegments.map((segment) => (
-                <Text
+                <BannerAlertText
                   key={segment.key}
                   style={[
-                    styles.messageText,
                     { color: config.textColor },
                     segment.type === "styled" && styles.styledText,
                   ]}
                 >
                   {segment.content}
-                </Text>
+                </BannerAlertText>
               ))}
-            </Text>
+            </BannerAlertText>
           </Touchable>
         );
       }
@@ -558,20 +559,19 @@ const NotificationAlert = ({
           style={[styles.blockWrapper, styles.actionableBlock]}
           hitSlop={A11Y.hitSlop}
         >
-          <Text>
+          <BannerAlertText>
             {blockSegments.map((segment) => (
-              <Text
+              <BannerAlertText
                 key={segment.key}
                 style={[
-                  styles.messageText,
                   { color: config.textColor },
                   segment.type === "styled" && styles.styledText,
                 ]}
               >
                 {segment.content}
-              </Text>
+              </BannerAlertText>
             ))}
-          </Text>
+          </BannerAlertText>
         </Touchable>
       );
     },
@@ -622,7 +622,7 @@ const NotificationAlert = ({
        
         <View 
           ref={contentRef}
-          style={styles.content}
+          style={[styles.content, contentStyle]}
           accessible={false}
           importantForAccessibility="yes"
         >
@@ -630,13 +630,13 @@ const NotificationAlert = ({
           {title && (
             <A11y.Index index={1}>
             <View accessible={true} accessibilityRole="header">
-              <Text ref={titleRef} 
-              style={[styles.title, { color: config.titleColor }]}
+              <FieldTitle ref={titleRef} 
+              style={[ { color: config.titleColor }]}
               accessible={true}
               accessibilityRole="header" accessibilityLevel={2}
             >
                 {title}
-              </Text>
+              </FieldTitle>
             </View>
             </A11y.Index>
           )}
@@ -730,7 +730,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   styledText: {
-    color: Color.colorMidnightblue,
+    color: Color.sparklightBrightPurple,
     fontWeight: "700",
     textDecorationLine: "underline",
   },

@@ -36,20 +36,20 @@ const Terms = ({ navigation }) => {
   // fetch push/SMS via the services directly — awaiting the saga dispatch resolves before the data lands in redux
   const runFetch = () => {
     const promise = (async () => {
-      const [pushRes, smsRes] = await Promise.allSettled([
-        fetchPushNotifications(),
-        fetchSmsSubscription(),
-      ]);
-      if (pushRes.status === "fulfilled") {
-        dataRef.current.push = pushRes.value;
-        dispatch(savePushNotifications(pushRes.value));
-      }
-      if (smsRes.status === "fulfilled") {
-        dataRef.current.sms = smsRes.value;
-        dispatch(saveSMSSelection(smsRes.value));
-      }
-      fetchDoneRef.current =
-        pushRes.status === "fulfilled" && smsRes.status === "fulfilled";
+      // const [pushRes, smsRes] = await Promise.allSettled([
+      //   fetchPushNotifications(),
+      //   fetchSmsSubscription(),
+      // ]);
+      // if (pushRes.status === "fulfilled") {
+      //   dataRef.current.push = pushRes.value;
+      //   dispatch(savePushNotifications(pushRes.value));
+      // }
+      // if (smsRes.status === "fulfilled") {
+      //   dataRef.current.sms = smsRes.value;
+      //   dispatch(saveSMSSelection(smsRes.value));
+      // }
+      // fetchDoneRef.current =
+      //   pushRes.status === "fulfilled" && smsRes.status === "fulfilled";
       return fetchDoneRef.current;
     })();
     fetchPromiseRef.current = promise;
@@ -195,35 +195,37 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   buttonDecline: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.sparklightPrimaryPurple + "1A",
   },
   buttons: {
-    backgroundColor: Color.colorMidnightblue,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
     paddingHorizontal: 0,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: Border.br_11xs,
+    borderRadius: 25,
     minHeight: 50,
-    width: "45%",
+    width: '45%',
   },
   buttonsParent: {
-    justifyContent: "space-between",
-    flexDirection: "row",
-    width: "90%",
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    width: '90%',
   },
   accept: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaBold,
+    fontWeight: "700",
     textAlign: "center",
     color: Color.sparklightWhite,
   },
   decline: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorMidnightblue,
+    fontFamily: FontFamily.RadioCanadaBold,
+    fontWeight: "700",
+    color: Color.sparklightPrimaryPurple,
     textAlign: "center",
   },
   container: {

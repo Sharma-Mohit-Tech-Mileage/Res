@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import AppStyles from "../../styles/AppStyles";
 
 const DEFAULT_DATE_FORMAT = "MM/DD/YYYY";
 
@@ -207,7 +208,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
               accessible={true}
               accessibilityRole="text"
             >
-              <Infocircle color="#0060AE" style={styles.infoCircleIcon} />
+              <Infocircle color="#353091" style={styles.infoCircleIcon} />
             </View>
             <View style={styles.infoTextContainer}>
               <Text
@@ -235,14 +236,14 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     marginBottom: 30,
     backgroundColor: Color.sparklightWhite,
+    
   },
   infoBox: {
     flexDirection: "column",
     marginVertical: 20,
-    borderColor: "#0060AE",
+    borderColor: "#353091",
     backgroundColor: "#F0F8FF",
     borderRadius: Border.br_11xs,
     marginTop: 20,
@@ -287,15 +288,15 @@ const styles = StyleSheet.create({
   linkText: {
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: FontSize.size_sm,
-    color: "#353091",
+    color: "#8D3B90",
     textDecorationLine: "underline",
-    fontWeight: "600",
+    fontWeight: "700",
   },
   highlightText: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_sm,
-    color: "#353091",
-    fontWeight: "600",
+    fontSize: FontSize.size_lg,
+    color: "#8D3B90",
+    fontWeight: "700",
   },
   messageContainer: {
     marginTop: 0,

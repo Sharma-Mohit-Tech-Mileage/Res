@@ -110,8 +110,8 @@ export const container = {
   },
 
   section: {
-    marginBottom: theme.spacing.base,
-    marginHorizontal: theme.spacing.base,
+  marginBottom: theme.spacing.base,
+  
   },
 };
 

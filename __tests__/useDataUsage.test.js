@@ -1,3 +1,11 @@
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  setItem: jest.fn(() => Promise.resolve()),
+  getItem: jest.fn(() => Promise.resolve(null)),
+  removeItem: jest.fn(() => Promise.resolve()),
+  getAllKeys: jest.fn(() => Promise.resolve([])),
+  multiRemove: jest.fn(() => Promise.resolve()),
+}));
+
 const React = require('react');
 const renderer = require('react-test-renderer');
 const { act } = renderer;
@@ -8,6 +16,16 @@ let mockState;
 jest.mock('react-redux', () => ({
   useDispatch: () => mockDispatch,
   useSelector: (selector) => selector(mockState),
+}));
+
+jest.mock('../src/network/apis/services/dataUsageService', () => ({
+  getEquipment: jest.fn(() => Promise.resolve([])),
+}));
+
+jest.mock('react-native-app-auth', () => ({
+  authorize: jest.fn(() => Promise.resolve({})),
+  refresh: jest.fn(() => Promise.resolve({})),
+  logout: jest.fn(() => Promise.resolve()),
 }));
 
 const mockFetchCurrentUsageRequest = jest.fn(() => ({ type: 'FETCH_CURRENT_USAGE_REQUEST' }));

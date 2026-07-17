@@ -31,10 +31,16 @@ import Icon from "../common/Icon";
 import Config from "react-native-config";
 import colors from "../../res/Colors";
 import { card } from "../../styles/utilities";
+import {
+  widthPercentageToDP,
+  heightPercentageToDP,
+} from "react-native-responsive-screen";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
+import AppStyles from "../../styles/AppStyles";
+import { SectionTitle,Title,MenuText } from "../common/customui/Typography";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -148,9 +154,9 @@ const BillingScreen = ({ navigation }) => {
       <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
-        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
-        useAngle={true}
-        angle={90}
+        start={{ x: 0, y: 0 }}
+        end={{ x:1.3, y: 0}}
+        colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
       />
       <View style={styles.frameParent}>
         <View style={styles.rightActionableParent}>
@@ -162,20 +168,20 @@ const BillingScreen = ({ navigation }) => {
           >
             <BillingIconWhite isSelected={false} />
           </View>
-          <Text style={styles.melissaSmith}
+          <Title style={styles.melissaSmith}
           accessibilityLabel="Billing Services" accessibilityRole='Header'
            accessibilityLevel={1} 
            nativeID="Billing Services-header"
            //accessibilityHint="Header"
            >
-          Billing Services</Text>
+          Billing Services</Title>
         </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ marginHorizontal: 20 }}
+          
         >
-          <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
+          <View style={styles.cardsContainer}>
             {isContentLoading ? (
               <View style={styles.loadingContainer}>
                 <LoadingOverlay
@@ -192,6 +198,7 @@ const BillingScreen = ({ navigation }) => {
                   dueDate={dueDate}
                   navigation={navigation}
                   style={styles.card}
+                  
                 />
                 <AutoPayCard
                   isAutoPayStatus={isAutoPayStatus}
@@ -204,18 +211,20 @@ const BillingScreen = ({ navigation }) => {
                   navigation={navigation}
                   isStatusLoading={paperlessLoading}
                 />
-                <View style={[card.elevated, styles.myModemSpaceBlock]}>
+                <View style={[AppStyles.card,{paddingBottom:16}]}>
+                  <>
                   <View
                     style={[
                       styles.myModemWrapper,
                       styles.frameParentSpaceBlock1,
                     ]}
                   >
-                    <Text style={styles.leftTitle} 
+                    <SectionTitle style={[styles.leftTitle]} 
                     accessible={true}
                     accessibilityLabel="Billing Options"
                     accessibilityRole="header" accessibilityLevel={2}>
-                      Billing Options</Text>
+                      Billing Options
+                      </SectionTitle>
                   </View>
                   <View
                     style={[
@@ -238,18 +247,16 @@ const BillingScreen = ({ navigation }) => {
                       accessibilityRole="button"
                       accessibilityLabel="Manage Payment Method"
                     >
-                      {
-                        <Icon
-                          name="building-doc"
-                          color={Color.colorMidnightblue}
-                          size={20}
-                          style={{ marginRight: 16 }}
-                        />
-                      }
-                      <Text style={styles.modemHealthSupport}>
+                     
+                      <MenuText style={styles.modemHealthSupport}>
                         Manage Payment Method
-                      </Text>
-                      <RightIcon />
+                      </MenuText>
+                      <View
+                        style={styles.rightIconLayout}
+                      >
+                        <RightIcon />
+                      </View>
+ 
                     </Touchable>
 
                     <View style={styles.frameLayout} />
@@ -264,18 +271,15 @@ const BillingScreen = ({ navigation }) => {
                         accessibilityRole="button"
                         accessibilityLabel="View Bill Breakdown"
                       >
-                        {
-                          <Icon
-                            name="search-book"
-                            color={Color.colorMidnightblue}
-                            size={20}
-                            style={{ marginRight: 16 }}
-                          />
-                        }
-                        <Text style={styles.modemHealthSupport}>
+                        
+                        <MenuText style={styles.modemHealthSupport}>
                           {"View Bill Breakdown"}
-                        </Text>
-                        <RightIcon />
+                        </MenuText>
+                        <View
+                          style={styles.rightIconLayout}
+                        >
+                          <RightIcon />
+                        </View>
                       </Touchable>
                     }
                     <View style={styles.frameLayout} />
@@ -289,19 +293,17 @@ const BillingScreen = ({ navigation }) => {
                       accessibilityRole="button"
                       accessibilityLabel="View Payment History"
                     >
-                      {
-                        <Icon
-                          name="document"
-                          color={Color.colorMidnightblue}
-                          size={20}
-                          style={{ marginRight: 16 }}
-                        />
-                      }
+                      
 
-                      <Text style={styles.modemHealthSupport}>
+                      <MenuText style={styles.modemHealthSupport}>
                         View Payment History
-                      </Text>
-                      <RightIcon />
+                      </MenuText>
+                      <View
+                        style={styles.rightIconLayout}
+                      >
+                        <RightIcon />
+                      </View>
+ 
                     </Touchable>
                     <View style={styles.frameLayout} />
 
@@ -315,20 +317,19 @@ const BillingScreen = ({ navigation }) => {
                       accessibilityRole="button"
                       accessibilityLabel="View Billing Statements"
                     >
-                      {
-                        <Icon
-                          name="bill-paid"
-                          color={Color.colorMidnightblue}
-                          size={20}
-                          style={{ marginRight: 16 }}
-                        />
-                      }
-                      <Text style={styles.modemHealthSupport}>
+                      
+                      <MenuText style={styles.modemHealthSupport}>
                         View Billing Statements
-                      </Text>
-                      <RightIcon />
+                      </MenuText>
+                      <View
+                        style={styles.rightIconLayout}
+                      >
+                        <RightIcon />
+                      </View>
+ 
                     </Touchable>
                   </View>
+                  </>
                 </View>
               </>
             )}
@@ -346,13 +347,12 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     height: 150,
+  },cardsContainer: {
+    paddingBottom: heightPercentageToDP("25%"),
+    marginTop: Padding.p_base,
+    marginHorizontal: 16,
   },
   leftTitle: {
-    color: colors.sp_black,
-    fontSize: 18,
-    fontWeight: "600",
-    textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
     alignContent: "flex-start",
     alignSelf: "center",
   },
@@ -373,10 +373,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   melissaSmith: {
-    fontSize: FontSize.size_3xl,
     width: 210,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
     lineHeight: 28,
     textAlign: "center",
   },
@@ -404,14 +401,20 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   myModemWrapper: {
-    paddingTop: Padding.p_5xs,
+    paddingTop: Padding.p_base,
     alignItems: "center",
     flexDirection: "row",
     paddingHorizontal: Padding.p_5xl,
   },
   frameParentSpaceBlock1: {
-    paddingBottom: Padding.p_5xl,
-    alignSelf: "stretch",
+    paddingBottom: Padding.p_base,
+    
+  },
+  rightIconLayout: {
+    height: 24,
+    width: 24,
+    justifyContent: "center",
+    alignItems: "center",
   },
   frame9defaultSpaceBlock: {
     paddingVertical: Padding.p_base,
@@ -435,10 +438,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   modemHealthSupport: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: colors.sparklight_purple_blue,
-    fontFamily: FontFamily.openSansRegular,
     textAlign: "left",
     lineHeight: 28,
     flex: 1,
