@@ -249,7 +249,7 @@ const AccountOverview = () => {
                   accessibilityRole="link"
                   hitSlop={A11Y.hitSlop}
                   style={styles.footerLink}
-                  onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://business.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
+                  onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
                 >
                   <Text accessibilityLabel="Privacy Policy" style={styles.linkStyle}>
                     Privacy Policy
