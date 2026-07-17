@@ -211,7 +211,8 @@ const BillingScreen = ({ navigation }) => {
                   navigation={navigation}
                   isStatusLoading={paperlessLoading}
                 />
-                <View style={[AppStyles.card, { marginBottom: 16 }]}>
+                <View style={[AppStyles.card,{paddingBottom:16}]}>
+                  <>
                   <View
                     style={[
                       styles.myModemWrapper,
@@ -328,6 +329,7 @@ const BillingScreen = ({ navigation }) => {
  
                     </Touchable>
                   </View>
+                  </>
                 </View>
               </>
             )}

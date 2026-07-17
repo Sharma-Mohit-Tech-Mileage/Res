@@ -281,7 +281,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         </View>
 
         {/* Payment History List */}
-         <View style={{ flex: 1, marginBottom: 20,...AppStyles.card }}>
+         <View style={{ flex: 1,...AppStyles.card }}>
         {loading && payments.length === 0 ? (
           <LoadingOverlay
           loading={loading}/>

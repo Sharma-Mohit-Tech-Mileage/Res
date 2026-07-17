@@ -284,8 +284,8 @@ const InAppNotifications = ({ navigation }) => {
 
       <ScrollView ref={scrollViewRef}>
         <View style={styles.inAppNotificationsInner}>
-          <View style={[AppStyles.card, styles.cardContainer]}>
-            <View style={styles.frameBorder}>
+          <View style={[AppStyles.card, { margin: 16 }]}>
+            <View >
               {notification && (
                 <Animated.View
                   style={[

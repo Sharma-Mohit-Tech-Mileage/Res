@@ -40,7 +40,7 @@ import {
 
 import Toggle from "../common/Toggle";
 import AlertIcon from "../../../assets/svgs/Alerttriangle";
-import { widthPercentageToDP } from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 import {SectionTitle,SectionContent,HintText,Hyperlink} from "../common/customui/Typography";
 
@@ -342,7 +342,7 @@ const TextNotifications = ({ navigation }) => {
       )}
       <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always">
         <View style={styles.textNotificationsInner}>
-           <View style={[AppStyles.card]}>
+           <View style={[AppStyles.card,{margin:16,paddingBottom:16}]}>
             {notification && (
               <Animated.View
                 style={{
@@ -451,6 +451,7 @@ const TextNotifications = ({ navigation }) => {
                 description="Receive text notifications when your appointments have updates."
                 onChange={handleToggleChange}
               />
+              <View style={styles.frameChild} />
               <NotificationSetting
                 title="Outage Alerts"
                 name="outageOptOut"
@@ -458,6 +459,7 @@ const TextNotifications = ({ navigation }) => {
                 description="Receive text notifications when outage occur."
                 onChange={handleToggleChange}
               />
+              <View style={styles.frameChild} />
               <NotificationSetting
                 title="Billing"
                 name="billingOptOutStatus"
@@ -466,7 +468,7 @@ const TextNotifications = ({ navigation }) => {
                 onChange={handleToggleChange}
               />
 
-            <View style={styles.frameChild} />
+          
             {isCheckboxVisible && (
               <View
                 style={{
@@ -581,7 +583,7 @@ const TextNotifications = ({ navigation }) => {
 
 
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
-  <View style={[styles.frameContainer, styles.frameBorder]}>
+  <View style={[styles.frameContainer]}>
     <View style={styles.frameView}>
       <View style={styles.rowContent}>
         <View style={styles.textWrap}>
@@ -768,10 +770,10 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue,
   },
   textNotificationsInner: {
-    paddingTop: Padding.p_5xl,
     flex: 1,
-    paddingHorizontal: Padding.p_base,
-    marginBottom: 200,
+    paddingBottom: hp('20%'),
+  
+    overflow: "hidden",
   },
   checkBox: {
     width: 12,
@@ -834,7 +836,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   frameContainer: {
-    borderBottomWidth: 1,
+    
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "stretch",
@@ -859,3 +861,4 @@ const styles = StyleSheet.create({
 });
 
 export default TextNotifications;
+
