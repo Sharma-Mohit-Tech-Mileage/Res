@@ -1095,7 +1095,7 @@ stages:
   - stage: IOSTestFlight
     displayName: 'iOS TestFlight'
     dependsOn: IOSStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo')))
+    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: IOSTestFlightStage
         displayName: 'Upload IPA to TestFlight'
@@ -1238,7 +1238,7 @@ stages:
   - stage: InternalTestingDeployment
     displayName: 'Internal Testing Android'
     dependsOn: AndroidStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo')))
+    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: DeployToInternalTesting
         displayName: 'Deploy to Play Store Internal Testing'
