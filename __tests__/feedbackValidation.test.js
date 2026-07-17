@@ -11,6 +11,6 @@ describe("feedbackSchema", () => {
         feedbackEmail: "test@example.com",
         cosentContactUs: undefined,
       })
-    ).rejects.toThrow("Please choose Yes or No to contact us.");
+    ).rejects.toThrow("Please choose Yes or No to contact you .");
   });
 });

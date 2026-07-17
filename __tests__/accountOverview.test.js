@@ -20,6 +20,7 @@ const mockSelectorState = {
 const mockGetUser = jest.fn();
 const mockGetSsoToken = jest.fn(() => Promise.resolve({ idToken: 'id-token' }));
 const mockLogoutZendesk = jest.fn();
+const mockClearChatData = jest.fn();
 const mockLogout = jest.fn(() => Promise.resolve({}));
 const mockSetUserId = jest.fn();
 const mockSetUserProperty = jest.fn(() => Promise.resolve());
@@ -110,7 +111,10 @@ jest.mock('../assets/svgs/Rightactionable18', () => 'UserManagementIcon');
 jest.mock('../assets/svgs/Messagealertcircle', () => 'Feedbackicon');
 jest.mock('../assets/svgs/Chevonright', () => 'RightIcon');
 jest.mock('react-native-responsive-screen', () => ({ widthPercentageToDP: () => 100 }));
-jest.mock('../src/components/utility/RNZendeskChat', () => ({ logoutZendesk: () => mockLogoutZendesk() }));
+jest.mock('../src/components/utility/RNZendeskChat', () => ({
+  logoutZendesk: () => mockLogoutZendesk(),
+  clearChatData: () => mockClearChatData(),
+}));
 jest.mock('../src/components/utility/NativeCookieManager', () => ({ clearAuthCookies: jest.fn() }));
 
 const flushPromises = () => Promise.resolve().then(() => Promise.resolve());
@@ -266,14 +270,14 @@ describe('AccountOverview behavior', () => {
       name: 'Terms & Conditions',
     });
     expect(mockNavigate).toHaveBeenCalledWith('ArticleWindowUtility', {
-      url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true',
+      url: 'https://support.sparklight.com/hc/en-us/articles/30298585161879-MySparklight-Business-App-Release-Notes?isMobile=true',
       name: 'App Release Notes',
     });
   });
 
   it('executes logout action when OK is pressed in confirmation', async () => {
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, msg, buttons) => {
-      const okAction = buttons.find((b) => b.text === 'OK');
+      const okAction = buttons.find((b) => b.text?.toLowerCase() === 'ok');
       okAction.onPress();
     });
 
@@ -309,7 +313,7 @@ describe('AccountOverview behavior', () => {
     });
 
     const buttons = tree.root.findAllByType(Pressable);
-    const feedbackBtn = buttons.find((b) => b.props.accessibilityLabel === 'App Feedback');
+    const feedbackBtn = buttons.find((b) => b.props.accessibilityLabel === 'App Feedback Button');
 
     act(() => {
       feedbackBtn.props.onPress();
@@ -383,7 +387,7 @@ describe('AccountOverview behavior', () => {
     mockSetUserProperty.mockRejectedValueOnce(new Error('analytics failed'));
 
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, msg, buttons) => {
-      const okAction = buttons.find((b) => b.text === 'OK');
+      const okAction = buttons.find((b) => b.text?.toLowerCase() === 'ok');
       okAction.onPress();
     });
 
@@ -410,7 +414,7 @@ describe('AccountOverview behavior', () => {
   it('uses android logout redirect URL when platform is android', async () => {
     const restoreOs = jest.replaceProperty(Platform, 'OS', 'android');
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, msg, buttons) => {
-      const okAction = buttons.find((b) => b.text === 'OK');
+      const okAction = buttons.find((b) => b.text?.toLowerCase() === 'ok');
       okAction.onPress();
     });
 
