@@ -248,7 +248,7 @@ const AccountOverview = () => {
                   accessible={true}
                   accessibilityRole="link"
                   hitSlop={A11Y.hitSlop}
-                  style={styles.footerLink}
+                  style={[styles.footerLink, styles.buttonsSpaceBlock]}
                   onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
                 >
                   <Text accessibilityLabel="Privacy Policy" style={styles.linkStyle}>
@@ -263,7 +263,7 @@ const AccountOverview = () => {
                   accessible={true}
                   accessibilityRole="link"
                   hitSlop={A11Y.hitSlop}
-                  style={styles.footerLink}
+                  style={[styles.footerLink, styles.buttonsSpaceBlock]}
                   onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://business.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}
                 >
                   <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle}>
@@ -279,7 +279,7 @@ const AccountOverview = () => {
               accessibilityLabel={'Version '+VersionCheck.getCurrentVersion()}
               accessibilityRole="link"
               hitSlop={A11Y.hitSlop}
-              style={styles.footerLink}
+                style={[styles.footerLink, styles.buttonsSpaceBlock]}
             >
               <Text style={{ color: Color.sparklightBrightPurple, alignSelf: 'center', textDecorationLine: 'underline',fontWeight: '600' }}>
                 Version:{VersionCheck.getCurrentVersion()}

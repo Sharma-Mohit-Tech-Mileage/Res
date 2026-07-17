@@ -521,7 +521,7 @@ const ProfileSettings = () => {
                   styles.frameParentSpaceBlock,
                 ]}
               >
-                <View style={styles.frameChild} />
+                {/* <View style={styles.frameChild} /> */}
               </View>
             </View>
           </View>
