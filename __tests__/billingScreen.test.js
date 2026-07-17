@@ -147,10 +147,10 @@ describe('BillingScreen behavior', () => {
     });
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith(
-      'AutoPayPCIConnector',
+      'ArticleWindowUtility',
       expect.objectContaining({
         name: 'Manage Payment Method',
-        useNewPayment: true,
+        injectPaymentObj: true,
       })
     );
   });

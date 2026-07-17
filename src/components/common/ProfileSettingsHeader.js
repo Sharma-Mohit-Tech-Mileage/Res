@@ -47,9 +47,9 @@ const ProfileSettingsHeader = ({
       <LinearGradient
         style={[styles.profileSettingsChild]}
         locations={[0, 1]}
-        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
-        useAngle={true}
-        angle={90}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1.3, y: 0 }}
+        colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
       >
         <>
           <View style={[styles.navBar]}>

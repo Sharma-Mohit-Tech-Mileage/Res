@@ -20,5 +20,15 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>RadioCanada-Regular.ttf</string>
+		<string>RadioCanada-Bold.ttf</string>
+		<string>Effra_Std_Bd.ttf</string>
+		<string>RadioCanada-Medium.ttf</string>
+		<string>Effra_Std_Lt.ttf</string>
+		<string>RadioCanada-SemiBold.ttf</string>
+		<string>Effra_Std_Rg.ttf</string>
+	</array>
 </dict>
 </plist>

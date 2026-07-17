@@ -34,7 +34,10 @@ import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { passwordSchema } from "../utility/validationSchema"; 
 import colors from "../../res/Colors";
+import PrimaryButton from "../common/customui/PrimaryButton";
 import { requiredField } from "../../styles/utilities";
+import AppStyles from '../../styles/AppStyles';
+import { SectionTitle,HintText } from "../common/customui/Typography";
 const ChangePassword = () => {
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
@@ -217,7 +220,7 @@ const ChangePassword = () => {
       <ScrollView ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
-            <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
+            <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
               <View style={styles.infoWrapper}>
                 <NotificationAlert
                   type="error"
@@ -238,15 +241,14 @@ const ChangePassword = () => {
               </View>
               <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
                 <View style={{ flexDirection: "column" }}>
-                  <Text
-                    style={[styles.password, styles.passwordFlexBox]}
+                  <SectionTitle
                     accessibilityRole="header"
                     accessibilityLevel={2}
                   >
                     Password
-                  </Text>
-                  <Text
-                    style={[requiredField, { marginTop: 10 }]}
+                  </SectionTitle>
+                  <HintText
+                    style={[{ marginTop: 10, marginVertical: 5}]}
                     accessible={true}
                     importantForAccessibility="yes"
                     accessibilityRole="text"
@@ -254,7 +256,7 @@ const ChangePassword = () => {
                   >
                     {" "}
                     Fields marked with * are required.
-                  </Text>
+                  </HintText>
                 </View>
               </View>
               <View
@@ -331,30 +333,22 @@ const ChangePassword = () => {
               </View>
             </View>
           </View>
-          <View style={styles.frameParent1}>
-            <Touchable
-              minSize={0}
-              accessibilityLabel={"Save"}
-              accessibilityRole="button"
-              accessible={true}
-              style={[styles.buttons, styles.buttonsLayout]}
-              onPress={handleSubmit(handleSavePass, handleValidationError)}
-            >
-              <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
-            </Touchable>
-            <Touchable
-              minSize={0}
-              accessibilityLabel={`Cancel`}
-              accessibilityRole="button"
-              accessible={true}
-              style={[styles.buttons1, styles.buttonsLayout]}
-              onPress={() => navigation.navigate("PasswordSecurity")}
-            >
-              <Text style={[styles.makePayment1, styles.makeTypo]}>
-                {" "}
-                Cancel
-              </Text>
-            </Touchable>
+         <View
+            style={styles.frameParent1}
+            
+          >
+            <PrimaryButton
+              buttonType={"submit"}
+              title={"Save"}
+             onPress={handleSubmit(handleSavePass, handleValidationError)}
+              disabled={loading}
+            />
+
+            <PrimaryButton
+              buttonType={"cancel"}
+              title={"Cancel"}
+              onPress={() => navigation.goBack()}
+            />
           </View>
 
           <LoadingOverlay

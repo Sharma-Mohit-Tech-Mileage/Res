@@ -9,7 +9,7 @@ const Infocircle = (props) => (
     {...props}
   >
     <Path
-      stroke={props.color? props.color:"#0060AE"}
+      stroke={props.color? props.color:"#353091"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={1.5}

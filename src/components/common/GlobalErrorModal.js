@@ -10,6 +10,8 @@ import AlertIcon from "../../res/svgIcons/AlertIconV2";
 import { FontFamily } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import Touchable from "./customui/Touchable";
+import PrimaryButton from "./customui/PrimaryButton";
+
 
 // Simple error manager
 class ErrorManager {
@@ -81,21 +83,20 @@ export const GlobalErrorModal = () => {
             </Touchable>
           </View>
 
-          <Touchable
-            accessibilityRole="button"
-            accessibilityLabel="Close"
-            minSize={0}
-            style={[styles.closeBtn, { marginTop: 24 }]}
+          <PrimaryButton
+            title="Close"
+            buttonType="cancel"
             onPress={() => globalErrorManager.hide()}
-          >
-            <Text style={styles.closeAlertTxt}>Close</Text>
-          </Touchable>
+            accessibilityLabel="Close"
+            style={[ { marginTop: 24 }]}
+            accessibilityHint="Double tap to close the error modal"
+          />
         </View>
       </View>
     </Modal>
   );
-};
-
+}
+           
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
   alertContainer: {
     backgroundColor: "white",
     padding: 24,
-    borderRadius: 1,
+    borderRadius: 8,
     alignItems: "center",
     width: "90%",
     alignSelf: "center",
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   phoneNumber: {
-    color: colors.sparklight_purple_blue,
+    color: colors.sparklight_bright_purple,
     fontWeight: "700",
     textDecorationLine: "underline",
   },

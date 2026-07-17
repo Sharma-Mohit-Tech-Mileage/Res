@@ -18,6 +18,7 @@ import {
 } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
+import { Hyperlink } from "../common/customui/Typography";
 import moment from "moment";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
 import {card} from '../../styles/utilities'
@@ -36,6 +37,7 @@ import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
 import SecondaryButton from "../common/customui/PrimaryButton";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import AppStyles from "../../styles/AppStyles";
 
 
 // Constants
@@ -263,7 +265,7 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
           Try our new{' '}
         </Text>
         <View style={{ flexDirection: "row" }}>
-          <Text
+          <Hyperlink
             accessibilityRole="link"
             accessibilityLabel="Open Bill Explainer"
             accessibilityHint="Double tap to open link"
@@ -272,7 +274,7 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
             onPress={() => renderBillExplainerLink(navigation)}
           >
             Bill Explainer
-          </Text>
+          </Hyperlink>
           <Text accessible={false} importantForAccessibility="no" style={[styles.billExplainerLinkText, { textDecorationLine: 'none' }]}>!</Text>
         </View>
         </View>
@@ -470,6 +472,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
     }
 
     return (
+      <View style={[ {borderTopLeftRadius: 0, borderTopRightRadius: 0, marginBottom: 32}]}>
       <FlatList
         data={billingData}
         renderItem={({ item, index }) => <BreakDownItem item={item} />}
@@ -483,6 +486,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={explainerLoading} />}
         contentContainerStyle={{ paddingBottom: 120 }}
       />
+      </View>
     );
   };
 
@@ -499,7 +503,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         renderErrorMessage(errorCode, navigation)
       ) : (
         <View
-          style={[card, styles.cardContainer, { marginBottom: 32 }]}
+          style={[AppStyles.card, styles.cardContainer, { marginBottom: 32 }]}
         >
           <ScrollView
             contentContainerStyle={{ paddingBottom: 24 }}

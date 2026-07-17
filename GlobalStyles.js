@@ -1,9 +1,14 @@
 export const FontFamily = {
-    openSansSemiBold: "OpenSans-SemiBold",
-    textXsSemibold: "Inter-SemiBold",
-    openSansRegular: 'OpenSans-Regular',
-    interBold: "Inter-Bold",
-    textXsMedium: "Inter-Medium",
+    openSansSemiBold: "RadioCanada-SemiBold",
+    textXsSemibold: "RadioCanada-SemiBold",
+    openSansRegular: 'RadioCanada-Regular',
+    interBold: "RadioCanada-Bold",
+    textXsMedium: "RadioCanada-Medium",
+
+    RadioCanadaSemiBold: "RadioCanada-SemiBold",
+    RadioCanadaRegular: 'RadioCanada-Regular',
+    RadioCanadaBold: "RadioCanada-Bold",
+    RadioCanadaMedium: "RadioCanada-Medium",
 };
 
 /* font sizes */
@@ -23,6 +28,7 @@ export const FontSize = {
 /* Colors */
 export const Color = {
     gray50: "#f9fafb",
+    Black_100: "#101828",
     colorWhitesmoke_100: "#f8f8f8",
     colorWhitesmoke_200: "#ebeef1",
     colorWhitesmoke_300: "#eaecf0",
@@ -38,6 +44,8 @@ export const Color = {
     colorGray_100: "#101828",
     sparklightGray1: "#4C5458",
     sparklightBrightPurple: "#8D3B90",
+    sparklightPrimaryPurple: "#8D3B90",
+    sparklightSecondaryPurple: "#353091",
     success50: "#ecfdf3",
     colorAquamarine: "#abefc6",
     success700: "#067647",

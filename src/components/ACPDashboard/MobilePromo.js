@@ -5,7 +5,7 @@ import { card } from "../../styles/utilities";
 import FeatureCard from "./FeatureCardMobile";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import Touchable from "../common/customui/Touchable";
+import PrimaryButton from "../common/customui/PrimaryButton";
 
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
@@ -49,23 +49,12 @@ const MobilePromo = () => {
           >
             SAVE with FREE Unlimited Mobile for 1 year*
           </Text>
-          <Touchable
-            minSize={0}
-            style={({ pressed }) => [
-              styles.offerBtn,
-              pressed && styles.offerBtnPressed,
-            ]}
+          <PrimaryButton
+            title="Get Offer"
+            buttonType="submit"
             onPress={handleAddMobile}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="Get Offer"
-            accessibilityHint="Opens Sparklight mobile offer"
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Text style={styles.getOfferButton} importantForAccessibility="no" maxFontSizeMultiplier={1.2}>
-              Get Offer
-            </Text>
-          </Touchable>
+            textStyle={styles.getOfferButton}
+          />
         </View>
       </ImageBackground>
     );
@@ -215,17 +204,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontWeight: "600",
     textAlign: "center",
-  },
-  offerBtn: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 22,
-    paddingVertical: 10,
-    backgroundColor: Color.sparklightBrightPurple,
-    borderRadius: 50,
-    minWidth: 110,
-  },
-  offerBtnPressed: {
-    opacity: 0.85,
   },
 });
 
