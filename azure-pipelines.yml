@@ -170,6 +170,8 @@ stages:
         displayName: 'Run iOS Unit Tests'
         pool:
           vmImage: 'macos-latest'
+        timeoutInMinutes: 90
+        cancelTimeoutInMinutes: 10
         steps:
           - checkout: self
 
@@ -719,7 +721,8 @@ stages:
         displayName: 'Build iOS IPA (Xcode Archive)'
         pool:
           vmImage: 'macos-latest'
-        timeoutInMinutes: 180
+        timeoutInMinutes: 240
+        cancelTimeoutInMinutes: 15
         steps:
           - checkout: self
             clean: true
@@ -869,11 +872,27 @@ stages:
               echo "export NODE_BINARY=$NODE_BIN" > ios/.xcode.env.local
               ARCHIVE_PATH="$(Build.ArtifactStagingDirectory)/My Sparklight.xcarchive"
               EXPORT_PATH="$(Build.ArtifactStagingDirectory)/ipa"
-              ARCHIVE_LOG="$(Build.ArtifactStagingDirectory)/xcodebuild-archive.log"
+              LOG_DIR="$(Build.ArtifactStagingDirectory)/ios-build-logs"
+              mkdir -p "$LOG_DIR"
+              ARCHIVE_LOG="$LOG_DIR/xcodebuild-archive.log"
+              EXPORT_LOG="$LOG_DIR/xcodebuild-export.log"
               JOBS="$(sysctl -n hw.ncpu || echo 4)"
               TEAM_ID="$(IOS_TEAM_ID)"
               BUNDLE_ID="$(IOS_BUNDLE_ID)"
               PROV_UUID="$(iosProvProfile.provisioningProfileUuid)"
+
+              (
+                while true; do
+                  echo "[heartbeat] iOS archive in progress: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                  sleep 60
+                done
+              ) &
+              HEARTBEAT_PID=$!
+
+              cleanup_heartbeat() {
+                kill "$HEARTBEAT_PID" 2>/dev/null || true
+              }
+              trap cleanup_heartbeat EXIT
 
               echo "Archiving with Xcode..."
               if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
@@ -927,15 +946,38 @@ stages:
                   -exportArchive \
                   -archivePath "$ARCHIVE_PATH" \
                   -exportPath "$EXPORT_PATH" \
-                  -exportOptionsPlist "$EXPORT_OPTS" 2>&1 | tee "$(Build.ArtifactStagingDirectory)/xcodebuild-export.log"; then
+                  -exportOptionsPlist "$EXPORT_OPTS" 2>&1 | tee "$EXPORT_LOG"; then
                 echo "❌ IPA export failed"
-                tail -n 100 "$(Build.ArtifactStagingDirectory)/xcodebuild-export.log" || true
+                tail -n 100 "$EXPORT_LOG" || true
                 exit 1
               fi
 
               echo "✅ IPA exported:"
               find "$EXPORT_PATH" -maxdepth 1 -name "*.ipa" -exec ls -lh {} \;
             displayName: 'Xcode archive and export IPA'
+
+          - script: |
+              set -euo pipefail
+              LOG_DIR="$(Build.ArtifactStagingDirectory)/ios-build-logs"
+              mkdir -p "$LOG_DIR"
+              echo "=== iOS Build Diagnostics ===" > "$LOG_DIR/diagnostics.txt"
+              echo "Result: $(Agent.JobStatus)" >> "$LOG_DIR/diagnostics.txt"
+              echo "Build ID: $(Build.BuildId)" >> "$LOG_DIR/diagnostics.txt"
+              echo "Branch: $(Build.SourceBranch)" >> "$LOG_DIR/diagnostics.txt"
+              echo "Commit: $(Build.SourceVersion)" >> "$LOG_DIR/diagnostics.txt"
+              echo "Finished: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$LOG_DIR/diagnostics.txt"
+              ls -la "$(Build.ArtifactStagingDirectory)" >> "$LOG_DIR/diagnostics.txt" || true
+            displayName: 'Collect iOS diagnostics'
+            condition: always()
+            continueOnError: true
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish iOS build logs'
+            condition: always()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-build-logs'
+              ArtifactName: 'ios-build-logs'
+              publishLocation: 'Container'
 
           - task: PublishBuildArtifacts@1
             displayName: 'Publish IPA artifact'
@@ -993,6 +1035,8 @@ stages:
         displayName: 'Validate IPA for Staging'
         pool:
           vmImage: 'macos-latest'
+        timeoutInMinutes: 45
+        cancelTimeoutInMinutes: 10
         steps:
           - download: current
             artifact: ios-ipa
@@ -1057,6 +1101,8 @@ stages:
         displayName: 'Upload IPA to TestFlight'
         pool:
           vmImage: 'macos-latest'
+        timeoutInMinutes: 90
+        cancelTimeoutInMinutes: 10
         steps:
           - download: current
             artifact: ios-ipa
