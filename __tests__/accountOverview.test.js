@@ -131,7 +131,7 @@ describe('AccountOverview behavior', () => {
     AccountOverview = require('../src/components/account/AccountOverview').default;
   });
 
-  it('loads full menu and navigates to User Management for standard account number', async () => {
+  it('loads full menu and navigates to Profile for standard account number', async () => {
     let tree;
     await act(async () => {
       tree = renderer.create(<AccountOverview />);
@@ -141,13 +141,14 @@ describe('AccountOverview behavior', () => {
     expect(mockTriggerOnScreenEntry).toHaveBeenCalledWith('AccountStackScreen');
 
     const buttons = tree.root.findAllByType(Pressable);
-    const userMgmt = buttons.find((b) => b.props.accessibilityLabel === 'User Management');
+    const profileBtn = buttons.find((b) => b.props.accessibilityLabel === 'Profile Button');
+    expect(profileBtn).toBeDefined();
 
     act(() => {
-      userMgmt.props.onPress();
+      profileBtn.props.onPress();
     });
 
-    expect(mockNavigate).toHaveBeenCalledWith('UserManagement');
+    expect(mockNavigate).toHaveBeenCalledWith('ProfileSettings');
   });
 
   it('hides User Management for 16+ digit account numbers', async () => {
@@ -183,10 +184,15 @@ describe('AccountOverview behavior', () => {
     });
 
     const buttons = tree.root.findAllByType(Pressable);
-    const profileBtn = buttons.find((b) => b.props.accessibilityLabel === 'Profile');
-    const passwordBtn = buttons.find((b) => b.props.accessibilityLabel === 'Password & Security');
-    const notificationsBtn = buttons.find((b) => b.props.accessibilityLabel === 'Notifications');
-    const feedbackBtn = buttons.find((b) => b.props.accessibilityLabel === 'App Feedback');
+    const profileBtn = buttons.find((b) => b.props.accessibilityLabel === 'Profile Button');
+    const passwordBtn = buttons.find((b) => b.props.accessibilityLabel === 'Password & Security Button');
+    const notificationsBtn = buttons.find((b) => b.props.accessibilityLabel === 'Notifications Button');
+    const feedbackBtn = buttons.find((b) => b.props.accessibilityLabel === 'App Feedback Button');
+
+    expect(profileBtn).toBeDefined();
+    expect(passwordBtn).toBeDefined();
+    expect(notificationsBtn).toBeDefined();
+    expect(feedbackBtn).toBeDefined();
 
     act(() => {
       profileBtn.props.onPress();
@@ -230,9 +236,9 @@ describe('AccountOverview behavior', () => {
     });
 
     const buttons = tree.root.findAllByType(Pressable);
-    const profileBtn = buttons.find((b) => b.props.accessibilityLabel === 'Profile');
-    const passwordBtn = buttons.find((b) => b.props.accessibilityLabel === 'Password & Security');
-    const notificationsBtn = buttons.find((b) => b.props.accessibilityLabel === 'Notifications');
+    const profileBtn = buttons.find((b) => b.props.accessibilityLabel === 'Profile Button');
+    const passwordBtn = buttons.find((b) => b.props.accessibilityLabel === 'Password & Security Button');
+    const notificationsBtn = buttons.find((b) => b.props.accessibilityLabel === 'Notifications Button');
 
     const linkButtons = buttons.filter((b) => b.props.accessibilityRole === 'link');
     const privacyBtn = linkButtons[0];
@@ -256,7 +262,7 @@ describe('AccountOverview behavior', () => {
       name: 'Privacy Policy',
     });
     expect(mockNavigate).toHaveBeenCalledWith('ArticleWindowUtility', {
-      url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions?isMobile=true',
+      url: 'https://business.sparklight.com/legal/mobile-app-terms-and-conditions',
       name: 'Terms & Conditions',
     });
     expect(mockNavigate).toHaveBeenCalledWith('ArticleWindowUtility', {
