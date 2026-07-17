@@ -224,6 +224,7 @@ const AddNotificationScreen = () => {
         return;
       }
       setIsSubmitting(true);
+      setPaperlessStatus(true);
       dispatch(
         updatePrimaryAndPaperlessRequest(
           {
@@ -446,7 +447,7 @@ const AddNotificationScreen = () => {
                 convenient, eco-friendly, and keeps your information at your
                 fingertips.
               </SectionContent>
-             { !paperlessStatus && (
+             { (!paperlessStatus ) && (
               <View style={{ paddingVertical: Padding.p_5xs }}>
               <NotificationAlert
                 type="warning"

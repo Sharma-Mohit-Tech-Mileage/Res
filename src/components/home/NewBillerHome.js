@@ -494,11 +494,11 @@ const NewBillerHome = ({ navigation }) => {
               <View style={styles.overlayStack}>
                 {hasAnyAlert && <View style={{ height: alertsHeight }} />}
                 {isMobilePilotEnabled ? (
-                  <View style={[AppStyles.card,{ margin:16 , overflow: "hidden"}]}>
+                  <View style={[AppStyles.card,{ margin:16 , overflow: "hidden", flexDirection:'column',flex:1, alignItems:'center', justifyContent:'center'}]}>
                     <View
                       style={[
-                        styles.contentWrapper,
-                        { paddingHorizontal: Padding.p_base },
+                        
+                        { paddingHorizontal: Padding.p_base},
                       ]}
                     >
                       <MobilePilotLandingPage />

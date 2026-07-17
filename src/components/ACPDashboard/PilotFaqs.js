@@ -94,13 +94,13 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: IMAGE_WIDTH,
     // Cap at native asset width (326px) and center so iPad never upscales/blurs.
-    maxWidth: 326,
+    maxWidth: 320,
     alignSelf: "center",
     overflow: "hidden",
   },
   promoImage: {
     width: IMAGE_WIDTH,
-    maxWidth: 326,
+    maxWidth: 320,
     aspectRatio: 1.92,
     alignSelf: "center",
     borderRadius: Border.br_11xs,

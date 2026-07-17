@@ -396,7 +396,7 @@ const SplashScreen = ({ navigation, route }) => {
         });
       }
 
-      if (!user.userInfo.mobileTCAcceptanceFlag) {
+      if (user.userInfo.mobileTCAcceptanceFlag) {
         navigation.reset({ index: 0, routes: [{ name: "MyTab" }] });
       } else {
         navigation.reset({ index: 0, routes: [{ name: "Terms" }] });
@@ -731,7 +731,8 @@ const SplashScreen = ({ navigation, route }) => {
         </Text>
       )}
 
-      <Text style={getStyle("copyright")}>
+      <Text 
+      style={getStyle("copyright")}>
         {`©${moment().year()} Cable One, Inc. All rights reserved.`}
       </Text>
 
@@ -819,7 +820,7 @@ const styles = StyleSheet.create({
   },
   copyright: {
     position: "absolute",
-    bottom: hp("5%"),
+    bottom: hp("12%"),
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     textAlign: "center",

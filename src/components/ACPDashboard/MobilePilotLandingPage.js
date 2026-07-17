@@ -236,7 +236,6 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     marginBottom: 30,
     backgroundColor: Color.sparklightWhite,
     
