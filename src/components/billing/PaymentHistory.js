@@ -14,6 +14,7 @@ import { A11Y } from "../../styles/theme";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import moment from "moment";
 import Icon from "../common/Icon";
+import { Hyperlink } from "../common/customui/Typography";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -198,7 +199,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         {loading ? (
           <SmallLoader />
         ) : (
-          <Text style={styles.loadMoreText}>Load more</Text>
+          <Hyperlink style={styles.hyperlink}>Load more</Hyperlink>
         )}
       </Touchable>
     );

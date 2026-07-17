@@ -16,6 +16,7 @@ import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
 import SmallLoader from "../common/customui/SmallLoader";
+import { Hyperlink } from "../common/customui/Typography";
 import AppStyles from "../../styles/AppStyles";
 const CLEAR_BILLING_ERROR = 'CLEAR_BILLING_ERROR';
 const CLEAR_DOWNLOAD_ERROR = 'CLEAR_DOWNLOAD_ERROR';
@@ -150,7 +151,7 @@ const BillingStatementsScreen = ({ navigation }) => {
               <SmallLoader />
             </View>
           ) : (
-            <Text style={styles.uploadText}>Download</Text>
+            <Hyperlink  style={styles.hyperlink}>Download</Hyperlink >
           )}
         </View>
       </Touchable>
