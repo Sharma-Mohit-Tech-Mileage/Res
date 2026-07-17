@@ -124,8 +124,10 @@ stages:
     dependsOn: InitialCommit
     condition: succeeded()
     jobs:
-      - job: RunUnitTests
-        displayName: 'Execute Unit Tests'
+      - job: RunAndroidUnitTests
+        displayName: 'Run Android Unit Tests'
+        pool:
+          vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
 
@@ -149,26 +151,52 @@ stages:
             workingDirectory: '.'
 
           - script: |
+              echo "Running Android unit tests..."
+              cd android
+              ./gradlew testDemoReleaseUnitTest --no-daemon
+            displayName: 'Run Android Unit Tests'
+
+          - task: PublishTestResults@2
+            displayName: 'Publish Android Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/build/test-results/**/*.xml'
+              searchFolder: '$(System.DefaultWorkingDirectory)/android'
+              mergeTestResults: true
+              failTaskOnFailedTests: false
+
+      - job: RunIOSUnitTests
+        displayName: 'Run iOS Unit Tests'
+        pool:
+          vmImage: 'macos-latest'
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: 'Install Node 20.6.1'
+            inputs:
+              versionSpec: '20.6.1'
+
+          - script: |
+              npm install --legacy-peer-deps
+              npm install --no-save --legacy-peer-deps jest-junit
+              npx update-browserslist-db@latest --yes || true
+            displayName: 'Install Dependencies'
+            workingDirectory: '.'
+
+          - script: |
               echo "Running application-wide Jest test cases..."
               npx jest --ci --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit
             displayName: 'Run App-wide Jest Test Cases'
             workingDirectory: '.'
 
-          - script: |
-              cd android
-              ./gradlew testDemoReleaseUnitTest --no-daemon
-            displayName: 'Run Android Unit Tests'
-
-          - script: |
-              node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
-            displayName: 'Enforce Coverage Gate'
-
           - task: PublishTestResults@2
-            displayName: 'Publish Test Results'
+            displayName: 'Publish iOS Test Results'
             condition: succeededOrFailed()
             inputs:
               testResultsFormat: 'JUnit'
-              testResultsFiles: '**/junit.xml,**/build/test-results/**/*.xml'
+              testResultsFiles: '**/junit.xml'
               searchFolder: '$(System.DefaultWorkingDirectory)'
               mergeTestResults: true
               failTaskOnFailedTests: false
@@ -180,6 +208,21 @@ stages:
               PathtoPublish: '$(System.DefaultWorkingDirectory)/coverage'
               ArtifactName: 'coverage-reports'
               publishLocation: 'Container'
+
+      - job: EnforceCoverageGate
+        displayName: 'Enforce Coverage Gate'
+        dependsOn:
+          - RunIOSUnitTests
+        condition: succeeded('RunIOSUnitTests')
+        pool:
+          vmImage: 'macos-latest'
+        steps:
+          - checkout: self
+
+          - script: |
+              node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
+            displayName: 'Evaluate Coverage Summary'
+            workingDirectory: '.'
 
   # ==========================================
   # STAGE 3: SECURITY & CODE QUALITY
