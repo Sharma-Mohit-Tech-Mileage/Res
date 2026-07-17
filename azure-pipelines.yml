@@ -118,9 +118,461 @@ stages:
   # ==========================================
   # STAGE 1: BUILD
   # ==========================================
+
+  - stage: UnitTests
+    displayName: 'Unit Tests'
+    dependsOn: InitialCommit
+    condition: succeeded()
+    jobs:
+      - job: RunUnitTests
+        displayName: 'Execute Unit Tests'
+        steps:
+          - checkout: self
+
+          - task: JavaToolInstaller@0
+            displayName: 'Install JDK 17'
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          - task: NodeTool@0
+            displayName: 'Install Node 20.6.1'
+            inputs:
+              versionSpec: '20.6.1'
+
+          - script: |
+              npm install --legacy-peer-deps
+              npm install --no-save --legacy-peer-deps jest-junit
+              npx update-browserslist-db@latest --yes || true
+            displayName: 'Install Dependencies'
+            workingDirectory: '.'
+
+          - script: |
+              echo "Running application-wide Jest test cases..."
+              npx jest --ci --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit
+            displayName: 'Run App-wide Jest Test Cases'
+            workingDirectory: '.'
+
+          - script: |
+              cd android
+              ./gradlew testDemoReleaseUnitTest --no-daemon
+            displayName: 'Run Android Unit Tests'
+
+          - script: |
+              node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
+            displayName: 'Enforce Coverage Gate'
+
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/junit.xml,**/build/test-results/**/*.xml'
+              searchFolder: '$(System.DefaultWorkingDirectory)'
+              mergeTestResults: true
+              failTaskOnFailedTests: false
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Coverage Reports'
+            condition: succeededOrFailed()
+            inputs:
+              PathtoPublish: '$(System.DefaultWorkingDirectory)/coverage'
+              ArtifactName: 'coverage-reports'
+              publishLocation: 'Container'
+
+  # ==========================================
+  # STAGE 3: SECURITY & CODE QUALITY
+  # ==========================================
+
+  - stage: SecurityAndQuality
+    displayName: 'Security & Code Quality'
+    dependsOn: UnitTests
+    condition: succeeded()
+    jobs:
+      # -------- Job 1: Lint Quality Checks --------
+      - job: LintQualityChecks
+        displayName: 'Lint Quality Checks'
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: 'Install Node'
+            inputs:
+              versionSpec: '20.6.1'
+
+          - script: |
+              npm install --legacy-peer-deps
+            displayName: 'Install Dependencies'
+
+          - script: |
+              echo "Running ESLint analysis..."
+              npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json 2>&1 || true
+              if [ -f eslint-report.json ]; then
+                ESLINT_COUNT=$(jq 'length' eslint-report.json 2>/dev/null || echo '0')
+                ESLINT_ISSUE_COUNT=$(jq '[.[].messages[]] | length' eslint-report.json 2>/dev/null || echo '0')
+                echo "✓ ESLint: Analyzed $ESLINT_COUNT files, found $ESLINT_ISSUE_COUNT issues"
+              else
+                echo "⚠️ ESLint: No report generated"
+              fi
+            displayName: 'Run ESLint'
+            continueOnError: true
+
+          - script: |
+              echo "Running Prettier check..."
+              PRETTIER_OUTPUT=$(npx prettier --check src/ 2>&1 || true)
+              echo "$PRETTIER_OUTPUT" | tee prettier-report.txt
+              if echo "$PRETTIER_OUTPUT" | grep -q 'file'; then
+                PRETTIER_ISSUE_COUNT=$(echo "$PRETTIER_OUTPUT" | grep -c 'file' || echo '0')
+                echo "✓ Prettier: Found $PRETTIER_ISSUE_COUNT formatting issues"
+              else
+                echo "✓ Prettier: All files formatted correctly"
+              fi
+            displayName: 'Run Prettier Check'
+            continueOnError: true
+
+          - script: |
+              set -euo pipefail
+              REPORT_DIR="$(Build.ArtifactStagingDirectory)/lint-reports"
+              mkdir -p "$REPORT_DIR"
+              SUMMARY_FILE="$REPORT_DIR/lint-summary.txt"
+              
+              {
+                echo "=== JavaScript Lint Report Summary ==="
+                echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                echo ""
+              } > "$SUMMARY_FILE"
+              
+              if [ -f "$(System.DefaultWorkingDirectory)/eslint-report.json" ]; then
+                cp "$(System.DefaultWorkingDirectory)/eslint-report.json" "$REPORT_DIR/"
+                ESLINT_COUNT=$(jq 'length' "$REPORT_DIR/eslint-report.json" 2>/dev/null || echo '0')
+                ESLINT_ISSUE_COUNT=$(jq '[.[].messages[]] | length' "$REPORT_DIR/eslint-report.json" 2>/dev/null || echo '0')
+                {
+                  echo "ESLint Results:"
+                  echo "  Files Analyzed: $ESLINT_COUNT"
+                  echo "  Total Issues: $ESLINT_ISSUE_COUNT"
+                  echo ""
+                } >> "$SUMMARY_FILE"
+              else
+                echo "  ESLint: No report generated (check npm dependencies or src/ path)" >> "$SUMMARY_FILE"
+                echo "" >> "$SUMMARY_FILE"
+              fi
+              
+              if [ -f "$(System.DefaultWorkingDirectory)/prettier-report.txt" ]; then
+                cp "$(System.DefaultWorkingDirectory)/prettier-report.txt" "$REPORT_DIR/"
+                PRETTIER_ISSUE_COUNT=$(grep -c 'file' "$REPORT_DIR/prettier-report.txt" 2>/dev/null || echo '0')
+                {
+                  echo "Prettier Results:"
+                  echo "  Formatting Issues: $PRETTIER_ISSUE_COUNT"
+                  echo ""
+                } >> "$SUMMARY_FILE"
+              else
+                echo "  Prettier: No report generated" >> "$SUMMARY_FILE"
+                echo "" >> "$SUMMARY_FILE"
+              fi
+              
+              FILE_COUNT=$(find "$REPORT_DIR" -type f \( -name 'eslint-report.json' -o -name 'prettier-report.txt' \) | wc -l)
+              if [ "$FILE_COUNT" -eq 0 ]; then
+                {
+                  echo "⚠️ Lint Report Status: No lint reports were generated."
+                  echo "Possible Causes:"
+                  echo "  - Dependencies may not have installed correctly"
+                  echo "  - Source directory (src/) may be empty or inaccessible"
+                  echo "  - ESLint/Prettier may have encountered a fatal error"
+                  echo ""
+                  echo "Action: Check build logs for npm install errors."
+                } >> "$SUMMARY_FILE"
+              else
+                {
+                  echo "✓ Lint Report Status: Reports generated successfully"
+                } >> "$SUMMARY_FILE"
+              fi
+            displayName: 'Stage and Summarize Lint Reports'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Lint Reports'
+            condition: succeededOrFailed()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/lint-reports'
+              ArtifactName: 'lint-reports'
+              publishLocation: 'Container'
+
+      # -------- Job 2: SAST Scanning --------
+      - job: SecurityScanning
+        displayName: 'Static Application Security Testing (SAST)'
+        condition: ${{ parameters.runSecurityChecks }}
+        steps:
+          - checkout: self
+
+          - script: |
+              echo "Installing dependency-check..."
+              set +e
+              ZIP_FILE="dependency-check-release.zip"
+              CANDIDATE_URLS=(
+                "https://github.com/jeremylong/DependencyCheck/releases/latest/download/dependency-check-release.zip"
+                "https://github.com/jeremylong/DependencyCheck_Home/releases/latest/download/dependency-check-release.zip"
+              )
+
+              DOWNLOADED="false"
+              for URL in "${CANDIDATE_URLS[@]}"; do
+                echo "Trying: $URL"
+                if curl -fsSL "$URL" -o "$ZIP_FILE"; then
+                  DOWNLOADED="true"
+                  break
+                fi
+              done
+
+              if [ "$DOWNLOADED" = "true" ]; then
+                unzip -oq "$ZIP_FILE"
+                if [ -x "$(pwd)/dependency-check/bin/dependency-check.sh" ]; then
+                  "$(pwd)/dependency-check/bin/dependency-check.sh" --version || true
+                else
+                  echo "dependency-check extracted but executable not found; will skip scan."
+                fi
+              else
+                echo "Dependency-Check download failed from all candidate URLs; scan step will be skipped."
+              fi
+            displayName: 'Setup Dependency-Check'
+            continueOnError: true
+
+          - script: |
+              REPORT_DIR="$(System.DefaultWorkingDirectory)/dependency-check-report"
+              mkdir -p "$REPORT_DIR"
+
+              if [ ! -x "$(pwd)/dependency-check/bin/dependency-check.sh" ]; then
+                echo "{\"status\":\"skipped\",\"reason\":\"dependency-check unavailable\"}" > "$(System.DefaultWorkingDirectory)/dependency-check-report.json"
+                echo "Dependency-Check not available; vulnerability scan skipped."
+                exit 0
+              fi
+
+              "$(pwd)/dependency-check/bin/dependency-check.sh" \
+                --scan "$(System.DefaultWorkingDirectory)" \
+                --format JSON \
+                --project "Sparklight Residential App" \
+                --out "$REPORT_DIR" || echo "Dependency check completed with warnings"
+
+              if [ -f "$REPORT_DIR/dependency-check-report.json" ]; then
+                cp "$REPORT_DIR/dependency-check-report.json" "$(System.DefaultWorkingDirectory)/dependency-check-report.json"
+              fi
+            displayName: 'Run Dependency Check (Vulnerability Scanning)'
+            continueOnError: true
+
+          - script: |
+              echo "Analyzing package.json for known vulnerabilities..."
+              npm audit --audit-level=moderate --json --package-lock-only > npm-audit-report.json || echo "npm audit completed with warnings"
+            displayName: 'Run npm Audit'
+            continueOnError: true
+
+          - script: |
+              if [ -f "npm-audit-report.json" ]; then
+                echo "=== NPM Audit Report ==="
+                cat npm-audit-report.json
+              fi
+              if [ -f "dependency-check-report.json" ]; then
+                echo "=== Dependency Check Report ==="
+                python3 -m json.tool dependency-check-report.json | head -50
+              fi
+            displayName: 'Display Security Reports'
+            continueOnError: true
+
+          - script: |
+              REPORT_DIR="$(Build.ArtifactStagingDirectory)/security-reports"
+              mkdir -p "$REPORT_DIR"
+
+              if [ -f "$(System.DefaultWorkingDirectory)/npm-audit-report.json" ]; then
+                cp "$(System.DefaultWorkingDirectory)/npm-audit-report.json" "$REPORT_DIR/"
+              fi
+
+              if [ -f "$(System.DefaultWorkingDirectory)/dependency-check-report.json" ]; then
+                cp "$(System.DefaultWorkingDirectory)/dependency-check-report.json" "$REPORT_DIR/"
+              fi
+
+              if [ -z "$(find "$REPORT_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+                echo "No security report files were generated." > "$REPORT_DIR/security-summary.txt"
+              fi
+            displayName: 'Stage Security Reports'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Security Reports'
+            condition: succeededOrFailed()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/security-reports'
+              ArtifactName: 'security-reports'
+              publishLocation: 'Container'
+
+      - job: RunIOSSecurityChecks
+        displayName: 'Run iOS Security and Lint Checks'
+        pool:
+          vmImage: 'macos-latest'
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: 'Install Node 20.6.1'
+            inputs:
+              versionSpec: '20.6.1'
+
+          - script: npm install --legacy-peer-deps
+            displayName: 'Install Dependencies'
+
+          - script: |
+              npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json || true
+            displayName: 'Run ESLint (iOS Path)'
+            continueOnError: true
+
+          - script: |
+              npx prettier --check src/ 2>&1 | tee prettier-report.txt || true
+            displayName: 'Run Prettier Check (iOS Path)'
+            continueOnError: true
+
+          - script: |
+              npm audit --audit-level=moderate --json --package-lock-only > npm-audit-report.json || true
+            displayName: 'Run npm Audit (iOS Path)'
+            continueOnError: true
+
+          - script: |
+              set -euo pipefail
+
+              LINT_DIR="$(Build.ArtifactStagingDirectory)/ios-lint-stage"
+              SEC_DIR="$(Build.ArtifactStagingDirectory)/ios-security-stage"
+              mkdir -p "$LINT_DIR" "$SEC_DIR"
+
+              if [ -f "$(System.DefaultWorkingDirectory)/eslint-report.json" ]; then
+                cp "$(System.DefaultWorkingDirectory)/eslint-report.json" "$LINT_DIR/"
+              fi
+
+              if [ -f "$(System.DefaultWorkingDirectory)/prettier-report.txt" ]; then
+                cp "$(System.DefaultWorkingDirectory)/prettier-report.txt" "$LINT_DIR/"
+              fi
+
+              if [ -f "$(System.DefaultWorkingDirectory)/npm-audit-report.json" ]; then
+                cp "$(System.DefaultWorkingDirectory)/npm-audit-report.json" "$SEC_DIR/"
+              fi
+
+              if [ -z "$(find "$LINT_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+                echo "No lint files." > "$LINT_DIR/lint-summary.txt"
+              fi
+
+              if [ -z "$(find "$SEC_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+                echo "No security files." > "$SEC_DIR/security-summary.txt"
+              fi
+            displayName: 'Stage iOS Security and Lint Reports'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish iOS Lint Stage Reports'
+            condition: succeededOrFailed()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-lint-stage'
+              ArtifactName: 'ios-lint-stage-reports'
+              publishLocation: 'Container'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish iOS Security Stage Reports'
+            condition: succeededOrFailed()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-security-stage'
+              ArtifactName: 'ios-security-stage-reports'
+              publishLocation: 'Container'
+
+      # -------- Job 3: Android Lint --------
+      - job: AndroidLint
+        displayName: 'Android Lint Checks'
+        steps:
+          - checkout: self
+
+          - task: JavaToolInstaller@0
+            displayName: 'Install JDK 17'
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          - script: |
+              set -euo pipefail
+              cd android
+              echo "Starting Android Lint for Demo Release variant..."
+              if ./gradlew lintDemoRelease --no-daemon 2>&1 | tee lint-build.log; then
+                echo "✓ Android Lint completed successfully"
+              else
+                echo "⚠️ Android Lint encountered issues (check detailed logs below)"
+              fi
+            displayName: 'Run Android Lint'
+            continueOnError: true
+
+          - script: |
+              set -euo pipefail
+              SOURCE_DIR="$(System.DefaultWorkingDirectory)/android/app/build/reports"
+              REPORT_DIR="$(Build.ArtifactStagingDirectory)/android-lint-reports"
+              mkdir -p "$REPORT_DIR"
+              SUMMARY_FILE="$REPORT_DIR/android-lint-summary.txt"
+              
+              {
+                echo "=== Android Lint Report Summary ==="
+                echo "Variant: demoRelease"
+                echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                echo ""
+              } > "$SUMMARY_FILE"
+              
+              if [ -d "$SOURCE_DIR" ]; then
+                echo "Source directory found: $SOURCE_DIR"
+                cp -R "$SOURCE_DIR"/. "$REPORT_DIR/" 2>/dev/null || true
+                
+                LINT_REPORT_COUNT=$(find "$REPORT_DIR" -name 'lint-results*.xml' -o -name 'lint-results*.html' | wc -l || echo '0')
+                {
+                  echo "Reports Generated: $LINT_REPORT_COUNT"
+                  echo ""
+                  if [ "$LINT_REPORT_COUNT" -gt 0 ]; then
+                    echo "Report Files:"
+                    find "$REPORT_DIR" -type f -name 'lint-results*' -exec ls -lh {} \; | awk '{print "  " $9 " (" $5 ")"}'
+                  fi
+                  echo ""
+                } >> "$SUMMARY_FILE"
+              else
+                echo "Source directory NOT found: $SOURCE_DIR" >> "$SUMMARY_FILE"
+              fi
+              
+              if [ -f "$(System.DefaultWorkingDirectory)/android/lint-build.log" ]; then
+                {
+                  echo "Build Log (last 50 lines):"
+                  tail -50 "$(System.DefaultWorkingDirectory)/android/lint-build.log" | sed 's/^/  /'
+                  echo ""
+                } >> "$SUMMARY_FILE"
+              fi
+              
+              if [ -z "$(find "$REPORT_DIR" -name 'lint-results*' -type f 2>/dev/null)" ]; then
+                {
+                  echo "⚠️ Lint Report Status: No lint result files were generated."
+                  echo ""
+                  echo "Possible Causes:"
+                  echo "  1. Gradle build may have failed before lint task"
+                  echo "  2. No lint issues detected (build succeeded silently)"
+                  echo "  3. Build configuration may not include lintOptions"
+                  echo "  4. Insufficient permissions or disk space"
+                  echo ""
+                  echo "Action: Check gradle build log above for detailed errors."
+                } >> "$SUMMARY_FILE"
+              else
+                {
+                  echo "✓ Lint Report Status: Report files generated successfully"
+                } >> "$SUMMARY_FILE"
+              fi
+            displayName: 'Stage and Summarize Android Lint Reports'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Android Lint Reports'
+            condition: succeededOrFailed()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/android-lint-reports'
+              ArtifactName: 'android-lint-reports'
+              publishLocation: 'Container'
+
+  # ==========================================
+  # STAGE 4: CODE REVIEW
+  # ==========================================
+
   - stage: Build
     displayName: 'Android Build'
-    dependsOn: InitialCommit
+    dependsOn: SecurityAndQuality
     condition: succeeded()
     jobs:
       - job: BuildAndroid
@@ -212,14 +664,15 @@ stages:
               publishLocation: 'Container'
 
   # ==========================================
-  # STAGE 1B: IOS BUILD (PARALLEL)
+  # STAGE 1B: iOS Build (Parallel)
   # ==========================================
-  - stage: IOSChecks
-    displayName: ' iOS Build'
-    dependsOn: InitialCommit
+
+  - stage: IOSBuild
+    displayName: 'iOS Build'
+    dependsOn: SecurityAndQuality
     condition: succeeded()
     jobs:
-      - job: RunIOSChecks
+      - job: RunIOSBuild
         displayName: 'Build iOS IPA (Xcode Archive)'
         pool:
           vmImage: 'macos-latest'
@@ -449,164 +902,48 @@ stages:
               publishLocation: 'Container'
 
   # ==========================================
-  # STAGE 2B: IOS UNIT TESTS
-  # ==========================================
-  - stage: IOSUnitTests
-    displayName: ' iOS Unit Tests'
-    dependsOn: IOSChecks
-    condition: succeeded()
-    jobs:
-      - job: RunIOSUnitTests
-        displayName: 'Execute iOS Unit Tests'
-        pool:
-          vmImage: 'macos-latest'
-        steps:
-          - checkout: self
-
-          - task: NodeTool@0
-            displayName: 'Install Node 20.6.1'
-            inputs:
-              versionSpec: '20.6.1'
-
-          - script: |
-              npm install --legacy-peer-deps
-              npm install --no-save --legacy-peer-deps jest-junit
-              npx update-browserslist-db@latest --yes || true
-            displayName: 'Install Dependencies'
-
-          - script: |
-              npx jest --ci --runInBand --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit
-            displayName: 'Run iOS Jest Test Cases'
-
-          - task: PublishTestResults@2
-            displayName: 'Publish iOS Test Results'
-            condition: succeededOrFailed()
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '**/junit.xml'
-              searchFolder: '$(System.DefaultWorkingDirectory)'
-              mergeTestResults: true
-              failTaskOnFailedTests: false
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish iOS Coverage Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(System.DefaultWorkingDirectory)/coverage'
-              ArtifactName: 'ios-coverage-reports-stage'
-              publishLocation: 'Container'
-
-  # ==========================================
-  # STAGE 3B: IOS SECURITY & CODE QUALITY
-  # ==========================================
-  - stage: IOSSecurityAndQuality
-    displayName: ' iOS Security & Code Quality'
-    dependsOn: IOSUnitTests
-    condition: succeeded()
-    jobs:
-      - job: RunIOSSecurityChecks
-        displayName: 'Run iOS Security and Lint Checks'
-        pool:
-          vmImage: 'macos-latest'
-        steps:
-          - checkout: self
-
-          - task: NodeTool@0
-            displayName: 'Install Node 20.6.1'
-            inputs:
-              versionSpec: '20.6.1'
-
-          - script: npm install --legacy-peer-deps
-            displayName: 'Install Dependencies'
-
-          - script: |
-              npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json || true
-            displayName: 'Run ESLint (iOS Path)'
-            continueOnError: true
-
-          - script: |
-              npx prettier --check src/ 2>&1 | tee prettier-report.txt || true
-            displayName: 'Run Prettier Check (iOS Path)'
-            continueOnError: true
-
-          - script: |
-              npm audit --audit-level=moderate --json --package-lock-only > npm-audit-report.json || true
-            displayName: 'Run npm Audit (iOS Path)'
-            continueOnError: true
-
-          - script: |
-              set -euo pipefail
-
-              LINT_DIR="$(Build.ArtifactStagingDirectory)/ios-lint-stage"
-              SEC_DIR="$(Build.ArtifactStagingDirectory)/ios-security-stage"
-              mkdir -p "$LINT_DIR" "$SEC_DIR"
-
-              if [ -f "$(System.DefaultWorkingDirectory)/eslint-report.json" ]; then
-                cp "$(System.DefaultWorkingDirectory)/eslint-report.json" "$LINT_DIR/"
-              fi
-
-              if [ -f "$(System.DefaultWorkingDirectory)/prettier-report.txt" ]; then
-                cp "$(System.DefaultWorkingDirectory)/prettier-report.txt" "$LINT_DIR/"
-              fi
-
-              if [ -f "$(System.DefaultWorkingDirectory)/npm-audit-report.json" ]; then
-                cp "$(System.DefaultWorkingDirectory)/npm-audit-report.json" "$SEC_DIR/"
-              fi
-
-              if [ -z "$(find "$LINT_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-                echo "No lint files." > "$LINT_DIR/lint-summary.txt"
-              fi
-
-              if [ -z "$(find "$SEC_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-                echo "No security files." > "$SEC_DIR/security-summary.txt"
-              fi
-            displayName: 'Stage iOS Security and Lint Reports'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish iOS Lint Stage Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-lint-stage'
-              ArtifactName: 'ios-lint-stage-reports'
-              publishLocation: 'Container'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish iOS Security Stage Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-security-stage'
-              ArtifactName: 'ios-security-stage-reports'
-              publishLocation: 'Container'
-
-  # ==========================================
-  # STAGE 4B: IOS CODE REVIEW
-  # ==========================================
-  - stage: IOSCodeReview
-    displayName: ' iOS Code Review'
-    dependsOn: IOSSecurityAndQuality
-    condition: succeeded()
-    jobs:
-      - job: IOSCodeReviewGates
-        displayName: 'iOS Code Review Quality Gates'
-        pool:
-          vmImage: 'macos-latest'
-        steps:
-          - checkout: self
-
-          - script: |
-              echo "=== iOS Code Review Checklist ==="
-              echo "✓ iOS Build: PASSED"
-              echo "✓ iOS Unit Tests: PASSED"
-              echo "✓ iOS Security & Lint: PASSED"
-              echo "Ready for iOS staging."
-            displayName: 'Review iOS Quality Gates'
-
-  # ==========================================
   # STAGE 5B: IOS STAGING
   # ==========================================
+
+  - stage: CodeReview
+    displayName: 'Code Review'
+    dependsOn:
+      - Build
+      - IOSBuild
+    condition: succeeded()
+    jobs:
+      - job: CodeReviewGates
+        displayName: 'Code Review Quality Gates'
+        steps:
+          - checkout: self
+
+          - script: |
+              echo "=== Code Review Checklist ==="
+              echo "✓ Build Stage: PASSED"
+              echo "✓ Unit Tests: PASSED"
+              echo "✓ Security Checks: PASSED"
+              echo "✓ Lint Quality Checks: PASSED"
+              echo "✓ Application-wide Test Cases: PASSED"
+              echo ""
+              echo "Ready for staging deployment."
+            displayName: 'Review Quality Gates'
+
+          - script: |
+              echo "Generating Build Report..."
+              echo "Build Version: $(androidVersionName)"
+              echo "Build Number: $(androidVersionCode)"
+              echo "Commit: $(Build.SourceVersion)"
+              echo "Branch: $(Build.SourceBranchName)"
+              echo "Timestamp: $(Build.StartTime)"
+            displayName: 'Generate Build Report'
+
+  # ==========================================
+  # STAGE 5: iOS Staging
+  # ==========================================
+
   - stage: IOSStaging
-    displayName: ' iOS Staging'
-    dependsOn: IOSCodeReview
+    displayName: 'iOS Staging'
+    dependsOn: CodeReview
     condition: succeeded()
     jobs:
       - job: PrepareIOSStaging
@@ -633,8 +970,43 @@ stages:
   # ==========================================
   # STAGE 6B: IOS TESTFLIGHT
   # ==========================================
+
+  - stage: AndroidStaging
+    displayName: 'Android Staging'
+    dependsOn: CodeReview
+    condition: succeeded()
+    jobs:
+      - job: PrepareAndroidStaging
+        displayName: 'Validate Android AAB for Staging'
+        steps:
+          - checkout: self
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Android Build Artifacts'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'android-build-$(androidVersionName)'
+              downloadPath: '$(Pipeline.Workspace)/android-aab'
+
+          - script: |
+              set -euo pipefail
+              AAB_PATH=$(find "$(Pipeline.Workspace)/android-aab" -type f -name "*.aab" | head -n 1)
+              if [ -z "$AAB_PATH" ]; then
+                echo "❌ No AAB found in android artifact"
+                find "$(Pipeline.Workspace)/android-aab" -maxdepth 5 || true
+                exit 1
+              fi
+              echo "✅ AAB validated for staging: $AAB_PATH"
+              ls -lh "$AAB_PATH"
+            displayName: 'Validate Android AAB artifact'
+
+  # ==========================================
+  # STAGE 6B: IOS TESTFLIGHT
+  # ==========================================
+
   - stage: IOSTestFlight
-    displayName: ' iOS TestFlight'
+    displayName: 'iOS TestFlight'
     dependsOn: IOSStaging
     condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo')))
     jobs:
@@ -773,417 +1145,10 @@ stages:
   # ==========================================
   # STAGE 2: UNIT TESTS
   # ==========================================
-  - stage: UnitTests
-    displayName: 'Unit Tests'
-    dependsOn: Build
-    condition: succeeded()
-    jobs:
-      - job: RunUnitTests
-        displayName: 'Execute Unit Tests'
-        steps:
-          - checkout: self
 
-          - task: JavaToolInstaller@0
-            displayName: 'Install JDK 17'
-            inputs:
-              versionSpec: '17'
-              jdkArchitectureOption: 'x64'
-              jdkSourceOption: 'PreInstalled'
-
-          - task: NodeTool@0
-            displayName: 'Install Node 20.6.1'
-            inputs:
-              versionSpec: '20.6.1'
-
-          - script: |
-              npm install --legacy-peer-deps
-              npm install --no-save --legacy-peer-deps jest-junit
-              npx update-browserslist-db@latest --yes || true
-            displayName: 'Install Dependencies'
-            workingDirectory: '.'
-
-          - script: |
-              echo "Running application-wide Jest test cases..."
-              npx jest --ci --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit
-            displayName: 'Run App-wide Jest Test Cases'
-            workingDirectory: '.'
-
-          - script: |
-              cd android
-              ./gradlew testDemoReleaseUnitTest --no-daemon
-            displayName: 'Run Android Unit Tests'
-
-          - script: |
-              node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
-            displayName: 'Enforce Coverage Gate'
-
-          - task: PublishTestResults@2
-            displayName: 'Publish Test Results'
-            condition: succeededOrFailed()
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '**/junit.xml,**/build/test-results/**/*.xml'
-              searchFolder: '$(System.DefaultWorkingDirectory)'
-              mergeTestResults: true
-              failTaskOnFailedTests: false
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Coverage Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(System.DefaultWorkingDirectory)/coverage'
-              ArtifactName: 'coverage-reports'
-              publishLocation: 'Container'
-
-  # ==========================================
-  # STAGE 3: SECURITY & CODE QUALITY
-  # ==========================================
-  - stage: SecurityAndQuality
-    displayName: 'Security & Code Quality'
-    dependsOn: UnitTests
-    condition: succeeded()
-    jobs:
-      # -------- Job 1: Lint Quality Checks --------
-      - job: LintQualityChecks
-        displayName: 'Lint Quality Checks'
-        steps:
-          - checkout: self
-
-          - task: NodeTool@0
-            displayName: 'Install Node'
-            inputs:
-              versionSpec: '20.6.1'
-
-          - script: |
-              npm install --legacy-peer-deps
-            displayName: 'Install Dependencies'
-
-          - script: |
-              echo "Running ESLint analysis..."
-              npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json 2>&1 || true
-              if [ -f eslint-report.json ]; then
-                ESLINT_COUNT=$(jq 'length' eslint-report.json 2>/dev/null || echo '0')
-                ESLINT_ISSUE_COUNT=$(jq '[.[].messages[]] | length' eslint-report.json 2>/dev/null || echo '0')
-                echo "✓ ESLint: Analyzed $ESLINT_COUNT files, found $ESLINT_ISSUE_COUNT issues"
-              else
-                echo "⚠️ ESLint: No report generated"
-              fi
-            displayName: 'Run ESLint'
-            continueOnError: true
-
-          - script: |
-              echo "Running Prettier check..."
-              PRETTIER_OUTPUT=$(npx prettier --check src/ 2>&1 || true)
-              echo "$PRETTIER_OUTPUT" | tee prettier-report.txt
-              if echo "$PRETTIER_OUTPUT" | grep -q 'file'; then
-                PRETTIER_ISSUE_COUNT=$(echo "$PRETTIER_OUTPUT" | grep -c 'file' || echo '0')
-                echo "✓ Prettier: Found $PRETTIER_ISSUE_COUNT formatting issues"
-              else
-                echo "✓ Prettier: All files formatted correctly"
-              fi
-            displayName: 'Run Prettier Check'
-            continueOnError: true
-
-          - script: |
-              set -euo pipefail
-              REPORT_DIR="$(Build.ArtifactStagingDirectory)/lint-reports"
-              mkdir -p "$REPORT_DIR"
-              SUMMARY_FILE="$REPORT_DIR/lint-summary.txt"
-              
-              {
-                echo "=== JavaScript Lint Report Summary ==="
-                echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-                echo ""
-              } > "$SUMMARY_FILE"
-              
-              if [ -f "$(System.DefaultWorkingDirectory)/eslint-report.json" ]; then
-                cp "$(System.DefaultWorkingDirectory)/eslint-report.json" "$REPORT_DIR/"
-                ESLINT_COUNT=$(jq 'length' "$REPORT_DIR/eslint-report.json" 2>/dev/null || echo '0')
-                ESLINT_ISSUE_COUNT=$(jq '[.[].messages[]] | length' "$REPORT_DIR/eslint-report.json" 2>/dev/null || echo '0')
-                {
-                  echo "ESLint Results:"
-                  echo "  Files Analyzed: $ESLINT_COUNT"
-                  echo "  Total Issues: $ESLINT_ISSUE_COUNT"
-                  echo ""
-                } >> "$SUMMARY_FILE"
-              else
-                echo "  ESLint: No report generated (check npm dependencies or src/ path)" >> "$SUMMARY_FILE"
-                echo "" >> "$SUMMARY_FILE"
-              fi
-              
-              if [ -f "$(System.DefaultWorkingDirectory)/prettier-report.txt" ]; then
-                cp "$(System.DefaultWorkingDirectory)/prettier-report.txt" "$REPORT_DIR/"
-                PRETTIER_ISSUE_COUNT=$(grep -c 'file' "$REPORT_DIR/prettier-report.txt" 2>/dev/null || echo '0')
-                {
-                  echo "Prettier Results:"
-                  echo "  Formatting Issues: $PRETTIER_ISSUE_COUNT"
-                  echo ""
-                } >> "$SUMMARY_FILE"
-              else
-                echo "  Prettier: No report generated" >> "$SUMMARY_FILE"
-                echo "" >> "$SUMMARY_FILE"
-              fi
-              
-              FILE_COUNT=$(find "$REPORT_DIR" -type f \( -name 'eslint-report.json' -o -name 'prettier-report.txt' \) | wc -l)
-              if [ "$FILE_COUNT" -eq 0 ]; then
-                {
-                  echo "⚠️ Lint Report Status: No lint reports were generated."
-                  echo "Possible Causes:"
-                  echo "  - Dependencies may not have installed correctly"
-                  echo "  - Source directory (src/) may be empty or inaccessible"
-                  echo "  - ESLint/Prettier may have encountered a fatal error"
-                  echo ""
-                  echo "Action: Check build logs for npm install errors."
-                } >> "$SUMMARY_FILE"
-              else
-                {
-                  echo "✓ Lint Report Status: Reports generated successfully"
-                } >> "$SUMMARY_FILE"
-              fi
-            displayName: 'Stage and Summarize Lint Reports'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Lint Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/lint-reports'
-              ArtifactName: 'lint-reports'
-              publishLocation: 'Container'
-
-      # -------- Job 2: SAST Scanning --------
-      - job: SecurityScanning
-        displayName: 'Static Application Security Testing (SAST)'
-        condition: ${{ parameters.runSecurityChecks }}
-        steps:
-          - checkout: self
-
-          - script: |
-              echo "Installing dependency-check..."
-              set +e
-              ZIP_FILE="dependency-check-release.zip"
-              CANDIDATE_URLS=(
-                "https://github.com/jeremylong/DependencyCheck/releases/latest/download/dependency-check-release.zip"
-                "https://github.com/jeremylong/DependencyCheck_Home/releases/latest/download/dependency-check-release.zip"
-              )
-
-              DOWNLOADED="false"
-              for URL in "${CANDIDATE_URLS[@]}"; do
-                echo "Trying: $URL"
-                if curl -fsSL "$URL" -o "$ZIP_FILE"; then
-                  DOWNLOADED="true"
-                  break
-                fi
-              done
-
-              if [ "$DOWNLOADED" = "true" ]; then
-                unzip -oq "$ZIP_FILE"
-                if [ -x "$(pwd)/dependency-check/bin/dependency-check.sh" ]; then
-                  "$(pwd)/dependency-check/bin/dependency-check.sh" --version || true
-                else
-                  echo "dependency-check extracted but executable not found; will skip scan."
-                fi
-              else
-                echo "Dependency-Check download failed from all candidate URLs; scan step will be skipped."
-              fi
-            displayName: 'Setup Dependency-Check'
-            continueOnError: true
-
-          - script: |
-              REPORT_DIR="$(System.DefaultWorkingDirectory)/dependency-check-report"
-              mkdir -p "$REPORT_DIR"
-
-              if [ ! -x "$(pwd)/dependency-check/bin/dependency-check.sh" ]; then
-                echo "{\"status\":\"skipped\",\"reason\":\"dependency-check unavailable\"}" > "$(System.DefaultWorkingDirectory)/dependency-check-report.json"
-                echo "Dependency-Check not available; vulnerability scan skipped."
-                exit 0
-              fi
-
-              "$(pwd)/dependency-check/bin/dependency-check.sh" \
-                --scan "$(System.DefaultWorkingDirectory)" \
-                --format JSON \
-                --project "Sparklight Residential App" \
-                --out "$REPORT_DIR" || echo "Dependency check completed with warnings"
-
-              if [ -f "$REPORT_DIR/dependency-check-report.json" ]; then
-                cp "$REPORT_DIR/dependency-check-report.json" "$(System.DefaultWorkingDirectory)/dependency-check-report.json"
-              fi
-            displayName: 'Run Dependency Check (Vulnerability Scanning)'
-            continueOnError: true
-
-          - script: |
-              echo "Analyzing package.json for known vulnerabilities..."
-              npm audit --audit-level=moderate --json --package-lock-only > npm-audit-report.json || echo "npm audit completed with warnings"
-            displayName: 'Run npm Audit'
-            continueOnError: true
-
-          - script: |
-              if [ -f "npm-audit-report.json" ]; then
-                echo "=== NPM Audit Report ==="
-                cat npm-audit-report.json
-              fi
-              if [ -f "dependency-check-report.json" ]; then
-                echo "=== Dependency Check Report ==="
-                python3 -m json.tool dependency-check-report.json | head -50
-              fi
-            displayName: 'Display Security Reports'
-            continueOnError: true
-
-          - script: |
-              REPORT_DIR="$(Build.ArtifactStagingDirectory)/security-reports"
-              mkdir -p "$REPORT_DIR"
-
-              if [ -f "$(System.DefaultWorkingDirectory)/npm-audit-report.json" ]; then
-                cp "$(System.DefaultWorkingDirectory)/npm-audit-report.json" "$REPORT_DIR/"
-              fi
-
-              if [ -f "$(System.DefaultWorkingDirectory)/dependency-check-report.json" ]; then
-                cp "$(System.DefaultWorkingDirectory)/dependency-check-report.json" "$REPORT_DIR/"
-              fi
-
-              if [ -z "$(find "$REPORT_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-                echo "No security report files were generated." > "$REPORT_DIR/security-summary.txt"
-              fi
-            displayName: 'Stage Security Reports'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Security Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/security-reports'
-              ArtifactName: 'security-reports'
-              publishLocation: 'Container'
-
-      # -------- Job 3: Android Lint --------
-      - job: AndroidLint
-        displayName: 'Android Lint Checks'
-        steps:
-          - checkout: self
-
-          - task: JavaToolInstaller@0
-            displayName: 'Install JDK 17'
-            inputs:
-              versionSpec: '17'
-              jdkArchitectureOption: 'x64'
-              jdkSourceOption: 'PreInstalled'
-
-          - script: |
-              set -euo pipefail
-              cd android
-              echo "Starting Android Lint for Demo Release variant..."
-              if ./gradlew lintDemoRelease --no-daemon 2>&1 | tee lint-build.log; then
-                echo "✓ Android Lint completed successfully"
-              else
-                echo "⚠️ Android Lint encountered issues (check detailed logs below)"
-              fi
-            displayName: 'Run Android Lint'
-            continueOnError: true
-
-          - script: |
-              set -euo pipefail
-              SOURCE_DIR="$(System.DefaultWorkingDirectory)/android/app/build/reports"
-              REPORT_DIR="$(Build.ArtifactStagingDirectory)/android-lint-reports"
-              mkdir -p "$REPORT_DIR"
-              SUMMARY_FILE="$REPORT_DIR/android-lint-summary.txt"
-              
-              {
-                echo "=== Android Lint Report Summary ==="
-                echo "Variant: demoRelease"
-                echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-                echo ""
-              } > "$SUMMARY_FILE"
-              
-              if [ -d "$SOURCE_DIR" ]; then
-                echo "Source directory found: $SOURCE_DIR"
-                cp -R "$SOURCE_DIR"/. "$REPORT_DIR/" 2>/dev/null || true
-                
-                LINT_REPORT_COUNT=$(find "$REPORT_DIR" -name 'lint-results*.xml' -o -name 'lint-results*.html' | wc -l || echo '0')
-                {
-                  echo "Reports Generated: $LINT_REPORT_COUNT"
-                  echo ""
-                  if [ "$LINT_REPORT_COUNT" -gt 0 ]; then
-                    echo "Report Files:"
-                    find "$REPORT_DIR" -type f -name 'lint-results*' -exec ls -lh {} \; | awk '{print "  " $9 " (" $5 ")"}'
-                  fi
-                  echo ""
-                } >> "$SUMMARY_FILE"
-              else
-                echo "Source directory NOT found: $SOURCE_DIR" >> "$SUMMARY_FILE"
-              fi
-              
-              if [ -f "$(System.DefaultWorkingDirectory)/android/lint-build.log" ]; then
-                {
-                  echo "Build Log (last 50 lines):"
-                  tail -50 "$(System.DefaultWorkingDirectory)/android/lint-build.log" | sed 's/^/  /'
-                  echo ""
-                } >> "$SUMMARY_FILE"
-              fi
-              
-              if [ -z "$(find "$REPORT_DIR" -name 'lint-results*' -type f 2>/dev/null)" ]; then
-                {
-                  echo "⚠️ Lint Report Status: No lint result files were generated."
-                  echo ""
-                  echo "Possible Causes:"
-                  echo "  1. Gradle build may have failed before lint task"
-                  echo "  2. No lint issues detected (build succeeded silently)"
-                  echo "  3. Build configuration may not include lintOptions"
-                  echo "  4. Insufficient permissions or disk space"
-                  echo ""
-                  echo "Action: Check gradle build log above for detailed errors."
-                } >> "$SUMMARY_FILE"
-              else
-                {
-                  echo "✓ Lint Report Status: Report files generated successfully"
-                } >> "$SUMMARY_FILE"
-              fi
-            displayName: 'Stage and Summarize Android Lint Reports'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish Android Lint Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/android-lint-reports'
-              ArtifactName: 'android-lint-reports'
-              publishLocation: 'Container'
-
-  # ==========================================
-  # STAGE 4: CODE REVIEW
-  # ==========================================
-  - stage: CodeReview
-    displayName: 'Code Review'
-    dependsOn: SecurityAndQuality
-    condition: succeeded()
-    jobs:
-      - job: CodeReviewGates
-        displayName: 'Code Review Quality Gates'
-        steps:
-          - checkout: self
-
-          - script: |
-              echo "=== Code Review Checklist ==="
-              echo "✓ Build Stage: PASSED"
-              echo "✓ Unit Tests: PASSED"
-              echo "✓ Security Checks: PASSED"
-              echo "✓ Lint Quality Checks: PASSED"
-              echo "✓ Application-wide Test Cases: PASSED"
-              echo ""
-              echo "Ready for staging deployment."
-            displayName: 'Review Quality Gates'
-
-          - script: |
-              echo "Generating Build Report..."
-              echo "Build Version: $(androidVersionName)"
-              echo "Build Number: $(androidVersionCode)"
-              echo "Commit: $(Build.SourceVersion)"
-              echo "Branch: $(Build.SourceBranchName)"
-              echo "Timestamp: $(Build.StartTime)"
-            displayName: 'Generate Build Report'
-
-  # ==========================================
-  # STAGE 5: INTERNAL TESTING DEPLOYMENT
-  # ==========================================
   - stage: InternalTestingDeployment
-    displayName: 'Internal Testing Deployment'
-    dependsOn: CodeReview
+    displayName: 'Internal Testing Android'
+    dependsOn: AndroidStaging
     condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo')))
     jobs:
       - job: DeployToInternalTesting
