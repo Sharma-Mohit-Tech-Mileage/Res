@@ -268,7 +268,7 @@ const Support = ({ route }) => {
                       <MenuText
                         style={[
                           styles.textTypoRight,
-                          { paddingVertical: Padding.p_xs, paddingHorizontal: Padding.p_base },
+                          { paddingVertical: Padding.p_xs, paddingHorizontal: Padding.p_5xl },
                         ]}
                       >
                         {"Sparklight Customer Support"}
@@ -308,6 +308,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     height: "100%",
+    width: "100%",
+    paddingLeft: Padding.p_5xl,
+    paddingRight: Padding.p_base,
   },
   textTypoRight: {
     lineHeight: 20,
@@ -316,7 +319,7 @@ const styles = StyleSheet.create({
     width: 24,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: Padding. p_13xl,
+    marginRight: 0,
   },
   frameChild: {
     paddingHorizontal: Padding.p_5xl,
@@ -330,7 +333,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   iconLeft: {
-    marginLeft: Padding.p_xs,
+    marginRight: Padding.p_3xs,
   },
   iconRight: {
     marginRight: Padding.p_5xs,
@@ -389,7 +392,7 @@ const styles = StyleSheet.create({
   },
   searchChild: {
     flex: 1,
-    paddingHorizontal: Padding.p_base,
+    paddingHorizontal: 0,
     paddingVertical: Padding.p_base,
   },
   search: {
