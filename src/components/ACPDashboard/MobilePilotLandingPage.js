@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import AppStyles from "../../styles/AppStyles";
 
 const DEFAULT_DATE_FORMAT = "MM/DD/YYYY";
 

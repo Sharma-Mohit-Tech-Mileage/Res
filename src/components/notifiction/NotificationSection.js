@@ -14,7 +14,7 @@ import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import AppStyles from "../../styles/AppStyles";
 import {SectionTitle,FieldContent, IndicatorText,BannerAlertText} from "../common/customui/Typography";
 import EditActionButton from "../common/customui/EditActionButton";
-
+import { A11y } from "react-native-a11y-order";
 const digitToWord = {
   0: "zero",
   1: "one",
@@ -223,20 +223,32 @@ const NotificationSection = ({
 
   return (
     <View style={[AppStyles.card,{marginBottom: Padding.p_base}]}>
-      <View style={styles.header}>
+      <A11y.Order style={styles.header}>
+        <A11y.Index index={0} >
+        <View
+          accessible={true}
+          accessibilityRole="header"
+          accessibilityLevel={2}
+          accessibilityLabel={editAccessibilityLabel}
+        >     
         <SectionTitle
           accessibilityRole="header"
           accessibilityLevel={2}
         >
           {title}
         </SectionTitle>
+        </View>
+        </A11y.Index>
+        <A11y.Index index={1} >
+      <View style={{flexDirection: "row", alignItems: "center"}}>
         {isComingSoon ? (
           <ComingSoonBadge />
         ) : (
           !isAdmin && <EditButton onPress={onEdit} isLoading={isLoading} accessibilityLabel={editAccessibilityLabel} />
         )}
       </View>
-
+     </A11y.Index>
+    </A11y.Order>
       {isAdmin && <AdminMessage />}
 
       {isLoading ? (

@@ -646,7 +646,7 @@ const styles = StyleSheet.create({
   },
   checkBoxArea: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     flexWrap: "wrap",
     width: "100%",
     minHeight: A11Y.minTouch,
@@ -670,10 +670,10 @@ const styles = StyleSheet.create({
   },
   checkboxTouchable: {
     flexDirection: "row",
-    alignItems: "center",
+   
     marginRight: 0,
-    minHeight: A11Y.minTouch,
-    paddingVertical: Padding.p_5xs,
+   
+    paddingVertical: Padding.p_9xs,
     marginLeft: 8,
   },
   termsLinkTouchable: {

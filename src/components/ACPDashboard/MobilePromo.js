@@ -6,6 +6,7 @@ import FeatureCard from "./FeatureCardMobile";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import Touchable from "../common/customui/Touchable";
+import AppStyles from "../../styles/AppStyles";
 
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
@@ -27,7 +28,7 @@ const MobilePromo = () => {
     return (
       <ImageBackground
         source={require("../../../assets/offer-banner-home.jpg")}
-        style={[styles.offerCard, isCompactMobile && styles.offerCardCompact]}
+        style={[ isCompactMobile && styles.offerCardCompact,AppStyles.card]}
         imageStyle={styles.offerCardImage}
         resizeMode="cover"
         accessible={false}

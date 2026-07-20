@@ -435,13 +435,11 @@ const styles = StyleSheet.create({
     width: "95%",
     marginTop: Padding.p_base,
   },
-  checkboxTouchable: {
+ checkboxTouchable: {
     flexDirection: "row",
-    alignItems: "center",
     marginRight: 0,
-    minHeight: A11Y.minTouch,
-    paddingVertical: Padding.p_5xs,
-    
+    paddingVertical: Padding.p_9xs,
+    marginLeft: 8,
   },
   termsLinkTouchable: {
     minHeight: A11Y.minTouch,
