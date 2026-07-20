@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import AppStyles from "../../styles/AppStyles";
 
 const DEFAULT_DATE_FORMAT = "MM/DD/YYYY";
 
@@ -245,7 +244,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderColor: "#353091",
     backgroundColor: "#F0F8FF",
-    borderRadius: Border.br_11xs,
+    borderRadius: Border.br_5xs,
     marginTop: 20,
     borderWidth: 1,
     marginBottom: 25,

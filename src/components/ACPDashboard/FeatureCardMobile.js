@@ -1,7 +1,8 @@
 // components/FeatureCard.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { FontFamily, FontSize, Color, Padding,Border } from "../../../GlobalStyles";
+import { FontFamily, FontSize, Color, Padding, Border } from "../../../GlobalStyles";
+import AppStyles from "../../styles/AppStyles";
 import Icon from "../common/Icon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../common/customui/Touchable";
@@ -37,7 +38,7 @@ const FeatureCardMobile = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[AppStyles.card, styles.container]}>
       <Text
         style={[styles.title, { color: "#393D40" }]}
         accessible={true}
@@ -95,6 +96,11 @@ const FeatureCardMobile = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.sparklightWhite,
+    borderTopWidth: 0,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: Border.br_5xs,
+    borderBottomRightRadius: Border.br_5xs,
   },
   header: {
     paddingHorizontal: Padding.p_base,

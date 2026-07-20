@@ -465,6 +465,7 @@ const TextNotifications = ({ navigation }) => {
                 name="billingOptOutStatus"
                 value={formatedData.billingOptOutStatus}
                 description="Receive text notifications for billing."
+                compactBottom={true}
                 onChange={handleToggleChange}
               />
 
@@ -582,9 +583,9 @@ const TextNotifications = ({ navigation }) => {
 };
 
 
-const NotificationSetting = ({ name, value, title, description, onChange }) => (
+const NotificationSetting = ({ name, value, title, description, onChange, compactBottom = false }) => (
   <View style={[styles.frameContainer]}>
-    <View style={styles.frameView}>
+    <View style={[styles.frameView, compactBottom && styles.frameViewCompactBottom]}>
       <View style={styles.rowContent}>
         <View style={styles.textWrap}>
           <View style={styles.titleRow}>
@@ -606,7 +607,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
             />
           </View>
           <SectionContent
-            style={[ styles.descriptionText]}
+            style={[styles.descriptionText, compactBottom && styles.descriptionTextCompactBottom]}
             accessible={false}
             importantForAccessibility="no"
           >
@@ -835,6 +836,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xl,
     width: "100%",
   },
+  frameViewCompactBottom: {
+    paddingBottom: 0,
+  },
   frameContainer: {
     
     flexDirection: "row",
@@ -850,6 +854,9 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginBottom: Padding.p_9xs,
   },
+  descriptionTextCompactBottom: {
+    marginBottom: 0,
+  },
   receiveAppNotifications1: {
     lineHeight: 22,
   },frameBorder: {
@@ -861,4 +868,5 @@ const styles = StyleSheet.create({
 });
 
 export default TextNotifications;
+
 

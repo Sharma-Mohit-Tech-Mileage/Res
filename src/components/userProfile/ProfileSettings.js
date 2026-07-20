@@ -538,9 +538,9 @@ const ProfileSettings = () => {
                 // Show reconnect message, no link
                 Platform.OS === "android" ? (
                   <View style={{ marginTop: 20 }}>
-                    <Text style={styles.manageSerTxt1}>
+                    <FieldContent style={styles.manageSerTxt1}>
                       To reconnect your service, please call us at{" "}
-                      <Text
+                      <FieldContent
                         style={styles.manageSerTxt2}
                         onPress={() => makeCall("833-807-1020")}
                         accessibilityRole="link"
@@ -548,16 +548,16 @@ const ProfileSettings = () => {
                         accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
                         <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
-                        <Text
+                        <FieldContent
                           style={styles.manageSerTxt3}
                           accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                           accessible={true}
                           importantForAccessibility="yes"
                         >
                           {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                        </Text>
-                      </Text>
-                    </Text>
+                        </FieldContent>
+                      </FieldContent>
+                    </FieldContent>
                   </View>
                 ) : (
                   <View
@@ -568,10 +568,10 @@ const ProfileSettings = () => {
                       marginTop: 20,
                     }}
                   >
-                    <Text style={styles.manageSerTxt1}>
+                    <FieldContent style={styles.manageSerTxt1}>
                       To reconnect your service, please call us at{" "}
-                    </Text>
-                    <Text
+                    </FieldContent>
+                    <FieldContent
                       style={styles.manageSerTxt2}
                       onPress={() => makeCall("833-807-1020")}
                       accessibilityRole="link"
@@ -579,22 +579,22 @@ const ProfileSettings = () => {
                       accessibilityHint="Double tap to call customer service 833 807 1020"
                     >
                       <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
-                      <Text
+                      <FieldContent
                         style={styles.manageSerTxt3}
                         accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                       >
                         {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                      </Text>
-                    </Text>
+                      </FieldContent>
+                    </FieldContent>
                   </View>
                 )
               ) : (
                 <>
                   {Platform.OS === "android" ? (
                     <View style={{ marginTop: 20 }}>
-                      <Text style={styles.manageSerTxt1}>
+                      <FieldContent style={styles.manageSerTxt1}>
                         To cancel or change service, please call us at{" "}
-                        <Text
+                        <FieldContent
                           style={styles.manageSerTxt2}
                           onPress={() => makeCall("833-807-1020")}
                           accessibilityRole="link"
@@ -602,16 +602,16 @@ const ProfileSettings = () => {
                           accessibilityHint="Double tap to call customer service 833 807 1020"
                         >
                           <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
-                          <Text
+                          <FieldContent
                             style={styles.manageSerTxt3}
                             accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                             accessible={true}
                             importantForAccessibility="yes"
                           >
                             {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                          </Text>
-                        </Text>
-                      </Text>
+                          </FieldContent>
+                        </FieldContent>
+                      </FieldContent>
                     </View>
                   ) : (
                     <View
@@ -622,10 +622,10 @@ const ProfileSettings = () => {
                         marginTop: 20,
                       }}
                     >
-                      <Text style={styles.manageSerTxt1}>
+                      <FieldContent style={styles.manageSerTxt1}>
                         To cancel or change service, please call us at{" "}
-                      </Text>
-                      <Text
+                      </FieldContent>
+                      <FieldContent
                         style={styles.manageSerTxt2}
                         onPress={() => makeCall("833-807-1020")}
                         accessibilityRole="link"
@@ -633,13 +633,13 @@ const ProfileSettings = () => {
                         accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
                         <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
-                        <Text
+                        <FieldContent
                           style={styles.manageSerTxt3}
                           accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                         >
                           {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                        </Text>
-                      </Text>
+                        </FieldContent>
+                      </FieldContent>
                     </View>
                   )}
                 </>
@@ -798,27 +798,18 @@ const styles = StyleSheet.create({
     marginTop: -15,
   },
   manageSerTxt1: {
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "400",
-    fontSize: FontSize.size_base,
     textAlign: "left",
-    color: "#000000",
+    lineHeight: 20,
     marginTop: 5,
   },
   manageSerTxt2: {
-    fontFamily: FontFamily.openSansSemiBold,
-    color: Color.colorMidnightblue,
-    fontWeight: "700",
-    fontSize: FontSize.size_base,
+    lineHeight: 20,
   },
   phoneLinkText: {
     textDecorationLine: "underline",
   },
   manageSerTxt3: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    color: Color.colorGray_100,
-    fontWeight: "400",
+    lineHeight: 20,
   },
 });
 
