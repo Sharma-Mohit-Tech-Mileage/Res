@@ -99,7 +99,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     borderTopLeftRadius: 0,
     borderTopRightRadius: 0,
-    marginTop: -19,
+    borderBottomLeftRadius: Border.br_5xs,
+    borderBottomRightRadius: Border.br_5xs,
   },
   header: {
     paddingHorizontal: Padding.p_base,

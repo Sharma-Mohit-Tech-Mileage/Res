@@ -1,5 +1,12 @@
 import React from "react";
-import { View, StyleSheet, ImageBackground, Linking, Text, useWindowDimensions } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ImageBackground,
+  Linking,
+  Text,
+  useWindowDimensions,
+} from "react-native";
 import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
 import { card } from "../../styles/utilities";
 import FeatureCard from "./FeatureCardMobile";
@@ -28,15 +35,23 @@ const MobilePromo = () => {
     return (
       <ImageBackground
         source={require("../../../assets/offer-banner-home.jpg")}
-        style={[ isCompactMobile && styles.offerCardCompact,AppStyles.card]}
-        imageStyle={styles.offerCardImage}
+        style={[isCompactMobile && styles.offerCardCompact, AppStyles.card]}
+        imageStyle={[AppStyles.card, styles.offerCardImage]}
         resizeMode="cover"
         accessible={false}
         importantForAccessibility="no"
       >
-        <View style={[styles.offerContent, isCompactMobile && styles.offerContentCompact]}>
+        <View
+          style={[
+            styles.offerContent,
+            isCompactMobile && styles.offerContentCompact,
+          ]}
+        >
           <Text
-            style={[styles.offerEyebrow, isCompactMobile && styles.offerEyebrowCompact]}
+            style={[
+              styles.offerEyebrow,
+              isCompactMobile && styles.offerEyebrowCompact,
+            ]}
             accessible={true}
             accessibilityLabel="Sparklight Internet plus Mobile"
             maxFontSizeMultiplier={1.2}
@@ -46,7 +61,10 @@ const MobilePromo = () => {
             Mobile
           </Text>
           <Text
-            style={[styles.offerHeadline, isCompactMobile && styles.offerHeadlineCompact]}
+            style={[
+              styles.offerHeadline,
+              isCompactMobile && styles.offerHeadlineCompact,
+            ]}
             accessible={true}
             accessibilityRole="header"
             accessibilityLabel="SAVE with FREE Unlimited Mobile for 1 year"
@@ -57,7 +75,10 @@ const MobilePromo = () => {
           <Touchable
             minSize={0}
             onPress={handleAddMobile}
-            style={[styles.offerButton, isCompactMobile && styles.offerButtonCompact]}
+            style={[
+              styles.offerButton,
+              isCompactMobile && styles.offerButtonCompact,
+            ]}
             accessibilityRole="button"
             accessibilityLabel="Get Offer"
           >
@@ -67,71 +88,76 @@ const MobilePromo = () => {
       </ImageBackground>
     );
   };
-  
 
   return (
     <>
-    <View style={[card.elevated, styles.container]}>
-      {showSparklightMobile ? renderOfferBanner() : (
-        <>
-      <View style={styles.imageContainer}>
-         <ImageBackground
-          source={PromoImage}
-          resizeMode="cover"
-          style={styles.promoImage}
-          imageStyle={styles.promoImageBackground}
-          accessible={false}
-          importantForAccessibility="no"
-        >
-          <View style={styles.promoHeadingOverlay}>
-            <Text
-              accessible={true}
-              accessibilityRole="header"
-              accessibilityLabel="Plan starting at $ 15 per month"
-              accessibilityLevel={2}
-              style={styles.promoHeadingAccessibilityText}
-            >
-              Plan starting at $ 15 per month
-            </Text>
-          </View>
-        </ImageBackground>
+      <View style={[AppStyles.card, styles.container]}>
+        {showSparklightMobile ? (
+          renderOfferBanner()
+        ) : (
+          <>
+            <View style={[styles.imageContainer]}>
+              <ImageBackground
+                source={PromoImage}
+                resizeMode="cover"
+                style={styles.promoImage}
+                imageStyle={styles.promoImageBackground}
+                accessible={false}
+                importantForAccessibility="no"
+              >
+                <View style={styles.promoHeadingOverlay}>
+                  <Text
+                    accessible={true}
+                    accessibilityRole="header"
+                    accessibilityLabel="Plan starting at $ 15 per month"
+                    accessibilityLevel={2}
+                    style={styles.promoHeadingAccessibilityText}
+                  >
+                    Plan starting at $ 15 per month
+                  </Text>
+                </View>
+              </ImageBackground>
+            </View>
+
+            <FeatureCard
+              isLoading={false}
+              title="Paperless Billing"
+              features={[
+                "Reliable 5G National Coverage",
+                "Unlimited Talk & Text",
+                "No Annual Contracts",
+                "Easy to Switch, Keep Your Number",
+              ]}
+              buttonText="Add Sparklight Mobile"
+              buttonVariant="primary"
+              isActive={true}
+              onButtonPress={handleAddMobile}
+            />
+          </>
+        )}
       </View>
-      
-      <FeatureCard
-        isLoading={false}
-        title="Paperless Billing"
-        features={[
-          "Reliable 5G National Coverage",
-          "Unlimited Talk & Text",
-          "No Annual Contracts",
-          "Easy to Switch, Keep Your Number",
-        ]}
-        buttonText="Add Sparklight Mobile"
-        buttonVariant="primary"
-        isActive={true}
-        onButtonPress={handleAddMobile}
-      /> 
-      </>)}
-    </View>
-    {showSparklightMobile && <Text style={[styles.offerDesclaimer]}
-              accessible={true}
-              accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
-              maxFontSizeMultiplier={1.2}>
-             *Offer not available for FlexConnect or LIFT customers. Certain taxes & fees do not apply.
-            </Text>}
-      </>
+      {showSparklightMobile && (
+        <Text
+          style={[styles.offerDesclaimer]}
+          accessible={true}
+          accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
+          maxFontSizeMultiplier={1.2}
+        >
+          *Offer not available for FlexConnect or LIFT customers. Certain taxes
+          & fees do not apply.
+        </Text>
+      )}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
     marginHorizontal: 8,
   },
   imageContainer: {
     alignSelf: "center",
     overflow: "hidden",
-    marginBottom: 20,
     width: "100%",
     // Cap at native asset width (326px) so iPad never upscales/blurs.
     maxWidth: 326,
@@ -141,6 +167,7 @@ const styles = StyleSheet.create({
     maxWidth: 326,
     alignSelf: "center",
     aspectRatio: 1.1,
+   
   },
   promoImageBackground: {
     resizeMode: "cover",

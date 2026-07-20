@@ -469,7 +469,7 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
       style={styles.container}
     >
-      {showChatIcon && (
+      {(showChatIcon && !isMobilePilotEnabled ) && (
         <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
           <ZendeskChatIcon />
         </View>
