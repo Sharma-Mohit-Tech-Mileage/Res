@@ -40,6 +40,7 @@ import {
   FieldContent,
   Hyperlink,
 } from "../common/customui/Typography";
+import { A11y } from "react-native-a11y-order";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -351,18 +352,13 @@ const ProfileSettings = () => {
                   </SkeletonPlaceholder>
                 ) : (
                   emailAddress && (
-                    <View
-                      style={styles.editableRow}
-                      accessible={false}
-                      importantForAccessibility="no"
-                    >
-                      <View
-                        style={[
+                    <A11y.Order style={styles.editableRow}>
+                      <A11y.Index index={0} style={[
                           styles.editableContent,
                           { marginBottom: Padding.p_9xs },
-                        ]}
-                        accessible={false}
-                        importantForAccessibility="no"
+                        ]}>
+                      <View
+                        
                       >
                         <FieldTitle
                           style={styles.firstName}
@@ -372,6 +368,7 @@ const ProfileSettings = () => {
                         >
                           Email Address
                         </FieldTitle>
+                    
                         <FieldContent
                           style={[styles.melissa, styles.melissaTypo]}
                           accessible={true}
@@ -383,15 +380,19 @@ const ProfileSettings = () => {
                           {emailAddress || "N/A"}
                         </FieldContent>
                       </View>
+                      </A11y.Index>
+                      <A11y.Index index={1}>
                       <Touchable
                         style={styles.editButton}
                         onPress={() => handleArrowPress("email")}
+                        accessibilityRole="button"
                         accessibilityLabel="Edit email address"
                         accessibilityHint="Double tap to edit your email address"
                       >
                         <EditIcon />
                       </Touchable>
-                    </View>
+                      </A11y.Index>
+                    </A11y.Order>
                   )
                 )}
 
@@ -401,18 +402,13 @@ const ProfileSettings = () => {
                   </SkeletonPlaceholder>
                 ) : (
                   phoneNumber && (
-                    <View
-                      style={[styles.editableRow,{ marginBottom: Padding.p_9xs }]}
-                      accessible={false}
-                      importantForAccessibility="no"
-                    >
+                    <A11y.Order style={[styles.editableRow, { marginBottom: Padding.p_9xs }]}> 
+                      <A11y.Index index={0}>
                       <View
                         style={[
                           styles.editableContent,
                           { marginBottom: Padding.p_9xs },
                         ]}
-                        accessible={false}
-                        importantForAccessibility="no"
                       >
                         <FieldTitle
                           style={styles.firstName}
@@ -438,15 +434,20 @@ const ProfileSettings = () => {
                           {phoneNumber || "N/A"}
                         </FieldContent>
                       </View>
+                      </A11y.Index>
+                      <A11y.Index index={1}>
                       <Touchable
                         style={styles.editButton}
                         onPress={() => handleArrowPress("mobile")}
+                        accessibilityRole="button"
                         accessibilityLabel="Edit mobile number"
                         accessibilityHint="Double tap to edit your mobile number"
                       >
                         <EditIcon />
                       </Touchable>
-                    </View>
+
+                    </A11y.Index>
+                    </A11y.Order>
                   )
                 )}
               </View>
