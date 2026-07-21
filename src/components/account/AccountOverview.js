@@ -224,7 +224,7 @@ const AccountOverview = () => {
                         {item.name}
                       </MenuText>
                       {/* Chevron/Arrow icon */}
-                      <View style={[{ marginLeft: 10 }, styles.rightIconLayout]}>
+                        <View style={styles.rightIconLayout}>
                           <RightIcon />
                           </View>
                     </Touchable>
@@ -360,7 +360,8 @@ const styles = StyleSheet.create({
   rightIconLayout: {
     height: 24,
     width: 24,
-    marginTop:12
+    justifyContent: "center",
+    alignItems: "center",
   },
   leftIconLayout: {
     height: 28,
@@ -423,6 +424,7 @@ const styles = StyleSheet.create({
   rightActionableGroup: {
     paddingVertical: Padding.p_base,
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: Padding.p_5xl,
   },
   frameChild: {

@@ -3,10 +3,6 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  Linking,
-  Platform,
-  Text,
-  RefreshControl,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useSelector } from "react-redux";
@@ -21,16 +17,9 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { useAnnouncement } from '../../hooks/useAnnouncement';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
-import {
-  startChatWithConfig,
-  startChat,
-} from "../utility/RNZendeskChat";
-import base64 from "react-native-base64";
+
 import CustomerErrorPage from "../utility/SystemErrorPopup";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 import RighIcon from "../../../assets/svgs/Chevonright";
 import Searchmd from "../../../assets/svgs/Searchmd";
@@ -262,6 +251,7 @@ const Support = ({ route }) => {
                         justifyContent: "space-between",
                         alignItems: "center",
                         width: "100%",
+                        paddingRight: Padding.p_5xl,
                         marginTop: Padding.p_3xs,
                       }}
                     >
@@ -310,7 +300,7 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
     paddingLeft: Padding.p_5xl,
-    paddingRight: Padding.p_base,
+    paddingRight: Padding.p_5xl,
   },
   textTypoRight: {
     lineHeight: 20,
@@ -320,7 +310,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginRight: 0,
-  },
+  }, 
   frameChild: {
     paddingHorizontal: Padding.p_5xl,
     height: 1,
