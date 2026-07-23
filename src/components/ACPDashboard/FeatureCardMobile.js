@@ -38,7 +38,7 @@ const FeatureCardMobile = ({
   };
 
   return (
-    <View style={[AppStyles.card, styles.container]}>
+    <View style={[styles.container]}>
       <Text
         style={[styles.title, { color: "#393D40" }]}
         accessible={true}

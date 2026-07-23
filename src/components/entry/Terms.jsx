@@ -36,20 +36,20 @@ const Terms = ({ navigation }) => {
   // fetch push/SMS via the services directly — awaiting the saga dispatch resolves before the data lands in redux
   const runFetch = () => {
     const promise = (async () => {
-      // const [pushRes, smsRes] = await Promise.allSettled([
-      //   fetchPushNotifications(),
-      //   fetchSmsSubscription(),
-      // ]);
-      // if (pushRes.status === "fulfilled") {
-      //   dataRef.current.push = pushRes.value;
-      //   dispatch(savePushNotifications(pushRes.value));
-      // }
-      // if (smsRes.status === "fulfilled") {
-      //   dataRef.current.sms = smsRes.value;
-      //   dispatch(saveSMSSelection(smsRes.value));
-      // }
-      // fetchDoneRef.current =
-      //   pushRes.status === "fulfilled" && smsRes.status === "fulfilled";
+      const [pushRes, smsRes] = await Promise.allSettled([
+        fetchPushNotifications(),
+        fetchSmsSubscription(),
+      ]);
+      if (pushRes.status === "fulfilled") {
+        dataRef.current.push = pushRes.value;
+        dispatch(savePushNotifications(pushRes.value));
+      }
+      if (smsRes.status === "fulfilled") {
+        dataRef.current.sms = smsRes.value;
+        dispatch(saveSMSSelection(smsRes.value));
+      }
+      fetchDoneRef.current =
+        pushRes.status === "fulfilled" && smsRes.status === "fulfilled";
       return fetchDoneRef.current;
     })();
     fetchPromiseRef.current = promise;
