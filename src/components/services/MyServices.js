@@ -169,6 +169,8 @@ const MyServicesContent = ({ route }) => {
           onCloseNotification={handleCloseNotification}
           hasUserInitiatedCheck={hasUserInitiatedCheck}
         />
+
+        <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
       </ScrollView>
     </View>
   );

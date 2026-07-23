@@ -173,6 +173,8 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
     borderTopLeftRadius: Border.br_5xs,
     borderTopRightRadius: Border.br_5xs,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   promoHeadingOverlay: {
     position: "absolute",

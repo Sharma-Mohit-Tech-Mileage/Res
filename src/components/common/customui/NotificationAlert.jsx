@@ -622,7 +622,7 @@ const NotificationAlert = ({
        
         <View 
           ref={contentRef}
-          style={[styles.content, contentStyle]}
+          style={[styles.content, !showCloseIcon && styles.contentNoClose]}
           accessible={false}
           importantForAccessibility="yes"
         >
@@ -691,8 +691,10 @@ const NotificationAlert = ({
 const styles = StyleSheet.create({
   outer: {
     position: "relative",
+    width: "100%",
   },
   container: {
+    flex: 1,
     flexDirection: "row",
     padding: 16,
     borderWidth: 1,
@@ -702,7 +704,7 @@ const styles = StyleSheet.create({
   },
   iconWrapper: {
     marginTop: 1,
-    marginEnd: 10,
+    marginEnd: 4,
   },
   iconWithoutTitle: {
     marginTop: 10,
@@ -711,6 +713,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     paddingRight: 32,
+  },
+    contentNoClose: {
+    paddingRight: 0,
   },
   title: {
     fontSize: FontSize.size_base,
