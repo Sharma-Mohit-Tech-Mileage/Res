@@ -347,7 +347,7 @@ const TextNotifications = ({ navigation }) => {
               <Animated.View
                 style={{
                   transform: [{ translateY }],
-                  paddingHorizontal: Padding.p_5xl,
+                  paddingHorizontal: Padding.p_xs,
                 }}
                 accessible={false}
                 importantForAccessibility="no"

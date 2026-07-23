@@ -385,6 +385,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: 5,
+    marginRight: 24,
   },
   passwordFlexBox: {
     textAlign: "left",

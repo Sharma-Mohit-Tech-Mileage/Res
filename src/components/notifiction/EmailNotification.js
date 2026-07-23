@@ -300,7 +300,7 @@ const AddNotificationScreen = () => {
               <Animated.View
                 style={{
                   transform: [{ translateY }],
-                  paddingHorizontal: Padding.p_5xl,
+                  paddingHorizontal: Padding.p_xs,
                 }}
                 accessible={false}
                 importantForAccessibility="no"
@@ -320,7 +320,7 @@ const AddNotificationScreen = () => {
               </Animated.View>
             )}
            {
-            <View style={{ paddingHorizontal: Padding.p_5xl }}>
+            <View style={{ paddingHorizontal: Padding.p_xs }}>
               <NotificationAlert
                 type="warning"
                 title={!isEnrolled ? "Critical Notifications" : undefined}
