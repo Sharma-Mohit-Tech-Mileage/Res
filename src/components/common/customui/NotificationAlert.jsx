@@ -59,7 +59,7 @@ const TYPE_CONFIG = {
   },
   warning: {
     backgroundColor: "#FFFAEB",
-    borderColor: "#DD6D02",
+    borderColor: "#F88700",
     iconColor: Color.sparkLightInfo,
     textColor: "#000000",
     titleColor: "#000000",

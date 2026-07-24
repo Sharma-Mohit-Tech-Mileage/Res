@@ -9,7 +9,7 @@ const Alerttriangle= (props) => (
     {...props}
   >
     <Path
-      stroke="#EF4E3E"
+      stroke="#F88700"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

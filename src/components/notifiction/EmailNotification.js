@@ -341,9 +341,6 @@ const AddNotificationScreen = () => {
             <View
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
-              {isEnrolled && (
-                <SectionTitle style={styles.instructions}>{"Edit Email Address"}</SectionTitle>
-              )}
               <SectionContent style={styles.instructions}>
                 {!isEnrolled
                   ? "Please enter your email address below and stay connected with us."
