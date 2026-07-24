@@ -351,13 +351,14 @@ const AddNotificationScreen = () => {
               </SectionContent>
 
               <HintText
-               style={{marginTop: 8, marginBottom: 4}}
+               style={styles.requiredFieldsText}
                   accessibilityRole="text" 
                   accessible={true}
                   accessibilityLabel="Fields marked with asterisk are required.">
                 {" "}
                 Fields marked with * are required.
               </HintText>
+              <View style={styles.section}></View>
               <Controller
                 control={control}
                 name="email"
@@ -696,6 +697,10 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexWrap: "wrap",
   },
+    section: {
+    paddingHorizontal: Padding.p_5xl,
+    paddingVertical: Padding.p_5xs,
+  },
   errorText: {
     marginLeft: 8,
     color: "red",
@@ -705,6 +710,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     flexDirection: "row",
     alignItems: "center",
+  },
+   requiredFieldsText: {
+    textAlign: "left",
   },
 });
 
