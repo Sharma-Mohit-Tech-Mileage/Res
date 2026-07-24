@@ -433,8 +433,9 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
   },
   alertContainer: {
-    paddingHorizontal: Padding.p_5xl,
-    paddingTop: Padding.p_base,
+    paddingHorizontal: Padding.p_xs,
+    paddingTop: Padding.p_9xs,
+    alignSelf: "center",
     width: "100%",
   },
   divider: {

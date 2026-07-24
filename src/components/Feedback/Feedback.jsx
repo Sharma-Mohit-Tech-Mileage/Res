@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, findNodeHandle } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
@@ -52,6 +52,7 @@ const Feedback = () => {
   const announcementTimerRef = useRef(null);
   const emailFieldRef = useRef(null);
   const feedbackTextRef = useRef(null);
+  const surveyErrorRef = useRef(null);
 
   const {
     control,
@@ -95,6 +96,27 @@ const Feedback = () => {
       emailFieldRef.current?.focus();
     }
   };
+
+  useEffect(() => {
+    if (!errors.cosentContactUs && !isError) {
+      return;
+    }
+
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+
+    const timer = setTimeout(() => {
+      const handle = findNodeHandle(surveyErrorRef.current);
+      if (handle) {
+        AccessibilityInfo.setAccessibilityFocus(handle);
+      }
+
+      AccessibilityInfo.announceForAccessibility(
+        errors.cosentContactUs?.message || "Please choose Yes or No to contact you."
+      );
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [errors.cosentContactUs, isError]);
 
   const handleRatingSelect = (option) => {
     if (isSubmittingRef.current) return;
@@ -380,6 +402,7 @@ const Feedback = () => {
               </Radio.Group>
               {(isError || errors.cosentContactUs) && (
                 <View
+                  ref={surveyErrorRef}
                   style={styles.errorContainer}
                   accessible={true}
                   accessibilityLabel="Please choose Yes or No to contact you."

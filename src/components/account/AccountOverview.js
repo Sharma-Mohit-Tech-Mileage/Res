@@ -20,7 +20,7 @@ import { logout } from 'react-native-app-auth';
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import Config from "react-native-config";
-import { MenuText, HeadingH1 } from "../common/customui/Typography";
+import { MenuText, HeadingH1,Hyperlink } from "../common/customui/Typography";
 import AppStyles from "../../styles/AppStyles";
 
 import PrimaryButton from "../common/customui/PrimaryButton";
@@ -251,9 +251,9 @@ const AccountOverview = () => {
                   style={[styles.footerLink, styles.buttonsSpaceBlock]}
                   onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
                 >
-                  <Text accessibilityLabel="Privacy Policy" style={styles.linkStyle}>
+                  <Hyperlink accessibilityLabel="Privacy Policy" >
                     Privacy Policy
-                  </Text>
+                  </Hyperlink>
                 </Touchable>
 
                 <Text style={styles.separator} accessible={false}> | </Text>
@@ -266,9 +266,9 @@ const AccountOverview = () => {
                   style={[styles.footerLink, styles.buttonsSpaceBlock]}
                   onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://business.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}
                 >
-                  <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle}>
+                  <Hyperlink accessibilityLabel="Terms & Conditions" >
                     Terms & Conditions
-                  </Text>
+                  </Hyperlink>
                 </Touchable>
               </View>
 
@@ -281,9 +281,9 @@ const AccountOverview = () => {
               hitSlop={A11Y.hitSlop}
                 style={[styles.footerLink, styles.buttonsSpaceBlock]}
             >
-              <Text style={{ color: Color.sparklightBrightPurple, alignSelf: 'center', textDecorationLine: 'underline',fontWeight: '600' }}>
-                Version:{VersionCheck.getCurrentVersion()}
-              </Text>
+              <Hyperlink >
+                Version: {VersionCheck.getCurrentVersion()}
+              </Hyperlink>
             </Touchable>
             <Text style={styles.copyright}>
                 {`©${moment().year()} Cable One, Inc. All rights reserved.`}
@@ -344,6 +344,7 @@ const styles = StyleSheet.create({
   separator: {
     color: Color.sparklightBrightPurple,
     alignSelf: 'center',
+    fontFamily: FontFamily.RadioCanadaBold,
     fontWeight: '600'
   },
   makePaymentTypo: {

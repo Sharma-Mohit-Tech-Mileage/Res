@@ -59,7 +59,7 @@ const TYPE_CONFIG = {
   },
   warning: {
     backgroundColor: "#FFFAEB",
-    borderColor: "#DD6D02",
+    borderColor: "#F88700",
     iconColor: Color.sparkLightInfo,
     textColor: "#000000",
     titleColor: "#000000",
@@ -234,6 +234,8 @@ const NotificationAlert = ({
   autoFocusTitle = false,
   splitKey = "",
   iconRef = null,
+  iconComponent = null,
+  iconColor = null,
   contentStyle = {},
 }) => {
   const dispatch = useDispatch();
@@ -247,7 +249,7 @@ const NotificationAlert = ({
   const internalIconRef = useRef(null);
   
   const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
-  const IconComponent = config.IconComponent;
+  const IconComponent = iconComponent || config.IconComponent;
 
 
   // Aggressively force focus to the success icon on Android after alert is visible
@@ -614,7 +616,7 @@ const NotificationAlert = ({
           <IconComponent
             width={24}
             height={24}
-            color={config.iconColor}
+            color={iconColor || config.iconColor}
             accessible={false}
           />
         </View>
