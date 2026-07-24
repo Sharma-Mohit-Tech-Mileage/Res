@@ -441,9 +441,7 @@ const TextNotifications = ({ navigation }) => {
               </HintText>
             </View>
 
-            <View
-              style={{ marginHorizontal: 20, paddingVertical: Padding.p_base }}
-            >
+            <View style={styles.section}>
               <Controller
                 control={control}
                 name="phoneNumber"
@@ -900,6 +898,10 @@ const styles = StyleSheet.create({
   descriptionText: {
     marginTop: 0,
     marginBottom: Padding.p_9xs,
+  },
+  section: {
+    paddingHorizontal: Padding.p_5xl,
+    paddingVertical: Padding.p_5xl,
   },
   descriptionTextCompactBottom: {
     marginBottom: 0,

@@ -213,7 +213,6 @@ const styles = StyleSheet.create({
   container: serviceCard.container,
    card: {
     ...AppStyles.card,
-    overflow: "hidden",
   },
   cardSpacing: {
     marginHorizontal: 16,
