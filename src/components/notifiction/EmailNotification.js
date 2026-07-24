@@ -24,6 +24,7 @@ import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import { A11y } from "react-native-a11y-order";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import AppStyles from "../../styles/AppStyles";
+import Alerttriangle from "../../res/svgIcons/AlertIcon";
 import {
   HintText,
   IndicatorText,
@@ -331,6 +332,8 @@ const AddNotificationScreen = () => {
                 }
                 showCloseIcon={false}
                 isVisible={true}
+                iconComponent={Alerttriangle}
+                iconColor="#F88700"
                 accessibilityLabel="Important: By providing your email address, you're signing up for critical notifications"
                 accessibilityLiveRegion="polite"
                 accessibilityRole="alert"
@@ -454,6 +457,8 @@ const AddNotificationScreen = () => {
                 }
                 showCloseIcon={false}
                 isVisible={true}
+                iconComponent={Alerttriangle}
+                iconColor="#F88700"
                 accessibilityLabel="By deactivating paperless billing, you will be charged a $3 paper statement fee where legally permitted."
                 accessibilityLiveRegion="polite"
                 accessibilityRole="alert"

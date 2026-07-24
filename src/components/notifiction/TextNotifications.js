@@ -40,6 +40,7 @@ import {
 
 import Toggle from "../common/Toggle";
 import AlertIcon from "../../../assets/svgs/Alerttriangle";
+import Alerttriangle from "../../res/svgIcons/AlertIcon";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -408,6 +409,8 @@ const TextNotifications = ({ navigation }) => {
                   message={message1}
                   showCloseIcon={false}
                   isVisible={true}
+                  iconComponent={Alerttriangle}
+                  iconColor="#F88700"
                   accessibilityLabel={
                     formatedData?.phoneNumber
                       ? "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply."
