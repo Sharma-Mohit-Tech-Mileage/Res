@@ -15,9 +15,9 @@ export const NavigationUtils = {
   checkTextNotificationNeeded: (profile) => {
     if (!profile?.smsSubscription?.length) 
       return true;
-    const phoneNum = profile.smsSubscription[0].phoneNum;
-    
-    return !(phoneNum && (phoneNum.length === 10 || phoneNum.length === 11));
+    // normalize to digits so numeric or formatted values ("(555) 123-4567") still count as valid
+    const digits = String(profile.smsSubscription[0].phoneNum ?? "").replace(/\D/g, "");
+    return !(digits.length === 10 || digits.length === 11);
   },
 
 
@@ -69,6 +69,7 @@ export const NavigationUtils = {
           break;
           
         case 'email':
+          return 'EntryEmailNotifications';
           if (isAdmin) continue;
           
           const needsEmail = await NavigationUtils.checkEmailNotificationNeeded(accountNumber);

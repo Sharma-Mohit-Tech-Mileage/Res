@@ -114,8 +114,8 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode 460
-        versionName "27.1.0"
+        versionCode 478
+        versionName "28.0.1"
     }
 
 
@@ -199,5 +199,12 @@ dependencies {
     }
 }
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+// Force the browser library to 1.8.0 to resolve AGP 8.9.1 / SDK 36 requirement conflict
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.browser:browser:1.8.0'
+    }
+}
 
 //apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

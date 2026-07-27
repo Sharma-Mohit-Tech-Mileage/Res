@@ -7,10 +7,11 @@ import {
   Linking,
   AccessibilityInfo,
 } from "react-native";
-import { FontFamily, Border } from "../../../GlobalStyles";
+import { FontFamily, Border, Color, Padding } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "./customui/Touchable";
+import { A11Y } from "../../styles/theme";
 
 export const ErrorType = {
   NETWORK_ERROR: "NETWORK_ERROR",
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "700",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: colors.black,
     marginLeft: 8,
   },
@@ -262,7 +263,7 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 14,
     lineHeight: 20,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: colors.darkest_grey,
     marginBottom: 20,
     textAlign: "center",
@@ -276,16 +277,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   button: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-    alignItems: "center",
+    alignSelf: "stretch",
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: Padding.p_base,
+    borderRadius: Border.br_81xl, // Adjust as needed
+    minHeight: A11Y.minTouch,
+    justifyContent: "center",
   },
   primaryButton: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   secondaryButton: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: 'transparent',
   },
   buttonSpacing: {
     marginTop: 8,
@@ -293,13 +296,16 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: "600",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaBold,
   },
   primaryButtonText: {
     color: colors.snow_white,
+    
   },
   secondaryButtonText: {
-    color: colors.sparklight_purple_blue,
+    color: Color.sparklightPrimaryPurple,
+    textDecorationLine: "underline",
+    FontFamily: FontFamily.RadioCanadaBold,
   },
 });
 

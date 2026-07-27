@@ -18,6 +18,7 @@ import UsageChart from "./components/UsageChart";
 import ManageEquipmentCard from "./components/ManageEquipmentCard";
 import EeroPromoCard from "./components/EeroPromoCard";
 import { useDataUsage } from "../hooks/useDataUsage";
+import AppStyles from "../../../styles/AppStyles";
 
 const DataUsageContent = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();

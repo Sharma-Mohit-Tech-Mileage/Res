@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, AccessibilityInfo, findNodeHandle, Image } from
 import { theme } from '../../styles/theme';
 import { typography } from '../../styles/utilities';
 import Touchable from '../common/customui/Touchable';
+import { Hyperlink } from '../common/customui/Typography';
 
 const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, onLearnMoreNavigate }) => {
   const titleRef = useRef(null);
@@ -51,9 +52,9 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, onLearnMor
             accessibilityRole="link"
             accessibilityLabel={link.text || 'Learn more'}
           >
-            <Text style={styles.learnMoreText}>
+            <Hyperlink >
               {link.text || 'Learn more'}
-            </Text>
+            </Hyperlink>
           </Touchable>
         ))}
       </View>

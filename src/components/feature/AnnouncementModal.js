@@ -7,6 +7,8 @@ import { theme } from '../../styles/theme';
 import { button } from '../../styles/utilities';
 import { trackStepViewed } from '../../utils/announcementHelpers';
 import Touchable from '../common/customui/Touchable';
+import{Hyperlink} from '../common/customui/Typography';
+import PrimaryButton from '../common/customui/PrimaryButton';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -155,14 +157,14 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
             <LinearGradient
               colors={['#8D3B90', '#353091']}
               start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+              end={{ x: 1.3, y: 0}}
               style={styles.newFeatureBadge}
             >
               <Text style={styles.badgeText}>NEW FEATURE</Text>
             </LinearGradient>
 
             <Touchable onPress={handleSkip} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }} minSize={0}>
-              <Text style={styles.skipText}>Skip</Text>
+              <Hyperlink>Skip</Hyperlink>
             </Touchable>
           </View>
 
@@ -184,16 +186,17 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
 
             <View style={styles.actions}>
               {currentStep > 0 && (
-                <Touchable minSize={0} style={styles.buttonSecondary} onPress={handleBack}>
-                  <Text style={styles.buttonSecondaryText}>Back</Text>
-                </Touchable>
+                <PrimaryButton
+                  title="Back"
+                  onPress={handleBack}
+                  buttonType="cancel"
+                />
               )}
-
-              <Touchable minSize={0} style={styles.buttonPrimary} onPress={handleNext}>
-                <Text style={styles.buttonPrimaryText}>
-                  {isLastStep ? 'Got it' : 'Next'}
-                </Text>
-              </Touchable>
+              <PrimaryButton
+                title={isLastStep ? 'Got it' : 'Next'}
+                onPress={handleNext}
+                buttonType="submit"
+              />
             </View>
           </View>
         </View>

@@ -15,13 +15,11 @@
 		5AA4F6F9711A10F5FF37F603 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 54FB1A3F0D81553C57C22FFA /* PrivacyInfo.xcprivacy */; };
 		6CE6FB97BEE719BE45FCBBF4 /* Pods_My_Sparklight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20538EB60AA90B60C171A757 /* Pods_My_Sparklight.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		9160E9BE2B1E3DEE0023F6E0 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9160E9BB2B1E3DEE0023F6E0 /* OpenSans-Bold.ttf */; };
 		9183127E2BD2FDD100204633 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9183127D2BD2FDD100204633 /* GoogleService-Info.plist */; };
-		9185016F2B30B0130048F5A3 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9185016E2B30B0130048F5A3 /* OpenSans-Regular.ttf */; };
-		918501702B30B0130048F5A3 /* OpenSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9185016E2B30B0130048F5A3 /* OpenSans-Regular.ttf */; };
-		918501722B30B78E0048F5A3 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 918501712B30B78E0048F5A3 /* OpenSans-Bold.ttf */; };
-		918501742B30B8A60048F5A3 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 918501732B30B8A60048F5A3 /* Inter-Bold.ttf */; };
-		918501762B30B8C70048F5A3 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 918501752B30B8C70048F5A3 /* Inter-SemiBold.ttf */; };
+		91861BE32FF61F4800B09C86 /* RadioCanada-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91861BE22FF61F4800B09C86 /* RadioCanada-SemiBold.ttf */; };
+		91861BE42FF61F4800B09C86 /* RadioCanada-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91861BDF2FF61F4800B09C86 /* RadioCanada-Bold.ttf */; };
+		91861BE52FF61F4800B09C86 /* RadioCanada-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91861BE02FF61F4800B09C86 /* RadioCanada-Medium.ttf */; };
+		91861BE62FF61F4800B09C86 /* RadioCanada-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 91861BE12FF61F4800B09C86 /* RadioCanada-Regular.ttf */; };
 		91B8AF6B2F4CB4CA0076FD56 /* Config.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 91B8AF6A2F4CB4CA0076FD56 /* Config.xcconfig */; };
 		91F2150F2CE700540069587B /* RNZendeskChatModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 91F2150E2CE700540069587B /* RNZendeskChatModule.m */; };
 		F84EF25C0615014D8DBBB823 /* Pods_My_Sparklight_My_SparklightTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B7DA79E4D51D8CD31E27B89 /* Pods_My_Sparklight_My_SparklightTests.framework */; };
@@ -61,14 +59,13 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Sparklight/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-Sparklight-SparklightTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sparklight-SparklightTests.release.xcconfig"; path = "Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests.release.xcconfig"; sourceTree = "<group>"; };
 		910951722B01E11E003F4BF8 /* Sparklight.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Sparklight.entitlements; path = Sparklight/Sparklight.entitlements; sourceTree = "<group>"; };
-		9160E9BB2B1E3DEE0023F6E0 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Bold.ttf"; path = "../assets/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
 		917C28B42BAA5EA400A59A47 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9183127D2BD2FDD100204633 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		9183127F2BD2FDEF00204633 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		9185016E2B30B0130048F5A3 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Regular.ttf"; path = "../assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
-		918501712B30B78E0048F5A3 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Bold.ttf"; path = "../assets/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
-		918501732B30B8A60048F5A3 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Bold.ttf"; path = "../assets/fonts/Inter-Bold.ttf"; sourceTree = "<group>"; };
-		918501752B30B8C70048F5A3 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-SemiBold.ttf"; path = "../assets/fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		91861BDF2FF61F4800B09C86 /* RadioCanada-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RadioCanada-Bold.ttf"; sourceTree = "<group>"; };
+		91861BE02FF61F4800B09C86 /* RadioCanada-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RadioCanada-Medium.ttf"; sourceTree = "<group>"; };
+		91861BE12FF61F4800B09C86 /* RadioCanada-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RadioCanada-Regular.ttf"; sourceTree = "<group>"; };
+		91861BE22FF61F4800B09C86 /* RadioCanada-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RadioCanada-SemiBold.ttf"; sourceTree = "<group>"; };
 		91B8AF6A2F4CB4CA0076FD56 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		91F2150D2CE700540069587B /* RNZendeskChatModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNZendeskChatModule.h; sourceTree = "<group>"; };
 		91F2150E2CE700540069587B /* RNZendeskChatModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNZendeskChatModule.m; sourceTree = "<group>"; };
@@ -116,15 +113,14 @@
 		13B07FAE1A68108700A75B9A /* Sparklight */ = {
 			isa = PBXGroup;
 			children = (
-				918501732B30B8A60048F5A3 /* Inter-Bold.ttf */,
-				918501752B30B8C70048F5A3 /* Inter-SemiBold.ttf */,
-				918501712B30B78E0048F5A3 /* OpenSans-Bold.ttf */,
+				91861BDF2FF61F4800B09C86 /* RadioCanada-Bold.ttf */,
+				91861BE02FF61F4800B09C86 /* RadioCanada-Medium.ttf */,
+				91861BE12FF61F4800B09C86 /* RadioCanada-Regular.ttf */,
+				91861BE22FF61F4800B09C86 /* RadioCanada-SemiBold.ttf */,
 				917C28B42BAA5EA400A59A47 /* GoogleService-Info.plist */,
 				910951722B01E11E003F4BF8 /* Sparklight.entitlements */,
-				9185016E2B30B0130048F5A3 /* OpenSans-Regular.ttf */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
-				9160E9BB2B1E3DEE0023F6E0 /* OpenSans-Bold.ttf */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
@@ -294,7 +290,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				918501702B30B0130048F5A3 /* OpenSans-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,14 +298,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				9183127E2BD2FDD100204633 /* GoogleService-Info.plist in Resources */,
-				9185016F2B30B0130048F5A3 /* OpenSans-Regular.ttf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
-				918501722B30B78E0048F5A3 /* OpenSans-Bold.ttf in Resources */,
-				918501742B30B8A60048F5A3 /* Inter-Bold.ttf in Resources */,
-				918501762B30B8C70048F5A3 /* Inter-SemiBold.ttf in Resources */,
+				91861BE32FF61F4800B09C86 /* RadioCanada-SemiBold.ttf in Resources */,
+				91861BE42FF61F4800B09C86 /* RadioCanada-Bold.ttf in Resources */,
+				91861BE52FF61F4800B09C86 /* RadioCanada-Medium.ttf in Resources */,
+				91861BE62FF61F4800B09C86 /* RadioCanada-Regular.ttf in Resources */,
 				91B8AF6B2F4CB4CA0076FD56 /* Config.xcconfig in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				9160E9BE2B1E3DEE0023F6E0 /* OpenSans-Bold.ttf in Resources */,
 				5AA4F6F9711A10F5FF37F603 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

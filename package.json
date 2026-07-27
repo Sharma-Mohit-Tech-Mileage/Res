@@ -41,7 +41,7 @@
     "react-hook-form": "^7.49.2",
     "react-native": "0.77.2",
     "react-native-a11y-order": "^0.6.0",
-    "react-native-app-auth": "^7.2.0",
+    "react-native-app-auth": "7.2.0",
     "react-native-base64": "^0.2.1",
     "react-native-blob-util": "^0.23.2",
     "react-native-calendars": "^1.1312.1",

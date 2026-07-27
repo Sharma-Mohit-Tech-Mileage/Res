@@ -1,10 +1,12 @@
 // components/FeatureCard.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
+import { FontFamily, FontSize, Color, Padding, Border } from "../../../GlobalStyles";
+import AppStyles from "../../styles/AppStyles";
 import Icon from "../common/Icon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../common/customui/Touchable";
+import { A11Y } from "../../styles/theme";
 
 const FeatureCardMobile = ({
   title,
@@ -36,7 +38,7 @@ const FeatureCardMobile = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       <Text
         style={[styles.title, { color: "#393D40" }]}
         accessible={true}
@@ -94,6 +96,11 @@ const FeatureCardMobile = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.sparklightWhite,
+    borderTopWidth: 0,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: Border.br_5xs,
+    borderBottomRightRadius: Border.br_5xs,
   },
   header: {
     paddingHorizontal: Padding.p_base,
@@ -129,12 +136,13 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   button: {
+    alignSelf: "stretch",
     marginHorizontal: Padding.p_base,
-    marginBottom: 36,
-    marginTop: 16, // <-- Add this line for top spacing
-    paddingVertical: Padding.p_xs,
-    borderRadius: 4,
-    alignItems: "center",
+    marginBottom: 32,
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: Padding.p_base,
+    borderRadius: Border.br_81xl, // Adjust as needed
+    minHeight: A11Y.minTouch,
     justifyContent: "center",
   },
   buttonPrimary: {

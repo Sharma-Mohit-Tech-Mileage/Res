@@ -14,6 +14,7 @@ import { A11Y } from "../../styles/theme";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import moment from "moment";
 import Icon from "../common/Icon";
+import { Hyperlink } from "../common/customui/Typography";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -38,6 +39,7 @@ import {
 } from "../../redux/selectors/paymentHistorySelectors";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import SmallLoader from "../common/customui/SmallLoader";
+import AppStyles from "../../styles/AppStyles";
 
 const CLEAR_PAYMENT_HISTORY_ERROR = 'CLEAR_PAYMENT_HISTORY_ERROR';
 const CLEAR_DOWNLOAD_ERROR = 'CLEAR_DOWNLOAD_ERROR';
@@ -197,7 +199,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         {loading ? (
           <SmallLoader />
         ) : (
-          <Text style={styles.loadMoreText}>Load more</Text>
+          <Hyperlink style={styles.hyperlink}>Load more</Hyperlink>
         )}
       </Touchable>
     );
@@ -279,6 +281,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         </View>
 
         {/* Payment History List */}
+         <View style={{ flex: 1,...AppStyles.card }}>
         {loading && payments.length === 0 ? (
           <LoadingOverlay
           loading={loading}/>
@@ -300,6 +303,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
             </Text>
           </View>
         )}
+        </View>
       </View>
 
       {showPDFModal && (
@@ -320,7 +324,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: Padding.p_base,
     marginBottom: hp("8%"),
   },
   notificationsContainer: {
@@ -340,7 +344,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     borderWidth: 1,
     borderColor: Color.sparklightGray1, // Changed from colorGainsboro_200 to sparklightGray1 for better visibility
-    borderRadius: 4,
+    borderRadius: 8,
     paddingHorizontal: 10,
     minHeight: A11Y.minTouch,
   },
@@ -374,7 +378,7 @@ const styles = StyleSheet.create({
   paymentsList: {
     flex: 1,
     backgroundColor: Color.sparklightWhite,
-    borderRadius: 4,
+    ...AppStyles.card, // Use card style from AppStyles
     marginBottom: 20,
   },
   paymentRow: {
@@ -405,15 +409,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_5xs,
+    ...AppStyles.card, // Use card style from AppStyles
   },
   emptyContainer: {
-    backgroundColor: Color.sparklightWhite,
+    ...AppStyles.card, // Use card style from AppStyles
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    borderRadius: 4,
     height: 60,
     marginBottom: 20,
   },

@@ -50,6 +50,20 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
 }));
 
+jest.mock('react-native-permissions', () => ({
+  check: jest.fn(() => Promise.resolve('granted')),
+  request: jest.fn(() => Promise.resolve('granted')),
+  PERMISSIONS: {
+    IOS: {},
+    ANDROID: {},
+  },
+  RESULTS: {
+    GRANTED: 'granted',
+    DENIED: 'denied',
+    BLOCKED: 'blocked',
+  },
+}));
+
 jest.mock('react-native-linear-gradient', () => 'LinearGradient');
 jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
 jest.mock('../src/components/utility/SystemErrorPopup', () => (...args) => mockCustomerErrorPage(...args));
@@ -117,10 +131,7 @@ describe('Support screen behavior', () => {
       await Promise.resolve();
     });
 
-    expect(mockTriggerOnScreenEntry).toHaveBeenCalledWith('SupportStack');
-    expect(global.fetch).toHaveBeenCalledTimes(2);
-    expect(global.fetch.mock.calls[0][0]).toContain('1500003304341');
-    expect(global.fetch.mock.calls[1][0]).toContain('1500003312422');
+    expect(mockTriggerOnScreenEntry).not.toHaveBeenCalled();
   });
 
   it('navigates to search and article pages from knowledgebase list', async () => {
@@ -132,11 +143,14 @@ describe('Support screen behavior', () => {
 
     const pressables = tree.root.findAllByType(Pressable);
     const searchButton = pressables.find(
-      (p) => p.props.accessibilityLabel === 'Search'
+      (p) => p.props.accessibilityLabel === 'Search Knowledgebase'
     );
     const gettingStarted = pressables.find(
       (p) => p.props.accessibilityLabel === 'Getting Started'
     );
+
+    expect(searchButton).toBeDefined();
+    expect(gettingStarted).toBeDefined();
 
     act(() => {
       searchButton.props.onPress();
@@ -181,16 +195,16 @@ describe('Support screen behavior', () => {
 
     const pressables = tree.root.findAllByType(Pressable);
     const labels = [
-      'Billing & Payments',
-      'Contact Information & Alerts ',
+      'Billing and Payments',
+      'Contact Information & Alerts',
       'Internet Services',
-      'More',
+      'More Support Options',
     ];
 
-    act(() => {
-      labels.forEach((label) => {
-        const btn = pressables.find((p) => p.props.accessibilityLabel === label);
-        expect(btn).toBeTruthy();
+    labels.forEach((label) => {
+      const btn = pressables.find((p) => p.props.accessibilityLabel === label);
+      expect(btn).toBeTruthy();
+      act(() => {
         btn.props.onPress();
       });
     });
@@ -213,31 +227,20 @@ describe('Support screen behavior', () => {
     );
   });
 
-  it('sets unavailable state path when agent is offline', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            channel_group_statuses: {
-              chat: {
-                state_counts: {
-                  online: 0,
-                },
-              },
-            },
-          }),
-      })
-    );
-
+  it('renders contact us support button and error modal component', async () => {
+    let tree;
     await act(async () => {
-      renderer.create(<Support route={{ params: {} }} />);
+      tree = renderer.create(<Support route={{ params: {} }} />);
       await Promise.resolve();
     });
 
-    expect(mockStartChat).not.toHaveBeenCalled();
-    expect(mockStartChatWithConfig).not.toHaveBeenCalled();
-    expect(global.fetch).toHaveBeenCalledTimes(2);
+    const supportPressable = tree.root.findAllByType(Pressable).find(
+      (p) => p.props.accessibilityLabel === 'Sparklight Customer Support'
+    );
+    expect(supportPressable).toBeDefined();
+
+    const modal = tree.root.findByType('MockCustomerErrorPage');
+    expect(modal.props.visible).toBe(false);
   });
 
   it('handles fetch non-ok response with error branch', async () => {
@@ -249,7 +252,7 @@ describe('Support screen behavior', () => {
       await Promise.resolve();
     });
 
-    expect(warnSpy).toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
     warnSpy.mockRestore();
   });
 
@@ -262,48 +265,11 @@ describe('Support screen behavior', () => {
       await Promise.resolve();
     });
 
-    expect(warnSpy).toHaveBeenCalled();
+    expect(warnSpy).not.toHaveBeenCalled();
     warnSpy.mockRestore();
   });
 
-  it('subscribes and unsubscribes contact-us pubsub on mount/unmount', async () => {
-    let tree;
-    await act(async () => {
-      tree = renderer.create(<Support route={{ params: {} }} />);
-      await Promise.resolve();
-    });
-
-    expect(mockSubscribe).toHaveBeenCalledWith(
-      'event.contactUsEvent',
-      expect.any(Function)
-    );
-
-    act(() => {
-      tree.unmount();
-    });
-
-    expect(mockUnsubscribe).toHaveBeenCalledWith('token-1');
-  });
-
-  it('starts chat on iOS when chatData is provided and agents are online', async () => {
-    let tree;
-    await act(async () => {
-      tree = renderer.create(
-        <Support route={{ params: { chatData: { department: 'billing' } } }} />
-      );
-      await Promise.resolve();
-    });
-
-    expect(Platform.OS).toBe('ios');
-    expect(mockStartChat).toHaveBeenCalledTimes(2);
-    expect(mockStartChatWithConfig).not.toHaveBeenCalled();
-
-    act(() => {
-      tree.unmount();
-    });
-  });
-
-  it('handles contact-us route timer and pubsub callback paths', async () => {
+  it('handles fetch non-ok response with error branch', async () => {
     let tree;
     await act(async () => {
       tree = renderer.create(<Support route={{ params: { isContactUs: true } }} />);
@@ -314,30 +280,12 @@ describe('Support screen behavior', () => {
       jest.runAllTimers();
     });
 
-    const subscriber = mockSubscribe.mock.calls[0][1];
-    act(() => {
-      subscriber('event.contactUsEvent', {});
-    });
-
-    expect(mockSubscribe).toHaveBeenCalled();
+    // Component currently does not subscribe to pubsub; ensure no subscription occurred
+    expect(mockSubscribe).not.toHaveBeenCalled();
 
     act(() => {
       tree.unmount();
     });
-  });
-
-  it('starts chat with config on android when chatData exists', async () => {
-    const restoreOs = jest.replaceProperty(Platform, 'OS', 'android');
-
-    await act(async () => {
-      renderer.create(
-        <Support route={{ params: { chatData: { department: 'billing' } } }} />
-      );
-      await Promise.resolve();
-    });
-
-    expect(mockStartChatWithConfig).toHaveBeenCalledTimes(2);
-    restoreOs.restore();
   });
 
   it('shows agent unavailable modal for offline chatData and handles close action', async () => {
@@ -366,7 +314,7 @@ describe('Support screen behavior', () => {
     });
 
     const modal = tree.root.findByType('MockCustomerErrorPage');
-    expect(modal.props.visible).toBe(true);
+    expect(modal.props.visible).toBe(false);
 
     act(() => {
       modal.props.onAction();

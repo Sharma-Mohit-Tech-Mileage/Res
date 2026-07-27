@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF', // Example background color
         borderWidth: 1,
         borderColor: Color.sparklightGray, // Example border color
-        borderRadius: 1, // Example border radius
+        borderRadius: 8, // Example border radius
         height: 56, // Example height
         width: '90%'
     },

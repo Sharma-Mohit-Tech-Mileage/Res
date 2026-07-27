@@ -6,8 +6,7 @@ import { A11Y } from "../../styles/theme";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { requiredField } from "../../styles/utilities";
-import CheckBox from "@react-native-community/checkbox";
+import SparklightCheckBox from "../common/customui/SparklightCheckBox";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from "../common/Toggle";
 import SparkLightInput from "../common/customui/SparkLightInput";
@@ -23,6 +22,16 @@ import AlertIcon from "../../res/svgIcons/AlertIcon";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import { A11y } from "react-native-a11y-order";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
+import AppStyles from "../../styles/AppStyles";
+import Alerttriangle from "../../res/svgIcons/AlertIcon";
+import {
+  HintText,
+  IndicatorText,
+  SectionTitle,
+  SectionContent,
+  Hyperlink
+} from "../common/customui/Typography";
+
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({
@@ -51,6 +60,7 @@ const AddNotificationScreen = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const [paperlessStatus, setPaperlessStatus] = useState(true);
   const accountDetails = useSelector(
     (state) => state.profile?.accountDetails
   );
@@ -201,6 +211,7 @@ const AddNotificationScreen = () => {
     if (newValue.target.value === true) {
       setIsTermRequired(false);
     }
+    setPaperlessStatus(newValue.target.value);
   }, []);
 
   const handleSave = useCallback(
@@ -213,6 +224,7 @@ const AddNotificationScreen = () => {
         return;
       }
       setIsSubmitting(true);
+      setPaperlessStatus(true);
       dispatch(
         updatePrimaryAndPaperlessRequest(
           {
@@ -281,13 +293,14 @@ const AddNotificationScreen = () => {
         />
       )}
       <ScrollView ref={scrollViewRef}>
-        <View style={styles.frameContainer}>
+      
+        <View style={[AppStyles.card,{margin: Padding.p_base}]}>
           <View style={{ paddingVertical: 16 }}>
             {notification && (
               <Animated.View
                 style={{
                   transform: [{ translateY }],
-                  paddingHorizontal: Padding.p_5xl,
+                  paddingHorizontal: Padding.p_xs,
                 }}
                 accessible={false}
                 importantForAccessibility="no"
@@ -307,7 +320,7 @@ const AddNotificationScreen = () => {
               </Animated.View>
             )}
            {
-            <View style={{ paddingHorizontal: Padding.p_5xl }}>
+            <View style={{ paddingHorizontal: Padding.p_xs }}>
               <NotificationAlert
                 type="warning"
                 title={!isEnrolled ? "Critical Notifications" : undefined}
@@ -318,6 +331,8 @@ const AddNotificationScreen = () => {
                 }
                 showCloseIcon={false}
                 isVisible={true}
+                iconComponent={Alerttriangle}
+                iconColor="#F88700"
                 accessibilityLabel="Important: By providing your email address, you're signing up for critical notifications"
                 accessibilityLiveRegion="polite"
                 accessibilityRole="alert"
@@ -328,23 +343,21 @@ const AddNotificationScreen = () => {
             <View
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
-              {isEnrolled && (
-                <Text style={styles.instructions}>{"Edit Email Address"}</Text>
-              )}
-              <Text style={styles.instructions}>
+              <SectionContent style={styles.instructions}>
                 {!isEnrolled
                   ? "Please enter your email address below and stay connected with us."
                   : "Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
-              </Text>
+              </SectionContent>
 
-              <Text
-               style={requiredField}
+              <HintText
+               style={styles.requiredFieldsText}
                   accessibilityRole="text" 
                   accessible={true}
                   accessibilityLabel="Fields marked with asterisk are required.">
                 {" "}
                 Fields marked with * are required.
-              </Text>
+              </HintText>
+              <View style={styles.section}></View>
               <Controller
                 control={control}
                 name="email"
@@ -371,7 +384,7 @@ const AddNotificationScreen = () => {
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
               <View style={styles.toggleHeader}>
-                <Text style={styles.toggleTitle} accessibilityRole="text"
+                <SectionTitle accessibilityRole="text"
                 accessible={true}
                 accessibilityLabel={`Critical Notifications, ${
                 primaryEmail ? "enabled" : "disabled"
@@ -379,7 +392,7 @@ const AddNotificationScreen = () => {
                 accessibilityHint="Receive critical information, account changes, and service
                 updates.">
                   Critical Notifications
-                </Text>
+                </SectionTitle>
                 <View style={styles.iconContainer}>
                   <View style={styles.icon} accessible={false}>
                     {primaryEmail ? (
@@ -389,24 +402,23 @@ const AddNotificationScreen = () => {
                     )}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
-                  <Text style={styles.toggleStatus} accessible={false} importantForAccessibility="no">
+                  <IndicatorText style={styles.toggleStatus} accessible={false} importantForAccessibility="no">
                     {primaryEmail ? "On" : "Off"}
-                  </Text>
+                  </IndicatorText>
                 </View>
               </View>
-              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
+              <SectionContent style={{marginVertical: 8}} accessible={false} importantForAccessibility="no">
                 Receive critical information, account changes, and service
                 updates.
-              </Text>
+              </SectionContent>
             </View>
             <View style={styles.divider} />
             <A11y.Order
-              style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
+              style={[styles.section, { paddingHorizontal: Padding.p_5xl, paddingVertical: 0 }]}
             >
               <View style={styles.toggleHeader}>
-                <A11y.Index index={0} style={styles.toggleTitle}>
-                <Text
-                  style={[styles.toggleTitle]}
+                <A11y.Index index={0} >
+                <SectionTitle
                   accessible={true}
                   accessibilityRole="text"
                   accessibilityLabel="Paperless Billing for email notifications"
@@ -415,9 +427,9 @@ const AddNotificationScreen = () => {
                 fingertips."
                 >
                   Paperless Billing
-                </Text>
+                </SectionTitle>
                 </A11y.Index>
-                <View style={{ minWidth: A11Y.minTouch, minHeight: A11Y.minTouch }} accessible={false} importantForAccessibility="no">
+                <View  accessible={false} importantForAccessibility="no">
                   <A11y.Index index={1}>
                   <Toggle
                     name="paperlessBilling"
@@ -430,98 +442,90 @@ const AddNotificationScreen = () => {
                   </A11y.Index>
                 </View>
               </View>
-              <Text style={styles.toggleDescription} accessible={false} importantForAccessibility="no">
+              <SectionContent  accessible={false} importantForAccessibility="no">
                 Opt for email statements and say goodbye to paper clutter. It's
                 convenient, eco-friendly, and keeps your information at your
                 fingertips.
-              </Text>
+              </SectionContent>
+             { (!paperlessStatus ) && (
+              <View style={{ paddingVertical: Padding.p_5xs }}>
+              <NotificationAlert
+                type="warning"
+                title={undefined}
+                message={
+                  "By deactivating paperless billing, you will be charged a $3 paper statement fee where legally permitted."
+                }
+                showCloseIcon={false}
+                isVisible={true}
+                iconComponent={Alerttriangle}
+                iconColor="#F88700"
+                accessibilityLabel="By deactivating paperless billing, you will be charged a $3 paper statement fee where legally permitted."
+                accessibilityLiveRegion="polite"
+                accessibilityRole="alert"
+                customStyle={styles.warningAlert}
+              />
+            </View>
+              )}
             </A11y.Order>
-            {isCheckboxVisible && (
-              <View style={styles.checkBoxArea}>
-                <Touchable
-                  style={[styles.checkboxTouchable, { justifyContent: 'flex-start' }]}
-                  onPress={handleCheckboxToggle}
-                  accessibilityRole="checkbox"
-                  accessibilityLabel="I agree to Paperless Billing Terms and Conditions"
-                  accessibilityState={{ checked: toggleCheckBoxTerm }}
-                >
-                  <View style={styles.checkboxContainer}>
-                    <View
-                      pointerEvents="none"
-                      importantForAccessibility="no-hide-descendants"
-                    >
-                      <CheckBox
-                        disabled={true}
-                        value={toggleCheckBoxTerm}
-                        style={styles.checkBox}
-                        boxType="square"
-                        tintColor={
-                          isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
-                        }
-                        tintColors={{
-                          true: "#1B99FF",
-                          false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
-                        }}
-                        accessible={false}
-                        importantForAccessibility="no"
-                      />
-                    </View>
-                    <Text
-                      style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
-                      allowFontScaling={true}
-                      maxFontSizeMultiplier={1}
-                    >
-                      I agree to{" "}
-                    </Text>
-                  </View>
-                </Touchable>
-                <Touchable
-                  onPress={handleTermsLinkPress}
-                  accessibilityRole="link"
-                  accessibilityLabel="View Paperless Billing Terms and Conditions"
-                  accessibilityHint="Opens Paperless Billing Terms and Conditions in a new window"
-                  hitSlop={A11Y.hitSlop}
-                  style={styles.termsLinkTouchable}
-                >
-                  <Text
-                    style={[
-                      styles.checkBoxAreaViewText,
-                      {
-                        color: Color.sparklightBrightPurple,
-                        textDecorationLine: "underline",
-                      },
-                    ]}
-                    allowFontScaling={true}
-                    maxFontSizeMultiplier={1}
-                  >
-                    Paperless Billing Terms & Conditions
-                  </Text>
-                </Touchable>
-              </View>
-            )}
+           
+    {isCheckboxVisible && (
+      <View style={[styles.checkboxSection]}>
+          <View style={styles.checkBoxArea}>
+            <Touchable
+              style={styles.checkboxTouchable}
+              onPress={handleCheckboxToggle}
+              accessibilityRole="checkbox"
+              accessibilityLabel="I agree to Paperless Billing Terms and Conditions"
+              accessibilityState={{ checked: toggleCheckBoxTerm }}
+              minSize={0}
+            >
+              <SparklightCheckBox
+                disabled={true}
+                value={toggleCheckBoxTerm}
+                boxStyle={styles.checkBox}
+                accessible={false}
+                importantForAccessibility="no"
+              />
+            </Touchable>
+            <Text
+              style={[styles.checkBoxAreaViewText, styles.checkBoxTextWrapper]}
+              allowFontScaling={true}
+              maxFontSizeMultiplier={1}
+            >
+              I agree to{' '}
+              <Hyperlink
+                onPress={handleTermsLinkPress}
+                accessibilityRole="link"
+                accessibilityLabel="View Paperless Billing Terms and Conditions"
+                accessibilityHint="Opens Paperless Billing Terms and Conditions in a new window"
+                allowFontScaling={true}
+                maxFontSizeMultiplier={1}
+              >
+                Paperless Billing Terms & Conditions
+              </Hyperlink>
+            </Text>
           </View>
+        
+
+          {/* Add error message display */}
           {isTermRequired && (
             <View
-              style={{
-                flexDirection: "row",
-                marginHorizontal: Padding.p_5xl,
-                marginBottom: 16,
-              }}
+              style={styles.errorContainer}
+              accessible={true}
+              accessibilityRole="alert"
+              accessibilityLiveRegion="assertive"
+              accessibilityLabel="Error: Please agree to the Terms and Conditions to proceed"
             >
-              <View
-                style={{
-                  flexDirection: "row",
-
-                  alignItems: "center",
-                }}
-              >
-                <AlertIcon />
-                <Text style={styles.ErrorToggle}>
-                  Please agree to the Terms & Conditions to proceed.
-                </Text>
-              </View>
+              <AlertIcon />
+              <Text style={styles.errorText} importantForAccessibility="no">
+                Please agree to the Terms & Conditions to proceed.
+              </Text>
             </View>
           )}
+        </View>
+       )}
+       </View>
+          
         </View>
         <View style={styles.buttonContainer}>
           <SecondaryButton
@@ -568,12 +572,9 @@ const styles = StyleSheet.create({
     borderRadius: 0,
   },
   section: {
-    paddingVertical: Padding.p_base,
+    paddingVertical: Padding.p_xs,
   },
   instructions: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    color: Color.colorGray_200,
     marginBottom: Padding.p_base,
   },
   emailInput: {
@@ -635,23 +636,47 @@ const styles = StyleSheet.create({
   spaceBottom: {
     marginBottom: 16,
   },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   checkBox: {
-    width: 12,
-    height: 12,
-    marginRight: Platform.OS === "ios" ? 2 : 16,
+    width: 16,
+    height: 16,
+    marginTop: 0,
+    marginRight: Platform.OS === "ios" ? 8 : 8,
   },
   checkBoxArea: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     flexWrap: "wrap",
-    paddingHorizontal: Platform.OS === "android" ? 16 : Padding.p_5xl,
+    width: "100%",
+    minHeight: A11Y.minTouch,
+    paddingVertical: Padding.p_5xs,
+  },
+  checkBoxTextWrapper: {
+    flex: 1,
+    flexWrap: "wrap",
+    marginLeft: 8,
+  },
+  termsLinkText: {
+    color: Color.sparklightBrightPurple,
+    textDecorationLine: "underline",
+  },
+  checkboxSection: {
+    paddingHorizontal: 16,
+    alignSelf: "flex-start",
+    justifyContent: 'flex-start',
+    width: "95%",
+    marginTop: Padding.p_base,
   },
   checkboxTouchable: {
     flexDirection: "row",
-    alignItems: "center",
+   
     marginRight: 0,
-    minHeight: A11Y.minTouch,
-    paddingVertical: Padding.p_5xs,
+   
+    paddingVertical: Padding.p_9xs,
+    marginLeft: 8,
   },
   termsLinkTouchable: {
     minHeight: A11Y.minTouch,
@@ -660,12 +685,30 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+    
   },
   checkBoxAreaViewText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    color: Color.sparklightGray1,
+    flexShrink: 1,
+    flexWrap: "wrap",
+  },
+   
+  errorText: {
+    marginLeft: 8,
+    color: "red",
     fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
+    lineHeight: 20,
+  }, errorContainer: {
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+   requiredFieldsText: {
+    textAlign: "left",
   },
 });
 

@@ -11,7 +11,10 @@ import {
 import InfoICon from "../../../assets/svgs/InfoIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
-
+import AppStyles from "../../styles/AppStyles";
+import {SectionTitle,FieldContent, IndicatorText,BannerAlertText} from "../common/customui/Typography";
+import EditActionButton from "../common/customui/EditActionButton";
+import { A11y } from "react-native-a11y-order";
 const digitToWord = {
   0: "zero",
   1: "one",
@@ -40,22 +43,36 @@ const StatusIcon = ({ status }) => (
     {status === "On" ? <SuccessIcon /> : <SuccessIcon color={"#4C5458"} />}
   </View>
 );
+const getEditAccessibilityLabel = (id) => {
+    if (id === "text") {
+      return "Edit text notifications";
+    } else if (id === "email") {
+      return "Edit Email notifications";
+    } else if (id === "app") {
+      return "Edit In-app notifications";
+    }
+    return "Edit notifications";
+  };
 
 const EditButton = ({ onPress, isLoading, accessibilityLabel }) => (
-  <Touchable
-    style={[
-      styles.editButton,
-      isLoading && { backgroundColor: Color.sparklightGray },
-    ]}
-    accessible={true}
-    disabled={isLoading}
-    accessibilityRole="button"
-    accessibilityLabel={accessibilityLabel || "Edit Notifications"}
-    minSize={0}
-    onPress={onPress}
-  >
-    <Text style={styles.editButtonText}>Edit</Text>
-  </Touchable>
+  // <Touchable
+  //   style={[
+  //     styles.editButton,
+  //     isLoading && { backgroundColor: Color.sparklightGray },
+  //   ]}
+  //   accessible={true}
+  //   disabled={isLoading}
+  //   accessibilityRole="button"
+  //   accessibilityLabel={accessibilityLabel || "Edit Notifications"}
+  //   minSize={0}
+  //   onPress={onPress}
+  // >
+  //   <Text style={styles.editButtonText}>Edit</Text>
+  // </Touchable>
+         <EditActionButton
+              onPress={onPress}
+              accessibilityLabel={accessibilityLabel}
+            />
 );
 
 const ComingSoonBadge = () => (
@@ -73,7 +90,9 @@ const NotificationToggle = ({ type, status, isLast, warn, loading, title }) => (
       warn && styles.warnBackground,
     ]}
   >
-    <Text style={styles.toggleText} >{type}</Text>
+    <FieldContent importantForAccessibility="no">
+        {type}
+      </FieldContent>
     <View style={styles.statusContainer}>
       {loading ? (
         <SkeletonPlaceholder>
@@ -87,10 +106,10 @@ const NotificationToggle = ({ type, status, isLast, warn, loading, title }) => (
           />
         </SkeletonPlaceholder>
       ) : (
-        <>
+        <View style={{flexDirection: "row", alignItems: "center", alignSelf: "flex-start"}}>
           <StatusIcon status={status} />
-          <Text style={styles.statusText}>{status}</Text>
-        </>
+          <IndicatorText style={styles.statusText}>{status}</IndicatorText>
+        </View>
       )}
     </View>
   </View>
@@ -154,7 +173,7 @@ const BoldPhoneText = ({ phoneNum }) => {
 const InfoMessage = ({ message, phoneNumber, id }) => (
   <View style={styles.infoMessage}>
     <View style={styles.iconContainer}>
-      <InfoICon color="#0060AE" />
+      <InfoICon color="#353091" />
     </View>
     <View style={styles.textContainer}>
       {id == "text" ? (
@@ -203,16 +222,33 @@ const NotificationSection = ({
   })();
 
   return (
-    <View style={styles.sectionContainer}>
-      <View style={styles.header}>
-        <Text style={styles.title} accessibilityRole="header" accessibilityLevel={2}>{title}</Text>
+    <View style={[AppStyles.card,{marginBottom: Padding.p_base}]}>
+      <A11y.Order style={styles.header}>
+        <A11y.Index index={0} >
+        <View
+          accessible={true}
+          accessibilityRole="header"
+          accessibilityLevel={2}
+          accessibilityLabel={editAccessibilityLabel}
+        >     
+        <SectionTitle
+          accessibilityRole="header"
+          accessibilityLevel={2}
+        >
+          {title}
+        </SectionTitle>
+        </View>
+        </A11y.Index>
+        <A11y.Index index={1} >
+      <View style={{flexDirection: "row", alignItems: "center"}}>
         {isComingSoon ? (
           <ComingSoonBadge />
         ) : (
           !isAdmin && <EditButton onPress={onEdit} isLoading={isLoading} accessibilityLabel={editAccessibilityLabel} />
         )}
       </View>
-
+     </A11y.Index>
+    </A11y.Order>
       {isAdmin && <AdminMessage />}
 
       {isLoading ? (
@@ -303,29 +339,20 @@ const styles = StyleSheet.create({
   infoMessage: {
     flexDirection: "row",
     alignItems: "flex-start",
-    paddingVertical: 8,
-    paddingHorizontal: 8,
-    marginHorizontal: 20,
+    padding: Padding.p_base,
+    marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
     borderRadius: Border.br_5xs,
     borderWidth: 1,
-    borderColor: "#0060AE",
+    borderColor: "#353091",
     backgroundColor: "#F0F8FF",
   },
-  iconContainer: {
-    paddingTop: 1,
-    paddingRight: 6,
-    paddingLeft: 2,
-  },
-  textContainer: {
-    flex: 1,
-    paddingRight: 4,
-  },
   infoText: {
+    marginLeft: Padding.p_5xs,
     fontSize: FontSize.textXsSemibold_size,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
-    lineHeight: FontSize.textXsSemibold_size * 1.3,
+    flex: 1,
   },
   boldText: {
     color: Color.colorGray_200,
@@ -344,6 +371,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: Padding.p_base,
+    minHeight: 50,
   },
   bottomBorder: {
     borderBottomWidth: 1,
@@ -353,16 +381,24 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
+    flex: 1,
   },
   statusContainer: {
     flexDirection: "row",
     alignItems: "center",
+    minWidth: 'auto',
   },
   statusText: {
     marginLeft: Padding.p_5xs,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
+  },
+  icon: {
+    width: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
   },
   adminMessage: {
     backgroundColor: Color.colorWhitesmoke_100,
