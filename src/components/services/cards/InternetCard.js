@@ -215,7 +215,6 @@ const styles = StyleSheet.create({
     ...AppStyles.card,
   },
   cardSpacing: {
-    padding: 16,
     marginHorizontal: 16,
   },
   bottomButton: serviceCard.bottomButton,

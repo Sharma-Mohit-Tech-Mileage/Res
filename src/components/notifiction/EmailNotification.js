@@ -6,7 +6,6 @@ import { A11Y } from "../../styles/theme";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { requiredField } from "../../styles/utilities";
 import SparklightCheckBox from "../common/customui/SparklightCheckBox";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from "../common/Toggle";
@@ -697,10 +696,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexWrap: "wrap",
   },
-    section: {
-    paddingHorizontal: Padding.p_5xl,
-    paddingVertical: Padding.p_5xs,
-  },
+   
   errorText: {
     marginLeft: 8,
     color: "red",
