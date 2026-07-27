@@ -80,6 +80,18 @@ const Feedback = () => {
     isSubmittingRef.current = false;
     setIsSubmitting(false);
 
+    // Priority 1: Additional Feedback must be announced/focused first.
+    if (fieldErrors.feedbackText) {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      setTimeout(() => {
+        feedbackTextRef.current?.focus();
+        AccessibilityInfo.announceForAccessibility(
+          fieldErrors.feedbackText?.message || "Additional feedback is required"
+        );
+      }, 400);
+      return;
+    }
+
     if (fieldErrors.cosentContactUs) {
       setIsError(true);
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
@@ -87,17 +99,19 @@ const Feedback = () => {
     }
 
     // Scroll to and focus the first field with an error so inline error is visible
-    if (fieldErrors.areaOfConcern || fieldErrors.feedbackText) {
+    if (fieldErrors.areaOfConcern) {
       scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-      if (fieldErrors.feedbackText) {
-        setTimeout(() => feedbackTextRef.current?.focus(), 400);
-      }
     } else if (fieldErrors.feedbackEmail) {
       emailFieldRef.current?.focus();
     }
   };
 
   useEffect(() => {
+    // Only announce consent error when Additional Feedback is already valid.
+    if (errors.feedbackText) {
+      return;
+    }
+
     if (!errors.cosentContactUs && !isError) {
       return;
     }
