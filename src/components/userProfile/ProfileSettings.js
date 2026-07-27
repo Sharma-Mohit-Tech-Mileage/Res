@@ -41,6 +41,7 @@ import {
   Hyperlink,
 } from "../common/customui/Typography";
 import { A11y } from "react-native-a11y-order";
+import AddIcon from "../../res/svgIcons/AddIcon";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -351,7 +352,7 @@ const ProfileSettings = () => {
                     <View style={styles.profileFieldSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  emailAddress && (
+                  
                     <A11y.Order style={styles.editableRow}>
                       <A11y.Index index={0} style={[
                           styles.editableContent,
@@ -374,10 +375,10 @@ const ProfileSettings = () => {
                           accessible={true}
                           accessibilityRole="text"
                           accessibilityLabel={`Email Address: ${
-                            emailAddress || "N/A"
+                            emailAddress || "No email address on file."
                           }`}
                         >
-                          {emailAddress || "N/A"}
+                          {emailAddress || "No email address on file."}
                         </FieldContent>
                       </View>
                       </A11y.Index>
@@ -386,14 +387,15 @@ const ProfileSettings = () => {
                         style={styles.editButton}
                         onPress={() => handleArrowPress("email")}
                         accessibilityRole="button"
-                        accessibilityLabel="Edit email address"
-                        accessibilityHint="Double tap to edit your email address"
+                        accessibilityLabel=
+                        {emailAddress ? "Edit email address" : "Add email address"}
+                        accessibilityHint={emailAddress ? "Double tap to edit your email address" : "Double tap to add your email address"}
                       >
-                        <EditIcon />
+                       { emailAddress ? <EditIcon /> : <AddIcon /> }
                       </Touchable>
                       </A11y.Index>
                     </A11y.Order>
-                  )
+                  
                 )}
 
                 {showPhoneLoading ? (
@@ -401,7 +403,7 @@ const ProfileSettings = () => {
                     <View style={styles.profileFieldSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  phoneNumber && (
+                  
                     <A11y.Order style={[styles.editableRow, { marginBottom: Padding.p_9xs }]}> 
                       <A11y.Index index={0}>
                       <View
@@ -428,10 +430,11 @@ const ProfileSettings = () => {
                               ? numberToWordsForAccessibility(
                                   phoneNumber.toString(),
                                 )
-                              : "N/A"
+                              : "No phone number on file."
                           }`}
+                          accessibilityHint={phoneNumber ? "Double tap to edit your mobile number" : "Double tap to add your mobile number"}
                         >
-                          {phoneNumber || "N/A"}
+                          {phoneNumber || "No phone number on file."}
                         </FieldContent>
                       </View>
                       </A11y.Index>
@@ -443,12 +446,12 @@ const ProfileSettings = () => {
                         accessibilityLabel="Edit mobile number"
                         accessibilityHint="Double tap to edit your mobile number"
                       >
-                        <EditIcon />
+                        { phoneNumber ? <EditIcon /> : <AddIcon /> }
                       </Touchable>
 
                     </A11y.Index>
                     </A11y.Order>
-                  )
+                  
                 )}
               </View>
             </View>
