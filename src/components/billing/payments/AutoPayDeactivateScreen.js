@@ -10,6 +10,8 @@ import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { fetchAutoPayDetails, cancelAutoPay } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, ordinal } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
+import AppStyles from "../../../styles/AppStyles";
+import {SectionTitle} from "../../common/customui/Typography";
 
 // Figma: Deactivate auto pay — warning, T&C agreement, single Deactivate action
 const AutoPayDeactivateScreen = ({ navigation }) => {
@@ -51,6 +53,7 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
     <View style={styles.container}>
       <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+        <View style={{ marginBottom: 16 }}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -85,6 +88,7 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
           onPress={onDeactivate}
         />
         <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
+        </View>
       </ScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />

@@ -180,11 +180,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             title={"Make a Payment"}
             buttonType='submit'
             onPress={() => {
-              navigation.navigate("ArticleWindowUtility", {
-                url: `${Config.PORTAL_BASE_URL}/portals/app-secure/make-payment`,
-                name: "Make a Payment",
-                injectPaymentObj: true,
-              });
+              navigation.navigate("MakePayment");
             }}
             accessible={true}
             accessibilityLabel="Make a Payment"
