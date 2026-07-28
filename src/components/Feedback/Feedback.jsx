@@ -341,16 +341,22 @@ const Feedback = () => {
 
 
 
-          <View style={{ paddingHorizontal: 16, paddingTop: 8}}>
-
+          <View style={{ paddingHorizontal: 16, paddingTop: 8}}
+         
+         
+          >
+             <View ref={surveyErrorRef} accessible={true}
+              >
               <FieldTitle
+               
                 style={[
                   (isError || errors.cosentContactUs) && styles.optionTxtError,
                 ]}
-              accessibilityLabel={"May Sparklight contact you about your feedback? Required"}
+              accessibilityLabel={isError ? "Please choose Yes or No to contact you." : "May Sparklight contact you about your feedback? Required"}
               >
               May Sparklight contact you about your feedback? *
               </FieldTitle>
+              </View>
               <Radio.Group
                 name="surveyOptions"
                 value={selectedOption}
@@ -416,7 +422,7 @@ const Feedback = () => {
               </Radio.Group>
               {(isError || errors.cosentContactUs) && (
                 <View
-                  ref={surveyErrorRef}
+                  
                   style={styles.errorContainer}
                   accessible={true}
                   accessibilityLabel="Please choose Yes or No to contact you."

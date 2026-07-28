@@ -489,7 +489,7 @@ const TextNotifications = ({ navigation }) => {
               onChange={handleToggleChange}
             />
 
-            {!isCheckboxVisible && (
+            {isCheckboxVisible && (
               <View style={[styles.checkboxSection]}>
                 <View style={styles.checkBoxArea}>
                   <Touchable
