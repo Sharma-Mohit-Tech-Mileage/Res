@@ -4,7 +4,6 @@ import CheckBox from "@react-native-community/checkbox";
 import Touchable from "../../common/customui/Touchable";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 
-// Figma T&C row: checkbox + "I agree to" toggles, the inline "Terms & Conditions" link opens the terms
 const AgreeTermsRow = ({ value, onValueChange, onViewTerms }) => (
   <View style={styles.row}>
     <Touchable
@@ -47,7 +46,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", marginVertical: 4 },
   agreePress: { flexDirection: "row", justifyContent: "flex-start", minHeight: 48 },
   checkboxBox: { marginRight: Platform.OS === "ios" ? 10 : 16 },
-  // 12x12 square matches the checkbox standard used across the app (EmailNotification, TextNotifications)
+
   checkbox: { width: 12, height: 12 },
   agreeText: {
     fontSize: FontSize.size_base,

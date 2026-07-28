@@ -1,28 +1,30 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Touchable from "../../common/customui/Touchable";
+import { FieldTitle, Hyperlink } from "../../common/customui/Typography";
 import PaymentBrandIcon from "../../common/PaymentBrandIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { paymentMethodA11yLabel, paymentMethodTitle, maskedDigits, isMethodExpired, radioA11yProps } from "./paymentsShared";
 
-// Figma method card: radio variant for payment selection, actions variant for the Payment Methods list
 const PaymentMethodCard = ({
   method,
   variant = "radio",
   selected = false,
   onPress,
   showAutoPayBadge = false,
+  autoPayBadgeLabel = "Auto Pay",
+  showNewAutoPayBadge = false,
   onEdit,
   onDelete,
   disabled = false,
   positionLabel = "",
 }) => {
   const expired = isMethodExpired(method);
-  // Figma: the Auto Pay method swaps its Delete link for the green badge
+
   const showEdit = !!onEdit && !expired;
   const showDelete = !!onDelete && !showAutoPayBadge;
 
-  const infoA11yLabel = `${paymentMethodA11yLabel(method)}${showAutoPayBadge ? ", used for Auto Pay" : ""}${
+  const infoA11yLabel = `${paymentMethodA11yLabel(method)}${showAutoPayBadge ? ", current Auto Pay method" : ""}${showNewAutoPayBadge ? ", selected as new Auto Pay method" : ""}${
     expired ? ", expired" : ""
   }${method?.expiry ? `, expires ${method.expiry}` : ""}`;
 
@@ -35,7 +37,7 @@ const PaymentMethodCard = ({
               {selected && <View style={styles.radioInner} />}
             </View>
           )}
-          <Text style={[styles.titleText, expired && styles.textDisabled]}>{paymentMethodTitle(method)}</Text>
+          <FieldTitle style={[styles.titleText, expired && styles.textDisabled]}>{paymentMethodTitle(method)}</FieldTitle>
         </View>
         <View style={styles.brandWrap} accessible={false} importantForAccessibility="no-hide-descendants">
           <PaymentBrandIcon type={method?.type} brand={method?.brand} height={22} />
@@ -45,7 +47,7 @@ const PaymentMethodCard = ({
     </>
   );
 
-  const hasActions = showEdit || showDelete || showAutoPayBadge || expired || !!method?.expiry;
+  const hasActions = showEdit || showDelete || showAutoPayBadge || showNewAutoPayBadge || expired || !!method?.expiry;
   const actionsRow = hasActions ? (
     <View style={styles.bottomRow}>
       <View style={styles.actionsWrap}>
@@ -57,7 +59,7 @@ const PaymentMethodCard = ({
             accessibilityLabel={`Edit ${paymentMethodA11yLabel(method)}`}
             style={styles.actionLink}
           >
-            <Text style={styles.actionText}>Edit</Text>
+            <Hyperlink style={styles.actionText}>Edit</Hyperlink>
           </Touchable>
         )}
         {showEdit && (showDelete || showAutoPayBadge) && (
@@ -73,12 +75,17 @@ const PaymentMethodCard = ({
             accessibilityLabel={`Delete ${paymentMethodA11yLabel(method)}`}
             style={styles.actionLink}
           >
-            <Text style={styles.actionText}>Delete</Text>
+            <Hyperlink style={styles.actionText}>Delete</Hyperlink>
           </Touchable>
         )}
         {showAutoPayBadge && (
           <Text style={styles.autoPayBadge} accessible={false} importantForAccessibility="no">
-            Auto Pay
+            {autoPayBadgeLabel}
+          </Text>
+        )}
+        {showNewAutoPayBadge && (
+          <Text style={[styles.autoPayBadge, styles.newAutoPayBadge]} accessible={false} importantForAccessibility="no">
+            New Auto Pay
           </Text>
         )}
         {expired && (
@@ -161,12 +168,7 @@ const styles = StyleSheet.create({
   },
   radioOuterSelected: { borderColor: Color.colorMidnightblue },
   radioInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: Color.colorMidnightblue },
-  titleText: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
-    flexShrink: 1,
-  },
+  titleText: { flexShrink: 1 },
   brandWrap: { marginLeft: 12 },
   digitsText: {
     fontSize: FontSize.size_5xl,
@@ -185,14 +187,12 @@ const styles = StyleSheet.create({
   },
   actionsWrap: { flexDirection: "row", alignItems: "center" },
   actionLink: { paddingVertical: 4, paddingHorizontal: 4 },
-  actionText: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightBrightPurple,
-    textDecorationLine: "underline",
-  },
+  actionText: {},
   actionDivider: { color: "#98A2B3", marginHorizontal: 6 },
+  newAutoPayBadge: {
+    backgroundColor: "#E9F8EE",
+    color: "#1D7832",
+  },
   autoPayBadge: {
     fontSize: FontSize.size_xs,
     fontFamily: FontFamily.openSansRegular,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   expiryText: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },

@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import PrimaryButton from "../../common/customui/PrimaryButton";
 import NextActionCard from "./NextActionCard";
+import NotificationAlert from "../../common/customui/NotificationAlert";
 import AnimatedSuccessIcon from "./AnimatedSuccessIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
 import { contentMaxWidth, formatCurrency } from "./paymentsShared";
 import { setFocusToRef, announceA11y } from "../../../utils/a11y";
@@ -29,9 +30,9 @@ const KIND_COPY = {
   },
 };
 
-// Figma: shared success screen — one completed action, one optional follow-up offer (one hop max)
 const PaymentConfirmationScreen = ({ navigation, route }) => {
   const kind = route.params?.kind || "";
+  const headerTitle = route.params?.headerTitle || "Billing Details";
   const copy = KIND_COPY[kind] || null;
   const successTitle = copy?.title || "Success!";
   const message = route.params?.message || copy?.message || "";
@@ -45,7 +46,6 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
     setFocusToRef(titleRef, { delay: 600 });
   }, [message]);
 
-  // Figma: dollar amounts inside the success message render bold
   const messageParts = message.split(/(\$[\d,]+\.?\d*)/g);
 
   const followUp =
@@ -61,6 +61,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               amount: nextAction.amount,
               methodId: nextAction.methodId,
               fromOffer: true,
+              headerTitle: "Make a Payment",
             }),
         }
       : nextAction?.type === "setupAutoPay"
@@ -73,13 +74,14 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               mode: "enroll",
               methodId: nextAction.methodId,
               fromOffer: true,
+              headerTitle: "Set Up Auto Pay",
             }),
         }
       : null;
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.popToTop()} />
+      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.popToTop()} />
       <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
         <View style={[card.elevated, styles.successCard]}>
           <View style={styles.iconWrap} accessible={false} importantForAccessibility="no-hide-descendants">
@@ -107,17 +109,25 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               accessible
               accessibilityLabel={`${copy?.numberLabel || "Confirmation Number"}, ${confirmationNumber.split("").join(" ")}`}
             >
-              <Text style={styles.detailLabel}>{copy?.numberLabel || "Confirmation Number"}</Text>
-              <Text style={styles.detailValue}>{confirmationNumber}</Text>
+              <FieldTitle style={styles.detailLabel}>{copy?.numberLabel || "Confirmation Number"}</FieldTitle>
+              <FieldContent style={styles.detailValue}>{confirmationNumber}</FieldContent>
             </View>
           )}
           {!!email && (
             <View style={styles.detailBlock} accessible accessibilityLabel={`Email confirmation sent to ${email}`}>
-              <Text style={styles.detailLabel}>Email Confirmation Sent to</Text>
-              <Text style={styles.detailValue}>{email}</Text>
+              <FieldTitle style={styles.detailLabel}>Email Confirmation Sent to</FieldTitle>
+              <FieldContent style={styles.detailValue}>{email}</FieldContent>
             </View>
           )}
         </View>
+
+        {kind === "payment-submitted" && !confirmationNumber && (
+          <NotificationAlert
+            type="warning"
+            message="Your payment is being processed. Confirmation details will be available in your payment history shortly. Please do not submit your payment again."
+            showCloseIcon={false}
+          />
+        )}
 
         {!!followUp && (
           <NextActionCard
@@ -157,18 +167,8 @@ const styles = StyleSheet.create({
   },
   messageAmount: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
   detailBlock: { alignSelf: "stretch", marginTop: 24 },
-  detailLabel: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightGray1,
-    marginBottom: 8,
-  },
-  detailValue: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-    color: Color.colorGray_200,
-  },
+  detailLabel: { marginBottom: 8 },
+  detailValue: {},
 });
 
 export default PaymentConfirmationScreen;

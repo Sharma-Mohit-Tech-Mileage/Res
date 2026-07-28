@@ -1,22 +1,23 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { SectionTitle, HintText } from "../../common/customui/Typography";
 import { fetchAutoPayDetails, cancelAutoPay } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, ordinal } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 
-// Figma: Deactivate auto pay — warning, T&C agreement, single Deactivate action
-const AutoPayDeactivateScreen = ({ navigation }) => {
+const AutoPayDeactivateScreen = ({ navigation, route }) => {
+  const headerTitle = route.params?.headerTitle || "Manage Auto Pay";
   const [details, setDetails] = useState(null);
   const [agreed, setAgreed] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const inFlightRef = useRef(false);
   const [errorAlert, setErrorAlert] = useState("");
   const abortRef = useRef(null);
 
@@ -33,23 +34,25 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
   const dueDayLabel = ordinal(details?.dueDay || 22);
 
   const onDeactivate = async () => {
-    if (submitting || !agreed) return;
+    if (inFlightRef.current || !agreed) return;
+    inFlightRef.current = true;
     setSubmitting(true);
     try {
       await cancelAutoPay();
-      // Figma: deactivation success shows no confirmation number or email section
-      navigation.replace("PaymentConfirmation", { kind: "autopay-deactivated" });
+
+      navigation.replace("PaymentConfirmation", { kind: "autopay-deactivated", headerTitle });
     } catch (error) {
       setErrorAlert("We could not deactivate Auto Pay right now. Please try again.");
       announceA11y("Error, Auto Pay was not deactivated.");
     } finally {
+      inFlightRef.current = false;
       setSubmitting(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
@@ -61,10 +64,10 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
           />
         )}
 
-        <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+        <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           Deactivate auto pay
-        </Text>
-        <Text style={styles.introText}>You are going to deactivate your current auto pay account</Text>
+        </SectionTitle>
+        <HintText style={styles.introText}>You are going to deactivate your current auto pay account</HintText>
 
         <NotificationAlert
           type="warning"
@@ -80,7 +83,7 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
         <PrimaryButton
           title={submitting ? "Deactivating..." : "Deactivate"}
           buttonType="submit"
-          disabled={!agreed}
+          disabled={submitting || !agreed}
           accessibilityLabel="Deactivate Auto Pay"
           onPress={onDeactivate}
         />
@@ -96,19 +99,9 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightGray1,
     marginBottom: 8,
   },
-  introText: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
-    lineHeight: 22,
-    marginBottom: 8,
-  },
+  introText: { lineHeight: 20, marginBottom: 8 },
   agreeBlock: { marginTop: 12, marginBottom: 8 },
 });
 

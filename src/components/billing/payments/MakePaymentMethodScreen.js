@@ -7,34 +7,43 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
 import PaymentMethodCard from "./PaymentMethodCard";
-import ConfirmActionModal from "./ConfirmActionModal";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import SparkLightInput from "../../common/customui/SparkLightInput";
+import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
+import { SectionTitle } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
-  deletePaymentMethod,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, describePaymentMethod, isMethodExpired, openOrbipaySecureCapture } from "./paymentsShared";
-import { announceA11y } from "../../../utils/a11y";
+import { contentMaxWidth, isMethodExpired, openOrbipayPaymentExecution } from "./paymentsShared";
 
-// Figma: Make a Payment step 2 — pick a saved method or pay with a new one
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const MakePaymentMethodScreen = ({ navigation, route }) => {
   const amount = Number(route.params?.amount) || 0;
+  const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
   const [selectedId, setSelectedId] = useState("");
-  const [pendingDelete, setPendingDelete] = useState(null);
   const [errorAlert, setErrorAlert] = useState("");
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const emailRef = useRef(null);
   const abortRef = useRef(null);
 
   useFocusEffect(
     useCallback(() => {
+      const flash = route.params?.paymentFlash;
+      if (flash?.message) {
+        setErrorAlert(flash.message);
+        navigation.setParams({ paymentFlash: undefined });
+      }
       abortRef.current = new AbortController();
       const signal = abortRef.current.signal;
       Promise.all([fetchPaymentMethods(signal), fetchAutoPayDetails(signal)])
         .then(([list, details]) => {
           setMethods(list);
           setAutoPay(details);
+          setEmail((prev) => prev || details.email || "");
           setSelectedId((prev) => prev || list.find((m) => m.isDefault && !isMethodExpired(m))?.id || "");
         })
         .catch(() => {
@@ -43,7 +52,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
           setErrorAlert("We could not load your payment methods. Please try again.");
         });
       return () => abortRef.current?.abort();
-    }, [])
+    }, [route.params?.paymentFlash, navigation])
   );
 
   const loading = methods === null;
@@ -51,28 +60,20 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   const canContinue = !!selectedMethod && !isMethodExpired(selectedMethod);
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
-  // "Pay with new" goes to Review with no saved method; Submit then opens the payment widget
-  const onPayWithNewMethod = () => navigation.navigate("MakePaymentReview", { amount, methodId: "" });
+  const needsEmailEntry = !loading && !autoPay?.email;
 
-  // Orbipay cannot edit PCI fields natively; edits go through the secure capture page
-  const onEditMethod = () => openOrbipaySecureCapture(navigation, "Edit Payment Method");
-
-  const onConfirmDelete = async () => {
-    const method = pendingDelete;
-    setPendingDelete(null);
-    try {
-      await deletePaymentMethod(method.id);
-      setMethods((prev) => prev?.filter((m) => m.id !== method.id));
-      setSelectedId((prev) => (prev === method.id ? "" : prev));
-      announceA11y("Payment method deleted.");
-    } catch (error) {
-      setErrorAlert("We could not delete this payment method. Please try again.");
+  const onPayWithNewMethod = () => {
+    if (!EMAIL_PATTERN.test(email.trim())) {
+      setEmailError("Please enter a valid email address.");
+      emailRef.current?.focus();
+      return;
     }
+    openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: email.trim() });
   };
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} autoFocusBack />
+      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} autoFocusBack />
       <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
@@ -84,9 +85,9 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
           />
         )}
 
-        <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+        <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           Select payment method
-        </Text>
+        </SectionTitle>
 
         {loading ? (
           <SkeletonPlaceholder>
@@ -105,8 +106,6 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
                 selected={method.id === selectedId}
                 onPress={() => setSelectedId(method.id)}
                 showAutoPayBadge={isAutoPayLinked(method)}
-                onEdit={onEditMethod}
-                onDelete={() => setPendingDelete(method)}
                 positionLabel={`${index + 1} of ${methods.length}`}
               />
             ))}
@@ -115,6 +114,23 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
 
         {!loading && (
           <>
+            {needsEmailEntry && (
+              <SparkLightInput
+                ref={emailRef}
+                name="email"
+                label="Email Address (required)"
+                accessibilityLabel="Email Address"
+                placeholder="Email Address"
+                value={email}
+                required
+                error={emailError}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  if (emailError) setEmailError("");
+                }}
+                accessibilityHint="A payment confirmation email will be sent to this address."
+              />
+            )}
             <Touchable
               onPress={onPayWithNewMethod}
               accessibilityRole="button"
@@ -129,7 +145,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
               buttonType="submit"
               disabled={!canContinue}
               accessibilityLabel="Continue"
-              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId })}
+              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle })}
             />
             <PrimaryButton
               title="Cancel"
@@ -140,16 +156,6 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
         )}
       </ScrollView>
 
-      <ConfirmActionModal
-        visible={!!pendingDelete}
-        title="Delete payment method?"
-        message={pendingDelete ? `${describePaymentMethod(pendingDelete)} will be removed from your account.` : ""}
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
-        destructive
-        onConfirm={onConfirmDelete}
-        onCancel={() => setPendingDelete(null)}
-      />
     </View>
   );
 };
@@ -158,10 +164,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightGray1,
     marginBottom: 12,
   },
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
@@ -178,14 +180,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "stretch",
     backgroundColor: "#FFFFFF",
-    borderRadius: 4,
+    borderRadius: Border.br_81xl,
+    borderWidth: 1,
+    borderColor: Color.colorMidnightblue,
     padding: 16,
     marginTop: 4,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 2,
   },
   newMethodText: {
     fontSize: FontSize.size_base,

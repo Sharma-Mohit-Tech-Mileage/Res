@@ -5,7 +5,6 @@ import LinkText from "../../common/customui/LinkText";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
 
-// One optional follow-up offer after a success — a single suggestion, never a bundled second action
 const NextActionCard = ({ title, message, ctaLabel, onPress, onDismiss }) => (
   <View style={[card.elevated, styles.container]}>
     <Text style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
@@ -31,13 +30,14 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
     color: Color.colorGray_100,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   message: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
     lineHeight: 20,
+    marginBottom: 4,
   },
   dismissLink: { alignSelf: "center", marginTop: 4 },
 });

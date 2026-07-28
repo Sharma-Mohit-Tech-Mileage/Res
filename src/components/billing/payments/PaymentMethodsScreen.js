@@ -10,25 +10,32 @@ import ConfirmActionModal from "./ConfirmActionModal";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
 import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
+import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
   deletePaymentMethod,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, describePaymentMethod, openOrbipaySecureCapture } from "./paymentsShared";
+import { contentMaxWidth, describePaymentMethod, openOrbipaySecureCapture, openOrbipayEdit } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 
-// Figma: Add payment method — saved methods list with Add link, Edit | Delete actions, success toast
-const PaymentMethodsScreen = ({ navigation }) => {
+const PaymentMethodsScreen = ({ navigation, route }) => {
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [busy, setBusy] = useState(false);
+  const deletingRef = useRef(false);
   const [alert, setAlert] = useState(null);
   const abortRef = useRef(null);
 
   useFocusEffect(
     useCallback(() => {
+
+      const flash = route.params?.paymentFlash;
+      if (flash) {
+        setAlert(flash);
+        navigation.setParams({ paymentFlash: undefined });
+      }
       abortRef.current = new AbortController();
       const signal = abortRef.current.signal;
       Promise.all([fetchPaymentMethods(signal), fetchAutoPayDetails(signal)])
@@ -46,17 +53,24 @@ const PaymentMethodsScreen = ({ navigation }) => {
           });
         });
       return () => abortRef.current?.abort();
-    }, [])
+    }, [route.params?.paymentFlash, navigation])
   );
 
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
-  const onAddMethod = () => openOrbipaySecureCapture(navigation);
+  const onAddMethod = () => {
+    setAlert(null);
+    openOrbipaySecureCapture(navigation, { returnTo: "PaymentMethods", headerTitle: "Manage Payment Method" });
+  };
 
-  // Orbipay cannot edit PCI fields natively; edits go through the secure capture page
-  const onEditMethod = () => openOrbipaySecureCapture(navigation, "Edit Payment Method");
+  const onEditMethod = (method) => {
+    setAlert(null);
+    openOrbipayEdit(navigation, method, { returnTo: "PaymentMethods", headerTitle: "Manage Payment Method" });
+  };
 
   const onConfirmDelete = async () => {
+    if (deletingRef.current || !pendingDelete) return;
+    deletingRef.current = true;
     const method = pendingDelete;
     setPendingDelete(null);
     setBusy(true);
@@ -72,13 +86,14 @@ const PaymentMethodsScreen = ({ navigation }) => {
         message: "We could not delete this payment method. Please try again.",
       });
     } finally {
+      deletingRef.current = false;
       setBusy(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader title="Manage Payment Method" onPressBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
         {!!alert && (
           <NotificationAlert
@@ -91,9 +106,9 @@ const PaymentMethodsScreen = ({ navigation }) => {
         )}
 
         <View style={styles.headingRow}>
-          <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+          <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
             Add payment method
-          </Text>
+          </SectionTitle>
           <LinkText
             onPress={() => !busy && onAddMethod()}
             disabled={busy}
@@ -101,8 +116,8 @@ const PaymentMethodsScreen = ({ navigation }) => {
             accessibilityHint="Opens a secure page to add a card or bank account."
           >
             <View style={styles.addLinkRow}>
-              <Text style={styles.addLinkText}>Add</Text>
-              <PlusCircleIcon />
+              <Hyperlink style={styles.addLinkText}>Add</Hyperlink>
+              <PlusCircleIcon color={Color.colorMidnightblue} />
             </View>
           </LinkText>
         </View>
@@ -129,7 +144,7 @@ const PaymentMethodsScreen = ({ navigation }) => {
               variant="actions"
               showAutoPayBadge={isAutoPayLinked(method)}
               disabled={busy}
-              onEdit={onEditMethod}
+              onEdit={() => onEditMethod(method)}
               onDelete={() => setPendingDelete(method)}
             />
           ))
@@ -160,21 +175,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   heading: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightGray1,
     flexShrink: 1,
     marginRight: 8,
   },
   addLinkRow: { flexDirection: "row", alignItems: "center" },
-  addLinkText: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightBrightPurple,
-    textDecorationLine: "underline",
-    marginRight: 4,
-  },
+  addLinkText: { marginRight: 4 },
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyCard: { padding: 20, marginBottom: 16, alignItems: "flex-start" },
   emptyTitle: {

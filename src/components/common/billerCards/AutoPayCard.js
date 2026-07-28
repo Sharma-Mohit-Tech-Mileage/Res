@@ -55,17 +55,7 @@ const AutoPayCard = ({
           </SectionTitle>
           {showSkeleton ? (
             <SkeletonPlaceholder>
-              <View
-                style={{
-                  width: wp("16%"),
-                  height: 25,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                  marginTop: 5,
-                }}
-              />
+              <View style={{ width: 80, height: 20, borderRadius: 4, marginLeft: 10, marginTop: 6 }} />
             </SkeletonPlaceholder>
           ) : (
             <Hyperlink
@@ -82,16 +72,7 @@ const AutoPayCard = ({
         <View style={{ position: "absolute", right: 10 }}>
           {showSkeleton ? (
             <SkeletonPlaceholder>
-              <View
-                style={{
-                  width: wp("16%"),
-                  height: 25,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                }}
-              />
+              <View style={{ width: 56, height: 22, borderRadius: 4 }} />
             </SkeletonPlaceholder>
           ) :( <>
               {isAutoPayStatus ? (

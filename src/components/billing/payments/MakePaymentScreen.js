@@ -7,6 +7,7 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { SectionTitle } from "../../common/customui/Typography";
 import { fetchAutoPayDetails } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, formatCurrency, parseAmountInput, radioA11yProps } from "./paymentsShared";
 
@@ -16,8 +17,8 @@ const AMOUNT_TOTAL = "total";
 const AMOUNT_PAST_DUE = "pastDue";
 const AMOUNT_CUSTOM = "custom";
 
-// Figma: Make a Payment step 1 — payment type, then payment amount for one-time payments
 const MakePaymentScreen = ({ navigation }) => {
+  const headerTitle = "Make a Payment";
   const [details, setDetails] = useState(null);
   const [paymentType, setPaymentType] = useState(TYPE_ONE_TIME);
   const [amountOption, setAmountOption] = useState("");
@@ -41,6 +42,7 @@ const MakePaymentScreen = ({ navigation }) => {
   );
 
   const loading = details === null;
+  const enrolled = !!details?.enrolled;
   const totalDue = Number(details?.balanceDue) || 0;
   const pastDue = Number(details?.pastDueAmount) || 0;
 
@@ -52,7 +54,6 @@ const MakePaymentScreen = ({ navigation }) => {
   };
   const canContinue = paymentType === TYPE_AUTOMATIC || resolveAmount() !== null;
 
-  // Figma: selecting Automatic only switches the type; Continue routes to Auto Pay
   const onContinue = () => {
     if (paymentType === TYPE_AUTOMATIC) {
       navigation.navigate("AutoPay");
@@ -67,7 +68,7 @@ const MakePaymentScreen = ({ navigation }) => {
       return;
     }
     setAmountError("");
-    navigation.navigate("MakePaymentMethod", { amount });
+    navigation.navigate("MakePaymentMethod", { amount, headerTitle });
   };
 
   const onSelectCustom = () => {
@@ -75,7 +76,6 @@ const MakePaymentScreen = ({ navigation }) => {
     amountInputRef.current?.focus();
   };
 
-  // The trailing input stays OUTSIDE the radio Touchable so VoiceOver focuses it separately
   const renderRadioRow = ({ key, label, amount, amountStyle, note, selected, onPress, trailing }) => (
     <View key={key} style={[styles.optionRow, selected && styles.optionRowSelected]}>
       <Touchable
@@ -98,7 +98,7 @@ const MakePaymentScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
       <ScrollView
         contentContainerStyle={[styles.content, contentMaxWidth]}
         showsVerticalScrollIndicator={false}
@@ -114,36 +114,40 @@ const MakePaymentScreen = ({ navigation }) => {
           />
         )}
 
-        <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-          Select payment type
-        </Text>
-        <View style={styles.typeRow} accessibilityRole="radiogroup">
-          {[
-            { key: TYPE_ONE_TIME, label: "One-time payment" },
-            { key: TYPE_AUTOMATIC, label: "Automatic payment" },
-          ].map((type) => {
-            const selected = paymentType === type.key;
-            return (
-              <Touchable
-                key={type.key}
-                style={[styles.typeCard, selected && styles.typeCardSelected]}
-                onPress={() => setPaymentType(type.key)}
-                {...radioA11yProps(type.label, selected)}
-              >
-                <View style={[styles.radioOuter, styles.typeRadio, selected && styles.radioOuterSelected]}>
-                  {selected && <View style={styles.radioInner} />}
-                </View>
-                <Text style={styles.typeLabel}>{type.label}</Text>
-              </Touchable>
-            );
-          })}
-        </View>
+        {!loading && !enrolled && (
+          <>
+            <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+              Select payment type
+            </SectionTitle>
+            <View style={styles.typeRow} accessibilityRole="radiogroup">
+              {[
+                { key: TYPE_ONE_TIME, label: "One-time payment" },
+                { key: TYPE_AUTOMATIC, label: "Automatic payment" },
+              ].map((type) => {
+                const selected = paymentType === type.key;
+                return (
+                  <Touchable
+                    key={type.key}
+                    style={[styles.typeCard, selected && styles.typeCardSelected]}
+                    onPress={() => setPaymentType(type.key)}
+                    {...radioA11yProps(type.label, selected)}
+                  >
+                    <View style={[styles.radioOuter, styles.typeRadio, selected && styles.radioOuterSelected]}>
+                      {selected && <View style={styles.radioInner} />}
+                    </View>
+                    <Text style={styles.typeLabel}>{type.label}</Text>
+                  </Touchable>
+                );
+              })}
+            </View>
+          </>
+        )}
 
         {paymentType === TYPE_ONE_TIME && (
           <>
-            <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+            <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
               Select payment amount <Text style={styles.requiredMark}>(required)</Text>
-            </Text>
+            </SectionTitle>
             {loading ? (
               <SkeletonPlaceholder>
                 <View style={styles.rowSkeleton} />
@@ -230,10 +234,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightGray1,
     marginBottom: 12,
     marginTop: 8,
   },

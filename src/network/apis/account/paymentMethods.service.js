@@ -24,7 +24,9 @@ const authContext = async () => {
   };
 };
 
-// Maps an Orbipay funding account (RetrieveFundingAccounts shape) onto the app's method model
+const cleanName = (value) =>
+  String(value || "").replace(/\b(?:null|undefined)\b/gi, "").replace(/\s+/g, " ").trim();
+
 const normalizePaymentMethod = (raw = {}) => {
   const accountType = (raw.account_type || raw.accountType || "").toLowerCase();
   const subtype = (raw.account_subtype || raw.accountSubType || "").toLowerCase();
@@ -39,7 +41,7 @@ const normalizePaymentMethod = (raw = {}) => {
     idCustomer: customerMatch ? customerMatch[1] : "",
     type: isCard ? "card" : "bank",
     brand: (subtype.split("_")[0] || (isCard ? "card" : "bank")).toLowerCase(),
-    nickname: raw.nickname || raw.account_holder_name || fallbackName,
+    nickname: cleanName(raw.nickname) || cleanName(raw.account_holder_name) || fallbackName,
     lastFour: masked.replace(/[^0-9]/g, "").slice(-4),
     expiry: raw.expiry_date || raw.expiryDate || "",
     isDefault: false,
@@ -47,17 +49,37 @@ const normalizePaymentMethod = (raw = {}) => {
   };
 };
 
+const pickConfirmationNumber = (data) => {
+  const scopes = [data, data?.data, data?.payment, data?.result].filter(Boolean);
+  for (const scope of scopes) {
+    for (const key of Object.keys(scope)) {
+      if (/confirm|reference/i.test(key) && /number|no$|code|id$/i.test(key) && scope[key]) return String(scope[key]);
+    }
+  }
+  return String(data?.confirmationNumber || data?.confirmation_number || "");
+};
+
+const ensureServiceOk = (res) => {
+  const errs = res?.data?.errors || res?.data?.error_list;
+  if (Array.isArray(errs) && errs.length) {
+    const raw = String(errs[0]?.message || errs[0]?.description || "");
+    throw new Error(!raw || raw.includes("<") ? "The payment service is temporarily unavailable. Please try again later." : raw);
+  }
+};
+
 export const fetchPaymentMethods = async () => {
   const { accountNumber, config } = await authContext();
   const res = await _axios.get(getEndpoint(ENDPOINTS.FUNDING_ACCOUNTS, { accountNumber }), config);
+  ensureServiceOk(res);
   const list = Array.isArray(res.data) ? res.data : res.data?.fundingAccounts || [];
   return list.map(normalizePaymentMethod).filter((m) => m.id && m.status === "active");
 };
 
 export const fetchAutoPayDetails = async () => {
   const { accountNumber, config } = await authContext();
-  // easyPayId is the enrolled funding account id
+
   const res = await _axios.get(getEndpoint(ENDPOINTS.ACCOUNTS_EASYPAY, { accountNumber }), config);
+  ensureServiceOk(res);
   return {
     enrolled: !!res.data?.isEasyPay,
     paymentMethodId: String(res.data?.easyPayId || ""),
@@ -72,11 +94,11 @@ export const deletePaymentMethod = async (methodId) => {
     { accountNumber, fundingAccountId: methodId },
     config
   );
+  ensureServiceOk(res);
   return res.data;
 };
 
-// Saved-method one-time payment: DIRECT (no widget/token), keyed by fundingAccountNumber = last four
-export const submitPayment = async (amount, method) => {
+export const submitPayment = async (amount, method, emailOverride) => {
   const { accountNumber, config } = await authContext();
   const { email } = accountSnapshot();
   const res = await _axios.post(
@@ -89,16 +111,16 @@ export const submitPayment = async (amount, method) => {
       paymentRequestDate: "",
       paymentAmountType: "",
       fee: null,
-      email,
+      email: emailOverride || email,
       comment: "",
       customFields: {},
     },
     config
   );
-  return { confirmationNumber: String(res.data?.confirmationNumber || res.data?.confirmation_number || "") };
+  ensureServiceOk(res);
+  return { confirmationNumber: pickConfirmationNumber(res.data) };
 };
 
-// Payload captured from the portal's change-autopay flow (2026-07-15)
 const setupAutoPayPayload = (accountNumber, method) => ({
   accountNumber,
   fundingAccountNumber: method?.lastFour || "",
@@ -118,17 +140,17 @@ export const enrollAutoPay = async (methodId) => {
   const { accountNumber, config } = await authContext();
   const method = typeof methodId === "object" ? methodId : (await fetchPaymentMethods()).find((m) => m.id === methodId);
   const res = await _axios.post(getEndpoint(ENDPOINTS.EASYPAY_SETUP), setupAutoPayPayload(accountNumber, method || methodId), config);
-  return { confirmationNumber: String(res.data?.confirmationNumber || res.data?.confirmation_number || "") };
+  ensureServiceOk(res);
+  return { confirmationNumber: pickConfirmationNumber(res.data) };
 };
 
-// The portal has no update wrapper: changing the AutoPay method = deactivate, then enroll again
 export const updateAutoPayPaymentMethod = async (methodId) => {
   const { accountNumber, config } = await authContext();
-  await _axios.post(getEndpoint(ENDPOINTS.EASYPAY_DELETE, { accountNumber }), {}, config);
+  const res = await _axios.post(getEndpoint(ENDPOINTS.EASYPAY_DELETE, { accountNumber }), {}, config);
+  ensureServiceOk(res);
   return enrollAutoPay(methodId);
 };
 
-// Widget checkout-event -> AddFundingAccount consumes the single-use token directly
 export const confirmBankToken = async (token, digiSign) => {
   const { accountNumber, config } = await authContext();
   const res = await _axios.post(
@@ -136,11 +158,13 @@ export const confirmBankToken = async (token, digiSign) => {
     { token, digiSign, customer_account_reference: accountNumber, accountNumber },
     config
   );
-  return normalizePaymentMethod(res.data?.fundingAccount || res.data || {});
+  ensureServiceOk(res);
+  const method = normalizePaymentMethod(res.data?.funding_account || res.data?.fundingAccount || res.data || {});
+  if (!method.id) throw new Error("The payment service did not confirm your new payment method.");
+  return method;
 };
 
-// Widget create_payment checkout-event -> Payment/Submit (token+digiSign ride the payload)
-export const confirmPaymentToken = async (token, digiSign, amount) => {
+export const confirmPaymentToken = async (token, digiSign, amount, emailOverride) => {
   const { accountNumber, config } = await authContext();
   const { email } = accountSnapshot();
   const res = await _axios.post(
@@ -152,15 +176,15 @@ export const confirmPaymentToken = async (token, digiSign, amount) => {
       isAutoPay: false,
       amount: Number(amount).toFixed(2),
       webId: "0",
-      email,
+      email: emailOverride || email,
       paymentRequestDate: moment().format("YYYY-MM-DD"),
     },
     config
   );
-  return { confirmationNumber: String(res.data?.confirmationNumber || res.data?.confirmation_number || "") };
+  ensureServiceOk(res);
+  return { confirmationNumber: pickConfirmationNumber(res.data) };
 };
 
-// Widget update_funding_account mode -> UpdFundingAccount (PUT), keyed by id_account
 export const updateFundingAccount = async (methodId, { token, digiSign } = {}) => {
   const { accountNumber, config } = await authContext();
   const res = await _axios.put(
@@ -168,11 +192,13 @@ export const updateFundingAccount = async (methodId, { token, digiSign } = {}) =
     { token, digiSign, id_account: methodId, customer_account_reference: null, accountNumber },
     config
   );
+  ensureServiceOk(res);
   return res.data;
 };
 
 export const cancelAutoPay = async () => {
   const { accountNumber, config } = await authContext();
   const res = await _axios.post(getEndpoint(ENDPOINTS.EASYPAY_DELETE, { accountNumber }), {}, config);
-  return { confirmationNumber: String(res.data?.confirmationNumber || res.data?.confirmation_number || "") };
+  ensureServiceOk(res);
+  return { confirmationNumber: pickConfirmationNumber(res.data) };
 };
