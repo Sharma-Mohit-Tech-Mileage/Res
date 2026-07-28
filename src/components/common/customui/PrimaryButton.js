@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, StyleSheet, View } from 'react-native';
+import { Text, StyleSheet, View, Platform } from 'react-native';
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import { interaction } from "../../../styles/utilities";
@@ -10,14 +10,16 @@ const PrimaryButton = ({ title, onPress, buttonType, accessibilityLabel, disable
   const isOutline = buttonType === 'outline';
   const textStyles = [
     isSubmit ? styles.submitText : isOutline ? styles.outlineText : styles.cancelText,
-    isSubmit && disabled && styles.disabledText,
+    (isSubmit || isOutline) && disabled && styles.disabledText,
   ];
 
   return (
     <View style={styles.margin}>
       <Touchable
         accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel !== undefined ? accessibilityLabel : undefined}
+        accessibilityLabel={`${accessibilityLabel !== undefined ? accessibilityLabel : title}${
+          disabled && Platform.OS === "ios" ? ", not enabled" : ""
+        }`}
         accessibilityState={{ disabled }}
         disabled={disabled}
         style={({ pressed }) => [
@@ -25,6 +27,7 @@ const PrimaryButton = ({ title, onPress, buttonType, accessibilityLabel, disable
           isSubmit ? styles.submitButton : null,
           isOutline ? styles.outlineButton : null,
           isSubmit && disabled ? styles.disabledButton : null,
+          isOutline && disabled ? styles.disabledOutlineButton : null,
           pressed && !disabled && interaction.pressed,
         ]}
         onPress={() => !disabled && onPress && onPress()}
@@ -67,6 +70,9 @@ const styles = StyleSheet.create({
   disabledButton: {
     backgroundColor: "#EAECF0",
     elevation: 0,
+  },
+  disabledOutlineButton: {
+    borderColor: "#98A2B3",
   },
   submitText: {
     textAlign: "center",

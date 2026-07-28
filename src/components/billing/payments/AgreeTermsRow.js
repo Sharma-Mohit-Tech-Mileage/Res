@@ -46,9 +46,9 @@ const AgreeTermsRow = ({ value, onValueChange, onViewTerms }) => (
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", marginVertical: 4 },
   agreePress: { flexDirection: "row", justifyContent: "flex-start", minHeight: 48 },
-  checkboxBox: { marginRight: 12 },
-  // iOS RNCCheckbox defaults to a large frame; Android's native checkbox is already compact
-  checkbox: Platform.OS === "ios" ? { width: 22, height: 22 } : {},
+  checkboxBox: { marginRight: Platform.OS === "ios" ? 10 : 16 },
+  // 12x12 square matches the checkbox standard used across the app (EmailNotification, TextNotifications)
+  checkbox: { width: 12, height: 12 },
   agreeText: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,

@@ -200,7 +200,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 100 },
+  content: { padding: 20, paddingBottom: 140 },
   heading: {
     fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
@@ -218,13 +218,13 @@ const styles = StyleSheet.create({
   introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
   cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
   summaryCard: { padding: 16, marginTop: 8 },
-  fieldGroup: { paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: "#EAECF0", marginBottom: 12 },
-  fieldGroupLast: { paddingBottom: 0, borderBottomWidth: 0, marginBottom: 0 },
+  fieldGroup: { marginBottom: 16 },
+  fieldGroupLast: { marginBottom: 0 },
   fieldLabel: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
-    marginBottom: 2,
+    marginBottom: 8,
   },
   fieldValue: {
     fontSize: FontSize.size_base,

@@ -8,14 +8,11 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
 import PaymentMethodCard from "./PaymentMethodCard";
 import ConfirmActionModal from "./ConfirmActionModal";
-import RightArrow from "../../../res/svgIcons/RightArrow";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
   deletePaymentMethod,
-  addDemoPaymentMethod,
-  isDemoPaymentData,
 } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, describePaymentMethod, isMethodExpired, openOrbipaySecureCapture } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
@@ -54,20 +51,8 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   const canContinue = !!selectedMethod && !isMethodExpired(selectedMethod);
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
-  const onPayWithNewMethod = async () => {
-    if (!isDemoPaymentData) {
-      openOrbipaySecureCapture(navigation);
-      return;
-    }
-    try {
-      const added = await addDemoPaymentMethod();
-      setMethods((prev) => [...(prev || []), added]);
-      setSelectedId(added.id);
-      announceA11y("New payment method added and selected.");
-    } catch (error) {
-      setErrorAlert("We could not add a payment method right now. Please try again.");
-    }
-  };
+  // "Pay with new" goes to Review with no saved method; Submit then opens the payment widget
+  const onPayWithNewMethod = () => navigation.navigate("MakePaymentReview", { amount, methodId: "" });
 
   // Orbipay cannot edit PCI fields natively; edits go through the secure capture page
   const onEditMethod = () => openOrbipaySecureCapture(navigation, "Edit Payment Method");
@@ -87,7 +72,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} autoFocusBack />
       <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
@@ -138,7 +123,6 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
               style={styles.newMethodCard}
             >
               <Text style={styles.newMethodText}>Pay with new payment method</Text>
-              <RightArrow color={Color.sparklightBrightPurple} />
             </Touchable>
             <PrimaryButton
               title="Continue"
@@ -149,7 +133,6 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
             />
             <PrimaryButton
               title="Cancel"
-              buttonType="outline"
               accessibilityLabel="Cancel payment"
               onPress={() => navigation.popToTop()}
             />
@@ -173,7 +156,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 100 },
+  content: { padding: 20, paddingBottom: 140 },
   heading: {
     fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
@@ -209,7 +192,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
     color: Color.sparklightBrightPurple,
-    marginRight: 4,
   },
 });
 

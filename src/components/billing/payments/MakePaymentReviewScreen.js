@@ -12,8 +12,7 @@ import { card } from "../../../styles/utilities";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
-  submitDemoPayment,
-  isDemoPaymentData,
+  submitPayment,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
   contentMaxWidth,
@@ -54,7 +53,8 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
 
   const onSubmit = async () => {
     if (submitting || !agreed) return;
-    if (!isDemoPaymentData) {
+    // Widget only captures NEW card/bank data; saved methods pay through the wrapper API
+    if (!method?.id) {
       openOrbipayPaymentExecution(navigation, {
         amount,
         paymentMethodId: method?.id,
@@ -72,7 +72,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
     }
     setSubmitting(true);
     try {
-      const result = await submitDemoPayment(amount);
+      const result = await submitPayment(amount, method?.id);
       navigation.replace("PaymentConfirmation", {
         kind: "payment-submitted",
         message: `Your payment for ${formatCurrency(
@@ -128,7 +128,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           {renderField("Payment Date", paymentDate, moment().format("MMMM D, YYYY"), true)}
         </View>
 
-        {!isDemoPaymentData && (
+        {!method?.id && (
           <Text style={styles.helperText}>
             You will complete this payment on our secure payment page. Your card or bank details never leave that
             page.
@@ -154,7 +154,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 80 },
+  content: { padding: 20, paddingBottom: 140 },
   heading: {
     fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
@@ -163,13 +163,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   summaryCard: { padding: 16 },
-  fieldGroup: { paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: "#EAECF0", marginBottom: 12 },
-  fieldGroupLast: { paddingBottom: 0, borderBottomWidth: 0, marginBottom: 0 },
+  fieldGroup: { marginBottom: 16 },
+  fieldGroupLast: { marginBottom: 0 },
   fieldLabel: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
-    marginBottom: 2,
+    marginBottom: 8,
   },
   fieldValue: {
     fontSize: FontSize.size_base,

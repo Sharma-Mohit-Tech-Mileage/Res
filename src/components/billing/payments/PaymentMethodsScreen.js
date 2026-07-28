@@ -14,8 +14,6 @@ import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
   deletePaymentMethod,
-  addDemoPaymentMethod,
-  isDemoPaymentData,
 } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, describePaymentMethod, openOrbipaySecureCapture } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
@@ -53,27 +51,7 @@ const PaymentMethodsScreen = ({ navigation }) => {
 
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
-  const onAddMethod = async () => {
-    if (!isDemoPaymentData) {
-      openOrbipaySecureCapture(navigation);
-      return;
-    }
-    setBusy(true);
-    try {
-      const added = await addDemoPaymentMethod();
-      setMethods((prev) => [...(prev || []), added]);
-      setAlert({ type: "success", message: "You have successfully added a new payment method" });
-      announceA11y("You have successfully added a new payment method.");
-    } catch (error) {
-      setAlert({
-        type: "error",
-        title: "Something went wrong",
-        message: "We could not add a payment method right now. Please try again.",
-      });
-    } finally {
-      setBusy(false);
-    }
-  };
+  const onAddMethod = () => openOrbipaySecureCapture(navigation);
 
   // Orbipay cannot edit PCI fields natively; edits go through the secure capture page
   const onEditMethod = () => openOrbipaySecureCapture(navigation, "Edit Payment Method");
@@ -174,7 +152,7 @@ const PaymentMethodsScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 80 },
+  content: { padding: 20, paddingBottom: 140 },
   headingRow: {
     flexDirection: "row",
     justifyContent: "space-between",

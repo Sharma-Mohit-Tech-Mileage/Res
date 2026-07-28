@@ -47,7 +47,6 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
 
   // Figma: dollar amounts inside the success message render bold
   const messageParts = message.split(/(\$[\d,]+\.?\d*)/g);
-  const showBackToBilling = kind !== "autopay-activated" && kind !== "autopay-updated";
 
   const followUp =
     nextAction?.type === "payBalance"
@@ -130,14 +129,6 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
           />
         )}
 
-        {showBackToBilling && (
-          <PrimaryButton
-            title="Back to Billing"
-            buttonType="submit"
-            accessibilityLabel="Back to Billing"
-            onPress={() => navigation.popToTop()}
-          />
-        )}
       </ScrollView>
     </View>
   );
@@ -145,9 +136,9 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 80 },
-  successCard: { padding: 24, alignItems: "center", marginTop: 16 },
-  iconWrap: { marginBottom: 16 },
+  content: { padding: 20, paddingBottom: 140 },
+  successCard: { paddingVertical: 32, paddingHorizontal: 16, alignItems: "center", marginTop: 16 },
+  iconWrap: { marginBottom: 20 },
   title: {
     fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
@@ -162,14 +153,15 @@ const styles = StyleSheet.create({
     color: Color.colorGray_200,
     textAlign: "center",
     lineHeight: 22,
+    marginBottom: 8,
   },
   messageAmount: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
-  detailBlock: { alignSelf: "stretch", marginTop: 16 },
+  detailBlock: { alignSelf: "stretch", marginTop: 24 },
   detailLabel: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
-    marginBottom: 2,
+    marginBottom: 8,
   },
   detailValue: {
     fontSize: FontSize.size_base,

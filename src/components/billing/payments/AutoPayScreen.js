@@ -12,11 +12,8 @@ import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
-  addDemoPaymentMethod,
-  isDemoPaymentData,
 } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, ordinal, isMethodExpired, openOrbipaySecureCapture } from "./paymentsShared";
-import { announceA11y } from "../../../utils/a11y";
 
 // Figma: Activate/Manage auto pay — select a payment method, then continue to review
 const AutoPayScreen = ({ navigation }) => {
@@ -53,20 +50,7 @@ const AutoPayScreen = ({ navigation }) => {
   const canContinue =
     !!selectedMethod && !isMethodExpired(selectedMethod) && (!enrolled || selectedId !== autoPay?.paymentMethodId);
 
-  const onAddMethod = async () => {
-    if (!isDemoPaymentData) {
-      openOrbipaySecureCapture(navigation);
-      return;
-    }
-    try {
-      const added = await addDemoPaymentMethod();
-      setMethods((prev) => [...(prev || []), added]);
-      setSelectedId(added.id);
-      announceA11y("New payment method added and selected.");
-    } catch (error) {
-      setErrorAlert("We could not add a payment method right now. Please try again.");
-    }
-  };
+  const onAddMethod = () => openOrbipaySecureCapture(navigation);
 
   const onContinue = () => {
     if (!canContinue) return;
@@ -151,6 +135,7 @@ const AutoPayScreen = ({ navigation }) => {
               <PrimaryButton
                 title="Deactivate"
                 buttonType="outline"
+                disabled={selectedId !== autoPay?.paymentMethodId}
                 accessibilityLabel="Deactivate Auto Pay"
                 onPress={() => navigation.navigate("AutoPayDeactivate")}
               />
@@ -164,7 +149,7 @@ const AutoPayScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 80 },
+  content: { padding: 20, paddingBottom: 140 },
   heading: {
     fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,

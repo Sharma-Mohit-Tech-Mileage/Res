@@ -16,7 +16,7 @@ const BankMark = ({ size, fill }) => (
 
 // Resolves the official card-network mark (or bank glyph) from the payment method's own brand data
 const PaymentBrandIcon = ({ type, brand, height = 22 }) => {
-  if (type === "ach") return <BankMark size={height + 4} fill={Color.colorMidnightblue} />;
+  if (type === "ach" || type === "bank") return <BankMark size={height + 4} fill={Color.colorMidnightblue} />;
   // Official artwork is 780x500; keep its aspect ratio at the requested height
   const width = Math.round(height * 1.56);
   const name = (brand || "").toLowerCase();

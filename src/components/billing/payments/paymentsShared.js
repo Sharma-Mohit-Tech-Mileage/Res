@@ -1,9 +1,18 @@
 import Config from "react-native-config";
+import { Platform } from "react-native";
 import moment from "moment";
 import { digitsToWords } from "../../../utils/a11y";
 
 // Tablet-friendly content width: full-width on phones, centered column on wide screens
 export const contentMaxWidth = { width: "100%", maxWidth: 640, alignSelf: "center" };
+
+// iOS VoiceOver does not announce RN's radio role or a toggle hint; compose them manually there
+export const radioA11yProps = (label, checked) => ({
+  accessibilityRole: "radio",
+  accessibilityState: { checked: !!checked },
+  accessibilityLabel: Platform.OS === "ios" ? `${label}, radio button` : label,
+  accessibilityHint: Platform.OS === "ios" && !checked ? "Double tap to select." : undefined,
+});
 
 export const ordinal = (day) => {
   const n = Number(day);
@@ -24,18 +33,23 @@ export const paymentMethodTitle = (method) => {
 export const maskedDigits = (method) =>
   method?.type === "card" ? `**** **** **** ${method?.lastFour || ""}` : `**** **** ${method?.lastFour || ""}`;
 
-export const describePaymentMethod = (method) => {
-  if (!method) return "No payment method on file";
+// Skips the kind suffix when the nickname already ends with it ("Checking Account" + "account")
+const methodDisplayName = (method) => {
   const kind = method.type === "card" ? "card" : "account";
   const brand = method.nickname || method.brand || (method.type === "card" ? "Card" : "Bank account");
-  return method.lastFour ? `${brand} ${kind} ending in ${method.lastFour}` : brand;
+  return brand.toLowerCase().endsWith(kind) ? brand : `${brand} ${kind}`;
+};
+
+export const describePaymentMethod = (method) => {
+  if (!method) return "No payment method on file";
+  return method.lastFour ? `${methodDisplayName(method)} ending in ${method.lastFour}` : methodDisplayName(method);
 };
 
 export const paymentMethodA11yLabel = (method) => {
   if (!method) return "No payment method on file";
-  const kind = method.type === "card" ? "card" : "account";
-  const brand = method.nickname || method.brand || (method.type === "card" ? "Card" : "Bank account");
-  return method.lastFour ? `${brand} ${kind} ending in ${digitsToWords(method.lastFour)}` : brand;
+  return method.lastFour
+    ? `${methodDisplayName(method)} ending in ${digitsToWords(method.lastFour)}`
+    : methodDisplayName(method);
 };
 
 export const isMethodExpired = (method) => {

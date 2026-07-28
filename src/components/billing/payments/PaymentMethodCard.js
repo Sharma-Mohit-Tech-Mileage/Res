@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import Touchable from "../../common/customui/Touchable";
 import PaymentBrandIcon from "../../common/PaymentBrandIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { paymentMethodA11yLabel, paymentMethodTitle, maskedDigits, isMethodExpired } from "./paymentsShared";
+import { paymentMethodA11yLabel, paymentMethodTitle, maskedDigits, isMethodExpired, radioA11yProps } from "./paymentsShared";
 
 // Figma method card: radio variant for payment selection, actions variant for the Payment Methods list
 const PaymentMethodCard = ({
@@ -97,16 +97,16 @@ const PaymentMethodCard = ({
 
   if (variant === "radio") {
     return (
-      <View style={[styles.card, selected && styles.cardSelected, expired && styles.cardDisabled]}>
+      <View style={[styles.card, selected && styles.cardSelected]}>
         <Touchable
           onPress={onPress}
           disabled={disabled || expired}
-          accessibilityRole="radio"
+          {...radioA11yProps(
+            `${infoA11yLabel}${expired ? ", not eligible" : ""}${positionLabel ? `, ${positionLabel}` : ""}`,
+            selected
+          )}
           accessibilityState={{ checked: selected, disabled: disabled || expired }}
-          accessibilityLabel={`${infoA11yLabel}${expired ? ", not eligible" : ""}${
-            positionLabel ? `, ${positionLabel}` : ""
-          }`}
-          style={styles.radioPress}
+          style={[styles.radioPress, expired && styles.contentDisabled]}
         >
           {topContent}
         </Touchable>
@@ -116,8 +116,8 @@ const PaymentMethodCard = ({
   }
 
   return (
-    <View style={[styles.card, expired && styles.cardDisabled]}>
-      <View accessible accessibilityLabel={infoA11yLabel}>
+    <View style={styles.card}>
+      <View accessible accessibilityLabel={infoA11yLabel} style={expired && styles.contentDisabled}>
         {topContent}
       </View>
       {actionsRow}
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     borderColor: Color.colorMidnightblue,
     backgroundColor: "#F3F2FF",
   },
-  cardDisabled: { opacity: 0.55 },
+  contentDisabled: { opacity: 0.55 },
   radioPress: { alignItems: "stretch", alignSelf: "stretch" },
   topRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   titleWrap: { flexDirection: "row", alignItems: "center", flexShrink: 1 },
@@ -187,7 +187,8 @@ const styles = StyleSheet.create({
   actionLink: { paddingVertical: 4, paddingHorizontal: 4 },
   actionText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "700",
     color: Color.sparklightBrightPurple,
     textDecorationLine: "underline",
   },

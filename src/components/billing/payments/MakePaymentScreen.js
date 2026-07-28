@@ -8,7 +8,7 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { fetchAutoPayDetails } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, formatCurrency, parseAmountInput } from "./paymentsShared";
+import { contentMaxWidth, formatCurrency, parseAmountInput, radioA11yProps } from "./paymentsShared";
 
 const TYPE_ONE_TIME = "oneTime";
 const TYPE_AUTOMATIC = "automatic";
@@ -75,25 +75,25 @@ const MakePaymentScreen = ({ navigation }) => {
     amountInputRef.current?.focus();
   };
 
+  // The trailing input stays OUTSIDE the radio Touchable so VoiceOver focuses it separately
   const renderRadioRow = ({ key, label, amount, amountStyle, note, selected, onPress, trailing }) => (
-    <Touchable
-      key={key}
-      style={[styles.optionRow, selected && styles.optionRowSelected]}
-      onPress={onPress}
-      accessibilityRole="radio"
-      accessibilityState={{ checked: selected }}
-      accessibilityLabel={`${label}${amount ? `, ${amount}` : ""}${note ? `, ${note}` : ""}`}
-    >
-      <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
-        {selected && <View style={styles.radioInner} />}
-      </View>
-      <View style={styles.optionTextWrap}>
-        <Text style={styles.optionLabel}>{label}</Text>
-        {!!note && <Text style={styles.optionNote}>{note}</Text>}
-      </View>
-      {!!amount && <Text style={[styles.optionAmount, amountStyle]}>{amount}</Text>}
+    <View key={key} style={[styles.optionRow, selected && styles.optionRowSelected]}>
+      <Touchable
+        style={styles.optionPress}
+        onPress={onPress}
+        {...radioA11yProps(`${label}${amount ? `, ${amount}` : ""}${note ? `, ${note}` : ""}`, selected)}
+      >
+        <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
+          {selected && <View style={styles.radioInner} />}
+        </View>
+        <View style={styles.optionTextWrap}>
+          <Text style={styles.optionLabel}>{label}</Text>
+          {!!note && <Text style={styles.optionNote}>{note}</Text>}
+        </View>
+        {!!amount && <Text style={[styles.optionAmount, amountStyle]}>{amount}</Text>}
+      </Touchable>
       {trailing}
-    </Touchable>
+    </View>
   );
 
   return (
@@ -128,9 +128,7 @@ const MakePaymentScreen = ({ navigation }) => {
                 key={type.key}
                 style={[styles.typeCard, selected && styles.typeCardSelected]}
                 onPress={() => setPaymentType(type.key)}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: selected }}
-                accessibilityLabel={type.label}
+                {...radioA11yProps(type.label, selected)}
               >
                 <View style={[styles.radioOuter, styles.typeRadio, selected && styles.radioOuterSelected]}>
                   {selected && <View style={styles.radioInner} />}
@@ -183,14 +181,15 @@ const MakePaymentScreen = ({ navigation }) => {
                       ref={amountInputRef}
                       style={styles.inlineAmountInput}
                       value={customAmount}
-                      placeholder="$"
+                      placeholder="$0.00"
                       placeholderTextColor={Color.sparklightGray1}
                       keyboardType="decimal-pad"
                       accessibilityLabel="Payment amount, required"
                       accessibilityHint={amountError ? amountError : undefined}
                       onFocus={() => setAmountOption(AMOUNT_CUSTOM)}
                       onChangeText={(text) => {
-                        setCustomAmount(text);
+                        const digits = text.replace(/[^0-9.]/g, "");
+                        setCustomAmount(digits ? `$${digits}` : "");
                         if (amountError) setAmountError("");
                       }}
                     />
@@ -217,7 +216,6 @@ const MakePaymentScreen = ({ navigation }) => {
             />
             <PrimaryButton
               title="Cancel"
-              buttonType="outline"
               accessibilityLabel="Cancel payment"
               onPress={() => navigation.popToTop()}
             />
@@ -230,7 +228,7 @@ const MakePaymentScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 100 },
+  content: { padding: 20, paddingBottom: 140 },
   heading: {
     fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
@@ -256,7 +254,7 @@ const styles = StyleSheet.create({
   typeCardSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: "#F3F2FF" },
   typeRadio: { marginRight: 8 },
   typeLabel: {
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_20,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
     color: Color.colorGray_200,
@@ -287,6 +285,7 @@ const styles = StyleSheet.create({
   },
   radioOuterSelected: { borderColor: Color.colorMidnightblue },
   radioInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: Color.colorMidnightblue },
+  optionPress: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-start" },
   optionTextWrap: { flex: 1, marginRight: 12 },
   optionLabel: {
     fontSize: FontSize.size_20,
