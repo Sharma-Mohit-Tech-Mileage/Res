@@ -61,9 +61,9 @@ export const theme = {
   // Typography from GlobalStyles
   typography: {
     family: {
-      regular: FontFamily.openSansRegular,
-      semiBold: FontFamily.openSansSemiBold,
-      bold: FontFamily.openSansSemiBold, // Using semiBold for bold
+      regular: FontFamily.RadioCanadaRegular,
+      semiBold: FontFamily.RadioCanadaSemiBold,
+      bold: FontFamily.RadioCanadaSemiBold, // Using semiBold for bold
     },
     size: {
       xs: FontSize.size_xs, // 12

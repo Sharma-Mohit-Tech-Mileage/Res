@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     textDecorationLine: 'underline',
   },

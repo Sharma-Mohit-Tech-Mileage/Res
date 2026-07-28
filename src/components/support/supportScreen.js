@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     textAlign: "auto",
     color: Color.colorGray_100,
     fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     flex: 1,
   },
   featuredIcon: {

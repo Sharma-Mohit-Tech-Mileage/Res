@@ -206,7 +206,7 @@ iconStyle: {
 suggestionText: {
     flex: 1, // To ensure text takes up the remaining space
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightBrightPurple,
     flexWrap:'wrap',
     maxWidth:wp('90%')

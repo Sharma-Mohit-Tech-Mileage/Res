@@ -37,7 +37,7 @@ export const card = {
 // Required-field text style (form helper)
 export const requiredField = {
   marginVertical: 5,
-  fontFamily: FontFamily.openSansRegular,
+  fontFamily: FontFamily.RadioCanadaRegular,
   fontWeight: "400",
   fontSize: FontSize.size_sm,
   color: Color.sparklightGray1,

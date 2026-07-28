@@ -64,14 +64,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     color: Color.colorGray_100,
     marginBottom: 8,
   },
   message: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     marginBottom: 20,
     lineHeight: 20,
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
   confirmText: {
     color: "#FFFFFF",
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
   },
   cancelButton: {
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   cancelText: {
     color: Color.colorMidnightblue,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     textDecorationLine: "underline",
   },

@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_lg,
     color: Color.sparklightBrightPurple,
     marginTop: Padding.p_5xs,

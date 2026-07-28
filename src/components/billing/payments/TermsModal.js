@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
   title: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     color: Color.colorGray_200,
     flexShrink: 1,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   scrollArea: { flexGrow: 0, marginBottom: 8 },
   termsText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     lineHeight: 24,
   },

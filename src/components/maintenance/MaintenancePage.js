@@ -178,7 +178,7 @@ const MaintenancePage = ({
             {
               position: "absolute",
               bottom: hp("5%"),
-              FontFamily: FontFamily.openSansRegular,
+              FontFamily: FontFamily.RadioCanadaRegular,
               fontSize: 14,
               fontWeight: "400",
               color: colors.snow_white,
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   versionText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_sm,
     color: "#FFFFFF",
     fontWeight: "400",
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   titleText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: wp("7%"),
     maxFontSize: 32,
     color: Color.sparklightGray1,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   messageText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: "#707679",
     textAlign: "left",
@@ -273,14 +273,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   estimatedTimeLabel: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
     color: "#000",
     marginBottom: 4,
     fontWeight: "400",
   },
   estimatedTimeValue: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
     color: "#000",
     fontWeight: "700",
@@ -296,14 +296,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   contactMessage: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: Color.sparklightGray1,
     textAlign: "center",
     fontWeight: "400",
   },
   contactLink: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: Color.sparklightBrightPurple,
     fontWeight: "700",
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   copyrightText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
     color: "#FFFFFF",
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   loginButtonText: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
     color: Color.sparklightWhite,
     textAlign: "center",
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   blockingInfoText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_sm,
     color: "#856404",
     textAlign: "center",

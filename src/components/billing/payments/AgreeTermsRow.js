@@ -51,13 +51,13 @@ const styles = StyleSheet.create({
   checkbox: Platform.OS === "ios" ? { width: 22, height: 22 } : {},
   agreeText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   linkPress: { justifyContent: "center", minHeight: 48, paddingHorizontal: 4 },
   linkText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.sparklightBrightPurple,
     textDecorationLine: "underline",

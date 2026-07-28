@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
     color: "#001321",
     fontSize: FontSize.size_base,
     fontWeight: "400",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     marginTop: 8,
   },
   loadingContainer: {
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     textAlign: "center",
   },
@@ -644,26 +644,26 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_100,
     fontWeight: "500",
   },
   detailValue: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     fontWeight: "400",
     textAlign: "right",
   },
   detailLabelNormal: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_100,
     fontWeight: "400",
   },
   detailValueNormal: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     fontWeight: "400",
     textAlign: "right",
@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
   },
   discountExpiryText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     fontWeight: "400",
     marginLeft: 4,
@@ -692,13 +692,13 @@ const styles = StyleSheet.create({
   },
   totalBalanceLabel: {
     fontSize: 18,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_100,
     fontWeight: "700",
   },
   totalBalanceValue: {
     fontSize: 18,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     fontWeight: "700",
     flex: 3,
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
   },
   makeTypo: {
     width: 282,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     textAlign: "center",
   },
@@ -755,7 +755,7 @@ const styles = StyleSheet.create({
   },
 
   billExplainerText: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: 18,
     lineHeight: 26,
     textAlign: "center",
@@ -763,7 +763,7 @@ const styles = StyleSheet.create({
   },
 
   billExplainerLinkText: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: 18,
     lineHeight: 26,
     textAlign: "center",

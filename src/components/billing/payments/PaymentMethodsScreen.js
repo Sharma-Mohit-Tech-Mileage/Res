@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.sparklightGray1,
     flexShrink: 1,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   addLinkRow: { flexDirection: "row", alignItems: "center" },
   addLinkText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightBrightPurple,
     textDecorationLine: "underline",
     marginRight: 4,
@@ -201,14 +201,14 @@ const styles = StyleSheet.create({
   emptyCard: { padding: 20, marginBottom: 16, alignItems: "flex-start" },
   emptyTitle: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     color: Color.colorGray_100,
     marginBottom: 8,
   },
   helperText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     lineHeight: 20,
   },

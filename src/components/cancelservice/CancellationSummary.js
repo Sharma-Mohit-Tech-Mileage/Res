@@ -340,7 +340,7 @@ const CancellationSummary = ({ navigation, route }) => {
           style={{
             fontSize: 22,
             fontWeight: "500",
-            fontFamily: FontFamily.openSansRegular,
+            fontFamily: FontFamily.RadioCanadaRegular,
             color: Color.colorGray_200,
             textAlign: "center",
             marginHorizontal: 24,
@@ -701,7 +701,7 @@ const CancellationSummary = ({ navigation, route }) => {
                       style={{
                         color: Color.sparklightBrightPurple,
                         textDecorationLine: "underline",
-                        fontFamily: FontFamily.openSansRegular,
+                        fontFamily: FontFamily.RadioCanadaRegular,
                         fontSize: 14,
                         fontWeight: "400",
                       }}
@@ -852,7 +852,7 @@ const CancellationSummary = ({ navigation, route }) => {
             <Text
               style={[
                 {
-                  fontFamily: FontFamily.openSansRegular,
+                  fontFamily: FontFamily.RadioCanadaRegular,
                   fontSize: 14,
                   color: Color.colorGray_200,
                   marginRight: 8,
@@ -963,7 +963,7 @@ const styles = {
   },
   makeTypo: {
     width: 282,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     fontSize: FontSize.size_base,
     textAlign: "center",
@@ -985,14 +985,14 @@ const styles = {
   lableTxt: {
     fontSize: FontSize.size_sm,
     fontWeight: "500",
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     color: Color.colorGray_200,
     lineHeight: 14,
   },
   valueTxt: {
     fontSize: FontSize.size_base,
     fontWeight: "700",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorblack_100,
     lineHeight: 16,
     marginTop: 10,
@@ -1000,7 +1000,7 @@ const styles = {
   valueTxt1: {
     fontSize: FontSize.size_base,
     fontWeight: "400",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorblack_100,
     lineHeight: 16,
     marginTop: 5,
@@ -1027,7 +1027,7 @@ const styles = {
     selfAlign: "center",
     fontWeight: "700",
     marginVertical: 24,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   checkBox: {
@@ -1056,14 +1056,14 @@ const styles = {
   },
   checkBoxAreaViewText: {
     fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     fontWeight: "400",
   },
   terms: {
     fontSize: FontSize.size_sm,
     color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     lineHeight: 18,
     fontWeight: "400",
   },

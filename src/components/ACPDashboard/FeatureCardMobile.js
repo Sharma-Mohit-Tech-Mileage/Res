@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorWhitesmoke_100,
   },
   title: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: 20,
     color: Color.sparklightBrightPurple,
     fontWeight: "700",
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     marginRight: Padding.p_xs,
   },
   featureText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: Color.sparklightGray1,
     fontWeight: "400",
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     borderColor: Color.sparklightGreen,
   },
   buttonText: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
     fontWeight: "700",
   },

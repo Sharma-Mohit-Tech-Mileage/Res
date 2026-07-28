@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   dropdownText: {
     flex: 1,
     color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     flexWrap: 'wrap',
     paddingRight: 8,
   },
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000000',
     flex: 1,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   selectedOptionText: {
     color: Color.sparklightPrimaryPurple,

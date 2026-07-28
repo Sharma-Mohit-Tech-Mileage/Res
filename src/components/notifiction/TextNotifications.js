@@ -632,7 +632,7 @@ const styles = StyleSheet.create({
   },
   containerTypo: {
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   mobilePhoneTypo: {
     color: Color.colorblack_100,
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontWeight: "400",
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   requiredFieldsText: {
     marginTop: Padding.p_base,
@@ -657,14 +657,14 @@ const styles = StyleSheet.create({
   },
   ErrorToggle: {
     color: Color.sparkLightRed,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     fontSize: 14,
     marginLeft: 4,
   },
   makeTypo: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttonContainer: {
     padding: Padding.p_base,
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     color: Color.colorGray_200,
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_sm,
     flex: 1,
   },
@@ -717,7 +717,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     textAlign: "left",
     color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   frameParent3: {
     justifyContent: "center",
@@ -737,15 +737,15 @@ const styles = StyleSheet.create({
     color: Color.sparklightDarkGray,
     lineHeight: 22,
     fontWeight: "400",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "left",
     alignSelf: "stretch",
     fontSize: FontSize.size_sm,
   },
   byOptingInContainer: {
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.RadioCanadaSemiBold_size,
     color: Color.sparklightDarkGray,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "left",
     alignSelf: "stretch",
   },
@@ -855,7 +855,7 @@ const styles = StyleSheet.create({
   },
   makeTypo: {
     width: 282,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     textAlign: "center",
   },

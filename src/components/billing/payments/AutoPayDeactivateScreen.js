@@ -101,14 +101,14 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 80 },
   heading: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.sparklightGray1,
     marginBottom: 8,
   },
   introText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     lineHeight: 22,
     marginBottom: 8,

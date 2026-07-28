@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   stepText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     fontWeight: "400",
     fontSize: 14,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_xl,
   },
   title: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     color: "#1F2937",
     fontWeight: "700",
     fontSize: 18,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   description: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     fontSize: 14,
     lineHeight: 21,

@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_lg,
     fontWeight: "600",
     color: Color.sparklightWhite,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
   },
   icon: {
     height: 24,

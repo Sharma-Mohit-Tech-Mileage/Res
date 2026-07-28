@@ -163,14 +163,14 @@ const styles = StyleSheet.create({
   radioInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: Color.colorMidnightblue },
   titleText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     flexShrink: 1,
   },
   brandWrap: { marginLeft: 12 },
   digitsText: {
     fontSize: FontSize.size_5xl,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.colorGray_200,
     letterSpacing: 1,
@@ -187,14 +187,14 @@ const styles = StyleSheet.create({
   actionLink: { paddingVertical: 4, paddingHorizontal: 4 },
   actionText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightBrightPurple,
     textDecorationLine: "underline",
   },
   actionDivider: { color: "#98A2B3", marginHorizontal: 6 },
   autoPayBadge: {
     fontSize: FontSize.size_xs,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     backgroundColor: "#C8E9D0",
     borderRadius: 4,
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   },
   expiredBadge: {
     fontSize: FontSize.size_xs,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     color: "#B92A1C",
     backgroundColor: "#FEF3F2",
     borderRadius: 4,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   },
   expiryText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   textDisabled: { color: Color.sparklightGray1 },

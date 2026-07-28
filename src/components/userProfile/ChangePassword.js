@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   },
   bulletPoiint: {
     color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_xs,
     fontStyle: "normal",
     fontWeight: "400",
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
   },
   passwordFlexBox: {
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
   },
   buttonsLayout: {
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   makeTypo: {
     width: 282,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
   },
 

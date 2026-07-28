@@ -9,6 +9,8 @@ import Touchable from "../../common/customui/Touchable";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { fetchAutoPayDetails } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, formatCurrency, parseAmountInput } from "./paymentsShared";
+import AppStyles from "../../../styles/AppStyles";
+import { FieldTitle, FieldContent } from "../../common/customui/Typography";
 
 const TYPE_ONE_TIME = "oneTime";
 const TYPE_AUTOMATIC = "automatic";
@@ -88,10 +90,10 @@ const MakePaymentScreen = ({ navigation }) => {
         {selected && <View style={styles.radioInner} />}
       </View>
       <View style={styles.optionTextWrap}>
-        <Text style={styles.optionLabel}>{label}</Text>
-        {!!note && <Text style={styles.optionNote}>{note}</Text>}
+        <FieldContent >{label}</FieldContent>
+        {!!note && <FieldContent style={styles.optionNote}>{note}</FieldContent>}
       </View>
-      {!!amount && <Text style={[styles.optionAmount, amountStyle]}>{amount}</Text>}
+      {!!amount && <FieldContent style={[styles.optionAmount, amountStyle]}>{amount}</FieldContent>}
       {trailing}
     </Touchable>
   );
@@ -100,10 +102,12 @@ const MakePaymentScreen = ({ navigation }) => {
     <View style={styles.container}>
       <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
       <ScrollView
-        contentContainerStyle={[styles.content, contentMaxWidth]}
+        contentContainerStyle={[ contentMaxWidth]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        <>
+        <View style={[AppStyles.card, { margin: 16,padding: 24 }]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -114,9 +118,9 @@ const MakePaymentScreen = ({ navigation }) => {
           />
         )}
 
-        <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+        <FieldTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           Select payment type
-        </Text>
+        </FieldTitle>
         <View style={styles.typeRow} accessibilityRole="radiogroup">
           {[
             { key: TYPE_ONE_TIME, label: "One-time payment" },
@@ -135,7 +139,7 @@ const MakePaymentScreen = ({ navigation }) => {
                 <View style={[styles.radioOuter, styles.typeRadio, selected && styles.radioOuterSelected]}>
                   {selected && <View style={styles.radioInner} />}
                 </View>
-                <Text style={styles.typeLabel}>{type.label}</Text>
+                <FieldContent style={styles.typeLabel}>{type.label}</FieldContent>
               </Touchable>
             );
           })}
@@ -143,9 +147,9 @@ const MakePaymentScreen = ({ navigation }) => {
 
         {paymentType === TYPE_ONE_TIME && (
           <>
-            <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-              Select payment amount <Text style={styles.requiredMark}>(required)</Text>
-            </Text>
+            <FieldTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+              Select payment amount <FieldContent >(required)</FieldContent>
+            </FieldTitle>
             {loading ? (
               <SkeletonPlaceholder>
                 <View style={styles.rowSkeleton} />
@@ -206,8 +210,10 @@ const MakePaymentScreen = ({ navigation }) => {
           </>
         )}
 
+        
+        </View>
         {!loading && (
-          <>
+          <View style={{ marginHorizontal: 16, marginBottom: 16 }}>
             <PrimaryButton
               title="Continue"
               buttonType="submit"
@@ -221,8 +227,9 @@ const MakePaymentScreen = ({ navigation }) => {
               accessibilityLabel="Cancel payment"
               onPress={() => navigation.popToTop()}
             />
-          </>
+          </View>
         )}
+        </>
       </ScrollView>
     </View>
   );
@@ -230,16 +237,12 @@ const MakePaymentScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 100 },
+  content: {  padding: 16, paddingBottom: 80 },
   heading: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightGray1,
     marginBottom: 12,
     marginTop: 8,
   },
-  requiredMark: { fontFamily: FontFamily.openSansRegular, fontWeight: "400" },
+  requiredMark: { fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "400" },
   typeRow: { flexDirection: "row", marginBottom: 12 },
   typeCard: {
     flex: 1,
@@ -256,10 +259,6 @@ const styles = StyleSheet.create({
   typeCardSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: "#F3F2FF" },
   typeRadio: { marginRight: 8 },
   typeLabel: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-    color: Color.colorGray_200,
     flexShrink: 1,
   },
   optionRow: {
@@ -290,26 +289,23 @@ const styles = StyleSheet.create({
   optionTextWrap: { flex: 1, marginRight: 12 },
   optionLabel: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   optionAmount: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.colorGray_200,
   },
   pastDueAmount: { color: "#DC3626" },
   optionNote: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
     lineHeight: 20,
     marginTop: 4,
   },
   amountErrorText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: "#B92A1C",
     marginBottom: 12,
   },
@@ -323,7 +319,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   rowSkeleton: { height: 56, borderRadius: 8, marginBottom: 12 },

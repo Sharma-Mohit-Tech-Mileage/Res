@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   offerEyebrow: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
     color: Color.sparklightBrightPurple,
     fontWeight: "600",
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   offerHeadline: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_3xl,
     lineHeight: 26,
     color: Color.colorMidnightblue,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   },
   offerDesclaimer: {
     color: Color.colorblack_100,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_xs,
     lineHeight: 16,
     fontWeight: "400",
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   },
   getOfferButton: {
     color: Color.sparklightWhite,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
     fontWeight: "600",
     textAlign: "center",

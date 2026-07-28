@@ -167,19 +167,19 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 80 },
   heading: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.sparklightGray1,
     marginBottom: 8,
   },
   introText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     lineHeight: 22,
     marginBottom: 20,
   },
-  introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
+  introBold: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
   selectRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   selectLabel: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     color: Color.colorGray_200,
     flexShrink: 1,
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   addLinkRow: { flexDirection: "row", alignItems: "center" },
   addLinkText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightBrightPurple,
     textDecorationLine: "underline",
     marginRight: 4,
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     lineHeight: 20,
     marginBottom: 12,

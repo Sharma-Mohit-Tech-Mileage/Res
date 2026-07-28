@@ -721,7 +721,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.interBold,
+    fontFamily: FontFamily.RadioCanadaBold,
     fontWeight: "700",
   },
   blockWrapper: {
@@ -734,7 +734,7 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   styledText: {
     color: Color.sparklightBrightPurple,
@@ -742,7 +742,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   boldText: {
-    fontFamily: FontFamily.openSansBold || FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.openSansBold || FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
   },
   resendButton: {

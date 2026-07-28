@@ -28,14 +28,14 @@ const styles = StyleSheet.create({
   container: { padding: 16, marginTop: 24, alignSelf: "stretch" },
   title: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     color: Color.colorGray_100,
     marginBottom: 4,
   },
   message: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     lineHeight: 20,
   },

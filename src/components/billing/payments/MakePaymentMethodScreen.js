@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 100 },
   heading: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.sparklightGray1,
     marginBottom: 12,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     lineHeight: 20,
     marginBottom: 12,
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   },
   newMethodText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.sparklightBrightPurple,
     marginRight: 4,

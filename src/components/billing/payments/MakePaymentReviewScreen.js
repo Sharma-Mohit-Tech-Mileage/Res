@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 80 },
   heading: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.sparklightGray1,
     marginBottom: 12,
@@ -167,19 +167,19 @@ const styles = StyleSheet.create({
   fieldGroupLast: { paddingBottom: 0, borderBottomWidth: 0, marginBottom: 0 },
   fieldLabel: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     marginBottom: 2,
   },
   fieldValue: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.colorGray_200,
   },
   helperText: {
     fontSize: FontSize.size_smi,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     lineHeight: 18,
     marginTop: 8,
