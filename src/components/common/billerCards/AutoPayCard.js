@@ -6,7 +6,6 @@ import { FontFamily, Color } from "../../../../GlobalStyles";
 import Checkcircle from "../../../../assets/svgs/Checkcircle";
 import Checkcircle1 from "../../../../assets/svgs/Checkcircle1"
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import Config from "react-native-config";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../customui/Touchable";
