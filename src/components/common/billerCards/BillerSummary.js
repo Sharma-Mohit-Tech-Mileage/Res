@@ -1,15 +1,17 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
-import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import { card } from "../../../styles/utilities";
+import Config from "react-native-config";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import Touchable from "../customui/Touchable";
+import AppStyles from "../../../styles/AppStyles";
+import PrimaryButton from "../customui/PrimaryButton";
+import { SectionTitle } from "../customui/Typography";
 const Card = ({ billAmt, dueDate, navigation, style }) => {
   const NotAvailable = () => {
     return (
@@ -52,16 +54,18 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
   };
 
   return (
-    <View style={[card.elevated, style]}>
+    <View style={[AppStyles.card,{marginBottom: 16}]}>
       <View style={styles.cardHreader}>
         <View
           style={{ marginLeft: 10, flexDirection: "row", alignItems: "center" }}
         >
-          <View style={{ alignSelf: "center" }}>
+          {/* <View style={{ alignSelf: "center" }}>
             <WalletSummaryIcon />
-          </View>
+          </View> */}
 
-          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2}>Bill Summary</Text>
+          <SectionTitle style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2}>
+            Bill Summary
+          </SectionTitle>
         </View>
       </View>
 
@@ -84,8 +88,8 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             style={[
               styles.label,
               {
-                fontWeight: "700",
-                color: colors.sparklight_purple_blue,
+                fontWeight: "400",
+                color: colors.Black_100,
                 fontSize: 18,
                 paddingBottom: 5,
                 alignSelf: "center",
@@ -139,7 +143,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
                   color:
                     dueDate == "Immediately"
                       ? colors.sparklight_red
-                      : colors.sparklight_purple_blue,
+                      : colors.darkest_grey,
                   fontWeight: dueDate == "Immediately" ? "400" : "700",
                 },
               ]}
@@ -161,7 +165,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
                     color:
                       dueDate == "Immediately"
                         ? colors.sparklight_red
-                        : colors.sparklight_purple_blue,
+                        : colors.darkest_grey,
                   },
                 ]}
               >
@@ -174,7 +178,9 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
 
       {billAmt != undefined ? (
         <View style={styles.cardFooter}>
-          <Touchable
+          <PrimaryButton
+            title={"Make a Payment"}
+            buttonType='submit'
             onPress={() => {
               navigation.navigate("MakePayment");
             }}
@@ -182,17 +188,10 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             accessibilityLabel="Make a Payment"
             accessibilityRole="button"
             minSize={0}
-            style={styles.paymentButton}
+            style={{width:'100%'} }
           >
-            <Text style={styles.paymentButtonText}>Make a Payment</Text>
-            <View
-              style={{ marginLeft: 2, alignSelf: "center" }}
-              accessible={false}
-              importantForAccessibility="no-hide-descendants"
-            >
-              <RightArrow color={colors.snow_white} />
-            </View>
-          </Touchable>
+            
+          </PrimaryButton>
         </View>
       ) : (
         <>
@@ -215,11 +214,6 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
 
 const styles = StyleSheet.create({
   leftTitle: {
-    color: colors.sp_black,
-    fontSize: 18,
-    fontWeight: "400",
-    textAlign: "center",
-    marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
   },
@@ -234,7 +228,7 @@ const styles = StyleSheet.create({
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.sparklight_purple_blue,
+    color: colors.darkest_grey,
     alignSelf: "center",
     paddingBottom: 5,
     fontFamily: FontFamily.openSansRegular,
@@ -245,17 +239,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: colors.gray600,
   },
-  paymentButton: {
-    flexDirection: "row",
-    backgroundColor: colors.sparklight_purple_blue,
-    width: wp("70%"),
-    paddingVertical: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 5,
-    alignSelf: "center",
-    marginLeft: wp("9%"),
-  },
+  
   paymentButtonText: {
     color: colors.snow_white,
     fontSize: 16,
@@ -264,16 +248,18 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   cardHreader: {
-    flexDirection: "row",
+   flexDirection: "row",
     backgroundColor: "#F8F8F8",
     width: "100%",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
     padding: 10,
   },
   cardFooter: {
-    flexDirection: "row",
-    backgroundColor: "#F8F8F8",
-    width: "100%",
-    padding: 10,
+    width: "90%",
+    alignSelf: "center",
+    margin: 10,
+    paddingBottom: 10,
   },
 });
 

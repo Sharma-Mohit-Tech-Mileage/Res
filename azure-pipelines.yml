@@ -118,16 +118,18 @@ stages:
   # ==========================================
   # STAGE 1: BUILD
   # ==========================================
-  - stage: Build
-    displayName: 'Android Build'
+
+  - stage: UnitTests
+    displayName: 'Unit Tests'
     dependsOn: InitialCommit
     condition: succeeded()
     jobs:
-      - job: BuildAndroid
-        displayName: 'Build Android App Bundle'
+      - job: RunAndroidUnitTests
+        displayName: 'Run Android Unit Tests'
+        pool:
+          vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
-            clean: true
 
           - task: JavaToolInstaller@0
             displayName: 'Install JDK 17'
@@ -135,333 +137,6 @@ stages:
               versionSpec: '17'
               jdkArchitectureOption: 'x64'
               jdkSourceOption: 'PreInstalled'
-
-          - script: java -version
-            displayName: 'Check Java Version'
-
-          - task: NodeTool@0
-            displayName: 'Install Node 20.6.1'
-            inputs:
-              versionSpec: '20.6.1'
-
-          - script: npm cache clean --force
-            displayName: 'Clean npm cache'
-
-          - script: npm install --legacy-peer-deps
-            displayName: 'Install node dependencies'
-
-          - task: DownloadSecureFile@1
-            name: keystoreFile
-            displayName: 'Download Keystore File'
-            inputs:
-              secureFile: 'Sparklight.keystore'
-
-          - script: |
-              set -euo pipefail
-              KEYSTORE_PATH="$(keystoreFile.secureFilePath)"
-              EXPECTED_SHA1="$(ANDROID_UPLOAD_CERT_SHA1)"
-
-              ACTUAL_SHA1=$(keytool -list -v -keystore "$KEYSTORE_PATH" -alias "$(keyAlias)" -storepass "$(jarsignerKeystorePassword)" -keypass "$(jarsignerKeyPassword)" | sed -n 's/^.*SHA1:[[:space:]]*\(.*\)$/\1/p' | head -n1 | tr -d '[:space:]')
-              EXPECTED_NORMALIZED=$(echo "$EXPECTED_SHA1" | tr -d '[:space:]')
-
-              echo "Resolved upload key SHA1: $ACTUAL_SHA1"
-              echo "Expected upload key SHA1: $EXPECTED_NORMALIZED"
-
-              if [ -z "$ACTUAL_SHA1" ]; then
-                echo "❌ Could not read SHA1 fingerprint from keystore alias $(keyAlias)."
-                exit 1
-              fi
-
-              if [ "$ACTUAL_SHA1" != "$EXPECTED_NORMALIZED" ]; then
-                echo "❌ Keystore fingerprint mismatch."
-                echo "The uploaded keystore does not match the Google Play upload key for package com.sparklight."
-                exit 1
-              fi
-
-              echo "✅ Keystore fingerprint matches expected Play upload key."
-            displayName: 'Validate Android upload keystore fingerprint'
-
-          - task: Gradle@4
-            displayName: 'Build Android App Bundle (Demo Release)'
-            inputs:
-              workingDirectory: 'android'
-              gradleWrapperFile: 'android/gradlew'
-              tasks: 'clean bundleDemoRelease'
-              options: >
-                -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
-                -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
-                -PKEY_ALIAS=$(keyAlias)
-                -PKEY_PASSWORD=$(jarsignerKeyPassword)
-                -PVERSION_CODE=$(androidVersionCode)
-                -PVERSION_NAME=$(androidVersionName)
-                --stacktrace
-                --warning-mode all
-              publishJUnitResults: false
-
-          - script: |
-              echo "Build completed successfully"
-              echo "Version: $(androidVersionName)"
-              echo "Build Code: $(androidVersionCode)"
-            displayName: 'Build Summary'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish APK/AAB Artifacts'
-            inputs:
-              PathtoPublish: '$(System.DefaultWorkingDirectory)/android/app/build/outputs'
-              ArtifactName: 'android-build-$(androidVersionName)'
-              publishLocation: 'Container'
-
-  # ==========================================
-  # STAGE 1B: IOS BUILD (PARALLEL)
-  # ==========================================
-  - stage: IOSChecks
-    displayName: ' iOS Build'
-    dependsOn: InitialCommit
-    condition: succeeded()
-    jobs:
-      - job: RunIOSChecks
-        displayName: 'Build iOS IPA (Xcode Archive)'
-        pool:
-          vmImage: 'macos-latest'
-        timeoutInMinutes: 180
-        steps:
-          - checkout: self
-            clean: true
-
-          - script: |
-              set -euo pipefail
-              REQUIRED_XCODE_MAJOR="$(IOS_REQUIRED_XCODE_MAJOR)"
-              MATCHED_XCODE="$(ls -d /Applications/Xcode_${REQUIRED_XCODE_MAJOR}*.app 2>/dev/null | sort -V | tail -n 1 || true)"
-
-              echo "Installed Xcode apps:"
-              ls -1 /Applications | grep '^Xcode' || true
-
-              if [ -z "$MATCHED_XCODE" ]; then
-                echo "❌ Xcode ${REQUIRED_XCODE_MAJOR}.x is not installed on this agent image."
-                echo "This app must be built with iPhoneOS SDK ${REQUIRED_XCODE_MAJOR} or later."
-                echo "Use an agent image that provides Xcode ${REQUIRED_XCODE_MAJOR}+ (or newer)."
-                exit 1
-              fi
-
-              sudo xcode-select -s "$MATCHED_XCODE/Contents/Developer"
-              echo "Xcode:"; xcodebuild -version
-              echo "SDKs:"; xcodebuild -showsdks
-
-              if ! xcodebuild -showsdks | grep -q "iphoneos${REQUIRED_XCODE_MAJOR}"; then
-                echo "❌ Required iPhoneOS SDK ${REQUIRED_XCODE_MAJOR} is not available in selected Xcode."
-                exit 1
-              fi
-
-              echo "Ruby:"; ruby -v
-              echo "CocoaPods:"; pod --version || true
-            displayName: 'Select Xcode and verify build tools'
-
-          - task: NodeTool@0
-            displayName: 'Install Node 20.6.1'
-            inputs:
-              versionSpec: '20.6.1'
-
-          - script: npm install --legacy-peer-deps
-            displayName: 'Install Node dependencies'
-
-          - script: |
-              set -euo pipefail
-              cd ios
-              rm -rf Pods Podfile.lock build
-              pod install --repo-update
-            displayName: 'Install CocoaPods dependencies'
-
-          - script: |
-              set -euo pipefail
-              PBXPROJ="ios/My Sparklight.xcodeproj/project.pbxproj"
-              perl -pi -e 's/CODE_SIGN_IDENTITY = "iOS Distribution"/CODE_SIGN_IDENTITY = "Apple Distribution"/g' "$PBXPROJ"
-              perl -pi -e 's/"iOS Distribution"/"Apple Distribution"/g' "$PBXPROJ"
-              perl -pi -e 's/CODE_SIGN_IDENTITY\[sdk=iphoneos\*\] = "iOS Distribution"/CODE_SIGN_IDENTITY[sdk=iphoneos*] = "Apple Distribution"/g' "$PBXPROJ"
-              echo "✅ Patched CODE_SIGN_IDENTITY"
-            displayName: 'Patch code sign identity'
-
-          - task: DownloadSecureFile@1
-            name: iosP12
-            displayName: 'Download Apple Certificate (.p12)'
-            inputs:
-              secureFile: '$(IOS_P12_CERT)'
-
-          - script: |
-              set -euo pipefail
-              P12_PASSWORD="${IOS_CERT_PASSWORD:-${IOS_P12_PASSWORD:-}}"
-              KEYCHAIN_PATH="$(Agent.TempDirectory)/ios-signing.keychain-db"
-              KEYCHAIN_PASSWORD="temp_keychain_$(date +%s)"
-              security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-              security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
-              security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-
-              IMPORT_OUTPUT_FILE="$(Agent.TempDirectory)/import_output.txt"
-              set +e
-              security import "$(iosP12.secureFilePath)" \
-                -k "$KEYCHAIN_PATH" \
-                -P "$P12_PASSWORD" \
-                -T /usr/bin/codesign \
-                -T /usr/bin/security > "$IMPORT_OUTPUT_FILE" 2>&1
-              IMPORT_EXIT_CODE=$?
-              set -e
-
-              if [ $IMPORT_EXIT_CODE -ne 0 ]; then
-                echo "Initial certificate import failed:"
-                cat "$IMPORT_OUTPUT_FILE"
-
-                if [ -n "$P12_PASSWORD" ]; then
-                  echo "Retrying certificate import with empty password..."
-                  set +e
-                  security import "$(iosP12.secureFilePath)" \
-                    -k "$KEYCHAIN_PATH" \
-                    -P "" \
-                    -T /usr/bin/codesign \
-                    -T /usr/bin/security > "$IMPORT_OUTPUT_FILE" 2>&1
-                  IMPORT_EXIT_CODE=$?
-                  set -e
-                fi
-              fi
-
-              if [ $IMPORT_EXIT_CODE -ne 0 ]; then
-                echo "Certificate import failed after retries:"
-                cat "$IMPORT_OUTPUT_FILE"
-                echo "Ensure IOS_CERT_PASSWORD or IOS_P12_PASSWORD matches the uploaded .p12 file."
-                exit 1
-              fi
-
-              security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH" 2>&1 || true
-              EXISTING=$(security list-keychains -d user | tr -d '"' | xargs)
-              security list-keychains -d user -s "$KEYCHAIN_PATH" $EXISTING
-              security default-keychain -d user -s "$KEYCHAIN_PATH"
-              echo "##vso[task.setvariable variable=IOS_KEYCHAIN_PATH]$KEYCHAIN_PATH"
-              echo "##vso[task.setvariable variable=IOS_KEYCHAIN_PASSWORD]$KEYCHAIN_PASSWORD"
-              echo "✅ Certificate imported"
-            displayName: 'Install certificate into keychain'
-            env:
-              IOS_CERT_PASSWORD: $(IOS_CERT_PASSWORD)
-              IOS_P12_PASSWORD: $(IOS_P12_PASSWORD)
-
-          - task: InstallAppleProvisioningProfile@1
-            name: iosProvProfile
-            displayName: 'Install provisioning profile'
-            inputs:
-              provisioningProfileLocation: 'secureFiles'
-              provProfileSecureFile: '$(IOS_PROV_PROFILE_SECUREFILE)'
-              removeProfile: true
-
-          - script: |
-              set -euo pipefail
-              echo "Disabling code signing for all Pods xcconfig targets..."
-              find "ios/Pods" -name "*.xcconfig" | while IFS= read -r f; do
-                grep -q "CODE_SIGNING_ALLOWED" "$f" || echo "CODE_SIGNING_ALLOWED = NO" >> "$f"
-              done
-              echo "✅ Pods code signing disabled"
-            displayName: 'Disable code signing for Pods'
-
-          - script: |
-              set -euo pipefail
-              APP_INFO_PLIST="ios/Sparklight/Info.plist"
-              BUILD_NUMBER="$(iosBuildNumber)"
-              /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_INFO_PLIST" \
-                || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$APP_INFO_PLIST"
-              echo "iOS build number: $BUILD_NUMBER"
-            displayName: 'Set iOS build number'
-
-          - script: |
-              set -euo pipefail
-              NODE_BIN="$(command -v node)"
-              echo "export NODE_BINARY=$NODE_BIN" > ios/.xcode.env.local
-              ARCHIVE_PATH="$(Build.ArtifactStagingDirectory)/My Sparklight.xcarchive"
-              EXPORT_PATH="$(Build.ArtifactStagingDirectory)/ipa"
-              ARCHIVE_LOG="$(Build.ArtifactStagingDirectory)/xcodebuild-archive.log"
-              JOBS="$(sysctl -n hw.ncpu || echo 4)"
-              TEAM_ID="$(IOS_TEAM_ID)"
-              BUNDLE_ID="$(IOS_BUNDLE_ID)"
-              PROV_UUID="$(iosProvProfile.provisioningProfileUuid)"
-
-              echo "Archiving with Xcode..."
-              if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
-                  -workspace "ios/My Sparklight.xcworkspace" \
-                  -scheme "Sparklight Dev" \
-                  -configuration Release \
-                  -sdk iphoneos \
-                  -archivePath "$ARCHIVE_PATH" \
-                  -destination "generic/platform=iOS" \
-                  -parallelizeTargets \
-                  -jobs "$JOBS" \
-                  PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
-                  CURRENT_PROJECT_VERSION="$(iosBuildNumber)" \
-                  CODE_SIGN_STYLE=Manual \
-                  DEVELOPMENT_TEAM="$TEAM_ID" \
-                  PROVISIONING_PROFILE="$PROV_UUID" \
-                  CODE_SIGN_IDENTITY="$(IOS_CODE_SIGN_IDENTITY)" \
-                  OTHER_CODE_SIGN_FLAGS="--keychain $(IOS_KEYCHAIN_PATH)" \
-                  COMPILER_INDEX_STORE_ENABLE=NO \
-                  archive 2>&1 | tee "$ARCHIVE_LOG"; then
-                echo "❌ Xcode archive failed"
-                grep -i "error:" "$ARCHIVE_LOG" | tail -20 || true
-                exit 1
-              fi
-
-              EXPORT_OPTS="$(Build.ArtifactStagingDirectory)/exportOptions.plist"
-              cat > "$EXPORT_OPTS" <<EOF
-              <?xml version="1.0" encoding="UTF-8"?>
-              <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-              <plist version="1.0">
-              <dict>
-                <key>method</key>
-                <string>app-store</string>
-                <key>signingStyle</key>
-                <string>manual</string>
-                <key>teamID</key>
-                <string>${TEAM_ID}</string>
-                <key>provisioningProfiles</key>
-                <dict>
-                  <key>${BUNDLE_ID}</key>
-                  <string>${PROV_UUID}</string>
-                </dict>
-                <key>compileBitcode</key>
-                <false/>
-              </dict>
-              </plist>
-              EOF
-
-              mkdir -p "$EXPORT_PATH"
-              if ! xcodebuild \
-                  -exportArchive \
-                  -archivePath "$ARCHIVE_PATH" \
-                  -exportPath "$EXPORT_PATH" \
-                  -exportOptionsPlist "$EXPORT_OPTS" 2>&1 | tee "$(Build.ArtifactStagingDirectory)/xcodebuild-export.log"; then
-                echo "❌ IPA export failed"
-                tail -n 100 "$(Build.ArtifactStagingDirectory)/xcodebuild-export.log" || true
-                exit 1
-              fi
-
-              echo "✅ IPA exported:"
-              find "$EXPORT_PATH" -maxdepth 1 -name "*.ipa" -exec ls -lh {} \;
-            displayName: 'Xcode archive and export IPA'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish IPA artifact'
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ipa'
-              ArtifactName: 'ios-ipa'
-              publishLocation: 'Container'
-
-  # ==========================================
-  # STAGE 2B: IOS UNIT TESTS
-  # ==========================================
-  - stage: IOSUnitTests
-    displayName: ' iOS Unit Tests'
-    dependsOn: IOSChecks
-    condition: succeeded()
-    jobs:
-      - job: RunIOSUnitTests
-        displayName: 'Execute iOS Unit Tests'
-        pool:
-          vmImage: 'macos-latest'
-        steps:
-          - checkout: self
 
           - task: NodeTool@0
             displayName: 'Install Node 20.6.1'
@@ -473,322 +148,32 @@ stages:
               npm install --no-save --legacy-peer-deps jest-junit
               npx update-browserslist-db@latest --yes || true
             displayName: 'Install Dependencies'
+            workingDirectory: '.'
 
           - script: |
-              npx jest --ci --runInBand --coverage --watchAll=false --passWithNoTests --reporters=default --reporters=jest-junit
-            displayName: 'Run iOS Jest Test Cases'
+              echo "Running Android unit tests..."
+              cd android
+              ./gradlew testDemoReleaseUnitTest --no-daemon
+            displayName: 'Run Android Unit Tests'
 
           - task: PublishTestResults@2
-            displayName: 'Publish iOS Test Results'
+            displayName: 'Publish Android Test Results'
             condition: succeededOrFailed()
             inputs:
               testResultsFormat: 'JUnit'
-              testResultsFiles: '**/junit.xml'
-              searchFolder: '$(System.DefaultWorkingDirectory)'
+              testResultsFiles: '**/build/test-results/**/*.xml'
+              searchFolder: '$(System.DefaultWorkingDirectory)/android'
               mergeTestResults: true
               failTaskOnFailedTests: false
 
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish iOS Coverage Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(System.DefaultWorkingDirectory)/coverage'
-              ArtifactName: 'ios-coverage-reports-stage'
-              publishLocation: 'Container'
-
-  # ==========================================
-  # STAGE 3B: IOS SECURITY & CODE QUALITY
-  # ==========================================
-  - stage: IOSSecurityAndQuality
-    displayName: ' iOS Security & Code Quality'
-    dependsOn: IOSUnitTests
-    condition: succeeded()
-    jobs:
-      - job: RunIOSSecurityChecks
-        displayName: 'Run iOS Security and Lint Checks'
+      - job: RunIOSUnitTests
+        displayName: 'Run iOS Unit Tests'
         pool:
           vmImage: 'macos-latest'
+        timeoutInMinutes: 90
+        cancelTimeoutInMinutes: 10
         steps:
           - checkout: self
-
-          - task: NodeTool@0
-            displayName: 'Install Node 20.6.1'
-            inputs:
-              versionSpec: '20.6.1'
-
-          - script: npm install --legacy-peer-deps
-            displayName: 'Install Dependencies'
-
-          - script: |
-              npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json || true
-            displayName: 'Run ESLint (iOS Path)'
-            continueOnError: true
-
-          - script: |
-              npx prettier --check src/ 2>&1 | tee prettier-report.txt || true
-            displayName: 'Run Prettier Check (iOS Path)'
-            continueOnError: true
-
-          - script: |
-              npm audit --audit-level=moderate --json --package-lock-only > npm-audit-report.json || true
-            displayName: 'Run npm Audit (iOS Path)'
-            continueOnError: true
-
-          - script: |
-              set -euo pipefail
-
-              LINT_DIR="$(Build.ArtifactStagingDirectory)/ios-lint-stage"
-              SEC_DIR="$(Build.ArtifactStagingDirectory)/ios-security-stage"
-              mkdir -p "$LINT_DIR" "$SEC_DIR"
-
-              if [ -f "$(System.DefaultWorkingDirectory)/eslint-report.json" ]; then
-                cp "$(System.DefaultWorkingDirectory)/eslint-report.json" "$LINT_DIR/"
-              fi
-
-              if [ -f "$(System.DefaultWorkingDirectory)/prettier-report.txt" ]; then
-                cp "$(System.DefaultWorkingDirectory)/prettier-report.txt" "$LINT_DIR/"
-              fi
-
-              if [ -f "$(System.DefaultWorkingDirectory)/npm-audit-report.json" ]; then
-                cp "$(System.DefaultWorkingDirectory)/npm-audit-report.json" "$SEC_DIR/"
-              fi
-
-              if [ -z "$(find "$LINT_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-                echo "No lint files." > "$LINT_DIR/lint-summary.txt"
-              fi
-
-              if [ -z "$(find "$SEC_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-                echo "No security files." > "$SEC_DIR/security-summary.txt"
-              fi
-            displayName: 'Stage iOS Security and Lint Reports'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish iOS Lint Stage Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-lint-stage'
-              ArtifactName: 'ios-lint-stage-reports'
-              publishLocation: 'Container'
-
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish iOS Security Stage Reports'
-            condition: succeededOrFailed()
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-security-stage'
-              ArtifactName: 'ios-security-stage-reports'
-              publishLocation: 'Container'
-
-  # ==========================================
-  # STAGE 4B: IOS CODE REVIEW
-  # ==========================================
-  - stage: IOSCodeReview
-    displayName: ' iOS Code Review'
-    dependsOn: IOSSecurityAndQuality
-    condition: succeeded()
-    jobs:
-      - job: IOSCodeReviewGates
-        displayName: 'iOS Code Review Quality Gates'
-        pool:
-          vmImage: 'macos-latest'
-        steps:
-          - checkout: self
-
-          - script: |
-              echo "=== iOS Code Review Checklist ==="
-              echo "✓ iOS Build: PASSED"
-              echo "✓ iOS Unit Tests: PASSED"
-              echo "✓ iOS Security & Lint: PASSED"
-              echo "Ready for iOS staging."
-            displayName: 'Review iOS Quality Gates'
-
-  # ==========================================
-  # STAGE 5B: IOS STAGING
-  # ==========================================
-  - stage: IOSStaging
-    displayName: ' iOS Staging'
-    dependsOn: IOSCodeReview
-    condition: succeeded()
-    jobs:
-      - job: PrepareIOSStaging
-        displayName: 'Validate IPA for Staging'
-        pool:
-          vmImage: 'macos-latest'
-        steps:
-          - download: current
-            artifact: ios-ipa
-            displayName: 'Download IPA artifact'
-
-          - script: |
-              set -euo pipefail
-              IPA_PATH=$(find "$(Pipeline.Workspace)/ios-ipa" -maxdepth 1 -type f -name "*.ipa" | head -n 1)
-              if [ -z "$IPA_PATH" ]; then
-                echo "❌ No IPA found in ios-ipa artifact"
-                find "$(Pipeline.Workspace)/ios-ipa" -maxdepth 5 || true
-                exit 1
-              fi
-              echo "✅ IPA validated for staging: $IPA_PATH"
-              ls -lh "$IPA_PATH"
-            displayName: 'Validate IPA artifact'
-
-  # ==========================================
-  # STAGE 6B: IOS TESTFLIGHT
-  # ==========================================
-  - stage: IOSTestFlight
-    displayName: ' iOS TestFlight'
-    dependsOn: IOSStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo')))
-    jobs:
-      - job: IOSTestFlightStage
-        displayName: 'Upload IPA to TestFlight'
-        pool:
-          vmImage: 'macos-latest'
-        steps:
-          - download: current
-            artifact: ios-ipa
-            displayName: 'Download IPA artifact'
-
-          - task: DownloadSecureFile@1
-            name: ascApiKey
-            displayName: 'Download App Store Connect API key (.p8)'
-            inputs:
-              secureFile: '$(IOS_ASC_API_KEY_SECUREFILE)'
-
-          - script: |
-              set -euo pipefail
-              IPA_PATH=$(find "$(Pipeline.Workspace)/ios-ipa" -maxdepth 1 -type f -name "*.ipa" | head -n 1)
-              if [ -z "$IPA_PATH" ]; then
-                echo "❌ No IPA found in ios-ipa artifact"
-                exit 1
-              fi
-
-              KEY_PATH="$(ascApiKey.secureFilePath)"
-              KEY_FILE_NAME="AuthKey_$(IOS_ASC_API_KEY_ID).p8"
-              mkdir -p "$HOME/private_keys" \
-                       "$HOME/.private_keys" \
-                       "$HOME/.appstoreconnect/private_keys" \
-                       "$(Agent.TempDirectory)/private_keys"
-              cp "$KEY_PATH" "$HOME/private_keys/$KEY_FILE_NAME"
-              cp "$KEY_PATH" "$HOME/.private_keys/$KEY_FILE_NAME"
-              cp "$KEY_PATH" "$HOME/.appstoreconnect/private_keys/$KEY_FILE_NAME"
-              cp "$KEY_PATH" "$(Agent.TempDirectory)/private_keys/$KEY_FILE_NAME"
-
-              echo "Uploading $IPA_PATH to TestFlight..."
-              xcrun altool \
-                --upload-app \
-                --type ios \
-                --file "$IPA_PATH" \
-                --apiKey "$(IOS_ASC_API_KEY_ID)" \
-                --apiIssuer "$(IOS_ASC_API_ISSUER_ID)" \
-                --show-progress
-              echo "✅ IPA submitted to App Store Connect / TestFlight"
-            displayName: 'Upload IPA to TestFlight'
-
-          - script: |
-              python3 - <<'PYEOF'
-              import smtplib, os
-              from email.mime.text import MIMEText
-              from email.mime.multipart import MIMEMultipart
-
-              smtp_server   = os.environ.get('SMTP_SERVER', '').strip()
-              smtp_port     = int(os.environ.get('SMTP_PORT', '587') or '587')
-              smtp_user     = os.environ.get('SMTP_USERNAME', '').strip()
-              smtp_pass     = os.environ.get('SMTP_PASSWORD', '').strip()
-              raw_recipients = os.environ.get('NOTIFICATION_EMAILS', '').strip()
-              recipients    = [r.strip() for r in raw_recipients.split(',') if r.strip()]
-              ios_version   = os.environ.get('IOS_VERSION_NAME', 'N/A')
-              build_num     = os.environ.get('IOS_BUILD_NUMBER', 'N/A')
-              branch        = os.environ.get('BUILD_BRANCH', 'N/A')
-              commit        = os.environ.get('BUILD_COMMIT', 'N/A')
-              bundle_id     = os.environ.get('IOS_BUNDLE_ID', 'N/A')
-              pipeline_url  = os.environ.get('BUILD_URL', '')
-
-              if not smtp_server or not smtp_user or not smtp_pass or not recipients:
-                  print('Email notification skipped: SMTP credentials or NOTIFICATION_EMAILS not configured.')
-                  exit(0)
-
-              msg = MIMEMultipart('alternative')
-              msg['From']    = smtp_user
-              msg['To']      = ', '.join(recipients)
-              msg['Subject'] = f'[MySparklight] iOS v{ios_version} Uploaded to TestFlight'
-
-              body_text = f"""MySparklight Residential - iOS Deployment Notification
-
-              The iOS app has been successfully uploaded to TestFlight.
-
-              Version    : {ios_version}
-              Build No   : {build_num}
-              Bundle ID  : {bundle_id}
-              Branch     : {branch}
-              Commit     : {commit}
-              Destination: TestFlight (App Store Connect)
-              Pipeline   : {pipeline_url}
-
-              This is an automated notification from the Azure DevOps CI/CD pipeline.
-              """
-
-              body_html = f"""<html><body>
-              <h2 style='color:#1565c0;'>&#x2705; iOS Uploaded to TestFlight</h2>
-              <table style='border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;'>
-                <tr><td style='padding:4px 12px;font-weight:bold;'>App</td><td style='padding:4px 12px;'>MySparklight Residential (iOS)</td></tr>
-                <tr style='background:#f5f5f5;'><td style='padding:4px 12px;font-weight:bold;'>Version</td><td style='padding:4px 12px;'>{ios_version}</td></tr>
-                <tr><td style='padding:4px 12px;font-weight:bold;'>Build No</td><td style='padding:4px 12px;'>{build_num}</td></tr>
-                <tr style='background:#f5f5f5;'><td style='padding:4px 12px;font-weight:bold;'>Bundle ID</td><td style='padding:4px 12px;'>{bundle_id}</td></tr>
-                <tr><td style='padding:4px 12px;font-weight:bold;'>Branch</td><td style='padding:4px 12px;'>{branch}</td></tr>
-                <tr style='background:#f5f5f5;'><td style='padding:4px 12px;font-weight:bold;'>Commit</td><td style='padding:4px 12px;'>{commit}</td></tr>
-                <tr><td style='padding:4px 12px;font-weight:bold;'>Destination</td><td style='padding:4px 12px;'>TestFlight (App Store Connect)</td></tr>
-              </table>
-              <br/><p style='color:#555;font-size:12px;'>This is an automated notification from the Azure DevOps CI/CD pipeline.</p>
-              </body></html>"""
-
-              msg.attach(MIMEText(body_text, 'plain'))
-              msg.attach(MIMEText(body_html, 'html'))
-
-              try:
-                  with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
-                      server.ehlo()
-                      server.starttls()
-                      server.ehlo()
-                      server.login(smtp_user, smtp_pass)
-                      server.sendmail(smtp_user, recipients, msg.as_string())
-                  print(f'Email notification sent to: {recipients}')
-              except Exception as e:
-                  print(f'Email notification failed: {e}')
-                  exit(1)
-              PYEOF
-            displayName: 'Send iOS TestFlight Email Notification'
-            continueOnError: true
-            env:
-              SMTP_SERVER: $(SMTP_SERVER)
-              SMTP_PORT: $(SMTP_PORT)
-              SMTP_USERNAME: $(SMTP_USERNAME)
-              SMTP_PASSWORD: $(SMTP_PASSWORD)
-              NOTIFICATION_EMAILS: $(NOTIFICATION_EMAILS)
-              IOS_VERSION_NAME: $(androidVersionName)
-              IOS_BUILD_NUMBER: $(iosBuildNumber)
-              IOS_BUNDLE_ID: $(IOS_BUNDLE_ID)
-              BUILD_BRANCH: $(Build.SourceBranchName)
-              BUILD_COMMIT: $(Build.SourceVersion)
-              BUILD_URL: $(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)
-
-  # ==========================================
-  # STAGE 2: UNIT TESTS
-  # ==========================================
-  - stage: UnitTests
-    displayName: 'Unit Tests'
-    dependsOn: Build
-    condition: succeeded()
-    jobs:
-      - job: RunUnitTests
-        displayName: 'Execute Unit Tests'
-        steps:
-          - checkout: self
-
-          - task: JavaToolInstaller@0
-            displayName: 'Install JDK 17'
-            inputs:
-              versionSpec: '17'
-              jdkArchitectureOption: 'x64'
-              jdkSourceOption: 'PreInstalled'
 
           - task: NodeTool@0
             displayName: 'Install Node 20.6.1'
@@ -808,21 +193,12 @@ stages:
             displayName: 'Run App-wide Jest Test Cases'
             workingDirectory: '.'
 
-          - script: |
-              cd android
-              ./gradlew testDemoReleaseUnitTest --no-daemon
-            displayName: 'Run Android Unit Tests'
-
-          - script: |
-              node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
-            displayName: 'Enforce Coverage Gate'
-
           - task: PublishTestResults@2
-            displayName: 'Publish Test Results'
+            displayName: 'Publish iOS Test Results'
             condition: succeededOrFailed()
             inputs:
               testResultsFormat: 'JUnit'
-              testResultsFiles: '**/junit.xml,**/build/test-results/**/*.xml'
+              testResultsFiles: '**/junit.xml'
               searchFolder: '$(System.DefaultWorkingDirectory)'
               mergeTestResults: true
               failTaskOnFailedTests: false
@@ -835,9 +211,25 @@ stages:
               ArtifactName: 'coverage-reports'
               publishLocation: 'Container'
 
+      - job: EnforceCoverageGate
+        displayName: 'Enforce Coverage Gate'
+        dependsOn:
+          - RunIOSUnitTests
+        condition: succeeded('RunIOSUnitTests')
+        pool:
+          vmImage: 'macos-latest'
+        steps:
+          - checkout: self
+
+          - script: |
+              node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
+            displayName: 'Evaluate Coverage Summary'
+            workingDirectory: '.'
+
   # ==========================================
   # STAGE 3: SECURITY & CODE QUALITY
   # ==========================================
+
   - stage: SecurityAndQuality
     displayName: 'Security & Code Quality'
     dependsOn: UnitTests
@@ -1053,6 +445,80 @@ stages:
               ArtifactName: 'security-reports'
               publishLocation: 'Container'
 
+      - job: RunIOSSecurityChecks
+        displayName: 'Run iOS Security and Lint Checks'
+        pool:
+          vmImage: 'macos-latest'
+        steps:
+          - checkout: self
+
+          - task: NodeTool@0
+            displayName: 'Install Node 20.6.1'
+            inputs:
+              versionSpec: '20.6.1'
+
+          - script: npm install --legacy-peer-deps
+            displayName: 'Install Dependencies'
+
+          - script: |
+              npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json || true
+            displayName: 'Run ESLint (iOS Path)'
+            continueOnError: true
+
+          - script: |
+              npx prettier --check src/ 2>&1 | tee prettier-report.txt || true
+            displayName: 'Run Prettier Check (iOS Path)'
+            continueOnError: true
+
+          - script: |
+              npm audit --audit-level=moderate --json --package-lock-only > npm-audit-report.json || true
+            displayName: 'Run npm Audit (iOS Path)'
+            continueOnError: true
+
+          - script: |
+              set -euo pipefail
+
+              LINT_DIR="$(Build.ArtifactStagingDirectory)/ios-lint-stage"
+              SEC_DIR="$(Build.ArtifactStagingDirectory)/ios-security-stage"
+              mkdir -p "$LINT_DIR" "$SEC_DIR"
+
+              if [ -f "$(System.DefaultWorkingDirectory)/eslint-report.json" ]; then
+                cp "$(System.DefaultWorkingDirectory)/eslint-report.json" "$LINT_DIR/"
+              fi
+
+              if [ -f "$(System.DefaultWorkingDirectory)/prettier-report.txt" ]; then
+                cp "$(System.DefaultWorkingDirectory)/prettier-report.txt" "$LINT_DIR/"
+              fi
+
+              if [ -f "$(System.DefaultWorkingDirectory)/npm-audit-report.json" ]; then
+                cp "$(System.DefaultWorkingDirectory)/npm-audit-report.json" "$SEC_DIR/"
+              fi
+
+              if [ -z "$(find "$LINT_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+                echo "No lint files." > "$LINT_DIR/lint-summary.txt"
+              fi
+
+              if [ -z "$(find "$SEC_DIR" -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+                echo "No security files." > "$SEC_DIR/security-summary.txt"
+              fi
+            displayName: 'Stage iOS Security and Lint Reports'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish iOS Lint Stage Reports'
+            condition: succeededOrFailed()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-lint-stage'
+              ArtifactName: 'ios-lint-stage-reports'
+              publishLocation: 'Container'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish iOS Security Stage Reports'
+            condition: succeededOrFailed()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-security-stage'
+              ArtifactName: 'ios-security-stage-reports'
+              publishLocation: 'Container'
+
       # -------- Job 3: Android Lint --------
       - job: AndroidLint
         displayName: 'Android Lint Checks'
@@ -1148,9 +614,387 @@ stages:
   # ==========================================
   # STAGE 4: CODE REVIEW
   # ==========================================
+
+  - stage: Build
+    displayName: 'Android Build'
+    dependsOn: SecurityAndQuality
+    condition: succeeded()
+    jobs:
+      - job: BuildAndroid
+        displayName: 'Build Android App Bundle'
+        steps:
+          - checkout: self
+            clean: true
+
+          - task: JavaToolInstaller@0
+            displayName: 'Install JDK 17'
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          - script: java -version
+            displayName: 'Check Java Version'
+
+          - task: NodeTool@0
+            displayName: 'Install Node 20.6.1'
+            inputs:
+              versionSpec: '20.6.1'
+
+          - script: npm cache clean --force
+            displayName: 'Clean npm cache'
+
+          - script: npm install --legacy-peer-deps
+            displayName: 'Install node dependencies'
+
+          - task: DownloadSecureFile@1
+            name: keystoreFile
+            displayName: 'Download Keystore File'
+            inputs:
+              secureFile: 'Sparklight.keystore'
+
+          - script: |
+              set -euo pipefail
+              KEYSTORE_PATH="$(keystoreFile.secureFilePath)"
+              EXPECTED_SHA1="$(ANDROID_UPLOAD_CERT_SHA1)"
+
+              ACTUAL_SHA1=$(keytool -list -v -keystore "$KEYSTORE_PATH" -alias "$(keyAlias)" -storepass "$(jarsignerKeystorePassword)" -keypass "$(jarsignerKeyPassword)" | sed -n 's/^.*SHA1:[[:space:]]*\(.*\)$/\1/p' | head -n1 | tr -d '[:space:]')
+              EXPECTED_NORMALIZED=$(echo "$EXPECTED_SHA1" | tr -d '[:space:]')
+
+              echo "Resolved upload key SHA1: $ACTUAL_SHA1"
+              echo "Expected upload key SHA1: $EXPECTED_NORMALIZED"
+
+              if [ -z "$ACTUAL_SHA1" ]; then
+                echo "❌ Could not read SHA1 fingerprint from keystore alias $(keyAlias)."
+                exit 1
+              fi
+
+              if [ "$ACTUAL_SHA1" != "$EXPECTED_NORMALIZED" ]; then
+                echo "❌ Keystore fingerprint mismatch."
+                echo "The uploaded keystore does not match the Google Play upload key for package com.sparklight."
+                exit 1
+              fi
+
+              echo "✅ Keystore fingerprint matches expected Play upload key."
+            displayName: 'Validate Android upload keystore fingerprint'
+
+          - task: Gradle@4
+            displayName: 'Build Android App Bundle (Demo Release)'
+            inputs:
+              workingDirectory: 'android'
+              gradleWrapperFile: 'android/gradlew'
+              tasks: 'clean bundleDemoRelease'
+              options: >
+                -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
+                -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
+                -PKEY_ALIAS=$(keyAlias)
+                -PKEY_PASSWORD=$(jarsignerKeyPassword)
+                -PVERSION_CODE=$(androidVersionCode)
+                -PVERSION_NAME=$(androidVersionName)
+                --stacktrace
+                --warning-mode all
+              publishJUnitResults: false
+
+          - script: |
+              echo "Build completed successfully"
+              echo "Version: $(androidVersionName)"
+              echo "Build Code: $(androidVersionCode)"
+            displayName: 'Build Summary'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish APK/AAB Artifacts'
+            inputs:
+              PathtoPublish: '$(System.DefaultWorkingDirectory)/android/app/build/outputs'
+              ArtifactName: 'android-build-$(androidVersionName)'
+              publishLocation: 'Container'
+
+  # ==========================================
+  # STAGE 1B: iOS Build (Parallel)
+  # ==========================================
+
+  - stage: IOSBuild
+    displayName: 'iOS Build'
+    dependsOn: SecurityAndQuality
+    condition: succeeded()
+    jobs:
+      - job: RunIOSBuild
+        displayName: 'Build iOS IPA (Xcode Archive)'
+        pool:
+          vmImage: 'macos-latest'
+        timeoutInMinutes: 240
+        cancelTimeoutInMinutes: 15
+        steps:
+          - checkout: self
+            clean: true
+
+          - script: |
+              set -euo pipefail
+              REQUIRED_XCODE_MAJOR="$(IOS_REQUIRED_XCODE_MAJOR)"
+              MATCHED_XCODE="$(ls -d /Applications/Xcode_${REQUIRED_XCODE_MAJOR}*.app 2>/dev/null | sort -V | tail -n 1 || true)"
+
+              echo "Installed Xcode apps:"
+              ls -1 /Applications | grep '^Xcode' || true
+
+              if [ -z "$MATCHED_XCODE" ]; then
+                echo "❌ Xcode ${REQUIRED_XCODE_MAJOR}.x is not installed on this agent image."
+                echo "This app must be built with iPhoneOS SDK ${REQUIRED_XCODE_MAJOR} or later."
+                echo "Use an agent image that provides Xcode ${REQUIRED_XCODE_MAJOR}+ (or newer)."
+                exit 1
+              fi
+
+              sudo xcode-select -s "$MATCHED_XCODE/Contents/Developer"
+              echo "Xcode:"; xcodebuild -version
+              echo "SDKs:"; xcodebuild -showsdks
+
+              if ! xcodebuild -showsdks | grep -q "iphoneos${REQUIRED_XCODE_MAJOR}"; then
+                echo "❌ Required iPhoneOS SDK ${REQUIRED_XCODE_MAJOR} is not available in selected Xcode."
+                exit 1
+              fi
+
+              echo "Ruby:"; ruby -v
+              echo "CocoaPods:"; pod --version || true
+            displayName: 'Select Xcode and verify build tools'
+
+          - task: NodeTool@0
+            displayName: 'Install Node 20.6.1'
+            inputs:
+              versionSpec: '20.6.1'
+
+          - script: npm install --legacy-peer-deps
+            displayName: 'Install Node dependencies'
+
+          - script: |
+              set -euo pipefail
+              cd ios
+              rm -rf Pods Podfile.lock build
+              pod install --repo-update
+            displayName: 'Install CocoaPods dependencies'
+
+          - script: |
+              set -euo pipefail
+              PBXPROJ="ios/My Sparklight.xcodeproj/project.pbxproj"
+              perl -pi -e 's/CODE_SIGN_IDENTITY = "iOS Distribution"/CODE_SIGN_IDENTITY = "Apple Distribution"/g' "$PBXPROJ"
+              perl -pi -e 's/"iOS Distribution"/"Apple Distribution"/g' "$PBXPROJ"
+              perl -pi -e 's/CODE_SIGN_IDENTITY\[sdk=iphoneos\*\] = "iOS Distribution"/CODE_SIGN_IDENTITY[sdk=iphoneos*] = "Apple Distribution"/g' "$PBXPROJ"
+              echo "✅ Patched CODE_SIGN_IDENTITY"
+            displayName: 'Patch code sign identity'
+
+          - task: DownloadSecureFile@1
+            name: iosP12
+            displayName: 'Download Apple Certificate (.p12)'
+            inputs:
+              secureFile: '$(IOS_P12_CERT)'
+
+          - script: |
+              set -euo pipefail
+              P12_PASSWORD="${IOS_CERT_PASSWORD:-${IOS_P12_PASSWORD:-}}"
+              KEYCHAIN_PATH="$(Agent.TempDirectory)/ios-signing.keychain-db"
+              KEYCHAIN_PASSWORD="temp_keychain_$(date +%s)"
+              security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+              security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+              security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+              IMPORT_OUTPUT_FILE="$(Agent.TempDirectory)/import_output.txt"
+              set +e
+              security import "$(iosP12.secureFilePath)" \
+                -k "$KEYCHAIN_PATH" \
+                -P "$P12_PASSWORD" \
+                -T /usr/bin/codesign \
+                -T /usr/bin/security > "$IMPORT_OUTPUT_FILE" 2>&1
+              IMPORT_EXIT_CODE=$?
+              set -e
+
+              if [ $IMPORT_EXIT_CODE -ne 0 ]; then
+                echo "Initial certificate import failed:"
+                cat "$IMPORT_OUTPUT_FILE"
+
+                if [ -n "$P12_PASSWORD" ]; then
+                  echo "Retrying certificate import with empty password..."
+                  set +e
+                  security import "$(iosP12.secureFilePath)" \
+                    -k "$KEYCHAIN_PATH" \
+                    -P "" \
+                    -T /usr/bin/codesign \
+                    -T /usr/bin/security > "$IMPORT_OUTPUT_FILE" 2>&1
+                  IMPORT_EXIT_CODE=$?
+                  set -e
+                fi
+              fi
+
+              if [ $IMPORT_EXIT_CODE -ne 0 ]; then
+                echo "Certificate import failed after retries:"
+                cat "$IMPORT_OUTPUT_FILE"
+                echo "Ensure IOS_CERT_PASSWORD or IOS_P12_PASSWORD matches the uploaded .p12 file."
+                exit 1
+              fi
+
+              security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH" 2>&1 || true
+              EXISTING=$(security list-keychains -d user | tr -d '"' | xargs)
+              security list-keychains -d user -s "$KEYCHAIN_PATH" $EXISTING
+              security default-keychain -d user -s "$KEYCHAIN_PATH"
+              echo "##vso[task.setvariable variable=IOS_KEYCHAIN_PATH]$KEYCHAIN_PATH"
+              echo "##vso[task.setvariable variable=IOS_KEYCHAIN_PASSWORD]$KEYCHAIN_PASSWORD"
+              echo "✅ Certificate imported"
+            displayName: 'Install certificate into keychain'
+            env:
+              IOS_CERT_PASSWORD: $(IOS_CERT_PASSWORD)
+              IOS_P12_PASSWORD: $(IOS_P12_PASSWORD)
+
+          - task: InstallAppleProvisioningProfile@1
+            name: iosProvProfile
+            displayName: 'Install provisioning profile'
+            inputs:
+              provisioningProfileLocation: 'secureFiles'
+              provProfileSecureFile: '$(IOS_PROV_PROFILE_SECUREFILE)'
+              removeProfile: true
+
+          - script: |
+              set -euo pipefail
+              echo "Disabling code signing for all Pods xcconfig targets..."
+              find "ios/Pods" -name "*.xcconfig" | while IFS= read -r f; do
+                grep -q "CODE_SIGNING_ALLOWED" "$f" || echo "CODE_SIGNING_ALLOWED = NO" >> "$f"
+              done
+              echo "✅ Pods code signing disabled"
+            displayName: 'Disable code signing for Pods'
+
+          - script: |
+              set -euo pipefail
+              APP_INFO_PLIST="ios/Sparklight/Info.plist"
+              BUILD_NUMBER="$(iosBuildNumber)"
+              /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_INFO_PLIST" \
+                || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$APP_INFO_PLIST"
+              echo "iOS build number: $BUILD_NUMBER"
+            displayName: 'Set iOS build number'
+
+          - script: |
+              set -euo pipefail
+              NODE_BIN="$(command -v node)"
+              echo "export NODE_BINARY=$NODE_BIN" > ios/.xcode.env.local
+              ARCHIVE_PATH="$(Build.ArtifactStagingDirectory)/My Sparklight.xcarchive"
+              EXPORT_PATH="$(Build.ArtifactStagingDirectory)/ipa"
+              LOG_DIR="$(Build.ArtifactStagingDirectory)/ios-build-logs"
+              mkdir -p "$LOG_DIR"
+              ARCHIVE_LOG="$LOG_DIR/xcodebuild-archive.log"
+              EXPORT_LOG="$LOG_DIR/xcodebuild-export.log"
+              JOBS="$(sysctl -n hw.ncpu || echo 4)"
+              TEAM_ID="$(IOS_TEAM_ID)"
+              BUNDLE_ID="$(IOS_BUNDLE_ID)"
+              PROV_UUID="$(iosProvProfile.provisioningProfileUuid)"
+
+              (
+                while true; do
+                  echo "[heartbeat] iOS archive in progress: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+                  sleep 60
+                done
+              ) &
+              HEARTBEAT_PID=$!
+
+              cleanup_heartbeat() {
+                kill "$HEARTBEAT_PID" 2>/dev/null || true
+              }
+              trap cleanup_heartbeat EXIT
+
+              echo "Archiving with Xcode..."
+              if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
+                  -workspace "ios/My Sparklight.xcworkspace" \
+                  -scheme "Sparklight Dev" \
+                  -configuration Release \
+                  -sdk iphoneos \
+                  -archivePath "$ARCHIVE_PATH" \
+                  -destination "generic/platform=iOS" \
+                  -parallelizeTargets \
+                  -jobs "$JOBS" \
+                  PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+                  CURRENT_PROJECT_VERSION="$(iosBuildNumber)" \
+                  CODE_SIGN_STYLE=Manual \
+                  DEVELOPMENT_TEAM="$TEAM_ID" \
+                  PROVISIONING_PROFILE="$PROV_UUID" \
+                  CODE_SIGN_IDENTITY="$(IOS_CODE_SIGN_IDENTITY)" \
+                  OTHER_CODE_SIGN_FLAGS="--keychain $(IOS_KEYCHAIN_PATH)" \
+                  COMPILER_INDEX_STORE_ENABLE=NO \
+                  archive 2>&1 | tee "$ARCHIVE_LOG"; then
+                echo "❌ Xcode archive failed"
+                grep -i "error:" "$ARCHIVE_LOG" | tail -20 || true
+                exit 1
+              fi
+
+              EXPORT_OPTS="$(Build.ArtifactStagingDirectory)/exportOptions.plist"
+              cat > "$EXPORT_OPTS" <<EOF
+              <?xml version="1.0" encoding="UTF-8"?>
+              <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+              <plist version="1.0">
+              <dict>
+                <key>method</key>
+                <string>app-store</string>
+                <key>signingStyle</key>
+                <string>manual</string>
+                <key>teamID</key>
+                <string>${TEAM_ID}</string>
+                <key>provisioningProfiles</key>
+                <dict>
+                  <key>${BUNDLE_ID}</key>
+                  <string>${PROV_UUID}</string>
+                </dict>
+                <key>compileBitcode</key>
+                <false/>
+              </dict>
+              </plist>
+              EOF
+
+              mkdir -p "$EXPORT_PATH"
+              if ! xcodebuild \
+                  -exportArchive \
+                  -archivePath "$ARCHIVE_PATH" \
+                  -exportPath "$EXPORT_PATH" \
+                  -exportOptionsPlist "$EXPORT_OPTS" 2>&1 | tee "$EXPORT_LOG"; then
+                echo "❌ IPA export failed"
+                tail -n 100 "$EXPORT_LOG" || true
+                exit 1
+              fi
+
+              echo "✅ IPA exported:"
+              find "$EXPORT_PATH" -maxdepth 1 -name "*.ipa" -exec ls -lh {} \;
+            displayName: 'Xcode archive and export IPA'
+
+          - script: |
+              set -euo pipefail
+              LOG_DIR="$(Build.ArtifactStagingDirectory)/ios-build-logs"
+              mkdir -p "$LOG_DIR"
+              echo "=== iOS Build Diagnostics ===" > "$LOG_DIR/diagnostics.txt"
+              echo "Result: $(Agent.JobStatus)" >> "$LOG_DIR/diagnostics.txt"
+              echo "Build ID: $(Build.BuildId)" >> "$LOG_DIR/diagnostics.txt"
+              echo "Branch: $(Build.SourceBranch)" >> "$LOG_DIR/diagnostics.txt"
+              echo "Commit: $(Build.SourceVersion)" >> "$LOG_DIR/diagnostics.txt"
+              echo "Finished: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$LOG_DIR/diagnostics.txt"
+              ls -la "$(Build.ArtifactStagingDirectory)" >> "$LOG_DIR/diagnostics.txt" || true
+            displayName: 'Collect iOS diagnostics'
+            condition: always()
+            continueOnError: true
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish iOS build logs'
+            condition: always()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ios-build-logs'
+              ArtifactName: 'ios-build-logs'
+              publishLocation: 'Container'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish IPA artifact'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/ipa'
+              ArtifactName: 'ios-ipa'
+              publishLocation: 'Container'
+
+  # ==========================================
+  # STAGE 5B: IOS STAGING
+  # ==========================================
+
   - stage: CodeReview
     displayName: 'Code Review'
-    dependsOn: SecurityAndQuality
+    dependsOn:
+      - Build
+      - IOSBuild
     condition: succeeded()
     jobs:
       - job: CodeReviewGates
@@ -1179,12 +1023,222 @@ stages:
             displayName: 'Generate Build Report'
 
   # ==========================================
-  # STAGE 5: INTERNAL TESTING DEPLOYMENT
+  # STAGE 5: iOS Staging
   # ==========================================
-  - stage: InternalTestingDeployment
-    displayName: 'Internal Testing Deployment'
+
+  - stage: IOSStaging
+    displayName: 'iOS Staging'
     dependsOn: CodeReview
-    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo')))
+    condition: succeeded()
+    jobs:
+      - job: PrepareIOSStaging
+        displayName: 'Validate IPA for Staging'
+        pool:
+          vmImage: 'macos-latest'
+        timeoutInMinutes: 45
+        cancelTimeoutInMinutes: 10
+        steps:
+          - download: current
+            artifact: ios-ipa
+            displayName: 'Download IPA artifact'
+
+          - script: |
+              set -euo pipefail
+              IPA_PATH=$(find "$(Pipeline.Workspace)/ios-ipa" -maxdepth 1 -type f -name "*.ipa" | head -n 1)
+              if [ -z "$IPA_PATH" ]; then
+                echo "❌ No IPA found in ios-ipa artifact"
+                find "$(Pipeline.Workspace)/ios-ipa" -maxdepth 5 || true
+                exit 1
+              fi
+              echo "✅ IPA validated for staging: $IPA_PATH"
+              ls -lh "$IPA_PATH"
+            displayName: 'Validate IPA artifact'
+
+  # ==========================================
+  # STAGE 6B: IOS TESTFLIGHT
+  # ==========================================
+
+  - stage: AndroidStaging
+    displayName: 'Android Staging'
+    dependsOn: CodeReview
+    condition: succeeded()
+    jobs:
+      - job: PrepareAndroidStaging
+        displayName: 'Validate Android AAB for Staging'
+        steps:
+          - checkout: self
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Android Build Artifacts'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'android-build-$(androidVersionName)'
+              downloadPath: '$(Pipeline.Workspace)/android-aab'
+
+          - script: |
+              set -euo pipefail
+              AAB_PATH=$(find "$(Pipeline.Workspace)/android-aab" -type f -name "*.aab" | head -n 1)
+              if [ -z "$AAB_PATH" ]; then
+                echo "❌ No AAB found in android artifact"
+                find "$(Pipeline.Workspace)/android-aab" -maxdepth 5 || true
+                exit 1
+              fi
+              echo "✅ AAB validated for staging: $AAB_PATH"
+              ls -lh "$AAB_PATH"
+            displayName: 'Validate Android AAB artifact'
+
+  # ==========================================
+  # STAGE 6B: IOS TESTFLIGHT
+  # ==========================================
+
+  - stage: IOSTestFlight
+    displayName: 'iOS TestFlight'
+    dependsOn: IOSStaging
+    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
+    jobs:
+      - job: IOSTestFlightStage
+        displayName: 'Upload IPA to TestFlight'
+        pool:
+          vmImage: 'macos-latest'
+        timeoutInMinutes: 90
+        cancelTimeoutInMinutes: 10
+        steps:
+          - download: current
+            artifact: ios-ipa
+            displayName: 'Download IPA artifact'
+
+          - task: DownloadSecureFile@1
+            name: ascApiKey
+            displayName: 'Download App Store Connect API key (.p8)'
+            inputs:
+              secureFile: '$(IOS_ASC_API_KEY_SECUREFILE)'
+
+          - script: |
+              set -euo pipefail
+              IPA_PATH=$(find "$(Pipeline.Workspace)/ios-ipa" -maxdepth 1 -type f -name "*.ipa" | head -n 1)
+              if [ -z "$IPA_PATH" ]; then
+                echo "❌ No IPA found in ios-ipa artifact"
+                exit 1
+              fi
+
+              KEY_PATH="$(ascApiKey.secureFilePath)"
+              KEY_FILE_NAME="AuthKey_$(IOS_ASC_API_KEY_ID).p8"
+              mkdir -p "$HOME/private_keys" \
+                       "$HOME/.private_keys" \
+                       "$HOME/.appstoreconnect/private_keys" \
+                       "$(Agent.TempDirectory)/private_keys"
+              cp "$KEY_PATH" "$HOME/private_keys/$KEY_FILE_NAME"
+              cp "$KEY_PATH" "$HOME/.private_keys/$KEY_FILE_NAME"
+              cp "$KEY_PATH" "$HOME/.appstoreconnect/private_keys/$KEY_FILE_NAME"
+              cp "$KEY_PATH" "$(Agent.TempDirectory)/private_keys/$KEY_FILE_NAME"
+
+              echo "Uploading $IPA_PATH to TestFlight..."
+              xcrun altool \
+                --upload-app \
+                --type ios \
+                --file "$IPA_PATH" \
+                --apiKey "$(IOS_ASC_API_KEY_ID)" \
+                --apiIssuer "$(IOS_ASC_API_ISSUER_ID)" \
+                --show-progress
+              echo "✅ IPA submitted to App Store Connect / TestFlight"
+            displayName: 'Upload IPA to TestFlight'
+
+          - script: |
+              python3 - <<'PYEOF'
+              import smtplib, os
+              from email.mime.text import MIMEText
+              from email.mime.multipart import MIMEMultipart
+
+              smtp_server   = os.environ.get('SMTP_SERVER', '').strip()
+              smtp_port     = int(os.environ.get('SMTP_PORT', '587') or '587')
+              smtp_user     = os.environ.get('SMTP_USERNAME', '').strip()
+              smtp_pass     = os.environ.get('SMTP_PASSWORD', '').strip()
+              raw_recipients = os.environ.get('NOTIFICATION_EMAILS', '').strip()
+              recipients    = [r.strip() for r in raw_recipients.split(',') if r.strip()]
+              ios_version   = os.environ.get('IOS_VERSION_NAME', 'N/A')
+              build_num     = os.environ.get('IOS_BUILD_NUMBER', 'N/A')
+              branch        = os.environ.get('BUILD_BRANCH', 'N/A')
+              commit        = os.environ.get('BUILD_COMMIT', 'N/A')
+              bundle_id     = os.environ.get('IOS_BUNDLE_ID', 'N/A')
+              pipeline_url  = os.environ.get('BUILD_URL', '')
+
+              if not smtp_server or not smtp_user or not smtp_pass or not recipients:
+                  print('Email notification skipped: SMTP credentials or NOTIFICATION_EMAILS not configured.')
+                  exit(0)
+
+              msg = MIMEMultipart('alternative')
+              msg['From']    = smtp_user
+              msg['To']      = ', '.join(recipients)
+              msg['Subject'] = f'[MySparklight] iOS v{ios_version} Uploaded to TestFlight'
+
+              body_text = f"""MySparklight Residential - iOS Deployment Notification
+
+              The iOS app has been successfully uploaded to TestFlight.
+
+              Version    : {ios_version}
+              Build No   : {build_num}
+              Bundle ID  : {bundle_id}
+              Branch     : {branch}
+              Commit     : {commit}
+              Destination: TestFlight (App Store Connect)
+              Pipeline   : {pipeline_url}
+
+              This is an automated notification from the Azure DevOps CI/CD pipeline.
+              """
+
+              body_html = f"""<html><body>
+              <h2 style='color:#1565c0;'>&#x2705; iOS Uploaded to TestFlight</h2>
+              <table style='border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;'>
+                <tr><td style='padding:4px 12px;font-weight:bold;'>App</td><td style='padding:4px 12px;'>MySparklight Residential (iOS)</td></tr>
+                <tr style='background:#f5f5f5;'><td style='padding:4px 12px;font-weight:bold;'>Version</td><td style='padding:4px 12px;'>{ios_version}</td></tr>
+                <tr><td style='padding:4px 12px;font-weight:bold;'>Build No</td><td style='padding:4px 12px;'>{build_num}</td></tr>
+                <tr style='background:#f5f5f5;'><td style='padding:4px 12px;font-weight:bold;'>Bundle ID</td><td style='padding:4px 12px;'>{bundle_id}</td></tr>
+                <tr><td style='padding:4px 12px;font-weight:bold;'>Branch</td><td style='padding:4px 12px;'>{branch}</td></tr>
+                <tr style='background:#f5f5f5;'><td style='padding:4px 12px;font-weight:bold;'>Commit</td><td style='padding:4px 12px;'>{commit}</td></tr>
+                <tr><td style='padding:4px 12px;font-weight:bold;'>Destination</td><td style='padding:4px 12px;'>TestFlight (App Store Connect)</td></tr>
+              </table>
+              <br/><p style='color:#555;font-size:12px;'>This is an automated notification from the Azure DevOps CI/CD pipeline.</p>
+              </body></html>"""
+
+              msg.attach(MIMEText(body_text, 'plain'))
+              msg.attach(MIMEText(body_html, 'html'))
+
+              try:
+                  with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+                      server.ehlo()
+                      server.starttls()
+                      server.ehlo()
+                      server.login(smtp_user, smtp_pass)
+                      server.sendmail(smtp_user, recipients, msg.as_string())
+                  print(f'Email notification sent to: {recipients}')
+              except Exception as e:
+                  print(f'Email notification failed: {e}')
+                  exit(1)
+              PYEOF
+            displayName: 'Send iOS TestFlight Email Notification'
+            continueOnError: true
+            env:
+              SMTP_SERVER: $(SMTP_SERVER)
+              SMTP_PORT: $(SMTP_PORT)
+              SMTP_USERNAME: $(SMTP_USERNAME)
+              SMTP_PASSWORD: $(SMTP_PASSWORD)
+              NOTIFICATION_EMAILS: $(NOTIFICATION_EMAILS)
+              IOS_VERSION_NAME: $(androidVersionName)
+              IOS_BUILD_NUMBER: $(iosBuildNumber)
+              IOS_BUNDLE_ID: $(IOS_BUNDLE_ID)
+              BUILD_BRANCH: $(Build.SourceBranchName)
+              BUILD_COMMIT: $(Build.SourceVersion)
+              BUILD_URL: $(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)
+
+  # ==========================================
+  # STAGE 2: UNIT TESTS
+  # ==========================================
+
+  - stage: InternalTestingDeployment
+    displayName: 'Internal Testing Android'
+    dependsOn: AndroidStaging
+    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: DeployToInternalTesting
         displayName: 'Deploy to Play Store Internal Testing'

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
-import Touchable from "../common/customui/Touchable";
+import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import { securityQuestions } from "../utility/constant";
@@ -20,6 +20,8 @@ import colors from "../../res/Colors";
 import { requiredField } from "../../styles/utilities";
 import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
+import AppStyles from '../../styles/AppStyles'
+import { HintText, SectionTitle, FieldTitle } from "../common/customui/Typography";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
@@ -64,6 +66,7 @@ const PasswordSecurityEdit = () => {
     setIsDropDownOpen(isOpen);
     setDropdownFocused(isOpen);
   };
+  
 
   useEffect(() => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
@@ -201,7 +204,7 @@ const PasswordSecurityEdit = () => {
       <ScrollView ref={scrollViewRef} >
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
-            <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
+            <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
               <View style={styles.infoWrapper}>
                 <NotificationAlert
                   type="error"
@@ -221,30 +224,29 @@ const PasswordSecurityEdit = () => {
                   accessibilityElementsHidden={dropdownFocused}
                 >
                   <View style={{flexDirection:'column'}}>
-                  <Text
-                    style={[styles.password, styles.passwordFlexBox]}
+                  <SectionTitle
+                    
                     accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
                   >
                     Security Question
-                  </Text>
-                  <Text style={[requiredField]} accessible={true} importantForAccessibility="yes" accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
+                  </SectionTitle>
+                  <HintText style={[{ marginVertical: 10}]} accessible={true} importantForAccessibility="yes" accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
                   {" "}
                   Fields marked with * are required.
-                </Text>
+                </HintText>
                 </View>
                 </View>
 
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
-                    <Text
-                      style={[styles.firstName1, styles.firstTypo]}
+                    <FieldTitle
                       accessible={true}
                       importantForAccessibility="yes"
                       accessibilityRole="text"
                       accessibilityLabel="Password Reset Question Required"
                     >
                       Password Reset Question *
-                    </Text>
+                    </FieldTitle>
                     <SparkLightDropdown
                       items={securityQuestionsNew}
                       selectedValue={customSecurityQuestion}
@@ -286,15 +288,15 @@ const PasswordSecurityEdit = () => {
                   style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
                 >
 
-                  <Text
-                      style={[styles.firstName1, styles.firstTypo,{marginBottom:8}]}
+                  <FieldTitle
+                      style={[{marginBottom:8}]}
                       accessible={true}
                       importantForAccessibility="yes"
                       accessibilityRole="text"
                       accessibilityLabel="Password Reset Answer Required"
                     >
                       Password Reset Answer *
-                    </Text>
+                    </FieldTitle>
                   <Controller
                     control={control}
                     name="securityAnswer"
@@ -314,29 +316,17 @@ const PasswordSecurityEdit = () => {
               </View>
             </View>
           </View>
-          <View
-            style={styles.frameParent1}
-          >
-            <Touchable
-              minSize={0}
-              style={[styles.buttons, styles.buttonsLayout]}
+          <View style={styles.frameParent1} >
+            <PrimaryButton
+              title="Save"
               onPress={handleSubmit(handleSave, handleValidationError)}
-              accessibilityLabel="Save changes"
-              accessibilityRole="button"
-              accessible={!dropdownFocused}
-            >
-              <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
-            </Touchable>
-            <Touchable
-              minSize={0}
-              style={[styles.buttons1, styles.buttonsLayout]}
+              buttonType="submit"
+            />
+            <PrimaryButton
+              title="Cancel"
               onPress={() => navigation.navigate("PasswordSecurity")}
-              accessibilityLabel="Cancel and return"
-              accessibilityRole="button"
-              accessible={!dropdownFocused}
-            >
-              <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
-            </Touchable>
+              buttonType="cancel"
+            />
           </View>
 
           <LoadingOverlay

@@ -107,9 +107,9 @@ const MyServicesContent = ({ route }) => {
       <LinearGradient
         style={[styles.gradientHeader, { height: 88 + insets.top }]}
         locations={[0, 1]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1.3, y: 0}}
         colors={SERVICE_HEADER_GRADIENT}
-        useAngle={true}
-        angle={90}
       />
 
       <View style={{ paddingTop: insets.top + 27 }}>
@@ -135,7 +135,7 @@ const MyServicesContent = ({ route }) => {
         <View style={styles.servicesContainer}>
           {showInternet && (
             <InternetCard
-              planName={data?.internet?.planName}
+              planName={data?.internet?.planName?.toLowerCase()}
               downloadSpeed={data?.internet?.downloadSpeed}
               uploadSpeed={data?.internet?.uploadSpeed}
               loading={loading}
@@ -145,7 +145,7 @@ const MyServicesContent = ({ route }) => {
 
           {showVideo && (
             <VideoCard
-              planName={data?.video?.planName}
+              planName={data?.video?.planName?.toLowerCase()}
               zipCode={zipCodeFromAccount}
               legacySpa={legacySPA}
               loading={loading}
@@ -154,7 +154,7 @@ const MyServicesContent = ({ route }) => {
 
           {showPhone && (
             <PhoneCard
-              planName={data?.phone?.planName}
+              planName={data?.phone?.planName?.toLowerCase()}
               legacyBrand={legacySPA}
               loading={loading}
             />
@@ -169,6 +169,8 @@ const MyServicesContent = ({ route }) => {
           onCloseNotification={handleCloseNotification}
           hasUserInitiatedCheck={hasUserInitiatedCheck}
         />
+
+        <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
       </ScrollView>
     </View>
   );

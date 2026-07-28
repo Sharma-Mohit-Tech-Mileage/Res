@@ -13,7 +13,7 @@ import {
 import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
-import CheckBox from "@react-native-community/checkbox";
+import SparklightCheckBox from "../common/customui/SparklightCheckBox";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRoute } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -23,9 +23,12 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { getUser } from "../../redux/utils/LocalStorage";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { PostApiRequest } from "../../network/RestApiClient";
-import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import { A11Y } from "../../styles/theme";
+import AppStyles from "../../styles/AppStyles";
+
+import SecondaryButton from "../common/customui/PrimaryButton";
 
 import {
   Color,
@@ -37,7 +40,18 @@ import {
 
 import Toggle from "../common/Toggle";
 import AlertIcon from "../../../assets/svgs/Alerttriangle";
-import { widthPercentageToDP } from "react-native-responsive-screen";
+import Alerttriangle from "../../res/svgIcons/AlertIcon";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+
+import {
+  SectionTitle,
+  SectionContent,
+  HintText,
+  Hyperlink,
+} from "../common/customui/Typography";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
@@ -45,7 +59,7 @@ const validationSchema = yup.object().shape({
     .string()
     .matches(
       /^(?:1)?\s*(?:\([2-9]\d{2}\)\s*|[2-9]\d{2}[- ]?)?[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?$/,
-      "Invalid mobile phone number."
+      "Invalid mobile phone number.",
     )
     .required("Phone number is required"),
   optOut: yup.boolean(),
@@ -61,6 +75,7 @@ const TextNotifications = ({ navigation }) => {
   const timeoutRef = useRef(null);
   const [notification, setNotification] = useState(null);
   const successIconRef = useRef(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [errorText, setErrorText] = useState(false);
@@ -70,10 +85,10 @@ const TextNotifications = ({ navigation }) => {
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isTermRequired, setIsTermRequired] = useState(false);
   const [message1, setMessage1] = useState(
-    "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply."
+    "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply.",
   );
   const [message, setMessage] = useState(
-    "Please enter your mobile phone number below and then select the type of message you would like to receive."
+    "Please enter your mobile phone number below and then select the type of message you would like to receive.",
   );
   const {
     control,
@@ -99,7 +114,6 @@ const TextNotifications = ({ navigation }) => {
     }
   }, [toggleCheckBoxTerm]);
 
-
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
 
   const [errorRef, setErrorFocus] = useAccessibilityFocus();
@@ -111,13 +125,13 @@ const TextNotifications = ({ navigation }) => {
   // Announce error message if screen reader is enabled
   useEffect(() => {
     if (showErrorAlert && screenReaderEnabled) {
-     
-
       // After the animation, set focus on the alert and re-announce for reliability (especially on Android)
       const t = setTimeout(() => {
         try {
           setErrorFocus();
-          AccessibilityInfo.announceForAccessibility('Text Notifications update failed.');
+          AccessibilityInfo.announceForAccessibility(
+            "Text Notifications update failed.",
+          );
         } catch (e) {
           console.warn("Accessibility focus error:", e);
         }
@@ -126,7 +140,6 @@ const TextNotifications = ({ navigation }) => {
       return () => clearTimeout(t);
     }
   }, [showErrorAlert, screenReaderEnabled, setErrorFocus]);
-
 
   // Announce error message if screen reader is enabled
   useEffect(() => {
@@ -155,10 +168,12 @@ const TextNotifications = ({ navigation }) => {
         }
       }, 1200);
 
-      return () => { clearTimeout(t1); clearTimeout(t2); };
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
     }
   }, [showSuccessAlert, screenReaderEnabled]);
-
 
   const handleTermsLinkPress = useCallback(
     (event) => {
@@ -168,17 +183,17 @@ const TextNotifications = ({ navigation }) => {
         name: "Terms & Conditions",
       });
     },
-    [navigation]
+    [navigation],
   );
 
   useEffect(() => {
     if (formatedData?.phoneNumber) {
       setIsCheckboxVisible(false);
       setMessage(
-        "Please enter the mobile phone number you would like to receive all future customer communications. You may opt out at any time."
+        "Please enter the mobile phone number you would like to receive all future customer communications. You may opt out at any time.",
       );
       setMessage1(
-        "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply."
+        "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply.",
       );
     } else {
       setIsCheckboxVisible(true);
@@ -204,7 +219,6 @@ const TextNotifications = ({ navigation }) => {
     }
   };
 
-
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     formatedData[name] = value;
@@ -221,7 +235,8 @@ const TextNotifications = ({ navigation }) => {
     }
   }, [route.params]);
 
-  const animateNotification = useCallback(() => {``
+  const animateNotification = useCallback(() => {
+    ``;
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -261,11 +276,15 @@ const TextNotifications = ({ navigation }) => {
         setIsTermRequired(true);
         return;
       }
-      if (formatedData.billingOptOutStatus || formatedData.outageOptOut || formatedData.optOut) {
+      if (
+        formatedData.billingOptOutStatus ||
+        formatedData.outageOptOut ||
+        formatedData.optOut
+      ) {
         postRequestTextNotification();
       } else {
         setErrorText(
-          "Please select the type of messages you would like to receive."
+          "Please select the type of messages you would like to receive.",
         );
         setShowErrorAlert(true);
         scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
@@ -276,6 +295,7 @@ const TextNotifications = ({ navigation }) => {
   };
 
   const postRequestTextNotification = async () => {
+    setIsSubmitting(true);
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
     formatedData["accountNumber"] = accountNumber;
@@ -295,22 +315,25 @@ const TextNotifications = ({ navigation }) => {
       (res) => {
         if (res) {
           setIsLoading(false);
+          setIsSubmitting(false);
           setShowSuccessAlert(true);
           setNotification({
-            message: "Your text notification preferences have been updated successfully.",
+            message:
+              "Your text notification preferences have been updated successfully.",
             type: "success",
           });
         }
       },
       (error) => {
         setIsLoading(false);
+        setIsSubmitting(false);
         console.warn("Error on retrying postRequestTextNotification", error);
         setNotification({
           message: "Text Notifications update failed.",
           type: "error",
         });
         setShowErrorAlert(true);
-      }
+      },
     );
   };
 
@@ -333,21 +356,23 @@ const TextNotifications = ({ navigation }) => {
       )}
       <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always">
         <View style={styles.textNotificationsInner}>
-          <View style={[styles.navigationBorder]}>
+          <View style={[AppStyles.card, { margin: 16, paddingBottom: 16 }]}>
             {notification && (
               <Animated.View
                 style={{
                   transform: [{ translateY }],
-                  paddingHorizontal: Padding.p_5xl,
+                  paddingHorizontal: Padding.p_xs,
                 }}
                 accessible={false}
                 importantForAccessibility="no"
               >
-                <View style={styles.spaceBottom} ref={notification.type === "error" ? errorRef : successRef}>
+                <View
+                  style={styles.spaceBottom}
+                  ref={notification.type === "error" ? errorRef : successRef}
+                >
                   <NotificationAlert
                     type={notification.type}
                     title={notification.type === "error" ? "Error" : "Success"}
-                    
                     message={notification.message}
                     showCloseIcon={true}
                     onClose={() => setNotification(null)}
@@ -355,7 +380,9 @@ const TextNotifications = ({ navigation }) => {
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"
                     accessibilityLabel={notification.message}
-                    iconRef={notification.type === "success" ? successIconRef : null}
+                    iconRef={
+                      notification.type === "success" ? successIconRef : null
+                    }
                   />
                 </View>
               </Animated.View>
@@ -382,6 +409,8 @@ const TextNotifications = ({ navigation }) => {
                   message={message1}
                   showCloseIcon={false}
                   isVisible={true}
+                  iconComponent={Alerttriangle}
+                  iconColor="#F88700"
                   accessibilityLabel={
                     formatedData?.phoneNumber
                       ? "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply."
@@ -395,25 +424,24 @@ const TextNotifications = ({ navigation }) => {
             </View>
 
             <View style={{ marginHorizontal: 20 }}>
-              <Text
-                style={[styles.mobilePhoneTypo]}
+              <SectionContent
                 accessibilityRole="text"
                 accessible={true}
                 accessibilityLabel={message}
               >
                 {message}
-              </Text>
-              <Text
+              </SectionContent>
+              <HintText
                 style={styles.requiredFieldsText}
                 accessibilityRole="text"
                 accessible={true}
                 accessibilityLabel="Fields marked with an asterisk are required"
               >
                 Fields marked with * are required.
-              </Text>
+              </HintText>
             </View>
 
-            <View style={{ marginHorizontal: 20, paddingVertical: Padding.p_base }}>
+            <View style={styles.section}>
               <Controller
                 control={control}
                 name="phoneNumber"
@@ -437,144 +465,109 @@ const TextNotifications = ({ navigation }) => {
             </View>
             <View style={styles.frameChild} />
             <NotificationSetting
-                title="Appointments"
-                name="optOut"
-                value={formatedData.optOut}
-                description="Receive text notifications when your appointments have updates."
-                onChange={handleToggleChange}
-              />
-              <NotificationSetting
-                title="Outage Alerts"
-                name="outageOptOut"
-                value={formatedData.outageOptOut}
-                description="Receive text notifications when outage occur."
-                onChange={handleToggleChange}
-              />
-              <NotificationSetting
-                title="Billing"
-                name="billingOptOutStatus"
-                value={formatedData.billingOptOutStatus}
-                description="Receive text notifications for billing."
-                onChange={handleToggleChange}
-              />
-
+              title="Appointments"
+              name="optOut"
+              value={formatedData.optOut}
+              description="Receive text notifications when your appointments have updates."
+              onChange={handleToggleChange}
+            />
             <View style={styles.frameChild} />
+            <NotificationSetting
+              title="Outage Alerts"
+              name="outageOptOut"
+              value={formatedData.outageOptOut}
+              description="Receive text notifications when outage occur."
+              onChange={handleToggleChange}
+            />
+            <View style={styles.frameChild} />
+            <NotificationSetting
+              title="Billing"
+              name="billingOptOutStatus"
+              value={formatedData.billingOptOutStatus}
+              description="Receive text notifications for billing."
+              compactBottom={true}
+              onChange={handleToggleChange}
+            />
+
             {isCheckboxVisible && (
-              <View
-                style={{
-                  paddingVertical: 16,
-                  marginHorizontal: Platform.OS==='android'? 10: 20,
-                  alignContent: "flex-start",
-                  alignItems: "flex-start",
-                }}
-              >
+              <View style={[styles.checkboxSection]}>
                 <View style={styles.checkBoxArea}>
                   <Touchable
-                    minSize={0}
-                    style={[styles.checkboxTouchable, { justifyContent: 'flex-start' }]}
+                    style={styles.checkboxTouchable}
                     onPress={handleCheckboxToggle}
                     accessibilityRole="checkbox"
                     accessibilityLabel="I agree to Text Messaging Terms and Conditions"
                     accessibilityState={{ checked: toggleCheckBoxTerm }}
-                  >
-                    <View style={styles.checkboxContainer}>
-                      <View
-                        pointerEvents="none"
-                        importantForAccessibility="no-hide-descendants"
-                      >
-                        <CheckBox
-                          disabled={true}
-                          value={toggleCheckBoxTerm}
-                          style={styles.checkBox}
-                          boxType="square"
-                          tintColor={
-                            isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
-                          }
-                          tintColors={{
-                            true: "#1B99FF",
-                            false: isTermRequired? "#EF4E3E": "#D0D5DD",
-                          }}
-                          accessible={false}
-                          importantForAccessibility="no"
-                        />
-                      </View>
-                      <Text
-                        style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
-                        allowFontScaling={true}
-                        maxFontSizeMultiplier={1}
-                      >
-                        I agree to{" "}
-                      </Text>
-                    </View>
-                  </Touchable>
-                  <Touchable
                     minSize={0}
-                    onPress={handleTermsLinkPress}
-                    accessibilityRole="link"
-                    accessibilityLabel="View Text Messaging Terms and Conditions"
-                    accessibilityHint="Opens Text Messaging Terms and Conditions in a new window"
-                    hitSlop={A11Y.hitSlop}
-                    style={styles.termsLinkTouchable}
                   >
-                    <Text
-                      style={[
-                        styles.checkBoxAreaViewText,
-                        {
-                          color: Color.sparklightBrightPurple,
-                          textDecorationLine: "underline",
-                        },
-                      ]}
+                    <SparklightCheckBox
+                      disabled={true}
+                      value={toggleCheckBoxTerm}
+                      boxStyle={styles.checkBox}
+                      accessible={false}
+                      importantForAccessibility="no"
+                    />
+                  </Touchable>
+                  <Text
+                    style={[
+                      styles.checkBoxAreaViewText,
+                      styles.checkBoxTextWrapper,
+                    ]}
+                    allowFontScaling={true}
+                    maxFontSizeMultiplier={1}
+                  >
+                    I agree to{" "}
+                    <Hyperlink
+                      onPress={handleTermsLinkPress}
+                      accessibilityRole="link"
+                      accessibilityLabel="View Text Messaging Terms and Conditions"
                       allowFontScaling={true}
                       maxFontSizeMultiplier={1}
                     >
                       Text Messaging Terms & Conditions
-                    </Text>
-                  </Touchable>
+                    </Hyperlink>
+                  </Text>
                 </View>
+
+                {/* Add error message display */}
                 {isTermRequired && (
-                  <View style={{ paddingTop: 8 }}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        alignItems: "center",
-                      }}
+                  <View
+                    style={styles.errorContainer}
+                    accessible={true}
+                    accessibilityRole="alert"
+                    accessibilityLiveRegion="assertive"
+                    accessibilityLabel="Error: Please agree to the Terms and Conditions to proceed"
+                  >
+                    <AlertIcon />
+                    <Text
+                      style={styles.errorText}
+                      importantForAccessibility="no"
                     >
-                      <AlertIcon />
-                      <Text style={styles.ErrorToggle}>
-                        Please agree to the Terms & Conditions to proceed.
-                      </Text>
-                    </View>
+                      Please agree to the Terms & Conditions to proceed.
+                    </Text>
                   </View>
                 )}
               </View>
             )}
           </View>
-          <View style={[{ alignSelf: "stretch" }]}>
-            <Touchable
-              minSize={0}
-              accessible={true}
-              accessibilityLabel="Save"
-              accessibilityRole="button"
-              style={[
-                styles.buttons,
-                styles.buttonsLayout,
-              ]}
+          <View style={styles.buttonContainer}>
+            <SecondaryButton
+              title="Save"
               onPress={handleSubmit(onSubmit, handleValidationError)}
-            >
-              <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
-            </Touchable>
-            <View style={{ padding: 8 }}></View>
-            <Touchable
-              minSize={0}
-              accessible={true}
+              accessibilityLabel="Save settings"
+              accessibilityHint="Double tap to save your notification preferences"
+              style={styles.saveButton}
+              buttonType={"submit"}
+              disabled={isSubmitting}
+            />
+            <SecondaryButton
+              title="Cancel"
+              onPress={() => navigation.goBack()}
               accessibilityLabel="Cancel"
-              accessibilityRole="button"
-              style={styles.buttonsLayout}
-              onPress={() => navigation.navigate("Notifications")}
-            >
-              <Text style={[styles.accountClr, styles.makeTypo]}>Cancel</Text>
-            </Touchable>
+              accessibilityHint="Double tap to cancel and go back"
+              style={styles.cancelButton}
+              disabled={isSubmitting}
+            />
           </View>
         </View>
       </ScrollView>
@@ -582,48 +575,53 @@ const TextNotifications = ({ navigation }) => {
   );
 };
 
-
-const NotificationSetting = ({ name, value, title, description, onChange }) => (
-  <View style={[styles.frameContainer, styles.frameBorder]}>
-    <View style={styles.frameView}>
-      <View style={styles.appointmentsParent}>
-        <View style={{ flexDirection: "column", flex: 1, marginRight: 10 }}>
-          <Text
-            style={styles.appointments}
-            accessible={true}
-            accessibilityRole="text"
-            accessibilityLabel={`${title} for text notifications ${description}`}
-          >
-            {title}
-          </Text>
-          <Text
+const NotificationSetting = ({
+  name,
+  value,
+  title,
+  description,
+  onChange,
+  compactBottom = false,
+}) => (
+  <View style={[styles.frameContainer]}>
+    <View
+      style={[styles.frameView, compactBottom && styles.frameViewCompactBottom]}
+    >
+      <View style={styles.rowContent}>
+        <View style={styles.textWrap}>
+          <View style={styles.titleRow}>
+            <SectionTitle
+              style={styles.appointments}
+              accessible={true}
+              accessibilityRole="text"
+              accessibilityLabel={`${title} for text notifications ${description}`}
+            >
+              {title}
+            </SectionTitle>
+            <Toggle
+              name={name}
+              initialValue={value}
+              section="textNotif"
+              label={title}
+              description={description}
+              onToggle={onChange}
+            />
+          </View>
+          <SectionContent
             style={[
-              styles.receiveAppNotifications1,
-              styles.receiveTypo,
-              { marginTop: 8 },
+              styles.descriptionText,
+              compactBottom && styles.descriptionTextCompactBottom,
             ]}
             accessible={false}
             importantForAccessibility="no"
           >
             {description}
-          </Text>
-        </View>
-
-        <View>
-          <Toggle
-            name={name}
-            initialValue={value}
-            section="textNotif"
-            label={title}
-            description={description}
-            onToggle={onChange}
-          />
+          </SectionContent>
         </View>
       </View>
     </View>
   </View>
 );
-
 
 const styles = StyleSheet.create({
   navigationBorder: {
@@ -645,9 +643,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   requiredFieldsText: {
-    fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.gray600,
     marginTop: Padding.p_base,
     textAlign: "left",
   },
@@ -670,6 +665,10 @@ const styles = StyleSheet.create({
   makeTypo: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
+  },
+  buttonContainer: {
+    padding: Padding.p_base,
+    gap: 12,
   },
   accountClr: {
     color: Color.colorMidnightblue,
@@ -775,28 +774,50 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue,
   },
   textNotificationsInner: {
-    paddingTop: Padding.p_5xl,
     flex: 1,
-    paddingHorizontal: Padding.p_base,
-    marginBottom: 200,
+    paddingBottom: hp("20%"),
+
+    overflow: "hidden",
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   checkBox: {
-    width: 12,
-    height: 12,
-    marginRight: Platform.OS === "ios" ? 2 : 16,
-    
+    width: 16,
+    height: 16,
+    marginTop: 0,
+    marginRight: Platform.OS === "ios" ? 8 : 8,
   },
   checkBoxArea: {
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
-  },
-  checkboxTouchable: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 0,
+    width: "100%",
     minHeight: A11Y.minTouch,
     paddingVertical: Padding.p_5xs,
+  },
+  checkBoxTextWrapper: {
+    flex: 1,
+    flexWrap: "wrap",
+    marginLeft: 8,
+  },
+  termsLinkText: {
+    color: Color.sparklightBrightPurple,
+    textDecorationLine: "underline",
+  },
+  checkboxSection: {
+    paddingHorizontal: 16,
+    alignSelf: "flex-start",
+    justifyContent: 'flex-start',
+    width: "95%",
+    marginTop: Padding.p_base,
+  },
+ checkboxTouchable: {
+    flexDirection: "row",
+    marginRight: 0,
+    paddingVertical: Padding.p_9xs,
+    marginLeft: 8,
   },
   termsLinkTouchable: {
     minHeight: A11Y.minTouch,
@@ -805,48 +826,90 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+    
   },
   checkBoxAreaViewText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    color: Color.sparklightGray1,
+    flexShrink: 1,
+    flexWrap: "wrap",
+  },
+    errorContainer: {
+    marginTop: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  errorContent: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+  },
+  errorText: {
+    marginLeft: 8,
+    color: "red",
     fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
-  },makeTypo: {
+    lineHeight: 20,
+  },
+  makeTypo: {
     width: 282,
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     textAlign: "center",
   },
   appointments: {
-    color: Color.colorGray_100,
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    lineHeight: 22,
     flex: 1,
   },
-  appointmentsParent: {
+  rowContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  titleRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    width: "100%",
   },
   frameView: {
-    paddingVertical: Padding.p_base,
+    paddingVertical: 0,
+    paddingBottom: 12,
     flexDirection: "row",
-    //alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
-    //flex: 1,
+    width: "100%",
+  },
+  frameViewCompactBottom: {
+    paddingBottom: 0,
   },
   frameContainer: {
-    borderBottomWidth: 1,
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "stretch",
   },
+  textWrap: {
+    flexDirection: "column",
+    flex: 1,
+    marginRight: 10,
+  },
+  descriptionText: {
+    marginTop: 0,
+    marginBottom: Padding.p_9xs,
+  },
+  section: {
+    paddingHorizontal: Padding.p_5xl,
+    paddingVertical: Padding.p_5xl,
+  },
+  descriptionTextCompactBottom: {
+    marginBottom: 0,
+  },
   receiveAppNotifications1: {
-    color: Color.colorGray_100,
     lineHeight: 22,
-  },frameBorder: {
+  },
+  frameBorder: {
     borderColor: Color.sparklightGray,
     backgroundColor: Color.sparklightWhite,
     alignItems: "center",

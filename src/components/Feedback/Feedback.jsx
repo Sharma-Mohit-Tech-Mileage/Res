@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, findNodeHandle } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
@@ -34,6 +34,8 @@ import useUserEmailPrefill from "../../hooks/useUserEmailPrefill";
 import FeedbackRatingSelector from "./FeedbackRatingSelector";
 import AreaOfConcernSelector from "./AreaOfConcernSelector";
 import { Radio } from "native-base";
+import {HintText,FieldTitle} from "../common/customui/Typography";
+import PrimaryButton from "../common/customui/PrimaryButton";
 
 const Feedback = () => {
   const navigation = useNavigation();
@@ -50,6 +52,7 @@ const Feedback = () => {
   const announcementTimerRef = useRef(null);
   const emailFieldRef = useRef(null);
   const feedbackTextRef = useRef(null);
+  const surveyErrorRef = useRef(null);
 
   const {
     control,
@@ -77,6 +80,18 @@ const Feedback = () => {
     isSubmittingRef.current = false;
     setIsSubmitting(false);
 
+    // Priority 1: Additional Feedback must be announced/focused first.
+    if (fieldErrors.feedbackText) {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      setTimeout(() => {
+        feedbackTextRef.current?.focus();
+        AccessibilityInfo.announceForAccessibility(
+          fieldErrors.feedbackText?.message || "Additional feedback is required"
+        );
+      }, 400);
+      return;
+    }
+
     if (fieldErrors.cosentContactUs) {
       setIsError(true);
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
@@ -84,15 +99,38 @@ const Feedback = () => {
     }
 
     // Scroll to and focus the first field with an error so inline error is visible
-    if (fieldErrors.areaOfConcern || fieldErrors.feedbackText) {
+    if (fieldErrors.areaOfConcern) {
       scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-      if (fieldErrors.feedbackText) {
-        setTimeout(() => feedbackTextRef.current?.focus(), 400);
-      }
     } else if (fieldErrors.feedbackEmail) {
       emailFieldRef.current?.focus();
     }
   };
+
+  useEffect(() => {
+    // Only announce consent error when Additional Feedback is already valid.
+    if (errors.feedbackText) {
+      return;
+    }
+
+    if (!errors.cosentContactUs && !isError) {
+      return;
+    }
+
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+
+    const timer = setTimeout(() => {
+      const handle = findNodeHandle(surveyErrorRef.current);
+      if (handle) {
+        AccessibilityInfo.setAccessibilityFocus(handle);
+      }
+
+      AccessibilityInfo.announceForAccessibility(
+        errors.cosentContactUs?.message || "Please choose Yes or No to contact you."
+      );
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [errors.cosentContactUs, isError]);
 
   const handleRatingSelect = (option) => {
     if (isSubmittingRef.current) return;
@@ -172,14 +210,14 @@ const Feedback = () => {
             <Text style={styles.question}>
               How would you rate your experience using the MySparklight app?
             </Text>
-            <Text
-              style={styles.requiredFieldsText}
+            <HintText
+              style={{marginTop: Padding.p_base,}}
               accessibilityRole="text"
               accessible={true}
               accessibilityLabel="Fields marked with an asterisk are required"
             >
               Fields marked with * are required.
-            </Text>
+            </HintText>
           </Animated.View>
 
           <Animated.View
@@ -303,17 +341,22 @@ const Feedback = () => {
 
 
 
-          <View style={{ paddingHorizontal: 16 }}>
-
-              <Text
+          <View style={{ paddingHorizontal: 16, paddingTop: 8}}
+         
+         
+          >
+             <View ref={surveyErrorRef} accessible={true}
+              >
+              <FieldTitle
+               
                 style={[
-                  styles.optionTxt,
                   (isError || errors.cosentContactUs) && styles.optionTxtError,
                 ]}
-              accessibilityLabel={"May Sparklight contact you about your feedback? Required"}
+              accessibilityLabel={isError ? "Please choose Yes or No to contact you." : "May Sparklight contact you about your feedback? Required"}
               >
               May Sparklight contact you about your feedback? *
-              </Text>
+              </FieldTitle>
+              </View>
               <Radio.Group
                 name="surveyOptions"
                 value={selectedOption}
@@ -379,6 +422,7 @@ const Feedback = () => {
               </Radio.Group>
               {(isError || errors.cosentContactUs) && (
                 <View
+                  
                   style={styles.errorContainer}
                   accessible={true}
                   accessibilityLabel="Please choose Yes or No to contact you."
@@ -431,38 +475,31 @@ const Feedback = () => {
             entering={FadeInDown.delay(700).springify()}
             style={styles.buttonContainer}
           >
-            <Touchable
-              accessibilityLabel={
-                isSubmitting ? "Feedback Submitting in progress" : "Submit Feedback"
-              }
-              accessibilityRole="button"
-              accessible={true}
-              style={[
-                styles.submitButton,
-                isSubmitting && styles.submitButtonDisabled,
-              ]}
+            <PrimaryButton
+              title={isSubmitting ? "Submitting..." : "Submit Feedback"}
               onPress={handleSubmit(onSubmit, handleValidationError)}
               disabled={isSubmitting}
-            >
-              <Text style={styles.submitButtonText}>
-                {isSubmitting ? "Submitting..." : "Submit Feedback"}
-              </Text>
-            </Touchable>
+              accessibilityLabel={isSubmitting ? "Submitting feedback" : "Submit feedback"}
+              accessibilityRole="button"
+              buttonType="submit"
+              accessible={!isSubmitting}
+            />
           </Animated.View>
 
           <Animated.View
             entering={FadeInDown.delay(800).springify()}
             style={styles.cancelWrapper}
           >
-            <Touchable
-              accessibilityLabel="Cancel"
-              accessibilityRole="button"
-              accessible={true}
+            <PrimaryButton
+              title="Cancel"
+              buttonType="cancel"
               onPress={() => navigation.navigate("Account")}
               disabled={isSubmitting}
-            >
-              <Text style={styles.cancelText}>Cancel</Text>
-            </Touchable>
+              accessibilityLabel="Cancel feedback submission"
+              accessibilityRole="button"
+              accessible={!isSubmitting}
+            />
+            
           </Animated.View>
         </Animated.View>
       </ScrollView>
@@ -525,7 +562,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
   },
   submitButton: {
-    backgroundColor: Color.colorMidnightblue,
+    backgroundColor: Color.sparklightBrightPurple,
     padding: Padding.p_base,
     borderRadius: Border.br_11xs,
     alignItems: "center",
@@ -548,7 +585,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   cancelWrapper: {
-    marginTop: Padding.p_13xl,
+    marginTop: Padding.p_5xs,
     paddingHorizontal: Padding.p_base,
     alignItems: "center",
   },
@@ -570,16 +607,15 @@ const styles = StyleSheet.create({
     height: 20,
     marginRight: Padding.p_xs,
   },
-  
   errorText: {
     color: "red",
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     marginTop: Padding.p_5xs,
   },optionTxt: {
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.size_base,
     color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
   },
   optionTxtError: {
     color: "red",

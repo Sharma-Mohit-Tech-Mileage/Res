@@ -23,6 +23,7 @@ import ErrorModal, { ErrorType } from "../common/ErrorModal";
 import LoadingStateIndicator, { LoadingState, } from "../common/LoadingStateIndicator";
 import Config from "react-native-config";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
+import { logDebug, logWarn, logError } from "../../utils/logger";
 
 const config = {
   issuer: Config.SSO_LOGIN,
@@ -187,6 +188,7 @@ const SplashScreen = ({ navigation, route }) => {
         !connectivity.isConnected ||
         connectivity.isInternetReachable === false
       ) {
+        logWarn("SplashScreen", "Refresh token check skipped due to no connectivity");
         setErrorState({
           visible: true,
           type: ErrorType.NETWORK_ERROR,
@@ -206,6 +208,7 @@ const SplashScreen = ({ navigation, route }) => {
       const user = await getUser();
 
       if (!user?.refreshToken) {
+        logDebug("SplashScreen", "No refresh token available; skipping session refresh");
         clearTimeout(sessionCheckTimeout.current);
         setLoadingState(LoadingState.NONE);
         setLoginEnable(true);
@@ -220,6 +223,7 @@ const SplashScreen = ({ navigation, route }) => {
       clearTimeout(sessionCheckTimeout.current);
 
       if (!result.success) {
+        logWarn("SplashScreen", "Session refresh failed", result);
         setLoadingState(LoadingState.NONE);
         setLoginEnable(true);
         return;
@@ -236,6 +240,7 @@ const SplashScreen = ({ navigation, route }) => {
       storeSsoToken(data);
       callSSOLoginApi(data);
     } catch (error) {
+      logError("SplashScreen", error);
       clearTimeout(sessionCheckTimeout.current);
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
@@ -246,11 +251,19 @@ const SplashScreen = ({ navigation, route }) => {
     setLoadingState(LoadingState.LOADING_DATA);
     // Capture SSO idToken from request so handleLogin can store it in the user object
     ssoIdTokenRef.current = request.idToken || null;
+    logDebug("SplashScreen", "Calling SSO login API", {
+      endpoint: getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN),
+      hasIdToken: Boolean(request.idToken),
+    });
     PostAuthApiRequest(getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN), request, onSuccess, onError);
   }, []);
 
   const onSuccess = useCallback(
     async (res) => {
+      logDebug("SplashScreen", "SSO login API succeeded", {
+        hasJwtToken: Boolean(res?.jwtToken),
+        userName: res?.userInfo?.userName,
+      });
       handleLogin(res);
     },
     [dispatch]
@@ -258,6 +271,11 @@ const SplashScreen = ({ navigation, route }) => {
 
   const onError = useCallback(
     (error) => {
+      logError("SplashScreen", error);
+      logWarn("SplashScreen", "SSO login API failed", {
+        status: error?.status,
+        message: error?.message,
+      });
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
       if (error.status === 204) {
@@ -294,6 +312,12 @@ const SplashScreen = ({ navigation, route }) => {
   );
 
   const handleLogin = async (res) => {
+    logDebug("SplashScreen", "Handling login response", {
+      userName: res?.userInfo?.userName,
+      customerType: res?.userInfo?.customerType,
+      authLevel: res?.userInfo?.authLevel,
+    });
+
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -309,6 +333,7 @@ const SplashScreen = ({ navigation, route }) => {
 
       // Check for business account first
       if (res.userInfo.customerType === "COM") {
+        logWarn("SplashScreen", "Business account login blocked");
         setLoadingState(LoadingState.NONE);
         setLoginEnable(true);
         setErrorState({
@@ -322,6 +347,10 @@ const SplashScreen = ({ navigation, route }) => {
       if (
         shouldBlockLogin(userInfo.acctStatus, userInfo.daysSinceDisconnectDate)
       ) {
+        logWarn("SplashScreen", "Login blocked due to disconnect status", {
+          acctStatus: userInfo.acctStatus,
+          daysSinceDisconnectDate: userInfo.daysSinceDisconnectDate,
+        });
         setLoadingState(LoadingState.NONE);
         setDisconnected(true);
         return;
@@ -331,6 +360,7 @@ const SplashScreen = ({ navigation, route }) => {
         res.userInfo?.authLevel != "HeadOfHousehold" &&
         userInfo?.authLevel == "Admin"
       ) {
+        logWarn("SplashScreen", "Admin permission login blocked");
         setLoadingState(LoadingState.NONE);
         setLoginEnable(true);
         setErrorState({
@@ -342,6 +372,7 @@ const SplashScreen = ({ navigation, route }) => {
         moveAfterLogin(user);
       }
     } else {
+      logWarn("SplashScreen", "Login response was empty");
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
     }
@@ -349,6 +380,9 @@ const SplashScreen = ({ navigation, route }) => {
 
   const moveAfterLogin = async (user) => {
     try {
+      logDebug("SplashScreen", "Moving user after successful login", {
+        userName: user?.userInfo?.userName,
+      });
       storeUser(user);
       dispatch(saveUserInfo(user));
       if (user.userInfo && user.userInfo.userName) {
@@ -368,7 +402,8 @@ const SplashScreen = ({ navigation, route }) => {
         navigation.reset({ index: 0, routes: [{ name: "Terms" }] });
       }
     } catch (error) {
-      console.warn("Error in moveAfterLogin:", error);
+      logError("SplashScreen", error);
+      logWarn("SplashScreen", "Error in moveAfterLogin");
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
       setErrorState({
@@ -390,11 +425,12 @@ const SplashScreen = ({ navigation, route }) => {
 
     const networkManager = NetworkManager.getInstance();
     const connectivity = await networkManager.checkConnectivity();
-
+    console.log("Connectivity check:", connectivity);
     if (
       !connectivity.isConnected ||
       connectivity.isInternetReachable === false
     ) {
+      logWarn("SplashScreen", "Login skipped due to no connectivity");
       setErrorState({
         visible: true,
         type: ErrorType.NETWORK_ERROR,
@@ -410,11 +446,13 @@ const SplashScreen = ({ navigation, route }) => {
 
     try {
       const result = await AuthenticationManager.authorizeWithTimeout(config);
+      logDebug("SplashScreen", "Authorization result", result);
       if (!result.success) {
         if (result.code === "USER_CANCELLED") {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
         } else if (result.code === "AUTH_TIMEOUT") {
+          logWarn("SplashScreen", "Login timed out");
           setErrorState({
             visible: true,
             type: ErrorType.AUTH_TIMEOUT,
@@ -423,6 +461,7 @@ const SplashScreen = ({ navigation, route }) => {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
         } else if (result.code === "BROWSER_UNAVAILABLE") {
+          logWarn("SplashScreen", "Browser unavailable for login");
           setErrorState({
             visible: true,
             type: ErrorType.BROWSER_UNAVAILABLE,
@@ -431,6 +470,7 @@ const SplashScreen = ({ navigation, route }) => {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
         } else if (result.code === "NETWORK_ERROR") {
+          logWarn("SplashScreen", "Login network error");
           setErrorState({
             visible: true,
             type: ErrorType.NETWORK_ERROR,
@@ -439,6 +479,7 @@ const SplashScreen = ({ navigation, route }) => {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
         } else {
+          logError("SplashScreen", result.error);
           setErrorState({
             visible: true,
             type: ErrorType.UNKNOWN_ERROR,
@@ -461,7 +502,8 @@ const SplashScreen = ({ navigation, route }) => {
       setLoadingState(LoadingState.AUTHENTICATING);
       callSSOLoginApi(data);
     } catch (error) {
-      console.warn("Authorization failed:", error);
+      logError("SplashScreen", error);
+      logWarn("SplashScreen", "Authorization failed");
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
       setErrorState({
@@ -626,8 +668,8 @@ const SplashScreen = ({ navigation, route }) => {
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+      end={{ x: 1.3, y: 0}}
+      colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
       style={styles.container}
     >
       <NetworkStatusBar />
@@ -670,6 +712,7 @@ const SplashScreen = ({ navigation, route }) => {
                 loginAuth();
               }
             }}
+          customStyle={{ color: colors.sparklight_bright_purple }}
             buttonText={"Login"}
             disabled={
               authLockRef.current ||
@@ -688,7 +731,8 @@ const SplashScreen = ({ navigation, route }) => {
         </Text>
       )}
 
-      <Text style={getStyle("copyright")}>
+      <Text 
+      style={getStyle("copyright")}>
         {`©${moment().year()} Cable One, Inc. All rights reserved.`}
       </Text>
 
@@ -776,7 +820,7 @@ const styles = StyleSheet.create({
   },
   copyright: {
     position: "absolute",
-    bottom: hp("5%"),
+    bottom: hp("12%"),
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     textAlign: "center",

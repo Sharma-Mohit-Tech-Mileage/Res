@@ -32,6 +32,15 @@ import { A11Y } from "../../styles/theme";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import AppStyles from "../../styles/AppStyles";
+import {
+  SectionTitle,
+  IndicatorText,
+  FieldTitle,
+  FieldContent,
+  Hyperlink,
+} from "../common/customui/Typography";
+import { A11y } from "react-native-a11y-order";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -50,9 +59,7 @@ const ProfileSettings = () => {
   console.log("Profile details from Redux:", profile);
 
   useEffect(() => {
-    
-      setShowEmailLoading(false);
-    
+    setShowEmailLoading(false);
   }, [profile, emailAddress]);
 
   const TextNotifSettings = useMemo(
@@ -211,17 +218,17 @@ const ProfileSettings = () => {
           setShowPhoneLoading(false);
           console.log("RESPONSE", res);
           if (res) {
-            if(res[0]?.smsMessageType) {
-            res[0]?.smsMessageType.forEach((value, index) => {
-              console.log(`Index: ${index}, Value: ${value}`);
-              TextNotifSettings[index].status = value?.optOutFlag
-                ? "Off"
-                : "On";
-            });
-            let phoneNum = res[0]?.phoneNum || "";
-            setPhoneNumber(phoneNum);
+            if (res[0]?.smsMessageType) {
+              res[0]?.smsMessageType.forEach((value, index) => {
+                console.log(`Index: ${index}, Value: ${value}`);
+                TextNotifSettings[index].status = value?.optOutFlag
+                  ? "Off"
+                  : "On";
+              });
+              let phoneNum = res[0]?.phoneNum || "";
+              setPhoneNumber(phoneNum);
+            }
           }
-        }
           setShowPhoneLoading(false);
         },
         (error) => {
@@ -279,39 +286,52 @@ const ProfileSettings = () => {
       <ScrollView accessibilityLabel="Profile settings page.">
         <View style={{ flexDirection: "column", marginBottom: 300 }}>
           <View style={styles.frameParent}>
-            <View style={[styles.frameGroup]}>
+            <View style={[AppStyles.card]}>
               <View
                 style={[
                   styles.generalInformationParent,
                   { marginTop: Padding.p_base },
                 ]}
               >
-                <Text
-                  style={[styles.generalInformation, styles.melissaTypo]}
+                <SectionTitle
                   accessible={true}
                   accessibilityRole="header"
                   accessibilityLevel={2}
                 >
                   General Information
-                </Text>
+                </SectionTitle>
               </View>
               <View style={styles.frameContainer}>
                 <View style={styles.firstNameParent}>
-                  <Text style={styles.firstName}>{"Customer Name"}</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                  <FieldTitle>{"Customer Name"}</FieldTitle>
+                  <FieldContent
+                    style={[styles.melissa, styles.melissaTypo]}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel={`Customer Name: ${
+                      customerName || "N/A"
+                    }`}
+                  >
                     {customerName}
-                  </Text>
+                  </FieldContent>
                 </View>
                 <View style={styles.firstNameParent}>
-                  <Text style={styles.firstName}>Username</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                  <FieldTitle>Username</FieldTitle>
+                  <FieldContent
+                    style={[styles.melissa, styles.melissaTypo]}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel={`Username: ${
+                      profileDetails.userName || "N/A"
+                    }`}
+                  >
                     {profileDetails.userName}
-                  </Text>
+                  </FieldContent>
                 </View>
 
                 <View style={styles.firstNameParent}>
-                  <Text style={styles.firstName}>Account Number</Text>
-                  <Text
+                  <FieldTitle>Account Number</FieldTitle>
+                  <FieldContent
                     style={[styles.melissa, styles.melissaTypo]}
                     accessible={true}
                     accessibilityRole="text"
@@ -324,135 +344,139 @@ const ProfileSettings = () => {
                     }`}
                   >
                     {profileDetails.accountNumber}
-                  </Text>
+                  </FieldContent>
                 </View>
                 {showEmailLoading ? (
                   <SkeletonPlaceholder>
                     <View style={styles.profileFieldSkeleton} />
                   </SkeletonPlaceholder>
-                ) : emailAddress && (
-                  <View
-                    style={styles.editableRow}
-                    accessible={false}
-                    importantForAccessibility="no"
-                  >
-                    <View
-                      style={[
-                        styles.editableContent,
-                        { marginBottom: Padding.p_9xs },
-                      ]}
-                      accessible={false}
-                      importantForAccessibility="no"
-                    >
-                      <Text
-                        style={styles.firstName}
-                        accessible={true}
-                        accessibilityRole="text"
-                        accessibilityLabel="Email Address"
+                ) : (
+                  emailAddress && (
+                    <A11y.Order style={styles.editableRow}>
+                      <A11y.Index index={0} style={[
+                          styles.editableContent,
+                          { marginBottom: Padding.p_9xs },
+                        ]}>
+                      <View
+                        
                       >
-                        Email Address
-                      </Text>
-                      <Text
-                        style={[styles.melissa, styles.melissaTypo]}
-                        accessible={true}
-                        accessibilityRole="text"
-                        accessibilityLabel={`Email Address: ${
-                          emailAddress || "N/A"
-                        }`}
+                        <FieldTitle
+                          style={styles.firstName}
+                          accessible={true}
+                          accessibilityRole="text"
+                          accessibilityLabel="Email Address"
+                        >
+                          Email Address
+                        </FieldTitle>
+                    
+                        <FieldContent
+                          style={[styles.melissa, styles.melissaTypo]}
+                          accessible={true}
+                          accessibilityRole="text"
+                          accessibilityLabel={`Email Address: ${
+                            emailAddress || "N/A"
+                          }`}
+                        >
+                          {emailAddress || "N/A"}
+                        </FieldContent>
+                      </View>
+                      </A11y.Index>
+                      <A11y.Index index={1}>
+                      <Touchable
+                        style={styles.editButton}
+                        onPress={() => handleArrowPress("email")}
+                        accessibilityRole="button"
+                        accessibilityLabel="Edit email address"
+                        accessibilityHint="Double tap to edit your email address"
                       >
-                        {emailAddress || "N/A"}
-                      </Text>
-                    </View>
-                    <Touchable
-                      style={styles.editButton}
-                      onPress={() => handleArrowPress("email")}
-                      accessibilityLabel="Edit email address"
-                      accessibilityHint="Double tap to edit your email address"
-                    >
-                      <EditIcon />
-                    </Touchable>
-                  </View>
+                        <EditIcon />
+                      </Touchable>
+                      </A11y.Index>
+                    </A11y.Order>
+                  )
                 )}
 
-
                 {showPhoneLoading ? (
-                    <SkeletonPlaceholder>
-                      <View style={styles.profileFieldSkeleton} />
-                    </SkeletonPlaceholder>
-                  )
-              : phoneNumber && (
-                  <View
-                    style={styles.editableRow}
-                    accessible={false}
-                    importantForAccessibility="no"
-                  >
-                    <View
-                      style={[
-                        styles.editableContent,
-                        { marginBottom: Padding.p_9xs },
-                      ]}
-                      accessible={false}
-                      importantForAccessibility="no"
-                    >
-                      <Text
-                        style={styles.firstName}
-                        accessible={true}
-                        accessibilityRole="text"
-                        accessibilityLabel="Mobile Number"
+                  <SkeletonPlaceholder>
+                    <View style={styles.profileFieldSkeleton} />
+                  </SkeletonPlaceholder>
+                ) : (
+                  phoneNumber && (
+                    <A11y.Order style={[styles.editableRow, { marginBottom: Padding.p_9xs }]}> 
+                      <A11y.Index index={0}>
+                      <View
+                        style={[
+                          styles.editableContent,
+                          { marginBottom: Padding.p_9xs },
+                        ]}
                       >
-                        Mobile Number
-                      </Text>
+                        <FieldTitle
+                          style={styles.firstName}
+                          accessible={true}
+                          accessibilityRole="text"
+                          accessibilityLabel="Mobile Number"
+                        >
+                          Mobile Number
+                        </FieldTitle>
 
-                      <Text
-                        style={[styles.melissa, styles.melissaTypo]}
-                        accessible={true}
-                        accessibilityRole="text"
-                        accessibilityLabel={`Mobile Number: ${
-                          phoneNumber
-                            ? numberToWordsForAccessibility(
-                                phoneNumber.toString(),
-                              )
-                            : "N/A"
-                        }`}
+                        <FieldContent
+                          style={[styles.melissa, styles.melissaTypo]}
+                          accessible={true}
+                          accessibilityRole="text"
+                          accessibilityLabel={`Mobile Number: ${
+                            phoneNumber
+                              ? numberToWordsForAccessibility(
+                                  phoneNumber.toString(),
+                                )
+                              : "N/A"
+                          }`}
+                        >
+                          {phoneNumber || "N/A"}
+                        </FieldContent>
+                      </View>
+                      </A11y.Index>
+                      <A11y.Index index={1}>
+                      <Touchable
+                        style={styles.editButton}
+                        onPress={() => handleArrowPress("mobile")}
+                        accessibilityRole="button"
+                        accessibilityLabel="Edit mobile number"
+                        accessibilityHint="Double tap to edit your mobile number"
                       >
-                        {phoneNumber || "N/A"}
-                      </Text>
-                    </View>
-                    <Touchable
-                      style={styles.editButton}
-                      onPress={() => handleArrowPress("mobile")}
-                      accessibilityLabel="Edit mobile number"
-                      accessibilityHint="Double tap to edit your mobile number"
-                    >
-                      <EditIcon />
-                    </Touchable>
-                  </View>
-                ) 
-              }
+                        <EditIcon />
+                      </Touchable>
+
+                    </A11y.Index>
+                    </A11y.Order>
+                  )
+                )}
               </View>
             </View>
           </View>
 
-          <View style={styles.frameParent}>
-            <View style={[styles.frameGroup]}>
+          <View style={[styles.frameParent, styles.frameParentReducedTop]}>
+            <View style={[AppStyles.card]}>
               <View style={[styles.generalInformationParent]}>
-                <Text
-                  style={[
-                    styles.generalInformation,
-                    styles.melissaTypo,
-                    { marginTop: Padding.p_base },
-                  ]}
+                <SectionTitle
+                  style={[{ marginTop: Padding.p_base }]}
                   accessible={true}
                   accessibilityRole="header"
                   accessibilityLevel={2}
                 >
                   Addresses
-                </Text>
+                </SectionTitle>
               </View>
               <View style={styles.frameContainer}>
                 <View style={styles.firstNameParent}>
-                  <Text style={styles.firstName}>{"Service Address"}</Text>
-                  <Text
+                  <FieldTitle
+                    style={styles.firstName}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel="Service Address"
+                  >
+                    Service Address
+                  </FieldTitle>
+                  <FieldContent
                     style={[
                       styles.melissa,
                       styles.melissaTypo,
@@ -465,11 +489,18 @@ const ProfileSettings = () => {
                     )}`}
                   >
                     {serviceAddress() || "N/A"}
-                  </Text>
+                  </FieldContent>
                 </View>
                 <View style={styles.firstNameParent}>
-                  <Text style={styles.firstName}>Billing Address</Text>
-                  <Text
+                  <FieldTitle
+                    style={styles.firstName}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel="Billing Address"
+                  >
+                    Billing Address
+                  </FieldTitle>
+                  <FieldContent
                     style={[
                       styles.melissa,
                       styles.melissaTypo,
@@ -482,7 +513,7 @@ const ProfileSettings = () => {
                     )}`}
                   >
                     {billingAddress() || "N/A"}
-                  </Text>
+                  </FieldContent>
                 </View>
               </View>
               <View
@@ -491,46 +522,43 @@ const ProfileSettings = () => {
                   styles.frameParentSpaceBlock,
                 ]}
               >
-                <View style={styles.frameChild} />
+                {/* <View style={styles.frameChild} /> */}
               </View>
             </View>
           </View>
-          <View
-            style={[styles.frameGroup, { marginHorizontal: Padding.p_base }]}
-          >
+          <View style={[AppStyles.card, { marginHorizontal: Padding.p_base }]}>
             <View style={{ padding: Padding.p_xl, flexDirection: "column" }}>
-              <Text
-                style={[styles.generalInformation, styles.melissaTypo]}
+              <SectionTitle
                 accessible={true}
                 accessibilityRole="header"
                 accessibilityLevel={2}
               >
                 Manage My Service
-              </Text>
+              </SectionTitle>
               {showReconnectMessage ? (
                 // Show reconnect message, no link
                 Platform.OS === "android" ? (
                   <View style={{ marginTop: 20 }}>
-                    <Text style={styles.manageSerTxt1}>
+                    <FieldContent style={styles.manageSerTxt1}>
                       To reconnect your service, please call us at{" "}
-                      <Text
+                      <FieldContent
                         style={styles.manageSerTxt2}
                         onPress={() => makeCall("833-807-1020")}
                         accessibilityRole="link"
                         accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
                         accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
-                        833-807-1020
-                        <Text
+                        <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
+                        <FieldContent
                           style={styles.manageSerTxt3}
                           accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                           accessible={true}
                           importantForAccessibility="yes"
                         >
                           {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                        </Text>
-                      </Text>
-                    </Text>
+                        </FieldContent>
+                      </FieldContent>
+                    </FieldContent>
                   </View>
                 ) : (
                   <View
@@ -541,50 +569,50 @@ const ProfileSettings = () => {
                       marginTop: 20,
                     }}
                   >
-                    <Text style={styles.manageSerTxt1}>
+                    <FieldContent style={styles.manageSerTxt1}>
                       To reconnect your service, please call us at{" "}
-                    </Text>
-                    <Text
+                    </FieldContent>
+                    <FieldContent
                       style={styles.manageSerTxt2}
                       onPress={() => makeCall("833-807-1020")}
                       accessibilityRole="link"
                       accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
                       accessibilityHint="Double tap to call customer service 833 807 1020"
                     >
-                      833-807-1020
-                      <Text
+                      <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
+                      <FieldContent
                         style={styles.manageSerTxt3}
                         accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                       >
                         {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                      </Text>
-                    </Text>
+                      </FieldContent>
+                    </FieldContent>
                   </View>
                 )
               ) : (
                 <>
                   {Platform.OS === "android" ? (
                     <View style={{ marginTop: 20 }}>
-                      <Text style={styles.manageSerTxt1}>
+                      <FieldContent style={styles.manageSerTxt1}>
                         To cancel or change service, please call us at{" "}
-                        <Text
+                        <FieldContent
                           style={styles.manageSerTxt2}
                           onPress={() => makeCall("833-807-1020")}
                           accessibilityRole="link"
                           accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
                           accessibilityHint="Double tap to call customer service 833 807 1020"
                         >
-                          833-807-1020
-                          <Text
+                          <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
+                          <FieldContent
                             style={styles.manageSerTxt3}
                             accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                             accessible={true}
                             importantForAccessibility="yes"
                           >
                             {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                          </Text>
-                        </Text>
-                      </Text>
+                          </FieldContent>
+                        </FieldContent>
+                      </FieldContent>
                     </View>
                   ) : (
                     <View
@@ -595,24 +623,24 @@ const ProfileSettings = () => {
                         marginTop: 20,
                       }}
                     >
-                      <Text style={styles.manageSerTxt1}>
+                      <FieldContent style={styles.manageSerTxt1}>
                         To cancel or change service, please call us at{" "}
-                      </Text>
-                      <Text
+                      </FieldContent>
+                      <FieldContent
                         style={styles.manageSerTxt2}
                         onPress={() => makeCall("833-807-1020")}
                         accessibilityRole="link"
                         accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
                         accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
-                        833-807-1020
-                        <Text
+                        <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
+                        <FieldContent
                           style={styles.manageSerTxt3}
                           accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                         >
                           {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                        </Text>
-                      </Text>
+                        </FieldContent>
+                      </FieldContent>
                     </View>
                   )}
                 </>
@@ -678,12 +706,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   firstName: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-    fontSize: FontSize.size_sm,
     textAlign: "left",
-    color: Color.colorGray_100,
-    lineHeight: 28,
   },
   melissa: {
     fontSize: FontSize.size_base,
@@ -772,25 +795,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
     width: "100%",
   },
+  frameParentReducedTop: {
+    marginTop: -15,
+  },
   manageSerTxt1: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "400",
-    fontSize: FontSize.size_base,
     textAlign: "left",
-    color: "#000000",
+    lineHeight: 20,
     marginTop: 5,
   },
   manageSerTxt2: {
-    fontFamily: FontFamily.openSansSemiBold,
-    color: Color.colorMidnightblue,
-    fontWeight: "700",
-    fontSize: FontSize.size_base,
+    lineHeight: 20,
+  },
+  phoneLinkText: {
+    textDecorationLine: "underline",
   },
   manageSerTxt3: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    color: Color.colorGray_100,
-    fontWeight: "700",
+    lineHeight: 20,
   },
 });
 

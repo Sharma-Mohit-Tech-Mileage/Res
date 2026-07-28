@@ -5,6 +5,8 @@ import { theme } from "../../../../styles/theme";
 import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
 import { spellOutChars } from "../../../../utils/a11y";
+import AppStyles from "../../../../styles/AppStyles";
+import {SectionTitle} from "../../../common/customui/Typography";
 const safeText = (v, fallback = "\u2014") =>
   v === null || v === undefined || String(v).trim() === "" ? fallback : String(v);
 
@@ -86,7 +88,7 @@ const ManageEquipmentCard = ({ equipment }) => {
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={styles.header} accessibilityRole="header">
-          <View
+          {/* <View
             style={styles.iconWrapper}
             accessible={false}
             importantForAccessibility="no-hide-descendants"
@@ -97,8 +99,10 @@ const ManageEquipmentCard = ({ equipment }) => {
               size={18}
               color={theme.colors.primary}
             />
-          </View>
-          <Text style={styles.headerTitle}>MY EQUIPMENT</Text>
+          </View> */}
+          <SectionTitle  accessibilityRole="header">
+            My Equipment
+          </SectionTitle>
         </View>
 
         {list.map((item, index) => (
@@ -119,7 +123,7 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.base,
   },
   card: {
-    ...card.base,
+    ...AppStyles.card,
     padding: theme.spacing.base,
   },
 

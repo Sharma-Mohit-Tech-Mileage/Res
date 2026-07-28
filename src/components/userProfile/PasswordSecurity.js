@@ -1,13 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  AccessibilityInfo,
-  InteractionManager,
-  Platform,
-  findNodeHandle,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, AccessibilityInfo, Platform } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -18,66 +10,68 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { interaction } from "../../styles/utilities";
+import AppStyles from '../../styles/AppStyles'
 import { useDispatch, useSelector } from "react-redux";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
-import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
+import useAccessibilityFocus from "../../hooks/useAccessibilityFocus";
+import { SectionTitle, FieldTitle, FieldContent } from "../common/customui/Typography";
+import EditActionButton from '../common/customui/EditActionButton'
+import { A11y } from "react-native-a11y-order";
 const PasswordSecurity = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const profile = useSelector((state) => state.profile || {});
+  const [successAlertRef, setSuccessAlertFocus] = useAccessibilityFocus();
   const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
-  const [messageRef] = useAccessibilityFocus();
-  const successIconRef = useRef(null);
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+  const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
+  const [suppressBackgroundA11y, setSuppressBackgroundA11y] = useState(false);
   const message =(route.params?.isPassword)?"Your password has been updated successfully.":"Your security question has been updated successfully."
-
   useEffect(() => {
-    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
-  }, []);
+      AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotionEnabled);
+      AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+    }, []);
 
-  useEffect(() => {
-    // iOS focus can land on header/back when navigating here — move it to the success icon once the banner renders.
-    if (!showSuccessAlert || !screenReaderEnabled) return;
-
-    const focusSuccessIcon = () => {
-      try {
-        if (successIconRef.current) {
-          const handle = findNodeHandle(successIconRef.current);
-          if (handle) {
-            AccessibilityInfo.setAccessibilityFocus(handle);
+  // Announce error message if screen reader is enabled
+    useEffect(() => {
+      if (showSuccessAlert && screenReaderEnabled && Platform.OS === "ios") {
+       
+        const t = setTimeout(() => {
+          try {
+            setSuccessAlertFocus();
+            AccessibilityInfo.announceForAccessibility(message);
+          } catch (e) {
+            console.warn("Accessibility focus error:", e);
           }
-        }
-      } catch (e) {
-        console.warn("Accessibility focus error:", e);
-      }
-    };
-
-    // Aggressive retries to override navigation focus stealing; Android needs longer delays for TalkBack.
-    const delays = Platform.OS === "ios"
-      ? [100, 300, 600, 1000, 1500, 2000] 
-      : [10, 50, 150, 300, 500, 800, 1200, 1800, 2500];
-    const timers = [];
-
-    const interaction = InteractionManager.runAfterInteractions(() => {
-      timers.push(setTimeout(focusSuccessIcon, Platform.OS === "ios" ? 50 : 0));
-    });
-
-    delays.forEach((ms) => {
-      timers.push(setTimeout(focusSuccessIcon, ms));
-    });
-
-    return () => {
-      if (interaction && typeof interaction.cancel === "function") {
-        interaction.cancel();
-      }
-      timers.forEach(clearTimeout);
-    };
-  }, [showSuccessAlert, screenReaderEnabled]);
+        }, 600);
   
+        return () => clearTimeout(t);
+      }
+    }, [showSuccessAlert, screenReaderEnabled]);
+
+    // Android/TalkBack: temporarily hide background so alert can reliably take focus.
+    useEffect(() => {
+      if (Platform.OS !== "android" || !screenReaderEnabled) {
+        if (suppressBackgroundA11y) setSuppressBackgroundA11y(false);
+        return;
+      }
+
+      if (!showSuccessAlert) {
+        if (suppressBackgroundA11y) setSuppressBackgroundA11y(false);
+        return;
+      }
+
+      setSuppressBackgroundA11y(true);
+      const t = setTimeout(() => {
+        setSuppressBackgroundA11y(false);
+      }, 1600);
+      return () => clearTimeout(t);
+    }, [showSuccessAlert, screenReaderEnabled]);
+
+    const hideBackgroundA11y = suppressBackgroundA11y;
   
   
   useEffect(() => {
@@ -95,18 +89,16 @@ const PasswordSecurity = () => {
 
   return (
     <View style={styles.passwordSecurity}>
-      <ProfileSettingsHeader
-        title="Password & Security"
-        onPressBack={() => navigation.navigate("Account")}
-        accessibilityHint="Go back to Account"
-      />
+      <View importantForAccessibility={hideBackgroundA11y ? "no-hide-descendants" : "auto"}>
+        <ProfileSettingsHeader
+          title="Password & Security"
+          onPressBack={() => navigation.navigate("Account")}
+          accessibilityHint="Go back to Account"
+        />
+      </View>
       <View style={[styles.passwordSecurityInner, styles.securitySpaceBlock]}>
-        <View style={[styles.frameParent, styles.navigationBorder]}>
-          <View
-            style={styles.infoWrapper}
-            ref={messageRef}
-            importantForAccessibility="yes"
-          >
+        <View style={[AppStyles.card, styles.navigationBorder]}>
+          <View style={styles.infoWrapper} ref={successAlertRef}>
             <NotificationAlert
               type="success"
               title="Success"
@@ -114,44 +106,37 @@ const PasswordSecurity = () => {
               showCloseIcon={true}
               isVisible={showSuccessAlert}
               onClose={() => setShowSuccessAlert(false)}
-              autoFocusTitle={false}
-              iconRef={successIconRef}
             />
           </View>
-          {/* Keep main content accessible even when success banner is visible.
-              Only the header/back is hidden during the banner to prevent focus snapping there. */}
-          <View>
-            <View style={[styles.passwordParent, styles.tabsFlexBox]}>
-              <Text
-                style={[styles.password, styles.passwordFlexBox]}
-                accessibilityRole="header"
-                accessibilityLevel={2}
-              >
+          <A11y.Order importantForAccessibility={hideBackgroundA11y ? "no-hide-descendants" : "auto"}>
+            <A11y.View style={[styles.passwordParent, styles.tabsFlexBox]} >
+              <A11y.Index index={0}>
+              <SectionTitle style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Password">
                 Password
-              </Text>
-              <Touchable
-                accessible={true}
-                accessibilityLabel="Edit Password"
-                accessibilityRole="button"
-                accessibilityHint="Double click to open edit password screen"
-                minSize={0}
-                style={[styles.buttons, styles.buttonsBg]}
+              </SectionTitle>
+              </A11y.Index>
+              <A11y.Index index={3} >
+              <EditActionButton
                 onPress={() => navigation.navigate("PasswordEdit")}
-              >
-                <Text style={[styles.makePayment, styles.titleFlexBox]}>Edit</Text>
-              </Touchable>
-            </View>
+                accessibilityLabel="Edit Password"
+                accessibilityHint="Double click to open edit password screen"
+              />
+              </A11y.Index>
+            </A11y.View>
             <View style={styles.frameGroup}>
+              <A11y.Index index={1}>
               <View style={styles.passwordGroup}>
-                <Text style={[styles.passwordFlexBox]}>Password</Text>
+                <FieldTitle style={[styles.passwordFlexBox]}>Password</FieldTitle>
                 <Text
-                  style={[styles.text, styles.passwordFlexBox]}
+                  style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightDarkGray}]}
                   accessibilityRole="text"
-                  accessibilityLabel="Password: hidden."
+                  accessibilityLabel="Password: hidden"
+                  accessible={true}
                 >
                   **********
                 </Text>
               </View>
+              </A11y.Index>
               <View
                 style={[styles.rectangleWrapper, styles.frameContainerSpaceBlock]}
               >
@@ -161,43 +146,39 @@ const PasswordSecurity = () => {
                 <View
                   style={[styles.securityQuestionWrapper, styles.tabsFlexBox]}
                 >
-                  <Text
-                    style={[styles.password, styles.passwordFlexBox]}
-                    accessibilityRole="header"
-                    accessibilityLevel={2}
-                  >
+                  <A11y.Index index={4}>
+                  <SectionTitle style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Security Question">
                     Security Question
-                  </Text>
-                  <Touchable
-                    accessible={true}
-                    accessibilityLabel="Edit Security Question"
-                    accessibilityRole="button"
-                    minSize={0}
-                    style={[styles.buttons, styles.buttonsBg]}
+                  </SectionTitle>
+                  </A11y.Index>
+                  <A11y.Index index={6}>
+                  <EditActionButton
                     onPress={() => navigation.navigate("PasswordSecurityEdit")}
-                  >
-                    <Text style={[styles.makePayment, styles.titleFlexBox]}>
-                      Edit
-                    </Text>
-                  </Touchable>
+                    accessibilityLabel="Edit Security Question"
+                    accessibilityHint="Double click to open edit security question screen"
+                  />
+                  </A11y.Index>
+                 
                 </View>
                 <View style={styles.passwordGroup}>
+                  <A11y.Index index={5}>
+                  
                   <View style={styles.nameOfYourFirstPetParent}>
-                    <Text style={[styles.passwordFlexBox]}>
+                    <FieldTitle style={[styles.passwordFlexBox]}>
                       {profileDetails.securityQuestion}
-                    </Text>
-                    <Text
-                      style={[styles.text, styles.passwordFlexBox]}
-                      accessibilityRole="text"
-                      accessibilityLabel="Security Answer: hidden."
-                    >
+                    </FieldTitle>
+                    <Text style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightDarkGray,paddingBottom: Padding.p_5xl}]}
+                    accessibilityRole="text"
+                    accessibilityLabel="Answer hidden."
+                    accessible={true}>
                       ******
                     </Text>
                   </View>
+                  </A11y.Index>
                 </View>
               </View>
             </View>
-          </View>
+          </A11y.Order>
         </View>
       </View>
     </View>
@@ -221,11 +202,13 @@ const styles = StyleSheet.create({
   tabsFlexBox: {
     flexDirection: "row",
     alignSelf: "stretch",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   passwordFlexBox: {
     textAlign: "left",
-    color: Color.sparklightGray1,
     lineHeight: 28,
+
   },
   buttonsBg: {
     paddingVertical: Padding.p_7xs,
@@ -239,8 +222,6 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   password: {
-    fontSize: FontSize.size_3xl,
-    fontFamily: FontFamily.openSansRegular,
     flex: 1,
   },
   makePayment: {
@@ -281,7 +262,7 @@ const styles = StyleSheet.create({
   },
   rectangleWrapper: {
     paddingVertical: 0,
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: 0,
   },
   securityQuestionWrapper: {
     alignItems: "center",

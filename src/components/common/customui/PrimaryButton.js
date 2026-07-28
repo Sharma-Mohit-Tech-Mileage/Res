@@ -5,12 +5,13 @@ import { A11Y } from "../../../styles/theme";
 import { interaction } from "../../../styles/utilities";
 import Touchable from "./Touchable";
 
-const PrimaryButton = ({ title, onPress, buttonType, accessibilityLabel, disabled = false }) => {
+const PrimaryButton = ({ title, onPress, buttonType, accessibilityLabel, disabled = false, textStyle }) => {
   const isSubmit = buttonType === 'submit';
   const isOutline = buttonType === 'outline';
   const textStyles = [
     isSubmit ? styles.submitText : isOutline ? styles.outlineText : styles.cancelText,
     (isSubmit || isOutline) && disabled && styles.disabledText,
+    textStyle,
   ];
 
   return (
@@ -40,26 +41,33 @@ const PrimaryButton = ({ title, onPress, buttonType, accessibilityLabel, disable
 
 const styles = StyleSheet.create({
   button: {
+    //marginTop: Border.p_base,
     alignSelf: "stretch",
     paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
-    borderRadius: Border.br_11xs,
-    elevation: Padding.p_5xs,
+    borderRadius: Border.br_81xl, // Adjust as needed
     minHeight: A11Y.minTouch,
     justifyContent: "center",
   },
   canbutton: {
+    //marginTop: Border.p_base,
     alignSelf: "stretch",
     paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
+    //borderRadius: Border.br_11xs, // Adjust as needed
+    //elevation: Padding.p_5xs, // For Android shadow
     minHeight: A11Y.minTouch,
     justifyContent: "center",
   },
-  margin: {
+  margin:{
     marginTop: Padding.p_base,
   },
+
   submitButton: {
-    backgroundColor: Color.colorMidnightblue,
+    backgroundColor: Color.sparklightPrimaryPurple,
+  },
+  cancelButton: {
+   // backgroundColor: Color.colorWhitesmoke_200, // Adjust color as needed
   },
   outlineButton: {
     backgroundColor: Color.sparklightWhite,
@@ -77,8 +85,8 @@ const styles = StyleSheet.create({
   submitText: {
     textAlign: "center",
     color: Color.sparklightWhite,
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: FontSize.size_lg,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "700",
   },
   outlineText: {
@@ -93,9 +101,12 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     textAlign: "center",
-    color: Color.colorMidnightblue,
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightPrimaryPurple, // Adjust color as needed
+    fontSize: FontSize.size_lg,
+    textDecorationLine: "underline",
+    fontWeight: "600",
+    fontStyle: "normal",
+    fontFamily: FontFamily.RadioCanadaBold,
   },
 });
 

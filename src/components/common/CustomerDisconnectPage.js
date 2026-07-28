@@ -105,14 +105,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgound_blue,
     justifyContent: "center",
     width: "100%",
+    borderRadius: 25,
     marginTop: 15,
   },
   closeAlertTxt: {
-    color: colors.sparklight_purple_blue,
+    color: colors.sparklight_bright_purple,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaBold,
   },
 });
 

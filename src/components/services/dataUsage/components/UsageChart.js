@@ -9,6 +9,8 @@ import { card } from "../../../../styles/utilities";
 import { cardHeader, dataUsageTabs } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 import Touchable from "../../../common/customui/Touchable";
+import AppStyles from "../../../../styles/AppStyles";
+import {SectionTitle} from "../../../common/customui/Typography";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 
@@ -561,15 +563,15 @@ const UsageChart = ({
       <View style={styles.card}>
         {/* Header icon — decorative */}
         <View style={styles.header}>
-          <View
+          {/* <View
             style={styles.iconWrapper}
             accessible={false}
             importantForAccessibility="no-hide-descendants"
             accessibilityElementsHidden={true}
           >
             <MaterialCommunityIcons name="chart-bar" size={20} color={theme.colors.primary} />
-          </View>
-          <Text style={styles.chartTitle} accessibilityRole="header">Historical Usage</Text>
+          </View> */}
+          <SectionTitle accessibilityRole="header">Historical Usage</SectionTitle>
         </View>
         <View style={styles.tabsContainer} accessibilityRole="tablist">
           {tabs.map((tab) => {
@@ -929,7 +931,7 @@ const fadeStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   container: { marginHorizontal: theme.spacing.base, marginBottom: theme.spacing.base },
-  card: { ...card.base, padding: theme.spacing.base },
+  card: { ...AppStyles.card, padding: theme.spacing.base },
   header: cardHeader.container,
   iconWrapper: cardHeader.iconWrapper,
   chartTitle: cardHeader.title,
@@ -942,7 +944,7 @@ const styles = StyleSheet.create({
   tab: {
     ...dataUsageTabs.tab,
     paddingVertical: 10,
-    minHeight: 42,
+    minHeight: 44,
     justifyContent: "center",
   },
   activeTab: dataUsageTabs.activeTab,
@@ -964,11 +966,11 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceVariant,
     borderColor: theme.colors.borderLight,
     borderRadius: theme.radius.xs,
-    minHeight: 44,
+    height: 48,
   },
   listToggle: {
     width: 44,
-    height: 44,
+    height: 48,
     borderRadius: theme.radius.xs,
     backgroundColor: theme.colors.surfaceVariant,
     borderWidth: 1,

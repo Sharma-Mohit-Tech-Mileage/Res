@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { header } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
 import SupportIcon from "../../../res/svgIcons/SupportIcon";
+import {Title} from "../../common/customui/Typography";
 
 const ServiceHeader = () => {
   return (
@@ -15,8 +16,8 @@ const ServiceHeader = () => {
         >
           <SupportIcon color={theme.colors.text.onPrimary} filled={true} />
         </View>
-        <Text
-          style={styles.title}
+        <Title
+          //style={styles.title}
           accessible={true}
           accessibilityLabel="Services"
           accessibilityLevel={2}
@@ -24,7 +25,7 @@ const ServiceHeader = () => {
           nativeID="services-header"
         >
           Services
-        </Text>
+        </Title>
       </View>
     </View>
   );
