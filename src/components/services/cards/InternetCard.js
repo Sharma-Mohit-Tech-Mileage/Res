@@ -72,7 +72,7 @@ const InternetCard = ({
   if (loading) {
     return (
       <View style={styles.container}>
-        <View style={[styles.card, styles.cardSpacing]}>
+        <View style={[styles.card, styles.cardSpacing1]}>
           <SkeletonPlaceholder
             backgroundColor={theme.colors.skeleton.base}
             highlightColor={theme.colors.skeleton.highlight}
@@ -215,6 +215,10 @@ const styles = StyleSheet.create({
     ...AppStyles.card,
   },
   cardSpacing: {
+    marginHorizontal: 16,
+  },
+  cardSpacing1: {
+    padding: 16,
     marginHorizontal: 16,
   },
   bottomButton: serviceCard.bottomButton,
