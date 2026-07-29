@@ -235,7 +235,7 @@ const SplashScreen = ({ navigation, route }) => {
         idTokenGuid: result.data.additionalParameters?.session_state,
         refreshToken: result.data.refreshToken,
       };
-
+console.log("[Login] Refresh flow ID token:", data.idToken);
       setLoadingState(LoadingState.LOADING_DATA);
       storeSsoToken(data);
       callSSOLoginApi(data);
@@ -330,6 +330,7 @@ const SplashScreen = ({ navigation, route }) => {
         jwtTimestamp: Date.now(),
         idTokenTimestamp: Date.now(),
       };
+          console.log("[Login] ID token used for login:", ssoIdTokenRef.current || null);
 
       // Check for business account first
       if (res.userInfo.customerType === "COM") {
