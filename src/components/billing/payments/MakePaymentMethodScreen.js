@@ -17,7 +17,12 @@ import {
   addDemoPaymentMethod,
   isDemoPaymentData,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, describePaymentMethod, isMethodExpired, openOrbipaySecureCapture } from "./paymentsShared";
+import {
+  contentMaxWidth,
+  describePaymentMethod,
+  isMethodExpired,
+  openOrbipaySecureCapture,
+} from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 import AppStyles from "../../../styles/AppStyles";
 import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
@@ -40,21 +45,31 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
         .then(([list, details]) => {
           setMethods(list);
           setAutoPay(details);
-          setSelectedId((prev) => prev || list.find((m) => m.isDefault && !isMethodExpired(m))?.id || "");
+          setSelectedId(
+            (prev) =>
+              prev ||
+              list.find((m) => m.isDefault && !isMethodExpired(m))?.id ||
+              "",
+          );
         })
         .catch(() => {
           setMethods([]);
           setAutoPay({ enrolled: false });
-          setErrorAlert("We could not load your payment methods. Please try again.");
+          setErrorAlert(
+            "We could not load your payment methods. Please try again.",
+          );
         });
       return () => abortRef.current?.abort();
-    }, [])
+    }, []),
   );
 
   const loading = methods === null;
   const selectedMethod = methods?.find((m) => m.id === selectedId) || null;
   const canContinue = !!selectedMethod && !isMethodExpired(selectedMethod);
-  const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
+  const isAutoPayLinked = (method) =>
+    !!autoPay?.enrolled &&
+    !!method.id &&
+    method.id === autoPay?.paymentMethodId;
 
   const onPayWithNewMethod = async () => {
     if (!isDemoPaymentData) {
@@ -67,12 +82,15 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
       setSelectedId(added.id);
       announceA11y("New payment method added and selected.");
     } catch (error) {
-      setErrorAlert("We could not add a payment method right now. Please try again.");
+      setErrorAlert(
+        "We could not add a payment method right now. Please try again.",
+      );
     }
   };
 
   // Orbipay cannot edit PCI fields natively; edits go through the secure capture page
-  const onEditMethod = () => openOrbipaySecureCapture(navigation, "Edit Payment Method");
+  const onEditMethod = () =>
+    openOrbipaySecureCapture(navigation, "Edit Payment Method");
 
   const onConfirmDelete = async () => {
     const method = pendingDelete;
@@ -83,91 +101,113 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
       setSelectedId((prev) => (prev === method.id ? "" : prev));
       announceA11y("Payment method deleted.");
     } catch (error) {
-      setErrorAlert("We could not delete this payment method. Please try again.");
+      setErrorAlert(
+        "We could not delete this payment method. Please try again.",
+      );
     }
   };
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[ contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ProfileSettingsHeader
+        title="Billing Details"
+        onPressBack={() => navigation.goBack()}
+      />
+      <ScrollView
+        contentContainerStyle={[contentMaxWidth, { paddingBottom: 100 }]}
+        showsVerticalScrollIndicator={false}
+      >
         <>
-        <View style={[AppStyles.card, {margin:16, padding: 24}]}>
-        {!!errorAlert && (
-          <NotificationAlert
-            type="error"
-            title="Something went wrong"
-            message={errorAlert}
-            onClose={() => setErrorAlert("")}
-            autoFocusTitle
-          />
-        )}
-
-        <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-          Select payment method
-        </Text>
-
-        {loading ? (
-          <SkeletonPlaceholder>
-            <View style={styles.cardSkeleton} />
-            <View style={styles.cardSkeleton} />
-          </SkeletonPlaceholder>
-        ) : methods.length === 0 ? (
-          <Text style={styles.emptyText}>You have no saved payment methods yet. Add one to continue.</Text>
-        ) : (
-          <View accessibilityRole="radiogroup">
-            {methods.map((method, index) => (
-              <PaymentMethodCard
-                key={method.id || index}
-                method={method}
-                variant="radio"
-                selected={method.id === selectedId}
-                onPress={() => setSelectedId(method.id)}
-                showAutoPayBadge={isAutoPayLinked(method)}
-                onEdit={onEditMethod}
-                onDelete={() => setPendingDelete(method)}
-                positionLabel={`${index + 1} of ${methods.length}`}
+          <View style={[AppStyles.card, { margin: 16, padding: 24 }]}>
+            {!!errorAlert && (
+              <NotificationAlert
+                type="error"
+                title="Something went wrong"
+                message={errorAlert}
+                onClose={() => setErrorAlert("")}
+                autoFocusTitle
               />
-            ))}
-          </View>
-        )}
+            )}
 
-        
-        </View>
-        {!loading && (
-          <View style={{marginHorizontal: 24}}>
-            <Touchable
-              onPress={onPayWithNewMethod}
-              accessibilityRole="button"
-              accessibilityLabel="Pay with new payment method"
-              accessibilityHint="Opens a secure page to add a card or bank account."
-              style={styles.newMethodCard}
+            <SectionTitle
+              style={styles.heading}
+              accessibilityRole="header"
+              accessibilityLevel={2}
             >
-              <Text style={styles.newMethodText}>Pay with new payment method</Text>
-              <RightArrow color={Color.sparklightBrightPurple} />
-            </Touchable>
-            <PrimaryButton
-              title="Continue"
-              buttonType="submit"
-              disabled={!canContinue}
-              accessibilityLabel="Continue"
-              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId })}
-            />
-            <PrimaryButton
-              title="Cancel"
-              buttonType="outline"
-              accessibilityLabel="Cancel payment"
-              onPress={() => navigation.popToTop()}
-            />
+              Select payment method
+            </SectionTitle>
+
+            {loading ? (
+              <SkeletonPlaceholder>
+                <View style={styles.cardSkeleton} />
+                <View style={styles.cardSkeleton} />
+              </SkeletonPlaceholder>
+            ) : methods.length === 0 ? (
+              <Text style={styles.emptyText}>
+                You have no saved payment methods yet. Add one to continue.
+              </Text>
+            ) : (
+              <View accessibilityRole="radiogroup">
+                {methods.map((method, index) => (
+                  <PaymentMethodCard
+                    key={method.id || index}
+                    method={method}
+                    variant="radio"
+                    selected={method.id === selectedId}
+                    onPress={() => setSelectedId(method.id)}
+                    showAutoPayBadge={isAutoPayLinked(method)}
+                    onEdit={onEditMethod}
+                    onDelete={() => setPendingDelete(method)}
+                    positionLabel={`${index + 1} of ${methods.length}`}
+                  />
+                ))}
+              </View>
+            )}
           </View>
-        )}
+          {!loading && (
+            <View style={{ marginHorizontal: 24 }}>
+              <PrimaryButton
+                title="Pay with new payment method"
+                buttonType="submit"
+                onPress={onPayWithNewMethod}
+                accessibilityRole="button"
+                accessibilityLabel="Pay with new payment method"
+                accessibilityHint="Opens a secure page to add a card or bank account."
+               />
+              <PrimaryButton
+                title="Continue"
+                buttonType="submit"
+                disabled={!canContinue}
+                accessibilityLabel="Continue"
+                onPress={() =>
+                  canContinue &&
+                  navigation.navigate("MakePaymentReview", {
+                    amount,
+                    methodId: selectedId,
+                  })
+                }
+              />
+              <PrimaryButton
+                title="Cancel"
+                buttonType="outline"
+                accessibilityLabel="Cancel payment"
+                onPress={() => navigation.popToTop()}
+              />
+            </View>
+          )}
         </>
       </ScrollView>
 
       <ConfirmActionModal
         visible={!!pendingDelete}
         title="Delete payment method?"
-        message={pendingDelete ? `${describePaymentMethod(pendingDelete)} will be removed from your account.` : ""}
+        message={
+          pendingDelete
+            ? `${describePaymentMethod(
+                pendingDelete,
+              )} will be removed from your account.`
+            : ""
+        }
         confirmLabel="Delete"
         cancelLabel="Cancel"
         destructive
