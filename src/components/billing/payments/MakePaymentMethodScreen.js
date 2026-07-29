@@ -19,6 +19,8 @@ import {
 } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, describePaymentMethod, isMethodExpired, openOrbipaySecureCapture } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
+import AppStyles from "../../../styles/AppStyles";
+import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
 
 // Figma: Make a Payment step 2 — pick a saved method or pay with a new one
 const MakePaymentMethodScreen = ({ navigation, route }) => {
@@ -88,7 +90,9 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[ contentMaxWidth]} showsVerticalScrollIndicator={false}>
+        <>
+        <View style={[AppStyles.card, {margin:16, padding: 24}]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -128,8 +132,10 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
           </View>
         )}
 
+        
+        </View>
         {!loading && (
-          <>
+          <View style={{marginHorizontal: 24}}>
             <Touchable
               onPress={onPayWithNewMethod}
               accessibilityRole="button"
@@ -153,8 +159,9 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
               accessibilityLabel="Cancel payment"
               onPress={() => navigation.popToTop()}
             />
-          </>
+          </View>
         )}
+        </>
       </ScrollView>
 
       <ConfirmActionModal

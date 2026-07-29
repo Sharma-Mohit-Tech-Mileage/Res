@@ -10,6 +10,8 @@ import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
+import AppStyles from "../../../styles/AppStyles";
+import {SectionTitle,Hyperlink} from "../../common/customui/Typography";;
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
@@ -101,10 +103,11 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
       <ScrollView
-        contentContainerStyle={[styles.content, contentMaxWidth]}
+        contentContainerStyle={[ contentMaxWidth]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={[AppStyles.card, {margin:16, padding: 24}]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -191,6 +194,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
             <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
           </>
         )}
+        </View>
       </ScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
