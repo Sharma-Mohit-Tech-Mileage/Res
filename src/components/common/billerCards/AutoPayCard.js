@@ -82,7 +82,7 @@ const AutoPayCard = ({
             </Hyperlink>
           )}
         </View>
-        <View style={{ position: "absolute", right: 10 }}>
+        <View style={{ position: "absolute", right: 10, top: 0, bottom: 0, justifyContent: "center" }}>
           {showSkeleton ? (
             <SkeletonPlaceholder>
               <View
@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
   },
   statusIcon: {
     marginTop: 0,
+    bottom: -1,
     marginRight: 4,
   },
   statusText: {

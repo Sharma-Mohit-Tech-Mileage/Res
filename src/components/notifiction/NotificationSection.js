@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   },
   infoMessage: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     padding: Padding.p_base,
     marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
@@ -347,8 +347,17 @@ const styles = StyleSheet.create({
     borderColor: "#353091",
     backgroundColor: "#F0F8FF",
   },
-  infoText: {
+  iconContainer: {
+    width: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textContainer: {
+    flex: 1,
     marginLeft: Padding.p_5xs,
+  },
+  infoText: {
     fontSize: FontSize.textXsSemibold_size,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
