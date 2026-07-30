@@ -13,6 +13,7 @@ import MakePaymentScreen from "../../components/billing/payments/MakePaymentScre
 import MakePaymentMethodScreen from "../../components/billing/payments/MakePaymentMethodScreen";
 import MakePaymentReviewScreen from "../../components/billing/payments/MakePaymentReviewScreen";
 import PaymentConfirmationScreen from "../../components/billing/payments/PaymentConfirmationScreen";
+import OrbipayWidgetScreen from "../../components/billing/payments/OrbipayWidgetScreen";
 const BillingStack = createNativeStackNavigator();
 
 function BillingStackScreen({ route }) {
@@ -95,6 +96,11 @@ function BillingStackScreen({ route }) {
       <BillingStack.Screen
         name="PaymentConfirmation"
         component={PaymentConfirmationScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="OrbipayWidget"
+        component={OrbipayWidgetScreen}
         options={{ headerBackVisible: false, headerShown: false }}
       />
 

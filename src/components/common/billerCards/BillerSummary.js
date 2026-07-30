@@ -3,6 +3,8 @@ import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
+import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
+import { card } from "../../../styles/utilities";
 import Config from "react-native-config";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "center",
     paddingBottom: 5,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     color: colors.sp_black,
   },
   dueDate: {
@@ -229,11 +231,11 @@ const styles = StyleSheet.create({
     color: colors.darkest_grey,
     alignSelf: "center",
     paddingBottom: 5,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
   },
   label: {
     fontSize: 12,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
     color: colors.gray600,
   },
@@ -243,7 +245,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     alignSelf: "center",
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
   },
   cardHreader: {
    flexDirection: "row",

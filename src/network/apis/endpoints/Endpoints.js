@@ -37,6 +37,18 @@ export const ENDPOINTS = {
     MOBILE_TC_FLAG: 'api/mobileuser/:accountNumber/updatemobiletcacceptanceflag/:userName/:flag',
     MOBILE_TC_UPDATE_USERDATA: 'api/Mobile/UpdateMobileAspnetUserData',
 
+    // Payment methods / AutoPay wrappers (PortalServices non-widget routes; confirm final paths w/ portal team)
+    EASYPAY_SETUP: 'api/Payment/SetupAutoPay',
+    EASYPAY_DELETE: 'api/Payment/DeleteEasyPayAccount/:accountNumber',
+    FUNDING_ACCOUNTS: 'api/Payment/RetrieveFundingAccounts/:accountNumber',
+    FUNDING_ACCOUNT_DELETE: 'api/Payment/DeleteFundingAccount',
+    PAYMENT_ONE_TIME: 'api/Payment/Submit',
+    PAYMENT_MAKE_ONETIME: 'api/Payment/MakeAOneTimePayment',
+
+    // Widget token flows land on the Payment controller directly (no separate Orbipay confirm routes)
+    FUNDING_ACCOUNT_ADD: 'api/Payment/AddFundingAccount',
+    FUNDING_ACCOUNT_UPDATE: 'api/Payment/UpdFundingAccount',
+
     // Logging
     LOG_ERROR: 'api/log/error',
     LOG_INFO: 'api/log/info',

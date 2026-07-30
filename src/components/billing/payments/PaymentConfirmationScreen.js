@@ -1,15 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import PrimaryButton from "../../common/customui/PrimaryButton";
 import NextActionCard from "./NextActionCard";
+import NotificationAlert from "../../common/customui/NotificationAlert";
 import AnimatedSuccessIcon from "./AnimatedSuccessIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
 import { contentMaxWidth, formatCurrency } from "./paymentsShared";
 import { setFocusToRef, announceA11y } from "../../../utils/a11y";
-import AppStyles from "../../../styles/AppStyles";
-import { SectionTitle,SectionContent,FieldTitle,FieldContent, } from "../../common/customui/Typography";
 
 const KIND_COPY = {
   "autopay-activated": {
@@ -31,9 +30,9 @@ const KIND_COPY = {
   },
 };
 
-// Figma: shared success screen — one completed action, one optional follow-up offer (one hop max)
 const PaymentConfirmationScreen = ({ navigation, route }) => {
   const kind = route.params?.kind || "";
+  const headerTitle = route.params?.headerTitle || "Billing Details";
   const copy = KIND_COPY[kind] || null;
   const successTitle = copy?.title || "Success!";
   const message = route.params?.message || copy?.message || "";
@@ -47,9 +46,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
     setFocusToRef(titleRef, { delay: 600 });
   }, [message]);
 
-  // Figma: dollar amounts inside the success message render bold
   const messageParts = message.split(/(\$[\d,]+\.?\d*)/g);
-  const showBackToBilling = kind !== "autopay-activated" && kind !== "autopay-updated";
 
   const followUp =
     nextAction?.type === "payBalance"
@@ -64,6 +61,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               amount: nextAction.amount,
               methodId: nextAction.methodId,
               fromOffer: true,
+              headerTitle: "Make a Payment",
             }),
         }
       : nextAction?.type === "setupAutoPay"
@@ -76,23 +74,24 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               mode: "enroll",
               methodId: nextAction.methodId,
               fromOffer: true,
+              headerTitle: "Set Up Auto Pay",
             }),
         }
       : null;
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.popToTop()} />
-      <ScrollView contentContainerStyle={[ contentMaxWidth]} showsVerticalScrollIndicator={false}>
-        <View style={[AppStyles.card, { padding: 24, margin: 16 }]}>
+      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.popToTop()} />
+      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+        <View style={[card.elevated, styles.successCard]}>
           <View style={styles.iconWrap} accessible={false} importantForAccessibility="no-hide-descendants">
             <AnimatedSuccessIcon size={64} />
           </View>
-          <SectionTitle ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={1}>
+          <Text ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={1}>
             {successTitle}
-          </SectionTitle>
+          </Text>
           {!!message && (
-            <SectionContent style={styles.message}>
+            <Text style={styles.message}>
               {messageParts.map((part, index) =>
                 /^\$[\d,]/.test(part) ? (
                   <Text key={index} style={styles.messageAmount}>
@@ -102,7 +101,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
                   part
                 )
               )}
-            </SectionContent>
+            </Text>
           )}
           {!!confirmationNumber && (
             <View
@@ -111,18 +110,24 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               accessibilityLabel={`${copy?.numberLabel || "Confirmation Number"}, ${confirmationNumber.split("").join(" ")}`}
             >
               <FieldTitle style={styles.detailLabel}>{copy?.numberLabel || "Confirmation Number"}</FieldTitle>
-              <FieldContent >{confirmationNumber}</FieldContent>
+              <FieldContent style={styles.detailValue}>{confirmationNumber}</FieldContent>
             </View>
           )}
           {!!email && (
             <View style={styles.detailBlock} accessible accessibilityLabel={`Email confirmation sent to ${email}`}>
               <FieldTitle style={styles.detailLabel}>Email Confirmation Sent to</FieldTitle>
-              <FieldContent>{email}</FieldContent>
+              <FieldContent style={styles.detailValue}>{email}</FieldContent>
             </View>
           )}
         </View>
 
-        <View style={{ marginHorizontal: 24, marginTop: 16 }}>
+        {kind === "payment-submitted" && !confirmationNumber && (
+          <NotificationAlert
+            type="warning"
+            message="Your payment is being processed. Confirmation details will be available in your payment history shortly. Please do not submit your payment again."
+            showCloseIcon={false}
+          />
+        )}
 
         {!!followUp && (
           <NextActionCard
@@ -134,15 +139,6 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
           />
         )}
 
-        {showBackToBilling && (
-          <PrimaryButton
-            title="Back to Billing"
-            buttonType="submit"
-            accessibilityLabel="Back to Billing"
-            onPress={() => navigation.popToTop()}
-          />
-        )}
-        </View>
       </ScrollView>
     </View>
   );
@@ -150,28 +146,29 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 80 },
-  successCard: { padding: 24, alignItems: "center", marginTop: 16 },
-  iconWrap: { marginBottom: 16 , alignSelf: "center"},
+  content: { padding: 20, paddingBottom: 140 },
+  successCard: { paddingVertical: 32, paddingHorizontal: 16, alignItems: "center", marginTop: 16 },
+  iconWrap: { marginBottom: 20 },
   title: {
+    fontSize: FontSize.size_20,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "700",
+    color: Color.colorGray_100,
     textAlign: "center",
     marginBottom: 8,
   },
   message: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200,
     textAlign: "center",
     lineHeight: 22,
+    marginBottom: 8,
   },
-  messageAmount: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
-  detailBlock: { alignSelf: "stretch", marginTop: 16 },
-  detailLabel: {
-    marginBottom: 2,
-  },
-  detailValue: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "700",
-    color: Color.colorGray_200,
-  },
+  messageAmount: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
+  detailBlock: { alignSelf: "stretch", marginTop: 24 },
+  detailLabel: { marginBottom: 8 },
+  detailValue: {},
 });
 
 export default PaymentConfirmationScreen;

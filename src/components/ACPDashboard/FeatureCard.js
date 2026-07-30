@@ -84,7 +84,7 @@ const FeatureCard = ({
       })()}
       {isLoading ? (
         <SkeletonPlaceholder>
-          <View style={[styles.button, { height: 100, paddingVertical: 24 }]} />
+          <View style={styles.buttonSkeleton} />
         </SkeletonPlaceholder>
       ) : (
         <Touchable
@@ -143,6 +143,12 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_lg,
     color: Color.colorGray_100,
     fontWeight: "400",
+  },
+  buttonSkeleton: {
+    height: 48,
+    borderRadius: 100,
+    marginHorizontal: Padding.p_base,
+    marginBottom: Padding.p_base,
   },
   button: {
     marginHorizontal: Padding.p_base,

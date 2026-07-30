@@ -18,7 +18,6 @@ const VARIANTS = {
   },
 };
 
-// Draws the status mark like handwriting: circle sweeps in, then the check/cross strokes in
 const AnimatedSuccessIcon = ({ size = 64, variant = "success", color }) => {
   const config = VARIANTS[variant] || VARIANTS.success;
   const strokeColor = color || config.color;
@@ -49,7 +48,8 @@ const AnimatedSuccessIcon = ({ size = 64, variant = "success", color }) => {
   }, [circleProgress, markProgress]);
 
   return (
-    <Svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+
+    <Svg width={size} height={size} viewBox="0.394 0 18 18" fill="none">
       <AnimatedCircle
         cx={9.394}
         cy={9}

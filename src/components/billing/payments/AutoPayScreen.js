@@ -9,29 +9,15 @@ import LinkText from "../../common/customui/LinkText";
 import PaymentMethodCard from "./PaymentMethodCard";
 import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { SectionTitle, HintText, FieldTitle, Hyperlink } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
-  addDemoPaymentMethod,
-  isDemoPaymentData,
 } from "../../../network/apis/account/paymentMethods.service";
-import {
-  contentMaxWidth,
-  ordinal,
-  isMethodExpired,
-  openOrbipaySecureCapture,
-} from "./paymentsShared";
-import { announceA11y } from "../../../utils/a11y";
-import AppStyles from "../../../styles/AppStyles";
-import {
-  SectionTitle,
-  SectionContent,
-  FieldTitle,
-  Hyperlink,
-} from "../../common/customui/Typography";
+import { contentMaxWidth, ordinal, isMethodExpired, openOrbipaySecureCapture, paymentMethodTitle } from "./paymentsShared";
 
-// Figma: Activate/Manage auto pay — select a payment method, then continue to review
-const AutoPayScreen = ({ navigation }) => {
+const AutoPayScreen = ({ navigation, route }) => {
+  const headerTitle = "Manage Auto Pay";
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
   const [selectedId, setSelectedId] = useState("");
@@ -40,167 +26,140 @@ const AutoPayScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      const flash = route.params?.paymentFlash;
+      if (flash?.message) {
+        setErrorAlert(flash.message);
+        navigation.setParams({ paymentFlash: undefined });
+      }
       abortRef.current = new AbortController();
       const signal = abortRef.current.signal;
       Promise.all([fetchPaymentMethods(signal), fetchAutoPayDetails(signal)])
         .then(([list, details]) => {
           setMethods(list);
           setAutoPay(details);
-          setSelectedId(
-            (prev) => prev || (details.enrolled ? details.paymentMethodId : ""),
-          );
+          setSelectedId((prev) => prev || (details.enrolled ? details.paymentMethodId : ""));
         })
         .catch(() => {
           setMethods([]);
           setAutoPay({ enrolled: false });
-          setErrorAlert(
-            "We could not load your payment information. Please try again.",
-          );
+          setErrorAlert("We could not load your payment information. Please try again.");
         });
       return () => abortRef.current?.abort();
-    }, []),
+    }, [route.params?.paymentFlash, navigation])
   );
 
   const loading = methods === null || autoPay === null;
   const enrolled = !!autoPay?.enrolled;
   const dueDayLabel = ordinal(autoPay?.dueDay || 22);
   const selectedMethod = methods?.find((m) => m.id === selectedId) || null;
-  // Continue unlocks on any eligible selection when enrolling, or on a different method when managing
-  const canContinue =
-    !!selectedMethod &&
-    !isMethodExpired(selectedMethod) &&
-    (!enrolled || selectedId !== autoPay?.paymentMethodId);
+  const currentMethod = methods?.find((m) => m.id === autoPay?.paymentMethodId) || null;
+  const isSwitching = enrolled && !!selectedMethod && !isMethodExpired(selectedMethod) && selectedId !== autoPay?.paymentMethodId;
+  const methodShortName = (m) => `${paymentMethodTitle(m)} ****${m?.lastFour || ""}`;
 
-  const onAddMethod = async () => {
-    if (!isDemoPaymentData) {
-      openOrbipaySecureCapture(navigation);
-      return;
-    }
-    try {
-      const added = await addDemoPaymentMethod();
-      setMethods((prev) => [...(prev || []), added]);
-      setSelectedId(added.id);
-      announceA11y("New payment method added and selected.");
-    } catch (error) {
-      setErrorAlert(
-        "We could not add a payment method right now. Please try again.",
-      );
-    }
-  };
+  const canContinue =
+    !!selectedMethod && !isMethodExpired(selectedMethod) && (!enrolled || selectedId !== autoPay?.paymentMethodId);
+
+  const onAddMethod = () => openOrbipaySecureCapture(navigation, { headerTitle });
 
   const onContinue = () => {
     if (!canContinue) return;
     navigation.navigate("AutoPayReview", {
       mode: enrolled ? "update" : "enroll",
       methodId: selectedId,
+      headerTitle,
     });
   };
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader
-        title="Billing Details"
-        onPressBack={() => navigation.goBack()}
-      />
-      <ScrollView
-        contentContainerStyle={[contentMaxWidth]}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={{ paddingBottom: 100 }}>
-          <View style={[AppStyles.card, { padding: 24, margin: 16 }]}>
-            {!!errorAlert && (
-              <NotificationAlert
-                type="error"
-                title="Something went wrong"
-                message={errorAlert}
-                onClose={() => setErrorAlert("")}
-                autoFocusTitle
-              />
-            )}
+      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
+      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+        {!!errorAlert && (
+          <NotificationAlert
+            type="error"
+            title="Something went wrong"
+            message={errorAlert}
+            onClose={() => setErrorAlert("")}
+            autoFocusTitle
+          />
+        )}
 
-            <SectionTitle
-              style={styles.heading}
-              accessibilityRole="header"
-              accessibilityLevel={2}
-            >
-              {enrolled ? "Manage auto pay" : "Activate auto pay"}
-            </SectionTitle>
-            <SectionContent style={styles.introText}>
-              {enrolled ? "You have signed up for" : "You are enrolling in"}{" "}
-              Sparklight Auto Pay. Your payment will be automatically charged on
-              the <Text style={styles.introBold}>{dueDayLabel}</Text> of each
-              month using your selected payment method.
-            </SectionContent>
+        <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+          {enrolled ? "Manage auto pay" : "Activate auto pay"}
+        </SectionTitle>
+        <HintText style={styles.introText}>
+          {enrolled ? "You have signed up for" : "You are enrolling in"} Sparklight Auto Pay. Your payment will be
+          automatically charged on the <Text style={styles.introBold}>{dueDayLabel}</Text> of each month using your
+          selected payment method.
+        </HintText>
 
-            <View style={styles.selectRow}>
-              <FieldTitle
-                style={styles.selectLabel}
-                accessibilityRole="header"
-                accessibilityLevel={3}
-              >
-                {enrolled
-                  ? "Select new payment method."
-                  : "Select payment method."}
-              </FieldTitle>
-              <LinkText
-                onPress={onAddMethod}
-                accessibilityLabel="Add payment method"
-                accessibilityHint="Opens a secure page to add a card or bank account."
-              >
-                <View style={styles.addLinkRow}>
-                  <Hyperlink style={styles.addLinkText}>Add</Hyperlink>
-                  <PlusCircleIcon />
-                </View>
-              </LinkText>
+        <View style={styles.selectRow}>
+          <FieldTitle style={styles.selectLabel} accessibilityRole="header" accessibilityLevel={3}>
+            {enrolled ? "Select new payment method." : "Select payment method."}
+          </FieldTitle>
+          <LinkText
+            onPress={onAddMethod}
+            accessibilityLabel="Add payment method"
+            accessibilityHint="Opens a secure page to add a card or bank account."
+          >
+            <View style={styles.addLinkRow}>
+              <Hyperlink style={styles.addLinkText}>Add</Hyperlink>
+              <PlusCircleIcon color={Color.colorMidnightblue} />
             </View>
-
-            {loading ? (
-              <SkeletonPlaceholder>
-                <View style={styles.cardSkeleton} />
-                <View style={styles.cardSkeleton} />
-              </SkeletonPlaceholder>
-            ) : methods.length === 0 ? (
-              <Text style={styles.emptyText}>
-                You have no saved payment methods yet. Add one to continue.
-              </Text>
-            ) : (
-              <View accessibilityRole="radiogroup">
-                {methods.map((method, index) => (
-                  <PaymentMethodCard
-                    key={method.id || index}
-                    method={method}
-                    variant="radio"
-                    selected={method.id === selectedId}
-                    onPress={() => setSelectedId(method.id)}
-                    showAutoPayBadge={
-                      enrolled && method.id === autoPay?.paymentMethodId
-                    }
-                    positionLabel={`${index + 1} of ${methods.length}`}
-                  />
-                ))}
-              </View>
-            )}
-          </View>
-          {!loading && (
-            <View style={{marginHorizontal: 24, marginBottom: 16}}>
-              <PrimaryButton
-                title="Continue"
-                buttonType="submit"
-                disabled={!canContinue}
-                accessibilityLabel="Continue"
-                onPress={onContinue}
-              />
-              {enrolled && (
-                <PrimaryButton
-                  title="Deactivate"
-                  buttonType="outline"
-                  accessibilityLabel="Deactivate Auto Pay"
-                  onPress={() => navigation.navigate("AutoPayDeactivate")}
-                />
-              )}
-            </View>
-          )}
+          </LinkText>
         </View>
+
+        {loading ? (
+          <SkeletonPlaceholder>
+            <View style={styles.cardSkeleton} />
+            <View style={styles.cardSkeleton} />
+          </SkeletonPlaceholder>
+        ) : methods.length === 0 ? (
+          <Text style={styles.emptyText}>You have no saved payment methods yet. Add one to continue.</Text>
+        ) : (
+          <View accessibilityRole="radiogroup">
+            {methods.map((method, index) => (
+              <PaymentMethodCard
+                key={method.id || index}
+                method={method}
+                variant="radio"
+                selected={method.id === selectedId}
+                onPress={() => setSelectedId(method.id)}
+                showAutoPayBadge={enrolled && method.id === autoPay?.paymentMethodId}
+                autoPayBadgeLabel="Current"
+                showNewAutoPayBadge={isSwitching && method.id === selectedId}
+                positionLabel={`${index + 1} of ${methods.length}`}
+              />
+            ))}
+          </View>
+        )}
+
+        {!loading && (
+          <>
+            {isSwitching && !!currentMethod && (
+              <NotificationAlert
+                type="warning"
+                message={`Auto Pay will switch from ${methodShortName(currentMethod)} to ${methodShortName(selectedMethod)}, starting with your payment on the ${dueDayLabel}.`}
+                showCloseIcon={false}
+              />
+            )}
+            <PrimaryButton
+              title="Continue"
+              buttonType="submit"
+              disabled={!canContinue}
+              accessibilityLabel="Continue"
+              onPress={onContinue}
+            />
+            {enrolled && (
+              <PrimaryButton
+                title="Deactivate"
+                buttonType="outline"
+                accessibilityLabel="Deactivate Auto Pay"
+                onPress={() => navigation.navigate("AutoPayDeactivate", { headerTitle })}
+              />
+            )}
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -208,37 +167,25 @@ const AutoPayScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 80 },
+  content: { padding: 20, paddingBottom: 140 },
   heading: {
     marginBottom: 8,
   },
-  introText: {
-    lineHeight: 22,
-    marginBottom: 20,
-  },
-  introBold: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
+  introText: { lineHeight: 20, marginBottom: 20 },
+  introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
   selectRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 8,
   },
-  selectLabel: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "600",
-    color: Color.colorGray_200,
-    flexShrink: 1,
-    marginRight: 8,
-  },
+  selectLabel: { flexShrink: 1, marginRight: 8 },
   addLinkRow: { flexDirection: "row", alignItems: "center" },
-  addLinkText: {
-    marginRight: 4,
-  },
+  addLinkText: { marginRight: 4 },
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
     lineHeight: 20,
     marginBottom: 12,

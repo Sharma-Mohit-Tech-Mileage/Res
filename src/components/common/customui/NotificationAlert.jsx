@@ -631,8 +631,8 @@ const NotificationAlert = ({
 
           {title && (
             <A11y.Index index={1}>
-            <View accessible={true} accessibilityRole="header">
-              <FieldTitle ref={titleRef} 
+            <View ref={titleRef} accessible={true} accessibilityRole="header">
+              <FieldTitle
               style={[ { color: config.titleColor }]}
               accessible={true}
               accessibilityRole="header" accessibilityLevel={2}

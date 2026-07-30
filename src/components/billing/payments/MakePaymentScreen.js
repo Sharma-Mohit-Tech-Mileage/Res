@@ -7,10 +7,9 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { SectionTitle } from "../../common/customui/Typography";
 import { fetchAutoPayDetails } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, formatCurrency, parseAmountInput } from "./paymentsShared";
-import AppStyles from "../../../styles/AppStyles";
-import { FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { contentMaxWidth, formatCurrency, parseAmountInput, radioA11yProps } from "./paymentsShared";
 
 const TYPE_ONE_TIME = "oneTime";
 const TYPE_AUTOMATIC = "automatic";
@@ -18,8 +17,8 @@ const AMOUNT_TOTAL = "total";
 const AMOUNT_PAST_DUE = "pastDue";
 const AMOUNT_CUSTOM = "custom";
 
-// Figma: Make a Payment step 1 — payment type, then payment amount for one-time payments
 const MakePaymentScreen = ({ navigation }) => {
+  const headerTitle = "Make a Payment";
   const [details, setDetails] = useState(null);
   const [paymentType, setPaymentType] = useState(TYPE_ONE_TIME);
   const [amountOption, setAmountOption] = useState("");
@@ -43,6 +42,7 @@ const MakePaymentScreen = ({ navigation }) => {
   );
 
   const loading = details === null;
+  const enrolled = !!details?.enrolled;
   const totalDue = Number(details?.balanceDue) || 0;
   const pastDue = Number(details?.pastDueAmount) || 0;
 
@@ -54,7 +54,6 @@ const MakePaymentScreen = ({ navigation }) => {
   };
   const canContinue = paymentType === TYPE_AUTOMATIC || resolveAmount() !== null;
 
-  // Figma: selecting Automatic only switches the type; Continue routes to Auto Pay
   const onContinue = () => {
     if (paymentType === TYPE_AUTOMATIC) {
       navigation.navigate("AutoPay");
@@ -69,7 +68,7 @@ const MakePaymentScreen = ({ navigation }) => {
       return;
     }
     setAmountError("");
-    navigation.navigate("MakePaymentMethod", { amount });
+    navigation.navigate("MakePaymentMethod", { amount, headerTitle });
   };
 
   const onSelectCustom = () => {
@@ -78,36 +77,33 @@ const MakePaymentScreen = ({ navigation }) => {
   };
 
   const renderRadioRow = ({ key, label, amount, amountStyle, note, selected, onPress, trailing }) => (
-    <Touchable
-      key={key}
-      style={[styles.optionRow, selected && styles.optionRowSelected]}
-      onPress={onPress}
-      accessibilityRole="radio"
-      accessibilityState={{ checked: selected }}
-      accessibilityLabel={`${label}${amount ? `, ${amount}` : ""}${note ? `, ${note}` : ""}`}
-    >
-      <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
-        {selected && <View style={styles.radioInner} />}
-      </View>
-      <View style={styles.optionTextWrap}>
-        <FieldContent >{label}</FieldContent>
-        {!!note && <FieldContent style={styles.optionNote}>{note}</FieldContent>}
-      </View>
-      {!!amount && <FieldContent style={[styles.optionAmount, amountStyle]}>{amount}</FieldContent>}
+    <View key={key} style={[styles.optionRow, selected && styles.optionRowSelected]}>
+      <Touchable
+        style={styles.optionPress}
+        onPress={onPress}
+        {...radioA11yProps(`${label}${amount ? `, ${amount}` : ""}${note ? `, ${note}` : ""}`, selected)}
+      >
+        <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
+          {selected && <View style={styles.radioInner} />}
+        </View>
+        <View style={styles.optionTextWrap}>
+          <Text style={styles.optionLabel}>{label}</Text>
+          {!!note && <Text style={styles.optionNote}>{note}</Text>}
+        </View>
+        {!!amount && <Text style={[styles.optionAmount, amountStyle]}>{amount}</Text>}
+      </Touchable>
       {trailing}
-    </Touchable>
+    </View>
   );
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
       <ScrollView
-        contentContainerStyle={[ contentMaxWidth]}
+        contentContainerStyle={[styles.content, contentMaxWidth]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <>
-        <View style={[AppStyles.card, { margin: 16,padding: 24 }]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -118,38 +114,40 @@ const MakePaymentScreen = ({ navigation }) => {
           />
         )}
 
-        <FieldTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-          Select payment type
-        </FieldTitle>
-        <View style={styles.typeRow} accessibilityRole="radiogroup">
-          {[
-            { key: TYPE_ONE_TIME, label: "One-time payment" },
-            { key: TYPE_AUTOMATIC, label: "Automatic payment" },
-          ].map((type) => {
-            const selected = paymentType === type.key;
-            return (
-              <Touchable
-                key={type.key}
-                style={[styles.typeCard, selected && styles.typeCardSelected]}
-                onPress={() => setPaymentType(type.key)}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: selected }}
-                accessibilityLabel={type.label}
-              >
-                <View style={[styles.radioOuter, styles.typeRadio, selected && styles.radioOuterSelected]}>
-                  {selected && <View style={styles.radioInner} />}
-                </View>
-                <FieldContent style={styles.typeLabel}>{type.label}</FieldContent>
-              </Touchable>
-            );
-          })}
-        </View>
+        {!loading && !enrolled && (
+          <>
+            <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+              Select payment type
+            </SectionTitle>
+            <View style={styles.typeRow} accessibilityRole="radiogroup">
+              {[
+                { key: TYPE_ONE_TIME, label: "One-time payment" },
+                { key: TYPE_AUTOMATIC, label: "Automatic payment" },
+              ].map((type) => {
+                const selected = paymentType === type.key;
+                return (
+                  <Touchable
+                    key={type.key}
+                    style={[styles.typeCard, selected && styles.typeCardSelected]}
+                    onPress={() => setPaymentType(type.key)}
+                    {...radioA11yProps(type.label, selected)}
+                  >
+                    <View style={[styles.radioOuter, styles.typeRadio, selected && styles.radioOuterSelected]}>
+                      {selected && <View style={styles.radioInner} />}
+                    </View>
+                    <Text style={styles.typeLabel}>{type.label}</Text>
+                  </Touchable>
+                );
+              })}
+            </View>
+          </>
+        )}
 
         {paymentType === TYPE_ONE_TIME && (
           <>
-            <FieldTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-              Select payment amount <FieldContent >(required)</FieldContent>
-            </FieldTitle>
+            <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+              Select payment amount <Text style={styles.requiredMark}>(required)</Text>
+            </SectionTitle>
             {loading ? (
               <SkeletonPlaceholder>
                 <View style={styles.rowSkeleton} />
@@ -187,14 +185,15 @@ const MakePaymentScreen = ({ navigation }) => {
                       ref={amountInputRef}
                       style={styles.inlineAmountInput}
                       value={customAmount}
-                      placeholder="$"
+                      placeholder="$0.00"
                       placeholderTextColor={Color.sparklightGray1}
                       keyboardType="decimal-pad"
                       accessibilityLabel="Payment amount, required"
                       accessibilityHint={amountError ? amountError : undefined}
                       onFocus={() => setAmountOption(AMOUNT_CUSTOM)}
                       onChangeText={(text) => {
-                        setCustomAmount(text);
+                        const digits = text.replace(/[^0-9.]/g, "");
+                        setCustomAmount(digits ? `$${digits}` : "");
                         if (amountError) setAmountError("");
                       }}
                     />
@@ -210,10 +209,8 @@ const MakePaymentScreen = ({ navigation }) => {
           </>
         )}
 
-        
-        </View>
         {!loading && (
-          <View style={{ marginHorizontal: 16, marginBottom: 16 }}>
+          <>
             <PrimaryButton
               title="Continue"
               buttonType="submit"
@@ -223,13 +220,11 @@ const MakePaymentScreen = ({ navigation }) => {
             />
             <PrimaryButton
               title="Cancel"
-              buttonType="outline"
               accessibilityLabel="Cancel payment"
               onPress={() => navigation.popToTop()}
             />
-          </View>
+          </>
         )}
-        </>
       </ScrollView>
     </View>
   );
@@ -237,12 +232,12 @@ const MakePaymentScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: {  padding: 16, paddingBottom: 80 },
+  content: { padding: 20, paddingBottom: 140 },
   heading: {
     marginBottom: 12,
     marginTop: 8,
   },
-  requiredMark: { fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "400" },
+  requiredMark: { fontFamily: FontFamily.openSansRegular, fontWeight: "400" },
   typeRow: { flexDirection: "row", marginBottom: 12 },
   typeCard: {
     flex: 1,
@@ -259,6 +254,10 @@ const styles = StyleSheet.create({
   typeCardSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: "#F3F2FF" },
   typeRadio: { marginRight: 8 },
   typeLabel: {
+    fontSize: FontSize.size_20,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "700",
+    color: Color.colorGray_200,
     flexShrink: 1,
   },
   optionRow: {
@@ -286,26 +285,30 @@ const styles = StyleSheet.create({
   },
   radioOuterSelected: { borderColor: Color.colorMidnightblue },
   radioInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: Color.colorMidnightblue },
+  optionPress: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-start" },
   optionTextWrap: { flex: 1, marginRight: 12 },
   optionLabel: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },
   optionAmount: {
     fontSize: FontSize.size_20,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
+    fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "700",
     color: Color.colorGray_200,
   },
   pastDueAmount: { color: "#DC3626" },
   optionNote: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200,
     lineHeight: 20,
     marginTop: 4,
   },
   amountErrorText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     color: "#B92A1C",
     marginBottom: 12,
   },
@@ -319,7 +322,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },
   rowSkeleton: { height: 56, borderRadius: 8, marginBottom: 12 },
