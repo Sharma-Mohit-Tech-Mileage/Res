@@ -24,7 +24,7 @@ import {
 } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 import AppStyles from "../../../styles/AppStyles";
-import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
+import { SectionTitle, FieldTitle,FieldContent,HintText } from "../../common/customui/Typography";
 
 // Figma: Make a Payment step 3 — review, agree to terms, submit
 const MakePaymentReviewScreen = ({ navigation, route }) => {
@@ -108,8 +108,8 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
       accessible
       accessibilityLabel={`${label}, ${a11yValue || value}`}
     >
-      <Text style={styles.fieldLabel}>{label}</Text>
-      <Text style={styles.fieldValue}>{value}</Text>
+      <FieldTitle style={styles.fieldLabel}>{label}</FieldTitle>
+      <FieldContent>{value}</FieldContent>
     </View>
   );
 
@@ -135,13 +135,13 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
               />
             )}
 
-            <Text
+            <SectionTitle
               style={styles.heading}
               accessibilityRole="header"
               accessibilityLevel={2}
             >
               Review payment
-            </Text>
+            </SectionTitle>
 
             <View style={[card.elevated, styles.summaryCard]}>
               {renderField(
@@ -159,10 +159,10 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
             </View>
 
             {!isDemoPaymentData && (
-              <Text style={styles.helperText}>
+              <HintText style={styles.helperText}>
                 You will complete this payment on our secure payment page. Your
                 card or bank details never leave that page.
-              </Text>
+              </HintText>
             )}
 
             <AgreeTermsRow
@@ -198,11 +198,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 80 },
   heading: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightGray1,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   summaryCard: { padding: 16 },
   fieldGroup: {
@@ -213,9 +209,6 @@ const styles = StyleSheet.create({
   },
   fieldGroupLast: { paddingBottom: 0, borderBottomWidth: 0, marginBottom: 0 },
   fieldLabel: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.sparklightGray1,
     marginBottom: 2,
   },
   fieldValue: {
@@ -225,9 +218,6 @@ const styles = StyleSheet.create({
     color: Color.colorGray_200,
   },
   helperText: {
-    fontSize: FontSize.size_smi,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.sparklightGray1,
     lineHeight: 18,
     marginTop: 8,
     textAlign: "center",

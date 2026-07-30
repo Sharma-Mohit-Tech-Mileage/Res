@@ -9,7 +9,7 @@ import { card } from "../../../styles/utilities";
 import { contentMaxWidth, formatCurrency } from "./paymentsShared";
 import { setFocusToRef, announceA11y } from "../../../utils/a11y";
 import AppStyles from "../../../styles/AppStyles";
-import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
+import { SectionTitle,SectionContent,FieldTitle,FieldContent, } from "../../common/customui/Typography";
 
 const KIND_COPY = {
   "autopay-activated": {
@@ -92,7 +92,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
             {successTitle}
           </SectionTitle>
           {!!message && (
-            <Text style={styles.message}>
+            <SectionContent style={styles.message}>
               {messageParts.map((part, index) =>
                 /^\$[\d,]/.test(part) ? (
                   <Text key={index} style={styles.messageAmount}>
@@ -102,7 +102,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
                   part
                 )
               )}
-            </Text>
+            </SectionContent>
           )}
           {!!confirmationNumber && (
             <View
@@ -110,14 +110,14 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               accessible
               accessibilityLabel={`${copy?.numberLabel || "Confirmation Number"}, ${confirmationNumber.split("").join(" ")}`}
             >
-              <Text style={styles.detailLabel}>{copy?.numberLabel || "Confirmation Number"}</Text>
-              <Text style={styles.detailValue}>{confirmationNumber}</Text>
+              <FieldTitle style={styles.detailLabel}>{copy?.numberLabel || "Confirmation Number"}</FieldTitle>
+              <FieldContent >{confirmationNumber}</FieldContent>
             </View>
           )}
           {!!email && (
             <View style={styles.detailBlock} accessible accessibilityLabel={`Email confirmation sent to ${email}`}>
-              <Text style={styles.detailLabel}>Email Confirmation Sent to</Text>
-              <Text style={styles.detailValue}>{email}</Text>
+              <FieldTitle style={styles.detailLabel}>Email Confirmation Sent to</FieldTitle>
+              <FieldContent>{email}</FieldContent>
             </View>
           )}
         </View>
@@ -152,24 +152,18 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 80 },
   successCard: { padding: 24, alignItems: "center", marginTop: 16 },
-  iconWrap: { marginBottom: 16 },
+  iconWrap: { marginBottom: 16 , alignSelf: "center"},
   title: {
     textAlign: "center",
     marginBottom: 8,
   },
   message: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.colorGray_200,
     textAlign: "center",
     lineHeight: 22,
   },
   messageAmount: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
   detailBlock: { alignSelf: "stretch", marginTop: 16 },
   detailLabel: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.sparklightGray1,
     marginBottom: 2,
   },
   detailValue: {

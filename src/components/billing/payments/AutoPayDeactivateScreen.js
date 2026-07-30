@@ -7,11 +7,14 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { fetchAutoPayDetails, cancelAutoPay } from "../../../network/apis/account/paymentMethods.service";
+import {
+  fetchAutoPayDetails,
+  cancelAutoPay,
+} from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, ordinal } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 import AppStyles from "../../../styles/AppStyles";
-import {SectionTitle} from "../../common/customui/Typography";
+import { SectionTitle, SectionContent } from "../../common/customui/Typography";
 
 // Figma: Deactivate auto pay — warning, T&C agreement, single Deactivate action
 const AutoPayDeactivateScreen = ({ navigation }) => {
@@ -29,7 +32,7 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
         .then(setDetails)
         .catch(() => setDetails({}));
       return () => abortRef.current?.abort();
-    }, [])
+    }, []),
   );
 
   const dueDayLabel = ordinal(details?.dueDay || 22);
@@ -40,9 +43,13 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
     try {
       await cancelAutoPay();
       // Figma: deactivation success shows no confirmation number or email section
-      navigation.replace("PaymentConfirmation", { kind: "autopay-deactivated" });
+      navigation.replace("PaymentConfirmation", {
+        kind: "autopay-deactivated",
+      });
     } catch (error) {
-      setErrorAlert("We could not deactivate Auto Pay right now. Please try again.");
+      setErrorAlert(
+        "We could not deactivate Auto Pay right now. Please try again.",
+      );
       announceA11y("Error, Auto Pay was not deactivated.");
     } finally {
       setSubmitting(false);
@@ -51,45 +58,66 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ProfileSettingsHeader
+        title="Billing Details"
+        onPressBack={() => navigation.goBack()}
+      />
+      <ScrollView
+        contentContainerStyle={[contentMaxWidth]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={[AppStyles.card, { padding: 24, margin: 16 }]}>
-        <View style={{ marginBottom: 16 }}>
-        {!!errorAlert && (
-          <NotificationAlert
-            type="error"
-            title="Something went wrong"
-            message={errorAlert}
-            onClose={() => setErrorAlert("")}
-            autoFocusTitle
-          />
-        )}
+          <View style={{ marginBottom: 16 }}>
+            {!!errorAlert && (
+              <NotificationAlert
+                type="error"
+                title="Something went wrong"
+                message={errorAlert}
+                onClose={() => setErrorAlert("")}
+                autoFocusTitle
+              />
+            )}
 
-        <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-          Deactivate auto pay
-        </Text>
-        <Text style={styles.introText}>You are going to deactivate your current auto pay account</Text>
+            <SectionTitle
+              style={styles.heading}
+              accessibilityRole="header"
+              accessibilityLevel={2}
+            >
+              Deactivate auto pay
+            </SectionTitle>
+            <SectionContent style={styles.introText}>
+              You are going to deactivate your current auto pay account
+            </SectionContent>
 
-        <NotificationAlert
-          type="warning"
-          message={`Your balance is due on the ${dueDayLabel} each month. By canceling Auto Pay, all future payments will need to be made manually.`}
-          splitKey={[{ text: dueDayLabel, bold: true }]}
-          showCloseIcon={false}
-        />
+            <NotificationAlert
+              type="warning"
+              message={`Your balance is due on the ${dueDayLabel} each month. By canceling Auto Pay, all future payments will need to be made manually.`}
+              splitKey={[{ text: dueDayLabel, bold: true }]}
+              showCloseIcon={false}
+            />
 
-        <View style={styles.agreeBlock}>
-          <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
-        </View>
-         </View>
-         <View style={{marginHorizontal: 24}}>
-        <PrimaryButton
-          title={submitting ? "Deactivating..." : "Deactivate"}
-          buttonType="submit"
-          disabled={!agreed}
-          accessibilityLabel="Deactivate Auto Pay"
-          onPress={onDeactivate}
-        />
-        <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
+            <View style={styles.agreeBlock}>
+              <AgreeTermsRow
+                value={agreed}
+                onValueChange={setAgreed}
+                onViewTerms={() => setShowTerms(true)}
+              />
+            </View>
+          </View>
+          <View style={{ marginHorizontal: 24 }}>
+            <PrimaryButton
+              title={submitting ? "Deactivating..." : "Deactivate"}
+              buttonType="submit"
+              disabled={!agreed}
+              accessibilityLabel="Deactivate Auto Pay"
+              onPress={onDeactivate}
+            />
+            <PrimaryButton
+              title="Back"
+              buttonType="outline"
+              accessibilityLabel="Back"
+              onPress={() => navigation.goBack()}
+            />
           </View>
         </View>
       </ScrollView>
@@ -103,17 +131,9 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 80 },
   heading: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightGray1,
     marginBottom: 8,
   },
   introText: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.colorGray_200,
-    lineHeight: 22,
     marginBottom: 8,
   },
   agreeBlock: { marginTop: 12, marginBottom: 8 },

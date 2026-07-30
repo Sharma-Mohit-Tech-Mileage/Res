@@ -4,14 +4,18 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import LinkText from "../../common/customui/LinkText";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
+import { SectionTitle, SectionContent } from "../../common/customui/Typography";
+import AppStyles from "../../../styles/AppStyles";  
 
 // One optional follow-up offer after a success — a single suggestion, never a bundled second action
 const NextActionCard = ({ title, message, ctaLabel, onPress, onDismiss }) => (
-  <View style={[card.elevated, styles.container]}>
-    <Text style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
+  <View style={[AppStyles.card, styles.container]}>
+    <SectionTitle style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
       {title}
-    </Text>
-    <Text style={styles.message}>{message}</Text>
+    </SectionTitle>
+    <SectionContent >
+      {message}
+    </SectionContent>
     <PrimaryButton title={ctaLabel} buttonType="submit" accessibilityLabel={ctaLabel} onPress={onPress} />
     {!!onDismiss && (
       <LinkText
@@ -27,10 +31,6 @@ const NextActionCard = ({ title, message, ctaLabel, onPress, onDismiss }) => (
 const styles = StyleSheet.create({
   container: { padding: 16, marginTop: 24, alignSelf: "stretch" },
   title: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "600",
-    color: Color.colorGray_100,
     marginBottom: 4,
   },
   message: {

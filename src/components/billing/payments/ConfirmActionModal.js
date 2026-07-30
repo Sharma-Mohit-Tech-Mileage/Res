@@ -4,6 +4,7 @@ import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import Touchable from "../../common/customui/Touchable";
 import { setFocusToRef } from "../../../utils/a11y";
+import {SectionTitle,SectionContent} from "../../common/customui/Typography";
 
 const ConfirmActionModal = ({
   visible,
@@ -31,10 +32,10 @@ const ConfirmActionModal = ({
           accessibilityLabel={`Dismiss, ${cancelLabel}`}
         />
         <View style={styles.sheet} accessibilityViewIsModal importantForAccessibility="yes">
-          <Text ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
+          <SectionTitle ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
             {title}
-          </Text>
-          {!!message && <Text style={styles.message}>{message}</Text>}
+          </SectionTitle>
+          {!!message && <SectionContent style={styles.message}>{message}</SectionContent>}
           <Touchable
             style={[styles.confirmButton, destructive && styles.destructiveButton]}
             onPress={onConfirm}
@@ -63,18 +64,10 @@ const styles = StyleSheet.create({
     paddingBottom: 34,
   },
   title: {
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "600",
-    color: Color.colorGray_100,
     marginBottom: 8,
   },
   message: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.sparklightGray1,
     marginBottom: 20,
-    lineHeight: 20,
   },
   confirmButton: {
     minHeight: A11Y.minTouch,
