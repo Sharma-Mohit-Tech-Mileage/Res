@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   introText: { lineHeight: 20, marginBottom: 20 },
-  introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
+  introBold: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
   selectRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     lineHeight: 20,
     marginBottom: 12,

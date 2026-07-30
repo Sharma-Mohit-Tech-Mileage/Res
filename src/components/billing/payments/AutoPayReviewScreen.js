@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   introText: { lineHeight: 20, marginBottom: 16 },
-  introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
+  introBold: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
   cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
   valueSkeleton: { height: 18, borderRadius: 4, width: "60%" },
   labelSkeleton: { height: 14, borderRadius: 4, width: "45%", marginBottom: 10 },

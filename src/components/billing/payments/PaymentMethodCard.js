@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   brandWrap: { marginLeft: 12 },
   digitsText: {
     fontSize: FontSize.size_5xl,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.colorGray_200,
     letterSpacing: 1,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   autoPayBadge: {
     fontSize: FontSize.size_xs,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     backgroundColor: "#C8E9D0",
     borderRadius: 4,
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   },
   expiredBadge: {
     fontSize: FontSize.size_xs,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     color: "#B92A1C",
     backgroundColor: "#FEF3F2",
     borderRadius: 4,
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   },
   expiryText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   textDisabled: { color: Color.sparklightGray1 },

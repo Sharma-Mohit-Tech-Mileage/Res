@@ -184,14 +184,14 @@ const styles = StyleSheet.create({
   emptyCard: { padding: 20, marginBottom: 16, alignItems: "flex-start" },
   emptyTitle: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     color: Color.colorGray_100,
     marginBottom: 8,
   },
   helperText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     lineHeight: 20,
   },

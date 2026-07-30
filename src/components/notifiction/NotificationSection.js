@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     color: Color.colorGray_200,
     ...(Platform.OS === "android"
       ? {
-          fontFamily: "OpenSans-Bold",
+          fontFamily: "RadioCanadaBold:",
           letterSpacing: 0.15,
         }
       : {

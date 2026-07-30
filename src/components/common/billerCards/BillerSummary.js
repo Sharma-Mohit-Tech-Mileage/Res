@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "center",
     paddingBottom: 5,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: colors.sp_black,
   },
   dueDate: {
@@ -231,11 +231,11 @@ const styles = StyleSheet.create({
     color: colors.darkest_grey,
     alignSelf: "center",
     paddingBottom: 5,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   label: {
     fontSize: 12,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "400",
     color: colors.gray600,
   },
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     alignSelf: "center",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   cardHreader: {
    flexDirection: "row",

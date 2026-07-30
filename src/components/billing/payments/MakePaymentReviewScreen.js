@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   fieldValue: {},
   helperText: {
     fontSize: FontSize.size_smi,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     lineHeight: 18,
     marginTop: 8,
