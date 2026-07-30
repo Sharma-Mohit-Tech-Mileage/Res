@@ -9,7 +9,7 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import { Color, FontSize, FontFamily, Border } from "../../../../GlobalStyles";
+import { Color, FontSize, FontFamily, Border,Padding } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -451,7 +451,7 @@ const NotificationAlert = ({
             accessible={true}
             accessibilityRole="text"
             accessibilityLabel={plainText}
-            style={styles.blockWrapper}
+            style={[styles.blockWrapper, styles.actionableBlock, index === 0 && styles.firstBlock]}
           >
             {hasBoldOnly ? (
               <BannerAlertText>
@@ -726,6 +726,10 @@ const styles = StyleSheet.create({
   },
   blockWrapper: {
     marginTop: 8,
+  },
+  firstBlock: {
+    marginTop: 4,
+    marginBottom: 4,
   },
   // Inline actionable links keep natural text height; hitSlop provides 48dp tap target (WCAG 2.5.5 inline-text exception).
   actionableBlock: {

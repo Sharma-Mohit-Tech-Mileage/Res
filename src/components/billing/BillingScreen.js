@@ -370,6 +370,7 @@ const styles = StyleSheet.create({
   melissaSmith: {
     width: 210,
     lineHeight: 28,
+    paddingBottom: Padding.p_5xs,
     textAlign: "center",
   },
   rightActionableParent: {

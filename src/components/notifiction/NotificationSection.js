@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: FontSize.size_3xl,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
   },
   editButton: {
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightWhite,
   },
   comingSoonBadge: {
@@ -332,13 +332,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   comingSoonText: {
-    fontSize: FontSize.RadioCanadaSemiBold_size,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: FontSize.textXsSemibold_size,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
   },
   infoMessage: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     padding: Padding.p_base,
     marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
@@ -347,10 +347,19 @@ const styles = StyleSheet.create({
     borderColor: "#353091",
     backgroundColor: "#F0F8FF",
   },
-  infoText: {
+  iconContainer: {
+    width: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textContainer: {
+    flex: 1,
     marginLeft: Padding.p_5xs,
-    fontSize: FontSize.RadioCanadaSemiBold_size,
-    fontFamily: FontFamily.RadioCanadaRegular,
+  },
+  infoText: {
+    fontSize: FontSize.textXsSemibold_size,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
     flex: 1,
   },
@@ -362,7 +371,7 @@ const styles = StyleSheet.create({
           letterSpacing: 0.15,
         }
       : {
-          fontFamily: FontFamily.RadioCanadaSemiBold,
+          fontFamily: FontFamily.openSansSemiBold,
           fontWeight: "600",
         }),
   },
@@ -379,7 +388,7 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
     flex: 1,
   },
@@ -391,7 +400,7 @@ const styles = StyleSheet.create({
   statusText: {
     marginLeft: Padding.p_5xs,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },
   icon: {
@@ -407,8 +416,8 @@ const styles = StyleSheet.create({
   },
   adminText: {
     textAlign: "center",
-    fontSize: FontSize.RadioCanadaSemiBold_size,
-    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: FontSize.textXsSemibold_size,
+    fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },
   warnBackground: {

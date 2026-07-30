@@ -7,6 +7,7 @@ import { getPhonePortalURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../../styles/AppStyles";
+import {SectionTitle} from "../../common/customui/Typography";
 const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   const phonePortalURL = getPhonePortalURL(legacyBrand);
   const showManageButton = phonePortalURL !== null;
@@ -43,9 +44,9 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
 
   return (
     <View style={styles.container}>
-      <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
+      <View style={[styles.card, styles.cardSpacing]}>
         {/* Service Header */}
-        <View style={styles.serviceHeader}>
+        <View style={styles.cardHreader}>
           {/* <View
             style={styles.iconWrapper}
             accessible={false}
@@ -60,19 +61,19 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
               importantForAccessibility="no"
             />
           </View> */}
-          <Text
-            style={{marginLeft: 16}}
+          <SectionTitle
+            style={{marginLeft: 8}}
             accessible={true}
             accessibilityLabel="Phone Service"
             accessibilityLevel={2}
             accessibilityRole="header"
           >
             Phone Service
-          </Text>
+          </SectionTitle>
         </View>
 
         {/* Plan Name & Action */}
-        <View style={styles.content}>
+        <View style={{ padding: 16 }}>
           <Text
             style={styles.planName}
             accessible={true}
@@ -101,6 +102,17 @@ const styles = StyleSheet.create({
   container: serviceCard.container,
   card: {
     ...AppStyles.card,
+  },
+  cardSpacing: {
+    marginHorizontal: 16,
+  }, 
+  cardHreader: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width: "100%",
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    padding: 10,
   },
   bottomButton: serviceCard.bottomButton,
   // Service Header
