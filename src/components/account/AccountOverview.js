@@ -275,7 +275,7 @@ const AccountOverview = () => {
             </View>
               <Touchable
               minSize={0}
-              onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30298585161879-MySparklight-Business-App-Release-Notes?isMobile=true', name: 'App Release Notes' })}
+              onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true', name: 'App Release Notes' })}
               accessibilityLabel={'Version '+VersionCheck.getCurrentVersion()}
               accessibilityRole="link"
               hitSlop={A11Y.hitSlop}
