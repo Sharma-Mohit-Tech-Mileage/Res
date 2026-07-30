@@ -222,11 +222,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 100 },
   heading: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightGray1,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyText: {

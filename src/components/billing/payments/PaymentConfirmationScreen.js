@@ -8,6 +8,8 @@ import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
 import { contentMaxWidth, formatCurrency } from "./paymentsShared";
 import { setFocusToRef, announceA11y } from "../../../utils/a11y";
+import AppStyles from "../../../styles/AppStyles";
+import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
 
 const KIND_COPY = {
   "autopay-activated": {
@@ -81,14 +83,14 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.popToTop()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
-        <View style={[card.elevated, styles.successCard]}>
+      <ScrollView contentContainerStyle={[ contentMaxWidth]} showsVerticalScrollIndicator={false}>
+        <View style={[AppStyles.card, { padding: 24, margin: 16 }]}>
           <View style={styles.iconWrap} accessible={false} importantForAccessibility="no-hide-descendants">
             <AnimatedSuccessIcon size={64} />
           </View>
-          <Text ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={1}>
+          <SectionTitle ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={1}>
             {successTitle}
-          </Text>
+          </SectionTitle>
           {!!message && (
             <Text style={styles.message}>
               {messageParts.map((part, index) =>
@@ -120,6 +122,8 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
           )}
         </View>
 
+        <View style={{ marginHorizontal: 24, marginTop: 16 }}>
+
         {!!followUp && (
           <NextActionCard
             title={followUp.title}
@@ -138,6 +142,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
             onPress={() => navigation.popToTop()}
           />
         )}
+        </View>
       </ScrollView>
     </View>
   );
@@ -149,10 +154,6 @@ const styles = StyleSheet.create({
   successCard: { padding: 24, alignItems: "center", marginTop: 16 },
   iconWrap: { marginBottom: 16 },
   title: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "700",
-    color: Color.colorGray_100,
     textAlign: "center",
     marginBottom: 8,
   },

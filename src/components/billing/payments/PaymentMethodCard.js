@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import Touchable from "../../common/customui/Touchable";
 import PaymentBrandIcon from "../../common/PaymentBrandIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import {Hyperlink} from "../../common/customui/Typography";
 import { paymentMethodA11yLabel, paymentMethodTitle, maskedDigits, isMethodExpired } from "./paymentsShared";
 
 // Figma method card: radio variant for payment selection, actions variant for the Payment Methods list
@@ -57,7 +58,7 @@ const PaymentMethodCard = ({
             accessibilityLabel={`Edit ${paymentMethodA11yLabel(method)}`}
             style={styles.actionLink}
           >
-            <Text style={styles.actionText}>Edit</Text>
+            <Hyperlink >Edit</Hyperlink>
           </Touchable>
         )}
         {showEdit && (showDelete || showAutoPayBadge) && (
@@ -73,7 +74,7 @@ const PaymentMethodCard = ({
             accessibilityLabel={`Delete ${paymentMethodA11yLabel(method)}`}
             style={styles.actionLink}
           >
-            <Text style={styles.actionText}>Delete</Text>
+            <Hyperlink >Delete</Hyperlink>
           </Touchable>
         )}
         {showAutoPayBadge && (

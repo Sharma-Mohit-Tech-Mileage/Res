@@ -106,7 +106,7 @@ const AutoPayScreen = ({ navigation }) => {
         contentContainerStyle={[contentMaxWidth]}
         showsVerticalScrollIndicator={false}
       >
-        <>
+        <View style={{ paddingBottom: 100 }}>
           <View style={[AppStyles.card, { padding: 24, margin: 16 }]}>
             {!!errorAlert && (
               <NotificationAlert
@@ -200,7 +200,7 @@ const AutoPayScreen = ({ navigation }) => {
               )}
             </View>
           )}
-        </>
+        </View>
       </ScrollView>
     </View>
   );

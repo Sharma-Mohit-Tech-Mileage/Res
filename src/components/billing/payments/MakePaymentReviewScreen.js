@@ -23,6 +23,8 @@ import {
   openOrbipayPaymentExecution,
 } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
+import AppStyles from "../../../styles/AppStyles";
+import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
 
 // Figma: Make a Payment step 3 — review, agree to terms, submit
 const MakePaymentReviewScreen = ({ navigation, route }) => {
@@ -44,12 +46,17 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
       Promise.all([fetchPaymentMethods(signal), fetchAutoPayDetails(signal)])
         .then(([list, details]) => {
           setAutoPay(details);
-          const paramMethodId = route.params?.methodId || route.params?.method?.id;
-          setMethod(list.find((m) => m.id === paramMethodId) || route.params?.method || null);
+          const paramMethodId =
+            route.params?.methodId || route.params?.method?.id;
+          setMethod(
+            list.find((m) => m.id === paramMethodId) ||
+              route.params?.method ||
+              null,
+          );
         })
         .catch(() => setAutoPay({ enrolled: true }));
       return () => abortRef.current?.abort();
-    }, [route.params?.methodId, route.params?.method])
+    }, [route.params?.methodId, route.params?.method]),
   );
 
   const onSubmit = async () => {
@@ -63,7 +70,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           params: {
             kind: "payment-submitted",
             message: `Your payment for ${formatCurrency(
-              amount
+              amount,
             )} has been received. It may take up to 24 hours to be reflected on your account.`,
           },
         },
@@ -76,7 +83,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
       navigation.replace("PaymentConfirmation", {
         kind: "payment-submitted",
         message: `Your payment for ${formatCurrency(
-          amount
+          amount,
         )} has been received. It may take up to 24 hours to be reflected on your account.`,
         confirmationNumber: result?.confirmationNumber || "",
         email: autoPay?.email || "",
@@ -86,7 +93,9 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
             : null,
       });
     } catch (error) {
-      setErrorAlert("We could not submit your payment right now. Please try again.");
+      setErrorAlert(
+        "We could not submit your payment right now. Please try again.",
+      );
       announceA11y("Error, your payment was not submitted.");
     } finally {
       setSubmitting(false);
@@ -106,45 +115,78 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
-        {!!errorAlert && (
-          <NotificationAlert
-            type="error"
-            title="Something went wrong"
-            message={errorAlert}
-            onClose={() => setErrorAlert("")}
-            autoFocusTitle
-          />
-        )}
+      <ProfileSettingsHeader
+        title="Billing Details"
+        onPressBack={() => navigation.goBack()}
+      />
+      <ScrollView
+        contentContainerStyle={[ contentMaxWidth]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={{ paddingBottom: 100 }}>
+          <View style={[AppStyles.card, { margin: 16, padding: 24 }]}>
+            {!!errorAlert && (
+              <NotificationAlert
+                type="error"
+                title="Something went wrong"
+                message={errorAlert}
+                onClose={() => setErrorAlert("")}
+                autoFocusTitle
+              />
+            )}
 
-        <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-          Review payment
-        </Text>
+            <Text
+              style={styles.heading}
+              accessibilityRole="header"
+              accessibilityLevel={2}
+            >
+              Review payment
+            </Text>
 
-        <View style={[card.elevated, styles.summaryCard]}>
-          {renderField("Payment Method", describePaymentMethod(method), paymentMethodA11yLabel(method))}
-          {renderField("Payment Amount", formatCurrency(amount))}
-          {renderField("Payment Date", paymentDate, moment().format("MMMM D, YYYY"), true)}
+            <View style={[card.elevated, styles.summaryCard]}>
+              {renderField(
+                "Payment Method",
+                describePaymentMethod(method),
+                paymentMethodA11yLabel(method),
+              )}
+              {renderField("Payment Amount", formatCurrency(amount))}
+              {renderField(
+                "Payment Date",
+                paymentDate,
+                moment().format("MMMM D, YYYY"),
+                true,
+              )}
+            </View>
+
+            {!isDemoPaymentData && (
+              <Text style={styles.helperText}>
+                You will complete this payment on our secure payment page. Your
+                card or bank details never leave that page.
+              </Text>
+            )}
+
+            <AgreeTermsRow
+              value={agreed}
+              onValueChange={setAgreed}
+              onViewTerms={() => setShowTerms(true)}
+            />
+          </View>
+          <View style={{ marginHorizontal: 24 }}>
+            <PrimaryButton
+              title={submitting ? "Submitting..." : "Submit Payment"}
+              buttonType="submit"
+              disabled={!agreed}
+              accessibilityLabel={`Submit payment of ${formatCurrency(amount)}`}
+              onPress={onSubmit}
+            />
+            <PrimaryButton
+              title="Back"
+              buttonType="outline"
+              accessibilityLabel="Back"
+              onPress={() => navigation.goBack()}
+            />
+          </View>
         </View>
-
-        {!isDemoPaymentData && (
-          <Text style={styles.helperText}>
-            You will complete this payment on our secure payment page. Your card or bank details never leave that
-            page.
-          </Text>
-        )}
-
-        <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
-
-        <PrimaryButton
-          title={submitting ? "Submitting..." : "Submit Payment"}
-          buttonType="submit"
-          disabled={!agreed}
-          accessibilityLabel={`Submit payment of ${formatCurrency(amount)}`}
-          onPress={onSubmit}
-        />
-        <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
       </ScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
@@ -163,7 +205,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   summaryCard: { padding: 16 },
-  fieldGroup: { paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: "#EAECF0", marginBottom: 12 },
+  fieldGroup: {
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EAECF0",
+    marginBottom: 12,
+  },
   fieldGroupLast: { paddingBottom: 0, borderBottomWidth: 0, marginBottom: 0 },
   fieldLabel: {
     fontSize: FontSize.size_sm,

@@ -11,7 +11,13 @@ import TermsModal from "./TermsModal";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
 import AppStyles from "../../../styles/AppStyles";
-import {SectionTitle,Hyperlink} from "../../common/customui/Typography";;
+import {
+  SectionTitle,
+  SectionContent,
+  FieldTitle,
+  FieldContent,
+  Hyperlink,
+} from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
@@ -57,10 +63,12 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
         })
         .catch(() => {
           setDetails({});
-          setErrorAlert("We could not load your payment information. Please try again.");
+          setErrorAlert(
+            "We could not load your payment information. Please try again.",
+          );
         });
       return () => abortRef.current?.abort();
-    }, [methodId])
+    }, [methodId]),
   );
 
   const loading = details === null;
@@ -76,7 +84,8 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
     }
     setSubmitting(true);
     try {
-      const submit = mode === "update" ? updateAutoPayPaymentMethod : enrollAutoPay;
+      const submit =
+        mode === "update" ? updateAutoPayPaymentMethod : enrollAutoPay;
       const result = await submit(methodId, email.trim());
       navigation.replace("PaymentConfirmation", {
         kind: mode === "update" ? "autopay-updated" : "autopay-activated",
@@ -91,7 +100,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
       setErrorAlert(
         mode === "update"
           ? "We could not update your Auto Pay payment method. Please try again."
-          : "We could not complete your Auto Pay enrollment. Please try again."
+          : "We could not complete your Auto Pay enrollment. Please try again.",
       );
       announceA11y("Error, your Auto Pay changes were not saved.");
     } finally {
@@ -101,100 +110,139 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader
+        title="Billing Details"
+        onPressBack={() => navigation.goBack()}
+      />
       <ScrollView
-        contentContainerStyle={[ contentMaxWidth]}
+        contentContainerStyle={[contentMaxWidth]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        style={{ paddingBottom: 100 }}
       >
-        <View style={[AppStyles.card, {margin:16, padding: 24}]}>
-        {!!errorAlert && (
-          <NotificationAlert
-            type="error"
-            title="Something went wrong"
-            message={errorAlert}
-            onClose={() => setErrorAlert("")}
-            autoFocusTitle
-          />
-        )}
-
-        <Text style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-          Review Auto Pay
-        </Text>
-        <Text style={styles.introText}>
-          {mode === "update" ? "You have signed up for" : "You are enrolling in"} Sparklight Auto Pay. Your payment
-          will be automatically charged on the <Text style={styles.introBold}>{dueDayLabel}</Text> of each month using
-          your selected payment method.
-        </Text>
-
-        {loading ? (
-          <SkeletonPlaceholder>
-            <View style={styles.cardSkeleton} />
-            <View style={styles.cardSkeleton} />
-          </SkeletonPlaceholder>
-        ) : (
-          <>
-            {balanceDue > 0 && (
+        <>
+          <View style={[AppStyles.card, { margin: 16, padding: 24 }]}>
+            {!!errorAlert && (
               <NotificationAlert
-                type="warning"
-                title="Your Balance Needs Attention"
-                message={`Your current balance of ${formatCurrency(
-                  balanceDue
-                )} won't be processed by Auto Pay before the due date. You can pay it after finishing this setup.`}
-                showCloseIcon={false}
+                type="error"
+                title="Something went wrong"
+                message={errorAlert}
+                onClose={() => setErrorAlert("")}
+                autoFocusTitle
               />
             )}
 
-            <View style={[card.elevated, styles.summaryCard]}>
-              <View
-                style={styles.fieldGroup}
-                accessible
-                accessibilityLabel={`Payment Method, ${paymentMethodA11yLabel(method)}`}
-              >
-                <Text style={styles.fieldLabel}>Payment Method</Text>
-                <Text style={styles.fieldValue}>{describePaymentMethod(method)}</Text>
-              </View>
-              <View
-                style={[styles.fieldGroup, styles.fieldGroupLast]}
-                accessible
-                accessibilityLabel={`Payment Date, on the ${dueDayLabel} of each month`}
-              >
-                <Text style={styles.fieldLabel}>Payment Date</Text>
-                <Text style={styles.fieldValue}>On the {dueDayLabel} of each month</Text>
-              </View>
-            </View>
+            <SectionTitle
+              style={styles.heading}
+              accessibilityRole="header"
+              accessibilityLevel={2}
+            >
+              Review Auto Pay
+            </SectionTitle>
+            <SectionContent style={styles.introText}>
+              {mode === "update"
+                ? "You have signed up for"
+                : "You are enrolling in"}{" "}
+              Sparklight Auto Pay. Your payment will be automatically charged on
+              the <Text style={styles.introBold}>{dueDayLabel}</Text> of each
+              month using your selected payment method.
+            </SectionContent>
 
-            <View style={[card.elevated, styles.emailCard]}>
-              <SparkLightInput
-                ref={emailRef}
-                name="email"
-                label="Email Address (required)"
-                accessibilityLabel="Email Address"
-                placeholder="Email Address"
-                value={email}
-                required
-                error={emailError}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  if (emailError) setEmailError("");
-                }}
-                accessibilityHint="A confirmation email will be sent to this address."
-              />
-            </View>
+            {loading ? (
+              <SkeletonPlaceholder>
+                <View style={styles.cardSkeleton} />
+                <View style={styles.cardSkeleton} />
+              </SkeletonPlaceholder>
+            ) : (
+              <>
+                {balanceDue > 0 && (
+                  <NotificationAlert
+                    type="warning"
+                    title="Your Balance Needs Attention"
+                    message={`Your current balance of ${formatCurrency(
+                      balanceDue,
+                    )} won't be processed by Auto Pay before the due date. You can pay it after finishing this setup.`}
+                    showCloseIcon={false}
+                  />
+                )}
 
-            <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
+                <View style={[card.elevated, styles.summaryCard]}>
+                  <View
+                    style={styles.fieldGroup}
+                    accessible
+                    accessibilityLabel={`Payment Method, ${paymentMethodA11yLabel(
+                      method,
+                    )}`}
+                  >
+                    <FieldTitle style={styles.fieldLabel}>
+                      Payment Method
+                    </FieldTitle>
+                    <FieldContent>{describePaymentMethod(method)}</FieldContent>
+                  </View>
+                  <View
+                    style={[styles.fieldGroup, styles.fieldGroupLast]}
+                    accessible
+                    accessibilityLabel={`Payment Date, on the ${dueDayLabel} of each month`}
+                  >
+                    <FieldTitle style={styles.fieldLabel}>
+                      Payment Date
+                    </FieldTitle>
+                    <FieldContent>
+                      On the {dueDayLabel} of each month
+                    </FieldContent>
+                  </View>
+                </View>
 
+                <View style={[card.elevated, styles.emailCard]}>
+                  <SparkLightInput
+                    ref={emailRef}
+                    name="email"
+                    label="Email Address (required)"
+                    accessibilityLabel="Email Address"
+                    placeholder="Email Address"
+                    value={email}
+                    required
+                    error={emailError}
+                    onChangeText={(text) => {
+                      setEmail(text);
+                      if (emailError) setEmailError("");
+                    }}
+                    accessibilityHint="A confirmation email will be sent to this address."
+                  />
+                </View>
+
+                <AgreeTermsRow
+                  value={agreed}
+                  onValueChange={setAgreed}
+                  onViewTerms={() => setShowTerms(true)}
+                />
+              </>
+            )}
+          </View>
+          <View style={{ marginHorizontal: 24 }}>
             <PrimaryButton
-              title={submitting ? "Saving..." : mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"}
+              title={
+                submitting
+                  ? "Saving..."
+                  : mode === "update"
+                  ? "Update Auto Pay"
+                  : "Activate Auto Pay"
+              }
               buttonType="submit"
               disabled={!agreed}
-              accessibilityLabel={mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"}
+              accessibilityLabel={
+                mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"
+              }
               onPress={onSubmit}
             />
-            <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
-          </>
-        )}
-        </View>
+            <PrimaryButton
+              title="Cancel"
+              buttonType="outline"
+              accessibilityLabel="Back"
+              onPress={() => navigation.goBack()}
+            />
+          </View>
+        </>
       </ScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
@@ -206,28 +254,22 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 100 },
   heading: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "700",
-    color: Color.sparklightGray1,
     marginBottom: 8,
   },
   introText: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.colorGray_200,
-    lineHeight: 22,
     marginBottom: 16,
   },
   introBold: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
   cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
   summaryCard: { padding: 16, marginTop: 8 },
-  fieldGroup: { paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: "#EAECF0", marginBottom: 12 },
+  fieldGroup: {
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EAECF0",
+    marginBottom: 12,
+  },
   fieldGroupLast: { paddingBottom: 0, borderBottomWidth: 0, marginBottom: 0 },
   fieldLabel: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.sparklightGray1,
     marginBottom: 2,
   },
   fieldValue: {

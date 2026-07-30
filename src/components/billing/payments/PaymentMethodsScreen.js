@@ -19,6 +19,8 @@ import {
 } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, describePaymentMethod, openOrbipaySecureCapture } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
+import AppStyles from "../../../styles/AppStyles";
+import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
 
 // Figma: Add payment method — saved methods list with Add link, Edit | Delete actions, success toast
 const PaymentMethodsScreen = ({ navigation }) => {
@@ -101,7 +103,8 @@ const PaymentMethodsScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[ contentMaxWidth]} showsVerticalScrollIndicator={false}>
+       <View style={[AppStyles.card, { padding: 24, margin: 16 }]}>
         {!!alert && (
           <NotificationAlert
             type={alert.type}
@@ -156,6 +159,7 @@ const PaymentMethodsScreen = ({ navigation }) => {
             />
           ))
         )}
+        </View>
       </ScrollView>
 
       <ConfirmActionModal

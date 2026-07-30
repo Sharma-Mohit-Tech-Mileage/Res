@@ -52,7 +52,8 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title="Billing Details" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[contentMaxWidth]} showsVerticalScrollIndicator={false}>
+        <View style={[AppStyles.card, { padding: 24, margin: 16 }]}>
         <View style={{ marginBottom: 16 }}>
         {!!errorAlert && (
           <NotificationAlert
@@ -79,7 +80,8 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
         <View style={styles.agreeBlock}>
           <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
         </View>
-
+         </View>
+         <View style={{marginHorizontal: 24}}>
         <PrimaryButton
           title={submitting ? "Deactivating..." : "Deactivate"}
           buttonType="submit"
@@ -88,6 +90,7 @@ const AutoPayDeactivateScreen = ({ navigation }) => {
           onPress={onDeactivate}
         />
         <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
+          </View>
         </View>
       </ScrollView>
 
