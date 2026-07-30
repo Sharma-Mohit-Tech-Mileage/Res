@@ -8,7 +8,7 @@ import {
 
 export const theme = {
   colors: {
-    primary: Color.sparklightBrightPurple,
+    primary: Color.sparklightPrimaryPurple,
     primaryLight: "#E6D5F5",
     primaryDark: Color.colorMidnightblue,
     white: Color.sparklightWhite,
@@ -40,7 +40,7 @@ export const theme = {
       success: Color.sparklightGreen,
       error: Color.sparkLightRed,
       warning: Color.sparkLightInfo,
-      info: Color.sparklightBrightPurple,
+      info: Color.sparklightPrimaryPurple,
     },
   },
 

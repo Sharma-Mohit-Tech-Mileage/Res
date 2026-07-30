@@ -315,7 +315,7 @@ const LoadingIndicator = memo(() => (
     <LoadingOverlay
       size="large"
       loading={true}
-      color={Color.sparklightBrightPurple}
+      color={Color.sparklightPrimaryPurple}
       accessible={true}
       accessibilityLabel="Loading billing breakdown data"
     />
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 26,
     textAlign: "center",
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: "underline",
   },
 

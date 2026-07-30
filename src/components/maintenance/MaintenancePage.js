@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   contactLink: {
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
     textDecorationLine: "underline",
   },

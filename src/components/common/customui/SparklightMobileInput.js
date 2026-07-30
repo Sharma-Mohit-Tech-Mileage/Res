@@ -162,7 +162,7 @@ const SparklightMobileInput = React.forwardRef(({
               isFocused && error != undefined
                 ? "red"
                 : isFocused
-                ? Color.sparklightBrightPurple
+                ? Color.sparklightPrimaryPurple
                 : Color.sparklightDarkGray,
           },
         ]}
@@ -193,7 +193,7 @@ const SparklightMobileInput = React.forwardRef(({
               borderColor: error
                 ? "red"
                 : isFocused
-                ? Color.sparklightBrightPurple
+                ? Color.sparklightPrimaryPurple
                 : Color.sparklightDarkGray,
             },
           ]}

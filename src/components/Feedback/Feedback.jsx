@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
   },
   submitButton: {
-    backgroundColor: Color.sparklightBrightPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
     padding: Padding.p_base,
     borderRadius: Border.br_11xs,
     alignItems: "center",

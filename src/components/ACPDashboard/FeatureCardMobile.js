@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: 20,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
     margin: 24,
     lineHeight: 24,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonPrimary: {
-    backgroundColor: Color.sparklightBrightPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   buttonSuccess: {
     backgroundColor: "#C8E9D0",

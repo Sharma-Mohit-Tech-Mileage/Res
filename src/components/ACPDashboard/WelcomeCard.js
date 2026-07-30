@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   offerEyebrow: {
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "600",
     marginBottom: 6,
   },
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     paddingHorizontal: 22,
     paddingVertical: 10,
-    backgroundColor: Color.sparklightBrightPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
     borderRadius: 50,
     minWidth: 110,
   },

@@ -207,7 +207,7 @@ suggestionText: {
     flex: 1, // To ensure text takes up the remaining space
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     flexWrap:'wrap',
     maxWidth:wp('90%')
       // Spark Light Purple from the design

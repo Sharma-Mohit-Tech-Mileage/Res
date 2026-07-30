@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
   loadMoreText: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaSemiBold,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: 'underline',
   },
 });

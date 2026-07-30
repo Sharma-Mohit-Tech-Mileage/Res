@@ -37,7 +37,6 @@ export const Color = {
     sparklightaddGray:"#666666",
     colorGray_100: "#101828",
     sparklightGray1: "#4C5458",
-    sparklightBrightPurple: "#8D3B90",
     sparklightPrimaryPurple: "#8D3B90",
     sparklightSecondaryPurple: "#353091",
     success50: "#ecfdf3",

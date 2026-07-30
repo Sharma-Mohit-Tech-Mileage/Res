@@ -336,13 +336,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xs,
   },
   linkStyle: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: 'underline',
     alignSelf: 'center',
     fontWeight: '600'
   },
   separator: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     alignSelf: 'center',
     fontFamily: FontFamily.RadioCanadaBold,
     fontWeight: '600'

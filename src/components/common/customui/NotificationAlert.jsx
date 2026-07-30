@@ -741,7 +741,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   styledText: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
     textDecorationLine: "underline",
   },

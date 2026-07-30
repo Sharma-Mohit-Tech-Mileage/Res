@@ -87,7 +87,7 @@ const CancellationSummary = ({ navigation, route }) => {
   const [error, setError] = useState(errorRes);
   const [devices, setDevices] = useState([]);
   const myTheme = {
-    arrowColor: Color.sparklightBrightPurple,
+    arrowColor: Color.sparklightPrimaryPurple,
     textSectionTitleColor: Color.sparklightDarkGray,
   };
 
@@ -458,7 +458,7 @@ const CancellationSummary = ({ navigation, route }) => {
           style={{
             flexDirection: "row",
             borderTopWidth: 1,
-            borderTopColor: Color.sparklightBrightPurple,
+            borderTopColor: Color.sparklightPrimaryPurple,
             paddingVertical: 8,
             backgroundColor: "#F8F8F8",
             width: "65%",
@@ -523,7 +523,7 @@ const CancellationSummary = ({ navigation, route }) => {
       updatedMarkedDates[selectedDate] = {
         customStyles: {
           container: {
-            backgroundColor: Color.sparklightBrightPurple,
+            backgroundColor: Color.sparklightPrimaryPurple,
             borderColor: Color.sparklightDarkGray,
             borderWidth: 1,
             elevation: 0,
@@ -667,7 +667,7 @@ const CancellationSummary = ({ navigation, route }) => {
                       style={[
                         styles.terms,
                         {
-                          color: Color.sparklightBrightPurple,
+                          color: Color.sparklightPrimaryPurple,
                           textDecorationLine: "underline",
                         },
                       ]}
@@ -699,7 +699,7 @@ const CancellationSummary = ({ navigation, route }) => {
                     please{" "}
                     <Text
                       style={{
-                        color: Color.sparklightBrightPurple,
+                        color: Color.sparklightPrimaryPurple,
                         textDecorationLine: "underline",
                         fontFamily: FontFamily.RadioCanadaRegular,
                         fontSize: 14,
@@ -802,11 +802,11 @@ const CancellationSummary = ({ navigation, route }) => {
                   value={toggleCheckBoxTerm}
                   style={styles.checkBox}
                   boxType="square"
-                  onCheckColor={Color.sparklightBrightPurple}
-                  tintColor={Color.sparklightBrightPurple}
-                  onTintColor={Color.sparklightBrightPurple}
+                  onCheckColor={Color.sparklightPrimaryPurple}
+                  tintColor={Color.sparklightPrimaryPurple}
+                  onTintColor={Color.sparklightPrimaryPurple}
                   tintColors={{
-                    true: Color.sparklightBrightPurple,
+                    true: Color.sparklightPrimaryPurple,
                     false:
                       Platform.OS === "ios"
                         ? Color.colorWhitesmoke_300

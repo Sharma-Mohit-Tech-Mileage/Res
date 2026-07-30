@@ -803,7 +803,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   termsLinkText: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: "underline",
   },
   checkboxSection: {

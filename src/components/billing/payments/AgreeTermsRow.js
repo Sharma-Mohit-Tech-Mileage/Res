@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: "underline",
   },
 });

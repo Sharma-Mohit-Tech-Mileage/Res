@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   uploadText: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaSemiBold,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     marginRight: 5,
     textDecorationLine: 'underline', // Add underline to the text
   },

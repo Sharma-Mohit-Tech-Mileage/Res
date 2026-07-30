@@ -11,7 +11,7 @@ const MenuGrid = () => {
       title: 'Billing',
       icon: 'credit-card',
       screenName: 'BillingTab',
-      color: Color.sparklightBrightPurple,
+      color: Color.sparklightPrimaryPurple,
     },
     {
       id: 'service',
@@ -25,7 +25,7 @@ const MenuGrid = () => {
       title: 'Support',
       icon: 'help-circle',
       screenName: 'Support',
-      color: Color.sparklightBrightPurple,
+      color: Color.sparklightPrimaryPurple,
     },
     {
       id: 'account',

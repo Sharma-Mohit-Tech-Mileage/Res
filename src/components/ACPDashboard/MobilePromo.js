@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   offerEyebrow: {
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "600",
     marginBottom: 6,
   },

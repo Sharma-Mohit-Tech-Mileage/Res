@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_lg,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
   },
   features: {
