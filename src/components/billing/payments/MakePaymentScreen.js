@@ -192,8 +192,13 @@ const MakePaymentScreen = ({ navigation }) => {
                       accessibilityHint={amountError ? amountError : undefined}
                       onFocus={() => setAmountOption(AMOUNT_CUSTOM)}
                       onChangeText={(text) => {
-                        const digits = text.replace(/[^0-9.]/g, "");
-                        setCustomAmount(digits ? `$${digits}` : "");
+                        let cleaned = text.replace(/[^0-9.]/g, "");
+                        const dot = cleaned.indexOf(".");
+                        // single decimal point, max two decimal places
+                        if (dot !== -1) {
+                          cleaned = cleaned.slice(0, dot + 1) + cleaned.slice(dot + 1).replace(/\./g, "").slice(0, 2);
+                        }
+                        setCustomAmount(cleaned ? `$${cleaned}` : "");
                         if (amountError) setAmountError("");
                       }}
                     />

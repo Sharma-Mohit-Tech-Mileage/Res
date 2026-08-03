@@ -81,7 +81,7 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
         </View>
 
         <PrimaryButton
-          title={submitting ? "Deactivating..." : "Deactivate"}
+          title={submitting ? "Deactivating..." : "Deactivate Auto Pay"}
           buttonType="submit"
           disabled={submitting || !agreed}
           accessibilityLabel="Deactivate Auto Pay"
