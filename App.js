@@ -9,7 +9,9 @@ import DeviceInfo from "react-native-device-info";
 import VersionCheck from "react-native-version-check";
 import AppUpdateAlert from "./src/components/utility/AppUpdateAlert";
 import { initializeApp } from "./src/firebase/FirebaseUtils";
-import analytics from "@react-native-firebase/analytics";
+import { getAnalytics, logEvent, setAnalyticsCollectionEnabled } from "@react-native-firebase/analytics";
+import { getMessaging, onTokenRefresh } from "@react-native-firebase/messaging";
+import { syncDeviceToken } from "./src/network/apis/account/profile.service";
 import Config from "react-native-config";
 import { MaintenanceProvider } from "./src/components/maintenance/MaintenanceContext";
 import { GlobalErrorModal } from "./src/components/common/GlobalErrorModal";
@@ -24,7 +26,7 @@ const App = () => {
 
   useEffect(() => {
     const enableAnalytics = async () => {
-      await analytics().setAnalyticsCollectionEnabled(!__DEV__ && Config.ENV === 'production');
+      await setAnalyticsCollectionEnabled(getAnalytics(), !__DEV__ && Config.ENV === 'production');
     };
     enableAnalytics();
     Appearance.setColorScheme('light');
@@ -50,11 +52,14 @@ const App = () => {
       await RemoteConfigManager.initialize();
     }
     init();
+    // FCM tokens rotate (reinstall/restore/GMS refresh); keep the backend record current
+    const unsubscribeTokenRefresh = onTokenRefresh(getMessaging(), () => {
+      syncDeviceToken();
+    });
+    return unsubscribeTokenRefresh;
   }, []);
 
   async function checkForUpdates() {
-    console.log("Checking for updates...");
-
     const currentVersion = DeviceInfo.getVersion();
     const latestVersion = await VersionCheck.getLatestVersion();
 
@@ -63,9 +68,7 @@ const App = () => {
 
     const currentMajor = parseInt(currentParts[0], 10);
     const latestMajor = parseInt(latestParts[0], 10);
-    console.log("Checking for updates...", currentMajor, latestMajor);
     if (latestMajor > currentMajor) {
-      console.log("Major update available.");
       setMajorUpdateVisible(true);
     }
   }
@@ -101,7 +104,7 @@ const App = () => {
         <AnalyticsContext.Provider
           value={{
             logEvent: (eventName, eventData) =>
-              analytics().logEvent(eventName, eventData),
+              logEvent(getAnalytics(), eventName, eventData),
           }}
         >
           <FeatureFlagsProvider>

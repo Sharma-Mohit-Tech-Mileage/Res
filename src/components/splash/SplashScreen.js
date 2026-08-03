@@ -14,7 +14,8 @@ import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import moment from "moment";
-import analytics from "@react-native-firebase/analytics";
+import { getAnalytics, logEvent, resetAnalyticsData, setUserId, setUserProperty } from "@react-native-firebase/analytics";
+import { syncDeviceToken } from "../../network/apis/account/profile.service";
 import { shouldBlockLogin } from "../utility/disconnectHelpers";
 import Logo from "../../res/images/SpalshLogo";
 import NetworkManager from "../../utils/NetworkManager";
@@ -235,7 +236,6 @@ const SplashScreen = ({ navigation, route }) => {
         idTokenGuid: result.data.additionalParameters?.session_state,
         refreshToken: result.data.refreshToken,
       };
-console.log("[Login] Refresh flow ID token:", data.idToken);
       setLoadingState(LoadingState.LOADING_DATA);
       storeSsoToken(data);
       callSSOLoginApi(data);
@@ -330,8 +330,6 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
         jwtTimestamp: Date.now(),
         idTokenTimestamp: Date.now(),
       };
-          console.log("[Login] ID token used for login:", ssoIdTokenRef.current || null);
-
       // Check for business account first
       if (res.userInfo.customerType === "COM") {
         logWarn("SplashScreen", "Business account login blocked");
@@ -387,14 +385,15 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
       storeUser(user);
       dispatch(saveUserInfo(user));
       if (user.userInfo && user.userInfo.userName) {
-        await analytics().setUserId(user.userInfo.userName.toString());
-        await analytics().setUserProperty(
+        await setUserId(getAnalytics(), user.userInfo.userName.toString());
+        await setUserProperty(getAnalytics(), 
           "Sparklight_user_id",
           user.userInfo.userName.toString()
         );
-        await analytics().logEvent("login", {
+        await logEvent(getAnalytics(), "login", {
           Sparklight_user_id: user.userInfo.userName.toString(),
         });
+        syncDeviceToken();
       }
 
       if (user.userInfo.mobileTCAcceptanceFlag) {
@@ -531,7 +530,7 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
             })
               .then(async () => {
                 try {
-                  await analytics().resetAnalyticsData();
+                  await resetAnalyticsData(getAnalytics());
                   await clearAuthCookies();
                   cleanUserData();
                   if (

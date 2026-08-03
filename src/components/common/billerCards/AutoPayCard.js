@@ -49,7 +49,7 @@ const AutoPayCard = ({
           alignItems: "center",
         }}
       >
-         <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Auto Pay Icon">
+         <View style={styles.iconBg} accessible={true} accessibilityRole="text" accessibilityLabel="Auto Pay Icon">
           <AutoPayIcon />
         </View> 
         <View style={{ flexDirection: "column" }}>

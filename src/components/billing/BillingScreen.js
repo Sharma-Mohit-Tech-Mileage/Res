@@ -142,7 +142,7 @@ const BillingScreen = ({ navigation }) => {
   }, [accountDetails]);
 
   return (
-    <View style={styles.account} accessibilityLabel="Billing Services screen"accessibilityRole='Header' accessibilityLevel={1}>
+    <View style={styles.account} accessibilityLabel="Billing Services screen" accessibilityRole='header' accessibilityLevel={1}>
       <ProfileSettingsHeader
         title=""
         iconAlignment="right"
@@ -169,7 +169,7 @@ const BillingScreen = ({ navigation }) => {
             <BillingIconWhite isSelected={false} />
           </View>
           <Title style={styles.melissaSmith}
-          accessibilityLabel="Billing Services" accessibilityRole='Header'
+          accessibilityLabel="Billing Services" accessibilityRole='header'
            accessibilityLevel={1} 
            nativeID="Billing Services-header"
            //accessibilityHint="Header"

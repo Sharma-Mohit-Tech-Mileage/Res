@@ -23,13 +23,14 @@ const PushNotifications = ({ navigation }) => {
     const enabledPermission = await requestUserPermission();
     if (enabledPermission) {
       const token = await getFcmToken();
+      // literal flags: false = subscribed
       const data = {
         accountNumber: user.userInfo?.accountNumber,
         deviceToken: token,
         deviceTokenTimestamp: moment().format(),
-        optOut: true,
-        outageOptOut: true,
-        billingOptOutStatus: true,
+        optOut: false,
+        outageOptOut: false,
+        billingOptOutStatus: false,
         userName: user.userInfo.userName,
         isAndroid: Platform.OS == "android",
       };
@@ -48,6 +49,7 @@ const PushNotifications = ({ navigation }) => {
       );
     } else {
       const token = await getFcmToken();
+      // permission denied: register the device but opted out (true = opting out)
       const dataWithoutPermission = {
         accountNumber: user.userInfo.accountNumber,
         deviceToken: token,
