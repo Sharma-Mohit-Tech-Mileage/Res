@@ -7,7 +7,6 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
 import PaymentMethodCard from "./PaymentMethodCard";
-import SparkLightInput from "../../common/customui/SparkLightInput";
 import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import {
@@ -16,7 +15,6 @@ import {
 } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, isMethodExpired, openOrbipayPaymentExecution } from "./paymentsShared";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const MakePaymentMethodScreen = ({ navigation, route }) => {
   const amount = Number(route.params?.amount) || 0;
@@ -25,9 +23,6 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   const [autoPay, setAutoPay] = useState(null);
   const [selectedId, setSelectedId] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const emailRef = useRef(null);
   const abortRef = useRef(null);
 
   useFocusEffect(
@@ -43,7 +38,6 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
         .then(([list, details]) => {
           setMethods(list);
           setAutoPay(details);
-          setEmail((prev) => prev || details.email || "");
           setSelectedId((prev) => prev || list.find((m) => m.isDefault && !isMethodExpired(m))?.id || "");
         })
         .catch(() => {
@@ -60,15 +54,9 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   const canContinue = !!selectedMethod && !isMethodExpired(selectedMethod);
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
-  const needsEmailEntry = !loading && !autoPay?.email;
-
   const onPayWithNewMethod = () => {
-    if (!EMAIL_PATTERN.test(email.trim())) {
-      setEmailError("Please enter a valid email address.");
-      emailRef.current?.focus();
-      return;
-    }
-    openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: email.trim() });
+    // email is resolved downstream (account primary email) — portal parity: no entry field here
+    openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: autoPay?.email || "" });
   };
 
   return (
@@ -114,23 +102,6 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
 
         {!loading && (
           <>
-            {needsEmailEntry && (
-              <SparkLightInput
-                ref={emailRef}
-                name="email"
-                label="Email Address (required)"
-                accessibilityLabel="Email Address"
-                placeholder="Email Address"
-                value={email}
-                required
-                error={emailError}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  if (emailError) setEmailError("");
-                }}
-                accessibilityHint="A payment confirmation email will be sent to this address."
-              />
-            )}
             <Touchable
               onPress={onPayWithNewMethod}
               accessibilityRole="button"
