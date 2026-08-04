@@ -121,13 +121,6 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
           )}
         </View>
 
-        {kind === "payment-submitted" && !confirmationNumber && (
-          <NotificationAlert
-            type="warning"
-            message="Your payment is being processed. Confirmation details will be available in your payment history shortly. Please do not submit your payment again."
-            showCloseIcon={false}
-          />
-        )}
 
         {!!followUp && (
           <NextActionCard

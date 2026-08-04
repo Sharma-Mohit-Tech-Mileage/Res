@@ -152,7 +152,7 @@ const AutoPayScreen = ({ navigation, route }) => {
             />
             {enrolled && (
               <PrimaryButton
-                title="Deactivate"
+                title="Deactivate Auto Pay"
                 buttonType="outline"
                 accessibilityLabel="Deactivate Auto Pay"
                 onPress={() => navigation.navigate("AutoPayDeactivate", { headerTitle })}
