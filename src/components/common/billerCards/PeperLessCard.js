@@ -61,17 +61,7 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
           </SectionTitle>
           {showSkeleton ? (
             <SkeletonPlaceholder>
-              <View
-                style={{
-                  width: wp("16%"),
-                  height: 25,
-                  marginLeft: 10,
-                  borderRadius: 4,
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                  marginTop: 5,
-                }}
-              />
+              <View style={{ width: 80, height: 20, borderRadius: 4, marginLeft: 10, marginTop: 6 }} />
             </SkeletonPlaceholder>
           ) : (
             <Hyperlink
@@ -85,19 +75,10 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
             </Hyperlink>
           )}
         </View>
-        <View style={{ position: "absolute", right: 10 }}>
+        <View style={{ position: "absolute", right: 10, top: 0, bottom: 0, justifyContent: "center" }}>
           {showSkeleton ? (
             <SkeletonPlaceholder>
-              <View
-                style={{
-                  width: wp("16%"),
-                  height: 25,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                }}
-              />
+              <View style={{ width: 56, height: 22, borderRadius: 4 }} />
             </SkeletonPlaceholder>
           ) : (
             <>
@@ -158,6 +139,7 @@ const styles = StyleSheet.create({
   },
   statusIcon: {
     marginTop: 0,
+    bottom: -1,
     marginRight: 4,
   },
   statusText: {

@@ -14,7 +14,7 @@ import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import AppStyles from "../../styles/AppStyles";
 import {SectionTitle,FieldContent, IndicatorText,BannerAlertText} from "../common/customui/Typography";
 import EditActionButton from "../common/customui/EditActionButton";
-
+import { A11y } from "react-native-a11y-order";
 const digitToWord = {
   0: "zero",
   1: "one",
@@ -223,20 +223,32 @@ const NotificationSection = ({
 
   return (
     <View style={[AppStyles.card,{marginBottom: Padding.p_base}]}>
-      <View style={styles.header}>
+      <A11y.Order style={styles.header}>
+        <A11y.Index index={0} >
+        <View
+          accessible={true}
+          accessibilityRole="header"
+          accessibilityLevel={2}
+          accessibilityLabel={editAccessibilityLabel}
+        >     
         <SectionTitle
           accessibilityRole="header"
           accessibilityLevel={2}
         >
           {title}
         </SectionTitle>
+        </View>
+        </A11y.Index>
+        <A11y.Index index={1} >
+      <View style={{flexDirection: "row", alignItems: "center"}}>
         {isComingSoon ? (
           <ComingSoonBadge />
         ) : (
           !isAdmin && <EditButton onPress={onEdit} isLoading={isLoading} accessibilityLabel={editAccessibilityLabel} />
         )}
       </View>
-
+     </A11y.Index>
+    </A11y.Order>
       {isAdmin && <AdminMessage />}
 
       {isLoading ? (
@@ -293,7 +305,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: FontSize.size_3xl,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
   },
   editButton: {
@@ -309,7 +321,7 @@ const styles = StyleSheet.create({
   },
   editButtonText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightWhite,
   },
   comingSoonBadge: {
@@ -320,13 +332,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   comingSoonText: {
-    fontSize: FontSize.textXsSemibold_size,
-    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.RadioCanadaSemiBold_size,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
   },
   infoMessage: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     padding: Padding.p_base,
     marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
@@ -335,10 +347,19 @@ const styles = StyleSheet.create({
     borderColor: "#353091",
     backgroundColor: "#F0F8FF",
   },
-  infoText: {
+  iconContainer: {
+    width: 18,
+    height: 18,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  textContainer: {
+    flex: 1,
     marginLeft: Padding.p_5xs,
-    fontSize: FontSize.textXsSemibold_size,
-    fontFamily: FontFamily.openSansRegular,
+  },
+  infoText: {
+    fontSize: FontSize.RadioCanadaSemiBold_size,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     flex: 1,
   },
@@ -346,11 +367,11 @@ const styles = StyleSheet.create({
     color: Color.colorGray_200,
     ...(Platform.OS === "android"
       ? {
-          fontFamily: "OpenSans-Bold",
+          fontFamily: "RadioCanadaBold:",
           letterSpacing: 0.15,
         }
       : {
-          fontFamily: FontFamily.openSansSemiBold,
+          fontFamily: FontFamily.RadioCanadaSemiBold,
           fontWeight: "600",
         }),
   },
@@ -367,7 +388,7 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     flex: 1,
   },
@@ -379,7 +400,7 @@ const styles = StyleSheet.create({
   statusText: {
     marginLeft: Padding.p_5xs,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   icon: {
@@ -395,8 +416,8 @@ const styles = StyleSheet.create({
   },
   adminText: {
     textAlign: "center",
-    fontSize: FontSize.textXsSemibold_size,
-    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.RadioCanadaSemiBold_size,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   warnBackground: {

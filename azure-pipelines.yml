@@ -64,6 +64,8 @@ variables:
   # in Azure DevOps (Pipeline > Edit > Variables) — do NOT store credentials in YAML.
   - name: NOTIFICATION_EMAILS
     value: 'Mohit.Sharma@cableone.biz'
+  - name: DEMO_NOTIFICATION_EMAILS
+    value: 'Mohit.Sharma@cableone.biz,mohit.sharma@sciata.com'
   - name: SMTP_SERVER
     value: ''  # e.g. smtp.office365.com or smtp.gmail.com
   - name: SMTP_PORT
@@ -119,10 +121,274 @@ stages:
   # STAGE 1: BUILD
   # ==========================================
 
+  - stage: DemoPromotion
+    displayName: 'Demo Promotion Deploy'
+    dependsOn:
+      - InitialCommit
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'Demo'))
+    jobs:
+      - job: DeployPreviousDevArtifacts
+        displayName: 'Deploy Previous Dev Artifacts'
+        pool:
+          vmImage: 'macos-latest'
+        steps:
+          - checkout: self
+            clean: true
+
+          - script: |
+              python3 - <<'PYEOF'
+              import os, smtplib
+              from email.mime.text import MIMEText
+              from email.mime.multipart import MIMEMultipart
+
+              smtp_server = os.environ.get('SMTP_SERVER', '').strip()
+              smtp_port = int(os.environ.get('SMTP_PORT', '587') or '587')
+              smtp_user = os.environ.get('SMTP_USERNAME', '').strip()
+              smtp_pass = os.environ.get('SMTP_PASSWORD', '').strip()
+              recipients = [r.strip() for r in os.environ.get('DEMO_NOTIFICATION_EMAILS', '').split(',') if r.strip()]
+
+              if not smtp_server or not smtp_user or not smtp_pass or not recipients:
+                  print('Email notification skipped: SMTP credentials or notification recipients not configured.')
+                  exit(0)
+
+              msg = MIMEMultipart('alternative')
+              msg['From'] = smtp_user
+              msg['To'] = ', '.join(recipients)
+              msg['Subject'] = '[MySparklight] Demo promotion initiated from Dev to Demo'
+
+              body_text = f"""MySparklight Residential - Demo deployment initiated from Dev to Demo.
+
+              Please be patient while the pipeline completes deployment to Play Store and TestFlight.
+
+              Build Branch: {os.environ.get('BUILD_BRANCH', 'Demo')}
+              Commit: {os.environ.get('BUILD_COMMIT', '')}
+              """
+
+              body_html = f"""<html><body>
+              <h2>Demo promotion initiated from Dev to Demo</h2>
+              <p>Please be patient while the pipeline completes deployment to Play Store and TestFlight.</p>
+              <p><strong>Branch:</strong> {os.environ.get('BUILD_BRANCH', 'Demo')}<br>
+              <strong>Commit:</strong> {os.environ.get('BUILD_COMMIT', '')}</p>
+              </body></html>"""
+
+              msg.attach(MIMEText(body_text, 'plain'))
+              msg.attach(MIMEText(body_html, 'html'))
+
+              with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+                  server.ehlo()
+                  server.starttls()
+                  server.ehlo()
+                  server.login(smtp_user, smtp_pass)
+                  server.sendmail(smtp_user, recipients, msg.as_string())
+
+              print('Demo promotion start email sent to: ' + ', '.join(recipients))
+              PYEOF
+            displayName: 'Send demo promotion start email'
+            env:
+              SMTP_SERVER: $(SMTP_SERVER)
+              SMTP_PORT: $(SMTP_PORT)
+              SMTP_USERNAME: $(SMTP_USERNAME)
+              SMTP_PASSWORD: $(SMTP_PASSWORD)
+              DEMO_NOTIFICATION_EMAILS: $(DEMO_NOTIFICATION_EMAILS)
+              BUILD_BRANCH: $(Build.SourceBranchName)
+              BUILD_COMMIT: $(Build.SourceVersion)
+
+          - script: |
+              set -euo pipefail
+              ORG_URL='$(System.CollectionUri)'
+              PROJECT='$(System.TeamProject)'
+              DEFINITION_ID='$(System.DefinitionId)'
+              DEV_BRANCH='refs/heads/Dev'
+              TOKEN='$(System.AccessToken)'
+
+              echo "Finding latest successful Dev build for definition $DEFINITION_ID..."
+              BUILD_API="$ORG_URL$PROJECT/_apis/build/builds?definitions=$DEFINITION_ID&branchName=$DEV_BRANCH&statusFilter=completed&resultFilter=succeeded&\$top=1&api-version=7.1-preview.7"
+              BUILD_JSON=$(curl -s -u :$TOKEN "$BUILD_API")
+              DEV_BUILD_ID=$(echo "$BUILD_JSON" | jq -r '.value[0].id // empty')
+
+              if [ -z "$DEV_BUILD_ID" ]; then
+                echo '❌ Could not find a successful Dev build to promote.'
+                echo "Build API response: $BUILD_JSON"
+                exit 1
+              fi
+
+              ARTIFACTS_API="$ORG_URL$PROJECT/_apis/build/builds/$DEV_BUILD_ID/artifacts?api-version=7.1-preview.5"
+              ARTIFACTS_JSON=$(curl -s -u :$TOKEN "$ARTIFACTS_API")
+              DEV_ANDROID_ARTIFACT=$(echo "$ARTIFACTS_JSON" | jq -r '.value[] | select(.name | startswith("android-build-")) | .name' | head -n1)
+              DEV_IOS_ARTIFACT=$(echo "$ARTIFACTS_JSON" | jq -r '.value[] | select(.name == "ios-ipa") | .name' | head -n1)
+
+              if [ -z "$DEV_ANDROID_ARTIFACT" ]; then
+                echo '❌ Could not locate Android artifact name in Dev build artifacts.'
+                echo "$ARTIFACTS_JSON"
+                exit 1
+              fi
+              if [ -z "$DEV_IOS_ARTIFACT" ]; then
+                echo '❌ Could not locate iOS artifact name in Dev build artifacts.'
+                echo "$ARTIFACTS_JSON"
+                exit 1
+              fi
+
+              echo "##vso[task.setvariable variable=DEV_BUILD_ID]$DEV_BUILD_ID"
+              echo "##vso[task.setvariable variable=DEV_ANDROID_ARTIFACT]$DEV_ANDROID_ARTIFACT"
+              echo "##vso[task.setvariable variable=DEV_IOS_ARTIFACT]$DEV_IOS_ARTIFACT"
+            displayName: 'Locate latest Dev build artifacts'
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Android artifact from Dev build'
+            inputs:
+              buildType: 'specific'
+              project: '$(System.TeamProject)'
+              definition: '$(System.DefinitionId)'
+              buildId: '$(DEV_BUILD_ID)'
+              downloadType: 'specific'
+              artifactName: '$(DEV_ANDROID_ARTIFACT)'
+              downloadPath: '$(Pipeline.Workspace)/android-demo-artifact'
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download iOS artifact from Dev build'
+            inputs:
+              buildType: 'specific'
+              project: '$(System.TeamProject)'
+              definition: '$(System.DefinitionId)'
+              buildId: '$(DEV_BUILD_ID)'
+              downloadType: 'specific'
+              artifactName: '$(DEV_IOS_ARTIFACT)'
+              downloadPath: '$(Pipeline.Workspace)/ios-demo-artifact'
+
+          - script: |
+              set -euo pipefail
+              AAB_PATH=$(find "$(Pipeline.Workspace)/android-demo-artifact" -type f -name "*.aab" | head -n 1)
+              IPA_PATH=$(find "$(Pipeline.Workspace)/ios-demo-artifact" -type f -name "*.ipa" | head -n 1)
+              if [ -z "$AAB_PATH" ]; then
+                echo '❌ Missing Android AAB artifact after download.'
+                find "$(Pipeline.Workspace)/android-demo-artifact" -type f | sort
+                exit 1
+              fi
+              if [ -z "$IPA_PATH" ]; then
+                echo '❌ Missing iOS IPA artifact after download.'
+                find "$(Pipeline.Workspace)/ios-demo-artifact" -type f | sort
+                exit 1
+              fi
+              echo "##vso[task.setvariable variable=AAB_FILE_PATH]$AAB_PATH"
+              echo "##vso[task.setvariable variable=IPA_FILE_PATH]$IPA_PATH"
+              DEMO_VERSION_CODE=$((ANDROIDVERSIONCODE + 1))
+              echo "##vso[task.setvariable variable=DEMO_VERSION_CODE]$DEMO_VERSION_CODE"
+              echo "AAB_PATH=$AAB_PATH"
+              echo "IPA_PATH=$IPA_PATH"
+              echo "DEMO_VERSION_CODE=$DEMO_VERSION_CODE"
+            displayName: 'Resolve artifact paths and demo version code'
+            env:
+              ANDROIDVERSIONCODE: $(androidVersionCode)
+
+          - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
+            displayName: 'Publish AAB to Play Store Internal Testing'
+            condition: eq('${{ parameters.deployToInternalTesting }}', 'true')
+            inputs:
+              serviceConnection: 'PlaystoreRessiConnection'
+              applicationId: 'com.sparklight'
+              action: 'SingleBundle'
+              bundleFile: '$(AAB_FILE_PATH)'
+              track: 'internal'
+              releaseName: 'MySparklight Residential $(androidVersionName)'
+              changeLogFile: '$(Build.ArtifactStagingDirectory)/play-release-notes.txt'
+
+          - task: DownloadSecureFile@1
+            name: ascApiKey
+            displayName: 'Download App Store Connect API key (.p8)'
+            inputs:
+              secureFile: '$(IOS_ASC_API_KEY_SECUREFILE)'
+
+          - script: |
+              set -euo pipefail
+              IPA_PATH='$(IPA_FILE_PATH)'
+              if [ -z "$IPA_PATH" ]; then
+                echo '❌ IPA_PATH not set'
+                exit 1
+              fi
+              KEY_PATH="$(ascApiKey.secureFilePath)"
+              KEY_FILE_NAME="AuthKey_$(IOS_ASC_API_KEY_ID).p8"
+              mkdir -p "$HOME/private_keys" "$HOME/.private_keys" "$HOME/.appstoreconnect/private_keys" "$(Agent.TempDirectory)/private_keys"
+              cp "$KEY_PATH" "$HOME/private_keys/$KEY_FILE_NAME"
+              cp "$KEY_PATH" "$HOME/.private_keys/$KEY_FILE_NAME"
+              cp "$KEY_PATH" "$HOME/.appstoreconnect/private_keys/$KEY_FILE_NAME"
+              cp "$KEY_PATH" "$(Agent.TempDirectory)/private_keys/$KEY_FILE_NAME"
+              echo "Uploading $IPA_PATH to TestFlight..."
+              xcrun altool --upload-app --type ios --file "$IPA_PATH" --apiKey "$(IOS_ASC_API_KEY_ID)" --apiIssuer "$(IOS_ASC_API_ISSUER_ID)" --show-progress
+              echo "✅ IPA submitted to App Store Connect / TestFlight"
+            displayName: 'Upload IPA to TestFlight'
+            condition: eq('${{ parameters.deployToTestFlight }}', 'true')
+
+          - script: |
+              python3 - <<'PYEOF'
+              import os, smtplib
+              from email.mime.text import MIMEText
+              from email.mime.multipart import MIMEMultipart
+
+              smtp_server = os.environ.get('SMTP_SERVER', '').strip()
+              smtp_port = int(os.environ.get('SMTP_PORT', '587') or '587')
+              smtp_user = os.environ.get('SMTP_USERNAME', '').strip()
+              smtp_pass = os.environ.get('SMTP_PASSWORD', '').strip()
+              recipients = [r.strip() for r in os.environ.get('DEMO_NOTIFICATION_EMAILS', '').split(',') if r.strip()]
+
+              if not smtp_server or not smtp_user or not smtp_pass or not recipients:
+                  print('Email notification skipped: SMTP credentials or notification recipients not configured.')
+                  exit(0)
+
+              msg = MIMEMultipart('alternative')
+              msg['From'] = smtp_user
+              msg['To'] = ', '.join(recipients)
+              msg['Subject'] = '[MySparklight] Demo promotion deployment successful'
+
+              body_text = f"""MySparklight Residential - Demo deployment completed successfully.
+
+              Version Code: {os.environ.get('DEMO_VERSION_CODE', 'N/A')}
+              Android Version: {os.environ.get('ANDROID_VERSION_NAME', 'N/A')}
+              Build Number: {os.environ.get('DEMO_VERSION_CODE', 'N/A')}
+              Branch: {os.environ.get('BUILD_BRANCH', 'Demo')}
+              Commit: {os.environ.get('BUILD_COMMIT', '')}
+              """
+
+              body_html = f"""<html><body>
+              <h2>Demo promotion deployment successful</h2>
+              <p>Play Store and TestFlight deployment completed.</p>
+              <table style='border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;'>
+                <tr><td style='padding:4px 12px;font-weight:bold;'>Branch</td><td style='padding:4px 12px;'>{os.environ.get('BUILD_BRANCH', 'Demo')}</td></tr>
+                <tr style='background:#f5f5f5;'><td style='padding:4px 12px;font-weight:bold;'>Commit</td><td style='padding:4px 12px;'>{os.environ.get('BUILD_COMMIT', '')}</td></tr>
+                <tr><td style='padding:4px 12px;font-weight:bold;'>Version Code</td><td style='padding:4px 12px;'>{os.environ.get('DEMO_VERSION_CODE', 'N/A')}</td></tr>
+              </table>
+              </body></html>"""
+
+              msg.attach(MIMEText(body_text, 'plain'))
+              msg.attach(MIMEText(body_html, 'html'))
+
+              with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+                  server.ehlo()
+                  server.starttls()
+                  server.ehlo()
+                  server.login(smtp_user, smtp_pass)
+                  server.sendmail(smtp_user, recipients, msg.as_string())
+
+              print('Demo promotion completion email sent to: ' + ', '.join(recipients))
+              PYEOF
+            displayName: 'Send demo promotion completion email'
+            env:
+              SMTP_SERVER: $(SMTP_SERVER)
+              SMTP_PORT: $(SMTP_PORT)
+              SMTP_USERNAME: $(SMTP_USERNAME)
+              SMTP_PASSWORD: $(SMTP_PASSWORD)
+              DEMO_NOTIFICATION_EMAILS: $(DEMO_NOTIFICATION_EMAILS)
+              BUILD_BRANCH: $(Build.SourceBranchName)
+              BUILD_COMMIT: $(Build.SourceVersion)
+              ANDROID_VERSION_NAME: $(androidVersionName)
+              DEMO_VERSION_CODE: $(DEMO_VERSION_CODE)
+            continueOnError: true
+
   - stage: UnitTests
     displayName: 'Unit Tests'
     dependsOn: InitialCommit
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'Demo'))
     jobs:
       - job: RunAndroidUnitTests
         displayName: 'Run Android Unit Tests'
@@ -233,7 +499,7 @@ stages:
   - stage: SecurityAndQuality
     displayName: 'Security & Code Quality'
     dependsOn: UnitTests
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'Demo'))
     jobs:
       # -------- Job 1: Lint Quality Checks --------
       - job: LintQualityChecks
@@ -618,7 +884,7 @@ stages:
   - stage: Build
     displayName: 'Android Build'
     dependsOn: SecurityAndQuality
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'Demo'))
     jobs:
       - job: BuildAndroid
         displayName: 'Build Android App Bundle'
@@ -715,7 +981,7 @@ stages:
   - stage: IOSBuild
     displayName: 'iOS Build'
     dependsOn: SecurityAndQuality
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'Demo'))
     jobs:
       - job: RunIOSBuild
         displayName: 'Build iOS IPA (Xcode Archive)'
@@ -995,7 +1261,7 @@ stages:
     dependsOn:
       - Build
       - IOSBuild
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'Demo'))
     jobs:
       - job: CodeReviewGates
         displayName: 'Code Review Quality Gates'
@@ -1029,7 +1295,7 @@ stages:
   - stage: IOSStaging
     displayName: 'iOS Staging'
     dependsOn: CodeReview
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'Demo'))
     jobs:
       - job: PrepareIOSStaging
         displayName: 'Validate IPA for Staging'
@@ -1061,7 +1327,7 @@ stages:
   - stage: AndroidStaging
     displayName: 'Android Staging'
     dependsOn: CodeReview
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'Demo'))
     jobs:
       - job: PrepareAndroidStaging
         displayName: 'Validate Android AAB for Staging'
@@ -1095,7 +1361,7 @@ stages:
   - stage: IOSTestFlight
     displayName: 'iOS TestFlight'
     dependsOn: IOSStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo')))
+    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: IOSTestFlightStage
         displayName: 'Upload IPA to TestFlight'
@@ -1238,7 +1504,7 @@ stages:
   - stage: InternalTestingDeployment
     displayName: 'Internal Testing Android'
     dependsOn: AndroidStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo')))
+    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Demo'), eq(variables['Build.SourceBranchName'], 'Demo'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Demo'), eq(variables['System.PullRequest.TargetBranch'], 'Demo'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: DeployToInternalTesting
         displayName: 'Deploy to Play Store Internal Testing'

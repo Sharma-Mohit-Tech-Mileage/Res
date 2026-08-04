@@ -270,7 +270,7 @@ describe('AccountOverview behavior', () => {
       name: 'Terms & Conditions',
     });
     expect(mockNavigate).toHaveBeenCalledWith('ArticleWindowUtility', {
-      url: 'https://support.sparklight.com/hc/en-us/articles/30298585161879-MySparklight-Business-App-Release-Notes?isMobile=true',
+      url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true',
       name: 'App Release Notes',
     });
   });

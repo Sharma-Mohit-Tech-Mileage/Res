@@ -101,11 +101,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "black",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   message: {
     color: colors.darkest_grey,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 24,
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   alertTitle: {
     color: colors.black,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     textAlign:'center',
     fontWeight: "400",
@@ -151,14 +151,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 8,
     fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   closeAlertTxt: {
     color: colors.sparklight_purple_blue,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
 });
 

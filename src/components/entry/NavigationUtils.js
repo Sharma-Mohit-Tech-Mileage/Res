@@ -69,7 +69,6 @@ export const NavigationUtils = {
           break;
           
         case 'email':
-          return 'EntryEmailNotifications';
           if (isAdmin) continue;
           
           const needsEmail = await NavigationUtils.checkEmailNotificationNeeded(accountNumber);

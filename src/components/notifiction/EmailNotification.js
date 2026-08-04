@@ -6,7 +6,6 @@ import { A11Y } from "../../styles/theme";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { requiredField } from "../../styles/utilities";
 import SparklightCheckBox from "../common/customui/SparklightCheckBox";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from "../common/Toggle";
@@ -24,6 +23,7 @@ import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import { A11y } from "react-native-a11y-order";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import AppStyles from "../../styles/AppStyles";
+import Alerttriangle from "../../res/svgIcons/AlertIcon";
 import {
   HintText,
   IndicatorText,
@@ -300,7 +300,7 @@ const AddNotificationScreen = () => {
               <Animated.View
                 style={{
                   transform: [{ translateY }],
-                  paddingHorizontal: Padding.p_5xl,
+                  paddingHorizontal: Padding.p_xs,
                 }}
                 accessible={false}
                 importantForAccessibility="no"
@@ -320,7 +320,7 @@ const AddNotificationScreen = () => {
               </Animated.View>
             )}
            {
-            <View style={{ paddingHorizontal: Padding.p_5xl }}>
+            <View style={{ paddingHorizontal: Padding.p_xs }}>
               <NotificationAlert
                 type="warning"
                 title={!isEnrolled ? "Critical Notifications" : undefined}
@@ -331,6 +331,8 @@ const AddNotificationScreen = () => {
                 }
                 showCloseIcon={false}
                 isVisible={true}
+                iconComponent={Alerttriangle}
+                iconColor="#F88700"
                 accessibilityLabel="Important: By providing your email address, you're signing up for critical notifications"
                 accessibilityLiveRegion="polite"
                 accessibilityRole="alert"
@@ -341,9 +343,6 @@ const AddNotificationScreen = () => {
             <View
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
-              {isEnrolled && (
-                <SectionTitle style={styles.instructions}>{"Edit Email Address"}</SectionTitle>
-              )}
               <SectionContent style={styles.instructions}>
                 {!isEnrolled
                   ? "Please enter your email address below and stay connected with us."
@@ -351,13 +350,14 @@ const AddNotificationScreen = () => {
               </SectionContent>
 
               <HintText
-               style={{marginTop: 8, marginBottom: 4}}
+               style={styles.requiredFieldsText}
                   accessibilityRole="text" 
                   accessible={true}
                   accessibilityLabel="Fields marked with asterisk are required.">
                 {" "}
                 Fields marked with * are required.
               </HintText>
+              <View style={styles.section}></View>
               <Controller
                 control={control}
                 name="email"
@@ -457,6 +457,8 @@ const AddNotificationScreen = () => {
                 }
                 showCloseIcon={false}
                 isVisible={true}
+                iconComponent={Alerttriangle}
+                iconColor="#F88700"
                 accessibilityLabel="By deactivating paperless billing, you will be charged a $3 paper statement fee where legally permitted."
                 accessibilityLiveRegion="polite"
                 accessibilityRole="alert"
@@ -598,25 +600,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   toggleTitle: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
     color: Color.colorGray_200,
   },
   ErrorToggle: {
     color: Color.sparkLightRed,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     fontSize: 14,
     marginLeft: 4,
   },
   toggleStatus: {
     marginLeft: 4,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: Color.colorGray_200,
   },
   toggleDescription: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_sm,
     color: Color.sparklightDarkGray,
     marginTop: 4,
@@ -646,7 +648,7 @@ const styles = StyleSheet.create({
   },
   checkBoxArea: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     flexWrap: "wrap",
     width: "100%",
     minHeight: A11Y.minTouch,
@@ -658,7 +660,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   termsLinkText: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: "underline",
   },
   checkboxSection: {
@@ -670,10 +672,10 @@ const styles = StyleSheet.create({
   },
   checkboxTouchable: {
     flexDirection: "row",
-    alignItems: "center",
+   
     marginRight: 0,
-    minHeight: A11Y.minTouch,
-    paddingVertical: Padding.p_5xs,
+   
+    paddingVertical: Padding.p_9xs,
     marginLeft: 8,
   },
   termsLinkTouchable: {
@@ -694,6 +696,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexWrap: "wrap",
   },
+   
   errorText: {
     marginLeft: 8,
     color: "red",
@@ -703,6 +706,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     flexDirection: "row",
     alignItems: "center",
+  },
+   requiredFieldsText: {
+    textAlign: "left",
   },
 });
 

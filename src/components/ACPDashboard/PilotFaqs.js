@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   description: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: "#000000",
     fontWeight: "400",
@@ -94,18 +94,19 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: IMAGE_WIDTH,
     // Cap at native asset width (326px) and center so iPad never upscales/blurs.
-    maxWidth: 320,
+    maxWidth: 315,
     alignSelf: "center",
     overflow: "hidden",
   },
   promoImage: {
     width: IMAGE_WIDTH,
-    maxWidth: 320,
+    maxWidth: 315,
     aspectRatio: 1.92,
     alignSelf: "center",
-    borderRadius: Border.br_11xs,
+    borderBottomLeftRadius: Border.br_5xs,
+    borderBottomRightRadius: Border.br_5xs,
     resizeMode: "cover",
   },
 });
-
+   
 export default PilotFaqs;

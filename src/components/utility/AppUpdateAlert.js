@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   },
   message: {
     color: colors.darkest_grey,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 28,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   closeAlertTxt: {
     color: colors.snow_white,
     fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: 'center',
   },
   buttonContainer: {
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
   alertTitle: {
     color: colors.black,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     fontWeight: "600",
     marginLeft: 10,

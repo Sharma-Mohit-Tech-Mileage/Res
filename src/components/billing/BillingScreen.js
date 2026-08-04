@@ -28,7 +28,6 @@ import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Icon from "../common/Icon";
-import Config from "react-native-config";
 import colors from "../../res/Colors";
 import { card } from "../../styles/utilities";
 import {
@@ -237,11 +236,7 @@ const BillingScreen = ({ navigation }) => {
                       minSize={0}
                       style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
                       onPress={() => {
-                        navigation.navigate("ArticleWindowUtility", {
-                          url: `${Config.PORTAL_BASE_URL}/portals/app-secure/billing-payment`,
-                          name: "Manage Payment Method",
-                          injectPaymentObj: true,
-                        });
+                        navigation.navigate("PaymentMethods");
                       }}
                       accessible={true}
                       accessibilityRole="button"
@@ -375,6 +370,7 @@ const styles = StyleSheet.create({
   melissaSmith: {
     width: 210,
     lineHeight: 28,
+    paddingBottom: Padding.p_5xs,
     textAlign: "center",
   },
   rightActionableParent: {

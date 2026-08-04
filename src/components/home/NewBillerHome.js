@@ -439,11 +439,7 @@ const NewBillerHome = ({ navigation }) => {
             buttonVariant={isAutoPayStatus ? "success" : "primary"}
             isActive={isAutoPayStatus}
             onButtonPress={() => {
-              navigation.navigate("ArticleWindowUtility", {
-                url: `${Config.PORTAL_BASE_URL}/portals/app-secure/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
-                name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-                injectPaymentObj: true,
-              });
+              navigation.navigate("BillingTab", { screen: "AutoPay" });
             }}
           />
           <FeatureCard

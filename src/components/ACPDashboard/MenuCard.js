@@ -28,7 +28,7 @@ const MenuCard = ({ item, style }) => {
       accessibilityHint={`Navigate to ${item.title} screen`}
     >
       <View style={styles.content}>
-        <Icon name={item.icon} size={30} color={ Color.sparklightBrightPurple} />
+        <Icon name={item.icon} size={30} color={ Color.sparklightPrimaryPurple} />
         <Text
           style={[
             styles.title,
@@ -60,9 +60,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_lg,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     marginTop: Padding.p_5xs,
     textAlign: 'center',
     fontWeight: '600',

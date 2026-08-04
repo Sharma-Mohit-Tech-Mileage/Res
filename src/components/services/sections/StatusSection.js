@@ -8,6 +8,8 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import AppStyles from "../../../styles/AppStyles";
 
+const MATCHED_CARD_MIN_HEIGHT = 220;
+
 // Sparklight brand purples
 const RING_OUTER = "#ba92bf";
 const RING_MIDDLE = "#9e61a2";
@@ -147,7 +149,7 @@ const StatusSection = ({
 
   return (
     <View style={[styles.container]}>
-      <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
+      <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16, minHeight: MATCHED_CARD_MIN_HEIGHT  }]}>
         {hasUserInitiatedCheck && outageData && (
           <View style={styles.alertInsideCard}>
             <NotificationAlert

@@ -9,7 +9,7 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import { Color, FontSize, FontFamily, Border } from "../../../../GlobalStyles";
+import { Color, FontSize, FontFamily, Border,Padding } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -59,7 +59,7 @@ const TYPE_CONFIG = {
   },
   warning: {
     backgroundColor: "#FFFAEB",
-    borderColor: "#DD6D02",
+    borderColor: "#F88700",
     iconColor: Color.sparkLightInfo,
     textColor: "#000000",
     titleColor: "#000000",
@@ -234,6 +234,8 @@ const NotificationAlert = ({
   autoFocusTitle = false,
   splitKey = "",
   iconRef = null,
+  iconComponent = null,
+  iconColor = null,
   contentStyle = {},
 }) => {
   const dispatch = useDispatch();
@@ -247,7 +249,7 @@ const NotificationAlert = ({
   const internalIconRef = useRef(null);
   
   const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
-  const IconComponent = config.IconComponent;
+  const IconComponent = iconComponent || config.IconComponent;
 
 
   // Aggressively force focus to the success icon on Android after alert is visible
@@ -449,7 +451,7 @@ const NotificationAlert = ({
             accessible={true}
             accessibilityRole="text"
             accessibilityLabel={plainText}
-            style={styles.blockWrapper}
+            style={[styles.blockWrapper, styles.actionableBlock, index === 0 && styles.firstBlock]}
           >
             {hasBoldOnly ? (
               <BannerAlertText>
@@ -614,7 +616,7 @@ const NotificationAlert = ({
           <IconComponent
             width={24}
             height={24}
-            color={config.iconColor}
+            color={iconColor || config.iconColor}
             accessible={false}
           />
         </View>
@@ -622,15 +624,15 @@ const NotificationAlert = ({
        
         <View 
           ref={contentRef}
-          style={[styles.content, contentStyle]}
+          style={[styles.content, !showCloseIcon && styles.contentNoClose]}
           accessible={false}
           importantForAccessibility="yes"
         >
 
           {title && (
             <A11y.Index index={1}>
-            <View accessible={true} accessibilityRole="header">
-              <FieldTitle ref={titleRef} 
+            <View ref={titleRef} accessible={true} accessibilityRole="header">
+              <FieldTitle
               style={[ { color: config.titleColor }]}
               accessible={true}
               accessibilityRole="header" accessibilityLevel={2}
@@ -691,8 +693,10 @@ const NotificationAlert = ({
 const styles = StyleSheet.create({
   outer: {
     position: "relative",
+    width: "100%",
   },
   container: {
+    flex: 1,
     flexDirection: "row",
     padding: 16,
     borderWidth: 1,
@@ -702,7 +706,7 @@ const styles = StyleSheet.create({
   },
   iconWrapper: {
     marginTop: 1,
-    marginEnd: 10,
+    marginEnd: 4,
   },
   iconWithoutTitle: {
     marginTop: 10,
@@ -712,13 +716,20 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     paddingRight: 32,
   },
+    contentNoClose: {
+    paddingRight: 0,
+  },
   title: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.interBold,
+    fontFamily: FontFamily.RadioCanadaBold,
     fontWeight: "700",
   },
   blockWrapper: {
     marginTop: 8,
+  },
+  firstBlock: {
+    marginTop: 4,
+    marginBottom: 4,
   },
   // Inline actionable links keep natural text height; hitSlop provides 48dp tap target (WCAG 2.5.5 inline-text exception).
   actionableBlock: {
@@ -727,15 +738,15 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   styledText: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
     textDecorationLine: "underline",
   },
   boldText: {
-    fontFamily: FontFamily.openSansBold || FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.openSansBold || FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
   },
   resendButton: {

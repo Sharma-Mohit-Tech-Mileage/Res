@@ -40,6 +40,8 @@ import {
   FieldContent,
   Hyperlink,
 } from "../common/customui/Typography";
+import { A11y } from "react-native-a11y-order";
+import AddIcon from "../../res/svgIcons/AddIcon";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -350,19 +352,14 @@ const ProfileSettings = () => {
                     <View style={styles.profileFieldSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  emailAddress && (
-                    <View
-                      style={styles.editableRow}
-                      accessible={false}
-                      importantForAccessibility="no"
-                    >
-                      <View
-                        style={[
+                  
+                    <A11y.Order style={styles.editableRow}>
+                      <A11y.Index index={0} style={[
                           styles.editableContent,
                           { marginBottom: Padding.p_9xs },
-                        ]}
-                        accessible={false}
-                        importantForAccessibility="no"
+                        ]}>
+                      <View
+                        
                       >
                         <FieldTitle
                           style={styles.firstName}
@@ -372,27 +369,33 @@ const ProfileSettings = () => {
                         >
                           Email Address
                         </FieldTitle>
+                    
                         <FieldContent
                           style={[styles.melissa, styles.melissaTypo]}
                           accessible={true}
                           accessibilityRole="text"
                           accessibilityLabel={`Email Address: ${
-                            emailAddress || "N/A"
+                            emailAddress || "No email address on file."
                           }`}
                         >
-                          {emailAddress || "N/A"}
+                          {emailAddress || "No email address on file."}
                         </FieldContent>
                       </View>
+                      </A11y.Index>
+                      <A11y.Index index={1}>
                       <Touchable
                         style={styles.editButton}
                         onPress={() => handleArrowPress("email")}
-                        accessibilityLabel="Edit email address"
-                        accessibilityHint="Double tap to edit your email address"
+                        accessibilityRole="button"
+                        accessibilityLabel=
+                        {emailAddress ? "Edit email address" : "Add email address"}
+                        accessibilityHint={emailAddress ? "Double tap to edit your email address" : "Double tap to add your email address"}
                       >
-                        <EditIcon />
+                       { emailAddress ? <EditIcon /> : <AddIcon /> }
                       </Touchable>
-                    </View>
-                  )
+                      </A11y.Index>
+                    </A11y.Order>
+                  
                 )}
 
                 {showPhoneLoading ? (
@@ -400,19 +403,14 @@ const ProfileSettings = () => {
                     <View style={styles.profileFieldSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  phoneNumber && (
-                    <View
-                      style={[styles.editableRow,{ marginBottom: Padding.p_9xs }]}
-                      accessible={false}
-                      importantForAccessibility="no"
-                    >
+                  
+                    <A11y.Order style={[styles.editableRow, { marginBottom: Padding.p_9xs }]}> 
+                      <A11y.Index index={0}>
                       <View
                         style={[
                           styles.editableContent,
                           { marginBottom: Padding.p_9xs },
                         ]}
-                        accessible={false}
-                        importantForAccessibility="no"
                       >
                         <FieldTitle
                           style={styles.firstName}
@@ -432,22 +430,28 @@ const ProfileSettings = () => {
                               ? numberToWordsForAccessibility(
                                   phoneNumber.toString(),
                                 )
-                              : "N/A"
+                              : "No phone number on file."
                           }`}
+                          accessibilityHint={phoneNumber ? "Double tap to edit your mobile number" : "Double tap to add your mobile number"}
                         >
-                          {phoneNumber || "N/A"}
+                          {phoneNumber || "No phone number on file."}
                         </FieldContent>
                       </View>
+                      </A11y.Index>
+                      <A11y.Index index={1}>
                       <Touchable
                         style={styles.editButton}
                         onPress={() => handleArrowPress("mobile")}
+                        accessibilityRole="button"
                         accessibilityLabel="Edit mobile number"
                         accessibilityHint="Double tap to edit your mobile number"
                       >
-                        <EditIcon />
+                        { phoneNumber ? <EditIcon /> : <AddIcon /> }
                       </Touchable>
-                    </View>
-                  )
+
+                    </A11y.Index>
+                    </A11y.Order>
+                  
                 )}
               </View>
             </View>
@@ -538,9 +542,9 @@ const ProfileSettings = () => {
                 // Show reconnect message, no link
                 Platform.OS === "android" ? (
                   <View style={{ marginTop: 20 }}>
-                    <Text style={styles.manageSerTxt1}>
+                    <FieldContent style={styles.manageSerTxt1}>
                       To reconnect your service, please call us at{" "}
-                      <Text
+                      <FieldContent
                         style={styles.manageSerTxt2}
                         onPress={() => makeCall("833-807-1020")}
                         accessibilityRole="link"
@@ -548,16 +552,16 @@ const ProfileSettings = () => {
                         accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
                         <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
-                        <Text
+                        <FieldContent
                           style={styles.manageSerTxt3}
                           accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                           accessible={true}
                           importantForAccessibility="yes"
                         >
                           {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                        </Text>
-                      </Text>
-                    </Text>
+                        </FieldContent>
+                      </FieldContent>
+                    </FieldContent>
                   </View>
                 ) : (
                   <View
@@ -568,10 +572,10 @@ const ProfileSettings = () => {
                       marginTop: 20,
                     }}
                   >
-                    <Text style={styles.manageSerTxt1}>
+                    <FieldContent style={styles.manageSerTxt1}>
                       To reconnect your service, please call us at{" "}
-                    </Text>
-                    <Text
+                    </FieldContent>
+                    <FieldContent
                       style={styles.manageSerTxt2}
                       onPress={() => makeCall("833-807-1020")}
                       accessibilityRole="link"
@@ -579,22 +583,22 @@ const ProfileSettings = () => {
                       accessibilityHint="Double tap to call customer service 833 807 1020"
                     >
                       <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
-                      <Text
+                      <FieldContent
                         style={styles.manageSerTxt3}
                         accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                       >
                         {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                      </Text>
-                    </Text>
+                      </FieldContent>
+                    </FieldContent>
                   </View>
                 )
               ) : (
                 <>
                   {Platform.OS === "android" ? (
                     <View style={{ marginTop: 20 }}>
-                      <Text style={styles.manageSerTxt1}>
+                      <FieldContent style={styles.manageSerTxt1}>
                         To cancel or change service, please call us at{" "}
-                        <Text
+                        <FieldContent
                           style={styles.manageSerTxt2}
                           onPress={() => makeCall("833-807-1020")}
                           accessibilityRole="link"
@@ -602,16 +606,16 @@ const ProfileSettings = () => {
                           accessibilityHint="Double tap to call customer service 833 807 1020"
                         >
                           <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
-                          <Text
+                          <FieldContent
                             style={styles.manageSerTxt3}
                             accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                             accessible={true}
                             importantForAccessibility="yes"
                           >
                             {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                          </Text>
-                        </Text>
-                      </Text>
+                          </FieldContent>
+                        </FieldContent>
+                      </FieldContent>
                     </View>
                   ) : (
                     <View
@@ -622,10 +626,10 @@ const ProfileSettings = () => {
                         marginTop: 20,
                       }}
                     >
-                      <Text style={styles.manageSerTxt1}>
+                      <FieldContent style={styles.manageSerTxt1}>
                         To cancel or change service, please call us at{" "}
-                      </Text>
-                      <Text
+                      </FieldContent>
+                      <FieldContent
                         style={styles.manageSerTxt2}
                         onPress={() => makeCall("833-807-1020")}
                         accessibilityRole="link"
@@ -633,13 +637,13 @@ const ProfileSettings = () => {
                         accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
                         <Hyperlink style={styles.phoneLinkText}>833-807-1020</Hyperlink>
-                        <Text
+                        <FieldContent
                           style={styles.manageSerTxt3}
                           accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                         >
                           {" Monday-Friday 9:00 AM-6:00 PM CST."}
-                        </Text>
-                      </Text>
+                        </FieldContent>
+                      </FieldContent>
                     </View>
                   )}
                 </>
@@ -657,7 +661,7 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     lineHeight: 28,
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttonsLayout: {
     paddingHorizontal: Padding.p_base,
@@ -693,7 +697,7 @@ const styles = StyleSheet.create({
   makePayment: {
     textAlign: "center",
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttons: {
     marginLeft: Padding.p_3xs,
@@ -746,7 +750,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Color.success700,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     textAlign: "center",
   },
   badge: {
@@ -798,27 +802,18 @@ const styles = StyleSheet.create({
     marginTop: -15,
   },
   manageSerTxt1: {
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "400",
-    fontSize: FontSize.size_base,
     textAlign: "left",
-    color: "#000000",
+    lineHeight: 20,
     marginTop: 5,
   },
   manageSerTxt2: {
-    fontFamily: FontFamily.openSansSemiBold,
-    color: Color.colorMidnightblue,
-    fontWeight: "700",
-    fontSize: FontSize.size_base,
+    lineHeight: 20,
   },
   phoneLinkText: {
     textDecorationLine: "underline",
   },
   manageSerTxt3: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    color: Color.colorGray_100,
-    fontWeight: "400",
+    lineHeight: 20,
   },
 });
 

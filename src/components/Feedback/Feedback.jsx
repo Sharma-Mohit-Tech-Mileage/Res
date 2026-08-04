@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { AccessibilityInfo } from "react-native";
+import { AccessibilityInfo, findNodeHandle } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
@@ -52,6 +52,7 @@ const Feedback = () => {
   const announcementTimerRef = useRef(null);
   const emailFieldRef = useRef(null);
   const feedbackTextRef = useRef(null);
+  const surveyErrorRef = useRef(null);
 
   const {
     control,
@@ -79,6 +80,18 @@ const Feedback = () => {
     isSubmittingRef.current = false;
     setIsSubmitting(false);
 
+    // Priority 1: Additional Feedback must be announced/focused first.
+    if (fieldErrors.feedbackText) {
+      scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+      setTimeout(() => {
+        feedbackTextRef.current?.focus();
+        AccessibilityInfo.announceForAccessibility(
+          fieldErrors.feedbackText?.message || "Additional feedback is required"
+        );
+      }, 400);
+      return;
+    }
+
     if (fieldErrors.cosentContactUs) {
       setIsError(true);
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
@@ -86,15 +99,38 @@ const Feedback = () => {
     }
 
     // Scroll to and focus the first field with an error so inline error is visible
-    if (fieldErrors.areaOfConcern || fieldErrors.feedbackText) {
+    if (fieldErrors.areaOfConcern) {
       scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-      if (fieldErrors.feedbackText) {
-        setTimeout(() => feedbackTextRef.current?.focus(), 400);
-      }
     } else if (fieldErrors.feedbackEmail) {
       emailFieldRef.current?.focus();
     }
   };
+
+  useEffect(() => {
+    // Only announce consent error when Additional Feedback is already valid.
+    if (errors.feedbackText) {
+      return;
+    }
+
+    if (!errors.cosentContactUs && !isError) {
+      return;
+    }
+
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+
+    const timer = setTimeout(() => {
+      const handle = findNodeHandle(surveyErrorRef.current);
+      if (handle) {
+        AccessibilityInfo.setAccessibilityFocus(handle);
+      }
+
+      AccessibilityInfo.announceForAccessibility(
+        errors.cosentContactUs?.message || "Please choose Yes or No to contact you."
+      );
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [errors.cosentContactUs, isError]);
 
   const handleRatingSelect = (option) => {
     if (isSubmittingRef.current) return;
@@ -305,16 +341,22 @@ const Feedback = () => {
 
 
 
-          <View style={{ paddingHorizontal: 16, paddingTop: 8}}>
-
+          <View style={{ paddingHorizontal: 16, paddingTop: 8}}
+         
+         
+          >
+             <View ref={surveyErrorRef} accessible={true}
+              >
               <FieldTitle
+               
                 style={[
                   (isError || errors.cosentContactUs) && styles.optionTxtError,
                 ]}
-              accessibilityLabel={"May Sparklight contact you about your feedback? Required"}
+              accessibilityLabel={isError ? "Please choose Yes or No to contact you." : "May Sparklight contact you about your feedback? Required"}
               >
               May Sparklight contact you about your feedback? *
               </FieldTitle>
+              </View>
               <Radio.Group
                 name="surveyOptions"
                 value={selectedOption}
@@ -380,6 +422,7 @@ const Feedback = () => {
               </Radio.Group>
               {(isError || errors.cosentContactUs) && (
                 <View
+                  
                   style={styles.errorContainer}
                   accessible={true}
                   accessibilityLabel="Please choose Yes or No to contact you."
@@ -483,12 +526,12 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 22,
     lineHeight: 28,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.gray600,
   },
   requiredFieldsText: {
     fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.gray600,
     marginTop: Padding.p_base,
     textAlign: "left",
@@ -507,7 +550,7 @@ const styles = StyleSheet.create({
   },
   charCount: {
     textAlign: "right",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "400",
     color: Color.sparklightDarkGray,
     fontSize: FontSize.size_xs,
@@ -519,7 +562,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
   },
   submitButton: {
-    backgroundColor: Color.sparklightBrightPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
     padding: Padding.p_base,
     borderRadius: Border.br_11xs,
     alignItems: "center",
@@ -536,7 +579,7 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: Color.sparklightWhite,
     textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     fontWeight: "600",
     lineHeight: 20,
@@ -549,7 +592,7 @@ const styles = StyleSheet.create({
   cancelText: {
     color: Color.colorMidnightblue,
     textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     fontWeight: "600",
     lineHeight: 20,
@@ -567,7 +610,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     marginTop: Padding.p_5xs,
   },optionTxt: {
     fontSize: FontSize.size_base,

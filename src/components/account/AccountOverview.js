@@ -20,7 +20,7 @@ import { logout } from 'react-native-app-auth';
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import Config from "react-native-config";
-import { MenuText, HeadingH1 } from "../common/customui/Typography";
+import { MenuText, HeadingH1,Hyperlink } from "../common/customui/Typography";
 import AppStyles from "../../styles/AppStyles";
 
 import PrimaryButton from "../common/customui/PrimaryButton";
@@ -224,7 +224,7 @@ const AccountOverview = () => {
                         {item.name}
                       </MenuText>
                       {/* Chevron/Arrow icon */}
-                      <View style={[{ marginLeft: 10 }, styles.rightIconLayout]}>
+                        <View style={styles.rightIconLayout}>
                           <RightIcon />
                           </View>
                     </Touchable>
@@ -251,9 +251,9 @@ const AccountOverview = () => {
                   style={[styles.footerLink, styles.buttonsSpaceBlock]}
                   onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
                 >
-                  <Text accessibilityLabel="Privacy Policy" style={styles.linkStyle}>
+                  <Hyperlink accessibilityLabel="Privacy Policy" >
                     Privacy Policy
-                  </Text>
+                  </Hyperlink>
                 </Touchable>
 
                 <Text style={styles.separator} accessible={false}> | </Text>
@@ -266,24 +266,24 @@ const AccountOverview = () => {
                   style={[styles.footerLink, styles.buttonsSpaceBlock]}
                   onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://business.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}
                 >
-                  <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle}>
+                  <Hyperlink accessibilityLabel="Terms & Conditions" >
                     Terms & Conditions
-                  </Text>
+                  </Hyperlink>
                 </Touchable>
               </View>
 
             </View>
               <Touchable
               minSize={0}
-              onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30298585161879-MySparklight-Business-App-Release-Notes?isMobile=true', name: 'App Release Notes' })}
+              onPress={() => navigation.navigate('ArticleWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true', name: 'App Release Notes' })}
               accessibilityLabel={'Version '+VersionCheck.getCurrentVersion()}
               accessibilityRole="link"
               hitSlop={A11Y.hitSlop}
                 style={[styles.footerLink, styles.buttonsSpaceBlock]}
             >
-              <Text style={{ color: Color.sparklightBrightPurple, alignSelf: 'center', textDecorationLine: 'underline',fontWeight: '600' }}>
-                Version:{VersionCheck.getCurrentVersion()}
-              </Text>
+              <Hyperlink >
+                Version: {VersionCheck.getCurrentVersion()}
+              </Hyperlink>
             </Touchable>
             <Text style={styles.copyright}>
                 {`©${moment().year()} Cable One, Inc. All rights reserved.`}
@@ -315,12 +315,12 @@ const styles = StyleSheet.create({
   },
   accept: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     color: Color.sparklightWhite,
   }, copyright: {
     marginTop:wp("25%"),
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     textAlign: "center",
     fontWeight: "400",
@@ -336,19 +336,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xs,
   },
   linkStyle: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: 'underline',
     alignSelf: 'center',
     fontWeight: '600'
   },
   separator: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     alignSelf: 'center',
+    fontFamily: FontFamily.RadioCanadaBold,
     fontWeight: '600'
   },
   makePaymentTypo: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -360,7 +361,8 @@ const styles = StyleSheet.create({
   rightIconLayout: {
     height: 24,
     width: 24,
-    marginTop:12
+    justifyContent: "center",
+    alignItems: "center",
   },
   leftIconLayout: {
     height: 28,
@@ -399,7 +401,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "600",
     color: Color.sparklightWhite,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
   },
 
   melissaSmith: {
@@ -423,6 +425,7 @@ const styles = StyleSheet.create({
   rightActionableGroup: {
     paddingVertical: Padding.p_base,
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: Padding.p_5xl,
   },
   frameChild: {

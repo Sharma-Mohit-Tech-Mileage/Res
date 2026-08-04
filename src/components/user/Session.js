@@ -72,7 +72,11 @@ export const RefreshToken = async () => {
       const user = await getUser();
       if (!user?.refreshToken) throw new Error("No refresh token in storage");
 
-      const result = await refresh(config, { refreshToken: user.refreshToken });
+      // Native refresh can hang; unresolved _refreshPromise deadlocks the 401 queue and every skeleton behind it
+      const result = await Promise.race([
+        refresh(config, { refreshToken: user.refreshToken }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("REFRESH_NATIVE_TIMEOUT")), 25000)),
+      ]);
 
       const data = {
         idToken: result.idToken,

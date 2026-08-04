@@ -162,7 +162,7 @@ const SparklightMobileInput = React.forwardRef(({
               isFocused && error != undefined
                 ? "red"
                 : isFocused
-                ? Color.sparklightBrightPurple
+                ? Color.sparklightPrimaryPurple
                 : Color.sparklightDarkGray,
           },
         ]}
@@ -193,7 +193,7 @@ const SparklightMobileInput = React.forwardRef(({
               borderColor: error
                 ? "red"
                 : isFocused
-                ? Color.sparklightBrightPurple
+                ? Color.sparklightPrimaryPurple
                 : Color.sparklightDarkGray,
             },
           ]}
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     height: 48,
     color: Color.colorGray_200,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     borderRadius: Border.br_11xs,
     paddingHorizontal: 10,
     flex: 1,
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   disabledInput: {
     backgroundColor: Color.Gray300,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     textAlign: "left",
     color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     marginBottom: Padding.p_5xs,
     alignSelf: "stretch",

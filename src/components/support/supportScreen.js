@@ -3,10 +3,6 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  Linking,
-  Platform,
-  Text,
-  RefreshControl,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useSelector } from "react-redux";
@@ -21,16 +17,9 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { useAnnouncement } from '../../hooks/useAnnouncement';
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
-import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
-import {
-  startChatWithConfig,
-  startChat,
-} from "../utility/RNZendeskChat";
-import base64 from "react-native-base64";
+
 import CustomerErrorPage from "../utility/SystemErrorPopup";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 import RighIcon from "../../../assets/svgs/Chevonright";
 import Searchmd from "../../../assets/svgs/Searchmd";
@@ -262,13 +251,14 @@ const Support = ({ route }) => {
                         justifyContent: "space-between",
                         alignItems: "center",
                         width: "100%",
+                        paddingRight: Padding.p_5xl,
                         marginTop: Padding.p_3xs,
                       }}
                     >
                       <MenuText
                         style={[
                           styles.textTypoRight,
-                          { paddingVertical: Padding.p_xs, paddingHorizontal: Padding.p_base },
+                          { paddingVertical: Padding.p_xs, paddingHorizontal: Padding.p_5xl },
                         ]}
                       >
                         {"Sparklight Customer Support"}
@@ -308,6 +298,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     height: "100%",
+    width: "100%",
+    paddingLeft: Padding.p_5xl,
+    paddingRight: Padding.p_5xl,
   },
   textTypoRight: {
     lineHeight: 20,
@@ -316,8 +309,8 @@ const styles = StyleSheet.create({
     width: 24,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: Padding. p_13xl,
-  },
+    marginRight: 0,
+  }, 
   frameChild: {
     paddingHorizontal: Padding.p_5xl,
     height: 1,
@@ -330,7 +323,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   iconLeft: {
-    marginLeft: Padding.p_xs,
+    marginRight: Padding.p_3xs,
   },
   iconRight: {
     marginRight: Padding.p_5xs,
@@ -357,7 +350,7 @@ const styles = StyleSheet.create({
     textAlign: "auto",
     color: Color.colorGray_100,
     fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     flex: 1,
   },
   featuredIcon: {
@@ -389,7 +382,7 @@ const styles = StyleSheet.create({
   },
   searchChild: {
     flex: 1,
-    paddingHorizontal: Padding.p_base,
+    paddingHorizontal: 0,
     paddingVertical: Padding.p_base,
   },
   search: {

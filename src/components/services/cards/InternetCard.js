@@ -7,6 +7,9 @@ import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import {SectionTitle} from "../../common/customui/Typography";
 import AppStyles from "../../../styles/AppStyles";
+import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
+import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
+
 
 const SpeedBanner = ({ downloadSpeed, uploadSpeed }) => (
   <View style={styles.speedBanner}>
@@ -19,7 +22,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed }) => (
       <Text style={styles.speedHeroValue}>{downloadSpeed || '--'}</Text>
       <Text style={styles.speedHeroUnit}>Mbps</Text>
       <View style={styles.speedTagRow}>
-        <Text style={styles.speedTagArrow}>{"↓ "}</Text>
+        <DownloadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
         <Text style={styles.speedTagText}>Download</Text>
       </View>
     </View>
@@ -36,7 +39,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed }) => (
       <Text style={styles.speedHeroValue}>{uploadSpeed || '--'}</Text>
       <Text style={styles.speedHeroUnit}>Mbps</Text>
       <View style={styles.speedTagRow}>
-        <Text style={styles.speedTagArrow}>{"↑ "}</Text>
+        <UploadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
         <Text style={styles.speedTagText}>Upload</Text>
       </View>
     </View>
@@ -69,7 +72,7 @@ const InternetCard = ({
   if (loading) {
     return (
       <View style={styles.container}>
-        <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
+        <View style={[styles.card, styles.cardSpacing1]}>
           <SkeletonPlaceholder
             backgroundColor={theme.colors.skeleton.base}
             highlightColor={theme.colors.skeleton.highlight}
@@ -91,7 +94,7 @@ const InternetCard = ({
 
   return (
     <View style={styles.container}>
-      <View style={[AppStyles.card,{marginHorizontal: 16}]}>
+      <View style={[styles.card, styles.cardSpacing]}>
         {/* Header */}
         <View style={styles.cardHreader}>
           {/*<View
@@ -208,7 +211,16 @@ const InternetCard = ({
 
 const styles = StyleSheet.create({
   container: serviceCard.container,
-  card: AppStyles.card,
+   card: {
+    ...AppStyles.card,
+  },
+  cardSpacing: {
+    marginHorizontal: 16,
+  },
+  cardSpacing1: {
+    padding: 16,
+    marginHorizontal: 16,
+  },
   bottomButton: serviceCard.bottomButton,
   serviceHeader: serviceCard.serviceHeader,
   iconWrapper: serviceCard.iconWrapper,
@@ -263,9 +275,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 4,
   },
-  speedTagArrow: {
+speedTagArrow: {
     fontSize: theme.typography.size.xs,
     fontWeight: "700",
+    marginRight: 4,
     color: theme.colors.primary,
   },
   speedTagText: {

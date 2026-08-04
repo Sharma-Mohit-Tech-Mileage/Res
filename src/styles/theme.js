@@ -8,7 +8,7 @@ import {
 
 export const theme = {
   colors: {
-    primary: Color.sparklightBrightPurple,
+    primary: Color.sparklightPrimaryPurple,
     primaryLight: "#E6D5F5",
     primaryDark: Color.colorMidnightblue,
     white: Color.sparklightWhite,
@@ -40,7 +40,7 @@ export const theme = {
       success: Color.sparklightGreen,
       error: Color.sparkLightRed,
       warning: Color.sparkLightInfo,
-      info: Color.sparklightBrightPurple,
+      info: Color.sparklightPrimaryPurple,
     },
   },
 
@@ -61,9 +61,9 @@ export const theme = {
   // Typography from GlobalStyles
   typography: {
     family: {
-      regular: FontFamily.openSansRegular,
-      semiBold: FontFamily.openSansSemiBold,
-      bold: FontFamily.openSansSemiBold, // Using semiBold for bold
+      regular: FontFamily.RadioCanadaRegular,
+      semiBold: FontFamily.RadioCanadaSemiBold,
+      bold: FontFamily.RadioCanadaSemiBold, // Using semiBold for bold
     },
     size: {
       xs: FontSize.size_xs, // 12

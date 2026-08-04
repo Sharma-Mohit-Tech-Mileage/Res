@@ -211,14 +211,14 @@ const styles = StyleSheet.create({
     color: Color.sparklightWhite,
     fontSize: FontSize.size_sm,
     fontWeight: "700",
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
   },
   touchableTextContainer: {
     flex: 1,
   },
   reconnectionText: {
     flex: 1,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: Color.colorGray_100,
     lineHeight: 22,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   thankYouText: {
     flex: 1,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: Color.colorGray_100,
     lineHeight: 22,

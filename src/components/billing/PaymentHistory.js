@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     minHeight: A11Y.minTouch,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: Color.colorGray_100,
   },
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   },
   sortText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     marginRight: 1,
   },
@@ -396,13 +396,13 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     fontWeight: "700",
   },
   detailValue: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   loadingContainer: {
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     textAlign: "center",
   },
@@ -433,8 +433,8 @@ const styles = StyleSheet.create({
   },
   loadMoreText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
-    color: Color.sparklightBrightPurple,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: 'underline',
   },
 });

@@ -1,7 +1,8 @@
 // components/FeatureCard.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { FontFamily, FontSize, Color, Padding,Border } from "../../../GlobalStyles";
+import { FontFamily, FontSize, Color, Padding, Border } from "../../../GlobalStyles";
+import AppStyles from "../../styles/AppStyles";
 import Icon from "../common/Icon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../common/customui/Touchable";
@@ -37,7 +38,7 @@ const FeatureCardMobile = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       <Text
         style={[styles.title, { color: "#393D40" }]}
         accessible={true}
@@ -95,6 +96,11 @@ const FeatureCardMobile = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.sparklightWhite,
+    borderTopWidth: 0,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: Border.br_5xs,
+    borderBottomRightRadius: Border.br_5xs,
   },
   header: {
     paddingHorizontal: Padding.p_base,
@@ -104,9 +110,9 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorWhitesmoke_100,
   },
   title: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: 20,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
     margin: 24,
     lineHeight: 24,
@@ -124,7 +130,7 @@ const styles = StyleSheet.create({
     marginRight: Padding.p_xs,
   },
   featureText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: Color.sparklightGray1,
     fontWeight: "400",
@@ -140,7 +146,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonPrimary: {
-    backgroundColor: Color.sparklightBrightPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   buttonSuccess: {
     backgroundColor: "#C8E9D0",
@@ -148,7 +154,7 @@ const styles = StyleSheet.create({
     borderColor: Color.sparklightGreen,
   },
   buttonText: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
     fontWeight: "700",
   },

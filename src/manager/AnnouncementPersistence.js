@@ -97,6 +97,15 @@ class AnnouncementPersistence {
     }
   }
 
+  // Stamps the current version as the announcement baseline (call when a new user completes T&C).
+  static async syncAppVersion() {
+    try {
+      await AsyncStorage.setItem(VERSION_KEY, DeviceInfo.getVersion());
+    } catch (error) {
+      logError('[AnnouncementPersistence] Error syncing version:', error);
+    }
+  }
+
   static async hasAppVersionChanged(mobileTCAcceptanceFlag = false) {
     try {
       const lastVersion = await AsyncStorage.getItem(VERSION_KEY);
