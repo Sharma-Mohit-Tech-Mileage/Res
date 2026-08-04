@@ -5,7 +5,7 @@ import NextActionCard from "./NextActionCard";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import AnimatedSuccessIcon from "./AnimatedSuccessIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { FieldTitle, FieldContent,HeadingH2 } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
 import { contentMaxWidth, formatCurrency } from "./paymentsShared";
 import { setFocusToRef, announceA11y } from "../../../utils/a11y";
@@ -87,9 +87,9 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
           <View style={styles.iconWrap} accessible={false} importantForAccessibility="no-hide-descendants">
             <AnimatedSuccessIcon size={64} />
           </View>
-          <Text ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={1}>
+          <HeadingH2 ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={1}>
             {successTitle}
-          </Text>
+          </HeadingH2>
           {!!message && (
             <Text style={styles.message}>
               {messageParts.map((part, index) =>
@@ -143,10 +143,6 @@ const styles = StyleSheet.create({
   successCard: { paddingVertical: 32, paddingHorizontal: 16, alignItems: "center", marginTop: 16 },
   iconWrap: { marginBottom: 20 },
   title: {
-    fontSize: FontSize.size_20,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "700",
-    color: Color.colorGray_100,
     textAlign: "center",
     marginBottom: 8,
   },

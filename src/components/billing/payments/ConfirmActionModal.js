@@ -4,7 +4,7 @@ import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import Touchable from "../../common/customui/Touchable";
 import { setFocusToRef } from "../../../utils/a11y";
-import {SectionTitle,SectionContent} from "../../common/customui/Typography";
+import {SectionTitle,SectionContent,Hyperlink} from "../../common/customui/Typography";
 
 const ConfirmActionModal = ({
   visible,
@@ -44,7 +44,7 @@ const ConfirmActionModal = ({
             <Text style={styles.confirmText}>{confirmLabel}</Text>
           </Touchable>
           <Touchable style={styles.cancelButton} onPress={onCancel} accessibilityLabel={cancelLabel}>
-            <Text style={styles.cancelText}>{cancelLabel}</Text>
+            <Hyperlink >{cancelLabel}</Hyperlink>
           </Touchable>
         </View>
       </View>

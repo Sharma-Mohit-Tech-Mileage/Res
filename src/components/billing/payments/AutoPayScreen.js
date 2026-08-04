@@ -9,7 +9,7 @@ import LinkText from "../../common/customui/LinkText";
 import PaymentMethodCard from "./PaymentMethodCard";
 import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { SectionTitle, HintText, FieldTitle, Hyperlink } from "../../common/customui/Typography";
+import { SectionTitle, SectionContent, HintText, FieldTitle, Hyperlink } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
@@ -73,7 +73,7 @@ const AutoPayScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -87,11 +87,11 @@ const AutoPayScreen = ({ navigation, route }) => {
         <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           {enrolled ? "Manage auto pay" : "Activate auto pay"}
         </SectionTitle>
-        <HintText style={styles.introText}>
+        <SectionContent style={styles.introText}>
           {enrolled ? "You have signed up for" : "You are enrolling in"} Sparklight Auto Pay. Your payment will be
           automatically charged on the <Text style={styles.introBold}>{dueDayLabel}</Text> of each month using your
           selected payment method.
-        </HintText>
+        </SectionContent>
 
         <View style={styles.selectRow}>
           <FieldTitle style={styles.selectLabel} accessibilityRole="header" accessibilityLevel={3}>

@@ -9,7 +9,7 @@ import SparkLightInput from "../../common/customui/SparkLightInput";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
 import { FontFamily } from "../../../../GlobalStyles";
-import { SectionTitle, HintText, FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { SectionTitle, SectionContent, HintText, FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
 import {
   fetchPaymentMethods,
@@ -124,11 +124,11 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
         <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           Review Auto Pay
         </SectionTitle>
-        <HintText style={styles.introText}>
+        <SectionContent style={styles.introText}>
           {mode === "update" ? "You have signed up for" : "You are enrolling in"} Sparklight Auto Pay. Your payment
           will be automatically charged on the <Text style={styles.introBold}>{dueDayLabel}</Text> of each month using
           your selected payment method.
-        </HintText>
+        </SectionContent>
 
         <>
             {!loading && amountDue > 0 && (
@@ -231,8 +231,8 @@ const styles = StyleSheet.create({
   summaryCard: { padding: 16, marginTop: 8 },
   fieldGroup: { marginBottom: 16 },
   fieldGroupLast: { marginBottom: 0 },
-  fieldLabel: { marginBottom: 8 },
-  fieldValue: {},
+  fieldLabel: { marginBottom: 2 },
+  fieldValue: {marginTop: 0},
   emailCard: { padding: 16 },
 });
 

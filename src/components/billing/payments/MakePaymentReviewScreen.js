@@ -10,7 +10,7 @@ import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { SectionTitle, FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { SectionTitle, SectionContent, FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
 import {
   fetchPaymentMethods,
@@ -223,8 +223,8 @@ const styles = StyleSheet.create({
   emailCard: { padding: 16, marginTop: 16 },
   fieldGroup: { marginBottom: 16 },
   fieldGroupLast: { marginBottom: 0 },
-  fieldLabel: { marginBottom: 8 },
-  fieldValue: {},
+  fieldLabel: { marginBottom: 2 },
+  fieldValue: {marginTop: 0},
   helperText: {
     fontSize: FontSize.size_smi,
     fontFamily: FontFamily.RadioCanadaRegular,

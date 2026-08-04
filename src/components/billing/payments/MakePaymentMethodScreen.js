@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   newMethodText: {
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_lg,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     color: Color.sparklightPrimaryPurple,
