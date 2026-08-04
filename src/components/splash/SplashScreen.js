@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
     color: colors.snow_white,
     textAlign: "center",
     fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "600",
   },
   splashContainer: {
@@ -822,7 +822,7 @@ const styles = StyleSheet.create({
   copyright: {
     position: "absolute",
     bottom: hp("12%"),
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     textAlign: "center",
     fontWeight: "400",

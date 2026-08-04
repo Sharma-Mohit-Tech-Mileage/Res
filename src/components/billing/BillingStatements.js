@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
   yearLabel: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     fontWeight: "700",
     paddingLeft: 5,
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   sortText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     marginRight: 1,
   },
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   },
   statementDate: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
   },
   iconButtonsContainer: {
@@ -349,8 +349,8 @@ const styles = StyleSheet.create({
   },
   uploadText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
-    color: Color.sparklightBrightPurple,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
+    color: Color.sparklightPrimaryPurple,
     marginRight: 5,
     textDecorationLine: 'underline', // Add underline to the text
   },
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#FF0000",
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   emptyContainer: {
     justifyContent: "center",
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     textAlign: "center",
   },

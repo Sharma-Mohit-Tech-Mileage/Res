@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: Border.br_81xl,
-    backgroundColor: Color.sparklightBrightPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: Padding.p_xs,

@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   description: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: "#000000",
     fontWeight: "400",

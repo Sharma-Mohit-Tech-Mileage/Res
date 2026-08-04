@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     suggestionText: {
         flex: 1, // To ensure text takes up the remaining space
         fontSize: FontSize.size_base,
-        fontFamily: FontFamily.openSansRegular,
+        fontFamily: FontFamily.RadioCanadaRegular,
         color: Color.colorMidnightblue, // Spark Light Purple from the design
     },
     overlayStyle: {

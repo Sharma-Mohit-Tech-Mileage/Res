@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   loadingTxt: {
     color: Color.sparklightGray1,
     textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     fontStyle: "normal",
     fontWeight: "400",

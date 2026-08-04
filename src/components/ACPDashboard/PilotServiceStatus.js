@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     color: "#737373",
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
   },
   labelFilled: {

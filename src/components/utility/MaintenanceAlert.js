@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
   makeTypo: {
     width: 282,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     textAlign: "center",
   },
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     color: "#001321",
     fontSize: FontSize.size_base,
     fontWeight: "400",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     marginTop: 8,
   },
 });

@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     lineHeight: 28,
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttonsLayout: {
     paddingHorizontal: Padding.p_base,
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
   makePayment: {
     textAlign: "center",
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttons: {
     marginLeft: Padding.p_3xs,
@@ -750,7 +750,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Color.success700,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     textAlign: "center",
   },
   badge: {

@@ -315,12 +315,12 @@ const styles = StyleSheet.create({
   },
   accept: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     color: Color.sparklightWhite,
   }, copyright: {
     marginTop:wp("25%"),
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     textAlign: "center",
     fontWeight: "400",
@@ -336,20 +336,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xs,
   },
   linkStyle: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: 'underline',
     alignSelf: 'center',
     fontWeight: '600'
   },
   separator: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     alignSelf: 'center',
     fontFamily: FontFamily.RadioCanadaBold,
     fontWeight: '600'
   },
   makePaymentTypo: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "600",
     color: Color.sparklightWhite,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
   },
 
   melissaSmith: {

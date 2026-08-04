@@ -526,12 +526,12 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 22,
     lineHeight: 28,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.gray600,
   },
   requiredFieldsText: {
     fontSize: 14,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.gray600,
     marginTop: Padding.p_base,
     textAlign: "left",
@@ -550,7 +550,7 @@ const styles = StyleSheet.create({
   },
   charCount: {
     textAlign: "right",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "400",
     color: Color.sparklightDarkGray,
     fontSize: FontSize.size_xs,
@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
   },
   submitButton: {
-    backgroundColor: Color.sparklightBrightPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
     padding: Padding.p_base,
     borderRadius: Border.br_11xs,
     alignItems: "center",
@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: Color.sparklightWhite,
     textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     fontWeight: "600",
     lineHeight: 20,
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
   cancelText: {
     color: Color.colorMidnightblue,
     textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     fontWeight: "600",
     lineHeight: 20,
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     marginTop: Padding.p_5xs,
   },optionTxt: {
     fontSize: FontSize.size_base,

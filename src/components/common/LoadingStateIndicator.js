@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: colors.snow_white,
     marginTop: 10,
     textAlign: "center",

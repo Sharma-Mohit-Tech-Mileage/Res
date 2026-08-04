@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   termsLinkText: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: "underline",
   },
   checkboxSection: {
@@ -471,20 +471,20 @@ const styles = StyleSheet.create({
   },
   errorToggle: {
     color: Color.sparkLightRed,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     fontSize: 14,
     marginLeft: 4,
   },
   accept: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     color: Color.sparklightWhite,
   },
   decline: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorMidnightblue,
     textAlign: "center",
   },
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   fieldLabel: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     fontSize: FontSize.size_sm,
     fontWeight: "600",

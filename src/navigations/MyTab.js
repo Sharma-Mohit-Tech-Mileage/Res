@@ -259,7 +259,7 @@ const MyTabs = ({ route }) => {
       tabBarLabelPosition: "below-icon",
       tabBarLabelStyle: {
         fontSize: FontSize.size_xs,
-        fontFamily: FontFamily.openSansRegular,
+        fontFamily: FontFamily.RadioCanadaRegular,
         fontWeight: "600",
       },
       headerShown: false,

@@ -14,6 +14,7 @@ import { saveUserInfo } from "../../redux/actions/UserAction";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import Config from "react-native-config";
 import NavigationUtils from "./NavigationUtils";
+import AnnouncementPersistence from "../../manager/AnnouncementPersistence";
 const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
 const { width, height } = Dimensions.get("window");
@@ -65,6 +66,8 @@ const Terms = ({ navigation }) => {
   }, [dispatch]);
 
   const termsAccepted = async () => {
+    // Baseline the install so a brand-new user never gets the What's New popup for the version they onboarded on
+    AnnouncementPersistence.syncAppVersion();
     await dispatch(updateTermsAndConditions(true, null));
     await dispatch(updateWalkThroughStep(0));
 

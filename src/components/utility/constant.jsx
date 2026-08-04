@@ -3,7 +3,7 @@ import VersionCheck from "react-native-version-check";
 import { Color } from "../../../GlobalStyles";
 export const ROLE_COLORS = {
   primaryadmin: Color.colorMidnightblue,
-  admin: Color.sparklightBrightPurple,
+  admin: Color.sparklightPrimaryPurple,
   viewonly: Color.sparklightGreen,
 };
 export const BOX_COLORS = {

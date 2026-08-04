@@ -84,7 +84,7 @@ const FeatureCard = ({
       })()}
       {isLoading ? (
         <SkeletonPlaceholder>
-          <View style={[styles.button, { height: 100, paddingVertical: 24 }]} />
+          <View style={styles.buttonSkeleton} />
         </SkeletonPlaceholder>
       ) : (
         <Touchable
@@ -121,9 +121,9 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorWhitesmoke_100,
   },
   title: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_lg,
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
   },
   features: {
@@ -139,10 +139,16 @@ const styles = StyleSheet.create({
     marginRight: Padding.p_xs,
   },
   featureText: {
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_lg,
     color: Color.colorGray_100,
     fontWeight: "400",
+  },
+  buttonSkeleton: {
+    height: 48,
+    borderRadius: 100,
+    marginHorizontal: Padding.p_base,
+    marginBottom: Padding.p_base,
   },
   button: {
     marginHorizontal: Padding.p_base,
@@ -164,7 +170,7 @@ const styles = StyleSheet.create({
     borderColor: Color.sparklightGreen,
   },
   buttonText: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_lg,
     fontWeight: "700",
   },

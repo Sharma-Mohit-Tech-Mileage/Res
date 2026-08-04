@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   },txtStyle:{
     color:colors.sparklight_purple_blue,
     textAlign:'center',
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily:FontFamily.RadioCanadaRegular,
     fontStyle:'normal',
     fontSize:16,
     

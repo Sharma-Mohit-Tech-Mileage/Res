@@ -8,6 +8,8 @@ export const FeatureFlags = {
   TABS_BILLING_HIDDEN: 'tabs.billing.hidden',
   BILLING_AUTOPAY: 'tabs.billing.enable_autopay',
   BILLING_PAYMENT_PLANS: 'tabs.billing.show_payment_plans',
+  BILLING_ORBIPAY_HOST: 'tabs.billing.orbipay.host',
+  BILLING_ORBIPAY_PORTAL_PATH: 'tabs.billing.orbipay.portal_widget_path',
   SUPPORT_CHAT: 'support.show_chat_widget',
   SUPPORT_FAQ: 'support.show_faq',
 };
@@ -36,6 +38,16 @@ export const FeatureFlagMetadata = {
   [FeatureFlags.TABS_BILLING_HIDDEN]: {
     description: 'Hide Billing tab',
     defaultValue: false,
+    affectedUsers: ['ALL'],
+  },
+  [FeatureFlags.BILLING_ORBIPAY_HOST]: {
+    description: 'Orbipay widget host: "app" (bundled HTML) or "portal" (portal-hosted page); any other value falls back to "app"',
+    defaultValue: 'app',
+    affectedUsers: ['ALL'],
+  },
+  [FeatureFlags.BILLING_ORBIPAY_PORTAL_PATH]: {
+    description: 'Path of the portal-hosted Orbipay widget page, appended to PORTAL_BASE_URL',
+    defaultValue: '/orbipayhost.html',
     affectedUsers: ['ALL'],
   },
 };

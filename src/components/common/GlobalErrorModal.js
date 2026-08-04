@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 20,
     color: colors.black,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
   },
   messageContainer: {
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   message: {
     color: colors.darkest_grey,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 28,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   closeAlertTxt: {
     color: colors.sparklight_purple_blue,
     fontWeight: "400",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     fontSize: 16,
   },
