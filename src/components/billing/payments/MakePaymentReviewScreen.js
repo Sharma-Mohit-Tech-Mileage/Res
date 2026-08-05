@@ -9,9 +9,15 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
 import SparkLightInput from "../../common/customui/SparkLightInput";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { SectionTitle, SectionContent, FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { Color, FontFamily, FontSize, Padding } from "../../../../GlobalStyles";
+import {
+  SectionTitle,
+  SectionContent,
+  FieldTitle,
+  FieldContent,
+} from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
+import AppStyles from "../../../styles/AppStyles";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
@@ -60,13 +66,23 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         .then(([list, details]) => {
           setAutoPay(details);
           setEmail((prev) => prev || details.email || "");
-          const paramMethodId = route.params?.methodId || route.params?.method?.id;
-          setMethod(list.find((m) => m.id === paramMethodId) || route.params?.method || null);
+          const paramMethodId =
+            route.params?.methodId || route.params?.method?.id;
+          setMethod(
+            list.find((m) => m.id === paramMethodId) ||
+              route.params?.method ||
+              null,
+          );
         })
         .catch(() => setAutoPay({ enrolled: true }))
         .finally(() => setLoading(false));
       return () => abortRef.current?.abort();
-    }, [route.params?.methodId, route.params?.method, route.params?.paymentFlash, navigation])
+    }, [
+      route.params?.methodId,
+      route.params?.method,
+      route.params?.paymentFlash,
+      navigation,
+    ]),
   );
 
   const onSubmit = async () => {
@@ -88,7 +104,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           params: {
             kind: "payment-submitted",
             message: `Your payment for ${formatCurrency(
-              amount
+              amount,
             )} has been received. It may take up to 24 hours to be reflected on your account.`,
           },
         },
@@ -103,7 +119,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         headerTitle,
         kind: "payment-submitted",
         message: `Your payment for ${formatCurrency(
-          amount
+          amount,
         )} has been received. It may take up to 24 hours to be reflected on your account.`,
         confirmationNumber: result?.confirmationNumber || "",
         email: email.trim(),
@@ -113,7 +129,9 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
             : null,
       });
     } catch (error) {
-      setErrorAlert("We could not submit your payment right now. Please try again.");
+      setErrorAlert(
+        "We could not submit your payment right now. Please try again.",
+      );
       announceA11y("Error, your payment was not submitted.");
     } finally {
       inFlightRef.current = false;
@@ -125,7 +143,9 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
     <View
       style={[styles.fieldGroup, last && styles.fieldGroupLast]}
       accessible={!valueLoading}
-      accessibilityLabel={valueLoading ? undefined : `${label}, ${a11yValue || value}`}
+      accessibilityLabel={
+        valueLoading ? undefined : `${label}, ${a11yValue || value}`
+      }
     >
       <FieldTitle style={styles.fieldLabel}>{label}</FieldTitle>
       {valueLoading ? (
@@ -140,71 +160,113 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
-        {!!errorAlert && (
-          <NotificationAlert
-            type="error"
-            title="Something went wrong"
-            message={errorAlert}
-            onClose={() => setErrorAlert("")}
-            autoFocusTitle
-          />
-        )}
-
-        <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-          Review payment
-        </SectionTitle>
-
-        <View style={[card.elevated, styles.summaryCard]}>
-          {renderField("Payment Method", describePaymentMethod(method), paymentMethodA11yLabel(method), false, loading)}
-          {renderField("Payment Amount", formatCurrency(amount), null, false, loading)}
-          {renderField("Payment Date", paymentDate, moment().format("MMMM D, YYYY"), true, loading)}
-        </View>
-
-        {(
-          <View style={[card.elevated, styles.emailCard]}>
-            {loading ? (
-              <SkeletonPlaceholder>
-                <View style={styles.valueSkeleton} />
-              </SkeletonPlaceholder>
-            ) : (
-              <SparkLightInput
-                ref={emailRef}
-                name="email"
-                label="Email Address (required)"
-                accessibilityLabel="Email Address"
-                placeholder="Email Address"
-                value={email}
-                required
-                error={emailError}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  if (emailError) setEmailError("");
-                }}
-                accessibilityHint="A confirmation email will be sent to this address."
+      <ProfileSettingsHeader
+        title={headerTitle}
+        onPressBack={() => navigation.goBack()}
+      />
+      <ScrollView
+        contentContainerStyle={[contentMaxWidth, { paddingBottom: 140 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <>
+          <View style={[AppStyles.card, { padding: 16, margin: 16 }]}>
+            {!!errorAlert && (
+              <NotificationAlert
+                type="error"
+                title="Something went wrong"
+                message={errorAlert}
+                onClose={() => setErrorAlert("")}
+                autoFocusTitle
               />
             )}
+
+            <SectionTitle
+              style={styles.heading}
+              accessibilityRole="header"
+              accessibilityLevel={2}
+            >
+              Review payment
+            </SectionTitle>
+
+            <View style={[card.elevated, styles.summaryCard]}>
+              {renderField(
+                "Payment Method",
+                describePaymentMethod(method),
+                paymentMethodA11yLabel(method),
+                false,
+                loading,
+              )}
+              {renderField(
+                "Payment Amount",
+                formatCurrency(amount),
+                null,
+                false,
+                loading,
+              )}
+              {renderField(
+                "Payment Date",
+                paymentDate,
+                moment().format("MMMM D, YYYY"),
+                true,
+                loading,
+              )}
+            </View>
+
+            {
+              <View style={[card.elevated, styles.emailCard]}>
+                {loading ? (
+                  <SkeletonPlaceholder>
+                    <View style={styles.valueSkeleton} />
+                  </SkeletonPlaceholder>
+                ) : (
+                  <SparkLightInput
+                    ref={emailRef}
+                    name="email"
+                    label="Email Address (required)"
+                    accessibilityLabel="Email Address"
+                    placeholder="Email Address"
+                    value={email}
+                    required
+                    error={emailError}
+                    onChangeText={(text) => {
+                      setEmail(text);
+                      if (emailError) setEmailError("");
+                    }}
+                    accessibilityHint="A confirmation email will be sent to this address."
+                  />
+                )}
+              </View>
+            }
+
+            {!method?.id && (
+              <Text style={styles.helperText}>
+                You will complete this payment on our secure payment page. Your
+                card or bank details never leave that page.
+              </Text>
+            )}
           </View>
-        )}
+          <View style={{ marginHorizontal: 24 }}>
+            <AgreeTermsRow
+              value={agreed}
+              onValueChange={setAgreed}
+              onViewTerms={() => setShowTerms(true)}
+            />
 
-        {!method?.id && (
-          <Text style={styles.helperText}>
-            You will complete this payment on our secure payment page. Your card or bank details never leave that
-            page.
-          </Text>
-        )}
-
-        <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
-
-        <PrimaryButton
-          title={submitting ? "Submitting..." : "Submit Payment"}
-          buttonType="submit"
-          disabled={submitting || !agreed || loading}
-          accessibilityLabel={`Submit payment of ${formatCurrency(amount)}`}
-          onPress={onSubmit}
-        />
-        <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
+            <PrimaryButton
+              title={submitting ? "Submitting..." : "Submit Payment"}
+              buttonType="submit"
+              disabled={submitting || !agreed || loading}
+              accessibilityLabel={`Submit payment of ${formatCurrency(amount)}`}
+              onPress={onSubmit}
+            />
+            <PrimaryButton
+              title="Back"
+              buttonType="outline"
+              accessibilityLabel="Back"
+              onPress={() => navigation.goBack()}
+            />
+          </View>
+        </>
       </ScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
@@ -216,15 +278,20 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    marginBottom: 12,
+    marginBottom: 24,
   },
   valueSkeleton: { height: 18, borderRadius: 4, width: "60%" },
   summaryCard: { padding: 16 },
   emailCard: { padding: 16, marginTop: 16 },
-  fieldGroup: { marginBottom: 16 },
+  fieldGroup: { paddingVertical: Padding.p_5xs },
   fieldGroupLast: { marginBottom: 0 },
-  fieldLabel: { marginBottom: 2 },
-  fieldValue: {marginTop: 0},
+  fieldLabel: { marginBottom: 2, lineHight: 28 },
+  fieldValue: {
+    marginTop: 0,
+    color: Color.sparklightGray1,
+    textAlign: "left",
+    fontFamily: FontFamily.RadioCanadaRegular,
+  },
   helperText: {
     fontSize: FontSize.size_smi,
     fontFamily: FontFamily.RadioCanadaRegular,
