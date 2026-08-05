@@ -118,6 +118,14 @@ stages:
             displayName: 'Validate Initial Commit Metadata'
 
           - script: |
+              echo "DEBUG: SMTP_SERVER='$(SMTP_SERVER)'"
+              echo "DEBUG: SMTP_PORT='$(SMTP_PORT)'"
+              echo "DEBUG: SMTP_USERNAME='$(SMTP_USERNAME)'"
+              echo "DEBUG: SMTP_PASSWORD='$(SMTP_PASSWORD)'"
+              echo "DEBUG: NOTIFICATION_EMAILS='$(NOTIFICATION_EMAILS)'"
+            displayName: 'Debug SMTP email variables'
+
+          - script: |
               python3 - <<'PYEOF'
               import os, smtplib
               from email.mime.text import MIMEText
