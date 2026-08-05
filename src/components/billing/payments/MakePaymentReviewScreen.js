@@ -133,7 +133,9 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           <View style={styles.valueSkeleton} />
         </SkeletonPlaceholder>
       ) : (
-        <FieldContent style={styles.fieldValue}>{value}</FieldContent>
+        <View style={styles.fieldValueBox}>
+          <FieldContent style={styles.fieldValue}>{value}</FieldContent>
+        </View>
       )}
     </View>
   );
@@ -196,6 +198,11 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         )}
 
         <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
+        {!method?.id && (
+          <Text style={styles.secureNote}>
+            For your security, you'll finish this payment on our secure checkout — we never see or store your card or bank details.
+          </Text>
+        )}
 
         <PrimaryButton
           title={submitting ? "Submitting..." : "Submit Payment"}
@@ -204,7 +211,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           accessibilityLabel={`Submit payment of ${formatCurrency(amount)}`}
           onPress={onSubmit}
         />
-        <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
+        <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
       </ScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
@@ -225,6 +232,8 @@ const styles = StyleSheet.create({
   fieldGroupLast: { marginBottom: 0 },
   fieldLabel: { marginBottom: 8 },
   fieldValue: {},
+  fieldValueBox: { backgroundColor: "#F3F4F8", borderRadius: 8, paddingVertical: 12, paddingHorizontal: 12 },
+  secureNote: { fontSize: 13, lineHeight: 18, color: Color.colorGray_200 || "#6B6B6B", marginTop: 12, marginBottom: 4 },
   helperText: {
     fontSize: FontSize.size_smi,
     fontFamily: FontFamily.openSansRegular,

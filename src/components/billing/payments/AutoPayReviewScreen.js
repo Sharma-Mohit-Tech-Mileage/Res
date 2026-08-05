@@ -154,7 +154,9 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                     <View style={styles.valueSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  <FieldContent style={styles.fieldValue}>{describePaymentMethod(method)}</FieldContent>
+                  <View style={styles.fieldValueBox}>
+                    <FieldContent style={styles.fieldValue}>{describePaymentMethod(method)}</FieldContent>
+                  </View>
                 )}
               </View>
               <View
@@ -168,7 +170,9 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                     <View style={styles.valueSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  <FieldContent style={styles.fieldValue}>On the {dueDayLabel} of each month</FieldContent>
+                  <View style={styles.fieldValueBox}>
+                    <FieldContent style={styles.fieldValue}>On the {dueDayLabel} of each month</FieldContent>
+                  </View>
                 )}
               </View>
             </View>
@@ -207,7 +211,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
               accessibilityLabel={mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"}
               onPress={onSubmit}
             />
-            <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
+            <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
         </>
       </ScrollView>
 
@@ -233,6 +237,7 @@ const styles = StyleSheet.create({
   fieldGroupLast: { marginBottom: 0 },
   fieldLabel: { marginBottom: 8 },
   fieldValue: {},
+  fieldValueBox: { backgroundColor: "#F3F4F8", borderRadius: 8, paddingVertical: 12, paddingHorizontal: 12 },
   emailCard: { padding: 16 },
 });
 

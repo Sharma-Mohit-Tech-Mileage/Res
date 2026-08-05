@@ -144,10 +144,10 @@ const AutoPayScreen = ({ navigation, route }) => {
               />
             )}
             <PrimaryButton
-              title="Continue"
+              title={enrolled ? "Update Auto Pay" : "Continue"}
               buttonType="submit"
               disabled={!canContinue}
-              accessibilityLabel="Continue"
+              accessibilityLabel={enrolled ? "Update Auto Pay" : "Continue"}
               onPress={onContinue}
             />
             {enrolled && (
