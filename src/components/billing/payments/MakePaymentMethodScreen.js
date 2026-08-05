@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    marginBottom: 12,
+    marginBottom: 24,
   },
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyText: {

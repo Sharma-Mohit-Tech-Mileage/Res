@@ -117,7 +117,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
           >
             <View style={styles.addLinkRow}>
               <Hyperlink style={styles.addLinkText}>Add</Hyperlink>
-              <PlusCircleIcon color={Color.colorMidnightblue} />
+              <PlusCircleIcon color={Color.sparklightPrimaryPurple} />
             </View>
           </LinkText>
         </View>

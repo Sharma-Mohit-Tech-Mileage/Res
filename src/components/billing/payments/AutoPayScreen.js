@@ -10,6 +10,7 @@ import PaymentMethodCard from "./PaymentMethodCard";
 import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { SectionTitle, SectionContent, HintText, FieldTitle, Hyperlink } from "../../common/customui/Typography";
+import AppStyles from "../../../styles/AppStyles";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
@@ -73,7 +74,9 @@ const AutoPayScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[ contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
+        <>
+        <View style={[AppStyles.card, { margin: 16 , padding: 16 }]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -95,7 +98,7 @@ const AutoPayScreen = ({ navigation, route }) => {
 
         <View style={styles.selectRow}>
           <FieldTitle style={styles.selectLabel} accessibilityRole="header" accessibilityLevel={3}>
-            {enrolled ? "Select new payment method." : "Select payment method."}
+            {enrolled ? "Select new payment method" : "Select payment method."}
           </FieldTitle>
           <LinkText
             onPress={onAddMethod}
@@ -104,7 +107,7 @@ const AutoPayScreen = ({ navigation, route }) => {
           >
             <View style={styles.addLinkRow}>
               <Hyperlink style={styles.addLinkText}>Add</Hyperlink>
-              <PlusCircleIcon color={Color.colorMidnightblue} />
+              <PlusCircleIcon color={Color.sparklightPrimaryPurple} />
             </View>
           </LinkText>
         </View>
@@ -133,7 +136,8 @@ const AutoPayScreen = ({ navigation, route }) => {
             ))}
           </View>
         )}
-
+        </View>
+        <View style={{ marginHorizontal: 24 }} >
         {!loading && (
           <>
             {isSwitching && !!currentMethod && (
@@ -160,6 +164,8 @@ const AutoPayScreen = ({ navigation, route }) => {
             )}
           </>
         )}
+        </View>
+        </>
       </ScrollView>
     </View>
   );
@@ -169,7 +175,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    marginBottom: 8,
+    marginBottom: 24,
   },
   introText: { lineHeight: 20, marginBottom: 20 },
   introBold: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
