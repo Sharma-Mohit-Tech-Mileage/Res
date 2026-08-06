@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
-import CheckBox from "@react-native-community/checkbox";
+import SparklightCheckBox from "../../common/customui/SparklightCheckBox";
 import Touchable from "../../common/customui/Touchable";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 
@@ -15,15 +15,10 @@ const AgreeTermsRow = ({ value, onValueChange, onViewTerms }) => (
       style={styles.agreePress}
     >
       <View pointerEvents="none" style={styles.checkboxBox}>
-        <CheckBox
-          disabled
+        <SparklightCheckBox
+          disabled={true}
           value={value}
-          boxType="square"
-          style={styles.checkbox}
-          tintColors={{ true: Color.colorMidnightblue, false: "#D0D5DD" }}
-          tintColor="#D0D5DD"
-          onCheckColor={Color.colorMidnightblue}
-          onTintColor={Color.colorMidnightblue}
+          boxStyle={styles.checkBox}
           accessible={false}
           importantForAccessibility="no"
         />
@@ -43,9 +38,18 @@ const AgreeTermsRow = ({ value, onValueChange, onViewTerms }) => (
 );
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", marginVertical: 4 },
-  agreePress: { flexDirection: "row", justifyContent: "flex-start", minHeight: 48 },
-  checkboxBox: { marginRight: Platform.OS === "ios" ? 10 : 16 },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    marginVertical: 4,
+  },
+  agreePress: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    minHeight: 48,
+  },
+  checkboxBox: { marginRight: Platform.OS === "ios" ? 4 : 8 },
 
   checkbox: { width: 12, height: 12 },
   agreeText: {
@@ -60,6 +64,11 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: Color.sparklightPrimaryPurple,
     textDecorationLine: "underline",
+  },checkBox: {
+    width: 16,
+    height: 16,
+    marginTop: 0,
+    marginRight: Platform.OS === "ios" ? 8 : 8,
   },
 });
 
