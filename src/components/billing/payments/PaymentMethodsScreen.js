@@ -94,7 +94,8 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title="Manage Payment Method" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{marginBottom: 140}]} showsVerticalScrollIndicator={false}>
+         <>
         {!!alert && (
           <NotificationAlert
             type={alert.type}
@@ -149,6 +150,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
             />
           ))
         )}
+       </>
       </ScrollView>
 
       <ConfirmActionModal
@@ -177,6 +179,7 @@ const styles = StyleSheet.create({
   heading: {
     flexShrink: 1,
     marginRight: 8,
+    marginBottom: 24,
   },
   addLinkRow: { flexDirection: "row", alignItems: "center" },
   addLinkText: { marginRight: 4 },

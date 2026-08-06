@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   actionsWrap: { flexDirection: "row", alignItems: "center" },
   actionLink: { paddingVertical: 4, paddingHorizontal: 4 },
   actionText: {},
-  actionDivider: { color: "#98A2B3", marginHorizontal: 6 },
+  actionDivider: { color: "#98A2B3", marginHorizontal: 4 },
   newAutoPayBadge: {
     backgroundColor: "#E9F8EE",
     color: "#1D7832",
