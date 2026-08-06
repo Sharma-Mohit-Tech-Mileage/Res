@@ -8,17 +8,9 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
-import { FontFamily,Padding,Color} from "../../../../GlobalStyles";
-import {
-  SectionTitle,
-  SectionContent,
-  HintText,
-  FieldTitle,
-  FieldContent,
-} from "../../common/customui/Typography";
+import { FontFamily } from "../../../../GlobalStyles";
+import { SectionTitle, HintText, FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
-import AppStyles from "../../../styles/AppStyles";
-
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
@@ -40,9 +32,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
   const mode = route.params?.mode === "update" ? "update" : "enroll";
   const methodId = route.params?.methodId || "";
   const fromOffer = !!route.params?.fromOffer;
-  const headerTitle =
-    route.params?.headerTitle ||
-    (mode === "enroll" ? "Set Up Auto Pay" : "Manage Auto Pay");
+  const headerTitle = route.params?.headerTitle || (mode === "enroll" ? "Set Up Auto Pay" : "Manage Auto Pay");
   const [method, setMethod] = useState(null);
   const [details, setDetails] = useState(null);
   const [email, setEmail] = useState("");
@@ -67,12 +57,10 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
         })
         .catch(() => {
           setDetails({});
-          setErrorAlert(
-            "We could not load your payment information. Please try again.",
-          );
+          setErrorAlert("We could not load your payment information. Please try again.");
         });
       return () => abortRef.current?.abort();
-    }, [methodId]),
+    }, [methodId])
   );
 
   const loading = details === null;
@@ -90,8 +78,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
     inFlightRef.current = true;
     setSubmitting(true);
     try {
-      const submit =
-        mode === "update" ? updateAutoPayPaymentMethod : enrollAutoPay;
+      const submit = mode === "update" ? updateAutoPayPaymentMethod : enrollAutoPay;
       const result = await submit(methodId, email.trim());
       navigation.replace("PaymentConfirmation", {
         headerTitle,
@@ -107,7 +94,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
       setErrorAlert(
         mode === "update"
           ? "We could not update your Auto Pay payment method. Please try again."
-          : "We could not complete your Auto Pay enrollment. Please try again.",
+          : "We could not complete your Auto Pay enrollment. Please try again."
       );
       announceA11y("Error, your Auto Pay changes were not saved.");
     } finally {
@@ -118,49 +105,38 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader
-        title={headerTitle}
-        onPressBack={() => navigation.goBack()}
-      />
+      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
       <ScrollView
-        contentContainerStyle={[ contentMaxWidth,{paddingBottom: 140}]}
+        contentContainerStyle={[styles.content, contentMaxWidth]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {!!errorAlert && (
+          <NotificationAlert
+            type="error"
+            title="Something went wrong"
+            message={errorAlert}
+            onClose={() => setErrorAlert("")}
+            autoFocusTitle
+          />
+        )}
+
+        <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
+          Review Auto Pay
+        </SectionTitle>
+        <HintText style={styles.introText}>
+          {mode === "update" ? "You have signed up for" : "You are enrolling in"} Sparklight Auto Pay. Your payment
+          will be automatically charged on the <Text style={styles.introBold}>{dueDayLabel}</Text> of each month using
+          your selected payment method.
+        </HintText>
+
         <>
-          <View style={[AppStyles.card, { padding: 16, margin: 16 }]}>
-            {!!errorAlert && (
-              <NotificationAlert
-                type="error"
-                title="Something went wrong"
-                message={errorAlert}
-                onClose={() => setErrorAlert("")}
-                autoFocusTitle
-              />
-            )}
-
-            <SectionTitle
-              style={styles.heading}
-              accessibilityRole="header"
-              accessibilityLevel={2}
-            >
-              Review Auto Pay
-            </SectionTitle>
-            <SectionContent style={styles.introText}>
-              {mode === "update"
-                ? "You have signed up for"
-                : "You are enrolling in"}{" "}
-              Sparklight Auto Pay. Your payment will be automatically charged on
-              the <Text style={styles.introBold}>{dueDayLabel}</Text> of each
-              month using your selected payment method.
-            </SectionContent>
-
             {!loading && amountDue > 0 && (
               <NotificationAlert
                 type="warning"
                 title="Your Balance Needs Attention"
                 message={`Your balance of ${formatCurrency(
-                  amountDue,
+                  amountDue
                 )} won't be processed by Auto Pay before the due date. You can pay it after finishing this setup.`}
                 showCloseIcon={false}
               />
@@ -170,33 +146,23 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
               <View
                 style={styles.fieldGroup}
                 accessible={!loading}
-                accessibilityLabel={
-                  loading
-                    ? undefined
-                    : `Payment Method, ${paymentMethodA11yLabel(method)}`
-                }
+                accessibilityLabel={loading ? undefined : `Payment Method, ${paymentMethodA11yLabel(method)}`}
               >
-                <FieldTitle style={styles.fieldLabel}>
-                  Payment Method
-                </FieldTitle>
+                <FieldTitle style={styles.fieldLabel}>Payment Method</FieldTitle>
                 {loading ? (
                   <SkeletonPlaceholder>
                     <View style={styles.valueSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  <FieldContent style={styles.fieldValue}>
-                    {describePaymentMethod(method)}
-                  </FieldContent>
+                  <View style={styles.fieldValueBox}>
+                    <FieldContent style={styles.fieldValue}>{describePaymentMethod(method)}</FieldContent>
+                  </View>
                 )}
               </View>
               <View
                 style={[styles.fieldGroup, styles.fieldGroupLast]}
                 accessible={!loading}
-                accessibilityLabel={
-                  loading
-                    ? undefined
-                    : `Payment Date, on the ${dueDayLabel} of each month`
-                }
+                accessibilityLabel={loading ? undefined : `Payment Date, on the ${dueDayLabel} of each month`}
               >
                 <FieldTitle style={styles.fieldLabel}>Payment Date</FieldTitle>
                 {loading ? (
@@ -204,9 +170,9 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                     <View style={styles.valueSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  <FieldContent style={styles.fieldValue}>
-                    On the {dueDayLabel} of each month
-                  </FieldContent>
+                  <View style={styles.fieldValueBox}>
+                    <FieldContent style={styles.fieldValue}>On the {dueDayLabel} of each month</FieldContent>
+                  </View>
                 )}
               </View>
             </View>
@@ -235,36 +201,17 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                 />
               )}
             </View>
-          </View>
-          <View style={{ marginHorizontal: 24 }}>
-            <AgreeTermsRow
-              value={agreed}
-              onValueChange={setAgreed}
-              onViewTerms={() => setShowTerms(true)}
-            />
+
+            <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
 
             <PrimaryButton
-              title={
-                submitting
-                  ? "Saving..."
-                  : mode === "update"
-                  ? "Update Auto Pay"
-                  : "Activate Auto Pay"
-              }
+              title={submitting ? "Saving..." : mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"}
               buttonType="submit"
               disabled={submitting || !agreed || loading}
-              accessibilityLabel={
-                mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"
-              }
+              accessibilityLabel={mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"}
               onPress={onSubmit}
             />
-            <PrimaryButton
-              title="Back"
-              buttonType="outline"
-              accessibilityLabel="Back"
-              onPress={() => navigation.goBack()}
-            />
-          </View>
+            <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
         </>
       </ScrollView>
 
@@ -277,30 +224,21 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    marginBottom: 24,
+    marginBottom: 8,
   },
   introText: { lineHeight: 20, marginBottom: 16 },
-  introBold: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
+  introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
   cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
   valueSkeleton: { height: 18, borderRadius: 4, width: "60%" },
-  labelSkeleton: {
-    height: 14,
-    borderRadius: 4,
-    width: "45%",
-    marginBottom: 10,
-  },
+  labelSkeleton: { height: 14, borderRadius: 4, width: "45%", marginBottom: 10 },
   inputSkeleton: { height: 44, borderRadius: 6, width: "100%" },
   summaryCard: { padding: 16, marginTop: 8 },
-  fieldGroup: { paddingVertical: Padding.p_5xs },
+  fieldGroup: { marginBottom: 16 },
   fieldGroupLast: { marginBottom: 0 },
-  fieldLabel: { marginBottom: 2, lineHight: 28 },
-  fieldValue: {
-    marginTop: 0,
-    color: Color.sparklightGray1,
-    textAlign: "left",
-    fontFamily: FontFamily.RadioCanadaRegular,
-  },
-  emailCard: { padding: 16 , marginTop: 16},
+  fieldLabel: { marginBottom: 8 },
+  fieldValue: {},
+  fieldValueBox: { backgroundColor: "#F3F4F8", borderRadius: 8, paddingVertical: 12, paddingHorizontal: 12 },
+  emailCard: { padding: 16 },
 });
 
 export default AutoPayReviewScreen;
