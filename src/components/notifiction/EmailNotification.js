@@ -145,11 +145,12 @@ const AddNotificationScreen = () => {
             message: "Error updating account details",
             type: "error",
           });
+          setFocusEmail();
         } finally {
           setIsSubmitting(false);
-          setToggleCheckBoxTerm(false);
+          setToggleCheckBoxTerm(true);
         }
-        setFocusEmail();
+        
       } else if (route.params?.updateFailed) {
         setNotification({
           message: route.params.failureMessage,
@@ -157,19 +158,29 @@ const AddNotificationScreen = () => {
         });
         setIsSubmitting(false);
         setToggleCheckBoxTerm(false);
+        setFocusEmail();
       }
-      setFocusEmail();
+      
     };
   
     updateAccountDetails();
+
     let emailToSet = primaryEmail || route.params?.additionalData?.email || "";
-    setValue("email", emailToSet);
+    //setValue("email", emailToSet);
     setIsEnrolled(!!emailToSet);
   }, [route.params, dispatch]);
 
 
 
-  const setFocusEmail = () => {};
+  const setFocusEmail = () => {
+    setTimeout(() => {  
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 400);
+  };
+
+
 
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -218,7 +229,6 @@ const AddNotificationScreen = () => {
     (data) => {
       const { email } = data;
       const { paperlessBilling } = formState;
-
       if (isCheckboxVisible && paperlessBilling && !toggleCheckBoxTerm) {
         setIsTermRequired(true);
         return;

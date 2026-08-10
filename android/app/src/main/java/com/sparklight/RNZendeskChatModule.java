@@ -165,6 +165,7 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
                 if (metadata.hasKey("mobileApp"))       fields.put("29542765557655", metadata.getString("mobileApp"));
                 if (metadata.hasKey("jwtId"))           fields.put("29230180962071", metadata.getString("jwtId"));
                 if (metadata.hasKey("source"))           fields.put("40313200914455", metadata.getString("source"));
+                if (metadata.hasKey("Initiation_Page")) fields.put("42432208863255", metadata.getString("Initiation_Page"));
             } else {
                 // Prod mapping
                 if (metadata.hasKey("userAgent"))       fields.put("29542407930903", metadata.getString("userAgent"));
@@ -184,6 +185,7 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
                 //if (metadata.hasKey("mobileApp"))       fields.put("29542765557655", metadata.getString("mobileApp"));
                 if (metadata.hasKey("jwtId"))           fields.put("29542045878167", metadata.getString("jwtId"));
                 if (metadata.hasKey("source"))          fields.put("40559477171223", metadata.getString("source"));
+                if (metadata.hasKey("Initiation_Page")) fields.put("42432144628503", metadata.getString("Initiation_Page"));
             }
 
             Zendesk.getInstance().getMessaging().setConversationFields(fields);
