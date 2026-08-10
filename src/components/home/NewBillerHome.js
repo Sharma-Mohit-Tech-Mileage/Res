@@ -469,7 +469,7 @@ const NewBillerHome = ({ navigation }) => {
     >
       {showChatIcon && (
         <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-          <ZendeskChatIcon />
+          <ZendeskChatIcon screenName={'Home Screen'} />
         </View>
       )}
       <View style={{ flex: 1 }}>

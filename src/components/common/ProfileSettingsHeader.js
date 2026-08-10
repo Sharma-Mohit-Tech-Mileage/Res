@@ -73,7 +73,7 @@ const ProfileSettingsHeader = ({
               </Text>
             </View>
             <View style={{ justifyContent: "flex-end" }}>
-              <ZendeskChatIcon />
+              <ZendeskChatIcon screenName={title} />
             </View>
 
             {showIcon && (

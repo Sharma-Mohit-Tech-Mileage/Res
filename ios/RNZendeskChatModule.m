@@ -160,6 +160,7 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
       if (metadata[@"mobileApp"])       { fields[@"29542765557655"] = metadata[@"mobileApp"]; }
       if (metadata[@"jwtId"])           { fields[@"29230180962071"] = metadata[@"jwtId"]; }
       if (metadata[@"source"])          { fields[@"40313200914455"] = metadata[@"source"]; }
+      if (metadata[@"Initiation_Page"]) { fields[@"42432208863255"] = metadata[@"Initiation_Page"]; }
     } else {
       // Prod mapping (existing behavior)
       if (metadata[@"userAgent"])        {fields[@"29542407930903"] = metadata[@"userAgent"];}
@@ -179,6 +180,7 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
       //if (metadata[@"mobileApp"])        {fields[@"29542765557655"] = metadata[@"mobileApp"];}
       if (metadata[@"jwtId"])            {fields[@"29542045878167"] = metadata[@"jwtId"];}
       if (metadata[@"source"])          { fields[@"40559477171223"] = metadata[@"source"]; }
+      if (metadata[@"Initiation_Page"]) {fields[@"42432144628503"] = metadata[@"Initiation_Page"];} 
     }
     [[Zendesk instance].messaging setConversationFields:fields];
     resolve(@(YES));
