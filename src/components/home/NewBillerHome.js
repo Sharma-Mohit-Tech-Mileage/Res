@@ -18,7 +18,7 @@ import FeatureCard from "../ACPDashboard/FeatureCard";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PostApiReqZendeskToken } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser , storeZendeskData} from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
 import { useOutageStatus } from "../services/hooks/useOutageStatus";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
@@ -308,8 +308,10 @@ const NewBillerHome = ({ navigation }) => {
             mobileApp: "mobileApp",
             jwtId: jwtToken,
             source: "Mobile App",
+            Initiation_Page: "Home Screen",
           };
           setConversationalFields(fields);
+          storeZendeskData(fields);
         }
       },
       (error) => {

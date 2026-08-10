@@ -3,6 +3,7 @@ import * as Keychain from "react-native-keychain";
 export const SECURE_KEYS = {
   ID_TOKEN: "idToken",
   REFRESH_TOKEN: "refreshToken",
+  ZENDESK_DATA: "zendeskData",
 };
 
 const SERVICE_PREFIX = "sparklight.secure.";
