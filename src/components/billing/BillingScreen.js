@@ -148,7 +148,7 @@ const BillingScreen = ({ navigation }) => {
         showIcon={false}
       />
       <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-      <ZendeskChatIcon />
+      <ZendeskChatIcon  screenName="Billing" />
       </View>
       <LinearGradient
         style={styles.linearGradientStyle}
