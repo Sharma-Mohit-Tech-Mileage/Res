@@ -62,7 +62,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} autoFocusBack />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{paddingHorizontal: 140}]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
