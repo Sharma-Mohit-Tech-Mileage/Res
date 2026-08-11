@@ -1,7 +1,12 @@
+import Config from 'react-native-config';
+
 const BASE = 'https://www.sparklight.com';
 const SUPPORT = 'https://support.sparklight.com';
 
 export const SPARKLIGHT_URLS = {
+  // Built from SSO_LOGIN so it follows the environment (UAT vs prod) automatically.
+  registerAccount: `${Config.SSO_LOGIN}/login-actions/registration?client_id=web-portal`,
+
   // Legal
   privacyPolicy: `${BASE}/legal/mobile-app-privacy-policy`,
   termsConditions: `${BASE}/legal/mobile-app-terms-and-conditions`,

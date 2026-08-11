@@ -24,6 +24,10 @@ import LoadingStateIndicator, { LoadingState, } from "../common/LoadingStateIndi
 import Config from "react-native-config";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
 import { logDebug, logWarn, logError } from "../../utils/logger";
+import { fetchACPUserAccountDetails } from "../../network/apis/account/profile.service";
+import { getTransferInfo } from "../utility/transferHelpers";
+import TransferOfServiceModal from "../common/TransferOfServiceModal";
+import { SPARKLIGHT_URLS } from "../../constants/urls";
 
 const config = {
   issuer: Config.SSO_LOGIN,
@@ -63,6 +67,7 @@ const SplashScreen = ({ navigation, route }) => {
   const ssoIdTokenRef = useRef(null);
   const [loginEnable, setLoginEnable] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
+  const [transferAccountNumber, setTransferAccountNumber] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [deviceSize, setDeviceSize] = useState(getDeviceSize());
   const [networkState, setNetworkState] = useState({ isConnected: true, type: "unknown", });
@@ -384,8 +389,20 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
       logDebug("SplashScreen", "Moving user after successful login", {
         userName: user?.userInfo?.userName,
       });
-      storeUser(user);
+      await storeUser(user);
       dispatch(saveUserInfo(user));
+
+      // Account details are keyed off the stored user, so this must follow storeUser.
+      const accountDetails = await fetchACPUserAccountDetails(null, false).catch(
+        () => null
+      );
+      const transfer = getTransferInfo(accountDetails);
+      if (transfer.isTransferred) {
+        setTransferAccountNumber(transfer.newAccountNumber);
+        setLoadingState(LoadingState.NONE);
+        return;
+      }
+
       if (user.userInfo && user.userInfo.userName) {
         await analytics().setUserId(user.userInfo.userName.toString());
         await analytics().setUserProperty(
@@ -742,6 +759,21 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
         errorType={errorState.type}
         customMessage={errorState.message}
         onAction={handleErrorAction}
+      />
+
+      <TransferOfServiceModal
+        visible={!!transferAccountNumber}
+        newAccountNumber={transferAccountNumber}
+        onSignIn={() =>
+          logoutAction(() => {
+            setTransferAccountNumber(null);
+            setAuthInProgress(false);
+            authLockRef.current = false;
+            setLoadingState(LoadingState.NONE);
+            setLoginEnable(true);
+          })
+        }
+        onRegister={() => Linking.openURL(SPARKLIGHT_URLS.registerAccount)}
       />
 
       <CustomerDisconnectPage
