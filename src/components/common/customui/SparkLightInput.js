@@ -211,7 +211,7 @@ const SparkLightInput = React.forwardRef(({
             accessible={false}
             importantForAccessibility="no"
           >
-            <WarningIcon />
+            <WarningIcon color="#EF4E3E" />
           </View>
           <Text
             style={styles.errorText}

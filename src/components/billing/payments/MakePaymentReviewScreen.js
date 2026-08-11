@@ -229,10 +229,18 @@ const styles = StyleSheet.create({
   summaryCard: { padding: 16 },
   emailCard: { padding: 16, marginTop: 16 },
   fieldGroup: { marginBottom: 16 },
-  fieldGroupLast: { marginBottom: 0 },
-  fieldLabel: { marginBottom: 8 },
-  fieldValue: {},
-  fieldValueBox: { backgroundColor: "#F3F4F8", borderRadius: 8, paddingVertical: 12, paddingHorizontal: 12 },
+  fieldGroupLast: { paddingBottom: 4 },
+  fieldLabel: {
+     textAlign: "left",
+     lineHeight: 28, },
+  fieldValue: {
+    fontSize: FontSize.size_base,
+    textAlign: "left",
+    fontWeight: "400",
+    color: Color.sparklightGray1,
+    fontFamily: FontFamily.RadioCanadaRegular,
+  },
+  fieldValueBox: {   },
   secureNote: { fontSize: 13, lineHeight: 18, color: Color.colorGray_200 || "#6B6B6B", marginTop: 12, marginBottom: 4 },
   helperText: {
     fontSize: FontSize.size_smi,

@@ -10,6 +10,7 @@ import { SectionTitle, HintText } from "../../common/customui/Typography";
 import { fetchAutoPayDetails, cancelAutoPay } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, ordinal } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
+import AppStyles from "../../../styles/AppStyles";
 
 const AutoPayDeactivateScreen = ({ navigation, route }) => {
   const headerTitle = route.params?.headerTitle || "Manage Auto Pay";
@@ -53,7 +54,9 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[ contentMaxWidth]} showsVerticalScrollIndicator={false}>
+        <>
+        <View style={[AppStyles.card, { padding: 16, margin: 16 }]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -71,11 +74,13 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
 
         <NotificationAlert
           type="warning"
+          iconColor="#F88700"
           message={`Your balance is due on the ${dueDayLabel} each month. By canceling Auto Pay, all future payments will need to be made manually.`}
           splitKey={[{ text: dueDayLabel, bold: true }]}
           showCloseIcon={false}
         />
-
+       </View>
+       <View style={{ marginHorizontal: 24, marginBottom: 16 }}>
         <View style={styles.agreeBlock}>
           <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
         </View>
@@ -88,6 +93,8 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
           onPress={onDeactivate}
         />
         <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
+        </View>
+        </>
       </ScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
@@ -99,10 +106,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    marginBottom: 8,
+    marginBottom: 24,
   },
   introText: { lineHeight: 20, marginBottom: 8 },
-  agreeBlock: { marginTop: 12, marginBottom: 8 },
+  agreeBlock: { marginTop: 8, marginBottom: 8 },
 });
 
 export default AutoPayDeactivateScreen;
