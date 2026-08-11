@@ -98,6 +98,7 @@ const PasswordSecurityEdit = () => {
       ...profileDetails,
       securityQuestion: itemValue === "Add your own question" ? '' : itemValue
     });
+    setValue("securityAnswer", ""); // Clear the answer field when question changes
     setCustomSecurityQuestion(itemValue);
     setIsDropDownOpen(false);
     setDropdownFocused(false);

@@ -2,9 +2,11 @@
 import { NativeModules } from 'react-native';
 const { RNZendeskChatModule } = NativeModules;
 import { getZendeskData } from "../../redux/utils/LocalStorage";
+import analytics from '@react-native-firebase/analytics';
 
-export const startChatWithConfig = (config) => {
+export const startChatWithConfig = async(config) => {
   console.log("startChat called with config:", config);
+  await analytics().logEvent("Zendesk_Chat_Start", { Chat_Initiation_Page: config.Initiation_Page });
   const fields = getZendeskData()
     .then((fields) => {
       const mergedObject = Object.assign({}, fields, config);
@@ -25,8 +27,9 @@ export const clearChatData = () => {
     RNZendeskChatModule.clearChatSession();
 };
 
-export const startChat = (config) => {
+export const startChat = async (config) => {
   console.log("startChat called with config:", config);
+  await analytics().logEvent("Zendesk_Chat_Start", { Chat_Initiation_Page: config.Initiation_Page });
   const fields = getZendeskData()
     .then((fields) => {
       const mergedObject = Object.assign({}, fields, config);
