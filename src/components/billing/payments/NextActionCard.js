@@ -8,7 +8,6 @@ import AppStyles from "../../../styles/AppStyles";
 import { SectionTitle, SectionContent } from "../../common/customui/Typography";
 
 const NextActionCard = ({ title, message, ctaLabel, onPress, onDismiss }) => (
-  <>
   <View style={[AppStyles.card, styles.container]}>
     <SectionTitle style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
       {title}
@@ -16,8 +15,6 @@ const NextActionCard = ({ title, message, ctaLabel, onPress, onDismiss }) => (
     <SectionContent style={styles.message}>
       {message}
     </SectionContent>
-    </View>
-   <View style={{ marginTop: 16}}>
     <PrimaryButton title={ctaLabel} buttonType="submit" accessibilityLabel={ctaLabel} onPress={onPress} />
     {!!onDismiss && (
       <LinkText
@@ -28,20 +25,19 @@ const NextActionCard = ({ title, message, ctaLabel, onPress, onDismiss }) => (
         textStyle={AppStyles.hyperlink}
       />
     )}
-    </View>
-  </>
+  </View>
 );
 
 const styles = StyleSheet.create({
   container: { padding: 16, marginTop: 24, alignSelf: "stretch" },
   title: {
-    marginBottom: 8,
+    marginBottom: 16,
   },
   message: {
     lineHeight: 20,
-    marginBottom: 4,
+    marginBottom: 16,
   },
-  dismissLink: { alignSelf: "center", marginTop: 8 },
+  dismissLink: { alignSelf: "center", marginTop: 16 },
 });
 
 export default NextActionCard;
