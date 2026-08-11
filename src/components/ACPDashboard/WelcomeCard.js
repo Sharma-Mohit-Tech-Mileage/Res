@@ -161,10 +161,10 @@ const WelcomeCard = () => {
         <Text
             style={[styles.offerDesclaimer]}
             accessible={true}
-            accessibilityLabel="Offer not available for FlexConnect or LIFT customers. Certain taxes and fees do not apply."
+            accessibilityLabel="Offer not available for FlexConnect customers. Certain taxes and fees do not apply."
             maxFontSizeMultiplier={1.2}
           >
-            *Offer not available for FlexConnect or LIFT customers. Certain
+            *Offer not available for FlexConnect customers. Certain
             taxes & fees do not apply.
           </Text>
       )}

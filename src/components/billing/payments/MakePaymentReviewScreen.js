@@ -192,17 +192,12 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
 
         {!method?.id && (
           <Text style={styles.helperText}>
-            You will complete this payment on our secure payment page. Your card or bank details never leave that
-            page.
+            For your security, you'll finish this payment on our secure checkout — we never see or store your card or bank details.
           </Text>
         )}
 
         <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
-        {!method?.id && (
-          <Text style={styles.secureNote}>
-            For your security, you'll finish this payment on our secure checkout — we never see or store your card or bank details.
-          </Text>
-        )}
+        
 
         <PrimaryButton
           title={submitting ? "Submitting..." : "Submit Payment"}

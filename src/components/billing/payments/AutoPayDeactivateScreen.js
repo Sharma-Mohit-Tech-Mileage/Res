@@ -6,7 +6,7 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
-import { SectionTitle, HintText } from "../../common/customui/Typography";
+import { SectionTitle, HintText, SectionContent } from "../../common/customui/Typography";
 import { fetchAutoPayDetails, cancelAutoPay } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, ordinal } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
@@ -70,7 +70,9 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
         <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           Deactivate auto pay
         </SectionTitle>
-        <HintText style={styles.introText}>You are going to deactivate your current auto pay account</HintText>
+        <SectionContent style={styles.instructions}>
+          You are going to deactivate your current auto pay account
+        </SectionContent>
 
         <NotificationAlert
           type="warning"
@@ -109,6 +111,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   introText: { lineHeight: 20, marginBottom: 8 },
+  instructions: { marginBottom: 8 },
   agreeBlock: { marginTop: 8, marginBottom: 8 },
 });
 

@@ -6,10 +6,11 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import SparkLightInput from "../../common/customui/SparkLightInput";
+import LinkText from "../../common/customui/LinkText";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
 import { FontFamily,Color,FontSize } from "../../../../GlobalStyles";
-import { SectionTitle, HintText, FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { SectionTitle, HintText, SectionContent, FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
 import {
   fetchPaymentMethods,
@@ -124,11 +125,14 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
         <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           Review Auto Pay
         </SectionTitle>
-        <HintText style={styles.introText}>
-          {mode === "update" ? "You have signed up for" : "You are enrolling in"} Sparklight Auto Pay. Your payment
-          will be automatically charged on the <Text style={styles.introBold}>{dueDayLabel}</Text> of each month using
-          your selected payment method.
-        </HintText>
+        <SectionContent style={styles.instructions}>
+          {mode === "update"
+            ? "You have signed up for Sparklight Auto Pay."
+            : "You are enrolling in Sparklight Auto Pay."}
+        </SectionContent>
+        <SectionContent style={styles.instructions}>
+          Your payment will be automatically charged on the <Text style={styles.introBold}>{dueDayLabel}</Text> of each month using your selected payment method.
+        </SectionContent>
 
         <>
             {!loading && amountDue > 0 && (
@@ -183,7 +187,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                   <View style={styles.labelSkeleton} />
                   <View style={styles.inputSkeleton} />
                 </SkeletonPlaceholder>
-              ) : (
+                ) : (
                 <SparkLightInput
                   ref={emailRef}
                   name="email"
@@ -225,14 +229,16 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 140 },
   heading: {
     marginBottom: 8,
+    lineHeight: 50,
   },
   introText: { lineHeight: 20, marginBottom: 16 },
+  instructions: { marginBottom: 0 },
   introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
   cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
   valueSkeleton: { height: 18, borderRadius: 4, width: "60%" },
   labelSkeleton: { height: 14, borderRadius: 4, width: "45%", marginBottom: 10 },
   inputSkeleton: { height: 44, borderRadius: 6, width: "100%" },
-  summaryCard: { padding: 16, marginTop: 8 },
+  summaryCard: { padding: 16, marginTop: 10, },
   fieldGroup: { marginBottom: 16 },
   fieldGroupLast: { paddingBottom: 4 },
   fieldLabel: {
@@ -246,7 +252,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   fieldValueBox: {   },
-  emailCard: { padding: 16 },
+  emailCard: { padding: 16 ,marginTop: 16, marginBottom: 16 },
 });
 
 export default AutoPayReviewScreen;
