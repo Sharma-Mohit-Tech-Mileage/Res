@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -11,6 +11,7 @@ import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
+  calculateFee,
   fetchAutoPayDetails,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
@@ -59,6 +60,20 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   const loading = methods === null;
   const selectedMethod = methods?.find((m) => m.id === selectedId) || null;
   const canContinue = !!selectedMethod && !isMethodExpired(selectedMethod);
+
+  // Fee Calculator runs on selection so the review screen already has the surcharge.
+  const [surcharge, setSurcharge] = useState(null);
+  useEffect(() => {
+    setSurcharge(null);
+    if (!isCreditCard(selectedMethod) || !amount) return undefined;
+    let cancelled = false;
+    calculateFee(amount, selectedMethod)
+      .then((fee) => !cancelled && setSurcharge(fee))
+      .catch(() => !cancelled && setSurcharge(null));
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedId, amount]);
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
   const onPayWithNewMethod = () => {
@@ -132,7 +147,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
               buttonType="submit"
               disabled={!canContinue}
               accessibilityLabel="Continue"
-              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle })}
+              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle, surcharge })}
             />
             <PrimaryButton
               title="Cancel"

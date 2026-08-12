@@ -100,6 +100,38 @@ export const deletePaymentMethod = async (methodId) => {
   return res.data;
 };
 
+// Response shape is not finalised yet, so accept any fee/surcharge-looking numeric field.
+const pickFeeAmount = (data) => {
+  const scopes = [data, data?.data, data?.result, data?.fee].filter((v) => v && typeof v === "object");
+  for (const scope of scopes) {
+    for (const key of Object.keys(scope)) {
+      if (/fee|surcharge/i.test(key)) {
+        const value = Number(scope[key]);
+        if (isFinite(value)) return value;
+      }
+    }
+  }
+  const direct = Number(data);
+  return isFinite(direct) ? direct : null;
+};
+
+// Orbipay Fee Calculator. CustomerId and FundingAccountId both come off the funding
+// account we already fetched, so no extra lookup is needed.
+export const calculateFee = async (amount, method, paymentScheduleType = "one_time_payment") => {
+  const { config } = await authContext();
+  const res = await _axios.post(
+    getEndpoint(ENDPOINTS.PAYMENT_CALCULATE_FEE),
+    {
+      amount: Number(amount),
+      paymentScheduleType,
+      CustomerId: method?.idCustomer || "",
+      FundingAccountId: method?.id || "",
+    },
+    config
+  );
+  return pickFeeAmount(res?.data);
+};
+
 export const submitPayment = async (amount, method, emailOverride) => {
   const { accountNumber, config } = await authContext();
   const { email } = accountSnapshot();
