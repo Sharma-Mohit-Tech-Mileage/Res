@@ -40,6 +40,8 @@ const normalizePaymentMethod = (raw = {}) => {
     id: String(raw.id || raw.fundingAccountId || raw.funding_account_id || ""),
     idCustomer: customerMatch ? customerMatch[1] : "",
     type: isCard ? "card" : "bank",
+    // Surcharge applies to credit cards only, so the credit/debit subtype has to survive normalisation.
+    cardType: isCard ? (subtype.includes("credit") ? "credit" : subtype.includes("debit") ? "debit" : "") : "",
     brand: (subtype.split("_")[0] || (isCard ? "card" : "bank")).toLowerCase(),
     nickname: cleanName(raw.nickname) || cleanName(raw.account_holder_name) || fallbackName,
     lastFour: masked.replace(/[^0-9]/g, "").slice(-4),

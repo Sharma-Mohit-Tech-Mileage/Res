@@ -23,6 +23,9 @@ import {
   paymentMethodA11yLabel,
   formatCurrency,
   openOrbipayPaymentExecution,
+  isCreditCard,
+  SURCHARGE_TITLE,
+  SURCHARGE_MESSAGE,
 } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 
@@ -33,6 +36,8 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
   const fromOffer = !!route.params?.fromOffer;
   const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [method, setMethod] = useState(route.params?.method || null);
+  // Supplied by the Orbipay Fee Calculator; informational only and never recalculated here.
+  const surcharge = route.params?.surcharge != null ? Number(route.params.surcharge) : null;
   const [autoPay, setAutoPay] = useState(null);
   const [loading, setLoading] = useState(true);
   const [agreed, setAgreed] = useState(false);
@@ -121,6 +126,9 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
     }
   };
 
+  const showSurcharge = isCreditCard(method) && surcharge != null;
+  const totalAmount = showSurcharge ? amount + surcharge : amount;
+
   const renderField = (label, value, a11yValue, last, valueLoading) => (
     <View
       style={[styles.fieldGroup, last && styles.fieldGroupLast]}
@@ -161,6 +169,18 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         <View style={[card.elevated, styles.summaryCard]}>
           {renderField("Payment Method", describePaymentMethod(method), paymentMethodA11yLabel(method), false, loading)}
           {renderField("Payment Amount", formatCurrency(amount), null, false, loading)}
+          {showSurcharge && (
+            <>
+              {renderField("Credit Card Surcharge", formatCurrency(surcharge), null, false, loading)}
+              <NotificationAlert
+                type="warning"
+                title={SURCHARGE_TITLE}
+                message={SURCHARGE_MESSAGE}
+                showCloseIcon={false}
+              />
+              {renderField("Total Amount", formatCurrency(totalAmount), null, false, loading)}
+            </>
+          )}
           {renderField("Payment Date", paymentDate, moment().format("MMMM D, YYYY"), true, loading)}
         </View>
 
@@ -208,7 +228,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           title={submitting ? "Submitting..." : "Submit Payment"}
           buttonType="submit"
           disabled={submitting || !agreed || loading}
-          accessibilityLabel={`Submit payment of ${formatCurrency(amount)}`}
+          accessibilityLabel={`Submit payment of ${formatCurrency(totalAmount)}`}
           onPress={onSubmit}
         />
         <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />

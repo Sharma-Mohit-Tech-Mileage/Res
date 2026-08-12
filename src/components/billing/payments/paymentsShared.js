@@ -22,6 +22,13 @@ export const ordinal = (day) => {
   return `${n}th`;
 };
 
+export const SURCHARGE_TITLE = "3% Credit Card Surcharge";
+
+export const SURCHARGE_MESSAGE =
+  "A 3% surcharge applies to all credit card payments. Payments made by debit card, directly from a checking or savings account, or by check are not subject to this surcharge.";
+
+export const isCreditCard = (method) => method?.type === "card" && method?.cardType === "credit";
+
 export const paymentMethodTitle = (method) => {
   if (!method) return "Payment method";
   return method.nickname || (method.type === "card" ? "Debit Card" : "Checking Account");

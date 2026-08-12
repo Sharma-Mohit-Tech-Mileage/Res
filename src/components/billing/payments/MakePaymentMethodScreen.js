@@ -13,7 +13,14 @@ import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, isMethodExpired, openOrbipayPaymentExecution } from "./paymentsShared";
+import {
+  contentMaxWidth,
+  isMethodExpired,
+  openOrbipayPaymentExecution,
+  isCreditCard,
+  SURCHARGE_TITLE,
+  SURCHARGE_MESSAGE,
+} from "./paymentsShared";
 
 
 const MakePaymentMethodScreen = ({ navigation, route }) => {
@@ -70,6 +77,15 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
             message={errorAlert}
             onClose={() => setErrorAlert("")}
             autoFocusTitle
+          />
+        )}
+
+        {isCreditCard(selectedMethod) && (
+          <NotificationAlert
+            type="warning"
+            title={SURCHARGE_TITLE}
+            message={SURCHARGE_MESSAGE}
+            showCloseIcon={false}
           />
         )}
 
