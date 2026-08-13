@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
-import Touchable from "../common/customui/Touchable";
+import { usernameTerms, validateUsername } from "../utility/constant";
+import {ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
+import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Padding,
@@ -14,10 +16,11 @@ import {
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
-import { updateProfileRequest } from "../../redux/actions/ProfileActionSuite";
+import {PostApiRequest} from "../../network/RestApiClient";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { profileSchema } from "../utility/validationSchema";
-import { isPrimaryAdmin } from "../utility/constant";
+import { usernameSchema } from "../utility/validationSchema";
+import AppStyles from "../../styles/AppStyles";
+import { SectionTitle, SectionContent } from "../common/customui/Typography";
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
@@ -26,15 +29,12 @@ const ProfileSettingsEdit = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [initialEmailAddress, setInitialEmailAddress] = useState("");
-  const profile = useSelector((state) => state.profile || {});
-  const profileDetailsfromStore = profile.profileDetails || {};
-  const isPrimaryUser = isPrimaryAdmin(profileDetailsfromStore.memberType);
   const scrollViewRef = useRef(null);
-  const firstNameRef = useRef(null);
-  const lastNameRef = useRef(null);
+
   const handleSave = async (data) => {
     const newData = { ...data };
-    dispatch(updateProfileRequest(newData, navigation));
+    Console.log("New Data to be saved:", newData);
+    // dispatch(updateProfileRequest(newData, navigation));
   };
 
   const {
@@ -43,28 +43,40 @@ const ProfileSettingsEdit = () => {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(
-      profileSchema(isPrimaryUser, profileDetailsfromStore.multipleEmails)
-    ),
-    defaultValues: {
-      ...profileDetailsfromStore,
-    },
+    resolver: yupResolver(usernameSchema()),
+    defaultValues: {},
   });
+
+const updateUsername = (newUsername) => {
+    const payload = {
+      accountNumber:"" ,
+      userName: "",
+      newUsername: newUsername,
+      modifiedBy: "MobileApp",
+      source: "MobileApp",
+      idToken: "",
+
+
+    };
+
+    PostApiRequest(ENDPOINTS.UPDATE_USERNAME, payload,(Response) => {
+      if (Response?.status === 200) {
+        navigation.goBack();
+      } else {
+        setShowErrorAlert(true);
+      }
+    },(error) => {
+      setShowErrorAlert(true);
+    });
+      
+  };    
+
+
 
   const handleValidationError = (errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setShowValidationAlert(true);
-    const fieldOrder = [
-      { key: "firstName", ref: firstNameRef },
-      { key: "lastName", ref: lastNameRef },
-    ];
-    const firstInvalid = fieldOrder.find((f) => errors?.[f.key]);
-    if (firstInvalid) firstInvalid.ref.current?.focus();
   };
-
-  useEffect(() => {
-    reset({ ...profileDetailsfromStore });
-  }, [profileDetailsfromStore, reset]);
 
   useEffect(() => {
     if (route.params?.updateFailed) {
@@ -73,7 +85,6 @@ const ProfileSettingsEdit = () => {
       navigation.setParams({ updateFailed: undefined });
     }
   }, [route.params?.updateFailed, navigation]);
-
 
   useEffect(() => {
     return () => {
@@ -85,12 +96,12 @@ const ProfileSettingsEdit = () => {
   return (
     <View style={styles.profileSettingsEdit}>
       <ProfileSettingsHeader
-        title="Edit Profile"
-        onPressBack={() => navigation.navigate("ProfileSettings")}
+        title="Edit Username"
+        onPressBack={() => navigation.goBack()}
       />
       <ScrollView ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
-          <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
+          <View style={[AppStyles.card, styles.frameGroupSpaceBlock]}>
             <View style={styles.infoWrapper}>
               <NotificationAlert
                 type="error"
@@ -115,7 +126,7 @@ const ProfileSettingsEdit = () => {
                 styles.informationWrapperFlexBox,
               ]}
             >
-              <Text style={styles.generalInformation}>General Information</Text>
+              <SectionTitle>Update Username</SectionTitle>
             </View>
             <View style={styles.frameParent}>
               <View
@@ -123,15 +134,14 @@ const ProfileSettingsEdit = () => {
               >
                 <Controller
                   control={control}
-                  name="firstName"
+                  name="newUsername"
                   render={({
                     field: { onChange, onBlur, value },
                     fieldState: { error },
                   }) => (
                     <SparkLightInput
-                      ref={firstNameRef}
-                      placeholder="First Name"
-                      label={"First Name"}
+                      placeholder=""
+                      label={"New Username"}
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={value}
@@ -145,72 +155,75 @@ const ProfileSettingsEdit = () => {
               >
                 <Controller
                   control={control}
-                  name="lastName"
+                  name="ConfirmNewUsername"
                   render={({
                     field: { onChange, onBlur, value },
                     fieldState: { error },
                   }) => (
-                    <SparkLightInput
-                      ref={lastNameRef}
-                      label={"Last Name"}
-                      placeholder="First Name"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      error={error?.message}
-                    />
-                  )}
-                />
-              </View>
-              <View
-                style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}
-              >
-                <Controller
-                  control={control}
-                  name="userName"
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { error },
-                  }) => (
-                    <SparkLightInput
-                      label={"Username"}
-                      placeholder="First Name"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      editable={false}
-                      error={error?.message}
-                    />
+                    <>
+                      <SparkLightInput
+                        label={"Confirm New Username"}
+                        placeholder=""
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        error={error?.message}
+                      />
+
+                      <View
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel={`Username requirements: ${usernameTerms.join(
+                          ". ",
+                        )}`}
+                        style={[
+                          styles.passwordFlexBox,
+                          { marginTop: Padding.p_base },
+                        ]}
+                      >
+                        {validateUsername(value).map((isValid, index) => (
+                          <View
+                            key={`point-${index}`}
+                            style={styles.bulletPointContainer}
+                          >
+                            <View style={{ paddingTop: 8 }}>
+                              <View
+                                style={[
+                                  styles.bullet,
+                                  {
+                                    backgroundColor: isValid
+                                      ? Color.sparklightGreen
+                                      : Color.colorGray_200,
+                                  },
+                                ]}
+                              />
+                            </View>
+                            <Text style={styles.bulletPoiint}>
+                              {usernameTerms[index]}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    </>
                   )}
                 />
               </View>
             </View>
           </View>
           <View style={{ marginTop: Padding.p_5xl }}>
-            <Touchable
-              minSize={0}
-              style={[
-                { backgroundColor: Color.colorMidnightblue },
-                styles.buttonsLayout,
-              ]}
+            <PrimaryButton
+              title="Save"
+              buttonType="submit"
               onPress={handleSubmit(handleSave, handleValidationError)}
-            >
-              <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>
-                Save
-              </Text>
-            </Touchable>
-            <View style={{ padding: 8 }}></View>
-            <Touchable
-              minSize={0}
-              style={styles.buttonsLayout}
-              onPress={() => navigation.navigate("ProfileSettings")}
-            >
-              <Text
-                style={[styles.makeTypo, { color: Color.colorMidnightblue }]}
-              >
-                Cancel
-              </Text>
-            </Touchable>
+            />
+
+            <View style={{ padding: 4 }}></View>
+            <PrimaryButton
+              title="Cancel"
+              buttonType="outline"
+              accessibilityLabel="Cancel"
+              onPress={() => navigation.goBack()}
+            />
           </View>
         </View>
       </ScrollView>
@@ -226,6 +239,31 @@ const styles = StyleSheet.create({
   informationWrapperFlexBox: {
     flexDirection: "row",
     alignSelf: "stretch",
+  },
+  bulletPoiint: {
+    color: Color.sparklightGray1,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: FontSize.size_xs,
+    fontStyle: "normal",
+    fontWeight: "400",
+    lineHeight: 19,
+  },
+  bulletPointContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 16,
+    marginRight: 24,
+  },
+  passwordFlexBox: {
+    textAlign: "left",
+    fontFamily: FontFamily.RadioCanadaRegular,
+    color: Color.sparklightGray1,
+  },
+  bullet: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    marginRight: 10,
   },
   buttonsLayout: {
     width: "100%",
@@ -250,8 +288,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   generalInformationWrapper: {
-    paddingTop: Padding.p_base,
-    paddingBottom: Padding.p_5xs,
+    paddingTop: Padding.p_5xs,
+    paddingBottom: Padding.p_5xl,
     alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
   },

@@ -101,6 +101,8 @@ const ProfileSettings = () => {
           phoneNumber: phoneNumber,
         },
       });
+    } else if (fieldType === "username") {
+      navigation.navigate("ProfileSettingsEdit", { field: "userName" });
     }
   };
 
@@ -316,19 +318,48 @@ const ProfileSettings = () => {
                     {customerName}
                   </FieldContent>
                 </View>
-                <View style={styles.firstNameParent}>
-                  <FieldTitle>Username</FieldTitle>
-                  <FieldContent
-                    style={[styles.melissa, styles.melissaTypo]}
-                    accessible={true}
-                    accessibilityRole="text"
-                    accessibilityLabel={`Username: ${
-                      profileDetails.userName || "N/A"
-                    }`}
-                  >
-                    {profileDetails.userName}
-                  </FieldContent>
-                </View>
+                <A11y.Order style={styles.editableRow}>
+                  <A11y.Index index={0}>
+                    <View style={[styles.editableContent, { marginBottom: Padding.p_9xs }]}>
+                      <FieldTitle
+                        style={styles.firstName}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel="Username"
+                      >
+                        Username
+                      </FieldTitle>
+
+                      <FieldContent
+                        style={[styles.melissa, styles.melissaTypo]}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel={`Username: ${
+                          profileDetails.userName || "No username on file."
+                        }`}
+                      >
+                        {profileDetails.userName || "No username on file."}
+                      </FieldContent>
+                    </View>
+                  </A11y.Index>
+                  <A11y.Index index={1}>
+                    <Touchable
+                      style={styles.editButton}
+                      onPress={() => handleArrowPress("username")}
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        profileDetails.userName ? "Edit username" : "Add username"
+                      }
+                      accessibilityHint={
+                        profileDetails.userName
+                          ? "Double tap to edit your username"
+                          : "Double tap to add your username"
+                      }
+                    >
+                      {profileDetails.userName ? <EditIcon /> : <AddIcon />}
+                    </Touchable>
+                  </A11y.Index>
+                </A11y.Order>
 
                 <View style={styles.firstNameParent}>
                   <FieldTitle>Account Number</FieldTitle>

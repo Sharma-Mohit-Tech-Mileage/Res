@@ -52,6 +52,19 @@ export const validatePassword = (newPassword, userName) => {
   return conditions;
 };
 
+export const validateUsername = (newUsername) => {
+  if (!newUsername) {
+    return Array(4).fill(false);
+  }
+  const conditions = [
+    newUsername.length >= 8 && newUsername.length <= 20,
+    /^[a-zA-Z0-9]+$/.test(newUsername),
+    !/[%&_?#=\-]/.test(newUsername),
+    !/\s/.test(newUsername),
+  ];
+  return conditions;
+};
+
 export const securityQuestions = [
   "Favorite author",
   "Favorite historical person",
@@ -67,6 +80,13 @@ export const passwordTerms = [
   "It must include an upper and lower case letter and a number.",
   "It must include at least one special character such as %, &, _, ?, #, =, -",
   "Your new password cannot have any spaces.",
+];
+
+export const usernameTerms = [
+  "It must contain 8 to 20 characters.",
+  "It must contain only letters (a-z) and numbers (0-9).",
+  "It must not contain any special characters (%, &, _, ?, #, =, -)",
+  "Your new username cannot have any spaces.",
 ];
 
 export const getPasswordPriorityHint = (password, userName) => {
