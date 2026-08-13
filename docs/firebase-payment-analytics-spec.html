@@ -68,8 +68,8 @@
 <tr><td>Historical data</td><td>Unaffected. No retroactive change.</td></tr>
 <tr><td>App performance / payment processing</td><td>No impact — calls are fire-and-forget and wrapped in try/catch.</td></tr>
 </table>
-<div class="box warn">
-<strong>One exception, and it needs Analytics sign-off.</strong> The privacy recommendation in §6 is to stop sending the account number as the user identifier. If <code>setUserId</code> / <code>Sparklight_user_id</code> is changed or removed, <strong>any existing user-scoped report or audience built on it will lose continuity</strong> — historical data remains, but new data will no longer join to it. This is the only proposed change that touches existing analytics, and it should be agreed with the Analytics team before implementation, not after.
+<div class="box ok">
+<strong>Decision taken: the existing user identifier is retained.</strong> <code>setUserId</code> and <code>Sparklight_user_id</code> continue to carry the account number, so no user-scoped report or audience loses continuity. With that decided, <strong>this work has no impact on existing analytics at all</strong> — there is no exception. The one related change is closing the identifier reset gaps in §6, which only makes existing behaviour match its intent and affects no historical data.
 </div>
 
 <h2>3. Two approaches</h2>
@@ -131,9 +131,22 @@
 <h2>6. Privacy</h2>
 <p><strong>Never send:</strong> account number, email address, card last-four, cardholder name, confirmation number, exact payment amount.</p>
 <p><strong>Amounts</strong> are sent as <code>amount_bucket</code> — <code>0-50</code>, <code>50-100</code>, <code>100-250</code>, <code>250+</code>. Reporting needs the distribution, not a financial record per customer.</p>
+<h3>Customer identifier — retained, with reset gaps to close</h3>
+<p><code>SplashScreen.js</code> sends the account number to Firebase three ways: <code>setUserId(accountNumber)</code>, <code>setUserProperty("Sparklight_user_id", …)</code>, and as a <code>login</code> event parameter. <strong>The decision is to retain this</strong> — it preserves reporting continuity and avoids repointing existing audiences.</p>
+<p>Adding payment events does change what that identifier is joinable to: previously logins and screen views, now also payment behaviour, method type and amount band. Two controls keep that acceptable, and both are already in this spec — amounts are bucketed rather than exact, and no new identifier is added to any payment event.</p>
+<p>The remaining requirement is that the identifier is <strong>reliably cleared when a session ends</strong>. It currently is not:</p>
+<table>
+<tr><th style="width:340px">Exit path</th><th>Clears identifier?</th></tr>
+<tr><td>Logout via Account screen</td><td>Yes — <code>setUserId(null)</code> + property null</td></tr>
+<tr><td>Logout via <code>SplashScreen.logoutAction</code></td><td>Yes — <code>resetAnalyticsData()</code></td></tr>
+<tr><td><code>GlobalErrorModal</code> close</td><td>Yes — Business only; <strong>missing in Residential</strong></td></tr>
+<tr><td><code>RestApiClient.redirectToLogin()</code> — 401 refresh failure</td><td><strong>No</strong></td></tr>
+<tr><td><code>MaintenanceContext.performLogout()</code></td><td><strong>No</strong></td></tr>
+</table>
 <div class="box warn">
-<strong>Pre-existing issue.</strong> <code>SplashScreen.js</code> sends the account number to Firebase three ways: <code>setUserId(accountNumber)</code>, <code>setUserProperty("Sparklight_user_id", …)</code>, and as a <code>login</code> event parameter. Adding payment events makes that identifier joinable to payment behaviour and amounts. Recommend hashing it, or removing it and relying on <code>payment_attempt_id</code> plus Firebase's own instance id. See §2 for the impact of changing it.
+<strong>Why this matters more once payment events exist.</strong> The two paths that do not clear leave the identifier pointing at the previous account. Any event fired before the next login is attributed to the wrong customer — with payment events, that means a payment journey recorded against someone who did not make it. The token-expiry failures that trigger <code>redirectToLogin()</code> are known to occur in production.
 </div>
+<p><strong>Fix:</strong> add the reset to <code>redirectToLogin()</code> and <code>MaintenanceContext.performLogout()</code> in both apps, and add the missing <code>GlobalErrorModal</code> reset in Residential. Roughly ten lines per app. This is a defect in existing behaviour rather than new scope — the intent to clear on logout is already there, it simply misses two exits.</p>
 
 <h2>7. Dashboard views enabled</h2>
 <ul>
@@ -160,7 +173,7 @@
 <tr><td>1</td><td>Approve Approach B (14 events, funnel from <code>screen_view</code>)</td><td>Analytics</td></tr>
 <tr><td>2</td><td>Confirm <code>payment_flow_abandoned</code> is derived, not fired</td><td>Analytics</td></tr>
 <tr><td>3</td><td>Approve <code>amount_bucket</code> instead of exact amounts</td><td>Analytics / Privacy</td></tr>
-<tr><td>4</td><td>Decide on the account-number identifier — hash, remove, or accept</td><td>Privacy / Analytics</td></tr>
+<tr><td>4</td><td><strong>Decided — retain the account-number identifier.</strong> Follow-up: close the three reset gaps in §6 so it is reliably cleared when a session ends.</td><td>Engineering</td></tr>
 <tr><td>5</td><td>Confirm <code>entry_point</code> values. Actual entries today are dashboard (<code>BillerSummary</code>), billing (<code>BillingScreen</code>) and the AutoPay card. "reminder" does not exist in the app.</td><td>Product</td></tr>
 </table>
 
