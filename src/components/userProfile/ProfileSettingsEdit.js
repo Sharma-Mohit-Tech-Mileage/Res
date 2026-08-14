@@ -27,7 +27,7 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const dispatch = useDispatch();
+  const [displaySuccessAlert, setDisplaySuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -77,23 +77,24 @@ const updateUsername = async (newUsername) => {
         ENDPOINTS.UPDATE_USERNAME,
         payload,
         (Response) => {
-          if (Response?.status === 200) {
-            console.log("Username updated successfully:", Response.data);
+           setLoading(false);
+          console.log("Username updated successfully:", JSON.stringify(Response));
+          if (Response?.status === "success") {
             navigation.goBack();
           } else {
             setShowErrorAlert(true);
           }
         },
         (error) => {
+           setLoading(false);
           console.warn("Update username error:", error);
           setShowErrorAlert(true);
         }
       );
     } catch (err) {
       console.warn("Error preparing username payload:", err);
-      setShowErrorAlert(true);
-    }finally {
       setLoading(false);
+      setShowErrorAlert(true);
     }
   };
 
@@ -251,7 +252,7 @@ const updateUsername = async (newUsername) => {
               onPress={() => navigation.goBack()}
             />
           </View>
-          <LoadingOverlay isVisible={loading} />
+          {loading && <LoadingOverlay isVisible={loading} />}
         </View>
       </ScrollView>
     </View>
