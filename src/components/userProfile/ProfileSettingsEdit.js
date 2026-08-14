@@ -15,7 +15,6 @@ import {
 } from "../../../GlobalStyles";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { useDispatch, useSelector } from "react-redux";
 import {PostApiRequest} from "../../network/RestApiClient";
 import { getUser, getSsoToken } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
@@ -23,6 +22,7 @@ import { usernameSchema } from "../utility/validationSchema";
 import AppStyles from "../../styles/AppStyles";
 import { SectionTitle, SectionContent } from "../common/customui/Typography";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
+import UsernameSuccessModal from "./UsernameSuccessModal";
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
@@ -57,7 +57,6 @@ const updateUsername = async (newUsername) => {
     try {
       const user = await getUser();
       const sso = await getSsoToken();
-
       const accountNumber = user?.userInfo?.accountNumber || user?.accountNumber || "";
       const userName = user?.userInfo?.userName || user?.userName || "";
       const idToken = (sso && (sso.idToken || sso.token)) || "";
@@ -80,7 +79,7 @@ const updateUsername = async (newUsername) => {
            setLoading(false);
           console.log("Username updated successfully:", JSON.stringify(Response));
           if (Response?.status === "success") {
-            navigation.goBack();
+            setDisplaySuccessAlert(true);
           } else {
             setShowErrorAlert(true);
           }
@@ -253,6 +252,13 @@ const updateUsername = async (newUsername) => {
             />
           </View>
           {loading && <LoadingOverlay isVisible={loading} />}
+          <UsernameSuccessModal
+            visible={displaySuccessAlert}
+            onClose={() => {
+              setDisplaySuccessAlert(false);
+              navigation.goBack();
+            }}
+          />
         </View>
       </ScrollView>
     </View>
