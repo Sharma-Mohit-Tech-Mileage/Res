@@ -17,10 +17,12 @@ import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
 import {PostApiRequest} from "../../network/RestApiClient";
+import { getUser, getSsoToken } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { usernameSchema } from "../utility/validationSchema";
 import AppStyles from "../../styles/AppStyles";
 import { SectionTitle, SectionContent } from "../common/customui/Typography";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
@@ -28,13 +30,16 @@ const ProfileSettingsEdit = () => {
   const dispatch = useDispatch();
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
-  const [initialEmailAddress, setInitialEmailAddress] = useState("");
+  const [loading, setLoading] = useState(false);
   const scrollViewRef = useRef(null);
 
   const handleSave = async (data) => {
     const newData = { ...data };
-    Console.log("New Data to be saved:", newData);
-    // dispatch(updateProfileRequest(newData, navigation));
+    console.log("New Data to be saved:", newData);
+    // call updateUsername with validated value
+    if (newData?.newUsername) {
+      await updateUsername(newData.newUsername);
+    }
   };
 
   const {
@@ -47,29 +52,50 @@ const ProfileSettingsEdit = () => {
     defaultValues: {},
   });
 
-const updateUsername = (newUsername) => {
-    const payload = {
-      accountNumber:"" ,
-      userName: "",
-      newUsername: newUsername,
-      modifiedBy: "MobileApp",
-      source: "MobileApp",
-      idToken: "",
+const updateUsername = async (newUsername) => {
+    setLoading(true);
+    try {
+      const user = await getUser();
+      const sso = await getSsoToken();
 
+      const accountNumber = user?.userInfo?.accountNumber || user?.accountNumber || "";
+      const userName = user?.userInfo?.userName || user?.userName || "";
+      const idToken = (sso && (sso.idToken || sso.token)) || "";
 
-    };
+      const payload = {
+        accountNumber: accountNumber,
+        userName: userName,
+        newUsername: newUsername,
+        modifiedBy: "MobileApp",
+        source: "MobileApp",
+        idToken: idToken,
+      };
 
-    PostApiRequest(ENDPOINTS.UPDATE_USERNAME, payload,(Response) => {
-      if (Response?.status === 200) {
-        navigation.goBack();
-      } else {
-        setShowErrorAlert(true);
-      }
-    },(error) => {
+      console.log("Updating username with payload:", payload);
+
+      PostApiRequest(
+        ENDPOINTS.UPDATE_USERNAME,
+        payload,
+        (Response) => {
+          if (Response?.status === 200) {
+            console.log("Username updated successfully:", Response.data);
+            navigation.goBack();
+          } else {
+            setShowErrorAlert(true);
+          }
+        },
+        (error) => {
+          console.warn("Update username error:", error);
+          setShowErrorAlert(true);
+        }
+      );
+    } catch (err) {
+      console.warn("Error preparing username payload:", err);
       setShowErrorAlert(true);
-    });
-      
-  };    
+    }finally {
+      setLoading(false);
+    }
+  };
 
 
 
@@ -225,6 +251,7 @@ const updateUsername = (newUsername) => {
               onPress={() => navigation.goBack()}
             />
           </View>
+          <LoadingOverlay isVisible={loading} />
         </View>
       </ScrollView>
     </View>

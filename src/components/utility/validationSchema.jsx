@@ -228,47 +228,12 @@ export const passwordSchema = (isCustomQuestionSelected) =>
   yup.object({
     newUsername: yup
       .string()
-      .required("Username is required"),
+      .required("Username is required")
+      .matches(/^[A-Za-z0-9]{8,20}$/, "Username must be 8-20 characters and contain only letters and numbers (no spaces or special characters)."),
     ConfirmNewUsername: yup
       .string()
-      .required("Confirm New Username is required") // Allows null values
-      .test(
-        "newUsername-conditional-validation",
-        "Username must meet the requirements",
-        (value) => {
-          // If the value is null or empty, skip further validation
-          if (!value) return true;
-
-          // Define the password rules
-          const usernameRules = yup
-            .string()
-            .min(8, "Username must be at least 8 characters long")
-            .max(20, "Username must not be more than 20 characters long")
-            .matches(
-              /[A-Z]/,
-              "Username must have at least one uppercase letter"
-            )
-            .matches(
-              /[a-z]/,
-              "Username must have at least one lowercase letter"
-            )
-            .matches(/[0-9]/, "Username must have at least one number")
-            .matches(
-              /[^a-zA-Z0-9]/,
-              "Username must include special characters like %, &, _, ?, #, =, -"
-            )
-            .matches(/^\S*$/, "No spaces are allowed in the username");
-
-          // Try validating the username against the rules
-          try {
-            usernameRules.validateSync(value);
-            return true; // Username is valid
-          } catch (error) {
-            // Return validation error
-            return new yup.ValidationError(error.message, null, "newUsername");
-          }
-        }
-      ),
+      .required("Confirm New Username is required")
+      .oneOf([yup.ref("newUsername"), null], "Usernames must match"),
     
   });
 
