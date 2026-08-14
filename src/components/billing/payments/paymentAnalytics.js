@@ -1,0 +1,122 @@
+import analytics from "@react-native-firebase/analytics";
+
+// Firebase payment analytics. Spec: docs/firebase-payment-analytics-spec.html
+//
+// Funnel steps come from the existing screen_view; these events carry only what a
+// screen cannot — what the customer chose, what happened, and what broke.
+//
+// payment_attempt_id groups one attempt. It is random, tied to nothing, and discarded
+// when the attempt ends, so two failed tries and a success in the same session stay
+// distinguishable without any customer identifier.
+
+let attemptId = null;
+
+const uuid = () =>
+  "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+  });
+
+// Never let analytics affect the payment flow: no throw, no rejection, never awaited.
+const log = (name, params = {}) => {
+  try {
+    const payload = attemptId ? { payment_attempt_id: attemptId, ...params } : { ...params };
+    Promise.resolve(analytics().logEvent(name, payload)).catch(() => {});
+  } catch (_) {
+    // ignored
+  }
+};
+
+export const startPaymentAttempt = () => {
+  attemptId = uuid();
+  return attemptId;
+};
+
+export const endPaymentAttempt = () => {
+  attemptId = null;
+};
+
+export const methodType = (method) => (method?.type === "card" ? "card" : "bank");
+
+export const amountBucket = (amount) => {
+  const value = Number(amount) || 0;
+  if (value < 50) return "0-50";
+  if (value < 100) return "50-100";
+  if (value < 250) return "100-250";
+  return "250+";
+};
+
+// ── Make a Payment ──────────────────────────────────────────────────────────
+
+export const trackPaymentTypeSelected = (paymentType) =>
+  log("payment_type_selected", { payment_type: paymentType });
+
+export const trackPaymentMethodSelected = (method) =>
+  log("payment_method_selected", {
+    payment_method_type: methodType(method),
+    card_type: method?.cardType || "",
+  });
+
+export const trackPaymentSubmitted = (amount, method, paymentType) =>
+  log("payment_submitted", {
+    payment_type: paymentType || "",
+    payment_method_type: methodType(method),
+    amount_bucket: amountBucket(amount),
+  });
+
+export const trackPaymentSuccess = (method) =>
+  log("payment_success", { payment_method_type: methodType(method) });
+
+export const trackPaymentFailed = (method, failureReason) =>
+  log("payment_failed", {
+    payment_method_type: methodType(method),
+    failure_reason: failureReason || "unknown",
+  });
+
+// ── Manage Payment Methods ──────────────────────────────────────────────────
+
+export const trackPaymentMethodAdded = (method) =>
+  log("payment_method_added", { payment_method_type: methodType(method) });
+
+export const trackPaymentMethodDeleted = (method) =>
+  log("payment_method_deleted", { payment_method_type: methodType(method) });
+
+export const trackPaymentMethodFailed = (method, failureReason) =>
+  log("payment_method_failed", {
+    payment_method_type: methodType(method),
+    failure_reason: failureReason || "unknown",
+  });
+
+// ── Manage AutoPay ──────────────────────────────────────────────────────────
+
+export const trackAutoPayEnabled = (method, entryPoint) =>
+  log("autopay_enabled", {
+    payment_method_type: methodType(method),
+    entry_point: entryPoint || "billing",
+  });
+
+export const trackAutoPayDisabled = (method) =>
+  log("autopay_disabled", { payment_method_type: methodType(method) });
+
+export const trackAutoPayFailed = (failureReason) =>
+  log("autopay_failed", { failure_reason: failureReason || "unknown" });
+
+// ── Health ──────────────────────────────────────────────────────────────────
+
+export const trackApiError = (endpoint, status, step) =>
+  log("payment_api_error", {
+    endpoint: endpoint || "unknown",
+    status: String(status ?? "no-response"),
+    step: step || "",
+  });
+
+export const trackValidationError = (field, reason) =>
+  log("payment_validation_error", { field: field || "", reason: reason || "" });
+
+export const trackStepDuration = (step, startedAt) => {
+  if (!startedAt) return;
+  log("payment_step_duration", {
+    step: step || "",
+    seconds: Math.round((Date.now() - startedAt) / 1000),
+  });
+};
