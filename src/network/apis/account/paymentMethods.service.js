@@ -100,19 +100,10 @@ export const deletePaymentMethod = async (methodId) => {
   return res.data;
 };
 
-// Response shape is not finalised yet, so accept any fee/surcharge-looking numeric field.
+// CalculateFee returns {"fee":"0.33"} - the amount arrives as a string.
 const pickFeeAmount = (data) => {
-  const scopes = [data, data?.data, data?.result, data?.fee].filter((v) => v && typeof v === "object");
-  for (const scope of scopes) {
-    for (const key of Object.keys(scope)) {
-      if (/fee|surcharge/i.test(key)) {
-        const value = Number(scope[key]);
-        if (isFinite(value)) return value;
-      }
-    }
-  }
-  const direct = Number(data);
-  return isFinite(direct) ? direct : null;
+  const value = Number(data?.fee ?? data?.data?.fee);
+  return isFinite(value) ? value : null;
 };
 
 // Orbipay Fee Calculator. CustomerId and FundingAccountId both come off the funding
@@ -124,8 +115,8 @@ export const calculateFee = async (amount, method, paymentScheduleType = "one_ti
     {
       surchargeAmount: Number(amount),
       paymentScheduleType,
-      fundingAccountId: method?.id || "",
-      customerId: method?.idCustomer || "",
+      CustomerId: method?.idCustomer || "",
+      FundingAccountId: method?.id || "",
     },
     config
   );
