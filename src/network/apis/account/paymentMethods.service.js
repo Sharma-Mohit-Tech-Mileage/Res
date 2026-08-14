@@ -122,10 +122,10 @@ export const calculateFee = async (amount, method, paymentScheduleType = "one_ti
   const res = await _axios.post(
     getEndpoint(ENDPOINTS.PAYMENT_CALCULATE_FEE),
     {
-      amount: Number(amount),
+      surchargeAmount: Number(amount),
       paymentScheduleType,
-      CustomerId: method?.idCustomer || "",
-      FundingAccountId: method?.id || "",
+      fundingAccountId: method?.id || "",
+      customerId: method?.idCustomer || "",
     },
     config
   );
