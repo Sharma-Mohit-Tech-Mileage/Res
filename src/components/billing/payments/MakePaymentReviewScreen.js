@@ -38,6 +38,9 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
   const [method, setMethod] = useState(route.params?.method || null);
   // Supplied by the Orbipay Fee Calculator; informational only and never recalculated here.
   const surcharge = route.params?.surcharge != null ? Number(route.params.surcharge) : null;
+  const showSurcharge = isCreditCard(method) && surcharge != null;
+  // The customer is charged amount + surcharge, so confirmation must report the total.
+  const totalAmount = showSurcharge ? amount + surcharge : amount;
   const [autoPay, setAutoPay] = useState(null);
   const [loading, setLoading] = useState(true);
   const [agreed, setAgreed] = useState(false);
@@ -93,7 +96,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           params: {
             kind: "payment-submitted",
             message: `Your payment for ${formatCurrency(
-              amount
+              totalAmount
             )} has been received. It may take up to 24 hours to be reflected on your account.`,
           },
         },
@@ -108,7 +111,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         headerTitle,
         kind: "payment-submitted",
         message: `Your payment for ${formatCurrency(
-          amount
+          totalAmount
         )} has been received. It may take up to 24 hours to be reflected on your account.`,
         confirmationNumber: result?.confirmationNumber || "",
         email: email.trim(),
@@ -125,9 +128,6 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
       setSubmitting(false);
     }
   };
-
-  const showSurcharge = isCreditCard(method) && surcharge != null;
-  const totalAmount = showSurcharge ? amount + surcharge : amount;
 
   const renderField = (label, value, a11yValue, last, valueLoading) => (
     <View
