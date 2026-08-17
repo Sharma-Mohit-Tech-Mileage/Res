@@ -67,18 +67,28 @@ const TransferOfServiceModal = ({
             >
               {groupDigits(newAccountNumber)}
             </Text>
-            <Touchable
-              minSize={0}
-              style={styles.copyBtn}
-              onPress={handleCopy}
-              accessible={true}
-              accessibilityRole="button"
-              accessibilityLabel={
-                copied ? "Account number copied" : "Copy account number"
-              }
-            >
-              <CopyIcon />
-            </Touchable>
+            <View style={styles.copyWrap}>
+              {copied && (
+                <View style={styles.copiedTip} accessible={false} pointerEvents="none">
+                  <View style={styles.copiedTipBubble}>
+                    <Text style={styles.copiedTipText}>Copied!</Text>
+                  </View>
+                  <View style={styles.copiedTipArrow} />
+                </View>
+              )}
+              <Touchable
+                minSize={0}
+                style={styles.copyBtn}
+                onPress={handleCopy}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  copied ? "Account number copied" : "Copy account number"
+                }
+              >
+                <CopyIcon />
+              </Touchable>
+            </View>
           </View>
 
           <Touchable
@@ -124,9 +134,9 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.snow_white,
-    borderRadius: 12,
-    paddingVertical: 28,
-    paddingHorizontal: 24,
+    borderRadius: 24,
+    paddingVertical: 32,
+    paddingHorizontal: 32,
     width: "100%",
   },
   titleRow: {
@@ -137,14 +147,14 @@ const styles = StyleSheet.create({
   title: {
     color: colors.black,
     fontFamily: FontFamily.RadioCanadaBold,
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: "700",
     marginLeft: 8,
   },
   body: {
-    color: colors.darkest_grey,
+    color: colors.black,
     fontFamily: FontFamily.RadioCanadaRegular,
-    fontSize: 14,
+    fontSize: 18,
     lineHeight: 22,
     textAlign: "center",
     marginTop: 16,
@@ -155,29 +165,62 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "#F5EFF6",
     borderRadius: 8,
-    paddingVertical: 14,
+    paddingVertical: 20,
     paddingHorizontal: 16,
-    marginTop: 24,
+    marginTop: 36,
   },
   accountNumber: {
     color: colors.black,
-    fontFamily: FontFamily.RadioCanadaBold,
-    fontSize: 15,
-    fontWeight: "700",
-    flexShrink: 1,
+    fontFamily: FontFamily.RadioCanadaMedium,
+    fontSize: 16,
+    fontWeight: "500",
+    flex: 1,
+    textAlign: "center",
+  },
+  copyWrap: {
+    marginLeft: 12,
   },
   copyBtn: {
     backgroundColor: "#EBDDED",
     borderRadius: 6,
     padding: 8,
-    marginLeft: 12,
+  },
+  copiedTip: {
+    // Fixed width + negative left centers the bubble over the 44px copy button; absolute children otherwise measure against that width and wrap
+    position: "absolute",
+    top: -40,
+    left: -18,
+    width: 80,
+    alignItems: "center",
+    zIndex: 1,
+  },
+  copiedTipBubble: {
+    backgroundColor: "#212121",
+    borderRadius: 3,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+  },
+  copiedTipArrow: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 7,
+    borderRightWidth: 7,
+    borderTopWidth: 7,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: "#212121",
+  },
+  copiedTipText: {
+    color: colors.snow_white,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: 13,
   },
   primaryBtn: {
     backgroundColor: colors.sparklight_bright_purple,
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 24,
+    marginTop: 44,
   },
   primaryTxt: {
     color: colors.snow_white,
@@ -189,16 +232,16 @@ const styles = StyleSheet.create({
   notRegistered: {
     color: colors.darkest_grey,
     fontFamily: FontFamily.RadioCanadaRegular,
-    fontSize: 13,
+    fontSize: 16,
     textAlign: "center",
-    marginTop: 32,
+    marginTop: 44,
   },
   secondaryBtn: {
     backgroundColor: "#F1EDF2",
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 12,
   },
   secondaryTxt: {
     color: colors.sparklight_bright_purple,

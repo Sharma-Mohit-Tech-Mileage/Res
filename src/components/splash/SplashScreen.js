@@ -600,6 +600,35 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
       });
   };
 
+  const transferSignIn = async () => {
+    setTransferAccountNumber(null);
+    setLoadingState(LoadingState.OPENING_BROWSER);
+    try {
+      const res = await getSsoToken();
+      // End the Keycloak session over HTTP instead of the system browser sheet, so no "Sign In / Cancel" dialog is shown (54047)
+      if (res?.refreshToken) {
+        fetch(`${Config.SSO_LOGIN}/protocol/openid-connect/logout`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `client_id=${encodeURIComponent(
+            Config.SSO_CLIENT_ID
+          )}&refresh_token=${encodeURIComponent(res.refreshToken)}`,
+        }).catch(() => {});
+      }
+      await analytics().resetAnalyticsData();
+    } catch (error) {
+      logWarn("SplashScreen", "Transfer sign-in cleanup error");
+    }
+    await clearAuthCookies();
+    await cleanUserData();
+    setAuthInProgress(false);
+    authLockRef.current = false;
+    setLoadingState(LoadingState.NONE);
+    setLoginEnable(true);
+    // Route straight into the sign-in flow instead of dropping the user on the welcome screen (54009)
+    loginAuth();
+  };
+
  const handleErrorAction = (action) => {
   setErrorState({ visible: false, type: null, message: null });
 
@@ -764,15 +793,7 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
       <TransferOfServiceModal
         visible={!!transferAccountNumber}
         newAccountNumber={transferAccountNumber}
-        onSignIn={() =>
-          logoutAction(() => {
-            setTransferAccountNumber(null);
-            setAuthInProgress(false);
-            authLockRef.current = false;
-            setLoadingState(LoadingState.NONE);
-            setLoginEnable(true);
-          })
-        }
+        onSignIn={transferSignIn}
         onRegister={() => Linking.openURL(SPARKLIGHT_URLS.registerAccount)}
       />
 
