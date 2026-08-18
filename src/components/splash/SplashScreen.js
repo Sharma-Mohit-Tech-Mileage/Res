@@ -286,7 +286,11 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
             null,
         });
         return;
+      }else if (error.status === 422) {
+         navigation.reset({ index: 0, routes: [{ name: "UserNameUpdate", params: { isLoginError: true } }] });
+        return;
       }
+
 
       // Network error
       if (

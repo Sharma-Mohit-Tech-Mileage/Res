@@ -3,7 +3,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { usernameTerms, validateUsername } from "../utility/constant";
-import {ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
+import { ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -15,11 +15,12 @@ import {
 } from "../../../GlobalStyles";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import {PostApiRequest} from "../../network/RestApiClient";
+import { PostApiRequest } from "../../network/RestApiClient";
 import { getUser, getSsoToken } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { usernameSchema } from "../utility/validationSchema";
 import AppStyles from "../../styles/AppStyles";
+import AlertIconV2 from "../../../src/res/svgIcons/AlertIconV2";
 import { SectionTitle, SectionContent } from "../common/customui/Typography";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import UsernameSuccessModal from "./UsernameSuccessModal";
@@ -27,9 +28,10 @@ import UsernameSuccessModal from "./UsernameSuccessModal";
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const isLoginError = route?.params?.isLoginError || false;
   const [displaySuccessAlert, setDisplaySuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const [showValidationAlert, setShowValidationAlert] = useState(false);
+  const [showValidationAlert, setShowValidationAlert] = useState(isLoginError);
   const [loading, setLoading] = useState(false);
   const scrollViewRef = useRef(null);
 
@@ -52,12 +54,13 @@ const ProfileSettingsEdit = () => {
     defaultValues: {},
   });
 
-const updateUsername = async (newUsername) => {
+  const updateUsername = async (newUsername) => {
     setLoading(true);
     try {
       const user = await getUser();
       const sso = await getSsoToken();
-      const accountNumber = user?.userInfo?.accountNumber || user?.accountNumber || "";
+      const accountNumber =
+        user?.userInfo?.accountNumber || user?.accountNumber || "";
       const userName = user?.userInfo?.userName || user?.userName || "";
       const idToken = (sso && (sso.idToken || sso.token)) || "";
 
@@ -76,8 +79,11 @@ const updateUsername = async (newUsername) => {
         ENDPOINTS.UPDATE_USERNAME,
         payload,
         (Response) => {
-           setLoading(false);
-          console.log("Username updated successfully:", JSON.stringify(Response));
+          setLoading(false);
+          console.log(
+            "Username updated successfully:",
+            JSON.stringify(Response),
+          );
           if (Response?.status === "success") {
             setDisplaySuccessAlert(true);
           } else {
@@ -85,10 +91,10 @@ const updateUsername = async (newUsername) => {
           }
         },
         (error) => {
-           setLoading(false);
+          setLoading(false);
           console.warn("Update username error:", error);
           setShowErrorAlert(true);
-        }
+        },
       );
     } catch (err) {
       console.warn("Error preparing username payload:", err);
@@ -96,8 +102,6 @@ const updateUsername = async (newUsername) => {
       setShowErrorAlert(true);
     }
   };
-
-
 
   const handleValidationError = (errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
@@ -119,6 +123,24 @@ const updateUsername = async (newUsername) => {
     };
   }, []);
 
+  const renderErrorMessage = () => {
+    return (
+      <View style={[styles.errorMain]}>
+        <View style={styles.errorInner}>
+          <AlertIconV2 />
+
+          <Text style={styles.errorText}>Your Account Needs Attention</Text>
+          <Text style={styles.errorSubText}>
+            To maintain access to your account and continue using our services,
+            you must update your username immediately. Your new username must
+            contain only letters and numbers. Special characters (e.g., @, #, $,
+            _, -) are no longer supported.
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.profileSettingsEdit}>
       <ProfileSettingsHeader
@@ -137,14 +159,7 @@ const updateUsername = async (newUsername) => {
                 isVisible={showErrorAlert}
                 onClose={() => setShowErrorAlert(false)}
               />
-              <NotificationAlert
-                type="error"
-                title="Error"
-                message="Please enter valid information to continue."
-                showCloseIcon={true}
-                isVisible={showValidationAlert}
-                onClose={() => setShowValidationAlert(false)}
-              />
+              {showValidationAlert && renderErrorMessage()}
             </View>
             <View
               style={[
@@ -212,7 +227,14 @@ const updateUsername = async (newUsername) => {
                             key={`point-${index}`}
                             style={styles.bulletPointContainer}
                           >
-                            <View style={{ paddingTop: 8 }}>
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                paddingTop: 6,
+                              }}
+                            >
                               <View
                                 style={[
                                   styles.bullet,
@@ -256,7 +278,10 @@ const updateUsername = async (newUsername) => {
             visible={displaySuccessAlert}
             onClose={() => {
               setDisplaySuccessAlert(false);
-              navigation.goBack();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Splash", params: { isLogout: true } }],
+              });
             }}
           />
         </View>
@@ -322,8 +347,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   generalInformationWrapper: {
-    paddingTop: Padding.p_5xs,
-    paddingBottom: Padding.p_5xl,
+    paddingBottom: Padding.p_5xs,
     alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
   },
@@ -374,6 +398,30 @@ const styles = StyleSheet.create({
   profileSettingsEdit: {
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
+  },
+  errorMain: { borderColor: "#DF2600", borderWidth: 1, marginBottom: 16 },
+  errorInner: {
+    backgroundColor: "#FEF3F2",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+    radius: 8,
+  },
+  errorText: {
+    color: "##000000",
+    fontFamily: FontFamily.RadioCanadaMedium,
+    fontSize: FontSize.size_lg,
+    padding: Padding.p_3xs,
+    fontWeight: "500",
+    lineHeight: 16,
+  },
+  errorSubText: {
+    color: "##000000",
+    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: FontSize.size_sm,
+    padding: Padding.p_3xs,
+    lineHeight: 18,
   },
 });
 
