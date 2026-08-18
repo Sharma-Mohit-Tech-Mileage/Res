@@ -26,6 +26,7 @@ import { clearAuthCookies } from "../utility/NativeCookieManager";
 import { logDebug, logWarn, logError } from "../../utils/logger";
 import { fetchACPUserAccountDetails } from "../../network/apis/account/profile.service";
 import { getTransferInfo } from "../utility/transferHelpers";
+import { announceA11y } from "../../utils/a11y";
 import TransferOfServiceModal from "../common/TransferOfServiceModal";
 import { SPARKLIGHT_URLS } from "../../constants/urls";
 
@@ -603,6 +604,8 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
   const transferSignIn = async () => {
     setTransferAccountNumber(null);
     setLoadingState(LoadingState.OPENING_BROWSER);
+    // Spoken feedback bridges the gap until the system sign-in sheet announces itself (54047)
+    announceA11y("Opening secure sign in");
     try {
       const res = await getSsoToken();
       // End the Keycloak session over HTTP instead of the system browser sheet, so no "Sign In / Cancel" dialog is shown (54047)

@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   copiedTipBubble: {
-    backgroundColor: "#212121",
+    backgroundColor: "#34744B",
     borderRadius: 3,
     paddingVertical: 5,
     paddingHorizontal: 12,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 7,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: "#212121",
+    borderTopColor: "#34744B",
   },
   copiedTipText: {
     color: colors.snow_white,
