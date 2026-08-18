@@ -26,7 +26,7 @@ import AppStyles from "../../styles/AppStyles";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, setUserId, setUserProperty } from '@react-native-firebase/analytics';
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import {
   widthPercentageToDP as wp,
@@ -72,8 +72,8 @@ const logoutAction = (dispatch, navigation) => {
     }).then(async (result) => {
       // Zendesk.logout();
       try {
-        await analytics().setUserId(null);
-        await analytics().setUserProperty('Sparklight_user_id', null);
+        await setUserId(getAnalytics(), null);
+        await setUserProperty(getAnalytics(), 'Sparklight_user_id', null);
       } catch (error) {
         console.warn('Error clearing analytics user ID:', error);
       }
@@ -134,7 +134,6 @@ const AccountOverview = () => {
       const formattedName = `${formatName(firstName)} ${formatName(lastName)}`.trim();
 
       setFullName(formattedName || fallbackFullName.trim());
-      console.log("Profile Details Updated:", profileDetails);
     }, [profileDetails])
   );
   

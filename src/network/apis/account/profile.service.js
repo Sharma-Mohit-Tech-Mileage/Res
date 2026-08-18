@@ -4,7 +4,8 @@ import axios from "axios";
 import moment from "moment";
 import { getEndpoint,ENDPOINTS } from "../endpoints/Endpoints";
 import Config from "react-native-config";
-import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
+import { Platform } from "react-native";
+import { getDeviceUniqueId, getFcmToken } from "../../../firebase/FirebaseUtils";
 import { getDeviceMetadata } from "../../../components/utility/DeviceInfo";
 import * as appLogger from "../../../utils/logger";
 import base64 from "react-native-base64";
@@ -365,9 +366,6 @@ const postPushNotifications = async (data) => {
   data["id"] = 0;
   data["DeviceId"] = deviceToken;
   data["customerType"] = "Residential";
-  data["optOut"] = !data.optOut;
-  data["outageOptOut"] = !data.outageOptOut;
-  data["billingOptOutStatus"] = !data.billingOptOutStatus;
 
   const config = { headers: { Authorization: `Bearer ${user.token}` } };
 
@@ -385,6 +383,37 @@ const postPushNotifications = async (data) => {
       error
     );
     throw error;
+  }
+};
+
+// Silent re-sync of the latest FCM token for an already-registered device; preserves stored opt flags.
+const syncDeviceToken = async () => {
+  try {
+    const user = await getUser();
+    if (!user?.token || !user?.userInfo?.userName) return;
+
+    const records = await fetchPushNotifications();
+    if (!Array.isArray(records) || records.length === 0) return;
+
+    const deviceId = await getDeviceUniqueId();
+    // exact device match only — records[0] could belong to another of the account's devices
+    const record = records.find((r) => (r.deviceId || r.DeviceId) === deviceId);
+    if (!record) return;
+
+    const token = await getFcmToken();
+    if (!token || token === record.deviceToken) return;
+
+    const types = record.pushMessageType || [];
+    await postPushNotifications({
+      deviceToken: token,
+      deviceTokenTimestamp: moment().format(),
+      isAndroid: Platform.OS === "android",
+      optOut: Boolean(types[0]?.optOutFlag),
+      outageOptOut: Boolean(types[1]?.optOutFlag),
+      billingOptOutStatus: Boolean(types[2]?.optOutFlag),
+    });
+  } catch (error) {
+    appLogger.logError("Device token sync failed:", error);
   }
 };
 
@@ -803,6 +832,7 @@ export {
   postTermsAndConditions,
   postTermsAndConditionsv2,
   postPushNotifications,
+  syncDeviceToken,
   unsubscribPaperLess,
   fetchPushNotifications,
   handleSubmitFeedback,

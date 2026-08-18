@@ -14,7 +14,8 @@ import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import moment from "moment";
-import analytics from "@react-native-firebase/analytics";
+import { getAnalytics, logEvent, resetAnalyticsData, setUserId, setUserProperty } from "@react-native-firebase/analytics";
+import { syncDeviceToken } from "../../network/apis/account/profile.service";
 import { shouldBlockLogin } from "../utility/disconnectHelpers";
 import Logo from "../../res/images/SpalshLogo";
 import NetworkManager from "../../utils/NetworkManager";
@@ -402,14 +403,15 @@ const SplashScreen = ({ navigation, route }) => {
       }
 
       if (user.userInfo && user.userInfo.userName) {
-        await analytics().setUserId(user.userInfo.userName.toString());
-        await analytics().setUserProperty(
+        await setUserId(getAnalytics(), user.userInfo.userName.toString());
+        await setUserProperty(getAnalytics(), 
           "Sparklight_user_id",
           user.userInfo.userName.toString()
         );
-        await analytics().logEvent("login", {
+        await logEvent(getAnalytics(), "login", {
           Sparklight_user_id: user.userInfo.userName.toString(),
         });
+        syncDeviceToken();
       }
 
       if (user.userInfo.mobileTCAcceptanceFlag) {
@@ -545,7 +547,7 @@ const SplashScreen = ({ navigation, route }) => {
             })
               .then(async () => {
                 try {
-                  await analytics().resetAnalyticsData();
+                  await resetAnalyticsData(getAnalytics());
                   await clearAuthCookies();
                   cleanUserData();
                   if (

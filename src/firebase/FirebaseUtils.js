@@ -1,5 +1,15 @@
 import { Alert, Linking, PermissionsAndroid, Platform } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
+import {
+  getMessaging,
+  hasPermission,
+  requestPermission,
+  getToken,
+  onMessage,
+  onNotificationOpenedApp,
+  getInitialNotification,
+} from '@react-native-firebase/messaging';
+// statics path: root re-export lands in v23+, and reading it off the default export warns
+import { AuthorizationStatus } from '@react-native-firebase/messaging/lib/statics';
 import * as Keychain from 'react-native-keychain';
 import { v4 as uuidv4 } from 'uuid';
 import 'react-native-get-random-values';
@@ -20,16 +30,16 @@ const requestUserPermission = async () => {
       logMessage = `Android API ${Platform.Version} POST_NOTIFICATIONS Permission: ${status}`;
     }
   } else {
-    const authStatus = await messaging().hasPermission();
-    if (authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL) {
+    const authStatus = await hasPermission(getMessaging());
+    if (authStatus === AuthorizationStatus.AUTHORIZED ||
+      authStatus === AuthorizationStatus.PROVISIONAL) {
       granted = true;
       logMessage = 'FCM Authorization Status: Already authorized/provisional';
     } else {
-      const requestStatus = await messaging().requestPermission();
+      const requestStatus = await requestPermission(getMessaging());
       granted =
-        requestStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-        requestStatus === messaging.AuthorizationStatus.PROVISIONAL;
+        requestStatus === AuthorizationStatus.AUTHORIZED ||
+        requestStatus === AuthorizationStatus.PROVISIONAL;
       logMessage = `FCM Authorization Status: ${granted ? 'authorized/provisional' : 'denied/undetermined'}`;
     }
   }
@@ -39,17 +49,17 @@ const requestUserPermission = async () => {
 };
 
 const notifyPermission = async () => {
-  let authStatus = await messaging().hasPermission();
+  let authStatus = await hasPermission(getMessaging());
 
-  if (authStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
-    authStatus = await messaging().requestPermission();
+  if (authStatus === AuthorizationStatus.NOT_DETERMINED) {
+    authStatus = await requestPermission(getMessaging());
   }
 
   const enabled =
-    authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-    authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+    authStatus === AuthorizationStatus.AUTHORIZED ||
+    authStatus === AuthorizationStatus.PROVISIONAL;
 
-  if (authStatus === messaging.AuthorizationStatus.DENIED) {
+  if (authStatus === AuthorizationStatus.DENIED) {
     Alert.alert(
       'Sparklight Would Like to Send You Notifications',
       'Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.',
@@ -77,9 +87,21 @@ const notifyPermission = async () => {
 };
 
 
+// Read-only permission check — never triggers the system dialog (safe on foreground/mount).
+const checkNotificationPermission = async () => {
+  if (Platform.OS === 'android' && Platform.Version >= 33) {
+    return PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+  }
+  const authStatus = await hasPermission(getMessaging());
+  return (
+    authStatus === AuthorizationStatus.AUTHORIZED ||
+    authStatus === AuthorizationStatus.PROVISIONAL
+  );
+};
+
 const getFcmToken = async () => {
   try {
-    const newFcmToken = await messaging().getToken();
+    const newFcmToken = await getToken(getMessaging());
     return newFcmToken;
   } catch (error) {
     console.warn(error);
@@ -89,12 +111,11 @@ const getFcmToken = async () => {
 
 const notificationListener = () => {
 
-  messaging().onNotificationOpenedApp(remoteMessage => {
+  onNotificationOpenedApp(getMessaging(), remoteMessage => {
   });
 
   // Quiet and Background State -> Check whether an initial notification is available
-  messaging()
-    .getInitialNotification()
+  getInitialNotification(getMessaging())
     .then(remoteMessage => {
       if (remoteMessage) {
       }
@@ -102,7 +123,7 @@ const notificationListener = () => {
     .catch(error => console.warn('failed', error));
 
   // Foreground State
-  messaging().onMessage(async remoteMessage => {
+  onMessage(getMessaging(), async remoteMessage => {
   });
 };
 
@@ -153,6 +174,7 @@ export const initializeApp = async () => {
 export {
   getFcmToken,
   requestUserPermission,
+  checkNotificationPermission,
   notificationListener,
   notifyPermission,
   getDeviceUniqueId
