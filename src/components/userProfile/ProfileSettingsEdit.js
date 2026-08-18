@@ -21,7 +21,11 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { usernameSchema } from "../utility/validationSchema";
 import AppStyles from "../../styles/AppStyles";
 import AlertIconV2 from "../../../src/res/svgIcons/AlertIconV2";
-import { SectionTitle, SectionContent } from "../common/customui/Typography";
+import {
+  SectionTitle,
+  SectionContent,
+  HintText,
+} from "../common/customui/Typography";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import UsernameSuccessModal from "./UsernameSuccessModal";
 
@@ -131,21 +135,29 @@ const ProfileSettingsEdit = () => {
 
           <Text style={styles.errorText}>Your Account Needs Attention</Text>
           <Text style={styles.errorSubText}>
-            To maintain access to your account and continue using our services,
-            you must update your username immediately. Your new username must
-            contain only letters and numbers. Special characters (e.g., @, #, $,
-            _, -) are no longer supported.
+            Your current username is no longer supported. Please create a new username using only letters and numbers.
           </Text>
         </View>
       </View>
     );
   };
 
+  const handleBackPress = () => {
+    if (!isLoginError) {
+      navigation.goBack();
+    }else {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Splash", params: { isLogout: true } }],
+      });
+    }
+  }
+
   return (
     <View style={styles.profileSettingsEdit}>
       <ProfileSettingsHeader
         title="Edit Username"
-        onPressBack={() => navigation.goBack()}
+        onPressBack={handleBackPress}
       />
       <ScrollView ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
@@ -168,8 +180,19 @@ const ProfileSettingsEdit = () => {
               ]}
             >
               <SectionTitle>Update Username</SectionTitle>
+
+              
             </View>
             <View style={styles.frameParent}>
+              <HintText
+                style={styles.requiredFieldsText}
+                accessibilityRole="text"
+                accessible={true}
+                accessibilityLabel="Fields marked with asterisk are required."
+              >
+                {" "}
+                Fields marked with * are required.
+              </HintText>
               <View
                 style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}
               >
@@ -182,7 +205,7 @@ const ProfileSettingsEdit = () => {
                   }) => (
                     <SparkLightInput
                       placeholder=""
-                      label={"New Username"}
+                      label={"New Username*"}
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={value}
@@ -203,7 +226,7 @@ const ProfileSettingsEdit = () => {
                   }) => (
                     <>
                       <SparkLightInput
-                        label={"Confirm New Username"}
+                        label={"Confirm New Username*"}
                         placeholder=""
                         onBlur={onBlur}
                         onChangeText={onChange}
@@ -270,7 +293,7 @@ const ProfileSettingsEdit = () => {
               title="Cancel"
               buttonType="outline"
               accessibilityLabel="Cancel"
-              onPress={() => navigation.goBack()}
+              onPress={handleBackPress}
             />
           </View>
           {loading && <LoadingOverlay isVisible={loading} />}
@@ -399,20 +422,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
   },
-  errorMain: { borderColor: "#DF2600", borderWidth: 1, marginBottom: 16 },
+  errorMain: {
+    
+    marginBottom: 16,
+   
+  },
   errorInner: {
     backgroundColor: "#FEF3F2",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     padding: 16,
-    radius: 8,
+    borderColor: "#DF2600",
+    borderWidth: 1,
+     borderRadius: 8,
   },
   errorText: {
     color: "##000000",
     fontFamily: FontFamily.RadioCanadaMedium,
     fontSize: FontSize.size_lg,
-    padding: Padding.p_3xs,
+    padding: Padding.p_5xs,
     fontWeight: "500",
     lineHeight: 16,
   },
@@ -420,8 +449,13 @@ const styles = StyleSheet.create({
     color: "##000000",
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_sm,
-    padding: Padding.p_3xs,
     lineHeight: 18,
+  },
+  requiredFieldsText: {
+    textAlign: "left",
+    marginTop: Padding.p_5xl,
+    marginBottom: Padding.p_base,
+    marginHorizontal: Padding.p_5xl,
   },
 });
 
