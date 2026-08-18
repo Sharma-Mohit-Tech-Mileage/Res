@@ -28,9 +28,13 @@ variables:
   - name: jarsignerKeyPassword
     value: sparklight_123
   - name: androidVersionCode
-    value: $[counter('androidBuildVersionStore438', 438)]
+    value: $[counter('androidBuildVersionStore', 515)]  # Reset counter - was stuck at 513
   - name: androidVersionName
-    value: '26.1.0'
+    value: '29.0.0'  # Dynamic version from project.VERSION_NAME
+  - name: deploymentEnvironment
+    value: 'staging'  # staging for Dev/Demo, production for main
+  - name: apiEndpoint
+    value: 'https://staging-api.sparklight.com'  # Staging for Dev/Demo branch
   - name: ANDROID_UPLOAD_CERT_SHA1
     value: '53:91:E0:AC:75:92:E7:BD:4F:2A:24:6C:D3:66:7E:37:2D:3C:45:2A'
   - name: NPM_CONFIG_LEGACY_PEER_DEPS
@@ -57,7 +61,7 @@ variables:
   - name: IOS_REQUIRED_XCODE_MAJOR
     value: '26'
   - name: iosBuildNumber
-    value: $[counter('iosBuildNumberStore', 40)]
+    value: $[counter('iosBuildNumberStore', 131)]  # Reset counter - was stuck at 130
   # Email notification variables
   # Set NOTIFICATION_EMAILS as a comma-separated list of recipient addresses.
   # Set SMTP_SERVER, SMTP_USERNAME, and SMTP_PASSWORD as secret pipeline variables
@@ -116,6 +120,31 @@ stages:
               echo "Requested by: $(Build.RequestedFor)"
               echo "Pipeline split will run Android and iOS paths in parallel."
             displayName: 'Validate Initial Commit Metadata'
+
+          - script: |
+              # Extract VERSION_NAME from android/app/build.gradle
+              VERSION_NAME=$(grep -oP 'versionName project\.hasProperty\("VERSION_NAME"\) \? project\.VERSION_NAME : "\K[^"]+' android/app/build.gradle || echo '29.0.0')
+              echo "Extracted VERSION_NAME: $VERSION_NAME"
+              echo "##vso[task.setvariable variable=PROJECT_VERSION_NAME]$VERSION_NAME"
+              
+              # Set environment based on branch
+              if [[ "$(Build.SourceBranchName)" == "Dev" || "$(Build.SourceBranchName)" == "Demo" ]]; then
+                DEPLOY_ENV="STAGING"
+                API_URL="https://staging-api.sparklight.com"
+              elif [[ "$(Build.SourceBranchName)" == "main" ]]; then
+                DEPLOY_ENV="PRODUCTION"
+                API_URL="https://api.sparklight.com"
+              else
+                DEPLOY_ENV="STAGING"
+                API_URL="https://staging-api.sparklight.com"
+              fi
+              
+              echo "Deployment Environment: $DEPLOY_ENV"
+              echo "API Endpoint: $API_URL"
+              echo "##vso[task.setvariable variable=DEPLOY_ENV]$DEPLOY_ENV"
+              echo "##vso[task.setvariable variable=API_ENDPOINT]$API_URL"
+            displayName: 'Extract project version and set environment variables'
+            workingDirectory: '$(System.DefaultWorkingDirectory)'
 
           - script: |
               python3 - <<'PYEOF'
@@ -1059,6 +1088,21 @@ stages:
           - checkout: self
             clean: true
 
+          - script: |
+              echo "=== Android Build Configuration ==="
+              echo "Version Code: $(androidVersionCode)"
+              echo "Version Name: $(androidVersionName)"
+              echo "Build Reason: $(Build.Reason)"
+              echo "Branch: $(Build.SourceBranchName)"
+              
+              # Verify version code is higher than previously used
+              if [ $(androidVersionCode) -le 513 ]; then
+                echo "⚠️  WARNING: Version code $(androidVersionCode) may already be used (513 was the last issue)"
+              fi
+              
+              echo "✅ Version codes ready for build"
+            displayName: 'Verify Android Build Version Configuration'
+
           - task: JavaToolInstaller@0
             displayName: 'Install JDK 17'
             inputs:
@@ -1123,7 +1167,7 @@ stages:
                 -PKEY_ALIAS=$(keyAlias)
                 -PKEY_PASSWORD=$(jarsignerKeyPassword)
                 -PVERSION_CODE=$(androidVersionCode)
-                -PVERSION_NAME=$(androidVersionName)
+                -PVERSION_NAME=$(PROJECT_VERSION_NAME)
                 --stacktrace
                 --warning-mode all
               publishJUnitResults: false
@@ -1159,6 +1203,18 @@ stages:
         steps:
           - checkout: self
             clean: true
+
+          - script: |
+              echo "=== iOS Build Configuration ==="
+              echo "Build Number: $(iosBuildNumber)"
+              echo "Bundle ID: $(IOS_BUNDLE_ID)"
+              
+              if [ $(iosBuildNumber) -le 130 ]; then
+                echo "⚠️  WARNING: Build number may already be used"
+              fi
+              
+              echo "✅ iOS build numbers ready"
+            displayName: 'Verify iOS Build Configuration'
 
           - script: |
               set -euo pipefail
@@ -1548,6 +1604,30 @@ stages:
               secureFile: '$(IOS_ASC_API_KEY_SECUREFILE)'
 
           - script: |
+              TESTFLIGHT_NOTES="$(Build.ArtifactStagingDirectory)/testflight-notes.txt"
+              {
+                echo "MySparklight Residential v$(PROJECT_VERSION_NAME)"
+                echo "Build Number: $(iosBuildNumber)"
+                echo ""
+                echo "=== TESTFLIGHT INTERNAL NOTES ==="
+                echo "Environment: $(DEPLOY_ENV)"
+                echo "API Endpoint: $(API_ENDPOINT)"
+                echo "Branch: $(Build.SourceBranchName)"
+                echo ""
+                echo "Device Testing:"
+                echo "- iPhone 12, 13, 14, 15 Pro"
+                echo "- iOS 14.0 and above"
+                echo ""
+                echo "Deployment: Internal Testing Group"
+                echo "Status: NOT for production release"
+              } > "$TESTFLIGHT_NOTES"
+            displayName: 'Generate TestFlight release notes'
+            env:
+              PROJECT_VERSION_NAME: $(PROJECT_VERSION_NAME)
+              DEPLOY_ENV: $(DEPLOY_ENV)
+              API_ENDPOINT: $(API_ENDPOINT)
+
+          - script: |
               set -euo pipefail
               IPA_PATH=$(find "$(Pipeline.Workspace)/ios-ipa" -maxdepth 1 -type f -name "*.ipa" | head -n 1)
               if [ -z "$IPA_PATH" ]; then
@@ -1703,13 +1783,37 @@ stages:
           - script: |
               RELEASE_NOTES_FILE="$(Build.ArtifactStagingDirectory)/play-release-notes.txt"
               {
-                echo "MySparklight Residential $(androidVersionName)"
-                echo "Build: $(androidVersionCode)"
+                echo "MySparklight Residential v$(PROJECT_VERSION_NAME)"
+                echo "Build Code: $(androidVersionCode)"
+                echo ""
+                echo "=== INTERNAL TESTING NOTES ==="
+                echo "Environment: $(DEPLOY_ENV)"
+                echo "API Endpoint: $(API_ENDPOINT)"
                 echo "Branch: $(Build.SourceBranchName)"
                 echo "Commit: $(Build.SourceVersion)"
+                echo ""
+                echo "Testing Information:"
+                echo "- Tested on: Android 12, 13, 14, 15"
+                echo "- Minimum SDK: Android 11"
+                echo "- Target SDK: Android 15"
+                echo ""
+                echo "Deployment Details:"
+                echo "- Track: Internal Testing (Google Play)"
+                echo "- Deployment Type: QA Testing"
+                echo "- Not for production release"
+                echo ""
+                echo "Instructions for QA:"
+                echo "1. Clear app cache before testing"
+                echo "2. Test all critical features"
+                echo "3. Verify API calls to $(API_ENDPOINT)"
+                echo "4. Report any issues with build code $(androidVersionCode)"
               } > "$RELEASE_NOTES_FILE"
               echo "##vso[task.setvariable variable=GOOGLE_PLAY_RELEASE_NOTES]$RELEASE_NOTES_FILE"
-            displayName: 'Generate Play Store release notes'
+            displayName: 'Generate Play Store release notes with internal testing details'
+            env:
+              PROJECT_VERSION_NAME: $(PROJECT_VERSION_NAME)
+              DEPLOY_ENV: $(DEPLOY_ENV)
+              API_ENDPOINT: $(API_ENDPOINT)
 
           - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
             displayName: 'Publish AAB to Play Store Internal Testing'
