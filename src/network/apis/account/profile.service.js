@@ -769,7 +769,8 @@ const fetchACPUserAccountDetails = async (signal, force = false) => {
       "bill_to_address",
       "service_address",
       "homes_passed_id",
-      "hierarchy"
+      "hierarchy",
+      "transfer_details"
     ],
   };
 
