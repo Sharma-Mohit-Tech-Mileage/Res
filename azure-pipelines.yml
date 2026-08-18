@@ -28,7 +28,7 @@ variables:
   - name: jarsignerKeyPassword
     value: sparklight_123
   - name: androidVersionCode
-    value: $[counter('androidBuildVersionStore438', 438)]
+    value: $[counter('androidBuildVersionStore', 515)]  # Reset counter - was stuck at 513
   - name: androidVersionName
     value: '29.0.0'  # Dynamic version from project.VERSION_NAME
   - name: deploymentEnvironment
@@ -61,7 +61,7 @@ variables:
   - name: IOS_REQUIRED_XCODE_MAJOR
     value: '26'
   - name: iosBuildNumber
-    value: $[counter('iosBuildNumberStore', 40)]
+    value: $[counter('iosBuildNumberStore', 131)]  # Reset counter - was stuck at 130
   # Email notification variables
   # Set NOTIFICATION_EMAILS as a comma-separated list of recipient addresses.
   # Set SMTP_SERVER, SMTP_USERNAME, and SMTP_PASSWORD as secret pipeline variables
@@ -1088,6 +1088,21 @@ stages:
           - checkout: self
             clean: true
 
+          - script: |
+              echo "=== Android Build Configuration ==="
+              echo "Version Code: $(androidVersionCode)"
+              echo "Version Name: $(androidVersionName)"
+              echo "Build Reason: $(Build.Reason)"
+              echo "Branch: $(Build.SourceBranchName)"
+              
+              # Verify version code is higher than previously used
+              if [ $(androidVersionCode) -le 513 ]; then
+                echo "⚠️  WARNING: Version code $(androidVersionCode) may already be used (513 was the last issue)"
+              fi
+              
+              echo "✅ Version codes ready for build"
+            displayName: 'Verify Android Build Version Configuration'
+
           - task: JavaToolInstaller@0
             displayName: 'Install JDK 17'
             inputs:
@@ -1188,6 +1203,18 @@ stages:
         steps:
           - checkout: self
             clean: true
+
+          - script: |
+              echo "=== iOS Build Configuration ==="
+              echo "Build Number: $(iosBuildNumber)"
+              echo "Bundle ID: $(IOS_BUNDLE_ID)"
+              
+              if [ $(iosBuildNumber) -le 130 ]; then
+                echo "⚠️  WARNING: Build number may already be used"
+              fi
+              
+              echo "✅ iOS build numbers ready"
+            displayName: 'Verify iOS Build Configuration'
 
           - script: |
               set -euo pipefail
