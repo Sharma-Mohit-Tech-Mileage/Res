@@ -9,7 +9,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
-import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails, updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import Config from "react-native-config";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
@@ -23,7 +23,7 @@ import { useMaintenance } from "../maintenance/MaintenanceContext";
 import { useOutageStatus } from "../services/hooks/useOutageStatus";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
-import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
+import { storePushNotificationStatus, getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 import MobilePilotLandingPage from "../../components/ACPDashboard/MobilePilotLandingPage";
 import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
@@ -212,43 +212,32 @@ const NewBillerHome = ({ navigation }) => {
 
 
   const enableNotifications = async () => {
+    if (!userInfo?.userName) return;
+    // ask only when no decision was recorded yet (entry wizard or a prior visit owns it otherwise)
+    const stored = await getPushNotificationStatus();
+    if (stored) return;
+
     const enabledPermission = await requestUserPermission();
-    if (enabledPermission) {
-      const token = await getFcmToken();
-      const data = {
-        accountNumber: userInfo?.accountNumber,
-        deviceToken: token,
-        deviceTokenTimestamp: moment().format(),
-        optOut: true,
-        outageOptOut: true,
-        billingOptOutStatus: true,
-        userName: userInfo.userName,
-        isAndroid: Platform.OS == "android",
-      };
-      const localData = {
-        status: "accepted",
-        date: new Date(),
-        permanentSkip: false,
-      };
-      storePushNotificationStatus(localData);
-    } else {
-      const token = await getFcmToken();
-      const dataWithoutPermission = {
-        accountNumber: userInfo.accountNumber,
-        deviceToken: token,
-        deviceTokenTimestamp: moment().format(),
-        optOut: true,
-        outageOptOut: true,
-        billingOptOutStatus: true,
-        userName: userInfo.userName,
-        isAndroid: Platform.OS == "android",
-      };
-      const localData = {
-        status: "skip",
-        date: new Date(),
-        permanentSkip: true,
-      };
-      storePushNotificationStatus(localData);
+    const token = await getFcmToken();
+    // literal flags: true = opting out (permission denied)
+    const data = {
+      accountNumber: userInfo?.accountNumber,
+      deviceToken: token,
+      deviceTokenTimestamp: moment().format(),
+      optOut: !enabledPermission,
+      outageOptOut: !enabledPermission,
+      billingOptOutStatus: !enabledPermission,
+      userName: userInfo.userName,
+      isAndroid: Platform.OS == "android",
+    };
+    const localData = {
+      status: enabledPermission ? "accepted" : "skip",
+      date: new Date(),
+      permanentSkip: !enabledPermission,
+    };
+    storePushNotificationStatus(localData);
+    if (token) {
+      await dispatch(updatePushNotificationsv2(data, null));
     }
   };
 

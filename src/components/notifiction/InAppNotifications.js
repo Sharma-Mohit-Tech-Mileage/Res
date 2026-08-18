@@ -5,7 +5,6 @@ import {
   Animated,
   ScrollView,
   Platform,
-  AppState,
   Linking,
   Alert,
   AccessibilityInfo,
@@ -18,10 +17,8 @@ import { widthPercentageToDP } from "react-native-responsive-screen";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
 import Toggle from "../common/Toggle";
-import { getUser } from "../../redux/utils/LocalStorage";
-import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
-import { PostApiRequest } from "../../network/RestApiClient";
-import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import { postPushNotifications } from "../../network/apis/account/profile.service";
+import usePushPermissionSync from "../../hooks/usePushPermissionSync";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import AppStyles from "../../styles/AppStyles";
@@ -104,17 +101,7 @@ const InAppNotifications = ({ navigation }) => {
     }
   }, [isFocused, route.params?.additionalData]);
 
-  useEffect(() => {
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") {
-        initialNotificationStatus();
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
+  usePushPermissionSync((granted) => setIsNotificationRequired(!granted));
 
   useEffect(() => {
     if (route.params?.updateFailed) {
@@ -147,11 +134,6 @@ const InAppNotifications = ({ navigation }) => {
 
   const handleToggleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const initialNotificationStatus = async () => {
-    const enabledPermission = await requestUserPermission();
-    setIsNotificationRequired(!enabledPermission);
   };
 
   const checkNofif = async (value) => {
@@ -210,48 +192,25 @@ const InAppNotifications = ({ navigation }) => {
 
     try {
       const token = await getFcmToken();
-      const user = await getUser();
-      const deviceId = await getDeviceUniqueId();
-      const accountNumber = user.userInfo?.accountNumber || null;
-      const userName = user.userInfo?.userName || null;
 
+      // omit deviceToken when unavailable rather than storing a non-push id as a token
       const requestData = {
-        accountNumber,
-        deviceToken: token || deviceId,
-        DeviceId: deviceId,
+        deviceToken: token || undefined,
         deviceTokenTimestamp: moment().format(),
         isAndroid: Platform.OS === "android",
         optOut: !formData.optOut,
         outageOptOut: !formData.outageOptOut,
-        userName,
         billingOptOutStatus: !formData.billingOptOutStatus,
-        customerType: "Residential",
       };
 
-      PostApiRequest(
-        getEndpoint(ENDPOINTS.MOBILE_NOTIFICATION_PREFS, { userName }),
-        requestData,
-        (res) => {
-          setIsLoading(false);
-          setIsSubmitting(false);
-          if (res) {
-            setNotification({
-              message:
-                "Your in-app notification preferences have been updated successfully.",
-              type: "success",
-            });
-          }
-        },
-        (error) => {
-          setIsLoading(false);
-          setIsSubmitting(false);
-          console.warn("Error on retrying postRequestInAppNotification", error);
-          setNotification({
-            message: "In-App Notifications update failed.",
-            type: "error",
-          });
-        },
-      );
+      await postPushNotifications(requestData);
+      setIsLoading(false);
+      setIsSubmitting(false);
+      setNotification({
+        message:
+          "Your in-app notification preferences have been updated successfully.",
+        type: "success",
+      });
     } catch (error) {
       setIsLoading(false);
       setIsSubmitting(false);

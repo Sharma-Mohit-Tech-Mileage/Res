@@ -175,7 +175,11 @@ const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
         const res = await _axios.post(endpoint, requestBody, {
             headers: { 'Content-Type': 'application/json' },
             timeout: 30000,
-            transformRequest: [(data, headers) => { delete headers['Authorization']; return JSON.stringify(data); }],
+            // Idempotent: retries replay already-serialised data, re-stringifying would double-encode it
+            transformRequest: [(data, headers) => {
+                delete headers['Authorization'];
+                return typeof data === 'string' ? data : JSON.stringify(data);
+            }],
         });
 
         if (res.status === 204) {

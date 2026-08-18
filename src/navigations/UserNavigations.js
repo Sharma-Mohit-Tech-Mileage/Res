@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { BackHandler } from "react-native"; 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import SplashScreen from "../components/splash/SplashScreen";
 import ArticleWindowUtility from '../components/utility/ArticleWindowUtility';
 import EmailNotifications from '../components/entry/EmailNotifications';
@@ -47,7 +47,7 @@ const UserNavigations = (props) => {
       // double-counting and to keep the route-named bucket out of the dashboard.
       if (currentRouteName !== 'ArticleWindowUtility') {
         try {
-          await analytics().logEvent('screen_view', {
+          await logEvent(getAnalytics(), 'screen_view', {
             screen_name: currentRouteName,
             screen_class: currentRouteName
           });

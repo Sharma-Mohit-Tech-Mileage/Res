@@ -46,7 +46,7 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
           alignItems: "center",
         }}
       >
-         <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Paperless Billing Icon">
+         <View style={styles.iconBg} accessible={true} accessibilityRole="text" accessibilityLabel="Paperless Billing Icon">
           <PaperIconBg />
         </View> 
         <View style={{ flexDirection: "column" }}>

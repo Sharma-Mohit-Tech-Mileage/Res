@@ -6,7 +6,11 @@ import analytics from '@react-native-firebase/analytics';
 
 export const startChatWithConfig = async(config) => {
   console.log("startChat called with config:", config);
-  await analytics().logEvent("Zendesk_Chat_Start", { Chat_Initiation_Page: config.Initiation_Page });
+  try {
+    await analytics().logEvent("zendesk_chat_start", { chat_initiation_page: config.Initiation_Page });
+  } catch (e) {
+    console.warn("analytics logEvent error (startChatWithConfig):", e);
+  }
   const fields = getZendeskData()
     .then((fields) => {
       const mergedObject = Object.assign({}, fields, config);
@@ -29,7 +33,11 @@ export const clearChatData = () => {
 
 export const startChat = async (config) => {
   console.log("startChat called with config:", config);
-  await analytics().logEvent("Zendesk_Chat_Start", { Chat_Initiation_Page: config.Initiation_Page });
+  try {
+    await analytics().logEvent("zendesk_chat_start", { chat_initiation_page: config.Initiation_Page });
+  } catch (e) {
+    console.warn("analytics logEvent error (startChat):", e);
+  }
   const fields = getZendeskData()
     .then((fields) => {
       const mergedObject = Object.assign({}, fields, config);

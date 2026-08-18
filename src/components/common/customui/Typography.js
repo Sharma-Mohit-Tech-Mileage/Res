@@ -12,11 +12,11 @@ const textColors = StyleSheet.create({
   },
 });
 
-const TextVariant = ({ children, style, variantStyle, ...props }) => (
-  <Text style={[variantStyle, style]} {...props}>
+const TextVariant = React.forwardRef(({ children, style, variantStyle, ...props }, ref) => (
+  <Text ref={ref} style={[variantStyle, style]} {...props}>
     {children}
   </Text>
-);
+));
 
 export const Title = ({ children, style, ...props }) => (
   <TextVariant variantStyle={AppStyles.H1} style={style} {...props}>
@@ -70,11 +70,12 @@ export const SectionContent = ({ children, style, ...props }) => (
   </TextVariant>
 );
 
-export const FieldTitle = ({ children, style, ...props }) => (
-  <TextVariant variantStyle={AppStyles.fieldTitle} style={style} {...props}>
+// forwardRef so screen-reader focus targets (e.g. NotificationAlert title) can reach the native Text
+export const FieldTitle = React.forwardRef(({ children, style, ...props }, ref) => (
+  <TextVariant ref={ref} variantStyle={AppStyles.fieldTitle} style={style} {...props}>
     {children}
   </TextVariant>
-);
+));
 
 export const FieldContent = ({ children, style, ...props }) => (
   <TextVariant variantStyle={AppStyles.fieldContent} style={style} {...props}>

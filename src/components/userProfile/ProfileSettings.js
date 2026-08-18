@@ -57,8 +57,6 @@ const ProfileSettings = () => {
 
   const emailAddress = getPrimaryEmail(accountDetails);
 
-  console.log("Profile details from Redux:", profile);
-
   useEffect(() => {
     setShowEmailLoading(false);
   }, [profile, emailAddress]);
@@ -214,16 +212,13 @@ const ProfileSettings = () => {
       const endpointUrl = getEndpoint(ENDPOINTS.SMS_NOTIFICATION_PREFS, {
         accountNumber: res1.userInfo?.accountNumber,
       });
-      console.log("REQUEST", endpointUrl);
       GetApiRequest(
         endpointUrl,
         (res) => {
           setShowPhoneLoading(false);
-          console.log("RESPONSE", res);
           if (res) {
             if (res[0]?.smsMessageType) {
               res[0]?.smsMessageType.forEach((value, index) => {
-                console.log(`Index: ${index}, Value: ${value}`);
                 TextNotifSettings[index].status = value?.optOutFlag
                   ? "Off"
                   : "On";
@@ -249,14 +244,6 @@ const ProfileSettings = () => {
       )
     : false;
 
-  useEffect(() => {
-    if (accountDetails?.bill_to_address) {
-      console.log(
-        "Billing Address API response:",
-        accountDetails.bill_to_address,
-      );
-    }
-  }, [accountDetails?.bill_to_address]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {

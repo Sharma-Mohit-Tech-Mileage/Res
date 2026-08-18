@@ -37,8 +37,8 @@ const servicesApi = {
 
       const response = await _axios.post(
         getEndpoint(ENDPOINTS.GET_OUTAGE, { accountNumber }),
-        { ...config },
-        { timeout: 30000 }
+        {},
+        { ...config, timeout: 30000 }
       );
 
       return response.data;

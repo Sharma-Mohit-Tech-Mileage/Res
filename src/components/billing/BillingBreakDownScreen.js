@@ -367,7 +367,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
 
    useEffect(() => {
-    console.log("Account Details1:", accountDetails);
     if (!accountDetails?.hierarchy?.hierarchy_id) {
        setExplainerLoading(true);
       let requestBody = {
@@ -403,7 +402,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
   const getBillExplainerData =(requestBody) => {  
     setExplainerLoading(true);
     PostApiRequest("api/GetBillExplainer/Get", requestBody ,(res)=>{
-      console.log("Bill Explainer Response:", res);
       setBillExplainerData(res);
       if(res?.eligibility){
         setShowBillExplainer(true);
@@ -442,10 +440,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
     }, [dispatch]),
   );
   useEffect(() => {
-    console.log("Error:123", errorCode);
-
     if (error && error.length > 0) {
-      console.log("Error:123", error.includes("204"));
       setErrorCode(error);
     }
   }, [error]);
