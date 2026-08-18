@@ -1209,7 +1209,7 @@ stages:
               echo "Build Number: $(iosBuildNumber)"
               echo "Bundle ID: $(IOS_BUNDLE_ID)"
               
-              if [ $(iosBuildNumber) -le 130 ]; then
+              if [ $(iosBuildNumber) -le 131 ]; then
                 echo "⚠️  WARNING: Build number may already be used"
               fi
               
@@ -1782,34 +1782,30 @@ stages:
 
           - script: |
               RELEASE_NOTES_FILE="$(Build.ArtifactStagingDirectory)/play-release-notes.txt"
+              # Condense to <500 chars for Google Play Store limit
               {
-                echo "MySparklight Residential v$(PROJECT_VERSION_NAME)"
-                echo "Build Code: $(androidVersionCode)"
+                echo "MySparklight Residential v$(PROJECT_VERSION_NAME) (Build $(androidVersionCode))"
                 echo ""
-                echo "=== INTERNAL TESTING NOTES ==="
+                echo "INTERNAL TESTING - NOT for production"
                 echo "Environment: $(DEPLOY_ENV)"
-                echo "API Endpoint: $(API_ENDPOINT)"
-                echo "Branch: $(Build.SourceBranchName)"
-                echo "Commit: $(Build.SourceVersion)"
+                echo "API: $(API_ENDPOINT)"
                 echo ""
-                echo "Testing Information:"
-                echo "- Tested on: Android 12, 13, 14, 15"
-                echo "- Minimum SDK: Android 11"
-                echo "- Target SDK: Android 15"
-                echo ""
-                echo "Deployment Details:"
-                echo "- Track: Internal Testing (Google Play)"
-                echo "- Deployment Type: QA Testing"
-                echo "- Not for production release"
-                echo ""
-                echo "Instructions for QA:"
-                echo "1. Clear app cache before testing"
-                echo "2. Test all critical features"
-                echo "3. Verify API calls to $(API_ENDPOINT)"
-                echo "4. Report any issues with build code $(androidVersionCode)"
+                echo "QA Testing:"
+                echo "• Tested on Android 12-15 (Min SDK 11, Target 15)"
+                echo "• Clear app cache before testing"
+                echo "• Verify API calls and all critical features"
+                echo "• Report issues with build code"
               } > "$RELEASE_NOTES_FILE"
+              
+              # Verify character count
+              CHAR_COUNT=$(wc -c < "$RELEASE_NOTES_FILE")
+              echo "Release notes character count: $CHAR_COUNT (max: 500)"
+              if [ $CHAR_COUNT -gt 500 ]; then
+                echo "⚠️  WARNING: Release notes exceed 500 character limit"
+              fi
+              
               echo "##vso[task.setvariable variable=GOOGLE_PLAY_RELEASE_NOTES]$RELEASE_NOTES_FILE"
-            displayName: 'Generate Play Store release notes with internal testing details'
+            displayName: 'Generate Play Store release notes (condensed)'
             env:
               PROJECT_VERSION_NAME: $(PROJECT_VERSION_NAME)
               DEPLOY_ENV: $(DEPLOY_ENV)
