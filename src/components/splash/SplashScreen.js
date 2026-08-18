@@ -241,7 +241,6 @@ const SplashScreen = ({ navigation, route }) => {
         idTokenGuid: result.data.additionalParameters?.session_state,
         refreshToken: result.data.refreshToken,
       };
-console.log("[Login] Refresh flow ID token:", data.idToken);
       setLoadingState(LoadingState.LOADING_DATA);
       storeSsoToken(data);
       callSSOLoginApi(data);
@@ -336,8 +335,6 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
         jwtTimestamp: Date.now(),
         idTokenTimestamp: Date.now(),
       };
-          console.log("[Login] ID token used for login:", ssoIdTokenRef.current || null);
-
       // Check for business account first
       if (res.userInfo.customerType === "COM") {
         logWarn("SplashScreen", "Business account login blocked");
@@ -444,7 +441,6 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
 
     const networkManager = NetworkManager.getInstance();
     const connectivity = await networkManager.checkConnectivity();
-    console.log("Connectivity check:", connectivity);
     if (
       !connectivity.isConnected ||
       connectivity.isInternetReachable === false

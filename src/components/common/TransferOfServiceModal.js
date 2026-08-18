@@ -186,10 +186,10 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   copiedTip: {
-    // Fixed width + negative left centers the bubble over the 44px copy button; absolute children otherwise measure against that width and wrap
+    // Fixed width + negative left centers the bubble over the 36px copy button; absolute children otherwise measure against that width and wrap
     position: "absolute",
     top: -40,
-    left: -18,
+    left: -22,
     width: 80,
     alignItems: "center",
     zIndex: 1,
