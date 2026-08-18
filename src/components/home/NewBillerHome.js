@@ -18,7 +18,7 @@ import FeatureCard from "../ACPDashboard/FeatureCard";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PostApiReqZendeskToken } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser , storeZendeskData} from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
 import { useOutageStatus } from "../services/hooks/useOutageStatus";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
@@ -297,8 +297,10 @@ const NewBillerHome = ({ navigation }) => {
             mobileApp: "mobileApp",
             jwtId: jwtToken,
             source: "Mobile App",
+            Initiation_Page: "Home Screen",
           };
           setConversationalFields(fields);
+          storeZendeskData(fields);
         }
       },
       (error) => {
@@ -428,11 +430,7 @@ const NewBillerHome = ({ navigation }) => {
             buttonVariant={isAutoPayStatus ? "success" : "primary"}
             isActive={isAutoPayStatus}
             onButtonPress={() => {
-              navigation.navigate("ArticleWindowUtility", {
-                url: `${Config.PORTAL_BASE_URL}/portals/app-secure/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
-                name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-                injectPaymentObj: true,
-              });
+              navigation.navigate("BillingTab", { screen: "AutoPay" });
             }}
           />
           <FeatureCard
@@ -460,7 +458,7 @@ const NewBillerHome = ({ navigation }) => {
     >
       {showChatIcon && (
         <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-          <ZendeskChatIcon />
+          <ZendeskChatIcon screenName={'Home Screen'} />
         </View>
       )}
       <View style={{ flex: 1 }}>

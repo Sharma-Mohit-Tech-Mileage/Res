@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   label: {
     flexShrink: 1,
     color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
   },
 });

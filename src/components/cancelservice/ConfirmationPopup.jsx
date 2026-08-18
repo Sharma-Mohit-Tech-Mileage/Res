@@ -26,7 +26,7 @@ const ConfimationPopup = ({
     >
       <View style={styles.overlay}>
         <View style={styles.alertContainer}>
-          <Text style={{textAlign:'center',alignSelf:'center',fontFamily:FontFamily.openSansRegular, color:colors.sparklight_grey,fontSize:22,fontWeight:'500'}}> {title} </Text>
+          <Text style={{textAlign:'center',alignSelf:'center',fontFamily:FontFamily.RadioCanadaRegular, color:colors.sparklight_grey,fontSize:22,fontWeight:'500'}}> {title} </Text>
           <Text style={styles.message}>{message}</Text>
           <Touchable
             style={styles.openBtn}
@@ -75,11 +75,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "black",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   message: {
     color: colors.darkest_grey,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 16,
     fontWeight: "400",
     lineHeight: 24,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   alertTitle: {
     color: colors.black,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     textAlign: "center",
     fontWeight: "400",
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 8,
     fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   closeAlertTxt: {
     color: colors.sparklight_purple_blue,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     padding: 8,
     fontSize: 16,
     textDecorationLine: "underline",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
 });
 

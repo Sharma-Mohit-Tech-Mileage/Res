@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   thankYouFor: {
     fontSize: 22,
     color: Color.colorGray_100,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     lineHeight: 28,
     textAlign: "center",
     fontWeight: "600",
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     color: Color.sparklightDarkGray,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     lineHeight: 28,
     textAlign: "center",
     paddingHorizontal: Padding.p_sm,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: FontSize.size_base,
     fontWeight: "600",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
 });
 

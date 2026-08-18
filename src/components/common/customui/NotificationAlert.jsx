@@ -631,8 +631,8 @@ const NotificationAlert = ({
 
           {title && (
             <A11y.Index index={1}>
-            <View accessible={true} accessibilityRole="header">
-              <FieldTitle ref={titleRef} 
+            <View ref={titleRef} accessible={true} accessibilityRole="header">
+              <FieldTitle
               style={[ { color: config.titleColor }]}
               accessible={true}
               accessibilityRole="header" accessibilityLevel={2}
@@ -721,7 +721,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.interBold,
+    fontFamily: FontFamily.RadioCanadaBold,
     fontWeight: "700",
   },
   blockWrapper: {
@@ -738,15 +738,15 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   styledText: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
     textDecorationLine: "underline",
   },
   boldText: {
-    fontFamily: FontFamily.openSansBold || FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.openSansBold || FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
   },
   resendButton: {

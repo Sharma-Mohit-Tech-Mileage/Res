@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   makePayment: {
     textAlign: "center",
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttons: {
     marginLeft: 10,
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   passwordGroup: {
     paddingVertical: Padding.p_5xs,

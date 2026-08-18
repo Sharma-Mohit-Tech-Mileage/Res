@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   text: {
     marginTop: 16,
     color: Color.colorGray_100,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     fontSize: FontSize.size_xs,
     lineHeight: 18,

@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   closeBtn: {
     textAlign: "center",
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttons: {
     marginLeft: 10,
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       fontWeight: '600',
       color: Color.sparklightWhite,
-      fontFamily: FontFamily.openSansSemiBold,
+      fontFamily: FontFamily.RadioCanadaSemiBold,
       padding: 8,
   },
   chevronLeft: {

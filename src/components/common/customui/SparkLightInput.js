@@ -211,7 +211,7 @@ const SparkLightInput = React.forwardRef(({
             accessible={false}
             importantForAccessibility="no"
           >
-            <WarningIcon />
+            <WarningIcon color="#EF4E3E" />
           </View>
           <Text
             style={styles.errorText}
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     color: Color.colorGray_200,
     fontSize: FontSize.size_base,
     paddingHorizontal: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     borderWidth: 1,
     paddingVertical: 12,
     borderRadius: Border.br_5xs,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   disabledInput: {
     backgroundColor: Color.Gray300,

@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_lg,
     fontFamily: FontFamily.RadioCanadaBold,
     textAlign: "center",
-    color: Color.sparklightBrightPurple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight:'700',
     alignSelf: "stretch",
     paddingVertical: Padding.p_base,

@@ -1,10 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { FontFamily, Color } from "../../../../GlobalStyles";
 import Checkcircle from "../../../../assets/svgs/Checkcircle";
 import Checkcircle1 from "../../../../assets/svgs/Checkcircle1"
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import Config from "react-native-config";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../customui/Touchable";
@@ -24,11 +25,7 @@ const AutoPayCard = ({
   const showSkeleton = isStatusLoading || isAutoPayStatus === undefined;
   const handleCardPress = () => {
     if (!showSkeleton) {
-      navigation.navigate("ArticleWindowUtility", {
-        url: `${Config.PORTAL_BASE_URL}/portals/app-secure/${isAutoPayStatus ? 'manage-autopay' : 'activate-autopay'}`,
-        name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-        injectPaymentObj: true,
-      });
+      navigation.navigate("AutoPay");
     }
   };
 
@@ -58,17 +55,7 @@ const AutoPayCard = ({
           </SectionTitle>
           {showSkeleton ? (
             <SkeletonPlaceholder>
-              <View
-                style={{
-                  width: wp("16%"),
-                  height: 25,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                  marginTop: 5,
-                }}
-              />
+              <View style={{ width: 80, height: 20, borderRadius: 4, marginLeft: 10, marginTop: 6 }} />
             </SkeletonPlaceholder>
           ) : (
             <Hyperlink
@@ -82,19 +69,10 @@ const AutoPayCard = ({
             </Hyperlink>
           )}
         </View>
-        <View style={{ position: "absolute", right: 10, top: 0, bottom: 0, justifyContent: "center" }}>
+        <View style={{ position: "absolute", right: 10 }}>
           {showSkeleton ? (
             <SkeletonPlaceholder>
-              <View
-                style={{
-                  width: wp("16%"),
-                  height: 25,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                }}
-              />
+              <View style={{ width: 56, height: 22, borderRadius: 4 }} />
             </SkeletonPlaceholder>
           ) :( <>
               {isAutoPayStatus ? (
@@ -158,7 +136,6 @@ const styles = StyleSheet.create({
   },
   statusIcon: {
     marginTop: 0,
-    bottom: -1,
     marginRight: 4,
   },
   statusText: {

@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     textAlign: "left",
     color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     marginBottom: Padding.p_5xs,
     alignSelf: "stretch",
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_100,
   },
   selectedChipText: {

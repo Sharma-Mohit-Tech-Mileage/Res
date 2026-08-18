@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   
   accept: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     color: Color.sparklightWhite,
   },

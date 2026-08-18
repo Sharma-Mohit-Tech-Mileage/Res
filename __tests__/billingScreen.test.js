@@ -146,13 +146,7 @@ describe('BillingScreen behavior', () => {
       managePayment.props.onPress();
     });
 
-    expect(mockNavigation.navigate).toHaveBeenCalledWith(
-      'ArticleWindowUtility',
-      expect.objectContaining({
-        name: 'Manage Payment Method',
-        injectPaymentObj: true,
-      })
-    );
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('PaymentMethods');
   });
 
   it('navigates to bill breakdown and payment history actions', async () => {

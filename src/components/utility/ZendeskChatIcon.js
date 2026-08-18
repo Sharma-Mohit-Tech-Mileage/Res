@@ -19,7 +19,7 @@ import FeatureFlags from "../../config/Featureflags";
 import { useFocusEffect } from "@react-navigation/native";
 import Touchable from "../common/customui/Touchable";
 
-const ZendeskChatIcon = () => {
+const ZendeskChatIcon = ({screenName}) => {
   const refreshFeatureFlags = useFeatureRefresh();
   const isChatFeatureEnabled = useFeatureFlag(FeatureFlags.DASHBOARD_CHAT_ICON, true);
 
@@ -34,9 +34,9 @@ const ZendeskChatIcon = () => {
 
   const handleChatPress = () => {
     if (Platform.OS === "ios") {
-      startChat();
+      startChat({Initiation_Page: screenName});
     } else {
-      startChatWithConfig();
+      startChatWithConfig({Initiation_Page: screenName});
     }
   };
 

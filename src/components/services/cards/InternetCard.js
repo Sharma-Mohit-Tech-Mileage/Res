@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   cardSpacing: {
     marginHorizontal: 16,
   },
-    cardSpacing1: {
+  cardSpacing1: {
     padding: 16,
     marginHorizontal: 16,
   },

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import { A11Y } from "../../styles/theme";
 import LeftIcon from "../../../assets/svgs/Chevronleft";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import Touchable from "./customui/Touchable";
+import { Platform } from "react-native";
+import { setFocusToRef } from "../../utils/a11y";
 
 const ProfileSettingsHeader = ({
   title,
@@ -19,8 +21,14 @@ const ProfileSettingsHeader = ({
   iconAlignment = "right",
   iconSource = LeftIcon,
   showIcon = true,
+  autoFocusBack = false,
 }) => {
   const [iconPressed, setIconPressed] = useState(false);
+  const backRef = useRef(null);
+  // TalkBack lands on the first focusable after push; steer it to Back when asked
+  useEffect(() => {
+    if (autoFocusBack && Platform.OS === "android") setFocusToRef(backRef, { delay: 500 });
+  }, [autoFocusBack]);
   const IconComponent = iconSource || LeftIcon;
 
   const handleBackPress = () => {
@@ -65,12 +73,13 @@ const ProfileSettingsHeader = ({
               </Text>
             </View>
             <View style={{ justifyContent: "flex-end" }}>
-              <ZendeskChatIcon />
+              <ZendeskChatIcon screenName={title} />
             </View>
 
             {showIcon && (
               <View style={styles.buttonContainer} pointerEvents="box-none">
                 <Touchable
+                  ref={backRef}
                   style={styles.pressable}
                   onPress={handleBackPress}
                   onAccessibilityTap={handleBackPress}
@@ -150,7 +159,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_lg,
     fontWeight: "600",
     color: Color.sparklightWhite,
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
   },
   icon: {
     height: 24,

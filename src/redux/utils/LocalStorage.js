@@ -105,6 +105,59 @@ export const storeUpgradeToken = async (value) => {
   }
 };
 
+
+export const storeZendeskData = async (value) => {
+  try {
+    if (value == null) {
+      await SecureStore.set(SECURE_KEYS.ZENDESK_DATA, null);
+      if (typeof AsyncStorage.removeItem === 'function') {
+        await AsyncStorage.removeItem("zendeskData");
+      }
+      return;
+    }
+
+    const serialized = JSON.stringify(value);
+    await SecureStore.set(SECURE_KEYS.ZENDESK_DATA, serialized);
+    if (typeof AsyncStorage.setItem === 'function') {
+      await AsyncStorage.setItem("zendeskData", serialized);
+    }
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+// getting data
+export const getZendeskData = async () => {
+  try {
+    const secure = await SecureStore.get(SECURE_KEYS.ZENDESK_DATA);
+    if (secure != null) {
+      try {
+        return JSON.parse(secure);
+      } catch {
+        return secure;
+      }
+    }
+
+    const legacy = await AsyncStorage.getItem("zendeskData");
+    if (legacy != null) {
+      await SecureStore.set(SECURE_KEYS.ZENDESK_DATA, legacy);
+      if (typeof AsyncStorage.removeItem === 'function') {
+        await AsyncStorage.removeItem("zendeskData");
+      }
+      try {
+        return JSON.parse(legacy);
+      } catch {
+        return legacy;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+
+
 // getting data
 export const getUpgradeToken = async () => {
   try {

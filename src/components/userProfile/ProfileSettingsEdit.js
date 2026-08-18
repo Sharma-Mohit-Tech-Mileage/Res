@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   },
   makeTypo: {
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
   },
   generalInformation: {
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     textAlign: "left",
     color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     flex: 1,
   },
   generalInformationWrapper: {

@@ -98,6 +98,7 @@ const PasswordSecurityEdit = () => {
       ...profileDetails,
       securityQuestion: itemValue === "Add your own question" ? '' : itemValue
     });
+    setValue("securityAnswer", ""); // Clear the answer field when question changes
     setCustomSecurityQuestion(itemValue);
     setIsDropDownOpen(false);
     setDropdownFocused(false);
@@ -351,7 +352,7 @@ const styles = StyleSheet.create({
   },
   bulletPoiint: {
     color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_xs,
     fontStyle: 'normal',
     fontWeight: '400',
@@ -364,13 +365,13 @@ const styles = StyleSheet.create({
   },
   passwordFlexBox: {
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
   },
   firstTypo: {
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.RadioCanadaSemiBold_size,
     textAlign: "left",
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
   },
   wrapperSpaceBlock: {
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
   makeTypo: {
     width: 282,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
   },
 
@@ -411,7 +412,7 @@ const styles = StyleSheet.create({
   },
   firstName: {
     color: Color.sparklightGray1,
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.RadioCanadaSemiBold_size,
     flex: 1,
   },
   eyeIcon: {
@@ -466,7 +467,7 @@ const styles = StyleSheet.create({
   },
   firstName1: {
     color: Color.sparklightGray1,
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.RadioCanadaSemiBold_size,
     alignSelf: "stretch",
   },
   frameParent1: {
@@ -512,7 +513,7 @@ const styles = StyleSheet.create({
   },
   Btn: {
     color: colors.snow_white,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     padding: 16,
     fontSize: 16,
