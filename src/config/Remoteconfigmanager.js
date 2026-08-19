@@ -36,7 +36,10 @@ const DEFAULT_FEATURES = {
   tabs: {
     services: { visible: false },
     billing: { hidden: false }
-  }
+  },
+  payments: {
+    surcharge_rate: 3,
+  },
 };
 
 class RemoteConfigManager {

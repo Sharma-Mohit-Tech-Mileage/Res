@@ -19,12 +19,14 @@ import {
   isMethodExpired,
   openOrbipayPaymentExecution,
   isCreditCard,
-  SURCHARGE_TITLE,
-  SURCHARGE_MESSAGE,
+  useSurchargeRate,
+  surchargeTitle,
+  surchargeMessage,
 } from "./paymentsShared";
 
 
 const MakePaymentMethodScreen = ({ navigation, route }) => {
+  const surchargeRate = useSurchargeRate();
   const amount = Number(route.params?.amount) || 0;
   const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [methods, setMethods] = useState(null);
@@ -98,8 +100,8 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
         {isCreditCard(selectedMethod) && (
           <NotificationAlert
             type="warning"
-            title={SURCHARGE_TITLE}
-            message={SURCHARGE_MESSAGE}
+            title={surchargeTitle(surchargeRate)}
+            message={surchargeMessage(surchargeRate)}
             showCloseIcon={false}
           />
         )}

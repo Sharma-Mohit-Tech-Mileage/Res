@@ -113,7 +113,9 @@ export const calculateFee = async (amount, method, paymentScheduleType = "one_ti
   const res = await _axios.post(
     getEndpoint(ENDPOINTS.PAYMENT_CALCULATE_FEE),
     {
-      surchargeAmount: Number(amount),
+      // API binds "amount" — sending "surchargeAmount" made the server price a
+      // $0 payment and return fee 0.00 (portal sends "amount" and gets 0.66).
+      amount: Number(amount),
       paymentScheduleType,
       CustomerId: method?.idCustomer || "",
       FundingAccountId: method?.id || "",
@@ -143,7 +145,15 @@ export const submitPayment = async (amount, method, emailOverride) => {
     config
   );
   ensureServiceOk(res);
-  return { confirmationNumber: pickConfirmationNumber(res.data) };
+  const status = String(res?.data?.status || "").toLowerCase();
+  const confirmationNumber = pickConfirmationNumber(res.data);
+  // Declines come back HTTP 200 with status "Failed" and every field null, so only a confirmation number proves success.
+  if (status === "failed" || status === "declined" || !confirmationNumber) {
+    const err = new Error("Payment was not accepted");
+    err.code = "PAYMENT_DECLINED";
+    throw err;
+  }
+  return { confirmationNumber, fee: pickFeeAmount(res.data) };
 };
 
 const setupAutoPayPayload = (accountNumber, method) => ({
