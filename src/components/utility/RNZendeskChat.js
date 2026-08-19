@@ -2,15 +2,26 @@
 import { NativeModules } from 'react-native';
 const { RNZendeskChatModule } = NativeModules;
 import { getZendeskData } from "../../redux/utils/LocalStorage";
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent,setAnalyticsCollectionEnabled } from '@react-native-firebase/analytics';
 
-export const startChatWithConfig = async(config) => {
+const analytics = getAnalytics();
+
+const trackEvent = (source) => {
+  logEvent(analytics, 'zendesk_chat_start', {
+    screen: 'Chat',
+    source: source,
+  })
+    .then(() => {
+      console.log('Event logged successfully');
+    })
+    .catch((error) => {
+      console.error('Analytics error:', error);
+    });
+};
+
+export const startChatWithConfig = (config) => {
   console.log("startChat called with config:", config);
-  try {
-    await analytics().logEvent("zendesk_chat_start", { chat_initiation_page: config.Initiation_Page });
-  } catch (e) {
-    console.warn("analytics logEvent error (startChatWithConfig):", e);
-  }
+  trackEvent(config?.Initiation_Page);
   const fields = getZendeskData()
     .then((fields) => {
       const mergedObject = Object.assign({}, fields, config);
@@ -31,13 +42,9 @@ export const clearChatData = () => {
     RNZendeskChatModule.clearChatSession();
 };
 
-export const startChat = async (config) => {
+export const startChat = (config) => {
   console.log("startChat called with config:", config);
-  try {
-    await analytics().logEvent("zendesk_chat_start", { chat_initiation_page: config.Initiation_Page });
-  } catch (e) {
-    console.warn("analytics logEvent error (startChat):", e);
-  }
+  trackEvent(config?.Initiation_Page);
   const fields = getZendeskData()
     .then((fields) => {
       const mergedObject = Object.assign({}, fields, config);

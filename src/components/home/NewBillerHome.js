@@ -35,6 +35,21 @@ import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import AppStyles from "../../styles/AppStyles";
 
+import {
+  getAnalytics,
+  setAnalyticsCollectionEnabled,
+} from '@react-native-firebase/analytics';
+
+const analytics = getAnalytics();
+
+setAnalyticsCollectionEnabled(analytics, true)
+  .then(() => {
+    console.log('Analytics collection enabled');
+  })
+  .catch(error => {
+    console.error('Failed to enable Analytics:', error);
+  });
+
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
   const { outageData, checkStatus: checkOutageStatus } = useOutageStatus('dashboard');
