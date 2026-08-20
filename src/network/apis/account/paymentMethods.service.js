@@ -100,9 +100,9 @@ export const deletePaymentMethod = async (methodId) => {
   return res.data;
 };
 
-// CalculateFee returns {"fee":"0.33"} - the amount arrives as a string.
+// The fee arrives as a string, either flat (CalculateFee {"fee":"0.33"}, payment DTO surchargeAmount) or nested (upstream fee.fee_amount).
 const pickFeeAmount = (data) => {
-  const value = Number(data?.fee ?? data?.data?.fee);
+  const value = Number(data?.surchargeAmount ?? data?.fee?.fee_amount ?? data?.fee ?? data?.data?.fee);
   return isFinite(value) ? value : null;
 };
 
@@ -217,7 +217,7 @@ export const confirmPaymentToken = async (token, digiSign, amount, emailOverride
     config
   );
   ensureServiceOk(res);
-  return { confirmationNumber: pickConfirmationNumber(res.data) };
+  return { confirmationNumber: pickConfirmationNumber(res.data), fee: pickFeeAmount(res.data) };
 };
 
 export const updateFundingAccount = async (methodId, { token, digiSign } = {}) => {

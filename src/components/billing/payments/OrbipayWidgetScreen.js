@@ -222,10 +222,12 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
         if (mode === "pay") {
           const result = await confirmPaymentToken(token, digiSign, amount, emailParam);
           if (!navigation.isFocused()) return;
+          // The customer is charged amount + surcharge, so the confirmation must report the total.
+          const total = result?.fee != null ? amount + result.fee : amount;
           navigation.replace("PaymentConfirmation", {
             headerTitle,
             kind: "payment-submitted",
-            message: `Your payment for ${formatCurrency(amount)} has been received. It may take up to 24 hours to be reflected on your account.`,
+            message: `Your payment for ${formatCurrency(total)} has been received. It may take up to 24 hours to be reflected on your account.`,
             confirmationNumber: result?.confirmationNumber || "",
             email: emailParam || getPrimaryEmail(accountDetails) || "",
           });

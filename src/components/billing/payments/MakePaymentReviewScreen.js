@@ -90,21 +90,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
       return;
     }
     if (!method?.id) {
-      openOrbipayPaymentExecution(navigation, {
-        amount,
-        method,
-        headerTitle,
-        email: email.trim(),
-        onSuccessRoute: {
-          name: "PaymentConfirmation",
-          params: {
-            kind: "payment-submitted",
-            message: `Your payment for ${formatCurrency(
-              totalAmount
-            )} has been received. It may take up to 24 hours to be reflected on your account.`,
-          },
-        },
-      });
+      openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: email.trim() });
       return;
     }
     inFlightRef.current = true;
