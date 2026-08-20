@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 import moment from "moment";
 import { digitsToWords } from "../../../utils/a11y";
 import RemoteConfigManager from "../../../config/Remoteconfigmanager";
+import { calculateFee } from "../../../network/apis/account/paymentMethods.service";
 
 export const contentMaxWidth = { width: "100%", maxWidth: 640, alignSelf: "center" };
 
@@ -51,7 +52,32 @@ export const surchargeMessage = (rate) =>
     rate
   )} surcharge applies to all credit card payments. Payments made by debit card, directly from a checking or savings account, or by check are not subject to this surcharge.`;
 
+export const surchargeBreakdownLabel = (rate) => `${formatSurchargeRate(rate)} Credit card surcharge:`;
+
 export const isCreditCard = (method) => method?.type === "card" && method?.cardType === "credit";
+
+// Fee Calculator lookup for a saved credit card; with onError the fee falls back to 0 instead of hiding.
+export const useSurchargeFee = (amount, method, { enabled = true, onError } = {}) => {
+  const [fee, setFee] = useState(null);
+  useEffect(() => {
+    setFee(null);
+    if (!enabled || !isCreditCard(method) || !(Number(amount) > 0)) return undefined;
+    let cancelled = false;
+    calculateFee(amount, method)
+      .then((value) => !cancelled && setFee(value))
+      .catch(() => {
+        if (cancelled) return;
+        if (onError) {
+          setFee(0);
+          onError();
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [enabled, method?.id, amount]);
+  return fee;
+};
 
 export const paymentMethodTitle = (method) => {
   if (!method) return "Payment method";
