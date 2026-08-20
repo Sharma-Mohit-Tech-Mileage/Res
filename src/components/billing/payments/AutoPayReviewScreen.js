@@ -24,6 +24,12 @@ import {
   describePaymentMethod,
   paymentMethodA11yLabel,
   formatCurrency,
+  isCreditCard,
+  surchargeBreakdownLabel,
+  surchargeTitle,
+  surchargeMessage,
+  useSurchargeRate,
+  useSurchargeFee,
 } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 
@@ -68,6 +74,20 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
   const dueDayLabel = ordinal(details?.dueDay || 22);
 
   const amountDue = Number(details?.pastDueAmount) || 0;
+  const surchargeRate = useSurchargeRate();
+  const isUpdate = mode === "update";
+  const showBalanceAlert = !loading && !isUpdate && amountDue > 0;
+  const scheduledAmount = Number(details?.balanceDue) || 0;
+
+  const onFeeError = () =>
+    setErrorAlert("We could not calculate the credit card surcharge. Please try again.");
+  const balanceSurcharge = useSurchargeFee(amountDue, method, { enabled: !isUpdate, onError: onFeeError });
+  const showBalanceSurcharge = balanceSurcharge != null;
+  const totalBalance = showBalanceSurcharge ? amountDue + balanceSurcharge : amountDue;
+
+  const scheduledSurcharge = useSurchargeFee(scheduledAmount, method, { enabled: isUpdate, onError: onFeeError });
+  const showScheduledSurcharge = isCreditCard(method) && scheduledSurcharge != null;
+  const scheduledTotal = showScheduledSurcharge ? scheduledAmount + scheduledSurcharge : scheduledAmount;
 
   const onSubmit = async () => {
     if (inFlightRef.current || !agreed) return;
@@ -104,6 +124,25 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
     }
   };
 
+  const renderAmountField = (label, value, valueLoading) => (
+    <View
+      style={styles.fieldGroup}
+      accessible={!valueLoading}
+      accessibilityLabel={valueLoading ? undefined : `${label}, ${value}`}
+    >
+      <FieldTitle style={styles.fieldLabel}>{label}</FieldTitle>
+      {valueLoading ? (
+        <SkeletonPlaceholder>
+          <View style={styles.valueSkeleton} />
+        </SkeletonPlaceholder>
+      ) : (
+        <View style={styles.fieldValueBox}>
+          <FieldContent style={styles.fieldValue}>{value}</FieldContent>
+        </View>
+      )}
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
@@ -135,17 +174,6 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
         </SectionContent>
 
         <>
-            {!loading && amountDue > 0 && (
-              <NotificationAlert
-                type="warning"
-                title="Your Balance Needs Attention"
-                message={`Your balance of ${formatCurrency(
-                  amountDue
-                )} won't be processed by Auto Pay before the due date. You can pay it after finishing this setup.`}
-                showCloseIcon={false}
-              />
-            )}
-
             <View style={[card.elevated, styles.summaryCard]}>
               <View
                 style={styles.fieldGroup}
@@ -163,8 +191,27 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                   </View>
                 )}
               </View>
+              {isUpdate && (
+                <>
+                  {renderAmountField("Payment Amount", formatCurrency(scheduledAmount), loading)}
+                  {showScheduledSurcharge && (
+                    <>
+                      {renderAmountField("Credit Card Surcharge", formatCurrency(scheduledSurcharge), loading)}
+                      <View style={styles.inCardAlert}>
+                        <NotificationAlert
+                          type="warning"
+                          title={surchargeTitle(surchargeRate)}
+                          message={surchargeMessage(surchargeRate)}
+                          showCloseIcon={false}
+                        />
+                      </View>
+                      {renderAmountField("Total Amount", formatCurrency(scheduledTotal), loading)}
+                    </>
+                  )}
+                </>
+              )}
               <View
-                style={[styles.fieldGroup, styles.fieldGroupLast]}
+                style={[styles.fieldGroup, !showBalanceAlert && styles.fieldGroupLast]}
                 accessible={!loading}
                 accessibilityLabel={loading ? undefined : `Payment Date, on the ${dueDayLabel} of each month`}
               >
@@ -179,6 +226,50 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                   </View>
                 )}
               </View>
+
+              {showBalanceAlert && (
+                <View style={styles.inCardAlert}>
+                  <NotificationAlert
+                    type="warning"
+                    title="Your Balance Needs Attention"
+                    message={`Your balance of ${formatCurrency(
+                      amountDue
+                    )} won't be processed by Auto Pay before the due date. You can pay it after finishing this setup.`}
+                    showCloseIcon={false}
+                  >
+                    {showBalanceSurcharge && (
+                      <View style={styles.breakdown}>
+                        <View style={styles.breakdownDivider} />
+                        <View
+                          style={styles.breakdownRow}
+                          accessible
+                          accessibilityLabel={`Current unpaid balance, ${formatCurrency(amountDue)}`}
+                        >
+                          <Text style={styles.breakdownText}>Current unpaid balance:</Text>
+                          <Text style={styles.breakdownText}>{formatCurrency(amountDue)}</Text>
+                        </View>
+                        <View
+                          style={styles.breakdownRow}
+                          accessible
+                          accessibilityLabel={`Credit card surcharge, ${formatCurrency(balanceSurcharge)}`}
+                        >
+                          <Text style={styles.breakdownText}>{surchargeBreakdownLabel(surchargeRate)}</Text>
+                          <Text style={styles.breakdownText}>{formatCurrency(balanceSurcharge)}</Text>
+                        </View>
+                        <View style={styles.breakdownDivider} />
+                        <View
+                          style={styles.breakdownRow}
+                          accessible
+                          accessibilityLabel={`Total balance, ${formatCurrency(totalBalance)}`}
+                        >
+                          <Text style={styles.breakdownText}>Total balance:</Text>
+                          <Text style={styles.breakdownText}>{formatCurrency(totalBalance)}</Text>
+                        </View>
+                      </View>
+                    )}
+                  </NotificationAlert>
+                </View>
+              )}
             </View>
 
             <View style={[card.elevated, styles.emailCard]}>
@@ -253,6 +344,17 @@ const styles = StyleSheet.create({
   },
   fieldValueBox: {   },
   emailCard: { padding: 16 ,marginTop: 16, marginBottom: 16 },
+  // Cancels the alert's own marginVertical so it sits on the card's 16pt rhythm.
+  inCardAlert: { marginTop: -8, marginBottom: -8 },
+  breakdown: { marginTop: 4 },
+  breakdownDivider: { height: 1, backgroundColor: "rgba(0, 0, 0, 0.12)", marginVertical: 8 },
+  breakdownRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 2 },
+  breakdownText: {
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
+    fontWeight: "700",
+    color: "#000000",
+  },
 });
 
 export default AutoPayReviewScreen;

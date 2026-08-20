@@ -15,10 +15,20 @@ import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, ordinal, isMethodExpired, openOrbipaySecureCapture, paymentMethodTitle } from "./paymentsShared";
+import {
+  contentMaxWidth,
+  ordinal,
+  isMethodExpired,
+  openOrbipaySecureCapture,
+  paymentMethodTitle,
+  surchargeTitle,
+  surchargeMessage,
+  useSurchargeRate,
+} from "./paymentsShared";
 
 const AutoPayScreen = ({ navigation, route }) => {
   const headerTitle = "Manage Auto Pay";
+  const surchargeRate = useSurchargeRate();
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
   const [selectedId, setSelectedId] = useState("");
@@ -76,6 +86,14 @@ const AutoPayScreen = ({ navigation, route }) => {
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
       <ScrollView contentContainerStyle={[ contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
         <>
+        <View style={styles.surchargeAlert}>
+          <NotificationAlert
+            type="warning"
+            title={surchargeTitle(surchargeRate)}
+            message={surchargeMessage(surchargeRate)}
+            showCloseIcon={false}
+          />
+        </View>
         <View style={[AppStyles.card, { margin: 16 , padding: 16 }]}>
         {!!errorAlert && (
           <NotificationAlert
@@ -174,6 +192,7 @@ const AutoPayScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
+  surchargeAlert: { marginHorizontal: 16, marginTop: 8, marginBottom: -8 },
   heading: {
     marginBottom: 24,
   },
