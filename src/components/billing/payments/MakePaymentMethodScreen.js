@@ -97,14 +97,12 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
           />
         )}
 
-        {isCreditCard(selectedMethod) && (
-          <NotificationAlert
-            type="warning"
-            title={surchargeTitle(surchargeRate)}
-            message={surchargeMessage(surchargeRate)}
-            showCloseIcon={false}
-          />
-        )}
+        <NotificationAlert
+          type="warning"
+          title={surchargeTitle(surchargeRate)}
+          message={surchargeMessage(surchargeRate)}
+          showCloseIcon={false}
+        />
 
         <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           Select payment method
