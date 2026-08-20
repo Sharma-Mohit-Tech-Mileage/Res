@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -11,12 +11,22 @@ import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
+  calculateFee,
   fetchAutoPayDetails,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, isMethodExpired, openOrbipayPaymentExecution } from "./paymentsShared";
+import {
+  contentMaxWidth,
+  isMethodExpired,
+  openOrbipayPaymentExecution,
+  isCreditCard,
+  useSurchargeRate,
+  surchargeTitle,
+  surchargeMessage,
+} from "./paymentsShared";
 
 
 const MakePaymentMethodScreen = ({ navigation, route }) => {
+  const surchargeRate = useSurchargeRate();
   const amount = Number(route.params?.amount) || 0;
   const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [methods, setMethods] = useState(null);
@@ -52,6 +62,20 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   const loading = methods === null;
   const selectedMethod = methods?.find((m) => m.id === selectedId) || null;
   const canContinue = !!selectedMethod && !isMethodExpired(selectedMethod);
+
+  // Fee Calculator runs on selection so the review screen already has the surcharge.
+  const [surcharge, setSurcharge] = useState(null);
+  useEffect(() => {
+    setSurcharge(null);
+    if (!isCreditCard(selectedMethod) || !amount) return undefined;
+    let cancelled = false;
+    calculateFee(amount, selectedMethod)
+      .then((fee) => !cancelled && setSurcharge(fee))
+      .catch(() => !cancelled && setSurcharge(null));
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedId, amount]);
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
   const onPayWithNewMethod = () => {
@@ -70,6 +94,15 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
             message={errorAlert}
             onClose={() => setErrorAlert("")}
             autoFocusTitle
+          />
+        )}
+
+        {isCreditCard(selectedMethod) && (
+          <NotificationAlert
+            type="warning"
+            title={surchargeTitle(surchargeRate)}
+            message={surchargeMessage(surchargeRate)}
+            showCloseIcon={false}
           />
         )}
 
@@ -116,7 +149,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
               buttonType="submit"
               disabled={!canContinue}
               accessibilityLabel="Continue"
-              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle })}
+              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle, surcharge })}
             />
             <PrimaryButton
               title="Cancel"
