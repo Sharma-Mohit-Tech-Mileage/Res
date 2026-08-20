@@ -165,10 +165,10 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   const widgetParamsRef = useRef(null);
 
   const hostFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_HOST, Config.ORBIPAY_DEFAULT_HOST || "app");
-  const portalPathFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_PORTAL_PATH, "/orbipayhost.html");
+  const portalPathFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_PORTAL_PATH, Config.ORBIPAY_PORTAL_WIDGET_PATH || "/orbipayhost.html");
   if (hostModeRef.current === null) {
     hostModeRef.current = hostFlag === "portal" ? "portal" : "app";
-    portalUrlRef.current = `${String(Config.PORTAL_BASE_URL || "").replace(/\/+$/, "")}${portalPathFlag || "/orbipayhost.html"}`;
+    portalUrlRef.current = `${String(Config.PORTAL_BASE_URL || "").replace(/\/+$/, "")}${portalPathFlag || Config.ORBIPAY_PORTAL_WIDGET_PATH || "/orbipayhost.html"}`;
   }
   const portalHosted = hostModeRef.current === "portal";
 
