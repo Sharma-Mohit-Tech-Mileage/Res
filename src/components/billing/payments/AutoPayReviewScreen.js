@@ -193,7 +193,6 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
               </View>
               {isUpdate && (
                 <>
-                  {renderAmountField("Payment Amount", formatCurrency(scheduledAmount), loading)}
                   {showScheduledSurcharge && (
                     <>
                       {renderAmountField("Credit Card Surcharge", formatCurrency(scheduledSurcharge), loading)}
