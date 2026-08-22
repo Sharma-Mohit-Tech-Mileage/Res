@@ -5,7 +5,7 @@ import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { usernameTerms, validateUsername } from "../utility/constant";
 import { ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
 import {
   Padding,
   FontSize,
@@ -28,10 +28,12 @@ import {
 } from "../common/customui/Typography";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import UsernameSuccessModal from "./UsernameSuccessModal";
+import { RefreshToken } from '../../components/user/Session';
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const isFocused = useIsFocused();
   const isLoginError = route?.params?.isLoginError || false;
   const [displaySuccessAlert, setDisplaySuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -127,6 +129,27 @@ const ProfileSettingsEdit = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isFocused) {
+      return undefined;
+    }
+
+    const refreshToken = () => {
+      console.log("Refreshing token...");
+      Promise.resolve(RefreshToken()).catch((error) => {
+        console.warn("Refresh token error:", error);
+      });
+    };
+
+    refreshToken();
+    const refreshInterval = setInterval(refreshToken, 5 * 60 * 1000);
+
+    return () => clearInterval(refreshInterval);
+  }, [isFocused]);
+
+
+  
+
   const renderErrorMessage = () => {
     return (
       <View style={[styles.errorMain]}>
@@ -158,6 +181,7 @@ const ProfileSettingsEdit = () => {
       <ProfileSettingsHeader
         title="Edit Username"
         onPressBack={handleBackPress}
+        showIcon={!isLoginError}
       />
       <ScrollView ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
@@ -171,7 +195,7 @@ const ProfileSettingsEdit = () => {
                 isVisible={showErrorAlert}
                 onClose={() => setShowErrorAlert(false)}
               />
-              {showValidationAlert && renderErrorMessage()}
+              {isLoginError && renderErrorMessage()}
             </View>
             <View
               style={[
@@ -194,7 +218,7 @@ const ProfileSettingsEdit = () => {
                 Fields marked with * are required.
               </HintText>
               <View
-                style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}
+                style={[styles.textinputWrapper, styles.frameGroupSpaceBlock,{marginTop: 24}]}
               >
                 <Controller
                   control={control}
@@ -205,7 +229,7 @@ const ProfileSettingsEdit = () => {
                   }) => (
                     <SparkLightInput
                       placeholder=""
-                      label={"New Username*"}
+                      label={"New Username *"}
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={value}
@@ -226,7 +250,7 @@ const ProfileSettingsEdit = () => {
                   }) => (
                     <>
                       <SparkLightInput
-                        label={"Confirm New Username*"}
+                        label={"Confirm New Username *"}
                         placeholder=""
                         onBlur={onBlur}
                         onChangeText={onChange}
@@ -290,7 +314,7 @@ const ProfileSettingsEdit = () => {
 
             <View style={{ padding: 4 }}></View>
             <PrimaryButton
-              title="Cancel"
+              title="Cancel & Sign Out"
               buttonType="outline"
               accessibilityLabel="Cancel"
               onPress={handleBackPress}
@@ -329,6 +353,7 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "400",
     lineHeight: 19,
+    ellipsis: 'clip',
   },
   bulletPointContainer: {
     flexDirection: "row",
@@ -370,7 +395,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   generalInformationWrapper: {
-    paddingBottom: Padding.p_5xs,
+    paddingTop: Padding.p_base,
     alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
   },
@@ -444,18 +469,22 @@ const styles = StyleSheet.create({
     padding: Padding.p_5xs,
     fontWeight: "500",
     lineHeight: 16,
+    marginTop: 8,
   },
   errorSubText: {
     color: "##000000",
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_sm,
     lineHeight: 18,
+    textAlign: "center",
+    marginTop: 4,
   },
   requiredFieldsText: {
     textAlign: "left",
-    marginTop: Padding.p_5xl,
+    marginTop: 10,
     marginBottom: Padding.p_base,
     marginHorizontal: Padding.p_5xl,
+    textAlign: "left",
   },
 });
 

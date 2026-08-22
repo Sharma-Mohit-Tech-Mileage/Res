@@ -146,6 +146,13 @@ const AccountOverview = () => {
       accessibilityLabel: 'Navigate to profile',
       includeInMenu: true,
     },
+     {
+      name: 'Change Username',
+      onPress: () => navigation.navigate('ProfileSettingsEdit'),
+      icon: ProfileSettingsIcon,
+      accessibilityLabel: 'Change Username',
+      includeInMenu: true,
+    },
     {
       name: 'Password & Security',
       onPress: () => navigation.navigate('PasswordSecurity'),

@@ -229,7 +229,13 @@ export const passwordSchema = (isCustomQuestionSelected) =>
     newUsername: yup
       .string()
       .required("Username is required")
-      .matches(/^[A-Za-z0-9]{8,20}$/, "Username must be 8-20 characters and contain only letters and numbers (no spaces or special characters)."),
+        .min(8, "It must contain 8 to 20 characters.")
+        .max(20, "It must contain 8 to 20 characters.")
+        .matches(
+          /^[A-Za-z0-9]+$/,
+          "It must contain only letters (a-z) and numbers (0-9)."
+        )
+        .matches(/^[^\s]*$/, "Your new username cannot have any spaces."),
     ConfirmNewUsername: yup
       .string()
       .required("Confirm New Username is required")
