@@ -289,7 +289,7 @@ const PasswordSecurityEdit = () => {
                   style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
                 >
 
-                  <FieldTitle
+                  {/* <FieldTitle
                       style={[{marginBottom:8}]}
                       accessible={true}
                       importantForAccessibility="yes"
@@ -297,7 +297,7 @@ const PasswordSecurityEdit = () => {
                       accessibilityLabel="Password Reset Answer Required"
                     >
                       Password Reset Answer *
-                    </FieldTitle>
+                    </FieldTitle> */}
                   <Controller
                     control={control}
                     name="securityAnswer"
@@ -305,6 +305,7 @@ const PasswordSecurityEdit = () => {
                       <SparkLightInput
                         ref={securityAnswerRef}
                         onBlur={onBlur}
+                        label="Password Reset Answer *"
                         onChangeText={onChange}
                         value={value}
                         error={error?.message}

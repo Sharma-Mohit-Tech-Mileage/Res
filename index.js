@@ -2,14 +2,14 @@ import 'react-native-gesture-handler';
 import 'react-native-url-polyfill/auto';
 import { AppRegistry } from 'react-native';
 import App from './App.js';
-import messaging from '@react-native-firebase/messaging';
+import { getMessaging, setBackgroundMessageHandler, onMessage } from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
 import { name as appName } from './app.json';
 
 
 const processedMessages = new Set();
 
-messaging().setBackgroundMessageHandler(async remoteMessage => {
+setBackgroundMessageHandler(getMessaging(), async remoteMessage => {
     console.log('Message handled in the background!', remoteMessage);
 
     if (remoteMessage.data && remoteMessage.data.title && remoteMessage.data.body) {
@@ -44,7 +44,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
     }
 });
 
-messaging().onMessage(async remoteMessage => {
+onMessage(getMessaging(), async remoteMessage => {
     console.log('Push Notification Message: ', remoteMessage);
 
     const title = remoteMessage.notification?.title || remoteMessage.data?.title;

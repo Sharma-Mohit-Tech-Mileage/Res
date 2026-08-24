@@ -72,7 +72,7 @@ const ProfileSettingsHeader = ({
                 {title}
               </Text>
             </View>
-            <View style={{ justifyContent: "flex-end" }}>
+            <View style={styles.chatContainer}>
               <ZendeskChatIcon screenName={title} />
             </View>
 
@@ -146,6 +146,17 @@ const styles = StyleSheet.create({
   titleContainer: {
     justifyContent: "center",
     alignItems: "center",
+    // Both side controls are absolute; this inset keeps long titles clear of them
+    paddingHorizontal: 56,
+  },
+  chatContainer: {
+    position: "absolute",
+    right: 8,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
   },
   pressable: {
     justifyContent: "center",
@@ -160,6 +171,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaSemiBold,
+    textAlign: "center",
   },
   icon: {
     height: 24,

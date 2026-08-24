@@ -17,8 +17,13 @@ xmlns:tools="http://schemas.android.com/tools">
       android:icon="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
+      android:enableOnBackInvokedCallback="false"
       android:theme="@style/AppTheme" android:supportsRtl="true"
         tools:ignore="GoogleAppIndexingWarning">
+     <!-- Android 16: keep portrait lock on >=600dp screens until adaptive layouts land (opt-out removed in API 37) -->
+     <property
+        android:name="android.window.PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY"
+        android:value="true" />
      <meta-data
     android:name="google_analytics_automatic_screen_reporting_enabled"
     android:value="false"

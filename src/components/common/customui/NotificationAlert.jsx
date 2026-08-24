@@ -237,6 +237,7 @@ const NotificationAlert = ({
   iconComponent = null,
   iconColor = null,
   contentStyle = {},
+  children = null,
 }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -645,6 +646,7 @@ const NotificationAlert = ({
           <A11y.Index index={2}> 
            <View > 
           {blocks.map((block, index) => renderBlock(block, index))}
+          {children}
           </View>
           </A11y.Index>
 

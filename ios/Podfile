@@ -66,10 +66,10 @@ target 'My Sparklight' do
   use_frameworks! :linkage => :static
   # Flags change depending on the env values.
   #flags = get_default_flags()
-    pod 'Firebase', '11.11.0', :modular_headers => true
-    pod 'FirebaseCoreInternal', '11.11.0', :modular_headers => true
+    pod 'Firebase', '11.15.0', :modular_headers => true
+    pod 'FirebaseCoreInternal', '11.15.0', :modular_headers => true
     pod 'GoogleUtilities', '8.1.0', :modular_headers => true
-    pod 'FirebaseCore', '11.11.0', :modular_headers => true
+    pod 'FirebaseCore', '11.15.0', :modular_headers => true
     
     pod 'ZendeskSDKMessaging', '2.36.0'
     

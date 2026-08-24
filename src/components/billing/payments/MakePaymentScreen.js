@@ -101,7 +101,7 @@ const MakePaymentScreen = ({ navigation }) => {
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
       <ScrollView
-        contentContainerStyle={[ contentMaxWidth]}
+        contentContainerStyle={[contentMaxWidth, { paddingBottom: 140 }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >

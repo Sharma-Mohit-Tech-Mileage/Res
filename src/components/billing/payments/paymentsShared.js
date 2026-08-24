@@ -1,6 +1,9 @@
+import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import moment from "moment";
 import { digitsToWords } from "../../../utils/a11y";
+import RemoteConfigManager from "../../../config/Remoteconfigmanager";
+import { calculateFee } from "../../../network/apis/account/paymentMethods.service";
 
 export const contentMaxWidth = { width: "100%", maxWidth: 640, alignSelf: "center" };
 
@@ -20,6 +23,60 @@ export const ordinal = (day) => {
   if (mod10 === 2 && mod100 !== 12) return `${n}nd`;
   if (mod10 === 3 && mod100 !== 13) return `${n}rd`;
   return `${n}th`;
+};
+
+export const DEFAULT_SURCHARGE_RATE = 3;
+
+export const formatSurchargeRate = (rate) => {
+  const value = Number(rate);
+  if (!isFinite(value) || value <= 0) return `${DEFAULT_SURCHARGE_RATE}%`;
+  return `${Number(value.toFixed(2))}%`;
+};
+
+// Display-only rate from Remote Config; the charged fee always comes from the Fee Calculator API, so a stale rate can never mis-bill.
+const readSurchargeRate = () => {
+  const value = Number(RemoteConfigManager.getFeatureFlag("payments.surcharge_rate", DEFAULT_SURCHARGE_RATE));
+  return isFinite(value) && value > 0 && value <= 10 ? value : DEFAULT_SURCHARGE_RATE;
+};
+
+export const useSurchargeRate = () => {
+  const [rate, setRate] = useState(readSurchargeRate);
+  useEffect(() => RemoteConfigManager.subscribeToFeatures(() => setRate(readSurchargeRate())), []);
+  return rate;
+};
+
+export const surchargeTitle = (rate) => `${formatSurchargeRate(rate)} Credit Card Surcharge`;
+
+export const surchargeMessage = (rate) =>
+  `A ${formatSurchargeRate(
+    rate
+  )} surcharge applies to all credit card payments. Payments made by debit card, directly from a checking or savings account, or by check are not subject to this surcharge.`;
+
+export const surchargeBreakdownLabel = (rate) => `${formatSurchargeRate(rate)} Credit card surcharge:`;
+
+export const isCreditCard = (method) => method?.type === "card" && method?.cardType === "credit";
+
+// Fee Calculator lookup for a saved credit card; with onError the fee falls back to 0 instead of hiding.
+export const useSurchargeFee = (amount, method, { enabled = true, onError } = {}) => {
+  const [fee, setFee] = useState(null);
+  useEffect(() => {
+    setFee(null);
+    if (!enabled || !isCreditCard(method) || !(Number(amount) > 0)) return undefined;
+    let cancelled = false;
+    calculateFee(amount, method)
+      .then((value) => !cancelled && setFee(value))
+      .catch(() => {
+        if (cancelled) return;
+        if (onError) {
+          setFee(0);
+          onError();
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [enabled, method?.id, amount]);
+  return fee;
 };
 
 export const paymentMethodTitle = (method) => {

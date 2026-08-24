@@ -1,4 +1,4 @@
-import remoteConfig from '@react-native-firebase/remote-config';
+import { getRemoteConfig, setDefaults, setConfigSettings, fetch as fetchRemoteConfig, activate, getValue } from '@react-native-firebase/remote-config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 import Config from 'react-native-config';
@@ -36,7 +36,10 @@ const DEFAULT_FEATURES = {
   tabs: {
     services: { visible: false },
     billing: { hidden: false }
-  }
+  },
+  payments: {
+    surcharge_rate: 3,
+  },
 };
 
 class RemoteConfigManager {
@@ -67,12 +70,13 @@ class RemoteConfigManager {
     try {
       await this._loadFromCache();
 
-      await remoteConfig().setDefaults({
+      const rc = getRemoteConfig();
+      await setDefaults(rc, {
         [CONFIG_KEY_MAINTENANCE]: JSON.stringify(DEFAULT_MAINTENANCE),
         [CONFIG_KEY_FEATURES]: JSON.stringify(DEFAULT_FEATURES)
       });
 
-      await remoteConfig().setConfigSettings({
+      await setConfigSettings(rc, {
         minimumFetchIntervalMillis: FETCH_INTERVAL_MS
       });
 
@@ -151,10 +155,11 @@ class RemoteConfigManager {
     this._isFetching = true;
 
     try {
-      await remoteConfig().fetch(0);
-      await remoteConfig().activate();
+      const rc = getRemoteConfig();
+      await fetchRemoteConfig(rc, 0);
+      await activate(rc);
 
-      const maintenanceJson = remoteConfig().getValue(CONFIG_KEY_MAINTENANCE).asString();
+      const maintenanceJson = getValue(rc, CONFIG_KEY_MAINTENANCE).asString();
       let parsedMaintenance = {};
 
       try {
@@ -168,7 +173,7 @@ class RemoteConfigManager {
         parsedMaintenance = this._maintenanceCache || DEFAULT_MAINTENANCE;
       }
 
-      const featuresJson = remoteConfig().getValue(CONFIG_KEY_FEATURES).asString();
+      const featuresJson = getValue(rc, CONFIG_KEY_FEATURES).asString();
       let parsedFeatures = {};
 
       try {
