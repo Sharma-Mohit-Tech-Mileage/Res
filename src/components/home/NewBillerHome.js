@@ -426,7 +426,7 @@ const NewBillerHome = ({ navigation }) => {
             title="Auto Pay"
             isLoading={loadingAutoPay}
             features={["Convenient", "Timely Payments", "Peace of Mind"]}
-            buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
+            buttonText={isAutoPayStatus ? "Active" : "Set Up Auto Pay"}
             buttonVariant={isAutoPayStatus ? "success" : "primary"}
             isActive={isAutoPayStatus}
             onButtonPress={() => {

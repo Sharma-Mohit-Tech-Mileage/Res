@@ -27,7 +27,6 @@ import {
 } from "./paymentsShared";
 
 const AutoPayScreen = ({ navigation, route }) => {
-  const headerTitle = "Manage Auto Pay";
   const surchargeRate = useSurchargeRate();
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
@@ -61,6 +60,7 @@ const AutoPayScreen = ({ navigation, route }) => {
 
   const loading = methods === null || autoPay === null;
   const enrolled = !!autoPay?.enrolled;
+  const headerTitle = !loading && !enrolled ? "Set Up Auto Pay" : "Manage Auto Pay";
   const dueDayLabel = ordinal(autoPay?.dueDay || 22);
   const selectedMethod = methods?.find((m) => m.id === selectedId) || null;
   const currentMethod = methods?.find((m) => m.id === autoPay?.paymentMethodId) || null;
@@ -106,7 +106,7 @@ const AutoPayScreen = ({ navigation, route }) => {
         )}
 
         <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-          {enrolled ? "Manage auto pay" : "Activate auto pay"}
+          {enrolled ? "Manage auto pay" : "Set up auto pay"}
         </SectionTitle>
         <SectionContent style={styles.introText}>
           {enrolled ? "You have signed up for" : "You are enrolling in"} Sparklight Auto Pay. Your payment will be

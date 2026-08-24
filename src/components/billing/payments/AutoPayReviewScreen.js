@@ -75,19 +75,14 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
 
   const amountDue = Number(details?.pastDueAmount) || 0;
   const surchargeRate = useSurchargeRate();
-  const isUpdate = mode === "update";
-  const showBalanceAlert = !loading && !isUpdate && amountDue > 0;
-  const scheduledAmount = Number(details?.balanceDue) || 0;
+  const showBalanceAlert = !loading && amountDue > 0;
+  const showSurchargeNotice = !loading && isCreditCard(method) && !showBalanceAlert;
 
   const onFeeError = () =>
     setErrorAlert("We could not calculate the credit card surcharge. Please try again.");
-  const balanceSurcharge = useSurchargeFee(amountDue, method, { enabled: !isUpdate, onError: onFeeError });
+  const balanceSurcharge = useSurchargeFee(amountDue, method, { onError: onFeeError });
   const showBalanceSurcharge = balanceSurcharge != null;
   const totalBalance = showBalanceSurcharge ? amountDue + balanceSurcharge : amountDue;
-
-  const scheduledSurcharge = useSurchargeFee(scheduledAmount, method, { enabled: isUpdate, onError: onFeeError });
-  const showScheduledSurcharge = isCreditCard(method) && scheduledSurcharge != null;
-  const scheduledTotal = showScheduledSurcharge ? scheduledAmount + scheduledSurcharge : scheduledAmount;
 
   const onSubmit = async () => {
     if (inFlightRef.current || !agreed) return;
@@ -123,25 +118,6 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
       setSubmitting(false);
     }
   };
-
-  const renderAmountField = (label, value, valueLoading) => (
-    <View
-      style={styles.fieldGroup}
-      accessible={!valueLoading}
-      accessibilityLabel={valueLoading ? undefined : `${label}, ${value}`}
-    >
-      <FieldTitle style={styles.fieldLabel}>{label}</FieldTitle>
-      {valueLoading ? (
-        <SkeletonPlaceholder>
-          <View style={styles.valueSkeleton} />
-        </SkeletonPlaceholder>
-      ) : (
-        <View style={styles.fieldValueBox}>
-          <FieldContent style={styles.fieldValue}>{value}</FieldContent>
-        </View>
-      )}
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -191,26 +167,8 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                   </View>
                 )}
               </View>
-              {isUpdate && (
-                <>
-                  {showScheduledSurcharge && (
-                    <>
-                      {renderAmountField("Credit Card Surcharge", formatCurrency(scheduledSurcharge), loading)}
-                      <View style={styles.inCardAlert}>
-                        <NotificationAlert
-                          type="warning"
-                          title={surchargeTitle(surchargeRate)}
-                          message={surchargeMessage(surchargeRate)}
-                          showCloseIcon={false}
-                        />
-                      </View>
-                      {renderAmountField("Total Amount", formatCurrency(scheduledTotal), loading)}
-                    </>
-                  )}
-                </>
-              )}
               <View
-                style={[styles.fieldGroup, !showBalanceAlert && styles.fieldGroupLast]}
+                style={[styles.fieldGroup, !showBalanceAlert && !showSurchargeNotice && styles.fieldGroupLast]}
                 accessible={!loading}
                 accessibilityLabel={loading ? undefined : `Payment Date, on the ${dueDayLabel} of each month`}
               >
@@ -269,6 +227,17 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                   </NotificationAlert>
                 </View>
               )}
+
+              {showSurchargeNotice && (
+                <View style={styles.inCardAlert}>
+                  <NotificationAlert
+                    type="warning"
+                    title={surchargeTitle(surchargeRate)}
+                    message={surchargeMessage(surchargeRate)}
+                    showCloseIcon={false}
+                  />
+                </View>
+              )}
             </View>
 
             <View style={[card.elevated, styles.emailCard]}>
@@ -299,10 +268,10 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
             <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
 
             <PrimaryButton
-              title={submitting ? "Saving..." : mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"}
+              title={submitting ? "Saving..." : mode === "update" ? "Update Auto Pay" : "Set Up Auto Pay"}
               buttonType="submit"
               disabled={submitting || !agreed || loading}
-              accessibilityLabel={mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"}
+              accessibilityLabel={mode === "update" ? "Update Auto Pay" : "Set Up Auto Pay"}
               onPress={onSubmit}
             />
             <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
