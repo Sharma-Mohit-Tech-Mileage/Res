@@ -1,6 +1,6 @@
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { Linking, Alert, Platform } from "react-native";
-import { logDebug, logWarn, logError } from "./logger";
+import { logDebug, logWarn, logError, logDiag } from "./logger";
 
 class AuthenticationManager {
   static AUTH_TIMEOUT = 120000;
@@ -27,6 +27,12 @@ class AuthenticationManager {
       const result = await Promise.race([authPromise, timeoutPromise]);
 
       logDebug("AuthenticationManager", "Authorization completed successfully");
+      logDiag("AuthenticationManager", {
+        event: "SSO ID token received",
+        platform: Platform.OS,
+        hasIdToken: Boolean(result?.idToken),
+        idTokenLength: result?.idToken?.length || 0,
+      });
       return {
         success: true,
         data: result,
@@ -51,6 +57,12 @@ class AuthenticationManager {
       const result = await Promise.race([refreshPromise, timeoutPromise]);
 
       logDebug("AuthenticationManager", "Token refresh completed successfully");
+      logDiag("AuthenticationManager", {
+        event: "SSO ID token received during refresh",
+        platform: Platform.OS,
+        hasIdToken: Boolean(result?.idToken),
+        idTokenLength: result?.idToken?.length || 0,
+      });
       return {
         success: true,
         data: result,

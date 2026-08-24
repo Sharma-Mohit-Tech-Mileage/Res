@@ -242,7 +242,10 @@ const SplashScreen = ({ navigation, route }) => {
         idTokenGuid: result.data.additionalParameters?.session_state,
         refreshToken: result.data.refreshToken,
       };
-      console.log("🔐 ID Token refreshed from session:", data.idToken);
+      logDebug("SplashScreen", "ID token refreshed from session", {
+        hasIdToken: Boolean(data.idToken),
+        idTokenLength: data.idToken?.length || 0,
+      });
       setLoadingState(LoadingState.LOADING_DATA);
       storeSsoToken(data);
       callSSOLoginApi(data);
@@ -258,7 +261,10 @@ const SplashScreen = ({ navigation, route }) => {
     setLoadingState(LoadingState.LOADING_DATA);
     // Capture SSO idToken from request so handleLogin can store it in the user object
     ssoIdTokenRef.current = request.idToken || null;
-    console.log("🔐 ID Token captured from SSO:", ssoIdTokenRef.current);
+    logDebug("SplashScreen", "ID token captured from SSO", {
+      hasIdToken: Boolean(ssoIdTokenRef.current),
+      idTokenLength: ssoIdTokenRef.current?.length || 0,
+    });
     logDebug("SplashScreen", "Calling SSO login API", {
       endpoint: getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN),
       hasIdToken: Boolean(request.idToken),
