@@ -11,6 +11,13 @@ import { fetchAutoPayDetails, cancelAutoPay } from "../../../network/apis/accoun
 import { contentMaxWidth, ordinal } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 import AppStyles from "../../../styles/AppStyles";
+import {
+  usePaymentStep,
+  trackAutoPayDisabled,
+  trackAutoPayFailed,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 const AutoPayDeactivateScreen = ({ navigation, route }) => {
   const headerTitle = route.params?.headerTitle || "Manage Auto Pay";
@@ -22,12 +29,17 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
   const [errorAlert, setErrorAlert] = useState("");
   const abortRef = useRef(null);
 
+  usePaymentStep("autopay_deactivate");
+
   useFocusEffect(
     useCallback(() => {
       abortRef.current = new AbortController();
       fetchAutoPayDetails(abortRef.current.signal)
         .then(setDetails)
-        .catch(() => setDetails({}));
+        .catch((error) => {
+          setDetails({});
+          trackApiError("autopay-details", errorStatus(error), "autopay_deactivate");
+        });
       return () => abortRef.current?.abort();
     }, [])
   );
@@ -40,9 +52,11 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
     setSubmitting(true);
     try {
       await cancelAutoPay();
-
+      trackAutoPayDisabled(null);
       navigation.replace("PaymentConfirmation", { kind: "autopay-deactivated", headerTitle });
     } catch (error) {
+      trackAutoPayFailed("deactivate_failed");
+      trackApiError("cancel-autopay", errorStatus(error), "autopay_deactivate");
       setErrorAlert("We could not deactivate Auto Pay right now. Please try again.");
       announceA11y("Error, Auto Pay was not deactivated.");
     } finally {

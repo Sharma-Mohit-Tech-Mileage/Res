@@ -11,12 +11,22 @@ import { SectionTitle } from "../../common/customui/Typography";
 import { fetchAutoPayDetails } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, formatCurrency, parseAmountInput, radioA11yProps } from "./paymentsShared";
 import AppStyles from "../../../styles/AppStyles";
+import {
+  usePaymentStep,
+  endPaymentAttempt,
+  trackPaymentTypeSelected,
+  trackValidationError,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 const TYPE_ONE_TIME = "oneTime";
 const TYPE_AUTOMATIC = "automatic";
 const AMOUNT_TOTAL = "total";
 const AMOUNT_PAST_DUE = "pastDue";
 const AMOUNT_CUSTOM = "custom";
+
+const ANALYTICS_PAYMENT_TYPE = { [AMOUNT_TOTAL]: "full", [AMOUNT_PAST_DUE]: "due", [AMOUNT_CUSTOM]: "custom" };
 
 const MakePaymentScreen = ({ navigation }) => {
   const headerTitle = "Make a Payment";
@@ -29,14 +39,17 @@ const MakePaymentScreen = ({ navigation }) => {
   const amountInputRef = useRef(null);
   const abortRef = useRef(null);
 
+  usePaymentStep("make_payment");
+
   useFocusEffect(
     useCallback(() => {
       abortRef.current = new AbortController();
       fetchAutoPayDetails(abortRef.current.signal)
         .then(setDetails)
-        .catch(() => {
+        .catch((error) => {
           setDetails({});
           setErrorAlert("We could not load your balance information. Please try again.");
+          trackApiError("autopay-details", errorStatus(error), "make_payment");
         });
       return () => abortRef.current?.abort();
     }, [])
@@ -55,9 +68,14 @@ const MakePaymentScreen = ({ navigation }) => {
   };
   const canContinue = paymentType === TYPE_AUTOMATIC || resolveAmount() !== null;
 
+  const selectAmountOption = (option) => {
+    if (option !== amountOption) trackPaymentTypeSelected(ANALYTICS_PAYMENT_TYPE[option]);
+    setAmountOption(option);
+  };
+
   const onContinue = () => {
     if (paymentType === TYPE_AUTOMATIC) {
-      navigation.navigate("AutoPay");
+      navigation.navigate("AutoPay", { entryPoint: "make_payment" });
       return;
     }
     const amount = resolveAmount();
@@ -65,15 +83,20 @@ const MakePaymentScreen = ({ navigation }) => {
       if (amountOption === AMOUNT_CUSTOM) {
         setAmountError("Enter an amount between $0.01 and $99,999.99.");
         amountInputRef.current?.focus();
+        trackValidationError("amount", "out_of_range");
       }
       return;
     }
     setAmountError("");
-    navigation.navigate("MakePaymentMethod", { amount, headerTitle });
+    navigation.navigate("MakePaymentMethod", {
+      amount,
+      headerTitle,
+      paymentType: ANALYTICS_PAYMENT_TYPE[amountOption] || "",
+    });
   };
 
   const onSelectCustom = () => {
-    setAmountOption(AMOUNT_CUSTOM);
+    selectAmountOption(AMOUNT_CUSTOM);
     amountInputRef.current?.focus();
   };
 
@@ -99,7 +122,13 @@ const MakePaymentScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader
+        title={headerTitle}
+        onPressBack={() => {
+          endPaymentAttempt();
+          navigation.goBack();
+        }}
+      />
       <ScrollView
         contentContainerStyle={[contentMaxWidth, { paddingBottom: 140 }]}
         showsVerticalScrollIndicator={false}
@@ -165,7 +194,7 @@ const MakePaymentScreen = ({ navigation }) => {
                     label: "Total balance due",
                     amount: formatCurrency(totalDue),
                     selected: amountOption === AMOUNT_TOTAL,
-                    onPress: () => setAmountOption(AMOUNT_TOTAL),
+                    onPress: () => selectAmountOption(AMOUNT_TOTAL),
                   })}
                 {pastDue > 0 &&
                   renderRadioRow({
@@ -177,7 +206,7 @@ const MakePaymentScreen = ({ navigation }) => {
                       pastDue
                     )} is past due. Please make a payment to avoid service interruption.`,
                     selected: amountOption === AMOUNT_PAST_DUE,
-                    onPress: () => setAmountOption(AMOUNT_PAST_DUE),
+                    onPress: () => selectAmountOption(AMOUNT_PAST_DUE),
                   })}
                 {renderRadioRow({
                   key: AMOUNT_CUSTOM,
@@ -194,7 +223,7 @@ const MakePaymentScreen = ({ navigation }) => {
                       keyboardType="decimal-pad"
                       accessibilityLabel="Payment amount, required"
                       accessibilityHint={amountError ? amountError : undefined}
-                      onFocus={() => setAmountOption(AMOUNT_CUSTOM)}
+                      onFocus={() => selectAmountOption(AMOUNT_CUSTOM)}
                       onChangeText={(text) => {
                         let cleaned = text.replace(/[^0-9.]/g, "");
                         const dot = cleaned.indexOf(".");
@@ -231,7 +260,10 @@ const MakePaymentScreen = ({ navigation }) => {
             <PrimaryButton
               title="Cancel"
               accessibilityLabel="Cancel payment"
-              onPress={() => navigation.popToTop()}
+              onPress={() => {
+                endPaymentAttempt();
+                navigation.popToTop();
+              }}
             />
           </>
         )}

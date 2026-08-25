@@ -1,6 +1,8 @@
-import analytics from "@react-native-firebase/analytics";
+import { useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { getAnalytics, logEvent } from "@react-native-firebase/analytics";
 
-// Firebase payment analytics. Spec: docs/firebase-payment-analytics-spec.html
+// Firebase payment analytics. Spec: Firebase-Payment-Analytics-Spec.docx (story 53472)
 //
 // Funnel steps come from the existing screen_view; these events carry only what a
 // screen cannot — what the customer chose, what happened, and what broke.
@@ -21,7 +23,7 @@ const uuid = () =>
 const log = (name, params = {}) => {
   try {
     const payload = attemptId ? { payment_attempt_id: attemptId, ...params } : { ...params };
-    Promise.resolve(analytics().logEvent(name, payload)).catch(() => {});
+    Promise.resolve(logEvent(getAnalytics(), name, payload)).catch(() => {});
   } catch (_) {
     // ignored
   }
@@ -32,11 +34,19 @@ export const startPaymentAttempt = () => {
   return attemptId;
 };
 
+export const ensurePaymentAttempt = () => attemptId || startPaymentAttempt();
+
+export const currentPaymentAttempt = () => attemptId;
+
 export const endPaymentAttempt = () => {
   attemptId = null;
 };
 
-export const methodType = (method) => (method?.type === "card" ? "card" : "bank");
+export const methodType = (method) =>
+  method?.type === "card" ? "card" : method?.type ? "bank" : "unknown";
+
+// The status lives at error.status (retry-exhausted), error.response.status (raw axios), or error.code (declines).
+export const errorStatus = (error) => error?.status ?? error?.response?.status ?? error?.code;
 
 export const amountBucket = (amount) => {
   const value = Number(amount) || 0;
@@ -113,10 +123,23 @@ export const trackApiError = (endpoint, status, step) =>
 export const trackValidationError = (field, reason) =>
   log("payment_validation_error", { field: field || "", reason: reason || "" });
 
-export const trackStepDuration = (step, startedAt) => {
+// attemptIdOverride keeps the id on events logged after the attempt has ended (confirmation dwell).
+export const trackStepDuration = (step, startedAt, attemptIdOverride) => {
   if (!startedAt) return;
   log("payment_step_duration", {
     step: step || "",
     seconds: Math.round((Date.now() - startedAt) / 1000),
+    ...(attemptIdOverride ? { payment_attempt_id: attemptIdOverride } : {}),
   });
+};
+
+// Per-screen wiring: guarantees an attempt id while in a flow and times the step on blur.
+export const usePaymentStep = (step) => {
+  useFocusEffect(
+    useCallback(() => {
+      ensurePaymentAttempt();
+      const startedAt = Date.now();
+      return () => trackStepDuration(step, startedAt);
+    }, [step])
+  );
 };
