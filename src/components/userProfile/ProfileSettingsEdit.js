@@ -39,6 +39,7 @@ const ProfileSettingsEdit = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(isLoginError);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("Profile update failed. Please try again.");
   const scrollViewRef = useRef(null);
 
   const handleSave = async (data) => {
@@ -78,6 +79,7 @@ const ProfileSettingsEdit = () => {
         source: "MobileApp",
         idToken: idToken,
       };
+      
 
       console.log("Updating username with payload:", payload);
 
@@ -92,13 +94,15 @@ const ProfileSettingsEdit = () => {
           );
           if (Response?.status === "success") {
             setDisplaySuccessAlert(true);
-          } else {
+          } else if (Response?.status === "error") {
+            setErrorMessage(Response?.errors[0] || "Profile update failed. Please try again.");
             setShowErrorAlert(true);
           }
         },
         (error) => {
           setLoading(false);
           console.warn("Update username error:", error);
+          setErrorMessage("Profile update failed. Please try again.");
           setShowErrorAlert(true);
         },
       );
@@ -130,7 +134,7 @@ const ProfileSettingsEdit = () => {
   }, []);
 
   useEffect(() => {
-    if (!isFocused) {
+    if (!isFocused && !isLoginError) {
       return undefined;
     }
 
@@ -190,7 +194,7 @@ const ProfileSettingsEdit = () => {
               <NotificationAlert
                 type="error"
                 title="Error"
-                message="Your profile update failed."
+                message={errorMessage}
                 showCloseIcon={true}
                 isVisible={showErrorAlert}
                 onClose={() => setShowErrorAlert(false)}
