@@ -297,7 +297,7 @@ const NewBillerHome = ({ navigation }) => {
             appVersion: VersionCheck.getCurrentVersion(),
             timezoneOffsetId: new Date().getTimezoneOffset().toString(),
             platform: Platform.OS,
-            locationHrefId: Config.URL,
+            locationHrefId: "",
             ipAddress: IPAddress || "",
             accountNumber: user?.userInfo.accountNumber,
             email: defaultPaymentDetails.email || "",

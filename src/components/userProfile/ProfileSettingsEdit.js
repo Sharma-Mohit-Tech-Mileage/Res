@@ -60,6 +60,29 @@ const ProfileSettingsEdit = () => {
     resolver: yupResolver(usernameSchema()),
     defaultValues: {},
   });
+function decodeIdToken(idToken) {
+  try {
+    // 1. Get the payload payload section (index 1)
+    const base64Url = idToken.split('.')[1]; 
+    
+    // 2. Replace URL-safe characters back to standard Base64
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); 
+    
+    // 3. Decode the Base64 string to a JSON string
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+
+    // 4. Return parsed user information (e.g., email, name, sub)
+    return JSON.parse(jsonPayload); 
+  } catch (error) {
+    console.error("Failed to parse ID Token claims", error);
+    return null;
+  }
+}
 
   const updateUsername = async (newUsername) => {
     setLoading(true);
@@ -67,8 +90,8 @@ const ProfileSettingsEdit = () => {
       const user = await getUser();
       const sso = await getSsoToken();
       const accountNumber =
-        user?.userInfo?.accountNumber || user?.accountNumber || "";
-      const userName = user?.userInfo?.userName || user?.userName || "";
+        isLoginError? decodeIdToken(sso.idToken || sso.token).preferred_username : user?.accountNumber || user?.userInfo?.accountNumber || "";
+      const userName =  isLoginError? decodeIdToken(sso.idToken || sso.token).preferred_username : user?.userInfo?.userName || user?.userName || "";
       const idToken = (sso && (sso.idToken || sso.token)) || "";
 
       const payload = {
@@ -80,8 +103,15 @@ const ProfileSettingsEdit = () => {
         idToken: idToken,
       };
       
-
+      console.log("Decoded ID Token:", decodeIdToken(idToken));
       console.log("Updating username with payload:", payload);
+
+      if (!accountNumber || !userName || !newUsername || !idToken) {
+        // throw new Error("Missing required fields for username update");
+       
+        console.log("Missing required fields for username update. AccountNumber:",decodeIdToken(idToken)?.preferred_username, "UserName:", decodeIdToken(idToken)?.preferred_username, "NewUsername:", newUsername, "IdToken:", idToken);
+        return;
+      }
 
       PostApiRequest(
         ENDPOINTS.UPDATE_USERNAME,
@@ -134,18 +164,21 @@ const ProfileSettingsEdit = () => {
   }, []);
 
   useEffect(() => {
-    if (!isFocused && !isLoginError) {
+    if (!isFocused ) {
       return undefined;
     }
 
     const refreshToken = () => {
       console.log("Refreshing token...");
+      if(!isLoginError) {
       Promise.resolve(RefreshToken()).catch((error) => {
         console.warn("Refresh token error:", error);
-      });
+        });
+      }
     };
-
+   
     refreshToken();
+
     const refreshInterval = setInterval(refreshToken, 5 * 60 * 1000);
 
     return () => clearInterval(refreshInterval);
@@ -493,3 +526,4 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileSettingsEdit;
+
