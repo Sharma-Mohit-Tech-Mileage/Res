@@ -9,7 +9,7 @@ import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "
 import { PostAuthApiRequest } from "../../network/RestApiClient";
 import { getEndpoint ,ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
-import { FontFamily } from "../../../GlobalStyles";
+import { FontFamily,Color } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
@@ -852,7 +852,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   networkStatusText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     textAlign: "center",
     fontSize: 14,
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -887,7 +887,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     fontWeight: "400",
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     alignSelf: "center",
     paddingHorizontal: wp("3%"),
   },

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import colors from '../../../res/Colors';
-import { FontFamily } from '../../../../GlobalStyles';
+import { FontFamily,Color } from '../../../../GlobalStyles';
 import { interaction } from "../../../styles/utilities";
 import Touchable from "./Touchable";
 
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 2,
   },txtStyle:{
-    color:colors.sparklight_purple_blue,
+    color:Color.sparklightSecondaryPurple,
     textAlign:'center',
     fontFamily:FontFamily.RadioCanadaRegular,
     fontStyle:'normal',

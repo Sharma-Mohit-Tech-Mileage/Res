@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { FontFamily, Padding } from "../../../../GlobalStyles";
+import { FontFamily, Padding,Color } from "../../../../GlobalStyles";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import { card } from "../../../styles/utilities";
 import Config from "react-native-config";
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   
   paymentButtonText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontSize: 16,
     fontWeight: "600",
     alignSelf: "center",

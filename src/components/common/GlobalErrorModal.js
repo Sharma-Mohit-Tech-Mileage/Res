@@ -7,7 +7,7 @@ import {
   Linking,
 } from "react-native";
 import AlertIcon from "../../res/svgIcons/AlertIconV2";
-import { FontFamily } from "../../../GlobalStyles";
+import { FontFamily,Color } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import Touchable from "./customui/Touchable";
 import PrimaryButton from "./customui/PrimaryButton";
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   closeAlertTxt: {
-    color: colors.sparklight_purple_blue,
+    color: Color.sparklightSecondaryPurple,
     fontWeight: "400",
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",

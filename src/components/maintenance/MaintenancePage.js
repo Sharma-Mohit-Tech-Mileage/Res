@@ -181,7 +181,7 @@ const MaintenancePage = ({
               FontFamily: FontFamily.RadioCanadaRegular,
               fontSize: 14,
               fontWeight: "400",
-              color: colors.snow_white,
+              color: Color.sparklightWhite,
               alignSelf: "center",
             },
           ]}

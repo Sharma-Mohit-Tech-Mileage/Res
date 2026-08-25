@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   phoneLink: {
-    color: colors.sparklight_purple_blue,
+    color: Color.sparklightSecondaryPurple,
     fontWeight: "600",
     textDecorationLine: "underline",
   },
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaBold,
   },
   primaryButtonText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     
   },
   secondaryButtonText: {

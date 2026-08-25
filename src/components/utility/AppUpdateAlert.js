@@ -90,13 +90,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   closeBtn: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.sparklightSecondaryPurple,
     width: '100%',
     marginTop: 15,
     paddingVertical: 8,
   },
   closeAlertTxt: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontSize: 16,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: 'center',

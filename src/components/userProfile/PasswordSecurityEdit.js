@@ -509,11 +509,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
   }, BtnContainer: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.sparklightSecondaryPurple,
     justifyContent: "center",
   },
   Btn: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     padding: 16,

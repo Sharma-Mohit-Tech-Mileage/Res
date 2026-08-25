@@ -50,6 +50,9 @@ export const Color = {
     backgroundBlur: "#F8F8F8",
     sparklight_yellow:'#FFCE51',
     sparklight_blue:'#00B8D8',
+
+
+    
 };
 
 export const Padding = {

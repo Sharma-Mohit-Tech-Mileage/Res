@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   openBtn: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.sparklightSecondaryPurple,
     justifyContent: "center",
     width: "100%",
     marginTop: 20,
@@ -147,14 +147,14 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   openPortaltxt: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   closeAlertTxt: {
-    color: colors.sparklight_purple_blue,
+    color: Color.sparklightSecondaryPurple,
     textAlign: "center",
     padding: 8,
     fontSize: 16,

@@ -6,7 +6,7 @@ import {
   FontFamily,
   Border,
 } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
+
 import Touchable from "../common/customui/Touchable";
 
 const ConfimationPopup = ({
@@ -26,7 +26,7 @@ const ConfimationPopup = ({
     >
       <View style={styles.overlay}>
         <View style={styles.alertContainer}>
-          <Text style={{textAlign:'center',alignSelf:'center',fontFamily:FontFamily.RadioCanadaRegular, color:colors.sparklight_grey,fontSize:22,fontWeight:'500'}}> {title} </Text>
+          <Text style={{textAlign:'center',alignSelf:'center',fontFamily:FontFamily.RadioCanadaRegular, color:Color.sparklightGray,fontSize:22,fontWeight:'500'}}> {title} </Text>
           <Text style={styles.message}>{message}</Text>
           <Touchable
             style={styles.openBtn}
@@ -51,7 +51,7 @@ const ConfimationPopup = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.splash_bg,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   overlay: {
     flex: 1,
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   message: {
-    color: colors.darkest_grey,
+    color: Color.colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 16,
     fontWeight: "400",
@@ -103,14 +103,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     textAlign: "center",
     fontWeight: "400",
   },
   openBtn: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.sparklightPrimaryPurple,
     justifyContent: "center",
     width: "100%",
     marginTop: 20,
@@ -121,14 +121,14 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   openPortaltxt: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   closeAlertTxt: {
-    color: colors.sparklight_purple_blue,
+    color: Color.sparklightPrimaryPurple,
     textAlign: "center",
     padding: 8,
     fontSize: 16,

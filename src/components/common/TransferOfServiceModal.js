@@ -11,7 +11,7 @@ import Touchable from "./customui/Touchable";
 import Alerttriangle from "../../../assets/svgs/Alerttriangle";
 import CopyIcon from "../../../assets/svgs/CopyIcon";
 import colors from "../../res/Colors";
-import { FontFamily } from "../../../GlobalStyles";
+import { FontFamily,Color } from "../../../GlobalStyles";
 
 const groupDigits = (value) =>
   String(value || "")
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   card: {
-    backgroundColor: colors.snow_white,
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 24,
     paddingVertical: 32,
     paddingHorizontal: 32,
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#34744B",
   },
   copiedTipText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 13,
   },
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     marginTop: 44,
   },
   primaryTxt: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaBold,
     fontSize: 15,
     fontWeight: "700",
