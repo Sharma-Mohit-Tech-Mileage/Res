@@ -79,9 +79,10 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
             accessible={true}
             accessibilityLabel={`Plan Name - ${planName}`}
           >
-            {planName}
+            { planName && planName.charAt(0).toUpperCase() + planName.slice(1)}
           </Text>
         </View>
+        <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
         {showManageButton && (
           <SecondaryButton
             title="Manage Phone Service"
@@ -92,6 +93,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
             accessibilityRole="button"
           />
         )}
+        </View>
       </View>
     </View>
   );
