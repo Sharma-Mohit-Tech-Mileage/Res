@@ -82,6 +82,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
             {planName}
           </Text>
         </View>
+        <View style={{ paddingHorizontal: 16, paddingBottom: 16 }}>
         {showManageButton && (
           <SecondaryButton
             title="Manage Phone Service"
@@ -92,6 +93,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
             accessibilityRole="button"
           />
         )}
+        </View>
       </View>
     </View>
   );
