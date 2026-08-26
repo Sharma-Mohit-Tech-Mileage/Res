@@ -47,7 +47,7 @@ export const FeatureFlagMetadata = {
   },
   [FeatureFlags.BILLING_ORBIPAY_PORTAL_PATH]: {
     description: 'Path of the portal-hosted Orbipay widget page, appended to PORTAL_BASE_URL',
-    defaultValue: '/orbipayhost.html',
+    defaultValue: Config.ORBIPAY_PORTAL_WIDGET_PATH || '/orbipayhost.html',
     affectedUsers: ['ALL'],
   },
 };
