@@ -8,7 +8,7 @@ import {
   AccessibilityInfo,
 } from "react-native";
 import Touchable from "./customui/Touchable";
-import Alerttriangle from "../../../assets/svgs/Alerttriangle";
+import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CopyIcon from "../../../assets/svgs/CopyIcon";
 import colors from "../../res/Colors";
 import { FontFamily,Color } from "../../../GlobalStyles";
@@ -40,13 +40,13 @@ const TransferOfServiceModal = ({
       <View style={styles.overlay}>
         <View style={styles.card} accessibilityViewIsModal={true}>
           <View style={styles.titleRow}>
-            <Alerttriangle width={16} height={16} color="#F88700" />
+            <AlertIcon color="#DD6D02" />
             <Text
               style={styles.title}
               accessibilityRole="header"
               accessible={true}
             >
-              Account update required
+              Account Number Updated
             </Text>
           </View>
 
@@ -146,8 +146,8 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.black,
-    fontFamily: FontFamily.RadioCanadaBold,
-    fontSize: 18,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: 20,
     fontWeight: "700",
     marginLeft: 8,
   },

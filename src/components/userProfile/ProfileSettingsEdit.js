@@ -30,6 +30,7 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 import UsernameSuccessModal from "./UsernameSuccessModal";
 import { RefreshToken } from '../../components/user/Session';
 
+
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -90,7 +91,7 @@ function decodeIdToken(idToken) {
       const user = await getUser();
       const sso = await getSsoToken();
       const accountNumber =
-        isLoginError? decodeIdToken(sso.idToken || sso.token).preferred_username : user?.accountNumber || user?.userInfo?.accountNumber || "";
+        isLoginError? decodeIdToken(sso.idToken || sso.token).account_number : user?.accountNumber || user?.userInfo?.accountNumber || "";
       const userName =  isLoginError? decodeIdToken(sso.idToken || sso.token).preferred_username : user?.userInfo?.userName || user?.userName || "";
       const idToken = (sso && (sso.idToken || sso.token)) || "";
 
@@ -169,8 +170,9 @@ function decodeIdToken(idToken) {
     }
 
     const refreshToken = () => {
-      console.log("Refreshing token...");
+     
       if(!isLoginError) {
+      console.log("Refreshing token...");
       Promise.resolve(RefreshToken()).catch((error) => {
         console.warn("Refresh token error:", error);
         });
@@ -351,7 +353,7 @@ function decodeIdToken(idToken) {
 
             <View style={{ padding: 4 }}></View>
             <PrimaryButton
-              title="Cancel & Sign Out"
+              title="Cancel"
               buttonType="outline"
               accessibilityLabel="Cancel"
               onPress={handleBackPress}
@@ -526,4 +528,5 @@ const styles = StyleSheet.create({
 });
 
 export default ProfileSettingsEdit;
+
 

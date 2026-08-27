@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Modal } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import moment from "moment";
@@ -9,8 +9,10 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
 import SparkLightInput from "../../common/customui/SparkLightInput";
+import SmallLoader from "../../common/customui/SmallLoader";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { SectionTitle, FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { SectionTitle } from "../../common/customui/Typography";
+import ReviewField from "./ReviewField";
 import { card } from "../../../styles/utilities";
 import {
   fetchPaymentMethods,
@@ -23,16 +25,26 @@ import {
   paymentMethodA11yLabel,
   formatCurrency,
   openOrbipayPaymentExecution,
+  isCreditCard,
+  useSurchargeRate,
+  surchargeTitle,
+  surchargeMessage,
 } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const MakePaymentReviewScreen = ({ navigation, route }) => {
+  const surchargeRate = useSurchargeRate();
   const amount = Number(route.params?.amount) || 0;
   const fromOffer = !!route.params?.fromOffer;
   const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [method, setMethod] = useState(route.params?.method || null);
+  // Supplied by the Orbipay Fee Calculator; informational only and never recalculated here.
+  const surcharge = route.params?.surcharge != null ? Number(route.params.surcharge) : null;
+  const showSurcharge = isCreditCard(method) && surcharge != null;
+  // The customer is charged amount + surcharge, so confirmation must report the total.
+  const totalAmount = showSurcharge ? amount + surcharge : amount;
   const [autoPay, setAutoPay] = useState(null);
   const [loading, setLoading] = useState(true);
   const [agreed, setAgreed] = useState(false);
@@ -41,8 +53,10 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const emailRef = useRef(null);
+  const scrollRef = useRef(null);
   const inFlightRef = useRef(false);
   const [errorAlert, setErrorAlert] = useState("");
+  const [surchargeInfoVisible, setSurchargeInfoVisible] = useState(true);
   const abortRef = useRef(null);
   const paymentDate = moment().format("M/D/YYYY");
 
@@ -78,21 +92,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
       return;
     }
     if (!method?.id) {
-      openOrbipayPaymentExecution(navigation, {
-        amount,
-        method,
-        headerTitle,
-        email: email.trim(),
-        onSuccessRoute: {
-          name: "PaymentConfirmation",
-          params: {
-            kind: "payment-submitted",
-            message: `Your payment for ${formatCurrency(
-              amount
-            )} has been received. It may take up to 24 hours to be reflected on your account.`,
-          },
-        },
-      });
+      openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: email.trim() });
       return;
     }
     inFlightRef.current = true;
@@ -103,7 +103,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         headerTitle,
         kind: "payment-submitted",
         message: `Your payment for ${formatCurrency(
-          amount
+          totalAmount
         )} has been received. It may take up to 24 hours to be reflected on your account.`,
         confirmationNumber: result?.confirmationNumber || "",
         email: email.trim(),
@@ -113,42 +113,34 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
             : null,
       });
     } catch (error) {
-      setErrorAlert("We could not submit your payment right now. Please try again.");
+      setErrorAlert(
+        error?.code === "PAYMENT_DECLINED"
+          ? "There was a problem making your payment. Please verify all information entered is correct and try again or call us at 1-877-692-2253."
+          : "We could not submit your payment right now. Please try again."
+      );
       announceA11y("Error, your payment was not submitted.");
+      // The error banner renders at the top of the scroll view, so bring it into view.
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
     } finally {
       inFlightRef.current = false;
       setSubmitting(false);
     }
   };
 
-  const renderField = (label, value, a11yValue, last, valueLoading) => (
-    <View
-      style={[styles.fieldGroup, last && styles.fieldGroupLast]}
-      accessible={!valueLoading}
-      accessibilityLabel={valueLoading ? undefined : `${label}, ${a11yValue || value}`}
-    >
-      <FieldTitle style={styles.fieldLabel}>{label}</FieldTitle>
-      {valueLoading ? (
-        <SkeletonPlaceholder>
-          <View style={styles.valueSkeleton} />
-        </SkeletonPlaceholder>
-      ) : (
-        <View style={styles.fieldValueBox}>
-          <FieldContent style={styles.fieldValue}>{value}</FieldContent>
-        </View>
-      )}
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
             title="Something went wrong"
             message={errorAlert}
+            splitKey={
+              errorAlert.includes("1-877-692-2253")
+                ? [{ text: "1-877-692-2253", action: "call", value: "1-877-692-2253" }]
+                : ""
+            }
             onClose={() => setErrorAlert("")}
             autoFocusTitle
           />
@@ -159,9 +151,32 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         </SectionTitle>
 
         <View style={[card.elevated, styles.summaryCard]}>
-          {renderField("Payment Method", describePaymentMethod(method), paymentMethodA11yLabel(method), false, loading)}
-          {renderField("Payment Amount", formatCurrency(amount), null, false, loading)}
-          {renderField("Payment Date", paymentDate, moment().format("MMMM D, YYYY"), true, loading)}
+          <ReviewField label="Payment Method" value={describePaymentMethod(method)} a11yValue={paymentMethodA11yLabel(method)} loading={loading} />
+          <ReviewField label="Payment Amount" value={formatCurrency(amount)} loading={loading} />
+          {showSurcharge && (
+            <>
+              <ReviewField
+                label="Credit Card Surcharge"
+                value={formatCurrency(surcharge)}
+                loading={loading}
+                showLabelIcon
+                onLabelIconPress={() => setSurchargeInfoVisible((visible) => !visible)}
+                labelIconExpanded={surchargeInfoVisible}
+              />
+              {surchargeInfoVisible && (
+                <View style={styles.inCardAlert}>
+                  <NotificationAlert
+                    type="warning"
+                    title={surchargeTitle(surchargeRate)}
+                    message={surchargeMessage(surchargeRate)}
+                    showCloseIcon={false}
+                  />
+                </View>
+              )}
+              <ReviewField label="Total Amount" value={formatCurrency(totalAmount)} loading={loading} />
+            </>
+          )}
+          <ReviewField label="Payment Date" value={paymentDate} a11yValue={moment().format("MMMM D, YYYY")} last loading={loading} />
         </View>
 
         {(
@@ -208,39 +223,56 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           title={submitting ? "Submitting..." : "Submit Payment"}
           buttonType="submit"
           disabled={submitting || !agreed || loading}
-          accessibilityLabel={`Submit payment of ${formatCurrency(amount)}`}
+          accessibilityLabel={`Submit payment of ${formatCurrency(totalAmount)}`}
           onPress={onSubmit}
         />
         <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
       </ScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
+
+      <Modal visible={submitting} transparent animationType="fade" onRequestClose={() => {}}>
+        <View style={styles.processingOverlay}>
+          <View style={styles.processingCard}>
+            <SmallLoader width={64} height={48} />
+            <Text style={styles.processingTxt}>Processing your payment…</Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
+  processingOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+  },
+  processingCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+  },
+  processingTxt: {
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    color: Color.sparklightGray1,
+    marginLeft: 10,
+  },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
     marginBottom: 12,
   },
   valueSkeleton: { height: 18, borderRadius: 4, width: "60%" },
+  inCardAlert: { marginTop: -8, marginBottom: 8 },
   summaryCard: { padding: 16 },
   emailCard: { padding: 16, marginTop: 16 },
-  fieldGroup: { marginBottom: 16 },
-  fieldGroupLast: { paddingBottom: 4 },
-  fieldLabel: {
-     textAlign: "left",
-     lineHeight: 28, },
-  fieldValue: {
-    fontSize: FontSize.size_base,
-    textAlign: "left",
-    fontWeight: "400",
-    color: Color.sparklightGray1,
-    fontFamily: FontFamily.RadioCanadaRegular,
-  },
-  fieldValueBox: {   },
   secureNote: { fontSize: 13, lineHeight: 18, color: Color.colorGray_200 || "#6B6B6B", marginTop: 12, marginBottom: 4 },
   helperText: {
     fontSize: FontSize.size_smi,

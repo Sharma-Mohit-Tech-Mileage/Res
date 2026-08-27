@@ -44,6 +44,7 @@ export const ENDPOINTS = {
     FUNDING_ACCOUNT_DELETE: 'api/Payment/DeleteFundingAccount',
     PAYMENT_ONE_TIME: 'api/Payment/Submit',
     PAYMENT_MAKE_ONETIME: 'api/Payment/MakeAOneTimePayment',
+    PAYMENT_CALCULATE_FEE: 'api/Payment/CalculateFee',
 
     // Widget token flows land on the Payment controller directly (no separate Orbipay confirm routes)
     FUNDING_ACCOUNT_ADD: 'api/Payment/AddFundingAccount',

@@ -23,8 +23,9 @@ const PaymentMethodCard = ({
 
   const showEdit = !!onEdit && !expired;
   const showDelete = !!onDelete && !showAutoPayBadge;
+  const cardTypeLabel = method?.cardType === "credit" ? "Credit" : method?.cardType === "debit" ? "Debit" : "";
 
-  const infoA11yLabel = `${paymentMethodA11yLabel(method)}${showAutoPayBadge ? ", current Auto Pay method" : ""}${showNewAutoPayBadge ? ", selected as new Auto Pay method" : ""}${
+  const infoA11yLabel = `${paymentMethodA11yLabel(method)}${cardTypeLabel ? `, ${cardTypeLabel.toLowerCase()}` : ""}${showAutoPayBadge ? ", current Auto Pay method" : ""}${showNewAutoPayBadge ? ", selected as new Auto Pay method" : ""}${
     expired ? ", expired" : ""
   }${method?.expiry ? `, expires ${method.expiry}` : ""}`;
 
@@ -41,6 +42,7 @@ const PaymentMethodCard = ({
         </View>
         <View style={styles.brandWrap} accessible={false} importantForAccessibility="no-hide-descendants">
           <PaymentBrandIcon type={method?.type} brand={method?.brand} height={22} />
+          {!!cardTypeLabel && <Text style={styles.cardTypeCaption}>{cardTypeLabel}</Text>}
         </View>
       </View>
       <Text style={[styles.digitsText, expired && styles.textDisabled]}>{maskedDigits(method)}</Text>
@@ -169,7 +171,15 @@ const styles = StyleSheet.create({
   radioOuterSelected: { borderColor: Color.colorMidnightblue },
   radioInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: Color.colorMidnightblue },
   titleText: { flexShrink: 1 },
-  brandWrap: { marginLeft: 12 },
+  brandWrap: { marginLeft: 12, alignItems: "center" },
+  // Reads like the physical card: brand mark with the network's Debit/Credit designation beneath it.
+  cardTypeCaption: {
+    fontSize: FontSize.size_xs,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
+    color: "#475467",
+    marginTop: 2,
+    letterSpacing: 0.4,
+  },
   digitsText: {
     fontSize: FontSize.size_5xl,
     fontFamily: FontFamily.RadioCanadaSemiBold,
