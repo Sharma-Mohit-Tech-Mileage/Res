@@ -46,7 +46,7 @@ const TransferOfServiceModal = ({
               accessibilityRole="header"
               accessible={true}
             >
-              Account update required
+              Account Number Updated
             </Text>
           </View>
 

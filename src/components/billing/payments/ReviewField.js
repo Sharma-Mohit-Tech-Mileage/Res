@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   labelRow: { flexDirection: "row", alignItems: "center" },
   labelIcon: { marginLeft: 6 },
   // Negative margin keeps the visual row height while the 48dp touch bounds overlap neighboring rows.
-  labelIconButton: { marginLeft: 6, marginVertical: -10 },
+  labelIconButton: { marginLeft: -10, marginVertical: -10 },
   fieldValue: {
     fontSize: FontSize.size_base,
     textAlign: "left",
