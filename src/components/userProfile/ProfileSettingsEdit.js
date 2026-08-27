@@ -30,6 +30,7 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 import UsernameSuccessModal from "./UsernameSuccessModal";
 import { RefreshToken } from '../../components/user/Session';
 
+
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -352,7 +353,7 @@ function decodeIdToken(idToken) {
 
             <View style={{ padding: 4 }}></View>
             <PrimaryButton
-              title="Cancel & Sign Out"
+              title="Cancel"
               buttonType="outline"
               accessibilityLabel="Cancel"
               onPress={handleBackPress}
