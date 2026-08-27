@@ -2,7 +2,6 @@ import { all, fork } from 'redux-saga/effects';
 import appSagas from './HomeSaga';
 import ProfileSagas from './ProfileSaga';
 import NotificationSaga from './NotificationSaga';
-import SupportSagas from './SupportSaga';
 import watchPaymentHistoryActions from './paymentHistorySaga';
 import watchBillingStatementActions from './billingStatementSaga';
 import watchBillingBreakdownActions from './billingBreakdownSaga';
@@ -14,7 +13,6 @@ function* rootSaga() {
     fork (appSagas),
     fork(ProfileSagas),
     fork(NotificationSaga),
-    fork(SupportSagas),
     fork(watchBillingStatementActions),
     fork(watchPaymentHistoryActions),
     fork(watchBillingBreakdownActions),

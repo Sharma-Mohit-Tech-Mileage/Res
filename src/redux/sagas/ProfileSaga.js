@@ -30,7 +30,10 @@ import {
   postPushNotifications,
   unsubscribPaperLess,
   fetchPushNotifications,
+  handleSubmitFeedback,
   resendEmailVerification,
+  logError,
+  logInfo,
   addUserAction,
   removeUser,
   editUserAction,
@@ -56,8 +59,11 @@ import {
   UNSUBSCRIBE_PAPERLESS,
   FETCH_PUSH_NOTIFICATIONS,
   UPDATE_PUSH_NOTIFICATIONS_V2,
+  SAVE_USER_FEEDBACK,
   UPDATE_EXISTING_EMAIL_NOTIFICATION,
   RESEND_EMAIL_VERIFICTION,
+  LOG_ERROR,
+  LOG_INFO,
   ADD_NEW_USER,
   DELETE_USER,
   EDIT_USER,
@@ -191,6 +197,15 @@ function* updateProfile(action) {
   } catch (error) {
     action.navigation.navigate("ProfileSettingsEdit", { updateFailed: true });
     appLogger.logError("API Error Response:", error, action.payload);
+  }
+}
+
+function* saveUserFeedBack(action) {
+  try {
+    const response = yield call(handleSubmitFeedback, action.payload);
+    action.navigation.navigate("ThumbsUp", { updateSuccess: true });
+  } catch (error) {
+    action.navigation.navigate("Feedback", { updateFailed: true });
   }
 }
 
@@ -362,6 +377,22 @@ function* resentVerifiction(action) {
         failureMessage,
       });
     }
+  }
+}
+
+function* logErrorSaga(action) {
+  try {
+    yield call(logError, action.payload);
+  } catch (error) {
+    appLogger.logError("API Error Response failed ============", error);
+  }
+}
+
+function* logInfoSaga(action) {
+  try {
+    const response = yield call(logInfo, action.payload);
+  } catch (error) {
+    appLogger.logError("API Error Response:", error);
   }
 }
 
@@ -706,11 +737,14 @@ function* ProfileSagas() {
   yield takeLatest(UPDATE_PUSH_NOTIFICATIONS, updatePushNotifications);
   yield takeLatest(UPDATE_PUSH_NOTIFICATIONS_V2, updatePushNotificationsV2);
   yield takeLatest(UNSUBSCRIBE_PAPERLESS, unsubscribPaperLessSaga);
+  yield takeLatest(SAVE_USER_FEEDBACK, saveUserFeedBack);
   yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateNewEmail);
   yield takeLatest(RESEND_EMAIL_VERIFICTION, resentVerifiction);
   yield takeLatest(ADD_NEW_USER, addUser);
   yield takeLatest(DELETE_USER, deleteUser);
   yield takeLatest(EDIT_USER, editUser);
+  yield takeLatest(LOG_ERROR, logErrorSaga);
+  yield takeLatest(LOG_INFO, logInfoSaga);
   yield takeLatest(ALLSVEMAILASSOCIATED, fetchSvEmails);
   yield takeLatest(
     ADD_SV_EMAIL_NO_FLAGS_REQUEST,
