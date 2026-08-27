@@ -26,7 +26,7 @@ import {
 import { card } from "../../styles/utilities";
 import SecondaryButton from "../common/customui/SecondaryButton";
 import ConfimationPopup from "./ConfirmationPopup";
-import colors from "../../res/Colors";
+
 import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
@@ -618,7 +618,7 @@ const CancellationSummary = ({ navigation, route }) => {
               <Text
                 style={[
                   styles.valueTxt1,
-                  { color: colors.sparklight_bright_purple },
+                  { color: Color.sparklightPrimaryPurple },
                 ]}
               >
                 EQUIPMENT RETURN POLICY
@@ -629,7 +629,7 @@ const CancellationSummary = ({ navigation, route }) => {
                 }}
               >
                 {showTerms ? (
-                  <UpArrow color={colors.sparklight_bright_purple} />
+                  <UpArrow color={Color.sparklightPrimaryPurple} />
                 ) : (
                   <DownArrow />
                 )}

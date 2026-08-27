@@ -10,7 +10,7 @@ import {
 import Touchable from "./customui/Touchable";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CopyIcon from "../../../assets/svgs/CopyIcon";
-import colors from "../../res/Colors";
+
 import { FontFamily,Color } from "../../../GlobalStyles";
 
 const groupDigits = (value) =>
@@ -145,14 +145,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 20,
     fontWeight: "700",
     marginLeft: 8,
   },
   body: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 18,
     lineHeight: 22,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     marginTop: 36,
   },
   accountNumber: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaMedium,
     fontSize: 16,
     fontWeight: "500",
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   primaryBtn: {
-    backgroundColor: colors.sparklight_bright_purple,
+    backgroundColor: Color.sparklightPrimaryPurple,
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   notRegistered: {
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 16,
     textAlign: "center",
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   secondaryTxt: {
-    color: colors.sparklight_bright_purple,
+    color: Color.sparklightPrimaryPurple,
     fontFamily: FontFamily.RadioCanadaBold,
     fontSize: 15,
     fontWeight: "700",

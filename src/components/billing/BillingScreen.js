@@ -27,9 +27,6 @@ import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
-import Icon from "../common/Icon";
-import colors from "../../res/Colors";
-import { card } from "../../styles/utilities";
 import {
   widthPercentageToDP,
   heightPercentageToDP,

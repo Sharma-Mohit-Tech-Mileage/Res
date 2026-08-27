@@ -22,7 +22,6 @@ import {
   FontFamily,
   FontSize,
 } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
 import Logo from "../../res/images/LogoSmall";
 
 const MaintenancePage = ({

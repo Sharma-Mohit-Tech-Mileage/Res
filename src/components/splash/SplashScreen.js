@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { View, StyleSheet, Text, Linking, Platform, Animated, Easing, Dimensions, } from "react-native";
-import colors from "../../res/Colors";
+
 import LinearGradient from "react-native-linear-gradient";
 import { logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
@@ -767,7 +767,7 @@ const SplashScreen = ({ navigation, route }) => {
                 loginAuth();
               }
             }}
-          customStyle={{ color: colors.sparklight_bright_purple }}
+          customStyle={{ color: Color.sparklightPrimaryPurple }}
             buttonText={"Login"}
             disabled={
               authLockRef.current ||
@@ -831,14 +831,14 @@ const SplashScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.splash_bg,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   networkStatusBarBottom: {
     position: "absolute",
     bottom: hp("12%"),
     left: 0,
     right: 0,
-    backgroundColor: colors.sparklight_red,
+    backgroundColor: Color.sparkLightRed,
     paddingVertical: 10,
     zIndex: 999,
   },
@@ -847,7 +847,7 @@ const styles = StyleSheet.create({
     bottom: hp("12%"),
     left: 0,
     right: 0,
-    backgroundColor: colors.sparklight_green,
+    backgroundColor: Color.sparklightGreen,
     paddingVertical: 10,
     zIndex: 999,
   },

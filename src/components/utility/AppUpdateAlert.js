@@ -7,7 +7,6 @@ import {
   Modal,
   Linking,
 } from "react-native";
-import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import { Color, Padding, FontFamily, Border } from "../../../GlobalStyles";
 import Touchable from "../common/customui/Touchable";
@@ -81,7 +80,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   message: {
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
@@ -118,7 +117,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     fontWeight: "600",

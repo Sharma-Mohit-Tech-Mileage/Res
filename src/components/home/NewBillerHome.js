@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
-import colors from "../../res/Colors";
+
 import { Color, Padding } from "../../../GlobalStyles";
 import { fetchACPUserAccountDetails, updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
@@ -533,7 +533,7 @@ const NewBillerHome = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.splash_bg,
+    backgroundColor: Color.sparklightPrimaryPurple,
     marginBottom: 30,
   },
   headerContainer: {
@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   mainContentContainer: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: Color.colorWhitesmoke_200,
     flex: 2,
     alignItems: "center",
     marginTop: 50,

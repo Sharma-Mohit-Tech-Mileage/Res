@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import { FontFamily, Padding,Color } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
-    color: theme.colors.Black_100,
+    color: Color.colorblack_100,
     lineHeight: 40,
   },
   speedHeroUnit: {

@@ -8,7 +8,7 @@ import {
   AccessibilityInfo,
 } from "react-native";
 import { FontFamily, Border, Color, Padding } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
+
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "./customui/Touchable";
 import { A11Y } from "../../styles/theme";
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: colors.black,
+    color: Color.colorblack_100,
     marginLeft: 8,
   },
   divider: {
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     marginBottom: 20,
     textAlign: "center",
   },

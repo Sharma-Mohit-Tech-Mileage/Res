@@ -33,9 +33,7 @@ import { GetApiRequest, PutApiRequest , PostApiRequest} from "../../network/Rest
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { passwordSchema } from "../utility/validationSchema"; 
-import colors from "../../res/Colors";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import { requiredField } from "../../styles/utilities";
 import AppStyles from '../../styles/AppStyles';
 import { SectionTitle,HintText } from "../common/customui/Typography";
 const ChangePassword = () => {

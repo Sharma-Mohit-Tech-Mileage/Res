@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Modal,
 } from "react-native";
-import colors from "../../res/Colors";
+
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "../common/customui/Touchable";
@@ -77,7 +77,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.splash_bg,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   overlay: {
     flex: 1,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   message: {
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     textAlign:'center',
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   closeBtn: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: Color.colorWhitesmoke_200,
     justifyContent: "center",
     width: "100%",
     marginTop: 15,

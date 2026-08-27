@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { FontFamily,Color } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
+
 import LottieView from "lottie-react-native";
 
 export const LoadingState = {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { StyleSheet, Text } from 'react-native';
-import colors from '../../../res/Colors';
 import { FontFamily,Color } from '../../../../GlobalStyles';
 import { interaction } from "../../../styles/utilities";
 import Touchable from "./Touchable";
@@ -24,7 +23,7 @@ const SecondaryButton=(props)=>{
 
 const styles = StyleSheet.create({
   TouchableOpacityButton: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: Color.colorWhitesmoke_200,
     marginTop: 10,
     paddingVertical: 10,
     paddingHorizontal: 10,
