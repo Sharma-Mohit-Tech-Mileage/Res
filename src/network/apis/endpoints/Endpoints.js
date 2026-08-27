@@ -51,6 +51,8 @@ export const ENDPOINTS = {
     FUNDING_ACCOUNT_UPDATE: 'api/Payment/UpdFundingAccount',
 
     // Logging
+    LOG_ERROR: 'api/log/error',
+    LOG_INFO: 'api/log/info',
 
     // Users
     USERS_BASE: 'api/users',
