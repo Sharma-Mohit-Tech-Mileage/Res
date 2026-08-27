@@ -131,6 +131,17 @@ export const theme = {
     lg: 32,
     xl: 40,
   },
+
+  // [51768] Large-screen geometry. Per-class maps are sparse — utils/responsive.js cascades a missing class down to the nearest smaller one.
+  layout: {
+    maxContentWidth: 640,
+    modalMaxWidth: 480,
+    // Extra horizontal breathing room once the window stops being phone-width; 0 keeps compact byte-identical to today.
+    gutter: { compact: 0, medium: 24, expanded: 32 },
+    columns: { compact: 1, medium: 1, expanded: 2 },
+    // Clearance for the absolutely-positioned tab bar; screens currently hard-code 100/120/140/150 by hand.
+    tabBarClearance: 140,
+  },
 };
 
 // minTouch is the scanner-measured size (Android 48dp / iOS 44pt / WCAG 2.5.5); hitSlop adds Fitts's-law event hit-rect.
