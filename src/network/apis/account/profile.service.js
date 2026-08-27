@@ -1,14 +1,11 @@
 import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-import axios from "axios";
 import moment from "moment";
 import { getEndpoint,ENDPOINTS } from "../endpoints/Endpoints";
-import Config from "react-native-config";
 import { Platform } from "react-native";
 import { getDeviceUniqueId, getFcmToken } from "../../../firebase/FirebaseUtils";
-import { getDeviceMetadata } from "../../../components/utility/DeviceInfo";
 import * as appLogger from "../../../utils/logger";
-import base64 from "react-native-base64";
+
 const getProfileDetails = async () => {
   let data = await getUser();
   const userName = data.userInfo?.userName || null;
@@ -442,130 +439,6 @@ const unsubscribPaperLess = async () => {
   }
 };
 
-const handleSubmitFeedback = async (obj) => {
-  const zendeskRequestApiUrl = Config.ZENDESK_FEEDBACK_URL;
-  const user = await getUser();
-  const deviceMetadata = await getDeviceMetadata();
-  const fullName = user.userInfo?.fullName;
-  const authToken = `${Config.ZENDESK_AUTH_EMAIL}/token:${Config.ZENDESK_AUTH_API_TOKEN}`;
-
-  const base64Auth = base64.encode(authToken);
-
-  const concernLabels = (obj.areaOfConcern || []).map((id) => {
-    const labels = {
-      service_issue: "Service Issue",
-      speed_concern: "Speed Concern",
-      bug: "Bug",
-      pricing_plans: "Pricing & Plans",
-      billing_payments: "Billing & Payments",
-      customer_support: "Customer Support",
-      feature_request: "Feature Request",
-      equipment_issue: "Equipment Issue",
-      other_issues: "Other Issues",
-    };
-    return labels[id] || id;
-  });
-
-  const payload = {
-    request: {
-      ticket_form_id: Config.ZENDESK_FEEDBACK_TICKET_FORM_ID,
-      requester: {
-        name: fullName,
-        email: obj.feedbackEmail,
-      },
-      recipient: Config.ZENDESK_FEEDBACK_RECIPIENT,
-      assignee_id: Config.ZENDESK_FEEDBACK_ASSIGNEE_ID,
-      group_id: Config.ZENDESK_FEEDBACK_GROUP_ID,
-      type: null,
-      custom_fields: [
-        { id: Config.ZENDESK_FEEDBACK_CATEGORY_ID, value: obj.category },
-        { id: Config.ZENDESK_FEEDBACK_VALUE_ID, value: obj.feedbackValue },
-        { id: Config.ZENDESK_FEEDBACK_EMAIL_ID, value: obj.feedbackEmail },
-        { id: Config.ZENDESK_COSENT_CONTACT_US_ID, value: obj.cosentContactUs ? "Yes" : "No" },
-        {
-          id: Config.ZENDESK_FEEDBACK_APP_VERSION_ID,
-          value: deviceMetadata.appVersion,
-        },
-        {
-          id: Config.ZENDESK_FEEDBACK_PLATFORM_ID,
-          value: deviceMetadata.platform,
-        },
-        {
-          id: Config.ZENDESK_FEEDBACK_OS_VERSION_ID,
-          value: deviceMetadata.osVersion,
-        },
-        {
-          id: Config.ZENDESK_FEEDBACK_DEVICE_MODEL_ID,
-          value: deviceMetadata.deviceModel,
-        },
-        {
-          id: Config.ZENDESK_FEEDBACK_ACCOUNT_NO,
-          value: user?.userInfo?.accountNumber,
-        },
-        {
-          id: Config.ZENDESK_FEEDBACK_AREA_OF_CONCERN_ID,
-          value: concernLabels.map((label) =>
-            label
-              .toLowerCase()
-              .replace(/\s*&\s*/g, "_and_")
-              .replace(/\s+/g, "_")
-          ),
-        },
-      ],
-      subject: "Residential MobileApp Feedback",
-      comment: {
-        body: obj.feedbackText || "No additional feedback provided.",
-        uploads: null,
-      },
-      tags: [
-        "Feedback",
-        "Residential",
-        "resimobileapp",
-        `pid_${user.userInfo.accountNumber}`,
-        deviceMetadata.platform.toLowerCase(),
-        ...concernLabels.map((label) =>
-          label
-            .toLowerCase()
-            .replace(/\s*&\s*/g, "_and_")
-            .replace(/\s+/g, "_")
-        ),
-      ],
-      via: { channel: "MobileApp" },
-    },
-  };
-
-  try {
-    console.log("Submitting feedback with payload:", payload);
-    const response = await axios.post(zendeskRequestApiUrl, payload, {
-      headers: {
-        Authorization: `Basic ${base64Auth}`,
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("Feedback submitted successfully:", response.data);
-    return response;
-  } catch (error) {
-    appLogger.logError("Zendesk API Error:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-const logError = async (errorData) => {
-  try {
-    await _axios.post(getEndpoint(ENDPOINTS.LOG_ERROR), errorData);
-  } catch (logErr) {
-    appLogger.logError("Failed to log error:", logErr);
-  }
-};
-
-const logInfo = async (infoData) => {
-  try {
-    await _axios.post(getEndpoint(ENDPOINTS.LOG_INFO), infoData);
-  } catch (logErr) {
-    appLogger.logError("Failed to log info:", logErr);
-  }
-};
-
 const addUserAction = async (data) => {
   let user = await getUser();
 
@@ -817,8 +690,6 @@ const fetchACPUserAccountDetails = async (signal, force = false) => {
 
 export {
   fetchACPUserAccountDetails,
-  logError,
-  logInfo,
   fetchUserList,
   getProfileDetails,
   fetchSmsSubscription,
@@ -835,7 +706,6 @@ export {
   syncDeviceToken,
   unsubscribPaperLess,
   fetchPushNotifications,
-  handleSubmitFeedback,
   manageSVEmails,
   isPaperlessEnabled,
   resendEmailVerification,
