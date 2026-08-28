@@ -19,20 +19,29 @@ const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => {
       onRequestClose={onClose}
     >
       <View style={styles.backdrop}>
-        <View style={styles.card} accessible accessibilityLiveRegion="polite">
+        <View
+          style={styles.card}
+          accessibilityViewIsModal
+          importantForAccessibility="yes"
+        >
           <View
             style={styles.iconWrap}
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
+            accessible
+            accessibilityRole="image"
+            accessibilityLabel="Success icon"
+            importantForAccessibility="yes"
           >
-            <AnimatedSuccessIcon size={64} />
+            <View accessible={false} importantForAccessibility="no-hide-descendants">
+              <AnimatedSuccessIcon size={64} />
+            </View>
           </View>
           <HeadingH2
             style={styles.title}
             accessibilityRole="header"
             accessibilityLevel={1}
+            accessible
           >
-            Success!!
+            Success!
           </HeadingH2>
           <Text
             style={[
@@ -48,6 +57,8 @@ const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => {
                 textAlign: "center",
               },
             ]}
+            accessible
+            accessibilityRole="text"
           >
             Your account username has been successfully updated.
           </Text>
@@ -71,7 +82,12 @@ const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => {
                 width: "100%",
               }}
             >
-              <HeadingH2 style={[styles.title]}>
+              <HeadingH2
+                style={[styles.title]}
+                accessibilityRole="header"
+                accessibilityLevel={2}
+                accessible
+              >
                 Signing back in to finish
               </HeadingH2>
               <Text
@@ -87,6 +103,8 @@ const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => {
                     textAlign: "center",
                   },
                 ]}
+                accessible
+                accessibilityRole="text"
               >
                 Please sign out and sign back into your account to apply your
                 recent changes. Your updates will take effect immediately upon
