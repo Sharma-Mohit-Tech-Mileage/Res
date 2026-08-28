@@ -110,3 +110,52 @@ describe("PaymentMethodCard actions", () => {
     expect(json).toContain("Edit");
   });
 });
+
+describe("Delete visibility", () => {
+  const React = require("react");
+  const renderer = require("react-test-renderer");
+  const PaymentMethodCard = require("../src/components/billing/payments/PaymentMethodCard").default;
+
+  const textOf = (tree) => JSON.stringify(tree.toJSON());
+
+  const render = (method, showAutoPayBadge = false) =>
+    renderer.create(
+      React.createElement(PaymentMethodCard, {
+        method,
+        variant: "actions",
+        showAutoPayBadge,
+        onEdit: () => {},
+        onDelete: () => {},
+      })
+    );
+
+  it("hides Delete on an inactive method and shows the Inactive badge instead", () => {
+    const json = textOf(render({ id: "1", status: "inactive", type: "bank", lastFour: "1987" }));
+    expect(json).not.toContain("Delete");
+    expect(json).toContain("Inactive");
+    expect(json).toContain("Edit");
+  });
+
+  it("keeps Delete on an active method", () => {
+    const json = textOf(render({ id: "2", status: "active", type: "card", expiry: "12/40", lastFour: "1234" }));
+    expect(json).toContain("Delete");
+  });
+
+  it("keeps Delete on an expired but active method — only inactive loses it", () => {
+    const json = textOf(render({ id: "3", status: "active", type: "card", expiry: "01/20", lastFour: "9954" }));
+    expect(json).toContain("Delete");
+    expect(json).toContain("Expired");
+  });
+
+  it("still hides Delete on the current AutoPay method", () => {
+    const json = textOf(render({ id: "4", status: "active", type: "card", expiry: "12/40", lastFour: "5555" }, true));
+    expect(json).not.toContain("Delete");
+    expect(json).toContain("Auto Pay");
+  });
+
+  it("hides Delete on a method that is both inactive and expired", () => {
+    const json = textOf(render({ id: "5", status: "inactive", type: "card", expiry: "01/20", lastFour: "7777" }));
+    expect(json).not.toContain("Delete");
+    expect(json).toContain("Expired");
+  });
+});

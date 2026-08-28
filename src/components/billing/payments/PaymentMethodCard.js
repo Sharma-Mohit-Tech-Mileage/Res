@@ -24,7 +24,8 @@ const PaymentMethodCard = ({
   const unusable = expired || inactive;
 
   const showEdit = !!onEdit;
-  const showDelete = !!onDelete && !showAutoPayBadge;
+  // An inactive method cannot be deleted; the Inactive badge takes the Delete slot instead.
+  const showDelete = !!onDelete && !showAutoPayBadge && !inactive;
   const cardTypeLabel = method?.cardType === "credit" ? "Credit" : method?.cardType === "debit" ? "Debit" : "";
 
   const infoA11yLabel = `${paymentMethodA11yLabel(method)}${cardTypeLabel ? `, ${cardTypeLabel.toLowerCase()}` : ""}${showAutoPayBadge ? ", current Auto Pay method" : ""}${showNewAutoPayBadge ? ", selected as new Auto Pay method" : ""}${
@@ -61,12 +62,13 @@ const PaymentMethodCard = ({
             disabled={disabled}
             accessibilityRole="link"
             accessibilityLabel={`Edit ${paymentMethodA11yLabel(method)}`}
+            minSize={0}
             style={styles.actionLink}
           >
             <Hyperlink style={styles.actionText}>Edit</Hyperlink>
           </Touchable>
         )}
-        {showEdit && (showDelete || showAutoPayBadge) && (
+        {showEdit && (showDelete || showAutoPayBadge || (inactive && !expired)) && (
           <Text style={styles.actionDivider} accessible={false} importantForAccessibility="no">
             |
           </Text>
@@ -77,6 +79,7 @@ const PaymentMethodCard = ({
             disabled={disabled}
             accessibilityRole="link"
             accessibilityLabel={`Delete ${paymentMethodA11yLabel(method)}`}
+            minSize={0}
             style={styles.actionLink}
           >
             <Hyperlink style={styles.actionText}>Delete</Hyperlink>
@@ -203,9 +206,9 @@ const styles = StyleSheet.create({
     minHeight: 24,
   },
   actionsWrap: { flexDirection: "row", alignItems: "center" },
-  actionLink: { paddingVertical: 4, paddingHorizontal: 4 },
+  actionLink: { paddingVertical: 4, paddingHorizontal: 4, minHeight: 48, justifyContent: "center" },
   actionText: {},
-  actionDivider: { color: "#98A2B3", marginHorizontal: 4 },
+  actionDivider: { color: "#98A2B3", marginHorizontal: 4, fontSize: FontSize.size_base, lineHeight: 20 },
   newAutoPayBadge: {
     backgroundColor: "#E9F8EE",
     color: "#1D7832",
