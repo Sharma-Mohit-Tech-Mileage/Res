@@ -74,7 +74,7 @@ export const fetchPaymentMethods = async () => {
   const res = await _axios.get(getEndpoint(ENDPOINTS.FUNDING_ACCOUNTS, { accountNumber }), config);
   ensureServiceOk(res);
   const list = Array.isArray(res.data) ? res.data : res.data?.fundingAccounts || [];
-  return list.map(normalizePaymentMethod).filter((m) => m.id && m.status === "active");
+  return list.map(normalizePaymentMethod).filter((m) => m.id && m.status !== "deleted");
 };
 
 export const fetchAutoPayDetails = async () => {

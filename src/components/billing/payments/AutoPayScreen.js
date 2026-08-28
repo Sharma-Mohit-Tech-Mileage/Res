@@ -18,7 +18,7 @@ import {
 import {
   contentMaxWidth,
   ordinal,
-  isMethodExpired,
+  isMethodUnusable,
   openOrbipaySecureCapture,
   paymentMethodTitle,
   surchargeTitle,
@@ -64,11 +64,11 @@ const AutoPayScreen = ({ navigation, route }) => {
   const dueDayLabel = ordinal(autoPay?.dueDay || 22);
   const selectedMethod = methods?.find((m) => m.id === selectedId) || null;
   const currentMethod = methods?.find((m) => m.id === autoPay?.paymentMethodId) || null;
-  const isSwitching = enrolled && !!selectedMethod && !isMethodExpired(selectedMethod) && selectedId !== autoPay?.paymentMethodId;
+  const isSwitching = enrolled && !!selectedMethod && !isMethodUnusable(selectedMethod) && selectedId !== autoPay?.paymentMethodId;
   const methodShortName = (m) => `${paymentMethodTitle(m)} ****${m?.lastFour || ""}`;
 
   const canContinue =
-    !!selectedMethod && !isMethodExpired(selectedMethod) && (!enrolled || selectedId !== autoPay?.paymentMethodId);
+    !!selectedMethod && !isMethodUnusable(selectedMethod) && (!enrolled || selectedId !== autoPay?.paymentMethodId);
 
   const onAddMethod = () => openOrbipaySecureCapture(navigation, { headerTitle });
 
