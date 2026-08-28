@@ -62,6 +62,7 @@ const PaymentMethodCard = ({
             disabled={disabled}
             accessibilityRole="link"
             accessibilityLabel={`Edit ${paymentMethodA11yLabel(method)}`}
+            minSize={0}
             style={styles.actionLink}
           >
             <Hyperlink style={styles.actionText}>Edit</Hyperlink>
@@ -78,6 +79,7 @@ const PaymentMethodCard = ({
             disabled={disabled}
             accessibilityRole="link"
             accessibilityLabel={`Delete ${paymentMethodA11yLabel(method)}`}
+            minSize={0}
             style={styles.actionLink}
           >
             <Hyperlink style={styles.actionText}>Delete</Hyperlink>
@@ -204,9 +206,9 @@ const styles = StyleSheet.create({
     minHeight: 24,
   },
   actionsWrap: { flexDirection: "row", alignItems: "center" },
-  actionLink: { paddingVertical: 4, paddingHorizontal: 4 },
+  actionLink: { paddingVertical: 4, paddingHorizontal: 4, minHeight: 48, justifyContent: "center" },
   actionText: {},
-  actionDivider: { color: "#98A2B3", marginHorizontal: 4 },
+  actionDivider: { color: "#98A2B3", marginHorizontal: 4, fontSize: FontSize.size_base, lineHeight: 20 },
   newAutoPayBadge: {
     backgroundColor: "#E9F8EE",
     color: "#1D7832",
