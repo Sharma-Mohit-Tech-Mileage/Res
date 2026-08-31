@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     marginBottom: hp("2%"),
   },
   estimatedTimeSection: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     padding: wp("4%"),
     borderRadius: Border.br_5xs,
     marginBottom: hp("2%"),

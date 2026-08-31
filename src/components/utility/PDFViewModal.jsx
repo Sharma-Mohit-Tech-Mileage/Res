@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
   },
   text1Clr: {
-    color: Color.colorWhitesmoke_200,
+    color: Color.Gray300,
     textAlign: "center",
   },
   pdf: {

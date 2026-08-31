@@ -32,7 +32,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             <Text
               style={[
                 styles.dueDate,
-                { fontWeight: "400", color: Color.sparklightDarkGray },
+                { fontWeight: "400", color: Color.sparklightGray1 },
               ]}
             >
               {"on: "}
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "400",
-    color: Color.gray600,
+    color: Color.sparklightGray1,
   },
   
   paymentButtonText: {

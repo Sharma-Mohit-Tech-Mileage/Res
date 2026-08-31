@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttons: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.Gray300,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,

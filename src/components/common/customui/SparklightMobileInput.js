@@ -163,7 +163,7 @@ const SparklightMobileInput = React.forwardRef(({
                 ? "red"
                 : isFocused
                 ? Color.sparklightPrimaryPurple
-                : Color.sparklightDarkGray,
+                : Color.sparklightGray1,
           },
         ]}
       >
@@ -194,7 +194,7 @@ const SparklightMobileInput = React.forwardRef(({
                 ? "red"
                 : isFocused
                 ? Color.sparklightPrimaryPurple
-                : Color.sparklightDarkGray,
+                : Color.sparklightGray1,
             },
           ]}
           accessibilityLabel={formatInputA11yReadout({

@@ -8,8 +8,8 @@ export const ROLE_COLORS = {
 };
 export const BOX_COLORS = {
   primaryadmin: Color.success50,
-  admin: Color.colorWhitesmoke_200,
-  viewonly: Color.colorWhitesmoke_200,
+  admin: Color.Gray300,
+  viewonly: Color.Gray300,
 };
 export const extractAcknowledgementEmail = (logObj) => {
   try {
@@ -32,9 +32,9 @@ export const convertToSpecialCase = (str) => {
 };
 
 export const BORDER_COLORS = {
-  primaryadmin: Color.colorAquamarine,
-  admin: Color.colorWhitesmoke_200,
-  viewonly: Color.colorWhitesmoke_200,
+  primaryadmin: Color.success50,
+  admin: Color.Gray300,
+  viewonly: Color.Gray300,
 };
 export const validatePassword = (newPassword, userName) => {
   if (!newPassword) {

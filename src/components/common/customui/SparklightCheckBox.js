@@ -23,9 +23,9 @@ const SparklightCheckBox = ({
           disabled={disabled}
           boxType="square"
           tintColor={Color.sparklightGray}
-          onCheckColor={Color.sparklightSecondaryPurple}
-          onTintColor={Color.sparklightSecondaryPurple}
-          tintColors={tintColors || { true: Color.sparklightSecondaryPurple, false: Color.sparklightGray }}
+          onCheckColor={Color.colorMidnightblue}
+          onTintColor={Color.colorMidnightblue}
+          tintColors={tintColors || { true: Color.colorMidnightblue, false: Color.sparklightGray }}
           style={[styles.checkbox, !value && styles.uncheckedBorder, boxStyle]}
         />
       </View>

@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   phoneLink: {
-    color: Color.sparklightSecondaryPurple,
+    color: Color.colorMidnightblue,
     fontWeight: "600",
     textDecorationLine: "underline",
   },

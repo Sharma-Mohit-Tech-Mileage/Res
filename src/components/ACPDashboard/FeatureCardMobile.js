@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
     paddingVertical: Padding.p_xs,
     borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_200,
+    borderBottomColor: Color.Gray300,
     backgroundColor: Color.colorWhitesmoke_100,
   },
   title: {

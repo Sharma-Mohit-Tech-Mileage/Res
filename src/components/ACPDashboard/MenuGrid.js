@@ -18,7 +18,7 @@ const MenuGrid = () => {
       title: 'Service',
       icon: 'wifi',
       screenName: 'MyServices',
-      color: Color.sparklightDarkGray,
+      color: Color.sparklightGray1,
     },
     {
       id: 'support',
@@ -32,7 +32,7 @@ const MenuGrid = () => {
       title: 'Account',
       icon: 'user',
       screenName: 'account',
-      color: Color.sparklightDarkGray,
+      color: Color.sparklightGray1,
     },
   ];
 

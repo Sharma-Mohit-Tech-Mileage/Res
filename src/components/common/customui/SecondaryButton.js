@@ -23,13 +23,13 @@ const SecondaryButton=(props)=>{
 
 const styles = StyleSheet.create({
   TouchableOpacityButton: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     marginTop: 10,
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 2,
   },txtStyle:{
-    color:Color.sparklightSecondaryPurple,
+    color:Color.colorMidnightblue,
     textAlign:'center',
     fontFamily:FontFamily.RadioCanadaRegular,
     fontStyle:'normal',

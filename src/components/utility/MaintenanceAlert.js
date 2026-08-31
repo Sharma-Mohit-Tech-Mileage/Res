@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   buttons1: {
     marginTop: Padding.p_base,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     paddingHorizontal: 0,
     width: 382,
   },

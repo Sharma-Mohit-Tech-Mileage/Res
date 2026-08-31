@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   closeBtn: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     justifyContent: "center",
     width: "100%",
     borderRadius: 25,

@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   },
   featuredIcon: {
     backgroundColor: Color.colorMidnightblue,
-    borderColor: Color.colorWhitesmoke_200,
+    borderColor: Color.Gray300,
     borderWidth: 4,
     width: 72,
     height: 72,
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   },
   support: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   linearGradientStyle: {

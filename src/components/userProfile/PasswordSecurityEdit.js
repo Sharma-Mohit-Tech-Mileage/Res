@@ -505,9 +505,9 @@ const styles = StyleSheet.create({
   },
   passwordSecurityEdit: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   }, BtnContainer: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.colorMidnightblue,
     justifyContent: "center",
   },
   Btn: {

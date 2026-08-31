@@ -68,7 +68,7 @@ const MyTabs = ({ route }) => {
     const IconComponent = ICON_MAP[tabId] || HomeIcon;
     const iconColor = focused
       ? Color.colorMidnightblue
-      : Color.sparklightDarkGray;
+      : Color.sparklightGray1;
 
     return <IconComponent color={iconColor} filled={focused} />;
   };
@@ -255,7 +255,7 @@ const MyTabs = ({ route }) => {
         height: tabBarHeight,
       },
       tabBarActiveTintColor: Color.colorMidnightblue,
-      tabBarInactiveTintColor: Color.sparklightDarkGray,
+      tabBarInactiveTintColor: Color.sparklightGray1,
       tabBarLabelPosition: "below-icon",
       tabBarLabelStyle: {
         fontSize: FontSize.size_xs,

@@ -13,8 +13,8 @@ export const theme = {
     primaryDark: Color.colorMidnightblue,
     white: Color.sparklightWhite,
     surface: Color.sparklightWhite,
-    surfaceVariant: Color.gray50,
-    background: Color.colorWhitesmoke_200,
+    surfaceVariant:Color.Gray300,
+    background: Color.Gray300,
     freedatabackground:Color.sparklight_blue,
     upload:Color.sparklight_blue,
     Black_100: Color.Black_100,
@@ -23,13 +23,13 @@ export const theme = {
     text: {
       primary: Color.colorGray_200,
       secondary: Color.sparklightGray1,
-      tertiary: Color.sparklightDarkGray,
+      tertiary: Color.sparklightGray1,
       onPrimary: Color.sparklightWhite,
     },
 
     // Border colors
-    border: Color.colorWhitesmoke_200,
-    borderLight: Color.colorWhitesmoke_300,
+    border: Color.Gray300,
+    borderLight: Color.Gray300,
 
    skeleton: {
       base: '#E1E9EE',

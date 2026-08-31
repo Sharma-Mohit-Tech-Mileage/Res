@@ -689,7 +689,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
   },
   text1Clr: {
-    color: Color.colorWhitesmoke_200,
+    color: Color.Gray300,
     textAlign: "center",
   },
   badgeBorder: {
@@ -767,12 +767,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   text: {
-    color: Color.success700,
+    color: Color.sparklightGreen,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     textAlign: "center",
   },
   badge: {
-    borderColor: Color.colorAquamarine,
+    borderColor: Color.success50,
     backgroundColor: Color.success50,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,

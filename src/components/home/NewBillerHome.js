@@ -548,7 +548,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   mainContentContainer: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     flex: 2,
     alignItems: "center",
     marginTop: 50,

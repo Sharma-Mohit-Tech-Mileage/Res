@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttons: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.Gray300,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
@@ -135,13 +135,13 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   openBtn: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.colorMidnightblue,
     justifyContent: "center",
     width: "100%",
     marginTop: 20,
   },
   closeBtn: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     justifyContent: "center",
     width: "100%",
     marginTop: 15,
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   closeAlertTxt: {
-    color: Color.sparklightSecondaryPurple,
+    color: Color.colorMidnightblue,
     textAlign: "center",
     padding: 8,
     fontSize: 16,

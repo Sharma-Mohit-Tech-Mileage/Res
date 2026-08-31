@@ -128,7 +128,7 @@ const PasswordSecurity = () => {
               <View style={styles.passwordGroup}>
                 <FieldTitle style={[styles.passwordFlexBox]}>Password</FieldTitle>
                 <Text
-                  style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightDarkGray}]}
+                  style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightGray1}]}
                   accessibilityRole="text"
                   accessibilityLabel="Password: hidden"
                   accessible={true}
@@ -167,7 +167,7 @@ const PasswordSecurity = () => {
                     <FieldTitle style={[styles.passwordFlexBox]}>
                       {profileDetails.securityQuestion}
                     </FieldTitle>
-                    <Text style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightDarkGray,paddingBottom: Padding.p_5xl}]}
+                    <Text style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightGray1,paddingBottom: Padding.p_5xl}]}
                     accessibilityRole="text"
                     accessibilityLabel="Answer hidden."
                     accessible={true}>
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     paddingTop: Padding.p_5xl,
   },
   passwordSecurity: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     flex: 1,
   },
 });

@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   // Using EXACT button styles from CustomAlertModal
   closeBtn: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     paddingHorizontal: 30,
     paddingVertical: 10,
     width: "100%",
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   closeAlertTxt: {
-    color: Color.sparklightSecondaryPurple,
+    color: Color.colorMidnightblue,
     fontWeight: "400",
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",

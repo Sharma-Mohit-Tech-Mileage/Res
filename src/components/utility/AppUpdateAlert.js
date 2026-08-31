@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   closeBtn: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.colorMidnightblue,
     width: '100%',
     marginTop: 15,
     paddingVertical: 8,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttons: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.Gray300,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,

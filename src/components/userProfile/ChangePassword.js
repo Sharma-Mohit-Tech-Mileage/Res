@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
   },
   passwordSecurityEdit: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
 });
 

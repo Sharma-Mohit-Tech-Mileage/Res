@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   },
   yourFeedbackMeans: {
     marginTop: 24,
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
     lineHeight: 28,
