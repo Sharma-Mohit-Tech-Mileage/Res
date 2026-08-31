@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
 import { usernameTerms, validateUsername } from "../utility/constant";
 import { ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import PrimaryButton from "../common/customui/PrimaryButton";
@@ -42,6 +42,10 @@ const ProfileSettingsEdit = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Profile update failed. Please try again.");
   const scrollViewRef = useRef(null);
+  const newUsernameInputRef = useRef(null);
+  const confirmNewUsernameInputRef = useRef(null);
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+  const [hasValidationError, setHasValidationError] = useState(false);
 
   const handleSave = async (data) => {
     const newData = { ...data };
@@ -144,9 +148,19 @@ function decodeIdToken(idToken) {
     }
   };
 
+  
   const handleValidationError = (errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    setShowValidationAlert(true);
+    console.log("Validation errors:", errors);
+    setHasValidationError(true);
+    const fieldOrder = [
+      { key: "newUsername", ref: newUsernameInputRef },
+      { key: "ConfirmNewUsername", ref: confirmNewUsernameInputRef },
+    ];
+    const firstInvalid = fieldOrder.find((f) => errors?.[f.key]);
+    if (firstInvalid) firstInvalid.ref.current?.focus();
+      
+    
   };
 
   useEffect(() => {
@@ -157,10 +171,33 @@ function decodeIdToken(idToken) {
     }
   }, [route.params?.updateFailed, navigation]);
 
+  // Focus on error icon when error alert is shown
+    useEffect(() => {
+      if (hasValidationError && screenReaderEnabled) {
+        const t = setTimeout(() => {
+          try {
+            if (newUsernameInputRef.current) {
+              const handle = findNodeHandle(newUsernameInputRef.current);
+              if (handle) {
+                AccessibilityInfo.setAccessibilityFocus(handle);
+                newUsernameInputRef.current?.setNativeProps({ accessibilityFocus: true });
+               // AccessibilityInfo.announceForAccessibility("Error icon");
+              }
+            }
+          } catch (e) {
+            console.warn("Accessibility focus error:", e);
+          }
+        }, 300);
+  
+        return () => clearTimeout(t);
+      }
+    }, [hasValidationError, screenReaderEnabled]);
+  
   useEffect(() => {
     return () => {
       setShowErrorAlert(false);
       setShowValidationAlert(false);
+       AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
     };
   }, []);
 
@@ -267,6 +304,7 @@ function decodeIdToken(idToken) {
                     fieldState: { error },
                   }) => (
                     <SparkLightInput
+                      ref={newUsernameInputRef}
                       placeholder=""
                       label={"New Username *"}
                       onBlur={onBlur}
@@ -289,6 +327,7 @@ function decodeIdToken(idToken) {
                   }) => (
                     <>
                       <SparkLightInput
+                        ref={confirmNewUsernameInputRef}
                         label={"Confirm New Username *"}
                         placeholder=""
                         onBlur={onBlur}
