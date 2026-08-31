@@ -28,9 +28,9 @@ variables:
   - name: jarsignerKeyPassword
     value: sparklight_123
   - name: androidVersionCode
-    value: $[counter(format('androidBuildVersionStore-{0}', variables['Build.SourceBranchName']), 515)]  # Per-branch counter so Dev increments by +1 per Dev build only
+    value: $[counter(format('androidBuildVersionStore-{0}', variables['Build.SourceBranchName']), 525)]  # Per-branch counter so Dev increments by +1 per Dev build only
   - name: androidVersionName
-    value: '29.0.0'  # Dynamic version from project.VERSION_NAME
+    value: '29.0.1'  # Dynamic version from project.VERSION_NAME
   - name: deploymentEnvironment
     value: 'staging'  # staging for Dev/Demo, production for main
   - name: apiEndpoint
