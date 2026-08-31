@@ -147,6 +147,28 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)'
 
           - script: |
+              # Azure DevOps Build REST API does not expose runtime-expression pipeline variables
+              # (like counter()-based androidVersionCode/iosBuildNumber) via `.variables`, so DemoPromotion/
+              # ProdPromotion cannot read them from build details. Publish them as a small artifact instead.
+              VERSION_INFO_DIR="$(Build.ArtifactStagingDirectory)/version-info"
+              mkdir -p "$VERSION_INFO_DIR"
+              cat > "$VERSION_INFO_DIR/version-info.json" <<EOF
+              {
+                "androidVersionCode": $(androidVersionCode),
+                "iosBuildNumber": $(iosBuildNumber)
+              }
+              EOF
+              cat "$VERSION_INFO_DIR/version-info.json"
+            displayName: 'Write version info artifact'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish version info artifact'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/version-info'
+              ArtifactName: 'version-info'
+              publishLocation: 'Container'
+
+          - script: |
               python3 - <<'PYEOF'
               import os, smtplib
               from email.mime.text import MIMEText
@@ -307,22 +329,6 @@ stages:
                 exit 1
               fi
 
-              BUILD_DETAILS_API="$ORG_URL$PROJECT/_apis/build/builds/$DEV_BUILD_ID?api-version=7.1-preview.7"
-              BUILD_DETAILS_JSON=$(curl -s -u :$TOKEN "$BUILD_DETAILS_API")
-              DEV_ANDROID_VERSION_CODE=$(echo "$BUILD_DETAILS_JSON" | jq -r '.variables.androidVersionCode.value // empty')
-              DEV_IOS_BUILD_NUMBER=$(echo "$BUILD_DETAILS_JSON" | jq -r '.variables.iosBuildNumber.value // empty')
-
-              if [ -z "$DEV_ANDROID_VERSION_CODE" ]; then
-                echo '❌ Could not read androidVersionCode from Dev build details.'
-                echo "$BUILD_DETAILS_JSON"
-                exit 1
-              fi
-              if [ -z "$DEV_IOS_BUILD_NUMBER" ]; then
-                echo '❌ Could not read iosBuildNumber from Dev build details.'
-                echo "$BUILD_DETAILS_JSON"
-                exit 1
-              fi
-
               ARTIFACTS_API="$ORG_URL$PROJECT/_apis/build/builds/$DEV_BUILD_ID/artifacts?api-version=7.1-preview.5"
               ARTIFACTS_JSON=$(curl -s -u :$TOKEN "$ARTIFACTS_API")
               DEV_IOS_ARTIFACT=$(echo "$ARTIFACTS_JSON" | jq -r '.value[] | select(.name == "ios-ipa") | .name' | head -n1)
@@ -333,20 +339,22 @@ stages:
                 exit 1
               fi
 
-              # Android is rebuilt fresh below (not reused from Dev) so the versionCode actually
-              # bumps to DEV+1 — Google Play rejects re-uploading the exact same AAB/versionCode Dev already used.
-              DEMO_VERSION_CODE=$((DEV_ANDROID_VERSION_CODE + 1))
-              DEMO_IOS_BUILD_NUMBER=$((DEV_IOS_BUILD_NUMBER + 1))
-
               echo "##vso[task.setvariable variable=DEV_BUILD_ID]$DEV_BUILD_ID"
               echo "##vso[task.setvariable variable=DEV_IOS_ARTIFACT]$DEV_IOS_ARTIFACT"
-              echo "##vso[task.setvariable variable=DEMO_VERSION_CODE]$DEMO_VERSION_CODE"
-              echo "##vso[task.setvariable variable=DEMO_IOS_BUILD_NUMBER]$DEMO_IOS_BUILD_NUMBER"
-              echo "DEMO_VERSION_CODE=$DEMO_VERSION_CODE"
-              echo "DEMO_IOS_BUILD_NUMBER=$DEMO_IOS_BUILD_NUMBER"
-            displayName: 'Locate latest Dev build and compute Demo version numbers'
+            displayName: 'Locate latest Dev build'
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download version info from Dev build'
+            inputs:
+              buildType: 'specific'
+              project: '$(System.TeamProject)'
+              definition: '$(System.DefinitionId)'
+              buildId: '$(DEV_BUILD_ID)'
+              downloadType: 'specific'
+              artifactName: 'version-info'
+              downloadPath: '$(Pipeline.Workspace)/dev-version-info'
 
           - task: DownloadBuildArtifacts@0
             displayName: 'Download iOS artifact from Dev build'
@@ -358,6 +366,57 @@ stages:
               downloadType: 'specific'
               artifactName: '$(DEV_IOS_ARTIFACT)'
               downloadPath: '$(Pipeline.Workspace)/ios-demo-artifact'
+
+          - script: |
+              set -euo pipefail
+              VERSION_INFO_FILE=$(find "$(Pipeline.Workspace)/dev-version-info" -type f -name 'version-info.json' | head -n 1)
+              if [ -z "$VERSION_INFO_FILE" ]; then
+                echo '❌ version-info.json not found in Dev build artifacts.'
+                find "$(Pipeline.Workspace)/dev-version-info" -type f | sort
+                exit 1
+              fi
+
+              DEV_ANDROID_VERSION_CODE=$(jq -r '.androidVersionCode // empty' "$VERSION_INFO_FILE")
+              DEV_IOS_BUILD_NUMBER=$(jq -r '.iosBuildNumber // empty' "$VERSION_INFO_FILE")
+
+              if [ -z "$DEV_ANDROID_VERSION_CODE" ] || [ -z "$DEV_IOS_BUILD_NUMBER" ]; then
+                echo '❌ Could not read version numbers from version-info.json.'
+                cat "$VERSION_INFO_FILE"
+                exit 1
+              fi
+
+              # Android is rebuilt fresh below (not reused from Dev) so the versionCode actually
+              # bumps to DEV+1 — Google Play rejects re-uploading the exact same AAB/versionCode Dev already used.
+              DEMO_VERSION_CODE=$((DEV_ANDROID_VERSION_CODE + 1))
+              DEMO_IOS_BUILD_NUMBER=$((DEV_IOS_BUILD_NUMBER + 1))
+
+              echo "##vso[task.setvariable variable=DEMO_VERSION_CODE]$DEMO_VERSION_CODE"
+              echo "##vso[task.setvariable variable=DEMO_IOS_BUILD_NUMBER]$DEMO_IOS_BUILD_NUMBER"
+              echo "DEMO_VERSION_CODE=$DEMO_VERSION_CODE"
+              echo "DEMO_IOS_BUILD_NUMBER=$DEMO_IOS_BUILD_NUMBER"
+            displayName: 'Compute Demo version numbers'
+
+          - script: |
+              set -euo pipefail
+              # Published so ProdPromotion can read the REAL version actually baked into this Demo
+              # build's rebuilt AAB/IPA, instead of the throwaway counter value from this run's InitialCommit stage.
+              VERSION_INFO_DIR="$(Build.ArtifactStagingDirectory)/demo-version-info"
+              mkdir -p "$VERSION_INFO_DIR"
+              cat > "$VERSION_INFO_DIR/version-info.json" <<EOF
+              {
+                "androidVersionCode": $(DEMO_VERSION_CODE),
+                "iosBuildNumber": $(DEMO_IOS_BUILD_NUMBER)
+              }
+              EOF
+              cat "$VERSION_INFO_DIR/version-info.json"
+            displayName: 'Write Demo version info artifact'
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Demo version info artifact'
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/demo-version-info'
+              ArtifactName: 'demo-version-info'
+              publishLocation: 'Container'
 
           - task: JavaToolInstaller@0
             displayName: 'Install JDK 17'
@@ -443,7 +502,7 @@ stages:
 
           - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
             displayName: 'Publish AAB to Play Store Internal Testing'
-            condition: eq('${{ parameters.deployToInternalTesting }}', 'true')
+            condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'))
             inputs:
               serviceConnection: 'PlaystoreRessiConnection'
               applicationId: 'com.sparklight'
@@ -558,7 +617,7 @@ stages:
               xcrun altool --upload-app --type ios --file "$UPDATED_IPA_PATH" --apiKey "$(IOS_ASC_API_KEY_ID)" --apiIssuer "$(IOS_ASC_API_ISSUER_ID)" --show-progress
               echo "✅ IPA submitted to App Store Connect / TestFlight"
             displayName: 'Upload IPA to TestFlight'
-            condition: eq('${{ parameters.deployToTestFlight }}', 'true')
+            condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'))
 
           - script: |
               python3 -m pip install --quiet --disable-pip-version-check --break-system-packages --user pyjwt cryptography
@@ -635,7 +694,7 @@ stages:
                   print(f'⚠️ Failed to update TestFlight internal test notes: {e}')
               PYEOF
             displayName: 'Publish commit message as TestFlight internal test notes'
-            condition: eq('${{ parameters.deployToTestFlight }}', 'true')
+            condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'))
             continueOnError: true
             env:
               ASC_KEY_ID: $(IOS_ASC_API_KEY_ID)
@@ -805,22 +864,6 @@ stages:
                 exit 1
               fi
 
-              BUILD_DETAILS_API="$ORG_URL$PROJECT/_apis/build/builds/$DEMO_BUILD_ID?api-version=7.1-preview.7"
-              BUILD_DETAILS_JSON=$(curl -s -u :$TOKEN "$BUILD_DETAILS_API")
-              PROMOTE_ANDROID_VERSION_CODE=$(echo "$BUILD_DETAILS_JSON" | jq -r '.variables.DEMO_VERSION_CODE.value // .variables.androidVersionCode.value // empty')
-              PROMOTE_IOS_BUILD_NUMBER=$(echo "$BUILD_DETAILS_JSON" | jq -r '.variables.DEMO_IOS_BUILD_NUMBER.value // .variables.iosBuildNumber.value // empty')
-
-              if [ -z "$PROMOTE_ANDROID_VERSION_CODE" ]; then
-                echo '❌ Could not read android version code from Demo build details.'
-                echo "$BUILD_DETAILS_JSON"
-                exit 1
-              fi
-              if [ -z "$PROMOTE_IOS_BUILD_NUMBER" ]; then
-                echo '❌ Could not read iOS build number from Demo build details.'
-                echo "$BUILD_DETAILS_JSON"
-                exit 1
-              fi
-
               ARTIFACTS_API="$ORG_URL$PROJECT/_apis/build/builds/$DEMO_BUILD_ID/artifacts?api-version=7.1-preview.5"
               ARTIFACTS_JSON=$(curl -s -u :$TOKEN "$ARTIFACTS_API")
               PROMOTE_IOS_ARTIFACT=$(echo "$ARTIFACTS_JSON" | jq -r '.value[] | select(.name == "ios-ipa") | .name' | head -n1)
@@ -831,20 +874,22 @@ stages:
                 exit 1
               fi
 
-              # Android is rebuilt fresh below (not reused from Demo) so the versionCode actually
-              # bumps to DEMO+1 — Google Play rejects re-uploading the exact same AAB/versionCode Demo already used.
-              PROD_VERSION_CODE=$((PROMOTE_ANDROID_VERSION_CODE + 1))
-              PROD_IOS_BUILD_NUMBER=$((PROMOTE_IOS_BUILD_NUMBER + 1))
-
               echo "##vso[task.setvariable variable=PROMOTE_BUILD_ID]$DEMO_BUILD_ID"
               echo "##vso[task.setvariable variable=PROMOTE_IOS_ARTIFACT]$PROMOTE_IOS_ARTIFACT"
-              echo "##vso[task.setvariable variable=PROD_VERSION_CODE]$PROD_VERSION_CODE"
-              echo "##vso[task.setvariable variable=PROD_IOS_BUILD_NUMBER]$PROD_IOS_BUILD_NUMBER"
-              echo "PROD_VERSION_CODE=$PROD_VERSION_CODE"
-              echo "PROD_IOS_BUILD_NUMBER=$PROD_IOS_BUILD_NUMBER"
-            displayName: 'Locate latest Demo build and compute Prod version numbers'
+            displayName: 'Locate latest Demo build'
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download version info from Demo build'
+            inputs:
+              buildType: 'specific'
+              project: '$(System.TeamProject)'
+              definition: '$(System.DefinitionId)'
+              buildId: '$(PROMOTE_BUILD_ID)'
+              downloadType: 'specific'
+              artifactName: 'demo-version-info'
+              downloadPath: '$(Pipeline.Workspace)/demo-version-info'
 
           - task: DownloadBuildArtifacts@0
             displayName: 'Download iOS artifact from Demo build'
@@ -856,6 +901,35 @@ stages:
               downloadType: 'specific'
               artifactName: '$(PROMOTE_IOS_ARTIFACT)'
               downloadPath: '$(Pipeline.Workspace)/ios-prod-artifact'
+
+          - script: |
+              set -euo pipefail
+              VERSION_INFO_FILE=$(find "$(Pipeline.Workspace)/demo-version-info" -type f -name 'version-info.json' | head -n 1)
+              if [ -z "$VERSION_INFO_FILE" ]; then
+                echo '❌ version-info.json not found in Demo build artifacts.'
+                find "$(Pipeline.Workspace)/demo-version-info" -type f | sort
+                exit 1
+              fi
+
+              PROMOTE_ANDROID_VERSION_CODE=$(jq -r '.androidVersionCode // empty' "$VERSION_INFO_FILE")
+              PROMOTE_IOS_BUILD_NUMBER=$(jq -r '.iosBuildNumber // empty' "$VERSION_INFO_FILE")
+
+              if [ -z "$PROMOTE_ANDROID_VERSION_CODE" ] || [ -z "$PROMOTE_IOS_BUILD_NUMBER" ]; then
+                echo '❌ Could not read version numbers from version-info.json.'
+                cat "$VERSION_INFO_FILE"
+                exit 1
+              fi
+
+              # Android is rebuilt fresh below (not reused from Demo) so the versionCode actually
+              # bumps to DEMO+1 — Google Play rejects re-uploading the exact same AAB/versionCode Demo already used.
+              PROD_VERSION_CODE=$((PROMOTE_ANDROID_VERSION_CODE + 1))
+              PROD_IOS_BUILD_NUMBER=$((PROMOTE_IOS_BUILD_NUMBER + 1))
+
+              echo "##vso[task.setvariable variable=PROD_VERSION_CODE]$PROD_VERSION_CODE"
+              echo "##vso[task.setvariable variable=PROD_IOS_BUILD_NUMBER]$PROD_IOS_BUILD_NUMBER"
+              echo "PROD_VERSION_CODE=$PROD_VERSION_CODE"
+              echo "PROD_IOS_BUILD_NUMBER=$PROD_IOS_BUILD_NUMBER"
+            displayName: 'Compute Prod version numbers'
 
           - task: JavaToolInstaller@0
             displayName: 'Install JDK 17'
@@ -941,7 +1015,7 @@ stages:
 
           - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
             displayName: 'Publish AAB to Play Store Production'
-            condition: eq('${{ parameters.deployToInternalTesting }}', 'true')
+            condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'))
             inputs:
               serviceConnection: 'PlaystoreRessiConnection'
               applicationId: 'com.sparklight'
@@ -1056,7 +1130,7 @@ stages:
               xcrun altool --upload-app --type ios --file "$UPDATED_IPA_PATH" --apiKey "$(IOS_ASC_API_KEY_ID)" --apiIssuer "$(IOS_ASC_API_ISSUER_ID)" --show-progress
               echo "✅ IPA submitted to App Store Connect / TestFlight"
             displayName: 'Upload IPA to TestFlight'
-            condition: eq('${{ parameters.deployToTestFlight }}', 'true')
+            condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'))
 
           - script: |
               python3 -m pip install --quiet --disable-pip-version-check --break-system-packages --user pyjwt cryptography
@@ -1133,7 +1207,7 @@ stages:
                   print(f'⚠️ Failed to update TestFlight internal test notes: {e}')
               PYEOF
             displayName: 'Publish commit message as TestFlight internal test notes'
-            condition: eq('${{ parameters.deployToTestFlight }}', 'true')
+            condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'))
             continueOnError: true
             env:
               ASC_KEY_ID: $(IOS_ASC_API_KEY_ID)
