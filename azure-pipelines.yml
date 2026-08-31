@@ -28,7 +28,7 @@ variables:
   - name: jarsignerKeyPassword
     value: sparklight_123
   - name: androidVersionCode
-    value: $[counter('androidBuildVersionStore-v2', 530)]  # New global counter seeded above the last version code (517) already used on Play Store
+    value: $[counter('androidBuildVersionStore-v2', 531)]  # Play Store internal testing track history already reached versionCode 23053; seeded well above it
   - name: androidVersionName
     value: '29.0.1'  # Dynamic version from project.VERSION_NAME
   - name: deploymentEnvironment
@@ -61,7 +61,7 @@ variables:
   - name: IOS_REQUIRED_XCODE_MAJOR
     value: '26'
   - name: iosBuildNumber
-    value: $[counter('iosBuildNumberStore-v2', 160)]  # New global counter seeded above the last bundle version (149) already used on TestFlight
+    value: $[counter('iosBuildNumberStore-v2', 161)]  # TestFlight history already reached bundle version 160; seeded well above it
   # Email notification variables
   # Set NOTIFICATION_EMAILS as a comma-separated list of recipient addresses.
   # Set SMTP_SERVER, SMTP_USERNAME, and SMTP_PASSWORD as secret pipeline variables
@@ -325,37 +325,28 @@ stages:
 
               ARTIFACTS_API="$ORG_URL$PROJECT/_apis/build/builds/$DEV_BUILD_ID/artifacts?api-version=7.1-preview.5"
               ARTIFACTS_JSON=$(curl -s -u :$TOKEN "$ARTIFACTS_API")
-              DEV_ANDROID_ARTIFACT=$(echo "$ARTIFACTS_JSON" | jq -r '.value[] | select(.name | startswith("android-build-")) | .name' | head -n1)
               DEV_IOS_ARTIFACT=$(echo "$ARTIFACTS_JSON" | jq -r '.value[] | select(.name == "ios-ipa") | .name' | head -n1)
 
-              if [ -z "$DEV_ANDROID_ARTIFACT" ]; then
-                echo '❌ Could not locate Android artifact name in Dev build artifacts.'
-                echo "$ARTIFACTS_JSON"
-                exit 1
-              fi
               if [ -z "$DEV_IOS_ARTIFACT" ]; then
                 echo '❌ Could not locate iOS artifact name in Dev build artifacts.'
                 echo "$ARTIFACTS_JSON"
                 exit 1
               fi
 
+              # Android is rebuilt fresh below (not reused from Dev) so the versionCode actually
+              # bumps to DEV+1 — Google Play rejects re-uploading the exact same AAB/versionCode Dev already used.
+              DEMO_VERSION_CODE=$((DEV_ANDROID_VERSION_CODE + 1))
+              DEMO_IOS_BUILD_NUMBER=$((DEV_IOS_BUILD_NUMBER + 1))
+
               echo "##vso[task.setvariable variable=DEV_BUILD_ID]$DEV_BUILD_ID"
-              echo "##vso[task.setvariable variable=DEV_ANDROID_ARTIFACT]$DEV_ANDROID_ARTIFACT"
               echo "##vso[task.setvariable variable=DEV_IOS_ARTIFACT]$DEV_IOS_ARTIFACT"
-            displayName: 'Locate latest Dev build artifacts'
+              echo "##vso[task.setvariable variable=DEMO_VERSION_CODE]$DEMO_VERSION_CODE"
+              echo "##vso[task.setvariable variable=DEMO_IOS_BUILD_NUMBER]$DEMO_IOS_BUILD_NUMBER"
+              echo "DEMO_VERSION_CODE=$DEMO_VERSION_CODE"
+              echo "DEMO_IOS_BUILD_NUMBER=$DEMO_IOS_BUILD_NUMBER"
+            displayName: 'Locate latest Dev build and compute Demo version numbers'
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-
-          - task: DownloadBuildArtifacts@0
-            displayName: 'Download Android artifact from Dev build'
-            inputs:
-              buildType: 'specific'
-              project: '$(System.TeamProject)'
-              definition: '$(System.DefinitionId)'
-              buildId: '$(DEV_BUILD_ID)'
-              downloadType: 'specific'
-              artifactName: '$(DEV_ANDROID_ARTIFACT)'
-              downloadPath: '$(Pipeline.Workspace)/android-demo-artifact'
 
           - task: DownloadBuildArtifacts@0
             displayName: 'Download iOS artifact from Dev build'
@@ -368,13 +359,57 @@ stages:
               artifactName: '$(DEV_IOS_ARTIFACT)'
               downloadPath: '$(Pipeline.Workspace)/ios-demo-artifact'
 
+          - task: JavaToolInstaller@0
+            displayName: 'Install JDK 17'
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          - task: NodeTool@0
+            displayName: 'Install Node 20.6.1'
+            inputs:
+              versionSpec: '20.6.1'
+
+          - task: Cache@2
+            displayName: 'Cache Gradle packages'
+            inputs:
+              key: 'gradle | "$(Agent.OS)" | android/build.gradle | android/app/build.gradle | android/gradle/wrapper/gradle-wrapper.properties'
+              restoreKeys: 'gradle | "$(Agent.OS)"'
+              path: '$(HOME)/.gradle/caches'
+
+          - script: npm install --legacy-peer-deps
+            displayName: 'Install node dependencies'
+
+          - task: DownloadSecureFile@1
+            name: keystoreFile
+            displayName: 'Download Keystore File'
+            inputs:
+              secureFile: 'Sparklight.keystore'
+
+          - task: Gradle@4
+            displayName: 'Rebuild Android App Bundle with Demo version code'
+            inputs:
+              workingDirectory: 'android'
+              gradleWrapperFile: 'android/gradlew'
+              tasks: 'clean bundleDemoRelease'
+              options: >
+                -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
+                -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
+                -PKEY_ALIAS=$(keyAlias)
+                -PKEY_PASSWORD=$(jarsignerKeyPassword)
+                -PVERSION_CODE=$(DEMO_VERSION_CODE)
+                -PVERSION_NAME=$(androidVersionName)
+                --stacktrace
+              publishJUnitResults: false
+
           - script: |
               set -euo pipefail
-              AAB_PATH=$(find "$(Pipeline.Workspace)/android-demo-artifact" -type f -name "*.aab" | head -n 1)
+              AAB_PATH=$(find "$(System.DefaultWorkingDirectory)/android/app/build/outputs" -type f -name "*.aab" | head -n 1)
               IPA_PATH=$(find "$(Pipeline.Workspace)/ios-demo-artifact" -type f -name "*.ipa" | head -n 1)
               if [ -z "$AAB_PATH" ]; then
-                echo '❌ Missing Android AAB artifact after download.'
-                find "$(Pipeline.Workspace)/android-demo-artifact" -type f | sort
+                echo '❌ Rebuilt Android AAB not found.'
+                find "$(System.DefaultWorkingDirectory)/android/app/build/outputs" -type f | sort
                 exit 1
               fi
               if [ -z "$IPA_PATH" ]; then
@@ -384,18 +419,9 @@ stages:
               fi
               echo "##vso[task.setvariable variable=AAB_FILE_PATH]$AAB_PATH"
               echo "##vso[task.setvariable variable=IPA_FILE_PATH]$IPA_PATH"
-              DEMO_VERSION_CODE=$((DEV_ANDROID_VERSION_CODE + 1))
-              DEMO_IOS_BUILD_NUMBER=$((DEV_IOS_BUILD_NUMBER + 1))
-              echo "##vso[task.setvariable variable=DEMO_VERSION_CODE]$DEMO_VERSION_CODE"
-              echo "##vso[task.setvariable variable=DEMO_IOS_BUILD_NUMBER]$DEMO_IOS_BUILD_NUMBER"
               echo "AAB_PATH=$AAB_PATH"
               echo "IPA_PATH=$IPA_PATH"
-              echo "DEMO_VERSION_CODE=$DEMO_VERSION_CODE"
-              echo "DEMO_IOS_BUILD_NUMBER=$DEMO_IOS_BUILD_NUMBER"
-            displayName: 'Resolve artifact paths and demo version code'
-            env:
-              DEV_ANDROID_VERSION_CODE: $(DEV_ANDROID_VERSION_CODE)
-              DEV_IOS_BUILD_NUMBER: $(DEV_IOS_BUILD_NUMBER)
+            displayName: 'Resolve artifact paths'
 
           - script: |
               RELEASE_NOTES_FILE="$(Build.ArtifactStagingDirectory)/play-release-notes.txt"
@@ -535,7 +561,7 @@ stages:
             condition: eq('${{ parameters.deployToTestFlight }}', 'true')
 
           - script: |
-              python3 -m pip install --quiet --disable-pip-version-check pyjwt cryptography
+              python3 -m pip install --quiet --disable-pip-version-check --break-system-packages --user pyjwt cryptography
               python3 - <<'PYEOF'
               import json, os, sys, time, urllib.request
               import jwt
@@ -797,39 +823,28 @@ stages:
 
               ARTIFACTS_API="$ORG_URL$PROJECT/_apis/build/builds/$DEMO_BUILD_ID/artifacts?api-version=7.1-preview.5"
               ARTIFACTS_JSON=$(curl -s -u :$TOKEN "$ARTIFACTS_API")
-              PROMOTE_ANDROID_ARTIFACT=$(echo "$ARTIFACTS_JSON" | jq -r '.value[] | select(.name | startswith("android-build-")) | .name' | head -n1)
               PROMOTE_IOS_ARTIFACT=$(echo "$ARTIFACTS_JSON" | jq -r '.value[] | select(.name == "ios-ipa") | .name' | head -n1)
 
-              if [ -z "$PROMOTE_ANDROID_ARTIFACT" ]; then
-                echo '❌ Could not locate Android artifact name in Demo build artifacts.'
-                echo "$ARTIFACTS_JSON"
-                exit 1
-              fi
               if [ -z "$PROMOTE_IOS_ARTIFACT" ]; then
                 echo '❌ Could not locate iOS artifact name in Demo build artifacts.'
                 echo "$ARTIFACTS_JSON"
                 exit 1
               fi
 
+              # Android is rebuilt fresh below (not reused from Demo) so the versionCode actually
+              # bumps to DEMO+1 — Google Play rejects re-uploading the exact same AAB/versionCode Demo already used.
+              PROD_VERSION_CODE=$((PROMOTE_ANDROID_VERSION_CODE + 1))
+              PROD_IOS_BUILD_NUMBER=$((PROMOTE_IOS_BUILD_NUMBER + 1))
+
               echo "##vso[task.setvariable variable=PROMOTE_BUILD_ID]$DEMO_BUILD_ID"
-              echo "##vso[task.setvariable variable=PROMOTE_ANDROID_ARTIFACT]$PROMOTE_ANDROID_ARTIFACT"
               echo "##vso[task.setvariable variable=PROMOTE_IOS_ARTIFACT]$PROMOTE_IOS_ARTIFACT"
-              echo "##vso[task.setvariable variable=PROMOTE_ANDROID_VERSION_CODE]$PROMOTE_ANDROID_VERSION_CODE"
-              echo "##vso[task.setvariable variable=PROMOTE_IOS_BUILD_NUMBER]$PROMOTE_IOS_BUILD_NUMBER"
-            displayName: 'Locate latest Demo build artifacts'
+              echo "##vso[task.setvariable variable=PROD_VERSION_CODE]$PROD_VERSION_CODE"
+              echo "##vso[task.setvariable variable=PROD_IOS_BUILD_NUMBER]$PROD_IOS_BUILD_NUMBER"
+              echo "PROD_VERSION_CODE=$PROD_VERSION_CODE"
+              echo "PROD_IOS_BUILD_NUMBER=$PROD_IOS_BUILD_NUMBER"
+            displayName: 'Locate latest Demo build and compute Prod version numbers'
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-
-          - task: DownloadBuildArtifacts@0
-            displayName: 'Download Android artifact from Demo build'
-            inputs:
-              buildType: 'specific'
-              project: '$(System.TeamProject)'
-              definition: '$(System.DefinitionId)'
-              buildId: '$(PROMOTE_BUILD_ID)'
-              downloadType: 'specific'
-              artifactName: '$(PROMOTE_ANDROID_ARTIFACT)'
-              downloadPath: '$(Pipeline.Workspace)/android-prod-artifact'
 
           - task: DownloadBuildArtifacts@0
             displayName: 'Download iOS artifact from Demo build'
@@ -842,13 +857,57 @@ stages:
               artifactName: '$(PROMOTE_IOS_ARTIFACT)'
               downloadPath: '$(Pipeline.Workspace)/ios-prod-artifact'
 
+          - task: JavaToolInstaller@0
+            displayName: 'Install JDK 17'
+            inputs:
+              versionSpec: '17'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          - task: NodeTool@0
+            displayName: 'Install Node 20.6.1'
+            inputs:
+              versionSpec: '20.6.1'
+
+          - task: Cache@2
+            displayName: 'Cache Gradle packages'
+            inputs:
+              key: 'gradle | "$(Agent.OS)" | android/build.gradle | android/app/build.gradle | android/gradle/wrapper/gradle-wrapper.properties'
+              restoreKeys: 'gradle | "$(Agent.OS)"'
+              path: '$(HOME)/.gradle/caches'
+
+          - script: npm install --legacy-peer-deps
+            displayName: 'Install node dependencies'
+
+          - task: DownloadSecureFile@1
+            name: keystoreFile
+            displayName: 'Download Keystore File'
+            inputs:
+              secureFile: 'Sparklight.keystore'
+
+          - task: Gradle@4
+            displayName: 'Rebuild Android App Bundle with Prod version code'
+            inputs:
+              workingDirectory: 'android'
+              gradleWrapperFile: 'android/gradlew'
+              tasks: 'clean bundleDemoRelease'
+              options: >
+                -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
+                -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
+                -PKEY_ALIAS=$(keyAlias)
+                -PKEY_PASSWORD=$(jarsignerKeyPassword)
+                -PVERSION_CODE=$(PROD_VERSION_CODE)
+                -PVERSION_NAME=$(androidVersionName)
+                --stacktrace
+              publishJUnitResults: false
+
           - script: |
               set -euo pipefail
-              AAB_PATH=$(find "$(Pipeline.Workspace)/android-prod-artifact" -type f -name "*.aab" | head -n 1)
+              AAB_PATH=$(find "$(System.DefaultWorkingDirectory)/android/app/build/outputs" -type f -name "*.aab" | head -n 1)
               IPA_PATH=$(find "$(Pipeline.Workspace)/ios-prod-artifact" -type f -name "*.ipa" | head -n 1)
               if [ -z "$AAB_PATH" ]; then
-                echo '❌ Missing Android AAB artifact after download.'
-                find "$(Pipeline.Workspace)/android-prod-artifact" -type f | sort
+                echo '❌ Rebuilt Android AAB not found.'
+                find "$(System.DefaultWorkingDirectory)/android/app/build/outputs" -type f | sort
                 exit 1
               fi
               if [ -z "$IPA_PATH" ]; then
@@ -858,18 +917,9 @@ stages:
               fi
               echo "##vso[task.setvariable variable=AAB_FILE_PATH]$AAB_PATH"
               echo "##vso[task.setvariable variable=IPA_FILE_PATH]$IPA_PATH"
-              PROD_VERSION_CODE=$((PROMOTE_ANDROID_VERSION_CODE + 1))
-              PROD_IOS_BUILD_NUMBER=$((PROMOTE_IOS_BUILD_NUMBER + 1))
-              echo "##vso[task.setvariable variable=PROD_VERSION_CODE]$PROD_VERSION_CODE"
-              echo "##vso[task.setvariable variable=PROD_IOS_BUILD_NUMBER]$PROD_IOS_BUILD_NUMBER"
               echo "AAB_PATH=$AAB_PATH"
               echo "IPA_PATH=$IPA_PATH"
-              echo "PROD_VERSION_CODE=$PROD_VERSION_CODE"
-              echo "PROD_IOS_BUILD_NUMBER=$PROD_IOS_BUILD_NUMBER"
-            displayName: 'Resolve artifact paths and prod version code'
-            env:
-              PROMOTE_ANDROID_VERSION_CODE: $(PROMOTE_ANDROID_VERSION_CODE)
-              PROMOTE_IOS_BUILD_NUMBER: $(PROMOTE_IOS_BUILD_NUMBER)
+            displayName: 'Resolve artifact paths'
 
           - script: |
               RELEASE_NOTES_FILE="$(Build.ArtifactStagingDirectory)/play-release-notes.txt"
@@ -1009,7 +1059,7 @@ stages:
             condition: eq('${{ parameters.deployToTestFlight }}', 'true')
 
           - script: |
-              python3 -m pip install --quiet --disable-pip-version-check pyjwt cryptography
+              python3 -m pip install --quiet --disable-pip-version-check --break-system-packages --user pyjwt cryptography
               python3 - <<'PYEOF'
               import json, os, sys, time, urllib.request
               import jwt
@@ -2296,7 +2346,7 @@ stages:
             displayName: 'Upload IPA to TestFlight'
 
           - script: |
-              python3 -m pip install --quiet --disable-pip-version-check pyjwt cryptography
+              python3 -m pip install --quiet --disable-pip-version-check --break-system-packages --user pyjwt cryptography
               python3 - <<'PYEOF'
               import base64, json, os, sys, time, urllib.request
               import jwt
