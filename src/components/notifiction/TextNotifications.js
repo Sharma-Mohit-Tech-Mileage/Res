@@ -453,7 +453,7 @@ const TextNotifications = ({ navigation }) => {
                     required={true}
                     onBlur={onBlur}
                     onChangeText={onChange}
-                    keyboardType="phone-pad"
+                    keyboardType="number-pad"
                     value={value}
                     error={errors.phoneNumber?.message}
                     maxLength={16}

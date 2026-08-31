@@ -40,6 +40,8 @@ const normalizePaymentMethod = (raw = {}) => {
     id: String(raw.id || raw.fundingAccountId || raw.funding_account_id || ""),
     idCustomer: customerMatch ? customerMatch[1] : "",
     type: isCard ? "card" : "bank",
+    // Surcharge applies to credit cards only, so the credit/debit subtype has to survive normalisation.
+    cardType: isCard ? (subtype.includes("credit") ? "credit" : subtype.includes("debit") ? "debit" : "") : "",
     brand: (subtype.split("_")[0] || (isCard ? "card" : "bank")).toLowerCase(),
     nickname: cleanName(raw.nickname) || cleanName(raw.account_holder_name) || fallbackName,
     lastFour: masked.replace(/[^0-9]/g, "").slice(-4),
@@ -72,7 +74,7 @@ export const fetchPaymentMethods = async () => {
   const res = await _axios.get(getEndpoint(ENDPOINTS.FUNDING_ACCOUNTS, { accountNumber }), config);
   ensureServiceOk(res);
   const list = Array.isArray(res.data) ? res.data : res.data?.fundingAccounts || [];
-  return list.map(normalizePaymentMethod).filter((m) => m.id && m.status === "active");
+  return list.map(normalizePaymentMethod).filter((m) => m.id && m.status !== "deleted");
 };
 
 export const fetchAutoPayDetails = async () => {
@@ -98,6 +100,31 @@ export const deletePaymentMethod = async (methodId) => {
   return res.data;
 };
 
+// The fee arrives as a string, either flat (CalculateFee {"fee":"0.33"}, payment DTO surchargeAmount) or nested (upstream fee.fee_amount).
+const pickFeeAmount = (data) => {
+  const value = Number(data?.surchargeAmount ?? data?.fee?.fee_amount ?? data?.fee ?? data?.data?.fee);
+  return isFinite(value) ? value : null;
+};
+
+// Orbipay Fee Calculator. CustomerId and FundingAccountId both come off the funding
+// account we already fetched, so no extra lookup is needed.
+export const calculateFee = async (amount, method, paymentScheduleType = "one_time_payment") => {
+  const { config } = await authContext();
+  const res = await _axios.post(
+    getEndpoint(ENDPOINTS.PAYMENT_CALCULATE_FEE),
+    {
+      // API binds "amount" — sending "surchargeAmount" made the server price a
+      // $0 payment and return fee 0.00 (portal sends "amount" and gets 0.66).
+      amount: Number(amount),
+      paymentScheduleType,
+      CustomerId: method?.idCustomer || "",
+      FundingAccountId: method?.id || "",
+    },
+    config
+  );
+  return pickFeeAmount(res?.data);
+};
+
 export const submitPayment = async (amount, method, emailOverride) => {
   const { accountNumber, config } = await authContext();
   const { email } = accountSnapshot();
@@ -118,7 +145,15 @@ export const submitPayment = async (amount, method, emailOverride) => {
     config
   );
   ensureServiceOk(res);
-  return { confirmationNumber: pickConfirmationNumber(res.data) };
+  const status = String(res?.data?.status || "").toLowerCase();
+  const confirmationNumber = pickConfirmationNumber(res.data);
+  // Declines come back HTTP 200 with status "Failed" and every field null, so only a confirmation number proves success.
+  if (status === "failed" || status === "declined" || !confirmationNumber) {
+    const err = new Error("Payment was not accepted");
+    err.code = "PAYMENT_DECLINED";
+    throw err;
+  }
+  return { confirmationNumber, fee: pickFeeAmount(res.data) };
 };
 
 const setupAutoPayPayload = (accountNumber, method) => ({
@@ -182,7 +217,7 @@ export const confirmPaymentToken = async (token, digiSign, amount, emailOverride
     config
   );
   ensureServiceOk(res);
-  return { confirmationNumber: pickConfirmationNumber(res.data) };
+  return { confirmationNumber: pickConfirmationNumber(res.data), fee: pickFeeAmount(res.data) };
 };
 
 export const updateFundingAccount = async (methodId, { token, digiSign } = {}) => {

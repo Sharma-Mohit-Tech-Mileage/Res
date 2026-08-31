@@ -160,6 +160,8 @@ const SparkLightInput = React.forwardRef(({
           value,
           isPhoneNumber: getKeyboardType() === "phone-pad",
           isSecure: secure,
+          // The real TextInput is a11y-hidden, so iOS never auto-reads the value — compose it here.
+          osAddsValue: false,
         })}${editable ? ", double tap to edit" : ""}`}
         accessibilityHint={error ? (errorHint || error) : undefined}
         importantForAccessibility="yes"
@@ -211,7 +213,7 @@ const SparkLightInput = React.forwardRef(({
             accessible={false}
             importantForAccessibility="no"
           >
-            <WarningIcon />
+            <WarningIcon color="#EF4E3E" />
           </View>
           <Text
             style={styles.errorText}

@@ -14,7 +14,8 @@ import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import moment from "moment";
-import analytics from "@react-native-firebase/analytics";
+import { getAnalytics, logEvent, resetAnalyticsData, setUserId, setUserProperty } from "@react-native-firebase/analytics";
+import { syncDeviceToken } from "../../network/apis/account/profile.service";
 import { shouldBlockLogin } from "../utility/disconnectHelpers";
 import Logo from "../../res/images/SpalshLogo";
 import NetworkManager from "../../utils/NetworkManager";
@@ -24,6 +25,11 @@ import LoadingStateIndicator, { LoadingState, } from "../common/LoadingStateIndi
 import Config from "react-native-config";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
 import { logDebug, logWarn, logError } from "../../utils/logger";
+import { fetchACPUserAccountDetails } from "../../network/apis/account/profile.service";
+import { getTransferInfo } from "../utility/transferHelpers";
+import { announceA11y } from "../../utils/a11y";
+import TransferOfServiceModal from "../common/TransferOfServiceModal";
+import { SPARKLIGHT_URLS } from "../../constants/urls";
 
 const config = {
   issuer: Config.SSO_LOGIN,
@@ -63,6 +69,7 @@ const SplashScreen = ({ navigation, route }) => {
   const ssoIdTokenRef = useRef(null);
   const [loginEnable, setLoginEnable] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
+  const [transferAccountNumber, setTransferAccountNumber] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [deviceSize, setDeviceSize] = useState(getDeviceSize());
   const [networkState, setNetworkState] = useState({ isConnected: true, type: "unknown", });
@@ -235,7 +242,6 @@ const SplashScreen = ({ navigation, route }) => {
         idTokenGuid: result.data.additionalParameters?.session_state,
         refreshToken: result.data.refreshToken,
       };
-console.log("[Login] Refresh flow ID token:", data.idToken);
       setLoadingState(LoadingState.LOADING_DATA);
       storeSsoToken(data);
       callSSOLoginApi(data);
@@ -330,8 +336,6 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
         jwtTimestamp: Date.now(),
         idTokenTimestamp: Date.now(),
       };
-          console.log("[Login] ID token used for login:", ssoIdTokenRef.current || null);
-
       // Check for business account first
       if (res.userInfo.customerType === "COM") {
         logWarn("SplashScreen", "Business account login blocked");
@@ -384,17 +388,30 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
       logDebug("SplashScreen", "Moving user after successful login", {
         userName: user?.userInfo?.userName,
       });
-      storeUser(user);
+      await storeUser(user);
       dispatch(saveUserInfo(user));
+
+      // Account details are keyed off the stored user, so this must follow storeUser.
+      const accountDetails = await fetchACPUserAccountDetails(null, false).catch(
+        () => null
+      );
+      const transfer = getTransferInfo(accountDetails);
+      if (transfer.isTransferred) {
+        setTransferAccountNumber(transfer.newAccountNumber);
+        setLoadingState(LoadingState.NONE);
+        return;
+      }
+
       if (user.userInfo && user.userInfo.userName) {
-        await analytics().setUserId(user.userInfo.userName.toString());
-        await analytics().setUserProperty(
+        await setUserId(getAnalytics(), user.userInfo.userName.toString());
+        await setUserProperty(getAnalytics(), 
           "Sparklight_user_id",
           user.userInfo.userName.toString()
         );
-        await analytics().logEvent("login", {
+        await logEvent(getAnalytics(), "login", {
           Sparklight_user_id: user.userInfo.userName.toString(),
         });
+        syncDeviceToken();
       }
 
       if (user.userInfo.mobileTCAcceptanceFlag) {
@@ -426,7 +443,6 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
 
     const networkManager = NetworkManager.getInstance();
     const connectivity = await networkManager.checkConnectivity();
-    console.log("Connectivity check:", connectivity);
     if (
       !connectivity.isConnected ||
       connectivity.isInternetReachable === false
@@ -531,7 +547,7 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
             })
               .then(async () => {
                 try {
-                  await analytics().resetAnalyticsData();
+                  await resetAnalyticsData(getAnalytics());
                   await clearAuthCookies();
                   cleanUserData();
                   if (
@@ -581,6 +597,37 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
           postLogoutCallback();
         }
       });
+  };
+
+  const transferSignIn = async () => {
+    setTransferAccountNumber(null);
+    setLoadingState(LoadingState.OPENING_BROWSER);
+    // Spoken feedback bridges the gap until the system sign-in sheet announces itself (54047)
+    announceA11y("Opening secure sign in");
+    try {
+      const res = await getSsoToken();
+      // End the Keycloak session over HTTP instead of the system browser sheet, so no "Sign In / Cancel" dialog is shown (54047)
+      if (res?.refreshToken) {
+        fetch(`${Config.SSO_LOGIN}/protocol/openid-connect/logout`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `client_id=${encodeURIComponent(
+            Config.SSO_CLIENT_ID
+          )}&refresh_token=${encodeURIComponent(res.refreshToken)}`,
+        }).catch(() => {});
+      }
+      await analytics().resetAnalyticsData();
+    } catch (error) {
+      logWarn("SplashScreen", "Transfer sign-in cleanup error");
+    }
+    await clearAuthCookies();
+    await cleanUserData();
+    setAuthInProgress(false);
+    authLockRef.current = false;
+    setLoadingState(LoadingState.NONE);
+    setLoginEnable(true);
+    // Route straight into the sign-in flow instead of dropping the user on the welcome screen (54009)
+    loginAuth();
   };
 
  const handleErrorAction = (action) => {
@@ -742,6 +789,13 @@ console.log("[Login] Refresh flow ID token:", data.idToken);
         errorType={errorState.type}
         customMessage={errorState.message}
         onAction={handleErrorAction}
+      />
+
+      <TransferOfServiceModal
+        visible={!!transferAccountNumber}
+        newAccountNumber={transferAccountNumber}
+        onSignIn={transferSignIn}
+        onRegister={() => Linking.openURL(SPARKLIGHT_URLS.registerAccount)}
       />
 
       <CustomerDisconnectPage

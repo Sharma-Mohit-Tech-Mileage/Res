@@ -4,10 +4,11 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import LinkText from "../../common/customui/LinkText";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";
+import AppStyles from "../../../styles/AppStyles";
 import { SectionTitle, SectionContent } from "../../common/customui/Typography";
 
 const NextActionCard = ({ title, message, ctaLabel, onPress, onDismiss }) => (
-  <View style={[card.elevated, styles.container]}>
+  <View style={[AppStyles.card, styles.container]}>
     <SectionTitle style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
       {title}
     </SectionTitle>
@@ -21,6 +22,7 @@ const NextActionCard = ({ title, message, ctaLabel, onPress, onDismiss }) => (
         onPress={onDismiss}
         accessibilityHint="Dismisses this suggestion."
         style={styles.dismissLink}
+        textStyle={AppStyles.hyperlink}
       />
     )}
   </View>
@@ -29,12 +31,13 @@ const NextActionCard = ({ title, message, ctaLabel, onPress, onDismiss }) => (
 const styles = StyleSheet.create({
   container: { padding: 16, marginTop: 24, alignSelf: "stretch" },
   title: {
-    marginBottom: 8,
+    marginBottom: 16,
   },
   message: {
-    marginBottom: 4,
+    lineHeight: 20,
+    marginBottom: 16,
   },
-  dismissLink: { alignSelf: "center", marginTop: 4 },
+  dismissLink: { alignSelf: "center", marginTop: 16 },
 });
 
 export default NextActionCard;

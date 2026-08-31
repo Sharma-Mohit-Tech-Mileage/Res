@@ -1,4 +1,4 @@
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import { Linking } from 'react-native';
 
 export const compareVersions = (v1, v2) => {
@@ -86,7 +86,7 @@ export const isCampaignEligible = (campaign, userInfo = {}, currentVersion = '1.
 
 export const trackAnnouncementImpression = async (campaignId, triggerType) => {
   try {
-    await analytics().logEvent('feature_announcement_impression', {
+    await logEvent(getAnalytics(), 'feature_announcement_impression', {
       campaign_id: campaignId,
       trigger_type: triggerType,
       timestamp: new Date().toISOString(),
@@ -98,7 +98,7 @@ export const trackAnnouncementImpression = async (campaignId, triggerType) => {
 
 export const trackStepViewed = async (campaignId, stepNumber, stepTitle) => {
   try {
-    await analytics().logEvent('feature_announcement_step_viewed', {
+    await logEvent(getAnalytics(), 'feature_announcement_step_viewed', {
       campaign_id: campaignId,
       step_number: stepNumber,
       step_title: stepTitle,
@@ -111,7 +111,7 @@ export const trackStepViewed = async (campaignId, stepNumber, stepTitle) => {
 
 export const trackAnnouncementCompletion = async (campaignId, totalSteps, timeSpentSeconds) => {
   try {
-    await analytics().logEvent('feature_announcement_completed', {
+    await logEvent(getAnalytics(), 'feature_announcement_completed', {
       campaign_id: campaignId,
       total_steps: totalSteps,
       time_spent_seconds: timeSpentSeconds,
@@ -124,7 +124,7 @@ export const trackAnnouncementCompletion = async (campaignId, totalSteps, timeSp
 
 export const trackAnnouncementDismissal = async (campaignId, dismissedAtStep) => {
   try {
-    await analytics().logEvent('feature_announcement_dismissed', {
+    await logEvent(getAnalytics(), 'feature_announcement_dismissed', {
       campaign_id: campaignId,
       dismissed_at_step: dismissedAtStep,
       timestamp: new Date().toISOString(),

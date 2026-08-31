@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -11,12 +11,22 @@ import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
+  calculateFee,
   fetchAutoPayDetails,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, isMethodExpired, openOrbipayPaymentExecution } from "./paymentsShared";
+import {
+  contentMaxWidth,
+  isMethodUnusable,
+  openOrbipayPaymentExecution,
+  isCreditCard,
+  useSurchargeRate,
+  surchargeTitle,
+  surchargeMessage,
+} from "./paymentsShared";
 
 
 const MakePaymentMethodScreen = ({ navigation, route }) => {
+  const surchargeRate = useSurchargeRate();
   const amount = Number(route.params?.amount) || 0;
   const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [methods, setMethods] = useState(null);
@@ -38,7 +48,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
         .then(([list, details]) => {
           setMethods(list);
           setAutoPay(details);
-          setSelectedId((prev) => prev || list.find((m) => m.isDefault && !isMethodExpired(m))?.id || "");
+          setSelectedId((prev) => prev || list.find((m) => m.isDefault && !isMethodUnusable(m))?.id || "");
         })
         .catch(() => {
           setMethods([]);
@@ -51,7 +61,21 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
 
   const loading = methods === null;
   const selectedMethod = methods?.find((m) => m.id === selectedId) || null;
-  const canContinue = !!selectedMethod && !isMethodExpired(selectedMethod);
+  const canContinue = !!selectedMethod && !isMethodUnusable(selectedMethod);
+
+  // Fee Calculator runs on selection so the review screen already has the surcharge.
+  const [surcharge, setSurcharge] = useState(null);
+  useEffect(() => {
+    setSurcharge(null);
+    if (!isCreditCard(selectedMethod) || !amount) return undefined;
+    let cancelled = false;
+    calculateFee(amount, selectedMethod)
+      .then((fee) => !cancelled && setSurcharge(fee))
+      .catch(() => !cancelled && setSurcharge(null));
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedId, amount]);
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
   const onPayWithNewMethod = () => {
@@ -62,7 +86,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} autoFocusBack />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -72,6 +96,13 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
             autoFocusTitle
           />
         )}
+
+        <NotificationAlert
+          type="warning"
+          title={surchargeTitle(surchargeRate)}
+          message={surchargeMessage(surchargeRate)}
+          showCloseIcon={false}
+        />
 
         <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           Select payment method
@@ -116,7 +147,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
               buttonType="submit"
               disabled={!canContinue}
               accessibilityLabel="Continue"
-              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle })}
+              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle, surcharge })}
             />
             <PrimaryButton
               title="Cancel"
@@ -135,7 +166,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    marginBottom: 12,
+    marginBottom: 24,
   },
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
   emptyText: {

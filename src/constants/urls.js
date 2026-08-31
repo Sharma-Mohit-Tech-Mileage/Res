@@ -1,7 +1,15 @@
+import { Platform } from 'react-native';
+import Config from 'react-native-config';
+
 const BASE = 'https://www.sparklight.com';
 const SUPPORT = 'https://support.sparklight.com';
 
+const SSO_REDIRECT = Platform.OS === 'ios' ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID;
+
 export const SPARKLIGHT_URLS = {
+  // Keycloak's direct registration endpoint needs a full OIDC request with a whitelisted redirect_uri; /login-actions/registration only works mid-login and throws a cookie error when opened cold (54010).
+  registerAccount: `${Config.SSO_LOGIN}/protocol/openid-connect/registrations?client_id=${Config.SSO_CLIENT_ID}&response_type=code&scope=openid&redirect_uri=${encodeURIComponent(SSO_REDIRECT)}`,
+
   // Legal
   privacyPolicy: `${BASE}/legal/mobile-app-privacy-policy`,
   termsConditions: `${BASE}/legal/mobile-app-terms-and-conditions`,

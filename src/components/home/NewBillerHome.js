@@ -9,7 +9,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
-import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails, updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import Config from "react-native-config";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
@@ -18,12 +18,12 @@ import FeatureCard from "../ACPDashboard/FeatureCard";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { GetApiRequest, PostApiReqZendeskToken } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser , storeZendeskData} from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
 import { useOutageStatus } from "../services/hooks/useOutageStatus";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
-import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
+import { storePushNotificationStatus, getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 import MobilePilotLandingPage from "../../components/ACPDashboard/MobilePilotLandingPage";
 import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
@@ -212,43 +212,32 @@ const NewBillerHome = ({ navigation }) => {
 
 
   const enableNotifications = async () => {
+    if (!userInfo?.userName) return;
+    // ask only when no decision was recorded yet (entry wizard or a prior visit owns it otherwise)
+    const stored = await getPushNotificationStatus();
+    if (stored) return;
+
     const enabledPermission = await requestUserPermission();
-    if (enabledPermission) {
-      const token = await getFcmToken();
-      const data = {
-        accountNumber: userInfo?.accountNumber,
-        deviceToken: token,
-        deviceTokenTimestamp: moment().format(),
-        optOut: true,
-        outageOptOut: true,
-        billingOptOutStatus: true,
-        userName: userInfo.userName,
-        isAndroid: Platform.OS == "android",
-      };
-      const localData = {
-        status: "accepted",
-        date: new Date(),
-        permanentSkip: false,
-      };
-      storePushNotificationStatus(localData);
-    } else {
-      const token = await getFcmToken();
-      const dataWithoutPermission = {
-        accountNumber: userInfo.accountNumber,
-        deviceToken: token,
-        deviceTokenTimestamp: moment().format(),
-        optOut: true,
-        outageOptOut: true,
-        billingOptOutStatus: true,
-        userName: userInfo.userName,
-        isAndroid: Platform.OS == "android",
-      };
-      const localData = {
-        status: "skip",
-        date: new Date(),
-        permanentSkip: true,
-      };
-      storePushNotificationStatus(localData);
+    const token = await getFcmToken();
+    // literal flags: true = opting out (permission denied)
+    const data = {
+      accountNumber: userInfo?.accountNumber,
+      deviceToken: token,
+      deviceTokenTimestamp: moment().format(),
+      optOut: !enabledPermission,
+      outageOptOut: !enabledPermission,
+      billingOptOutStatus: !enabledPermission,
+      userName: userInfo.userName,
+      isAndroid: Platform.OS == "android",
+    };
+    const localData = {
+      status: enabledPermission ? "accepted" : "skip",
+      date: new Date(),
+      permanentSkip: !enabledPermission,
+    };
+    storePushNotificationStatus(localData);
+    if (token) {
+      await dispatch(updatePushNotificationsv2(data, null));
     }
   };
 
@@ -308,8 +297,10 @@ const NewBillerHome = ({ navigation }) => {
             mobileApp: "mobileApp",
             jwtId: jwtToken,
             source: "Mobile App",
+            Initiation_Page: "Home Screen",
           };
           setConversationalFields(fields);
+          storeZendeskData(fields);
         }
       },
       (error) => {
@@ -435,7 +426,7 @@ const NewBillerHome = ({ navigation }) => {
             title="Auto Pay"
             isLoading={loadingAutoPay}
             features={["Convenient", "Timely Payments", "Peace of Mind"]}
-            buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
+            buttonText={isAutoPayStatus ? "Active" : "Set Up Auto Pay"}
             buttonVariant={isAutoPayStatus ? "success" : "primary"}
             isActive={isAutoPayStatus}
             onButtonPress={() => {
@@ -467,7 +458,7 @@ const NewBillerHome = ({ navigation }) => {
     >
       {showChatIcon && (
         <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-          <ZendeskChatIcon />
+          <ZendeskChatIcon screenName={'Home Screen'} />
         </View>
       )}
       <View style={{ flex: 1 }}>

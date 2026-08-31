@@ -115,7 +115,7 @@ const MyServicesContent = ({ route }) => {
       <View style={{ paddingTop: insets.top + 27 }}>
         <ServiceHeader />
         <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-      <ZendeskChatIcon />
+      <ZendeskChatIcon  screenName="My Services" />
       </View>
       </View>
 

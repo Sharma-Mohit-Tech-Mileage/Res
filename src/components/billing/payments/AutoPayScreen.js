@@ -10,14 +10,24 @@ import PaymentMethodCard from "./PaymentMethodCard";
 import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { SectionTitle, SectionContent, HintText, FieldTitle, Hyperlink } from "../../common/customui/Typography";
+import AppStyles from "../../../styles/AppStyles";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, ordinal, isMethodExpired, openOrbipaySecureCapture, paymentMethodTitle } from "./paymentsShared";
+import {
+  contentMaxWidth,
+  ordinal,
+  isMethodUnusable,
+  openOrbipaySecureCapture,
+  paymentMethodTitle,
+  surchargeTitle,
+  surchargeMessage,
+  useSurchargeRate,
+} from "./paymentsShared";
 
 const AutoPayScreen = ({ navigation, route }) => {
-  const headerTitle = "Manage Auto Pay";
+  const surchargeRate = useSurchargeRate();
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
   const [selectedId, setSelectedId] = useState("");
@@ -50,14 +60,15 @@ const AutoPayScreen = ({ navigation, route }) => {
 
   const loading = methods === null || autoPay === null;
   const enrolled = !!autoPay?.enrolled;
+  const headerTitle = !loading && !enrolled ? "Set Up Auto Pay" : "Manage Auto Pay";
   const dueDayLabel = ordinal(autoPay?.dueDay || 22);
   const selectedMethod = methods?.find((m) => m.id === selectedId) || null;
   const currentMethod = methods?.find((m) => m.id === autoPay?.paymentMethodId) || null;
-  const isSwitching = enrolled && !!selectedMethod && !isMethodExpired(selectedMethod) && selectedId !== autoPay?.paymentMethodId;
+  const isSwitching = enrolled && !!selectedMethod && !isMethodUnusable(selectedMethod) && selectedId !== autoPay?.paymentMethodId;
   const methodShortName = (m) => `${paymentMethodTitle(m)} ****${m?.lastFour || ""}`;
 
   const canContinue =
-    !!selectedMethod && !isMethodExpired(selectedMethod) && (!enrolled || selectedId !== autoPay?.paymentMethodId);
+    !!selectedMethod && !isMethodUnusable(selectedMethod) && (!enrolled || selectedId !== autoPay?.paymentMethodId);
 
   const onAddMethod = () => openOrbipaySecureCapture(navigation, { headerTitle });
 
@@ -73,7 +84,17 @@ const AutoPayScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[ contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
+        <>
+        <View style={styles.surchargeAlert}>
+          <NotificationAlert
+            type="warning"
+            title={surchargeTitle(surchargeRate)}
+            message={surchargeMessage(surchargeRate)}
+            showCloseIcon={false}
+          />
+        </View>
+        <View style={[AppStyles.card, { margin: 16 , padding: 16 }]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -85,7 +106,7 @@ const AutoPayScreen = ({ navigation, route }) => {
         )}
 
         <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
-          {enrolled ? "Manage auto pay" : "Activate auto pay"}
+          {enrolled ? "Manage auto pay" : "Set up auto pay"}
         </SectionTitle>
         <SectionContent style={styles.introText}>
           {enrolled ? "You have signed up for" : "You are enrolling in"} Sparklight Auto Pay. Your payment will be
@@ -95,7 +116,7 @@ const AutoPayScreen = ({ navigation, route }) => {
 
         <View style={styles.selectRow}>
           <FieldTitle style={styles.selectLabel} accessibilityRole="header" accessibilityLevel={3}>
-            {enrolled ? "Select new payment method." : "Select payment method."}
+            {enrolled ? "Select new payment method" : "Select payment method."}
           </FieldTitle>
           <LinkText
             onPress={onAddMethod}
@@ -104,7 +125,7 @@ const AutoPayScreen = ({ navigation, route }) => {
           >
             <View style={styles.addLinkRow}>
               <Hyperlink style={styles.addLinkText}>Add</Hyperlink>
-              <PlusCircleIcon color={Color.colorMidnightblue} />
+              <PlusCircleIcon color={Color.sparklightPrimaryPurple} />
             </View>
           </LinkText>
         </View>
@@ -133,7 +154,8 @@ const AutoPayScreen = ({ navigation, route }) => {
             ))}
           </View>
         )}
-
+        </View>
+        <View style={{ marginHorizontal: 24 }} >
         {!loading && (
           <>
             {isSwitching && !!currentMethod && (
@@ -144,10 +166,10 @@ const AutoPayScreen = ({ navigation, route }) => {
               />
             )}
             <PrimaryButton
-              title="Continue"
+              title={enrolled ? "Update Auto Pay" : "Continue"}
               buttonType="submit"
               disabled={!canContinue}
-              accessibilityLabel="Continue"
+              accessibilityLabel={enrolled ? "Update Auto Pay" : "Continue"}
               onPress={onContinue}
             />
             {enrolled && (
@@ -160,6 +182,8 @@ const AutoPayScreen = ({ navigation, route }) => {
             )}
           </>
         )}
+        </View>
+        </>
       </ScrollView>
     </View>
   );
@@ -168,8 +192,9 @@ const AutoPayScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
+  surchargeAlert: { marginHorizontal: 16, marginTop: 8, marginBottom: -8 },
   heading: {
-    marginBottom: 8,
+    marginBottom: 24,
   },
   introText: { lineHeight: 20, marginBottom: 20 },
   introBold: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },

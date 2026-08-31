@@ -10,6 +10,7 @@ import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import { fetchAutoPayDetails } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, formatCurrency, parseAmountInput, radioA11yProps } from "./paymentsShared";
+import AppStyles from "../../../styles/AppStyles";
 
 const TYPE_ONE_TIME = "oneTime";
 const TYPE_AUTOMATIC = "automatic";
@@ -87,7 +88,7 @@ const MakePaymentScreen = ({ navigation }) => {
           {selected && <View style={styles.radioInner} />}
         </View>
         <View style={styles.optionTextWrap}>
-          <Text style={styles.optionLabel}>{label}</Text>
+          <Text style={styles.typeLabel}>{label}</Text>
           {!!note && <Text style={styles.optionNote}>{note}</Text>}
         </View>
         {!!amount && <Text style={[styles.optionAmount, amountStyle]}>{amount}</Text>}
@@ -100,10 +101,13 @@ const MakePaymentScreen = ({ navigation }) => {
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
       <ScrollView
-        contentContainerStyle={[styles.content, contentMaxWidth]}
+        contentContainerStyle={[contentMaxWidth, { paddingBottom: 140 }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+
+        <>
+        <View style={[AppStyles.card, { margin: 16 , padding: 16 }]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -213,7 +217,8 @@ const MakePaymentScreen = ({ navigation }) => {
             )}
           </>
         )}
-
+        </View>
+        <View style={{ marginHorizontal: 24 }} >
         {!loading && (
           <>
             <PrimaryButton
@@ -230,6 +235,8 @@ const MakePaymentScreen = ({ navigation }) => {
             />
           </>
         )}
+        </View>
+        </>
       </ScrollView>
     </View>
   );
@@ -239,7 +246,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
   content: { padding: 20, paddingBottom: 140 },
   heading: {
-    marginBottom: 12,
+    marginBottom: 16,
     marginTop: 8,
   },
   requiredMark: { fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "400" },

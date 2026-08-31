@@ -141,14 +141,14 @@ const BillingScreen = ({ navigation }) => {
   }, [accountDetails]);
 
   return (
-    <View style={styles.account} accessibilityLabel="Billing Services screen"accessibilityRole='Header' accessibilityLevel={1}>
+    <View style={styles.account} accessibilityLabel="Billing Services screen" accessibilityRole='header' accessibilityLevel={1}>
       <ProfileSettingsHeader
         title=""
         iconAlignment="right"
         showIcon={false}
       />
       <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-      <ZendeskChatIcon />
+      <ZendeskChatIcon  screenName="Billing" />
       </View>
       <LinearGradient
         style={styles.linearGradientStyle}
@@ -168,7 +168,7 @@ const BillingScreen = ({ navigation }) => {
             <BillingIconWhite isSelected={false} />
           </View>
           <Title style={styles.melissaSmith}
-          accessibilityLabel="Billing Services" accessibilityRole='Header'
+          accessibilityLabel="Billing Services" accessibilityRole='header'
            accessibilityLevel={1} 
            nativeID="Billing Services-header"
            //accessibilityHint="Header"

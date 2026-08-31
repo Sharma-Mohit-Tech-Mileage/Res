@@ -16,7 +16,8 @@ import { announceA11y } from "../../../utils/a11y";
 import { useFeatureFlag } from "../../../contexts/Featureflagscontext";
 import FeatureFlags from "../../../config/Featureflags";
 
-const ORBIPAY_HOSTS = ["billerpayments.com"];
+// hcaptcha.com is the widget's captcha provider; blocking its iframe fails checkout with a captcha error.
+const ORBIPAY_HOSTS = ["billerpayments.com", "hcaptcha.com"];
 
 const isAllowedPaymentUrl = (url) => {
   const match = /^https:\/\/([^/?#:]+)/i.exec(String(url));
@@ -165,10 +166,10 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   const widgetParamsRef = useRef(null);
 
   const hostFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_HOST, Config.ORBIPAY_DEFAULT_HOST || "app");
-  const portalPathFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_PORTAL_PATH, "/orbipayhost.html");
+  const portalPathFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_PORTAL_PATH, Config.ORBIPAY_PORTAL_WIDGET_PATH || "/orbipayhost.html");
   if (hostModeRef.current === null) {
     hostModeRef.current = hostFlag === "portal" ? "portal" : "app";
-    portalUrlRef.current = `${String(Config.PORTAL_BASE_URL || "").replace(/\/+$/, "")}${portalPathFlag || "/orbipayhost.html"}`;
+    portalUrlRef.current = `${String(Config.PORTAL_BASE_URL || "").replace(/\/+$/, "")}${portalPathFlag || Config.ORBIPAY_PORTAL_WIDGET_PATH || "/orbipayhost.html"}`;
   }
   const portalHosted = hostModeRef.current === "portal";
 
@@ -222,10 +223,12 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
         if (mode === "pay") {
           const result = await confirmPaymentToken(token, digiSign, amount, emailParam);
           if (!navigation.isFocused()) return;
+          // The customer is charged amount + surcharge, so the confirmation must report the total.
+          const total = result?.fee != null ? amount + result.fee : amount;
           navigation.replace("PaymentConfirmation", {
             headerTitle,
             kind: "payment-submitted",
-            message: `Your payment for ${formatCurrency(amount)} has been received. It may take up to 24 hours to be reflected on your account.`,
+            message: `Your payment for ${formatCurrency(total)} has been received. It may take up to 24 hours to be reflected on your account.`,
             confirmationNumber: result?.confirmationNumber || "",
             email: emailParam || getPrimaryEmail(accountDetails) || "",
           });

@@ -125,7 +125,7 @@ const Support = ({ route }) => {
         colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
       />
       <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-        <ZendeskChatIcon />
+        <ZendeskChatIcon  screenName="Support" />
       </View>
       <View style={[styles.mainContainer]}>
         <View style={[styles.containerFlexBox]}>

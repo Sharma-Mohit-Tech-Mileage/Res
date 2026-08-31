@@ -10,7 +10,14 @@
     "env:production": "react-native-config .env.production",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --ci --coverage --watchAll=false --reporters=default --reporters=jest-junit",
+    "appium:server": "npx --no-install appium --base-path /wd/hub",
+    "appium:setup:android": "npm_config_legacy_peer_deps=true npx --no-install appium driver install uiautomator2",
+    "appium:setup:ios": "npm_config_legacy_peer_deps=true npx --no-install appium driver install xcuitest@7",
+    "appium:smoke": "node e2e/appium/smoke.test.js",
+    "appium:smoke:android": "PLATFORM=Android npm run appium:smoke",
+    "appium:smoke:ios": "PLATFORM=iOS npm run appium:smoke"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
@@ -19,11 +26,11 @@
     "@react-native-community/checkbox": "^0.5.16",
     "@react-native-community/netinfo": "^11.3.0",
     "@react-native-cookies/cookies": "^6.2.1",
-    "@react-native-firebase/analytics": "^21.2.0",
-    "@react-native-firebase/app": "^21.2.0",
-    "@react-native-firebase/crashlytics": "^21.2.0",
-    "@react-native-firebase/messaging": "^21.2.0",
-    "@react-native-firebase/remote-config": "^21.2.0",
+    "@react-native-firebase/analytics": "^22.4.0",
+    "@react-native-firebase/app": "^22.4.0",
+    "@react-native-firebase/crashlytics": "^22.4.0",
+    "@react-native-firebase/messaging": "^22.4.0",
+    "@react-native-firebase/remote-config": "^22.4.0",
     "@react-native-masked-view/masked-view": "^0.3.2",
     "@react-navigation/bottom-tabs": "^6.5.9",
     "@react-navigation/native": "^6.1.17",
@@ -92,6 +99,7 @@
     "@tsconfig/react-native": "^3.0.0",
     "@types/react": "^18.2.6",
     "@types/react-test-renderer": "^18.0.0",
+    "appium": "^2.19.0",
     "babel-jest": "^29.6.3",
     "babel-plugin-module-resolver": "^5.0.0",
     "eslint": "^8.19.0",
@@ -101,7 +109,8 @@
     "metro-react-native-babel-preset": "^0.76.8",
     "prettier": "^2.8.8",
     "react-test-renderer": "18.3.1",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "webdriverio": "^9.19.2"
   },
   "engines": {
     "node": ">=18"

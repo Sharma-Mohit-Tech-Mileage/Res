@@ -15,7 +15,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { setAuthCookiesOnAllDomains, clearAuthCookies } from './NativeCookieManager';
 import { logError } from '../../utils/logger';
 import { getPrimaryEmail } from './constant';
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import CryptoJS from 'crypto-js';
 
 const TAG = '[ArticalWindow]';
@@ -528,7 +528,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
 
     useEffect(() => {
         if (!name) return;
-        analytics().logEvent('screen_view', {
+        logEvent(getAnalytics(), 'screen_view', {
             screen_name: name,
             screen_class: injectPaymentObj ? 'BillingFlow' : 'ArticleView',
         }).catch(() => {});

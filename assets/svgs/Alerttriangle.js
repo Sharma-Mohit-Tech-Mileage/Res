@@ -5,11 +5,12 @@ const Alerttriangle= (props) => (
     xmlns="http://www.w3.org/2000/svg"
     width={23}
     height={23}
+    viewBox="0 0 24 24"
     fill="none"
     {...props}
   >
     <Path
-      stroke="#EF4E3E"
+      stroke={props.color || "#F88700"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

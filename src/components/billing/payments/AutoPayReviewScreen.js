@@ -6,10 +6,11 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import SparkLightInput from "../../common/customui/SparkLightInput";
+import LinkText from "../../common/customui/LinkText";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
-import { FontFamily } from "../../../../GlobalStyles";
-import { SectionTitle, SectionContent, HintText, FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { FontFamily,Color,FontSize } from "../../../../GlobalStyles";
+import { SectionTitle, HintText, SectionContent, FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
 import {
   fetchPaymentMethods,
@@ -23,6 +24,12 @@ import {
   describePaymentMethod,
   paymentMethodA11yLabel,
   formatCurrency,
+  isCreditCard,
+  surchargeBreakdownLabel,
+  surchargeTitle,
+  surchargeMessage,
+  useSurchargeRate,
+  useSurchargeFee,
 } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 
@@ -67,6 +74,15 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
   const dueDayLabel = ordinal(details?.dueDay || 22);
 
   const amountDue = Number(details?.pastDueAmount) || 0;
+  const surchargeRate = useSurchargeRate();
+  const showBalanceAlert = !loading && amountDue > 0;
+  const showSurchargeNotice = !loading && isCreditCard(method) && !showBalanceAlert;
+
+  const onFeeError = () =>
+    setErrorAlert("We could not calculate the credit card surcharge. Please try again.");
+  const balanceSurcharge = useSurchargeFee(amountDue, method, { onError: onFeeError });
+  const showBalanceSurcharge = balanceSurcharge != null;
+  const totalBalance = showBalanceSurcharge ? amountDue + balanceSurcharge : amountDue;
 
   const onSubmit = async () => {
     if (inFlightRef.current || !agreed) return;
@@ -124,24 +140,16 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
         <SectionTitle style={styles.heading} accessibilityRole="header" accessibilityLevel={2}>
           Review Auto Pay
         </SectionTitle>
-        <SectionContent style={styles.introText}>
-          {mode === "update" ? "You have signed up for" : "You are enrolling in"} Sparklight Auto Pay. Your payment
-          will be automatically charged on the <Text style={styles.introBold}>{dueDayLabel}</Text> of each month using
-          your selected payment method.
+        <SectionContent style={styles.instructions}>
+          {mode === "update"
+            ? "You have signed up for Sparklight Auto Pay."
+            : "You are enrolling in Sparklight Auto Pay."}
+        </SectionContent>
+        <SectionContent style={styles.instructions}>
+          Your payment will be automatically charged on the <Text style={styles.introBold}>{dueDayLabel}</Text> of each month using your selected payment method.
         </SectionContent>
 
         <>
-            {!loading && amountDue > 0 && (
-              <NotificationAlert
-                type="warning"
-                title="Your Balance Needs Attention"
-                message={`Your balance of ${formatCurrency(
-                  amountDue
-                )} won't be processed by Auto Pay before the due date. You can pay it after finishing this setup.`}
-                showCloseIcon={false}
-              />
-            )}
-
             <View style={[card.elevated, styles.summaryCard]}>
               <View
                 style={styles.fieldGroup}
@@ -154,11 +162,13 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                     <View style={styles.valueSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  <FieldContent style={styles.fieldValue}>{describePaymentMethod(method)}</FieldContent>
+                  <View style={styles.fieldValueBox}>
+                    <FieldContent style={styles.fieldValue}>{describePaymentMethod(method)}</FieldContent>
+                  </View>
                 )}
               </View>
               <View
-                style={[styles.fieldGroup, styles.fieldGroupLast]}
+                style={[styles.fieldGroup, !showBalanceAlert && !showSurchargeNotice && styles.fieldGroupLast]}
                 accessible={!loading}
                 accessibilityLabel={loading ? undefined : `Payment Date, on the ${dueDayLabel} of each month`}
               >
@@ -168,9 +178,66 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                     <View style={styles.valueSkeleton} />
                   </SkeletonPlaceholder>
                 ) : (
-                  <FieldContent style={styles.fieldValue}>On the {dueDayLabel} of each month</FieldContent>
+                  <View style={styles.fieldValueBox}>
+                    <FieldContent style={styles.fieldValue}>On the {dueDayLabel} of each month</FieldContent>
+                  </View>
                 )}
               </View>
+
+              {showBalanceAlert && (
+                <View style={styles.inCardAlert}>
+                  <NotificationAlert
+                    type="warning"
+                    title="Your Balance Needs Attention"
+                    message={`Your balance of ${formatCurrency(
+                      amountDue
+                    )} won't be processed by Auto Pay before the due date. You can pay it after finishing this setup.`}
+                    showCloseIcon={false}
+                  >
+                    {showBalanceSurcharge && (
+                      <View style={styles.breakdown}>
+                        <View style={styles.breakdownDivider} />
+                        <View
+                          style={styles.breakdownRow}
+                          accessible
+                          accessibilityLabel={`Current unpaid balance, ${formatCurrency(amountDue)}`}
+                        >
+                          <Text style={styles.breakdownText}>Current unpaid balance:</Text>
+                          <Text style={styles.breakdownText}>{formatCurrency(amountDue)}</Text>
+                        </View>
+                        <View
+                          style={styles.breakdownRow}
+                          accessible
+                          accessibilityLabel={`Credit card surcharge, ${formatCurrency(balanceSurcharge)}`}
+                        >
+                          <Text style={styles.breakdownText}>{surchargeBreakdownLabel(surchargeRate)}</Text>
+                          <Text style={styles.breakdownText}>{formatCurrency(balanceSurcharge)}</Text>
+                        </View>
+                        <View style={styles.breakdownDivider} />
+                        <View
+                          style={styles.breakdownRow}
+                          accessible
+                          accessibilityLabel={`Total balance, ${formatCurrency(totalBalance)}`}
+                        >
+                          <Text style={styles.breakdownText}>Total balance:</Text>
+                          <Text style={styles.breakdownText}>{formatCurrency(totalBalance)}</Text>
+                        </View>
+                      </View>
+                    )}
+                  </NotificationAlert>
+                </View>
+              )}
+
+              {showSurchargeNotice && (
+                <View style={styles.inCardAlert}>
+                  <NotificationAlert
+                    type="warning"
+                    title={surchargeTitle(surchargeRate)}
+                    message={surchargeMessage(surchargeRate)}
+                    showCloseIcon={false}
+                  />
+                </View>
+              )}
             </View>
 
             <View style={[card.elevated, styles.emailCard]}>
@@ -179,7 +246,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                   <View style={styles.labelSkeleton} />
                   <View style={styles.inputSkeleton} />
                 </SkeletonPlaceholder>
-              ) : (
+                ) : (
                 <SparkLightInput
                   ref={emailRef}
                   name="email"
@@ -201,13 +268,13 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
             <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
 
             <PrimaryButton
-              title={submitting ? "Saving..." : mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"}
+              title={submitting ? "Saving..." : mode === "update" ? "Update Auto Pay" : "Set Up Auto Pay"}
               buttonType="submit"
               disabled={submitting || !agreed || loading}
-              accessibilityLabel={mode === "update" ? "Update Auto Pay" : "Activate Auto Pay"}
+              accessibilityLabel={mode === "update" ? "Update Auto Pay" : "Set Up Auto Pay"}
               onPress={onSubmit}
             />
-            <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
+            <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
         </>
       </ScrollView>
 
@@ -221,19 +288,41 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 140 },
   heading: {
     marginBottom: 8,
+    lineHeight: 50,
   },
   introText: { lineHeight: 20, marginBottom: 16 },
-  introBold: { fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "700" },
+  instructions: { marginBottom: 0 },
+  introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
   cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
   valueSkeleton: { height: 18, borderRadius: 4, width: "60%" },
   labelSkeleton: { height: 14, borderRadius: 4, width: "45%", marginBottom: 10 },
   inputSkeleton: { height: 44, borderRadius: 6, width: "100%" },
-  summaryCard: { padding: 16, marginTop: 8 },
+  summaryCard: { padding: 16, marginTop: 10, },
   fieldGroup: { marginBottom: 16 },
-  fieldGroupLast: { marginBottom: 0 },
-  fieldLabel: { marginBottom: 2 },
-  fieldValue: {marginTop: 0},
-  emailCard: { padding: 16 },
+  fieldGroupLast: { paddingBottom: 4 },
+  fieldLabel: {
+     textAlign: "left",
+     lineHeight: 28, },
+  fieldValue: {
+    fontSize: FontSize.size_base,
+    textAlign: "left",
+    fontWeight: "400",
+    color: Color.sparklightGray1,
+    fontFamily: FontFamily.RadioCanadaRegular,
+  },
+  fieldValueBox: {   },
+  emailCard: { padding: 16 ,marginTop: 16, marginBottom: 16 },
+  // Cancels the alert's own marginVertical so it sits on the card's 16pt rhythm.
+  inCardAlert: { marginTop: -8, marginBottom: -8 },
+  breakdown: { marginTop: 4 },
+  breakdownDivider: { height: 1, backgroundColor: "rgba(0, 0, 0, 0.12)", marginVertical: 8 },
+  breakdownRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 2 },
+  breakdownText: {
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
+    fontWeight: "700",
+    color: "#000000",
+  },
 });
 
 export default AutoPayReviewScreen;
