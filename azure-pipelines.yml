@@ -28,7 +28,7 @@ variables:
   - name: jarsignerKeyPassword
     value: sparklight_123
   - name: androidVersionCode
-    value: $[counter(format('androidBuildVersionStore-{0}', variables['Build.SourceBranchName']), 525)]  # Per-branch counter so Dev increments by +1 per Dev build only
+    value: $[counter('androidBuildVersionStore-v2', 530)]  # New global counter seeded above the last version code (517) already used on Play Store
   - name: androidVersionName
     value: '29.0.1'  # Dynamic version from project.VERSION_NAME
   - name: deploymentEnvironment
@@ -61,7 +61,7 @@ variables:
   - name: IOS_REQUIRED_XCODE_MAJOR
     value: '26'
   - name: iosBuildNumber
-    value: $[counter(format('iosBuildNumberStore-{0}', variables['Build.SourceBranchName']), 131)]  # Per-branch counter so Dev increments by +1 per Dev build only
+    value: $[counter('iosBuildNumberStore-v2', 160)]  # New global counter seeded above the last bundle version (149) already used on TestFlight
   # Email notification variables
   # Set NOTIFICATION_EMAILS as a comma-separated list of recipient addresses.
   # Set SMTP_SERVER, SMTP_USERNAME, and SMTP_PASSWORD as secret pipeline variables
