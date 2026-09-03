@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { View, StyleSheet, Text, Linking, Platform, Animated, Easing, Dimensions, } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -58,6 +59,7 @@ const ANIMATION_CONFIG = {
 };
 
 const SplashScreen = ({ navigation, route }) => {
+  const insets = useSafeAreaInsets();
   const { isLogout } = route?.params?.isLogout ? route.params : { isLogout: false };
 
   const dispatch = useDispatch();
@@ -780,7 +782,7 @@ const SplashScreen = ({ navigation, route }) => {
       )}
 
       <Text 
-      style={getStyle("copyright")}>
+      style={[getStyle("copyright"), { bottom: insets.bottom + 24 }]}>
         {`©${moment().year()} Cable One, Inc. All rights reserved.`}
       </Text>
 
@@ -875,7 +877,8 @@ const styles = StyleSheet.create({
   },
   copyright: {
     position: "absolute",
-    bottom: hp("12%"),
+    // bottom comes from the safe-area inset at runtime; a % of screen height ignores
+    // the Android navigation bar and let this text sit underneath it.
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     textAlign: "center",

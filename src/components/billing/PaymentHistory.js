@@ -247,13 +247,25 @@ const PaymentHistoryScreen = ({ navigation }) => {
               accessibilityLabel="Search by Confirmation ID, text field, double tap to edit">
             <TextInput
               style={styles.searchInput}
-              placeholder="Search by Confirmation ID"
               value={searchQuery}
               onChangeText={handleSearchChange}
-              placeholderTextColor={Color.sparklightGray1}
               accessible={false}
               importantForAccessibility="no"
             />
+            {/* A TextInput's native placeholder cannot shrink to fit, so render the hint
+                as Text and let it scale down instead of truncating. */}
+            {!searchQuery ? (
+              <Text
+                style={styles.searchPlaceholder}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.75}
+                pointerEvents="none"
+                importantForAccessibility="no-hide-descendants"
+              >
+                Search by Confirmation ID
+              </Text>
+            ) : null}
             </View>
           </View>
           
@@ -338,7 +350,7 @@ const styles = StyleSheet.create({
     gap: 10, // Add some gap between the elements
   },
   searchContainer: {
-    width: "65%", // Increased width from 48% to 65%
+    width: "65%",
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Color.sparklightWhite,
@@ -354,6 +366,14 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginRight: 8,
+  },
+  searchPlaceholder: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: FontSize.size_base,
+    color: Color.sparklightGray1,
   },
   searchInput: {
     flex: 1,
