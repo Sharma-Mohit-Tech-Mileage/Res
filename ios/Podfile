@@ -93,5 +93,30 @@ target 'My Sparklight' do
       # :ccache_enabled => true
     )
     #__apply_Xcode_12_5_M1_post_install_workaround(installer)
+
+    # fmt 11.0.2 trips "call to consteval function is not a constant expression" under
+    # Apple Clang (Xcode 16+). Upstream disables consteval for older Apple compilers but
+    # not this case. Pods/ is gitignored, so patching base.h by hand survives only on the
+    # machine that did it - CI and clean checkouts fail. Re-apply it here, idempotently.
+    fmt_base = File.join(installer.sandbox.root, 'fmt', 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base)
+      src = File.read(fmt_base)
+      marker = 'FMT_APPLE_CONSTEVAL_WORKAROUND'
+      unless src.include?(marker)
+        guard = "#if !defined(__cpp_lib_is_constant_evaluated)\n#  define FMT_USE_CONSTEVAL 0"
+        if src.include?(guard)
+          src = src.sub(guard,
+            "// #{marker}: Apple Clang rejects fmt's consteval usage.\n" \
+            "#if defined(__APPLE__)\n#  define FMT_USE_CONSTEVAL 0\n" \
+            "#elif !defined(__cpp_lib_is_constant_evaluated)\n#  define FMT_USE_CONSTEVAL 0")
+          # CocoaPods installs Pods sources read-only, so make it writable first.
+          File.chmod(0644, fmt_base)
+          File.write(fmt_base, src)
+          Pod::UI.puts '[patch] fmt: consteval disabled for Apple Clang'
+        else
+          Pod::UI.warn '[patch] fmt: guard not found - base.h changed upstream, re-check this patch'
+        end
+      end
+    end
   end
 end
