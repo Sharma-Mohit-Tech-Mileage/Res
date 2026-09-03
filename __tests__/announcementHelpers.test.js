@@ -1,11 +1,11 @@
 const mockLogEvent = jest.fn();
 const mockOpenURL = jest.fn();
+const mockAnalyticsInstance = { app: 'mock-analytics' };
 
-jest.mock('@react-native-firebase/analytics', () => {
-  return () => ({
-    logEvent: mockLogEvent,
-  });
-});
+jest.mock('@react-native-firebase/analytics', () => ({
+  getAnalytics: jest.fn(() => mockAnalyticsInstance),
+  logEvent: (...args) => mockLogEvent(...args),
+}));
 
 jest.mock('react-native', () => ({
   Linking: {
@@ -115,6 +115,7 @@ describe('announcementHelpers', () => {
 
     expect(mockLogEvent).toHaveBeenCalledTimes(1);
     expect(mockLogEvent).toHaveBeenCalledWith(
+      mockAnalyticsInstance,
       'feature_announcement_impression',
       expect.objectContaining({
         campaign_id: 'camp-1',
@@ -129,14 +130,17 @@ describe('announcementHelpers', () => {
     await trackAnnouncementDismissal('camp-1', 3);
 
     expect(mockLogEvent).toHaveBeenCalledWith(
+      mockAnalyticsInstance,
       'feature_announcement_step_viewed',
       expect.objectContaining({ campaign_id: 'camp-1', step_number: 2, step_title: 'Step 2' }),
     );
     expect(mockLogEvent).toHaveBeenCalledWith(
+      mockAnalyticsInstance,
       'feature_announcement_completed',
       expect.objectContaining({ campaign_id: 'camp-1', total_steps: 4, time_spent_seconds: 35 }),
     );
     expect(mockLogEvent).toHaveBeenCalledWith(
+      mockAnalyticsInstance,
       'feature_announcement_dismissed',
       expect.objectContaining({ campaign_id: 'camp-1', dismissed_at_step: 3 }),
     );

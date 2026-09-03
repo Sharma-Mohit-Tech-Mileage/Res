@@ -4,7 +4,7 @@ import Touchable from "../../common/customui/Touchable";
 import { FieldTitle, Hyperlink } from "../../common/customui/Typography";
 import PaymentBrandIcon from "../../common/PaymentBrandIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { paymentMethodA11yLabel, paymentMethodTitle, maskedDigits, isMethodExpired, radioA11yProps } from "./paymentsShared";
+import { paymentMethodA11yLabel, paymentMethodTitle, maskedDigits, isMethodExpired, isMethodInactive, radioA11yProps } from "./paymentsShared";
 
 const PaymentMethodCard = ({
   method,
@@ -20,14 +20,17 @@ const PaymentMethodCard = ({
   positionLabel = "",
 }) => {
   const expired = isMethodExpired(method);
+  const inactive = isMethodInactive(method);
+  const unusable = expired || inactive;
 
-  const showEdit = !!onEdit && !expired;
-  const showDelete = !!onDelete && !showAutoPayBadge;
+  const showEdit = !!onEdit;
+  // An inactive method cannot be deleted; the Inactive badge takes the Delete slot instead.
+  const showDelete = !!onDelete && !showAutoPayBadge && !inactive;
   const cardTypeLabel = method?.cardType === "credit" ? "Credit" : method?.cardType === "debit" ? "Debit" : "";
 
   const infoA11yLabel = `${paymentMethodA11yLabel(method)}${cardTypeLabel ? `, ${cardTypeLabel.toLowerCase()}` : ""}${showAutoPayBadge ? ", current Auto Pay method" : ""}${showNewAutoPayBadge ? ", selected as new Auto Pay method" : ""}${
     expired ? ", expired" : ""
-  }${method?.expiry ? `, expires ${method.expiry}` : ""}`;
+  }${inactive && !expired ? ", inactive" : ""}${method?.expiry ? `, expires ${method.expiry}` : ""}`;
 
   const topContent = (
     <>
@@ -38,18 +41,18 @@ const PaymentMethodCard = ({
               {selected && <View style={styles.radioInner} />}
             </View>
           )}
-          <FieldTitle style={[styles.titleText, expired && styles.textDisabled]}>{paymentMethodTitle(method)}</FieldTitle>
+          <FieldTitle style={[styles.titleText, unusable && styles.textDisabled]}>{paymentMethodTitle(method)}</FieldTitle>
         </View>
         <View style={styles.brandWrap} accessible={false} importantForAccessibility="no-hide-descendants">
           <PaymentBrandIcon type={method?.type} brand={method?.brand} height={22} />
           {!!cardTypeLabel && <Text style={styles.cardTypeCaption}>{cardTypeLabel}</Text>}
         </View>
       </View>
-      <Text style={[styles.digitsText, expired && styles.textDisabled]}>{maskedDigits(method)}</Text>
+      <Text style={[styles.digitsText, unusable && styles.textDisabled]}>{maskedDigits(method)}</Text>
     </>
   );
 
-  const hasActions = showEdit || showDelete || showAutoPayBadge || showNewAutoPayBadge || expired || !!method?.expiry;
+  const hasActions = showEdit || showDelete || showAutoPayBadge || showNewAutoPayBadge || unusable || !!method?.expiry;
   const actionsRow = hasActions ? (
     <View style={styles.bottomRow}>
       <View style={styles.actionsWrap}>
@@ -59,12 +62,13 @@ const PaymentMethodCard = ({
             disabled={disabled}
             accessibilityRole="link"
             accessibilityLabel={`Edit ${paymentMethodA11yLabel(method)}`}
+            minSize={0}
             style={styles.actionLink}
           >
             <Hyperlink style={styles.actionText}>Edit</Hyperlink>
           </Touchable>
         )}
-        {showEdit && (showDelete || showAutoPayBadge) && (
+        {showEdit && (showDelete || showAutoPayBadge || (inactive && !expired)) && (
           <Text style={styles.actionDivider} accessible={false} importantForAccessibility="no">
             |
           </Text>
@@ -75,6 +79,7 @@ const PaymentMethodCard = ({
             disabled={disabled}
             accessibilityRole="link"
             accessibilityLabel={`Delete ${paymentMethodA11yLabel(method)}`}
+            minSize={0}
             style={styles.actionLink}
           >
             <Hyperlink style={styles.actionText}>Delete</Hyperlink>
@@ -95,6 +100,11 @@ const PaymentMethodCard = ({
             Expired
           </Text>
         )}
+        {inactive && !expired && (
+          <Text style={styles.inactiveBadge} accessible={false} importantForAccessibility="no">
+            Inactive
+          </Text>
+        )}
       </View>
       {!!method?.expiry && (
         <Text style={styles.expiryText} accessible={false} importantForAccessibility="no">
@@ -109,13 +119,13 @@ const PaymentMethodCard = ({
       <View style={[styles.card, selected && styles.cardSelected]}>
         <Touchable
           onPress={onPress}
-          disabled={disabled || expired}
+          disabled={disabled || unusable}
           {...radioA11yProps(
-            `${infoA11yLabel}${expired ? ", not eligible" : ""}${positionLabel ? `, ${positionLabel}` : ""}`,
+            `${infoA11yLabel}${unusable ? ", not eligible" : ""}${positionLabel ? `, ${positionLabel}` : ""}`,
             selected
           )}
-          accessibilityState={{ checked: selected, disabled: disabled || expired }}
-          style={[styles.radioPress, expired && styles.contentDisabled]}
+          accessibilityState={{ checked: selected, disabled: disabled || unusable }}
+          style={[styles.radioPress, unusable && styles.contentDisabled]}
         >
           {topContent}
         </Touchable>
@@ -126,7 +136,7 @@ const PaymentMethodCard = ({
 
   return (
     <View style={styles.card}>
-      <View accessible accessibilityLabel={infoA11yLabel} style={expired && styles.contentDisabled}>
+      <View accessible accessibilityLabel={infoA11yLabel} style={unusable && styles.contentDisabled}>
         {topContent}
       </View>
       {actionsRow}
@@ -196,9 +206,9 @@ const styles = StyleSheet.create({
     minHeight: 24,
   },
   actionsWrap: { flexDirection: "row", alignItems: "center" },
-  actionLink: { paddingVertical: 4, paddingHorizontal: 4 },
+  actionLink: { paddingVertical: 4, paddingHorizontal: 4, minHeight: 48, justifyContent: "center" },
   actionText: {},
-  actionDivider: { color: "#98A2B3", marginHorizontal: 4 },
+  actionDivider: { color: "#98A2B3", marginHorizontal: 4, fontSize: FontSize.size_base, lineHeight: 20 },
   newAutoPayBadge: {
     backgroundColor: "#E9F8EE",
     color: "#1D7832",
@@ -208,6 +218,17 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
     backgroundColor: "#C8E9D0",
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginLeft: 4,
+    overflow: "hidden",
+  },
+  inactiveBadge: {
+    fontSize: FontSize.size_xs,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
+    color: "#B54708",
+    backgroundColor: "#FFFAEB",
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,
