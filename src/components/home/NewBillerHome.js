@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, ScrollView, Platform, } from "react-native";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { View, StyleSheet, Platform } from "react-native";
+import { wp } from "../../utils/responsive";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -34,6 +34,7 @@ import { loginWithJWT, setConversationalFields, } from "../utility/RNZendeskChat
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import AppStyles from "../../styles/AppStyles";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
@@ -470,7 +471,7 @@ const NewBillerHome = ({ navigation }) => {
           accessibilityElementsHidden={isWalkthroughActive}
         >
           {renderHeader()}
-          <ScrollView style={styles.scrollContainer}>
+          <ScreenScroll style={styles.scrollContainer}>
             <View
               style={styles.mainContentContainer}
               importantForAccessibility={
@@ -508,7 +509,7 @@ const NewBillerHome = ({ navigation }) => {
                 </View>
               </View>
             )}
-          </ScrollView>
+          </ScreenScroll>
         </SafeAreaView>
       </View>
     </LinearGradient>
@@ -547,7 +548,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    width: wp("92%"),
+    width: "92%",
   },
   shadowProp: {
     shadowColor: "#171717",
@@ -575,7 +576,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   alertWrapper: {
-    width: wp("92%"),
+    width: "92%",
   },
 });
 

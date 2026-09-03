@@ -12,6 +12,7 @@ import { FontFamily } from "../../../GlobalStyles";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
 
 import logo from "../../../assets/sparklightlogo-01.png";
+import ModalCard from "./customui/ModalCard";
 import ModalOverlay from "./customui/ModalOverlay";
 
 const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
@@ -30,7 +31,7 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
       onRequestClose={onLogin}
     >
       <ModalOverlay>
-        <View style={styles.alertContainer}>
+        <ModalCard style={styles.alertContainer}>
           <View style={{ flexDirection: "column" }}>
             <Image
               source={logo}
@@ -68,7 +69,7 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
           >
             <Text style={styles.closeAlertTxt}>Close</Text>
           </Touchable>
-        </View>
+        </ModalCard>
       </ModalOverlay>
     </Modal>
   );

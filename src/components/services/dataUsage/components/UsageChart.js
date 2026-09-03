@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, Dimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
 import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
 import { G, Rect, Text as SvgText, Path, Line } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
@@ -12,7 +12,6 @@ import Touchable from "../../../common/customui/Touchable";
 import AppStyles from "../../../../styles/AppStyles";
 import {SectionTitle} from "../../../common/customui/Typography";
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const CHART_HEIGHT = 205;
 const X_LABEL_HEIGHT = 34;
@@ -122,6 +121,7 @@ const UsageChart = ({
   const [showList, setShowList] = useState(false);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const [isViewTransitioning, setIsViewTransitioning] = useState(false);
+  const { width: windowWidth } = useWindowDimensions();
 
 
   const handleToggleView = useCallback(() => {
@@ -237,7 +237,7 @@ const UsageChart = ({
   }, [chartData]);
 
   const { contentWidth, dynamicSpacing } = useMemo(() => {
-    const availableWidth = SCREEN_WIDTH - 80;
+    const availableWidth = windowWidth - 80;
     const totalBarsWidth = chartData.length * BAR_WIDTH;
     const totalSpacingNeeded = (chartData.length + 1) * MIN_SPACING;
     const minWidth = totalBarsWidth + totalSpacingNeeded;
@@ -246,7 +246,7 @@ const UsageChart = ({
     const spacing = (finalWidth - totalBarsWidth) / (chartData.length + 1);
 
     return { contentWidth: finalWidth, dynamicSpacing: spacing };
-  }, [chartData.length]);
+  }, [chartData.length, windowWidth]);
 
   const formatLabels = useCallback(
     (item) => {

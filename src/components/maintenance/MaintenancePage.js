@@ -7,10 +7,7 @@ import {
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { wp, hp } from "../../utils/responsive";
 import moment from "moment";
 import { navigationRef } from "../../navigations/UserNavigations";
 import Icon from "../common/Icon";

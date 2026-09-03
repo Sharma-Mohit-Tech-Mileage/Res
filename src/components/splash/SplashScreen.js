@@ -8,7 +8,7 @@ import { saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/RestApiClient";
 import { getEndpoint ,ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import { LAYOUT, getVerticalSizeTier, wp, hp } from "../../utils/responsive";
 import { FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import VersionCheck from "react-native-version-check";
@@ -42,13 +42,8 @@ const config = {
 const ANIMATION_DURATION = 2000;
 const SESSION_CHECK_TIMEOUT = 10000;
 
-const getDeviceSize = () => {
-  const screenHeight = Dimensions.get("window").height;
-  if (screenHeight < 550) return "tiny";
-  if (screenHeight < 600) return "verySmall";
-  if (screenHeight < 700) return "small";
-  return "normal";
-};
+// The tier table lives in utils/responsive so screens never redefine their own breakpoints.
+const getDeviceSize = () => getVerticalSizeTier(Dimensions.get("window").height);
 
 const ANIMATION_CONFIG = {
   tiny: { logoStart: 200 },
@@ -863,7 +858,7 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     marginTop: hp("25%"),
     paddingHorizontal: wp("10%"),
-    maxWidth: 480,
+    maxWidth: LAYOUT.modalMaxWidth,
     width: "100%",
     alignSelf: "center",
   },

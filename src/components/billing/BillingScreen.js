@@ -1,10 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
@@ -30,16 +25,14 @@ import moment from "moment";
 import Icon from "../common/Icon";
 import colors from "../../res/Colors";
 import { card } from "../../styles/utilities";
-import {
-  widthPercentageToDP,
-  heightPercentageToDP,
-} from "react-native-responsive-screen";
+import { hp as heightPercentageToDP } from "../../utils/responsive";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import AppStyles from "../../styles/AppStyles";
 import { SectionTitle,Title,MenuText } from "../common/customui/Typography";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -176,7 +169,7 @@ const BillingScreen = ({ navigation }) => {
           Billing Services</Title>
         </View>
 
-        <ScrollView
+        <ScreenScroll
           showsVerticalScrollIndicator={false}
           
         >
@@ -329,7 +322,7 @@ const BillingScreen = ({ navigation }) => {
               </>
             )}
           </View>
-        </ScrollView>
+        </ScreenScroll>
       </View>
     </View>
   );

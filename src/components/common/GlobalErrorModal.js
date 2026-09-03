@@ -11,6 +11,7 @@ import { FontFamily } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import Touchable from "./customui/Touchable";
 import PrimaryButton from "./customui/PrimaryButton";
+import ModalCard from "./customui/ModalCard";
 import ModalOverlay from "./customui/ModalOverlay";
 
 
@@ -56,7 +57,7 @@ export const GlobalErrorModal = () => {
       onRequestClose={() => globalErrorManager.hide()}
     >
       <ModalOverlay>
-        <View style={styles.alertContainer}>
+        <ModalCard style={styles.alertContainer}>
           <View style={styles.iconWrapper}>
             <AlertIcon />
           </View>
@@ -92,7 +93,7 @@ export const GlobalErrorModal = () => {
             style={[ { marginTop: 24 }]}
             accessibilityHint="Double tap to close the error modal"
           />
-        </View>
+        </ModalCard>
       </ModalOverlay>
     </Modal>
   );

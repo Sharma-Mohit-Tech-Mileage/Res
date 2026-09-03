@@ -5,6 +5,8 @@ import { A11Y } from "../../../styles/theme";
 import Touchable from "../../common/customui/Touchable";
 import { setFocusToRef } from "../../../utils/a11y";
 import {SectionTitle,SectionContent,Hyperlink} from "../../common/customui/Typography";
+import ModalCard from "../../common/customui/ModalCard";
+import { LAYOUT } from "../../../utils/responsive";
 
 const ConfirmActionModal = ({
   visible,
@@ -31,7 +33,7 @@ const ConfirmActionModal = ({
           accessibilityRole="button"
           accessibilityLabel={`Dismiss, ${cancelLabel}`}
         />
-        <View style={styles.sheet} accessibilityViewIsModal importantForAccessibility="yes">
+        <ModalCard style={styles.sheet} accessibilityViewIsModal importantForAccessibility="yes" maxWidth={LAYOUT.maxContentWidth}>
           <SectionTitle ref={titleRef} style={styles.title} accessibilityRole="header" accessibilityLevel={2}>
             {title}
           </SectionTitle>
@@ -46,7 +48,7 @@ const ConfirmActionModal = ({
           <Touchable style={styles.cancelButton} onPress={onCancel} accessibilityLabel={cancelLabel}>
             <Hyperlink >{cancelLabel}</Hyperlink>
           </Touchable>
-        </View>
+        </ModalCard>
       </View>
     </Modal>
   );

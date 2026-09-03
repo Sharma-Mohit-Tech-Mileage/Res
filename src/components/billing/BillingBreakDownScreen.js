@@ -1,11 +1,5 @@
 import React, { useEffect, useState, useCallback, memo } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, Text, View, FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Touchable from "../common/customui/Touchable";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +14,7 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { Hyperlink } from "../common/customui/Typography";
 import moment from "moment";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { hp, wp } from "../../utils/responsive";
 import {card} from '../../styles/utilities'
 import { PostApiRequest } from "../../network/RestApiClient";
 import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
@@ -38,6 +32,7 @@ import SecondaryButton from "../common/customui/PrimaryButton";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../styles/AppStyles";
+import { ScreenScroll } from "../common/customui/Screen";
 
 
 // Constants
@@ -500,7 +495,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         <View
           style={[AppStyles.card, styles.cardContainer, { marginBottom: 32 }]}
         >
-          <ScrollView
+          <ScreenScroll
             contentContainerStyle={{ paddingBottom: 24 }}
             showsVerticalScrollIndicator={false}
           >
@@ -521,7 +516,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
             </View>
             {/* Main content */}
             {renderContent()}
-          </ScrollView>
+          </ScreenScroll>
         </View>
       )}
     </View>
@@ -719,20 +714,18 @@ const styles = StyleSheet.create({
     height: 56,
   },
   makeTypo: {
-    width: 282,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     textAlign: "center",
   },
   makePayment: {
     color: Color.sparklightWhite,
-    width: 282,
   },
   buttons1: {
     marginTop: Padding.p_base,
     backgroundColor: Color.colorWhitesmoke_200,
     paddingHorizontal: 0,
-    width: 382,
+    width: "100%",
   },
   buttonsParent: {
     marginTop: Padding.p_base,

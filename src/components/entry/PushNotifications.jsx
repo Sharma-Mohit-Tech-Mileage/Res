@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text, ScrollView, Platform, } from "react-native";
+import { View, StyleSheet, Text, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import Touchable from "../common/customui/Touchable";
@@ -11,7 +11,8 @@ import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuit
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
 import NavigationUtils from "./NavigationUtils";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const PushNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -100,7 +101,7 @@ const PushNotifications = ({ navigation }) => {
           <View style={styles.headerTabTwo} />
           <View style={styles.headerTabThree} />
         </View> */}
-    <ScrollView
+    <ScreenScroll
       style={styles.inner}
       contentContainerStyle={styles.innerContent}
     >
@@ -148,7 +149,7 @@ const PushNotifications = ({ navigation }) => {
         </View>
         </View>
       
-    </ScrollView>
+    </ScreenScroll>
     </View>
   );
 };

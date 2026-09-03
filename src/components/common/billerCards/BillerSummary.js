@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { wp } from "../../../utils/responsive";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import { card } from "../../../styles/utilities";

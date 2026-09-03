@@ -9,6 +9,7 @@ import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "../common/customui/Touchable";
+import ModalCard from "../common/customui/ModalCard";
 import ModalOverlay from "../common/customui/ModalOverlay";
 
 
@@ -23,7 +24,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
         onRequestClose={onClose}
       >
         <ModalOverlay>
-          <View style={styles.alertContainer}>
+          <ModalCard style={styles.alertContainer}>
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
@@ -69,7 +70,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               </Text>
             </Touchable>
            )}
-          </View>
+          </ModalCard>
         </ModalOverlay>
       </Modal>
      );

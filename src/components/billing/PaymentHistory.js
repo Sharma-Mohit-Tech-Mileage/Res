@@ -17,7 +17,7 @@ import Icon from "../common/Icon";
 import { Hyperlink } from "../common/customui/Typography";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
 import {
   fetchPaymentHistory,
   downloadPaymentReceipt,
