@@ -4,6 +4,8 @@ import {
   Text,
   ScrollView,
   Image,
+  Keyboard,
+  Platform,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
@@ -492,10 +494,6 @@ const CancellationSummary = ({ navigation, route }) => {
         </View>
       </View>
     );
-  };
-
-  onCancel = () => {
-    navigation.navigate("account", { screen: "Account" });
   };
 
   const onDaySelected = (selectedDate) => {

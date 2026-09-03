@@ -57,9 +57,6 @@ const Survey = ({ route }) => {
     moment().add(10, "days").format("YYYY-MM-DDTHH:mm:ssZ")
   );
   const [loadingData, setLoadingData] = useState(false);
-  onCancel = () => {
-    navigation.navigate("account", { screen: "Account" });
-  };
   const onContinue = (option) => {
     if (option) {
       requestPostDisconnect();

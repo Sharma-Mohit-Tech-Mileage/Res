@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, View, Text, StyleSheet } from "react-native";
 import { Color, FontFamily } from "../../../../GlobalStyles";
 import LottieView from "lottie-react-native";
+import ModalOverlay from "./ModalOverlay";
 
 const LoadingOverlay = ({ loading, loadingTxt, onRequestClose, isWhite = false }) => {
   const animationSource = isWhite
@@ -24,12 +25,12 @@ const LoadingOverlay = ({ loading, loadingTxt, onRequestClose, isWhite = false }
       animationType="fade"
       onRequestClose={() => onRequestClose(false)}
     >
-      <View style={styles.overlay}>
+      <ModalOverlay>
         <View style={styles.alertContainer}>
           {LottieAnimation}
           <Text style={styles.loadingTxt}>{loadingTxt}...</Text>
         </View>
-      </View>
+      </ModalOverlay>
     </Modal>
   ) : (
     <View style={styles.noBackground}>
@@ -39,12 +40,6 @@ const LoadingOverlay = ({ loading, loadingTxt, onRequestClose, isWhite = false }
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
   lottie: {
     width: 180,
     height: 120,

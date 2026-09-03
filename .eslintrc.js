@@ -14,6 +14,11 @@ module.exports = {
     es2021: true,
     node: true,
   },
+  // Injected by Metro at build time, so they exist at runtime but not in any env preset.
+  globals: {
+    __DEV__: 'readonly',
+    fetch: 'readonly',
+  },
   ignorePatterns: [
     'node_modules/**',
     'android/**',
@@ -27,6 +32,9 @@ module.exports = {
     'react-native.config.js',
   ],
   rules: {
+    // Catches references to variables that were never imported - these throw at
+    // runtime and are otherwise invisible.
+    'no-undef': 'error',
     'no-restricted-imports': [
       'warn',
       {
@@ -54,6 +62,10 @@ module.exports = {
       rules: {
         'no-restricted-imports': 'off',
       },
+    },
+    {
+      files: ['__tests__/**'],
+      env: { jest: true },
     },
   ],
 };

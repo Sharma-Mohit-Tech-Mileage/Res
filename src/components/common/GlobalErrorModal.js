@@ -11,6 +11,7 @@ import { FontFamily } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import Touchable from "./customui/Touchable";
 import PrimaryButton from "./customui/PrimaryButton";
+import ModalOverlay from "./customui/ModalOverlay";
 
 
 // Simple error manager
@@ -54,7 +55,7 @@ export const GlobalErrorModal = () => {
       animationType="fade"
       onRequestClose={() => globalErrorManager.hide()}
     >
-      <View style={styles.overlay}>
+      <ModalOverlay>
         <View style={styles.alertContainer}>
           <View style={styles.iconWrapper}>
             <AlertIcon />
@@ -92,18 +93,12 @@ export const GlobalErrorModal = () => {
             accessibilityHint="Double tap to close the error modal"
           />
         </View>
-      </View>
+      </ModalOverlay>
     </Modal>
   );
 }
            
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
   alertContainer: {
     backgroundColor: "white",
     padding: 24,
