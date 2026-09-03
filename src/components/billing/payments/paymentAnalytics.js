@@ -2,14 +2,7 @@ import { useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { getAnalytics, logEvent } from "@react-native-firebase/analytics";
 
-// Firebase payment analytics. Spec: Firebase-Payment-Analytics-Spec.docx (story 53472)
-//
-// Funnel steps come from the existing screen_view; these events carry only what a
-// screen cannot — what the customer chose, what happened, and what broke.
-//
-// payment_attempt_id groups one attempt. It is random, tied to nothing, and discarded
-// when the attempt ends, so two failed tries and a success in the same session stay
-// distinguishable without any customer identifier.
+// Firebase payment analytics (53472). payment_attempt_id groups one attempt; random, discarded when it ends.
 
 let attemptId = null;
 
