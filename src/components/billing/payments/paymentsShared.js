@@ -113,6 +113,10 @@ export const isMethodExpired = (method) => {
   return parsed.isValid() ? parsed.endOf("month").isBefore(moment()) : false;
 };
 
+export const isMethodInactive = (method) => !!method?.status && method.status !== "active";
+
+export const isMethodUnusable = (method) => isMethodExpired(method) || isMethodInactive(method);
+
 export const formatScheduledDate = (dueDate) => {
   if (!dueDate) return "";
   const parsed = moment(dueDate, ["YYYY-MM-DD", "MM/DD/YYYY", moment.ISO_8601]);

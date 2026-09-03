@@ -11,7 +11,8 @@ import TermsModal from "./TermsModal";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import SmallLoader from "../../common/customui/SmallLoader";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { SectionTitle, FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { SectionTitle } from "../../common/customui/Typography";
+import ReviewField from "./ReviewField";
 import { card } from "../../../styles/utilities";
 import {
   fetchPaymentMethods,
@@ -65,6 +66,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
   const scrollRef = useRef(null);
   const inFlightRef = useRef(false);
   const [errorAlert, setErrorAlert] = useState("");
+  const [surchargeInfoVisible, setSurchargeInfoVisible] = useState(true);
   const abortRef = useRef(null);
   const paymentDate = moment().format("M/D/YYYY");
 
@@ -146,25 +148,6 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
     }
   };
 
-  const renderField = (label, value, a11yValue, last, valueLoading) => (
-    <View
-      style={[styles.fieldGroup, last && styles.fieldGroupLast]}
-      accessible={!valueLoading}
-      accessibilityLabel={valueLoading ? undefined : `${label}, ${a11yValue || value}`}
-    >
-      <FieldTitle style={styles.fieldLabel}>{label}</FieldTitle>
-      {valueLoading ? (
-        <SkeletonPlaceholder>
-          <View style={styles.valueSkeleton} />
-        </SkeletonPlaceholder>
-      ) : (
-        <View style={styles.fieldValueBox}>
-          <FieldContent style={styles.fieldValue}>{value}</FieldContent>
-        </View>
-      )}
-    </View>
-  );
-
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
@@ -189,21 +172,32 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         </SectionTitle>
 
         <View style={[card.elevated, styles.summaryCard]}>
-          {renderField("Payment Method", describePaymentMethod(method), paymentMethodA11yLabel(method), false, loading)}
-          {renderField("Payment Amount", formatCurrency(amount), null, false, loading)}
+          <ReviewField label="Payment Method" value={describePaymentMethod(method)} a11yValue={paymentMethodA11yLabel(method)} loading={loading} />
+          <ReviewField label="Payment Amount" value={formatCurrency(amount)} loading={loading} />
           {showSurcharge && (
             <>
-              {renderField("Credit Card Surcharge", formatCurrency(surcharge), null, false, loading)}
-              <NotificationAlert
-                type="warning"
-                title={surchargeTitle(surchargeRate)}
-                message={surchargeMessage(surchargeRate)}
-                showCloseIcon={false}
+              <ReviewField
+                label="Credit Card Surcharge"
+                value={formatCurrency(surcharge)}
+                loading={loading}
+                showLabelIcon
+                onLabelIconPress={() => setSurchargeInfoVisible((visible) => !visible)}
+                labelIconExpanded={surchargeInfoVisible}
               />
-              {renderField("Total Amount", formatCurrency(totalAmount), null, false, loading)}
+              {surchargeInfoVisible && (
+                <View style={styles.inCardAlert}>
+                  <NotificationAlert
+                    type="warning"
+                    title={surchargeTitle(surchargeRate)}
+                    message={surchargeMessage(surchargeRate)}
+                    showCloseIcon={false}
+                  />
+                </View>
+              )}
+              <ReviewField label="Total Amount" value={formatCurrency(totalAmount)} loading={loading} />
             </>
           )}
-          {renderField("Payment Date", paymentDate, moment().format("MMMM D, YYYY"), true, loading)}
+          <ReviewField label="Payment Date" value={paymentDate} a11yValue={moment().format("MMMM D, YYYY")} last loading={loading} />
         </View>
 
         {(
@@ -297,21 +291,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   valueSkeleton: { height: 18, borderRadius: 4, width: "60%" },
+  inCardAlert: { marginTop: -8, marginBottom: 8 },
   summaryCard: { padding: 16 },
   emailCard: { padding: 16, marginTop: 16 },
-  fieldGroup: { marginBottom: 16 },
-  fieldGroupLast: { paddingBottom: 4 },
-  fieldLabel: {
-     textAlign: "left",
-     lineHeight: 28, },
-  fieldValue: {
-    fontSize: FontSize.size_base,
-    textAlign: "left",
-    fontWeight: "400",
-    color: Color.sparklightGray1,
-    fontFamily: FontFamily.RadioCanadaRegular,
-  },
-  fieldValueBox: {   },
   secureNote: { fontSize: 13, lineHeight: 18, color: Color.colorGray_200 || "#6B6B6B", marginTop: 12, marginBottom: 4 },
   helperText: {
     fontSize: FontSize.size_smi,

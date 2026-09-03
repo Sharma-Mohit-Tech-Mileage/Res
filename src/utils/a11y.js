@@ -29,17 +29,17 @@ export function formatInputA11yReadout({
   value,
   isPhoneNumber = false,
   isSecure = false,
+  osAddsValue = true,
 }) {
-  // Field is static text (role="text") so the OS won't add value/type on Android — compose the full readout (label, required, value, "text field"); OS adds these on iOS.
+  // Compose the full readout on Android (contentDescription suppresses auto-value); iOS auto-reads the value only when the label sits on the real TextInput — callers whose input is a11y-hidden pass osAddsValue: false.
   const cleanLabel = (label || '').replace(/\s*\*\s*$/, '').trim() || 'Input';
   const parts = [cleanLabel];
   if (required) parts.push('required');
-  if (Platform.OS === 'android') {
-    if (!isSecure && value !== undefined && value !== null && value !== '') {
-      parts.push(isPhoneNumber ? digitsToWords(value) : spellOutDigits(value));
-    }
-    parts.push('text field');
+  const includeValue = Platform.OS === 'android' || !osAddsValue;
+  if (includeValue && !isSecure && value !== undefined && value !== null && value !== '') {
+    parts.push(isPhoneNumber ? digitsToWords(value) : spellOutDigits(value));
   }
+  if (Platform.OS === 'android') parts.push('text field');
   return parts.join(', ');
 }
 

@@ -26,7 +26,8 @@ import {
   errorStatus,
 } from "./paymentAnalytics";
 
-const ORBIPAY_HOSTS = ["billerpayments.com"];
+// hcaptcha.com is the widget's captcha provider; blocking its iframe fails checkout with a captcha error.
+const ORBIPAY_HOSTS = ["billerpayments.com", "hcaptcha.com"];
 
 const isAllowedPaymentUrl = (url) => {
   const match = /^https:\/\/([^/?#:]+)/i.exec(String(url));

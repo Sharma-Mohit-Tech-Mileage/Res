@@ -16,7 +16,7 @@ import {
 } from "../../../network/apis/account/paymentMethods.service";
 import {
   contentMaxWidth,
-  isMethodExpired,
+  isMethodUnusable,
   openOrbipayPaymentExecution,
   isCreditCard,
   useSurchargeRate,
@@ -58,7 +58,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
         .then(([list, details]) => {
           setMethods(list);
           setAutoPay(details);
-          setSelectedId((prev) => prev || list.find((m) => m.isDefault && !isMethodExpired(m))?.id || "");
+          setSelectedId((prev) => prev || list.find((m) => m.isDefault && !isMethodUnusable(m))?.id || "");
         })
         .catch((error) => {
           setMethods([]);
@@ -72,7 +72,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
 
   const loading = methods === null;
   const selectedMethod = methods?.find((m) => m.id === selectedId) || null;
-  const canContinue = !!selectedMethod && !isMethodExpired(selectedMethod);
+  const canContinue = !!selectedMethod && !isMethodUnusable(selectedMethod);
 
   // Fee Calculator runs on selection so the review screen already has the surcharge.
   const [surcharge, setSurcharge] = useState(null);
