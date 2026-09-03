@@ -1,10 +1,4 @@
-// Guardrails, not style rules: each one bans a pattern we have already migrated
-// away from, so the fix cannot creep back in a later PR.
-// Accessibility guardrail: bans raw touchable imports outside Touchable.js so
-// every interactive element clears 48dp (Android Scanner / WCAG 2.5.5). Severity
-// is 'warn' — flip to 'error' after migrating the remaining raw callsites.
-// Doesn't extend @react-native/eslint-config to avoid surfacing unrelated
-// findings; add `extends: ['@react-native']` later if desired.
+// Guardrails: each rule bans a pattern already migrated away from, so it cannot creep back.
 module.exports = {
   root: true,
   parserOptions: {
@@ -59,9 +53,7 @@ module.exports = {
         ],
       },
     ],
-    // Kept as a syntax rule rather than a second no-restricted-imports entry:
-    // that rule honours only the last 'paths' entry per module, so adding one
-    // here would have silently switched off the touchable guardrail above.
+    // A syntax rule, not a 2nd no-restricted-imports 'paths' entry - only the last entry per module wins.
     'no-restricted-syntax': [
       'warn',
       {
@@ -71,23 +63,19 @@ module.exports = {
           'Dimensions.get() is read once and never updates, so layouts freeze at the size the app launched with. Use useWindowDimensions() in components, or the helpers in src/utils/responsive.js.',
       },
     ],
-    // Catches references to variables that were never imported - these throw at
-    // runtime and are otherwise invisible. Clean as of the 51768 sweep.
+    // Catches never-imported variables; these throw at runtime and are otherwise invisible.
     'no-undef': 'error',
   },
   overrides: [
     {
-      // Touchable.js is the one file where Pressable may be imported directly —
-      // it's the primitive every other touchable wraps.
+      // Touchable.js is the primitive every other touchable wraps.
       files: ['src/components/common/customui/Touchable.js'],
       rules: {
         'no-restricted-imports': 'off',
       },
     },
     {
-      // The three modules that legitimately read Dimensions: the responsive
-      // helpers themselves, and two non-component modules that have no hook to
-      // call and so must read at call time.
+      // The only modules that legitimately read Dimensions; non-components must read at call time.
       files: [
         'src/utils/responsive.js',
         'src/components/utility/walkthroughHelpers.js',

@@ -1,5 +1,4 @@
-// [51768] Scroll container that owns large-screen geometry, so screens never ask how wide the window is.
-// Geometry only, never layout the caller did not ask for: fill and clearTabBar are opt-in, cap and gutter are null at compact.
+// [51768] Scroll container owning large-screen geometry; fill/clearTabBar are opt-in, cap/gutter null at compact.
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { LAYOUT, contentWidthStyle, useResponsive } from "../../../utils/responsive";
@@ -17,9 +16,7 @@ export const ScreenScroll = ({
 }) => {
   const { sizeClass, gutterStyle } = useResponsive();
   const clearance = clearTabBar === true ? LAYOUT.tabBarClearance : clearTabBar;
-  // maxWidth on a vertical ScrollView's contentContainerStyle does NOT constrain it - the
-  // container takes the ScrollView's width. Centre the container and cap an inner wrapper
-  // instead. At compact the cap is null, so no wrapper is added and output is unchanged.
+  // maxWidth on a ScrollView's contentContainerStyle does not constrain it, so cap an inner wrapper instead.
   const cap = contentWidthStyle(sizeClass, maxWidth);
   return (
     <ScrollView
