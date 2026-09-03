@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="180" failures="0" errors="0" time="4.462">
+  <testsuite name="announcementHelpers" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:00" time="0.445" tests="11">
+    <testcase classname="announcementHelpers compares semantic versions correctly" name="announcementHelpers compares semantic versions correctly" time="0.004">
+    </testcase>
+    <testcase classname="announcementHelpers checks date ranges correctly" name="announcementHelpers checks date ranges correctly" time="0.001">
+    </testcase>
+    <testcase classname="announcementHelpers evaluates campaign eligibility with targeting rules" name="announcementHelpers evaluates campaign eligibility with targeting rules" time="0.002">
+    </testcase>
+    <testcase classname="announcementHelpers tracks announcement impression analytics event" name="announcementHelpers tracks announcement impression analytics event" time="0.001">
+    </testcase>
+    <testcase classname="announcementHelpers tracks viewed/completed/dismissed events and handles analytics errors" name="announcementHelpers tracks viewed/completed/dismissed events and handles analytics errors" time="0.031">
+    </testcase>
+    <testcase classname="announcementHelpers returns early when nav config or ref is missing" name="announcementHelpers returns early when nav config or ref is missing" time="0">
+    </testcase>
+    <testcase classname="announcementHelpers navigates to external destination" name="announcementHelpers navigates to external destination" time="0">
+    </testcase>
+    <testcase classname="announcementHelpers navigates to deep links and screen destinations" name="announcementHelpers navigates to deep links and screen destinations" time="0.001">
+    </testcase>
+    <testcase classname="announcementHelpers navigates to tab without child screen" name="announcementHelpers navigates to tab without child screen" time="0">
+    </testcase>
+    <testcase classname="announcementHelpers navigates tab then child screen when childScreen is provided" name="announcementHelpers navigates tab then child screen when childScreen is provided" time="0.001">
+    </testcase>
+    <testcase classname="announcementHelpers handles unknown type and navigation errors" name="announcementHelpers handles unknown type and navigation errors" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="feedbackSchema" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:00" time="0.483" tests="1">
+    <testcase classname="feedbackSchema requires a contact consent selection" name="feedbackSchema requires a contact consent selection" time="0.021">
+    </testcase>
+  </testsuite>
+  <testsuite name="redux action creators coverage" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:00" time="0.504" tests="4">
+    <testcase classname="redux action creators coverage returns action objects for notification action suite" name="redux action creators coverage returns action objects for notification action suite" time="0.008">
+    </testcase>
+    <testcase classname="redux action creators coverage returns action objects for services/payment/billing/user/dashboard actions" name="redux action creators coverage returns action objects for services/payment/billing/user/dashboard actions" time="0.008">
+    </testcase>
+    <testcase classname="redux reducers coverage handles major services reducer transitions" name="redux reducers coverage handles major services reducer transitions" time="0.004">
+    </testcase>
+    <testcase classname="redux reducers coverage handles payment history reducer sorting/search/pagination" name="redux reducers coverage handles payment history reducer sorting/search/pagination" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="undefined" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:01" time="0.029" tests="1">
+    <testcase classname=" sanity check" name=" sanity check" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="useDataUsage hook" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:01" time="0.126" tests="4">
+    <testcase classname="useDataUsage hook dispatches initial usage requests and auto-fetches daily for latest period" name="useDataUsage hook dispatches initial usage requests and auto-fetches daily for latest period" time="0.011">
+    </testcase>
+    <testcase classname="useDataUsage hook builds period items and exposes dataPlan values" name="useDataUsage hook builds period items and exposes dataPlan values" time="0.006">
+    </testcase>
+    <testcase classname="useDataUsage hook fetchDailyForPeriod dispatches only for valid period items" name="useDataUsage hook fetchDailyForPeriod dispatches only for valid period items" time="0.002">
+    </testcase>
+    <testcase classname="useDataUsage hook refetchAll and empty-state branches work as expected" name="useDataUsage hook refetchAll and empty-state branches work as expected" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="MaintenanceWrapper" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:01" time="0.192" tests="4">
+    <testcase classname="MaintenanceWrapper renders maintenance page when maintenance mode is on" name="MaintenanceWrapper renders maintenance page when maintenance mode is on" time="0.006">
+    </testcase>
+    <testcase classname="MaintenanceWrapper renders children when maintenance mode is off" name="MaintenanceWrapper renders children when maintenance mode is off" time="0.001">
+    </testcase>
+    <testcase classname="MaintenanceWrapper renders maintenance page with defaults when blocked and no pageConfig" name="MaintenanceWrapper renders maintenance page with defaults when blocked and no pageConfig" time="0.001">
+    </testcase>
+    <testcase classname="MaintenanceWrapper renders children when maintenance is on but user is not blocked and config is missing" name="MaintenanceWrapper renders children when maintenance is on but user is not blocked and config is missing" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="MaintenancePage" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:00" time="0.681" tests="7">
+    <testcase classname="MaintenancePage opens support link when contact link is pressed" name="MaintenancePage opens support link when contact link is pressed" time="0.088">
+    </testcase>
+    <testcase classname="MaintenancePage navigates back to Splash when back to login is pressed" name="MaintenancePage navigates back to Splash when back to login is pressed" time="0.002">
+    </testcase>
+    <testcase classname="MaintenancePage does not attempt to open URL when contact link is not provided" name="MaintenancePage does not attempt to open URL when contact link is not provided" time="0.001">
+    </testcase>
+    <testcase classname="MaintenancePage logs when navigation ref is not available" name="MaintenancePage logs when navigation ref is not available" time="0.002">
+    </testcase>
+    <testcase classname="MaintenancePage shows estimated completion time when provided" name="MaintenancePage shows estimated completion time when provided" time="0.001">
+    </testcase>
+    <testcase classname="MaintenancePage hides contact link section when showLoginButton is true" name="MaintenancePage hides contact link section when showLoginButton is true" time="0.001">
+    </testcase>
+    <testcase classname="MaintenancePage attempts to open contact link even when openURL rejects" name="MaintenancePage attempts to open contact link even when openURL rejects" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="Support screen behavior" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:00" time="0.935" tests="9">
+    <testcase classname="Support screen behavior fires focus side effects and checks agent availability" name="Support screen behavior fires focus side effects and checks agent availability" time="0.347">
+    </testcase>
+    <testcase classname="Support screen behavior navigates to search and article pages from knowledgebase list" name="Support screen behavior navigates to search and article pages from knowledgebase list" time="0.006">
+    </testcase>
+    <testcase classname="Support screen behavior opens Sparklight customer support article from Contact Us section" name="Support screen behavior opens Sparklight customer support article from Contact Us section" time="0.004">
+    </testcase>
+    <testcase classname="Support screen behavior opens all right-side knowledgebase options with article params" name="Support screen behavior opens all right-side knowledgebase options with article params" time="0.004">
+    </testcase>
+    <testcase classname="Support screen behavior renders contact us support button and error modal component" name="Support screen behavior renders contact us support button and error modal component" time="0.009">
+    </testcase>
+    <testcase classname="Support screen behavior handles fetch non-ok response with error branch" name="Support screen behavior handles fetch non-ok response with error branch" time="0.006">
+    </testcase>
+    <testcase classname="Support screen behavior handles fetch rejection with error branch" name="Support screen behavior handles fetch rejection with error branch" time="0.006">
+    </testcase>
+    <testcase classname="Support screen behavior handles fetch non-ok response with error branch" name="Support screen behavior handles fetch non-ok response with error branch" time="0.006">
+    </testcase>
+    <testcase classname="Support screen behavior shows agent unavailable modal for offline chatData and handles close action" name="Support screen behavior shows agent unavailable modal for offline chatData and handles close action" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="DataUsageScreen" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:00" time="0.948" tests="9">
+    <testcase classname="DataUsageScreen renders with daily tab by default and can switch to monthly" name="DataUsageScreen renders with daily tab by default and can switch to monthly" time="0.19">
+    </testcase>
+    <testcase classname="DataUsageScreen navigates back when the header back action is pressed" name="DataUsageScreen navigates back when the header back action is pressed" time="0.003">
+    </testcase>
+    <testcase classname="DataUsageScreen updates the selected bar when a bar is pressed" name="DataUsageScreen updates the selected bar when a bar is pressed" time="0.003">
+    </testcase>
+    <testcase classname="DataUsageScreen requests daily usage for selected period" name="DataUsageScreen requests daily usage for selected period" time="0.003">
+    </testcase>
+    <testcase classname="DataUsageScreen does not request daily usage for invalid period label" name="DataUsageScreen does not request daily usage for invalid period label" time="0.001">
+    </testcase>
+    <testcase classname="DataUsageScreen uses monthly loading state when monthly tab is active" name="DataUsageScreen uses monthly loading state when monthly tab is active" time="0.008">
+    </testcase>
+    <testcase classname="DataUsageScreen falls back to empty monthly data when monthly usage is missing" name="DataUsageScreen falls back to empty monthly data when monthly usage is missing" time="0.002">
+    </testcase>
+    <testcase classname="DataUsageScreen falls back to empty label/data when period list and usage data are missing" name="DataUsageScreen falls back to empty label/data when period list and usage data are missing" time="0.001">
+    </testcase>
+    <testcase classname="DataUsageScreen refetches data and clears the refreshing state on pull-to-refresh" name="DataUsageScreen refetches data and clears the refreshing state on pull-to-refresh" time="0.007">
+    </testcase>
+  </testsuite>
+  <testsuite name="AccountOverview behavior" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:00" time="0.971" tests="12">
+    <testcase classname="AccountOverview behavior loads full menu and navigates to Profile for standard account number" name="AccountOverview behavior loads full menu and navigates to Profile for standard account number" time="0.31">
+    </testcase>
+    <testcase classname="AccountOverview behavior hides User Management for 16+ digit account numbers" name="AccountOverview behavior hides User Management for 16+ digit account numbers" time="0.01">
+    </testcase>
+    <testcase classname="AccountOverview behavior navigates all menuItems1 entries for 16+ digit accounts" name="AccountOverview behavior navigates all menuItems1 entries for 16+ digit accounts" time="0.015">
+    </testcase>
+    <testcase classname="AccountOverview behavior opens logout confirmation when logout is pressed" name="AccountOverview behavior opens logout confirmation when logout is pressed" time="0.014">
+    </testcase>
+    <testcase classname="AccountOverview behavior navigates to profile-related menus and policy links" name="AccountOverview behavior navigates to profile-related menus and policy links" time="0.006">
+    </testcase>
+    <testcase classname="AccountOverview behavior executes logout action when OK is pressed in confirmation" name="AccountOverview behavior executes logout action when OK is pressed in confirmation" time="0.005">
+    </testcase>
+    <testcase classname="AccountOverview behavior navigates to app feedback action" name="AccountOverview behavior navigates to app feedback action" time="0.003">
+    </testcase>
+    <testcase classname="AccountOverview behavior does not execute logout action when Cancel is pressed" name="AccountOverview behavior does not execute logout action when Cancel is pressed" time="0.007">
+    </testcase>
+    <testcase classname="AccountOverview behavior renders fallback profile label format when names are missing" name="AccountOverview behavior renders fallback profile label format when names are missing" time="0.005">
+    </testcase>
+    <testcase classname="AccountOverview behavior uses selector fallbacks when profile object is missing" name="AccountOverview behavior uses selector fallbacks when profile object is missing" time="0.005">
+    </testcase>
+    <testcase classname="AccountOverview behavior handles analytics cleanup error during logout without blocking reset" name="AccountOverview behavior handles analytics cleanup error during logout without blocking reset" time="0.004">
+    </testcase>
+    <testcase classname="AccountOverview behavior uses android logout redirect URL when platform is android" name="AccountOverview behavior uses android logout redirect URL when platform is android" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="BillingScreen behavior" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:00" time="0.986" tests="5">
+    <testcase classname="BillingScreen behavior triggers focus analytics and renders billing options actions" name="BillingScreen behavior triggers focus analytics and renders billing options actions" time="0.17">
+    </testcase>
+    <testcase classname="BillingScreen behavior navigates to bill breakdown and payment history actions" name="BillingScreen behavior navigates to bill breakdown and payment history actions" time="0.017">
+    </testcase>
+    <testcase classname="BillingScreen behavior computes immediate due-date branch when past due exists" name="BillingScreen behavior computes immediate due-date branch when past due exists" time="0.007">
+    </testcase>
+    <testcase classname="BillingScreen behavior handles getUser failures without crashing" name="BillingScreen behavior handles getUser failures without crashing" time="0.007">
+    </testcase>
+    <testcase classname="BillingScreen behavior runs the autopay error handler when the API request fails" name="BillingScreen behavior runs the autopay error handler when the API request fails" time="0.007">
+    </testcase>
+  </testsuite>
+  <testsuite name="All JS components compile with Babel" errors="0" failures="0" skipped="0" timestamp="2026-08-04T20:01:00" time="3.915" tests="113">
+    <testcase classname="All JS components compile with Babel discovers component JS files" name="All JS components compile with Babel discovers component JS files" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/DisconnectedBanner.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/DisconnectedBanner.js" time="0.866">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/FeatureCard.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/FeatureCard.js" time="0.022">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/FeatureCardMobile.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/FeatureCardMobile.js" time="0.018">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/InfoBanner.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/InfoBanner.js" time="0.009">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/MenuCard.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/MenuCard.js" time="0.009">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/MenuGrid.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/MenuGrid.js" time="0.008">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/MobilePilotLandingPage.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/MobilePilotLandingPage.js" time="0.039">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/MobilePromo.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/MobilePromo.js" time="0.018">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/PilotFaqs.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/PilotFaqs.js" time="0.008">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/PilotServiceStatus.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/PilotServiceStatus.js" time="0.016">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/PromoBanner.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/PromoBanner.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/ACPDashboard/WelcomeCard.js" name="All JS components compile with Babel compiles src/components/ACPDashboard/WelcomeCard.js" time="0.016">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/account/AccountOverview.js" name="All JS components compile with Babel compiles src/components/account/AccountOverview.js" time="0.042">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/BillingBreakDownScreen.js" name="All JS components compile with Babel compiles src/components/billing/BillingBreakDownScreen.js" time="0.061">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/BillingScreen.js" name="All JS components compile with Babel compiles src/components/billing/BillingScreen.js" time="0.046">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/BillingStatements.js" name="All JS components compile with Babel compiles src/components/billing/BillingStatements.js" time="0.036">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/PaymentHistory.js" name="All JS components compile with Babel compiles src/components/billing/PaymentHistory.js" time="0.041">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/AgreeTermsRow.js" name="All JS components compile with Babel compiles src/components/billing/payments/AgreeTermsRow.js" time="0.01">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/AnimatedSuccessIcon.js" name="All JS components compile with Babel compiles src/components/billing/payments/AnimatedSuccessIcon.js" time="0.01">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/AutoPayDeactivateScreen.js" name="All JS components compile with Babel compiles src/components/billing/payments/AutoPayDeactivateScreen.js" time="0.016">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/AutoPayReviewScreen.js" name="All JS components compile with Babel compiles src/components/billing/payments/AutoPayReviewScreen.js" time="0.037">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/AutoPayScreen.js" name="All JS components compile with Babel compiles src/components/billing/payments/AutoPayScreen.js" time="0.025">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/ConfirmActionModal.js" name="All JS components compile with Babel compiles src/components/billing/payments/ConfirmActionModal.js" time="0.011">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/MakePaymentMethodScreen.js" name="All JS components compile with Babel compiles src/components/billing/payments/MakePaymentMethodScreen.js" time="0.022">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/MakePaymentReviewScreen.js" name="All JS components compile with Babel compiles src/components/billing/payments/MakePaymentReviewScreen.js" time="0.037">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/MakePaymentScreen.js" name="All JS components compile with Babel compiles src/components/billing/payments/MakePaymentScreen.js" time="0.037">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/NextActionCard.js" name="All JS components compile with Babel compiles src/components/billing/payments/NextActionCard.js" time="0.008">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/OrbipayWidgetScreen.js" name="All JS components compile with Babel compiles src/components/billing/payments/OrbipayWidgetScreen.js" time="0.049">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/PaymentConfirmationScreen.js" name="All JS components compile with Babel compiles src/components/billing/payments/PaymentConfirmationScreen.js" time="0.017">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/PaymentMethodCard.js" name="All JS components compile with Babel compiles src/components/billing/payments/PaymentMethodCard.js" time="0.018">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/PaymentMethodsScreen.js" name="All JS components compile with Babel compiles src/components/billing/payments/PaymentMethodsScreen.js" time="0.025">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/TermsModal.js" name="All JS components compile with Babel compiles src/components/billing/payments/TermsModal.js" time="0.011">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/billing/payments/paymentsShared.js" name="All JS components compile with Babel compiles src/components/billing/payments/paymentsShared.js" time="0.011">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/cancelservice/CancellationSummary.js" name="All JS components compile with Babel compiles src/components/cancelservice/CancellationSummary.js" time="0.14">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/cancelservice/Survey.js" name="All JS components compile with Babel compiles src/components/cancelservice/Survey.js" time="0.049">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/CustomerDisconnectPage.js" name="All JS components compile with Babel compiles src/components/common/CustomerDisconnectPage.js" time="0.013">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/ErrorModal.js" name="All JS components compile with Babel compiles src/components/common/ErrorModal.js" time="0.019">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/GlobalErrorModal.js" name="All JS components compile with Babel compiles src/components/common/GlobalErrorModal.js" time="0.021">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/Icon.js" name="All JS components compile with Babel compiles src/components/common/Icon.js" time="0.01">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/LoadingStateIndicator.js" name="All JS components compile with Babel compiles src/components/common/LoadingStateIndicator.js" time="0.006">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/PaymentBrandIcon.js" name="All JS components compile with Babel compiles src/components/common/PaymentBrandIcon.js" time="0.009">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/ProfileSettingsHeader.js" name="All JS components compile with Babel compiles src/components/common/ProfileSettingsHeader.js" time="0.014">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/RenderText.js" name="All JS components compile with Babel compiles src/components/common/RenderText.js" time="0.018">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/Toggle.js" name="All JS components compile with Babel compiles src/components/common/Toggle.js" time="0.015">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/billerCards/AutoPayCard.js" name="All JS components compile with Babel compiles src/components/common/billerCards/AutoPayCard.js" time="0.011">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/billerCards/BillerSummary.js" name="All JS components compile with Babel compiles src/components/common/billerCards/BillerSummary.js" time="0.016">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/billerCards/PeperLessCard.js" name="All JS components compile with Babel compiles src/components/common/billerCards/PeperLessCard.js" time="0.009">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/CheckboxRow.js" name="All JS components compile with Babel compiles src/components/common/customui/CheckboxRow.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/EditActionButton.js" name="All JS components compile with Babel compiles src/components/common/customui/EditActionButton.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/IconButton.js" name="All JS components compile with Babel compiles src/components/common/customui/IconButton.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/LinkText.js" name="All JS components compile with Babel compiles src/components/common/customui/LinkText.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/LoadingOverlay.js" name="All JS components compile with Babel compiles src/components/common/customui/LoadingOverlay.js" time="0.006">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/PrimaryButton.js" name="All JS components compile with Babel compiles src/components/common/customui/PrimaryButton.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/SecondaryButton.js" name="All JS components compile with Babel compiles src/components/common/customui/SecondaryButton.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/SmallLoader.js" name="All JS components compile with Babel compiles src/components/common/customui/SmallLoader.js" time="0.004">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/SparkLightDropdown.js" name="All JS components compile with Babel compiles src/components/common/customui/SparkLightDropdown.js" time="0.022">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/SparkLightInput.js" name="All JS components compile with Babel compiles src/components/common/customui/SparkLightInput.js" time="0.02">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/SparkLightLoginButton.js" name="All JS components compile with Babel compiles src/components/common/customui/SparkLightLoginButton.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/SparklightCheckBox.js" name="All JS components compile with Babel compiles src/components/common/customui/SparklightCheckBox.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/SparklightMobileInput.js" name="All JS components compile with Babel compiles src/components/common/customui/SparklightMobileInput.js" time="0.024">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/Touchable.js" name="All JS components compile with Babel compiles src/components/common/customui/Touchable.js" time="0.014">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/common/customui/Typography.js" name="All JS components compile with Babel compiles src/components/common/customui/Typography.js" time="0.024">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/entry/NavigationUtils.js" name="All JS components compile with Babel compiles src/components/entry/NavigationUtils.js" time="0.01">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/feature/AnnouncementModal.js" name="All JS components compile with Babel compiles src/components/feature/AnnouncementModal.js" time="0.025">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/feature/AnnouncementProgress.js" name="All JS components compile with Babel compiles src/components/feature/AnnouncementProgress.js" time="0.004">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/feature/AnnouncementStep.js" name="All JS components compile with Babel compiles src/components/feature/AnnouncementStep.js" time="0.016">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/home/NewBillerHome.js" name="All JS components compile with Babel compiles src/components/home/NewBillerHome.js" time="0.076">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/maintenance/MaintenanceContext.js" name="All JS components compile with Babel compiles src/components/maintenance/MaintenanceContext.js" time="0.041">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/maintenance/MaintenancePage.js" name="All JS components compile with Babel compiles src/components/maintenance/MaintenancePage.js" time="0.018">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/maintenance/MaintenanceWrapper.js" name="All JS components compile with Babel compiles src/components/maintenance/MaintenanceWrapper.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/notifiction/EmailNotification.js" name="All JS components compile with Babel compiles src/components/notifiction/EmailNotification.js" time="0.07">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/notifiction/InAppNotifications.js" name="All JS components compile with Babel compiles src/components/notifiction/InAppNotifications.js" time="0.04">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/notifiction/NotificationSection.js" name="All JS components compile with Babel compiles src/components/notifiction/NotificationSection.js" time="0.023">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/notifiction/Notifications.js" name="All JS components compile with Babel compiles src/components/notifiction/Notifications.js" time="0.019">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/notifiction/TextNotifications.js" name="All JS components compile with Babel compiles src/components/notifiction/TextNotifications.js" time="0.081">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/MyServices.js" name="All JS components compile with Babel compiles src/components/services/MyServices.js" time="0.023">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/cards/InternetCard.js" name="All JS components compile with Babel compiles src/components/services/cards/InternetCard.js" time="0.023">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/cards/PhoneCard.js" name="All JS components compile with Babel compiles src/components/services/cards/PhoneCard.js" time="0.009">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/cards/VideoCard.js" name="All JS components compile with Babel compiles src/components/services/cards/VideoCard.js" time="0.011">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/dataUsage/DataUsageScreen.js" name="All JS components compile with Babel compiles src/components/services/dataUsage/DataUsageScreen.js" time="0.016">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/dataUsage/components/EeroPromoCard.js" name="All JS components compile with Babel compiles src/components/services/dataUsage/components/EeroPromoCard.js" time="0.015">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/dataUsage/components/ManageEquipmentCard.js" name="All JS components compile with Babel compiles src/components/services/dataUsage/components/ManageEquipmentCard.js" time="0.017">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/dataUsage/components/UsageChart.js" name="All JS components compile with Babel compiles src/components/services/dataUsage/components/UsageChart.js" time="0.143">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/dataUsage/components/UsageSummaryCard.js" name="All JS components compile with Babel compiles src/components/services/dataUsage/components/UsageSummaryCard.js" time="0.058">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/dataUsage/mockDataUsage.js" name="All JS components compile with Babel compiles src/components/services/dataUsage/mockDataUsage.js" time="0.011">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/dataUsage/transformEquipment.js" name="All JS components compile with Babel compiles src/components/services/dataUsage/transformEquipment.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/hooks/useDataUsage.js" name="All JS components compile with Babel compiles src/components/services/hooks/useDataUsage.js" time="0.011">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/hooks/useOutageStatus.js" name="All JS components compile with Babel compiles src/components/services/hooks/useOutageStatus.js" time="0.006">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/hooks/useServiceDetails.js" name="All JS components compile with Babel compiles src/components/services/hooks/useServiceDetails.js" time="0.004">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/sections/ServiceHeader.js" name="All JS components compile with Babel compiles src/components/services/sections/ServiceHeader.js" time="0.004">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/sections/StatusSection.js" name="All JS components compile with Babel compiles src/components/services/sections/StatusSection.js" time="0.014">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/services/utils/constants.js" name="All JS components compile with Babel compiles src/components/services/utils/constants.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/splash/SplashScreen.js" name="All JS components compile with Babel compiles src/components/splash/SplashScreen.js" time="0.079">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/support/supportScreen.js" name="All JS components compile with Babel compiles src/components/support/supportScreen.js" time="0.028">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/user/Session.js" name="All JS components compile with Babel compiles src/components/user/Session.js" time="0.01">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/userProfile/ChangePassword.js" name="All JS components compile with Babel compiles src/components/userProfile/ChangePassword.js" time="0.045">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/userProfile/PasswordSecurity.js" name="All JS components compile with Babel compiles src/components/userProfile/PasswordSecurity.js" time="0.028">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/userProfile/PasswordSecurityEdit.js" name="All JS components compile with Babel compiles src/components/userProfile/PasswordSecurityEdit.js" time="0.05">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/userProfile/ProfileSettings.js" name="All JS components compile with Babel compiles src/components/userProfile/ProfileSettings.js" time="0.057">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/userProfile/ProfileSettingsEdit.js" name="All JS components compile with Babel compiles src/components/userProfile/ProfileSettingsEdit.js" time="0.028">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/utility/AppUpdateAlert.js" name="All JS components compile with Babel compiles src/components/utility/AppUpdateAlert.js" time="0.007">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/utility/DeviceInfo.js" name="All JS components compile with Babel compiles src/components/utility/DeviceInfo.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/utility/MaintenanceAlert.js" name="All JS components compile with Babel compiles src/components/utility/MaintenanceAlert.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/utility/NativeCookieManager.js" name="All JS components compile with Babel compiles src/components/utility/NativeCookieManager.js" time="0.007">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/utility/RNZendeskChat.js" name="All JS components compile with Babel compiles src/components/utility/RNZendeskChat.js" time="0.006">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/utility/ZendeskChatIcon.js" name="All JS components compile with Babel compiles src/components/utility/ZendeskChatIcon.js" time="0.006">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/utility/disconnectHelpers.js" name="All JS components compile with Babel compiles src/components/utility/disconnectHelpers.js" time="0.005">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/utility/walkthroughHelpers.js" name="All JS components compile with Babel compiles src/components/utility/walkthroughHelpers.js" time="0.004">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/walkthrough/WalkthroughArrow.js" name="All JS components compile with Babel compiles src/components/walkthrough/WalkthroughArrow.js" time="0.007">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/walkthrough/WalkthroughContent.js" name="All JS components compile with Babel compiles src/components/walkthrough/WalkthroughContent.js" time="0.014">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/walkthrough/WalkthroughOverlay.js" name="All JS components compile with Babel compiles src/components/walkthrough/WalkthroughOverlay.js" time="0.018">
+    </testcase>
+    <testcase classname="All JS components compile with Babel compiles src/components/walkthrough/WalkthroughProgress.js" name="All JS components compile with Babel compiles src/components/walkthrough/WalkthroughProgress.js" time="0.003">
+    </testcase>
+  </testsuite>
+</testsuites>

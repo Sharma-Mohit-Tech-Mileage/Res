@@ -1,49 +1,75 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SecureStore, { SECURE_KEYS } from '../../utils/SecureStore';
 
 export const storeUser = async (value) => {
   try {
-    await AsyncStorage.setItem("resi_user", JSON.stringify(value));
+    const { refreshToken, ...rest } = value || {};
+    if (refreshToken != null) {
+      await SecureStore.set(SECURE_KEYS.REFRESH_TOKEN, refreshToken);
+    }
+    await AsyncStorage.setItem("resi_user", JSON.stringify(rest));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
 
 // getting data
 export const getUser = async () => {
   try {
-    const userData = JSON.parse(await AsyncStorage.getItem("resi_user"))
-    return userData;
+    const userData = JSON.parse(await AsyncStorage.getItem("resi_user"));
+    if (!userData) return userData;
+    let refreshToken = await SecureStore.get(SECURE_KEYS.REFRESH_TOKEN);
+    if (refreshToken == null && userData.refreshToken != null) {
+      refreshToken = userData.refreshToken;
+      await SecureStore.set(SECURE_KEYS.REFRESH_TOKEN, refreshToken);
+      delete userData.refreshToken;
+      await AsyncStorage.setItem("resi_user", JSON.stringify(userData));
+    }
+    return { ...userData, refreshToken };
   } catch (error) {
-   console.log(error); 
+   console.warn(error);
   }
 };
 
 export const storeSsoToken = async (value) => {
   try {
-    await AsyncStorage.setItem("idToken", JSON.stringify(value));
+    await SecureStore.set(SECURE_KEYS.ID_TOKEN, value == null ? null : JSON.stringify(value));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
 
 // getting data
 export const getSsoToken = async () => {
   try {
-    const userData = JSON.parse(await AsyncStorage.getItem("idToken"))
-    return userData;
+    const secure = await SecureStore.get(SECURE_KEYS.ID_TOKEN);
+    if (secure != null) return JSON.parse(secure);
+    const legacy = await AsyncStorage.getItem("idToken");
+    if (legacy != null) {
+      await SecureStore.set(SECURE_KEYS.ID_TOKEN, legacy);
+      await AsyncStorage.removeItem("idToken");
+      return JSON.parse(legacy);
+    }
+    return null;
   } catch (error) {
-   console.log(error); 
+   console.warn(error);
   }
 };
 
 export const cleanUserData = async () => {
   try {
+    await SecureStore.clear();
     const keys = await AsyncStorage.getAllKeys();
-    const keysToRemove = keys.filter(key => !key.includes("pushNotificationStatus"));
+    const keysToRemove = keys.filter(
+      key =>
+        !key.includes("pushNotificationStatus") &&
+        key !== "FEATURE_ANNOUNCEMENTS_STATE" &&
+        key !== "LAST_APP_VERSION"
+    );
 
     await AsyncStorage.multiRemove(keysToRemove);
   } catch (error) {
-    console.error('Error selectively clearing app data.', error);
+    console.warn('Error selectively clearing app data.', error);
   }
 };
 
@@ -54,7 +80,7 @@ export const storePushNotificationStatus = async (value) => {
     const key = `pushNotificationStatus_${userName}`;
     await AsyncStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
 
@@ -67,7 +93,7 @@ export const getPushNotificationStatus = async () => {
     const userData = JSON.parse(await AsyncStorage.getItem(key))
     return userData;
   } catch (error) {
-   console.log(error); 
+   console.warn(error); 
   }
 };
 
@@ -75,9 +101,62 @@ export const storeUpgradeToken = async (value) => {
   try {
     await AsyncStorage.setItem("upgradeToken", JSON.stringify(value));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
+
+
+export const storeZendeskData = async (value) => {
+  try {
+    if (value == null) {
+      await SecureStore.set(SECURE_KEYS.ZENDESK_DATA, null);
+      if (typeof AsyncStorage.removeItem === 'function') {
+        await AsyncStorage.removeItem("zendeskData");
+      }
+      return;
+    }
+
+    const serialized = JSON.stringify(value);
+    await SecureStore.set(SECURE_KEYS.ZENDESK_DATA, serialized);
+    if (typeof AsyncStorage.setItem === 'function') {
+      await AsyncStorage.setItem("zendeskData", serialized);
+    }
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+// getting data
+export const getZendeskData = async () => {
+  try {
+    const secure = await SecureStore.get(SECURE_KEYS.ZENDESK_DATA);
+    if (secure != null) {
+      try {
+        return JSON.parse(secure);
+      } catch {
+        return secure;
+      }
+    }
+
+    const legacy = await AsyncStorage.getItem("zendeskData");
+    if (legacy != null) {
+      await SecureStore.set(SECURE_KEYS.ZENDESK_DATA, legacy);
+      if (typeof AsyncStorage.removeItem === 'function') {
+        await AsyncStorage.removeItem("zendeskData");
+      }
+      try {
+        return JSON.parse(legacy);
+      } catch {
+        return legacy;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+
 
 // getting data
 export const getUpgradeToken = async () => {
@@ -85,7 +164,7 @@ export const getUpgradeToken = async () => {
     const upgradeData = JSON.parse(await AsyncStorage.getItem("upgradeToken"));
     return upgradeData;
   } catch (error) {
-   console.log(error); 
+   console.warn(error); 
   }
 };
 
@@ -94,7 +173,7 @@ export const storeValue = async (value) => {
   try {
     await AsyncStorage.setItem("ptickets", JSON.stringify(value));
   } catch (error) {
-    console.log(error);
+    console.warn(error);
   }
 };
 
@@ -104,7 +183,7 @@ export const getPendingTicket = async () => {
     const data = JSON.parse(await AsyncStorage.getItem("ptickets"));
     return data;
   } catch (error) {
-   console.log(error); 
+   console.warn(error); 
   }
 };
 

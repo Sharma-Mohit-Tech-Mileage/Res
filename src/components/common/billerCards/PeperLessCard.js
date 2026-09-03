@@ -1,144 +1,130 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import colors from "../../../res/Colors";
-import RightArrow from "../../../res/svgIcons/RightArrow";
 import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
-import { CommonActions } from '@react-navigation/native';
-import AppStyles from "../styles/AppStyles";
-const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatus, navigation, style }) => {
+import { card } from "../../../styles/utilities";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import Touchable from "../customui/Touchable";
+import AppStyles from "../../../styles/AppStyles";
+import { SectionTitle, IndicatorText,Hyperlink } from "../customui/Typography";
+import Checkcircle from "../../../../assets/svgs/Checkcircle";
+import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
+
+const StatusIcon = ({ status, style }) => {
+  return (
+    <View style={style}>
+      {status === "On" ? <Checkcircle /> : <Checkcircle1 />}
+    </View>
+  );
+};
+
+const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
+  const showSkeleton = isStatusLoading || paperlessStatus === undefined;
+
+  const handleCardPress = () => {
+    if (!showSkeleton) {
+      navigation.navigate("account", { screen: "Notifications" });
+    }
+  };
 
   return (
-      <View style={[AppStyles.card, style]}>
-        <View style={styles.cardHreader}>
-            <View
-              style={{
-                marginLeft: 10,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
+    <Touchable
+      style={[AppStyles.card, { alignItems: "stretch", marginBottom: 16 }]}
+      minSize={0}
+      onPress={handleCardPress}
+      accessible={false}
+      importantForAccessibility="no"
+    >
+      <View
+        style={{
+          margin: 10,
+          flexDirection: "row",
+          flex: 1,
+          padding: 5,
+          alignItems: "center",
+        }}
+      >
+         <View style={styles.iconBg} accessible={true} accessibilityRole="text" accessibilityLabel="Paperless Billing Icon">
+          <PaperIconBg />
+        </View> 
+        <View style={{ flexDirection: "column" }}>
+          <SectionTitle
+            style={styles.leftTitle}
+            accessible={true}
+            accessibilityRole="header"
+            accessibilityLevel={2}
+            accessibilityLabel="Paperless Billing"
+          >
+            Paperless Billing
+          </SectionTitle>
+          {showSkeleton ? (
+            <SkeletonPlaceholder>
+              <View style={{ width: 80, height: 20, borderRadius: 4, marginLeft: 10, marginTop: 6 }} />
+            </SkeletonPlaceholder>
+          ) : (
+            <Hyperlink
+              style={styles.manageLink}
+              accessible={true}
+              accessibilityRole='link'
+              accessibilityHint="Double tap to navigate to Paperless Billing management page."
+              accessibilityLabel={"Manage Paperless Billing" }
             >
-              <View style={{ alignSelf: "center" }}>
-              <PaperIconBg />
-              </View>
-
-              <Text style={styles.leftTitle}>Paperless Billing</Text>
-            </View>
-          </View>
-          {paperLessInfo.length>0 ? (
-            <>
-              <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
-              <Text style={[styles.dueDate]}>{paperLessInfo?.[0].emailAddress}</Text>
-              <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
-              <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Paperless Billing!</Text>
-            </>
+              Manage
+            </Hyperlink>
+          )}
+        </View>
+        <View style={{ position: "absolute", right: 10, top: 0, bottom: 0, justifyContent: "center" }}>
+          {showSkeleton ? (
+            <SkeletonPlaceholder>
+              <View style={{ width: 56, height: 22, borderRadius: 4 }} />
+            </SkeletonPlaceholder>
           ) : (
             <>
-              <Text style={styles.autoPayStatusTextInActive}>Paperless Billing Off</Text>
-              <View style={[styles.headerContainer,{alignItems:'center',justifyContent:'center'}]}>
-                <View style={{flexDirection:'column'}}>
-                <Text style={[styles.dueDate]}>Turn on Paperless Billing today! </Text>
-                <Text style={styles.subText}>Statements delivered via email.</Text>
+              {paperlessStatus ? (
+                <View style={styles.iconContainer}>
+                  <StatusIcon status="On" style={styles.statusIcon} />
+                  <IndicatorText
+                    style={styles.statusText}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel="Paperless Billing is On"
+                  >
+                    On
+                  </IndicatorText>
                 </View>
-              </View>
+              ) : (
+                <View style={styles.iconContainer}>
+                  <StatusIcon status="Off" style={styles.statusIcon} />
+                  <IndicatorText
+                    style={styles.statusText}
+                    accessible={true}
+                    accessibilityRole="text"
+                    accessibilityLabel="Paperless Billing is Off"
+                  >
+                    Off
+                  </IndicatorText>
+                </View>
+              )}
             </>
           )}
-          <View style={styles.cardFooter}>
-            <TouchableOpacity
-             onPress={() => {
-              navigation.dispatch(
-                CommonActions.reset({
-                  index: 0,
-                  routes: [
-                    { name: 'account', params: { screen: 'Notifications' } },
-                  ],
-                })
-              );
-            }}
-              accessible={true}
-              accessibilityLabel="Manage Paperless Billing"
-              accessibilityRole="button"
-              style={styles.paymentButton}
-            >
-              <Text style={styles.paymentButtonText}>Manage Paperless Billing</Text>
-              <View style={{ marginLeft: 2 }}>
-                <RightArrow color={colors.snow_white} />
-              </View>
-            </TouchableOpacity>
-          </View>
+        </View>
       </View>
-   
+    </Touchable>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: Padding.p_xs,
-    marginBottom: 23
-  },
-  shadowContainer: {
-    shadowColor: "#171717",
-    shadowOffset: { width: -2, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  card: {
-    flexDirection: 'row',
-    backgroundColor: "white",
-    borderRadius: 10,
-    alignSelf: "center",
-    overflow: 'hidden',
-    width: wp('92%'),
-  },
-  leftSection: {
-    paddingHorizontal: Padding.p_5xl,
-    paddingBottom: Padding.p_xs,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: wp('39%'),
-    height: '100%',
-    position: 'relative',
-  },
-  circleContainerShadow: {
-    position: 'absolute',
-    top: '50%',
-    left: -wp('38.75%') - 20,
-    width: wp('84%'),
-    height: wp('84%'),
-    borderRadius: wp('41.5%'),
-    backgroundColor: 'rgba(71, 84, 103, 0.05)',
-    transform: [{ translateY: -wp('41.5%') }],
-  },
-  circleContainer: {
-    position: 'absolute',
-    top: '50%',
-    left: -wp('38.75%') - 15,
-    width: wp('77.5%'),
-    height: wp('77.5%'),
-    borderRadius: wp('38.75%'),
-    backgroundColor: colors.sparklight_bright_purple,
-    transform: [{ translateY: -wp('38.75%') }],
-  },
-  icon: {
-    alignContent: 'flex-start',
-    alignSelf: 'flex-start',
-    marginBottom: 10,
-  },
   leftTitle: {
-    color: colors.sp_black,
-    fontSize: 18,
-    fontWeight: "400",
-    textAlign: "center",
-    marginLeft: 10,
+    marginLeft: 8,
     alignContent: "flex-start",
     alignSelf: "center",
   },
-  cardContent: {
-    alignItems:"center",
+  manageLink: {
+    marginLeft: 10,
   },
+  
   statusRow: {
     flexDirection: "row",
     justifyContent: "center",
@@ -146,94 +132,29 @@ const styles = StyleSheet.create({
     width: "100%",
     marginVertical: 5,
   },
-  dueDate: {
-    fontSize: 14,
-    fontWeight: "700",
-    alignContent: 'center',
-    fontFamily: FontFamily.openSansRegular,
-    color: colors.sparklight_purple_blue,
-    textAlign: 'center',
-    marginHorizontal:20,
-  },
-  thankYouText: {
-    fontSize: 14,
-    color: colors.sparklight_purple_blue,
-    textAlign: 'center',
-    fontWeight: "700",
-    FontFamily: FontFamily.openSansRegular,
-    marginTop: Padding.p_xs,
-    marginBottom: 19,
-  },
-  subText: {
-    fontSize: 14,
-    color: colors.gray600,
-    alignSelf: 'center',
-    
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "400",
-  },
-  autoPayStatusText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.sparklight_green,
-    backgroundColor: Color.success50,
-    alignSelf: 'center',
-    width: wp("40%"),
-    textAlign: 'center',
-    borderColor: colors.sparklight_green,
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 5,
-    marginTop: 13,
-    marginBottom: 12,
-    marginHorizontal:20,
-  },
-  autoPayStatusTextInActive: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: colors.dark_grey,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: 'center',
-    borderColor: colors.dark_grey,
-    borderWidth: 1,
-    textAlign: 'center',
-    width: wp("40%"),
-    borderRadius: 5,
-    padding: 5,
-    marginHorizontal:20,
-    marginVertical: Padding.p_base,
-  },
-  paymentButton: {
+  iconContainer: {
     flexDirection: "row",
-    backgroundColor: colors.sparklight_purple_blue,
-    width:wp("70%"),
-    paddingVertical: 8,
-    alignItems:'center',
-    justifyContent:'center',
-    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  statusIcon: {
+    marginTop: 0,
+    bottom: -1,
+    marginRight: 4,
+  },
+  statusText: {
+    marginLeft: 0,
+    marginTop: 0,
+  },
+  iconBg: {
     alignSelf: "center",
-    marginLeft: wp("9%"),
+    backgroundColor: "#8D3B901A",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  paymentButtonText: {
-    color: colors.snow_white,
-    fontSize: 16,
-    fontWeight: "600",
-    alignSelf:'center',
-    fontFamily: FontFamily.openSansRegular,
-  },cardHreader: {
-    flexDirection: "row",
-    backgroundColor: "#F8F8F8",
-    width:wp("92%"),
-    padding: 10,
-  },cardFooter: {
-    flexDirection: "row",
-    backgroundColor: "#F8F8F8",
-    width:wp("100%"),
-    padding: 10,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-  }
 });
 
 export default PeperLessCard;

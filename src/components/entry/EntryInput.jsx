@@ -1,28 +1,24 @@
-import React, { memo , useRef, useEffect,useState } from 'react';
+import React, { useRef } from 'react';
 import {
     StyleSheet,
     View,
     TextInput,
-    FlatList,
-    Text,
-    TouchableOpacity,
     Image,
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../GlobalStyles';
+import { formatInputA11yReadout } from '../../utils/a11y';
+import Phone from '../../res/svgIcons/Phone';
+import EmailIcon from '../../res/svgIcons/EmailIcone';
 
-const EntryInput = ({ input, placeholder, onChangeText, onSubmitText, iconImage, keyboardType }) => {
+const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconImage, keyboardType,style }) => {
     const inputRef = useRef(null);
 
     return (
-        <View style={styles.inputContainer}  accessibilityLabel="Input field with icon">
-        <Image
-            source={iconImage}
-            style={[styles.searchIcon, styles.leftIcon]}
-        />
+        <View style={[styles.inputContainer,style]}>
         <TextInput
             autoCapitalize="none"
             ref={inputRef}
-            style={styles.searchInput}
+            style={[styles.searchInput]}
             placeholder={placeholder}
             value={input}
             onChangeText={onChangeText}
@@ -33,11 +29,16 @@ const EntryInput = ({ input, placeholder, onChangeText, onSubmitText, iconImage,
             keyboardType={keyboardType}
             returnKeyType="done"
             enterKeyHint="done"
-            accessibilityLabel={placeholder} // Use the placeholder as the label for clarity
-            accessibilityTraits="search field"
+            accessibilityLabel={formatInputA11yReadout({
+                label: placeholder,
+                value: input,
+                isPhoneNumber: keyboardType === 'phone-pad',
+            })}
+            accessibilityRole="text"
+            importantForAccessibility="yes"
         />
     </View>
-    
+
     );
 };
 
@@ -55,9 +56,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF', // Example background color
         borderWidth: 1,
         borderColor: Color.sparklightGray, // Example border color
-        borderRadius: 1, // Example border radius
+        borderRadius: 8, // Example border radius
         height: 56, // Example height
-        width: '80%'
+        width: '90%'
     },
     searchIcon: {
         marginLeft: Padding.p_xs, // Example padding
@@ -72,8 +73,7 @@ const styles = StyleSheet.create({
         flex:1,
         flexDirection: 'row', // To align icons and text
         alignItems: 'center', // Vertically center the content
-        alignSelf: 'stretch',
-        flex: 1,
+        alignSelf: 'center',
         paddingHorizontal: Padding.p_base, // Example padding
         fontSize: FontSize.size_base, // Example font size
         color: Color.sparklightGray1, 
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     suggestionText: {
         flex: 1, // To ensure text takes up the remaining space
         fontSize: FontSize.size_base,
-        fontFamily: FontFamily.openSansRegular,
+        fontFamily: FontFamily.RadioCanadaRegular,
         color: Color.colorMidnightblue, // Spark Light Purple from the design
     },
     overlayStyle: {

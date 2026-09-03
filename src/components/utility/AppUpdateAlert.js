@@ -1,17 +1,16 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   View,
   Platform,
   StyleSheet,
   Text,
-  SafeAreaView,
-  TouchableOpacity,
   Modal,
   Linking,
 } from "react-native";
 import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import { Color, Padding, FontFamily, Border } from "../../../GlobalStyles";
+import Touchable from "../common/customui/Touchable";
 
 const AppUpdateAlert = ({ visible, onClose }) => {
   return (
@@ -37,7 +36,8 @@ const AppUpdateAlert = ({ visible, onClose }) => {
           <Text style={{ ...styles.message, textAlign: 'center' }}>
             To continue using the MySparklight app, please download the latest version. Enjoy new features, improved performance, and enhanced security.
           </Text>
-          <TouchableOpacity
+          <Touchable
+            minSize={0}
             style={styles.closeBtn}
             accessibilityLabel="Update the app now"
             accessibilityHint="Opens the app store to update the app"
@@ -55,7 +55,7 @@ const AppUpdateAlert = ({ visible, onClose }) => {
             }}
           >
             <Text style={styles.closeAlertTxt}>Update Now</Text>
-          </TouchableOpacity>
+          </Touchable>
         </View>
       </View>
     </Modal>
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
   },
   message: {
     color: colors.darkest_grey,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 28,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   closeAlertTxt: {
     color: colors.snow_white,
     fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: 'center',
   },
   buttonContainer: {
@@ -118,8 +118,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.sparklight_grey,
-    fontFamily: FontFamily.openSansRegular,
+    color: colors.black,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     fontWeight: "600",
     marginLeft: 10,

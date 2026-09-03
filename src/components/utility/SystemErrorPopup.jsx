@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  Image,
   Modal,
-  Linking
 } from "react-native";
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
+import Touchable from "../common/customui/Touchable";
 
 
 const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClose }) => {
@@ -46,33 +44,29 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
             <Text style={styles.message}>{message}</Text>
-             <TouchableOpacity
+             <Touchable
               style={styles.openBtn}
               onPress={onAction}
-              accessible={true}
               accessibilityLabel={onActionTxt}
-              accessibilityRole="button"
             >
               <Text
                 style={styles.openPortaltxt}
               >
                {onActionTxt}
               </Text>
-            </TouchableOpacity> 
+            </Touchable>
            {onClose!=undefined && (
-            <TouchableOpacity
+            <Touchable
               style={styles.closeBtn}
               onPress={onClose}
-              accessible={true}
               accessibilityLabel="Cancel"
-              accessibilityRole="button"
             >
               <Text
                 style={styles.closeAlertTxt}
               >
                 Cancel
               </Text>
-            </TouchableOpacity>
+            </Touchable>
            )}
           </View>
         </View>
@@ -107,11 +101,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "black",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   message: {
     color: colors.darkest_grey,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 24,
@@ -134,8 +128,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.sparklight_grey,
-    fontFamily: FontFamily.openSansRegular,
+    color: colors.black,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     textAlign:'center',
     fontWeight: "400",
@@ -157,14 +151,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 8,
     fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   closeAlertTxt: {
     color: colors.sparklight_purple_blue,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
 });
 

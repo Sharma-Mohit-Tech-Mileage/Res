@@ -15,7 +15,9 @@ const colors = {
     splash_bg:'#8D3B90',
     sp_black:'#292929',
     gray600: "#475467",
-    backgroundGR: '#2BA948'
+    backgroundGR: '#2BA948',
+    black: '#000000',
+    Black_100: '#101828',
 
   }
   

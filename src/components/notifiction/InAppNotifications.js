@@ -1,140 +1,335 @@
-import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, Text, Pressable, View, ScrollView, Platform } from "react-native";
-import { Color, FontSize, FontFamily, Padding, Border } from "../../../GlobalStyles";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import {
+  StyleSheet,
+  View,
+  Animated,
+  ScrollView,
+  Platform,
+  Linking,
+  Alert,
+  AccessibilityInfo,
+} from "react-native";
+import Touchable from "../common/customui/Touchable";
+import { Color, Padding } from "../../../GlobalStyles";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
-import { useDispatch } from 'react-redux';
-import { transformToUserPreferences } from '../utility/constant';
+import { widthPercentageToDP } from "react-native-responsive-screen";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { updatePushNotificationsv2 } from '../../redux/actions/ProfileActionSuite';
-import moment from 'moment';
-import Toggle from '../common/Toggle';
-import { getFcmToken, notifyPermission, requestUserPermission } from '../../firebase/FirebaseUtils';
+import moment from "moment";
+import Toggle from "../common/Toggle";
+import { postPushNotifications } from "../../network/apis/account/profile.service";
+import usePushPermissionSync from "../../hooks/usePushPermissionSync";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
+import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
+import AppStyles from "../../styles/AppStyles";
+import SecondaryButton from "../common/customui/PrimaryButton";
+import { SectionTitle, SectionContent } from "../common/customui/Typography";
+import {
+  getFcmToken,
+  notifyPermission,
+  requestUserPermission,
+} from "../../firebase/FirebaseUtils";
 import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
-const InAppNotifications = ({ navigation }) => {
-  const [initialize, setInitializeSettings] = useState({});
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const route = useRoute(); 
-  const additionalData = route.params?.additionalData;
-  const dispatch = useDispatch();
-  const scrollViewRef = useRef(null);
-  const isFocused = useIsFocused();
-  useEffect(() => {
 
-    if (isFocused) {
-      const initializedSettings = transformToUserPreferences(additionalData);
-      setInitializeSettings(initializedSettings);
+const initialFormState = {
+  optOut: false,
+  outageOptOut: false,
+  billingOptOutStatus: false,
+};
+
+const InAppNotifications = ({ navigation }) => {
+  const route = useRoute();
+  const [formData, setFormData] = useState(() => ({
+    ...initialFormState,
+    ...(route.params?.additionalData || {}),
+  }));
+  const [notification, setNotification] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isNotificationRequired, setIsNotificationRequired] = useState(false);
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+
+  const scrollViewRef = useRef(null);
+  const animatedValue = useRef(new Animated.Value(-100)).current;
+  const timeoutRef = useRef(null);
+  const isFocused = useIsFocused();
+
+  const isAndroidA11yModalActive =
+    Platform.OS === "android" &&
+    screenReaderEnabled &&
+    notification?.type === "error";
+
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
+
+  const translateY = animatedValue;
+
+  const animateNotification = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
 
+    animatedValue.setValue(-100);
+    Animated.timing(animatedValue, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, [animatedValue]);
+
+  useEffect(() => {
     return () => {
-      if (isFocused) {
-        setInitializeSettings({});
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
     };
-  }, [isFocused, additionalData]);
-  const handleToggleChange = (e) => {
-    const { name, value } = e.target;
-    setInitializeSettings(initialize => {
-      const updatedSettings = {
-        ...initialize,
-        [name]: !value
-      };
-      return updatedSettings;
-    });
-  };
+  }, []);
 
+  useEffect(() => {
+    if (notification) {
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      animateNotification();
+    }
+  }, [notification, animateNotification]);
+
+  useEffect(() => {
+    if (isFocused) {
+      const initializedSettings = route.params?.additionalData || {};
+      setFormData((prev) => ({ ...prev, ...initializedSettings }));
+    }
+  }, [isFocused, route.params?.additionalData]);
+
+  usePushPermissionSync((granted) => setIsNotificationRequired(!granted));
 
   useEffect(() => {
     if (route.params?.updateFailed) {
-      setShowErrorAlert(true);
-      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-      navigation.setParams({ updateFailed: undefined });
+      setNotification({
+        message:
+          route.params.errorMessage || "In-App Notifications update failed.",
+        type: "error",
+      });
+      navigation.setParams({
+        updateFailed: undefined,
+        errorMessage: undefined,
+      });
     }
-  }, [route.params?.updateFailed, navigation, dispatch]);
+  }, [route.params?.updateFailed, route.params?.errorMessage, navigation]);
 
-  const handleSave = async () => {
+  useEffect(() => {
+    if (route.params?.updateSuccess) {
+      setNotification({
+        message:
+          route.params.successMessage ||
+          "Your in-app notification preferences have been updated successfully.",
+        type: "success",
+      });
+      navigation.setParams({
+        updateSuccess: undefined,
+        successMessage: undefined,
+      });
+    }
+  }, [route.params?.updateSuccess, route.params?.successMessage, navigation]);
+
+  const handleToggleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const checkNofif = async (value) => {
+    if (!value) return;
+
     const pushNotification = await getPushNotificationStatus();
     if (pushNotification?.permanentSkip) {
-      await notifyPermission()
-    } else {
-      await requestUserPermission();
+      await notifyPermission();
+      return;
     }
-    const token = await getFcmToken();
-    initialize.deviceToken = token;
-    initialize.deviceTokenTimestamp = moment().format();
-    initialize.isAndroid = Platform.OS === "android"
-    await dispatch(updatePushNotificationsv2(initialize, navigation));
 
-  }
+    const enabledPermission = await requestUserPermission();
+    if (enabledPermission) {
+      setIsNotificationRequired(false);
+      return;
+    }
+
+    setIsNotificationRequired(true);
+    Alert.alert(
+      "Sparklight Would Like to Send You Notifications",
+      "Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.",
+      [
+        {
+          text: "Go to Settings",
+          style: "cancel",
+          onPress: () => {
+            if (Platform.OS === "ios") {
+              Linking.openURL("app-settings:");
+            } else {
+              Linking.openSettings();
+            }
+          },
+        },
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => {
+            setIsNotificationRequired(false);
+          },
+        },
+      ],
+    );
+  };
+
+  const postRequestInAppNotification = async () => {
+    if (
+      formData.optOut ||
+      formData.outageOptOut ||
+      formData.billingOptOutStatus
+    ) {
+      await checkNofif(true);
+    }
+
+    setIsSubmitting(true);
+    setIsLoading(true);
+
+    try {
+      const token = await getFcmToken();
+
+      // omit deviceToken when unavailable rather than storing a non-push id as a token
+      const requestData = {
+        deviceToken: token || undefined,
+        deviceTokenTimestamp: moment().format(),
+        isAndroid: Platform.OS === "android",
+        optOut: !formData.optOut,
+        outageOptOut: !formData.outageOptOut,
+        billingOptOutStatus: !formData.billingOptOutStatus,
+      };
+
+      await postPushNotifications(requestData);
+      setIsLoading(false);
+      setIsSubmitting(false);
+      setNotification({
+        message:
+          "Your in-app notification preferences have been updated successfully.",
+        type: "success",
+      });
+    } catch (error) {
+      setIsLoading(false);
+      setIsSubmitting(false);
+      console.warn("Permission error:", error);
+      setNotification({
+        message: "Failed to update notification preferences.",
+        type: "error",
+      });
+    }
+  };
+
+  const handleSave = async () => {
+    await postRequestInAppNotification();
+  };
+
   return (
-    <View style={styles.inAppNotifications} >
+    <View style={styles.inAppNotifications}>
       <ProfileSettingsHeader
         title="Edit In-App Notifications"
-        onPressBack={() => navigation.navigate('Notifications')}
+        onPressBack={() => navigation.navigate("Notifications")}
       />
-      <ScrollView>
+
+      {isLoading && (
+        <LoadingOverlay
+          loading={isLoading}
+          loadingTxt="Saving"
+          accessibilityLiveRegion="polite"
+        />
+      )}
+
+      <ScrollView ref={scrollViewRef}>
         <View style={styles.inAppNotificationsInner}>
+          <View style={[AppStyles.card, { margin: 16 }]}>
+            <View >
+              {notification && (
+                <Animated.View
+                  style={[
+                    styles.alertContainer,
+                    { transform: [{ translateY }] },
+                  ]}
+                  accessible={false}
+                  importantForAccessibility="yes"
+                >
+                  <View style={styles.spaceBottom}>
+                    <NotificationAlert
+                      type={notification.type}
+                      title={
+                        notification.type === "error" ? "Error" : "Success"
+                      }
+                      message={notification.message}
+                      showCloseIcon={true}
+                      onClose={() => setNotification(null)}
+                      accessibilityLiveRegion="assertive"
+                      accessibilityRole="alert"
+                      accessibilityLabel={notification.message}
+                      isVisible={true}
+                      autoFocusTitle={false}
+                    />
+                  </View>
+                </Animated.View>
+              )}
 
-          <View style={{ alignSelf: "stretch" }}  >
+              <View
+                importantForAccessibility={
+                  isAndroidA11yModalActive ? "no-hide-descendants" : "auto"
+                }
+                accessibilityElementsHidden={isAndroidA11yModalActive}
+              >
+                <NotificationSetting
+                  title="Appointments"
+                  name="optOut"
+                  value={formData.optOut}
+                  description="Receive app notifications when your appointments have updates."
+                  onChange={handleToggleChange}
+                />
 
-            <View style={[styles.frameGroup, styles.frameBorder]}>
-              <View style={styles.infoWrapper}><NotificationAlert
-                type="error"
-                title="Failed"
-                message="Notifications updated failed."
-                showCloseIcon={true}
-                isVisible={showErrorAlert}
-                onClose={() => setShowErrorAlert(false)}
-              /></View>
-              <NotificationSetting
-                title="Appointments"
-                name='optOut'
-                value={!initialize.optOut}
-                description="Receive app notifications when your appointments have updates."
-                onChange={handleToggleChange}
-              />
-              <NotificationSetting
-                title="Outage Alerts"
-                name='outageOptOut'
-                value={!initialize.outageOptOut}
-                description="Receive app notifications when outage occur."
-                onChange={handleToggleChange}
-              />
-              <NotificationSetting
-                title="Billing"
-                name='billingOptOutStatus'
-                value={!initialize.billingOptOutStatus}
-                description="Receive app notifications for billing."
-                onChange={handleToggleChange}
-              />
+                <View style={styles.divider} />
+
+                <NotificationSetting
+                  title="Outage Alerts"
+                  name="outageOptOut"
+                  value={formData.outageOptOut}
+                  description="Receive app notifications when outages occur."
+                  onChange={handleToggleChange}
+                />
+
+                <View style={styles.divider} />
+
+                <NotificationSetting
+                  title="Billing"
+                  name="billingOptOutStatus"
+                  value={formData.billingOptOutStatus}
+                  description="Receive app notifications for billing."
+                  onChange={handleToggleChange}
+                />
+              </View>
             </View>
-            <View style={styles.buttonsParent}  >
-              <Pressable
-               accessible={true}
-               accessibilityLabel="Save"
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  { backgroundColor: Color.colorMidnightblue, opacity: pressed ? 0.7 : 1.0 }, // Changes opacity based on press state
-                  styles.buttonsLayout
-                ]}
-                onPress={handleSave}
-              >
-                <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
-              </Pressable>
-              <Pressable
-               accessible={true}
-               accessibilityLabel="Cancel"
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  styles.buttons1,
-                  styles.buttonsLayout,
-                  { opacity: pressed ? 0.7 : 1.0 }
-                ]}
-                onPress={() => navigation.navigate("Notifications")}
-              >
-                <Text style={[{ color: Color.colorMidnightblue }, styles.makeTypo]}>Cancel</Text>
-              </Pressable>
-            </View>
+          </View>
+
+          <View style={styles.buttonsParent}>
+            <SecondaryButton
+              title="Save"
+              onPress={handleSave}
+              accessibilityLabel={
+                isSubmitting ? "Saving settings..." : "Save settings"
+              }
+              accessibilityHint="Double tap to save your notification preferences"
+              style={styles.saveButton}
+              disabled={isSubmitting}
+              buttonType="submit"
+            />
+            <SecondaryButton
+              title="Cancel"
+              onPress={() => navigation.goBack()}
+              accessibilityLabel="Cancel"
+              accessibilityHint="Double tap to cancel and go back"
+              style={styles.cancelButton}
+              disabled={isSubmitting}
+            />
           </View>
         </View>
       </ScrollView>
@@ -143,120 +338,123 @@ const InAppNotifications = ({ navigation }) => {
 };
 
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
-  <View style={[styles.frameContainer, styles.frameBorder]}>
+  <Touchable
+    minSize={0}
+    style={styles.frameContainer}
+    accessible={false}
+    importantForAccessibility="no"
+    onPress={() => onChange(name, !value)}
+  >
     <View style={styles.frameView}>
-      <View style={[{ justifyContent: "center" }, styles.tabsParentFlexBox]}>
-        <View style={styles.appointmentsParent}>
-          <Text style={styles.appointments}>{title}</Text>
-          <View>
+      <View style={styles.rowContent}>
+        <View style={styles.textWrap}>
+          <View style={styles.titleRow}>
+            <SectionTitle
+              style={styles.appointments}
+              accessible={true}
+              accessibilityRole="text"
+              accessibilityLabel={`${title} for In-app notifications. ${description}`}
+            >
+              {title}
+            </SectionTitle>
             <Toggle
               name={name}
               initialValue={value}
               label={title}
-              onToggle={onChange} />
+              description={description}
+              onToggle={() => onChange(name, !value)}
+              section="inAppNotif"
+            />
           </View>
+          <SectionContent
+            style={styles.descriptionText}
+            accessible={false}
+            importantForAccessibility="no"
+          >
+            {description}
+          </SectionContent>
         </View>
-        <Text style={[styles.receiveAppNotifications1, styles.receiveTypo,]}>
-          {description}
-        </Text>
       </View>
     </View>
-  </View>
+  </Touchable>
 );
 
 const styles = StyleSheet.create({
-
+  cardContainer: {
+    margin: 16,
+    padding: 0,
+    overflow: "hidden",
+  },
   frameBorder: {
     borderColor: Color.sparklightGray,
     backgroundColor: Color.sparklightWhite,
     alignItems: "center",
     borderStyle: "solid",
   },
-  tabsParentFlexBox: {
-    flex: 1,
-    justifyContent: "center",
+  alertContainer: {
+    paddingHorizontal: Padding.p_xs,
+    paddingTop: Padding.p_9xs,
+    alignSelf: "center",
+    width: "100%",
   },
-  receiveTypo: {
-    fontSize: FontSize.textXsSemibold_size,
-    color: Color.sparklightaddGray,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+  divider: {
+    height: 1,
+    backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
-  },
-  buttonsLayout: {
-    paddingHorizontal: 0,
-    width: '100%',
-    paddingVertical: Padding.p_base,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    height: 56,
-  },
-  makeTypo: {
-    width: 282,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    textAlign: "center",
   },
   appointments: {
-    color: Color.colorGray_100,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    lineHeight: 22,
     flex: 1,
   },
-  appointmentsParent: {
+  rowContent: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  titleRow: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "stretch",
+    justifyContent: "space-between",
+    width: "100%",
   },
   frameView: {
-    paddingVertical: Padding.p_base,
+    paddingVertical: Padding.p_5xs,
     flexDirection: "row",
-    alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
-    flex: 1,
+    width: "100%",
   },
   frameContainer: {
-    borderBottomWidth: 1,
+    borderBottomWidth: 0,
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "stretch",
   },
-  receiveAppNotifications1: {
-    color: Color.colorGray_100,
-    lineHeight: 22,
+  textWrap: {
+    flexDirection: "column",
+    flex: 1,
+    marginRight: 10,
   },
-  frameGroup: {
-    borderWidth: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    backgroundColor: Color.sparklightWhite,
-    alignSelf: "stretch",
-    overflow: "hidden",
+  descriptionText: {
+    marginTop: 0,
+    marginBottom: Padding.p_9xs,
   },
-  infoWrapper: {
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
-    paddingTop: Padding.p_base
-  },
-  buttons1: {
-    marginTop: 16,
-    backgroundColor: Color.colorWhitesmoke_200,
-    paddingHorizontal: 0,
+  spaceBottom: {
+    marginVertical: 16,
+    width: widthPercentageToDP("85%"),
   },
   buttonsParent: {
-    marginTop: 16,
-    alignSelf: "stretch",
+    margin: 16,
+    alignSelf: "center",
+    width: "90%",
+  },
+  saveButton: {
+    backgroundColor: Color.colorMidnightblue,
+  },
+  cancelButton: {
+    backgroundColor: Color.colorWhitesmoke_200,
   },
   inAppNotificationsInner: {
-    paddingTop: Padding.p_5xl,
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
-    width: '100%',
-    overflow: "hidden",
+    width: "100%",
   },
   inAppNotifications: {
     flex: 1,

@@ -8,10 +8,11 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
+import com.facebook.react.soloader.OpenSourceMergedSoMapping;
 
 import java.io.IOException;
 import java.util.List;
-
+import java.io.IOException;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -57,39 +58,18 @@ public class MainApplication extends Application implements ReactApplication {
     return mReactNativeHost;
   }
 
-  @Override
-  public void onCreate() {
+@Override
+public void onCreate() {
     super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
-    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-      // If you opted-in for the New Architecture, we load the native entry point for this app.
-      DefaultNewArchitectureEntryPoint.load();
+    try {
+        SoLoader.init(this, OpenSourceMergedSoMapping.INSTANCE);
+    } catch (IOException e) {
+        throw new RuntimeException(e);
     }
-    //ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
-
-
-//      OkHttpClient client = new OkHttpClient();
-//
-//      new Thread(new Runnable() {
-//          @Override
-//          public void run() {
-//              Request request = new Request.Builder()
-//                      .url(ZENDESK_API_URL)
-//                      .header("Authorization", "Bearer " + AUTH_TOKEN)
-//                      .build();
-//
-//              try (Response response = client.newCall(request).execute()) {
-//                  if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-//
-//                  System.out.println(response.body().string());
-//              } catch (IOException e) {
-//                  throw new RuntimeException(e);
-//              }
-//          }
-//      }).start();
-
-
-  }
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+        DefaultNewArchitectureEntryPoint.load();
+    }
+}
 
 
 }

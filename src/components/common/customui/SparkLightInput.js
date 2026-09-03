@@ -1,190 +1,326 @@
-import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { FontFamily, Padding, Color, FontSize, Border } from "../../../../GlobalStyles";
-import warningIcon from '../../../../assets/alert-triangle.png';
-import eyeIcon from '../../../../assets/eye.png';
-import eyeSlashIcon from '../../../../assets/HidePassword-01.png'
+import React, { useState, useEffect, useRef, useImperativeHandle } from "react";
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+} from "react-native";
+import {
+  FontFamily,
+  Padding,
+  Color,
+  FontSize,
+  Border,
+} from "../../../../GlobalStyles";
+import { A11Y } from "../../../styles/theme";
+import { formatInputA11yReadout, setFocusToRef } from "../../../utils/a11y";
+import WarningIcon from "../../../../assets/svgs/Alerttriangle";
+import EyeIcon from "../../../../assets/svgs/EyeIcon";
+import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
+import Passwordlock from "../../../../assets/svgs/Passwordlock";
+import Touchable from "./Touchable";
+import {FieldTitle, Hyperlink} from "./Typography";
 
-const SparkLightInput = ({
-    name,
-    label,
-    placeholder,
-    value,
-    onChangeText,
-    style,
-    accessibilityLabel,
-    secure = false,
-    error,
-    editable = true,
-    showTextIcon = false,
-    inputStyle,
-    ...props
-}) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const [passwordVisible, setPasswordVisible] = useState(!secure); // default to false if secure is true
-
-    const handleInputChange = (text) => {
-        if (onChangeText) {
-            onChangeText(text)
-        }
-    };
-
-    const togglePasswordVisibility = () => {
-        setPasswordVisible(!passwordVisible);
-    };
-
-    return (
-        <View style={[styles.outerContainer, style, error && styles.outerContainerError]}>
-            <View style={styles.labelContainer}>
-                {label && (
-                    <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
-                )}
-                {secure && (
-                    <TouchableOpacity 
-                    accessibilityLabel={passwordVisible ? 'Hide' : 'Show'}
-                    accessibilityRole="button"
-                    accessible={true}
-                    onPress={togglePasswordVisibility} style={styles.eyeButton}>
-                        <Image
-                            source={passwordVisible ? eyeSlashIcon : eyeIcon}
-                            style={styles.eyeIcon}
-                        />
-                        <Text style={styles.eyeText}>{passwordVisible ? 'Hide' : 'Show'}</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
-            <View style={[styles.textInputContainer, {
-                borderColor: isFocused && !error ? Color.sparklightBrightPurple : Color.sparklightDarkGray
-            }]}>
-                {showTextIcon &&
-                    <Image style={styles.lockIcon} source={require('../../../../assets/password_lock.png')} />
-                }
-
-                <TextInput
-                    placeholder={placeholder}
-                    value={value}
-                    onChangeText={handleInputChange}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    editable={editable}
-                    secureTextEntry={secure && !passwordVisible}
-                    style={[
-                        styles.textInput,
-                        !editable && styles.disabledInput, inputStyle,
-                        isFocused && !error && { borderColor: Color.sparklightBrightPurple },
-                        error && { borderColor: 'red' },
-                        !isFocused && !error && { borderColor: Color.sparklightDarkGray }
-                    ]}
-                    accessibilityLabel={accessibilityLabel || placeholder}
-                    returnKeyType="done" // Set the return key type to "done"
-                    keyboardAppearance="default" // Ensures the default keyboard appearance
-                    maxFontSizeMultiplier={1.25}
-                    {...props}
-                />
-            </View>
-            {error && (
-                <View style={styles.errorContainer}>
-                    <Image source={warningIcon} style={styles.errorIcon} />
-                    <Text style={styles.errorText}>{error}</Text>
-                </View>
-            )}
-        </View>
-    );
+const MyPassIcon = (passwordVisible) => {
+  return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
 };
 
-const styles = StyleSheet.create({
-    outerContainer: {
-        minHeight: 48, // Use minHeight instead of height
-        borderColor: Color.sparklightWhite,
-        borderWidth: 1,
-        borderRadius: Border.br_11xs,
-        justifyContent: 'center',
-        position: 'relative', // For absolute positioning of the error text
-    },
-    container: {
-        height: 40, // Keep the input field height
-        justifyContent: 'center',
-    },
-    textInput: {
-        height: 48, // Keep the input field height
-        color: Color.colorGray_200,
-        fontSize: FontSize.size_base,
-        fontFamily: FontFamily.openSansRegular,
-        borderRadius: Border.br_11xs,
-        paddingHorizontal: 10,
-        flex: 1
-    },
-    textInputContainer: {
-       // height: 48, // Keep the input field height
-        color: Color.colorGray_200,
-        borderWidth: 1,
-        borderRadius: Border.br_11xs,
-        flexDirection: "row",
-        alignItems: "center"
-    },
+const SparkLightInput = React.forwardRef(({
+  name,
+  label,
+  placeholder,
+  value,
+  onChangeText,
+  style,
+  accessibilityLabel,
+  accessibilityHint,
+  secure = false,
+  error,
+  errorHint,
+  editable = true,
+  showTextIcon = false,
+  inputStyle,
+  required = false,
+  onBlur: parentOnBlur,
+  onFocus: parentOnFocus,
+  ...props
+}, ref) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(!secure);
+  const inputRef = useRef(null);
+  const fieldRef = useRef(null);
+  const hasBlurred = useRef(false);
+  const isFocusedRef = useRef(false);
+  const valueRef = useRef(value);
 
-    errorContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 4, // Space between the input and the error message
+  // Keep valueRef in sync with current value prop
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      hasBlurred.current = true;
+      // Move the screen-reader cursor to the accessible wrapper (single node) so the field is read once; the live TextInput is hidden from a11y to avoid the double readout.
+      setFocusToRef(fieldRef, { delay: 200 });
     },
-    errorIcon: {
-        width: 20,
-        height: 20,
-        marginRight: Padding.p_xs,
-    },
-    errorText: {
-        color: 'red',
-        fontSize: FontSize.size_sm,
-        fontFamily: FontFamily.openSansRegular,
-    },
-    disabledInput: {
-        backgroundColor: Color.Gray300, // Light gray background
-        opacity: 1, // Make it look faded
-    },
-    outerContainerError: {
-        paddingBottom: 0, // Add padding to accommodate the error message
-    },
-    label: {
-        fontSize: FontSize.size_sm,
-        textAlign: "left",
-        color: Color.sparklightGray1,
-        fontFamily: FontFamily.openSansSemiBold,
-        fontWeight: "600",
-        marginBottom: Padding.p_5xs,
-        justifyContent: "center",
-        alignSelf: "stretch",
-    },
-    errorLabel: {
-        color: 'red', // Red color for the label when there's an error
-    },
-    labelContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        // If the label and eye button are not aligning correctly, adjust padding and margin here
-    },
-    eyeButton: {
-        flexDirection: 'row', // Ensure flex direction is row
-        alignItems: 'center', // Align items in the center vertically
-        justifyContent: 'center', // Center the items horizontally
-        // Adjust padding as needed for touch area and internal spacing
-    },
-    eyeIcon: {
-        width: 15,
-        height: 15,
-    },
-    eyeText: {
-        marginLeft: 6,
-        color: Color.colorMidnightblue,
-        lineHeight: 28,
-    },
-    lockIcon: {
-        width: 20,
-        height: 20,
-        resizeMode: "contain",
-        marginHorizontal: 10
+  }));
+
+  const handleInputChange = (text) => {
+    if (onChangeText) {
+      onChangeText(text);
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
+  // Auto-detect keyboard type based on field name/placeholder
+  const getKeyboardType = () => {
+    const lowerName = (name || placeholder || "").toLowerCase();
+    if (lowerName.includes("phone") || lowerName.includes("mobile")) {
+      return "phone-pad";
+    }
+    if (lowerName.includes("email")) {
+      return "email-address";
+    }
+    if (secure) {
+      return "default";
+    }
+    return "default";
+  };
+
+  const handleFocus = () => {
+    setIsFocused(true);
+    isFocusedRef.current = true;
+
+    if (parentOnFocus) parentOnFocus();
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+    isFocusedRef.current = false;
+    hasBlurred.current = true;
+
+    if (parentOnBlur) parentOnBlur();
+  };
+
+  // Common input styles
+  const getInputStyles = () => [
+    styles.textInput,
+    !editable && styles.disabledInput,
+    error && { borderColor: "red" },
+    !isFocused && !error && { borderColor: Color.sparklightDarkGray },
+  ];
+
+  return (
+    <View
+      style={[
+        styles.outerContainer,
+        style,
+        error && styles.outerContainerError,
+      ]}
+    >
+      <View style={[styles.labelContainer, secure && styles.labelContainerSecure]}>
+        {label && (
+          <View
+            accessible={false}
+            accessibilityElementsHidden={true}
+            importantForAccessibility="no-hide-descendants"
+          >
+            <FieldTitle style={[styles.label, error && styles.errorLabel]}>
+              {label}
+            </FieldTitle>
+          </View>
+        )}
+        {secure && (
+          <Touchable
+            accessibilityLabel={
+              passwordVisible ? "Hide password" : "Show password"
+            }
+            onPress={togglePasswordVisibility}
+            style={styles.eyeButton}
+          >
+            <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
+            <Hyperlink style={styles.eyeText}>
+              {passwordVisible ? "Hide" : "Show"}
+            </Hyperlink>
+          </Touchable>
+        )}
+      </View>
+
+      <View
+        ref={fieldRef}
+        accessible={true}
+        accessibilityRole="text"
+        accessibilityLabel={`${formatInputA11yReadout({
+          label: accessibilityLabel || label || placeholder,
+          required,
+          value,
+          isPhoneNumber: getKeyboardType() === "phone-pad",
+          isSecure: secure,
+          // The real TextInput is a11y-hidden, so iOS never auto-reads the value — compose it here.
+          osAddsValue: false,
+        })}${editable ? ", double tap to edit" : ""}`}
+        accessibilityHint={error ? (errorHint || error) : undefined}
+        importantForAccessibility="yes"
+        style={[
+          styles.textInputContainer,
+          {
+            borderColor:
+              isFocused && error != undefined
+                ? "red"
+                : Color.sparklightDarkGray,
+          },
+        ]}
+      >
+        {showTextIcon && (
+          <View style={styles.lockIcon}>
+            <Passwordlock />
+          </View>
+        )}
+
+        <TextInput
+          placeholder={placeholder}
+          value={value}
+          ref={inputRef}
+          onChangeText={handleInputChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          editable={editable}
+          secureTextEntry={secure && !passwordVisible}
+          style={getInputStyles()}
+          accessible={false}
+          importantForAccessibility="no"
+          keyboardType={getKeyboardType()}
+          returnKeyType="done"
+          keyboardAppearance="default"
+          maxFontSizeMultiplier={1.25}
+          {...props}
+        />
+      </View>
+
+      {error && (
+        <View
+          style={styles.errorContainer}
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
+          accessibilityLiveRegion="none"
+        >
+          <View
+            style={styles.errorIcon}
+            accessible={false}
+            importantForAccessibility="no"
+          >
+            <WarningIcon color="#EF4E3E" />
+          </View>
+          <Text
+            style={styles.errorText}
+            accessible={false}
+            importantForAccessibility="no"
+          >
+            {error}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+});
+
+const styles = StyleSheet.create({
+  outerContainer: {
+    minHeight: 48,
+    justifyContent: "center",
+    position: "relative",
+  },
+  container: {
+    height: 40,
+    justifyContent: "center",
+  },
+  textInput: {
+    height: 48,
+    color: Color.colorGray_200,
+    fontSize: FontSize.size_base,
+    paddingHorizontal: FontSize.size_base,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    borderWidth: 1,
+    paddingVertical: 12,
+    borderRadius: Border.br_5xs,
+    backgroundColor: '#FFFFFF',
+    borderColor:'#C7C7CC',
+    width: "100%",
+  },
+  textInputContainer: {
+    borderWidth: 0,
+    borderRadius: Border.br_5xs,
+
+    borderColor: "#C7C7CC",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  errorIcon: {
+    width: 20,
+    height: 20,
+    marginRight: Padding.p_xs,
+  },
+  errorText: {
+    color: "red",
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.RadioCanadaRegular,
+  },
+  disabledInput: {
+    backgroundColor: Color.Gray300,
+    opacity: 1,
+  },
+  outerContainerError: {
+    paddingBottom: 0,
+  },
+  label: {
+    textAlign: "left",
+    marginBottom: Padding.p_5xs,
+    alignSelf: "stretch",
+  },
+  errorLabel: {
+    color: "red",
+  },
+  labelContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  // Only password fields grow this row; non-password inputs unchanged.
+  labelContainerSecure: {
+    minHeight: A11Y.minTouch,
+  },
+  eyeButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: Padding.p_5xs,
+  },
+  eyeIcon: {
+    width: 15,
+    height: 15,
+  },
+  eyeText: {
+    marginLeft: 6,
+    lineHeight: 28,
+    color: "#8D3B90",
+    textDecorationLine: "underline",
+    textDecorationColor: "#8D3B90",
+  },
+  lockIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
+    marginHorizontal: 10,
+  },
 });
 
 export default SparkLightInput;

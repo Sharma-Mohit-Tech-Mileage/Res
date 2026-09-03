@@ -9,7 +9,7 @@ function* getInternetSpeed(action) {
      yield put(updateCurrentSpeed(response));
      
     } catch (error) {
-      console.log(error);
+      console.warn(error);
     } finally {
       //yield put(apiCalled());
     }
@@ -20,13 +20,11 @@ function* postInternetSpeed(action) {
     yield call(postCurrentSpeedInfo,action.payload);
     //Doing this because call fails on uat
     const getResults = yield call(getCurrentSpeedInfo);
-    console.log('getResults:', getResults);
     yield put(updateCurrentSpeed(getResults));
    } catch (error) {
-     console.log(error);
+     console.warn(error);
      //Doing this because call fails on uat
      const getResults = yield call(getCurrentSpeedInfo);
-     console.log('getResults:', getResults);
      yield put(updateCurrentSpeed(getResults));
 
    } finally {
@@ -37,11 +35,10 @@ function* postInternetSpeed(action) {
 function* getUserAccountInfo(action) {
   try {
     const response = yield call(getAccountInfo,action.payload)
-    console.log('Account Info',response)
     yield put(updateAccountInfo(response));
     
    } catch (error) {
-     console.log(error);
+     console.warn(error);
    } finally {
      //yield put(apiCalled());
    }

@@ -1,28 +1,28 @@
-/* fonts */
 export const FontFamily = {
-    openSansSemiBold: "OpenSans-SemiBold",
-    textXsSemibold: "Inter-SemiBold",
-    openSansRegular: 'OpenSans-Regular',
-    interBold: "Inter-Bold",
-    textXsMedium: "Inter-Medium",
+    RadioCanadaSemiBold: "RadioCanada-SemiBold",
+    RadioCanadaRegular: 'RadioCanada-Regular',
+    RadioCanadaBold: "RadioCanada-Bold",
+    RadioCanadaMedium: "RadioCanada-Medium",
 };
 
 /* font sizes */
 export const FontSize = {
-    textXsSemibold_size: 14,
+    RadioCanadaSemiBold_size: 14,
     size_base: 16,
     size_lg: 18,
     size_sm: 14,
     size_3xl: 22,
     size_xs: 12,
-    size_base: 16,
     size_smi: 13,
     size_5xl: 24,
     size_6xl: 28,
+    size_20:20
 };
+
 /* Colors */
 export const Color = {
     gray50: "#f9fafb",
+    Black_100: "#101828",
     colorWhitesmoke_100: "#f8f8f8",
     colorWhitesmoke_200: "#ebeef1",
     colorWhitesmoke_300: "#eaecf0",
@@ -30,13 +30,15 @@ export const Color = {
     colorGainsboro_200: "#d9d9d9",
     colorMidnightblue: "#353091",
     colorGray_200: "#001321",
+    colorblack_100: "#000000",
     sparklightGreen: "#2ba948",
     sparklightGray: "#e1e1e1",
     sparklightDarkGray: "#767676",
     sparklightaddGray:"#666666",
     colorGray_100: "#101828",
     sparklightGray1: "#4C5458",
-    sparklightBrightPurple: "#8D3B90",
+    sparklightPrimaryPurple: "#8D3B90",
+    sparklightSecondaryPurple: "#353091",
     success50: "#ecfdf3",
     colorAquamarine: "#abefc6",
     success700: "#067647",
@@ -47,7 +49,9 @@ export const Color = {
     colorlightRed: '#EF4E3E33',
     backgroundBlur: "#F8F8F8",
     sparklight_yellow:'#FFCE51',
+    sparklight_blue:'#00B8D8',
 };
+
 export const Padding = {
     p_5xs: 8,
     p_5xl: 24,
@@ -64,6 +68,7 @@ export const Padding = {
     p_8xs: 5,
     p_xl: 20,
 };
+
 /* border radiuses */
 export const Border = {
     br_81xl: 100,
@@ -75,4 +80,5 @@ export const Border = {
     br_7xs: 6,
     br_381xl: 400,
 };
+
 

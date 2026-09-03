@@ -1,107 +1,105 @@
 import { getUser, storeUser } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
-import store from '../../redux/configureStore';
+import store from "../../redux/configureStore";
 import { saveUserInfo } from "../../redux/actions/UserAction";
-import { PostAuthApiRequest } from "../../network/APIClient";
-import { Env } from "../../network/apis/account/Constants";
-import { navigationRef } from '../../navigations/UserNavigations';
+import { PostAuthApiRequest } from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import { INVALIDATE_ACCOUNT_CACHE } from "../../redux/constants/index";
+import Config from "react-native-config";
+import { Platform } from "react-native";
+
+const TAG = "[Session]";
+
+let _refreshPromise = null;
 
 const config = {
-    issuer: Env.SSO_LOGIN,
-    clientId: "sparklight-customer-mobile-app",
-    redirectUrl: "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
-    scopes: ["openid", "profile", "email", "phone", "address"],
-    iosPrefersEphemeralSession: true,
+  issuer: Config.SSO_LOGIN,
+  clientId: Config.SSO_CLIENT_ID,
+  redirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
+  scopes: ["openid", "profile", "email", "phone", "address"],
+  iosPrefersEphemeralSession: true,
 };
 
-const onSuccess = async (res) => {
-    try {
-        console.log('Session onSuccess:', res);
-        if (!res) throw new Error("No token received");
+const onSuccess = async (res, idToken = null) => {
+  if (!res) throw new Error("No token received from API");
 
-        const { jwtToken: token, userInfo, idTokenGuid, refreshToken } = res;
-        const user = {
-            userInfo,
-            token,
-            tokenGuid: idTokenGuid,
-            refreshToken,
-        };
-        let isNormalUser =
-        userInfo &&
-        userInfo.accountNumber &&
-        userInfo.accountNumber.toString().length === 9
-          ? true
-          : false;
-      console.log("[HANDLE_LOGIN] Is normal user:", isNormalUser);
-      user['isNormalUser'] = isNormalUser;
-        if (token) {
-            await storeUser(user);
-            console.log('User stored in local storage:', user);
-        }
+  const { jwtToken: token, userInfo, idTokenGuid, refreshToken } = res;
+  if (!token) throw new Error("API response missing jwtToken");
 
-        store.dispatch(saveUserInfo(user));
-        console.log('User info saved in Redux store:', user);
-        return token;
+  const now = Date.now();
+  const user = {
+    userInfo,
+    token,
+    tokenGuid: idTokenGuid,
+    refreshToken,
+    idToken,
+    jwtTimestamp: now,
+    idTokenTimestamp: now,
+  };
 
-    } catch (error) {
-        console.error('Error in onSuccess:', error);
-        throw error;
-    }
+  await storeUser(user);
+  store.dispatch(saveUserInfo(user));
+  return token;
 };
 
 const onError = (error) => {
-    console.error('Session onError:', error);
-    // Handle the error or navigate to the appropriate screen
-    // You could navigate to Splash here if needed
-    // navigationRef.current?.navigate('Splash');
-    throw error;  // Re-throw the error if needed
+  console.warn(`${TAG} Session error:`, error.message || error);
+  throw error;
 };
 
-const retryRequest = async (data, retries = 1) => {
-    try {
-        return await new Promise((resolve, reject) => {
-            PostAuthApiRequest("/mobile/api/gettoken", data, resolve, reject);
-        });
-    } catch (error) {
-        if (retries > 0) {
-            console.log('Retrying request, attempts left:', retries);
-            return retryRequest(data, retries - 1);
-        }
-        console.error('Retry request failed after retries:', error);
-        throw error;
+const retryRequest = async (data, retries = 2) => {
+  try {
+    const endpointUrl = getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN);
+    return await new Promise((resolve, reject) => {
+      PostAuthApiRequest(endpointUrl, data, resolve, reject);
+    });
+  } catch (error) {
+    if (retries > 0) {
+      return retryRequest(data, retries - 1);
     }
+    console.warn(`${TAG} Token refresh retries exhausted:`, error.message);
+    throw error;
+  }
 };
 
 export const RefreshToken = async () => {
+  if (_refreshPromise) return _refreshPromise;
+
+  const refreshStartTs = Date.now();
+
+  _refreshPromise = (async () => {
     try {
-        console.log('RefreshToken called');
-        const user = await getUser();
+      const user = await getUser();
+      if (!user?.refreshToken) throw new Error("No refresh token in storage");
 
-        if (!user || !user.refreshToken) {
-            throw new Error("No user or refresh token found");
-        }
+      // Native refresh can hang; unresolved _refreshPromise deadlocks the 401 queue and every skeleton behind it
+      const result = await Promise.race([
+        refresh(config, { refreshToken: user.refreshToken }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("REFRESH_NATIVE_TIMEOUT")), 25000)),
+      ]);
 
-        console.log('User retrieved from local storage:', user);
+      const data = {
+        idToken: result.idToken,
+        accessToken: result.accessToken,
+        idTokenGuid: result.additionalParameters?.session_state || "",
+        refreshToken: result.refreshToken,
+      };
 
-        const result = await refresh(config, {
-            refreshToken: user.refreshToken,
-        });
-
-        console.log('Token refresh result:', result);
-
-        const data = {
-            idToken: result.idToken,
-            accessToken: result.accessToken,
-            idTokenGuid: result.additionalParameters?.session_state || '',
-            refreshToken: result.refreshToken,
-        };
-
-        console.log('Data prepared for PostAuthApiRequest:', data);
-
-        const apiResponse = await retryRequest(data, 2);
-        return onSuccess(apiResponse);
-
+      const apiResponse = await retryRequest(data, 2);
+      const token = await onSuccess(apiResponse, result.idToken);
+      store.dispatch({ type: INVALIDATE_ACCOUNT_CACHE });
+      return token;
     } catch (error) {
-        return onError(error);  // Handle the error and navigate to Splash
+      console.warn(
+        `${TAG} RefreshToken FAILED | duration=${Date.now() - refreshStartTs}ms | error=${error.message}`
+      );
+      return onError(error);
     }
+  })();
+
+  try {
+    return await _refreshPromise;
+  } finally {
+    _refreshPromise = null;
+  }
 };

@@ -49,35 +49,43 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
-<dict>
-    <key>NSExceptionDomains</key>
-    <dict>
-        <key>sparklight.com</key>
-        <dict>
-            <!-- Allow insecure HTTP loads for this domain -->
-            <key>NSExceptionAllowsInsecureHTTPLoads</key>
-            <true/>
-            <!-- Allow connections to this domain with subdomains -->
-            <key>NSIncludesSubdomains</key>
-            <true/>
-            <!-- Disable the requirement for HTTPS (you should only use this if you cannot update the server to HTTPS) -->
-            <key>NSExceptionRequiresForwardSecrecy</key>
-            <false/>
-        </dict>
-    </dict>
-</dict>
-
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>sparklight.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<false/>
+			</dict>
+		</dict>
+	</dict>
 	<key>NSFaceIDUsageDescription</key>
 	<string>$(PRODUCT_NAME) Authentication with TouchId or FaceID</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
-		<string>InterSemi-Bold.ttf</string>
-		<string>Inter-Bold.ttf</string>
-		<string>OpenSans-Bold.ttf</string>
-		<string>OpenSans-Regular.ttf</string>
-		<string>OpenSans-SemiBold.ttf</string>
+		<string>MaterialCommunityIcons.ttf</string>
+		<string>RadioCanada-Bold</string>
+		<string>RadioCanada-Medium</string>
+		<string>RadioCanada-Regular</string>
+		<string>RadioCanada-SemiBold</string>
+		<string>RadioCanada-Regular.ttf</string>
+		<string>RadioCanada-Bold.ttf</string>
+		<string>Effra_Std_Bd.ttf</string>
+		<string>RadioCanada-Medium.ttf</string>
+		<string>Effra_Std_Lt.ttf</string>
+		<string>RadioCanada-SemiBold.ttf</string>
+		<string>Effra_Std_Rg.ttf</string>
+	</array>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
@@ -85,26 +93,31 @@
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen.storyboard</string>
+	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>arm64</string>
 	</array>
 	<key>UIStatusBarStyle</key>
-	<string></string>
+	<string/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+	<key>UIRequiresFullScreen</key>
+	<true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-  <key>NSCameraUsageDescription</key>
-  <string>This app needs access to your camera to take photos for chat support.If you don’t allow access now, you can enable it later in Settings.</string>
+	<key>ZENDESK_CHANNEL_KEY_IOS</key>
+	<string>$(ZENDESK_CHANNEL_KEY_IOS)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to your camera to take photos for chat support.If you don’t
+			allow access now, you can enable it later in Settings.</string>
 </dict>
 </plist>

@@ -1,59 +1,111 @@
-// Support.js
-
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
-import { useTabBarVisibility } from "../TabBarVisibilityContext";
+import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 import BillingScreen from "../../components/billing/BillingScreen";
-import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
-
+import BillingStatements from "../../components/billing/BillingStatements";
+import PaymentHistoryScreen from "../../components/billing/PaymentHistory";
+import BillingBreakDownScreen from "../../components/billing/BillingBreakDownScreen";
+import AutoPayScreen from "../../components/billing/payments/AutoPayScreen";
+import AutoPayReviewScreen from "../../components/billing/payments/AutoPayReviewScreen";
+import AutoPayDeactivateScreen from "../../components/billing/payments/AutoPayDeactivateScreen";
+import PaymentMethodsScreen from "../../components/billing/payments/PaymentMethodsScreen";
+import MakePaymentScreen from "../../components/billing/payments/MakePaymentScreen";
+import MakePaymentMethodScreen from "../../components/billing/payments/MakePaymentMethodScreen";
+import MakePaymentReviewScreen from "../../components/billing/payments/MakePaymentReviewScreen";
+import PaymentConfirmationScreen from "../../components/billing/payments/PaymentConfirmationScreen";
+import OrbipayWidgetScreen from "../../components/billing/payments/OrbipayWidgetScreen";
 const BillingStack = createNativeStackNavigator();
 
-function BillingStackScreen({route}) {
-    const { setTabBarVisible } = useTabBarVisibility();
-    return (
-        <BillingStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
-            <BillingStack.Screen
-                name="Billing"
-                initialParams={{ isWeb:route?.params?.isWeb }}
-                component={BillingScreen}
-                options={{
-                    headerBackVisible: false,
-                    headerShown: false,
-                }}
-                listeners={{
-                    focus: () => setTabBarVisible(true),
-                    blur: () => setTabBarVisible(true),
-                }}
-            />
-
+function BillingStackScreen({ route }) {
+  return (
+    <BillingStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
       <BillingStack.Screen
-        name="ArticalWindowUtility"
-        component={ArticalWindowUtility}
+        name="Billing"
+        initialParams={{ isWeb: route?.params?.isWeb }}
+        component={BillingScreen}
         options={{
           headerBackVisible: false,
           headerShown: false,
         }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
+      />
+      <BillingStack.Screen
+        name="BillingStatements"
+        component={BillingStatements}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
+        }}
+      />
+      <BillingStack.Screen
+        name="PaymentHistory"
+        component={PaymentHistoryScreen}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
         }}
       />
 
-     <BillingStack.Screen
-        name="AutoPayPCIConnector"
-        component={AutoPayPCIConnector}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
+      <BillingStack.Screen
+        name="BillingBreakDown"
+        component={BillingBreakDownScreen}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
         }}
       />
+      <BillingStack.Screen
+        name="ArticleWindowUtility"
+        component={ArticleWindowUtility}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="AutoPay"
+        component={AutoPayScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="AutoPayReview"
+        component={AutoPayReviewScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="AutoPayDeactivate"
+        component={AutoPayDeactivateScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="PaymentMethods"
+        component={PaymentMethodsScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="MakePayment"
+        component={MakePaymentScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="MakePaymentMethod"
+        component={MakePaymentMethodScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="MakePaymentReview"
+        component={MakePaymentReviewScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="PaymentConfirmation"
+        component={PaymentConfirmationScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
+      <BillingStack.Screen
+        name="OrbipayWidget"
+        component={OrbipayWidgetScreen}
+        options={{ headerBackVisible: false, headerShown: false }}
+      />
 
-
-            
-        </BillingStack.Navigator>
-    );
+    </BillingStack.Navigator>
+  );
 }
 
 export default BillingStackScreen;

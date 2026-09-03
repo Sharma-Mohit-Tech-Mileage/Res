@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StyleSheet, TouchableOpacity, Text, Pressable, View, ScrollView, AccessibilityInfo } from "react-native";
+import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
+import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import { securityQuestions } from "../utility/constant";
@@ -9,16 +10,28 @@ import SparkLightInput from '../common/customui/SparkLightInput';
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
-import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
-import LoadingOverlay from "../common/customui/CustomLoading";
+import { GetApiRequest} from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
+import { requiredField } from "../../styles/utilities";
+import aesEncryption from "../../../src/utils/AESEncryption";
+import { getUser } from "../../../src/redux/utils/LocalStorage";
+import AppStyles from '../../styles/AppStyles'
+import { HintText, SectionTitle, FieldTitle } from "../common/customui/Typography";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
+
+const getSecurityAnswerDisplayValue = (value) => {
+  if (!value) return "";
+  const decryptedValue = aesEncryption.decryptAnswer(value);
+  return decryptedValue || value;
+};
+
 const PasswordSecurityEdit = () => {
 
   const navigation = useNavigation();
@@ -26,8 +39,9 @@ const PasswordSecurityEdit = () => {
   const dispatch = useDispatch();
   const scrollViewRef = useRef(null);
   const mainContentRef = useRef(null);
+  const securityQuestionRef = useRef(null);
+  const securityAnswerRef = useRef(null);
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
-  const [isNewBiller, setIsNewBiller] = useState(false);
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
@@ -35,9 +49,12 @@ const PasswordSecurityEdit = () => {
   const [loadingTxt, setLoadingTxt] = useState("Please wait...");
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const [dropdownFocused, setDropdownFocused] = useState(false);
+  const errorIconRef = useRef(null);
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const [securityQuestionsNew, setSecurityQuestionsNew] = useState(securityQuestions);
 
-  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profile = useSelector(state => state.profile || {});
+  const user = useSelector(state => state.user.userData);
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
@@ -48,21 +65,44 @@ const PasswordSecurityEdit = () => {
   const handleDropdownStateChange = (isOpen) => {
     setIsDropDownOpen(isOpen);
     setDropdownFocused(isOpen);
-    announceForAccessibility(isOpen ?
-      "Security question dropdown opened. Select a question." :
-      "Security question dropdown closed."
-    );
   };
+  
+
+  useEffect(() => {
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
+
+  // Focus on error icon when error alert is shown
+  useEffect(() => {
+    if (showErrorAlert && screenReaderEnabled) {
+      const t = setTimeout(() => {
+        try {
+          if (errorIconRef.current) {
+            const handle = findNodeHandle(errorIconRef.current);
+            if (handle) {
+              AccessibilityInfo.setAccessibilityFocus(handle);
+              AccessibilityInfo.announceForAccessibility("Error icon");
+            }
+          }
+        } catch (e) {
+          console.warn("Accessibility focus error:", e);
+        }
+      }, 300);
+
+      return () => clearTimeout(t);
+    }
+  }, [showErrorAlert, screenReaderEnabled]);
+
   const handleSecurityQuestionChange = (itemValue) => {
     setLocalProfile({
       ...profileDetails,
       securityQuestion: itemValue === "Add your own question" ? '' : itemValue
     });
+    setValue("securityAnswer", ""); // Clear the answer field when question changes
     setCustomSecurityQuestion(itemValue);
     setIsDropDownOpen(false);
     setDropdownFocused(false);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
-    announceForAccessibility(`Selected security question: ${itemValue}`);
     if (mainContentRef.current) {
       mainContentRef.current.setNativeProps({
         accessibilityElementsHidden: false,
@@ -85,38 +125,43 @@ const PasswordSecurityEdit = () => {
 
 
 
-  const handleValidationError = () => {
+  const handleValidationError = (errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setShowValidationAlert(true);
     announceForAccessibility("Please fix validation errors before saving");
+    const fieldOrder = [
+      { key: "securityQuestion", ref: securityQuestionRef },
+      { key: "securityAnswer", ref: securityAnswerRef },
+    ];
+    const firstInvalid = fieldOrder.find((f) => errors?.[f.key]);
+    if (firstInvalid) firstInvalid.ref.current?.focus();
   };
 
 
-  const getSecurityQuestions=()=>{
-    const request = 'api/securityquestions/';
+  const getSecurityQuestions= async()=>{
+    const user = await getUser();
+    const userName = user?.userInfo?.userName || user?.userName || '';
+    const requestWithEndpoint = getEndpoint(ENDPOINTS.SECURITY_QUESTIONS, { userName });
     GetApiRequest(
-      request,
+      requestWithEndpoint,
       (res) => {
         if (res) {
           setSecurityQuestionsNew(res);
           checkCustomSecurityQuestion(res);
         }
-
       },
-      (error) => console.log(error)
+      
+      (error) => console.warn(error)
     );
   };
 
+
   const checkCustomSecurityQuestion = (questions) => {
     const storedQuestion = profileDetails.securityQuestion;
-    const isCustom = storedQuestion && !questions.includes(storedQuestion);
-    setIsCustomQuestionSelected(isCustom);
-    setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
+     setCustomSecurityQuestion(storedQuestion);
   };
 
   useEffect(() => {
-    // Reset the form with the updated profile details
-    //reset(profileDetails);
     setLoading(false);
   }, [profileDetails]);
 
@@ -124,25 +169,15 @@ const PasswordSecurityEdit = () => {
 
   useEffect(() => {
     const storedQuestion = profileDetails.securityQuestion;
-    const isCustom = storedQuestion && !securityQuestionsNew.includes(storedQuestion);
-    setIsCustomQuestionSelected(isCustom);
-    setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
+     setCustomSecurityQuestion(storedQuestion);
+    
 
   }, []);
 
   useEffect(() => {
-    getUser().then((res) => {
-      const isNew = res.userInfo.accountNumber.toString().length >= 16;
-      setIsNewBiller(isNew);
-
-      if (isNew) {
-        getSecurityQuestions();
-
-
-
-      }
-    });
+    getSecurityQuestions();
   }, []);
+
 
   useEffect(() => {
     if (route.params?.updateFailed) {
@@ -170,16 +205,17 @@ const PasswordSecurityEdit = () => {
       <ScrollView ref={scrollViewRef} >
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
-            <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
+            <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
               <View style={styles.infoWrapper}>
                 <NotificationAlert
                   type="error"
-                  title="Failed"
-                  message="Password and security question update failed."
+                  title="Error"
+                  message="Update failed. Please try again."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
                   onClose={() => setShowErrorAlert(false)}
                   accessible={!dropdownFocused}
+                  iconRef={errorIconRef}
                 />
               </View>
               <View style={styles.frameParent1}>
@@ -188,28 +224,36 @@ const PasswordSecurityEdit = () => {
                   accessible={!dropdownFocused}
                   accessibilityElementsHidden={dropdownFocused}
                 >
-                  <Text
-                    style={[styles.password, styles.passwordFlexBox]}
-                    accessibilityRole="header"
+                  <View style={{flexDirection:'column'}}>
+                  <SectionTitle
+                    
+                    accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
                   >
                     Security Question
-                  </Text>
+                  </SectionTitle>
+                  <HintText style={[{ marginVertical: 10}]} accessible={true} importantForAccessibility="yes" accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
+                  {" "}
+                  Fields marked with * are required.
+                </HintText>
+                </View>
                 </View>
 
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
-                    <Text
-                      style={[styles.firstName1, styles.firstTypo]}
-                      accessible={!dropdownFocused}
+                    <FieldTitle
+                      accessible={true}
+                      importantForAccessibility="yes"
+                      accessibilityRole="text"
+                      accessibilityLabel="Password Reset Question Required"
                     >
-                      Password Reset Question
-                    </Text>
+                      Password Reset Question *
+                    </FieldTitle>
                     <SparkLightDropdown
                       items={securityQuestionsNew}
                       selectedValue={customSecurityQuestion}
                       onValueChange={handleSecurityQuestionChange}
                       isDropDownOpen={handleDropdownStateChange}
-                      accessibilityLabel="Select security question"
+                      accessibilityLabel="Password Reset Question Required"
                       accessibilityHint="Double tap to open security question options"
                     />
                   </View>
@@ -226,6 +270,7 @@ const PasswordSecurityEdit = () => {
                         name="securityQuestion"
                         render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                           <SparkLightInput
+                            ref={securityQuestionRef}
                             onBlur={onBlur}
                             label="Type your Question"
                             onChangeText={onChange}
@@ -243,17 +288,28 @@ const PasswordSecurityEdit = () => {
                 <View
                   style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
                 >
+
+                  {/* <FieldTitle
+                      style={[{marginBottom:8}]}
+                      accessible={true}
+                      importantForAccessibility="yes"
+                      accessibilityRole="text"
+                      accessibilityLabel="Password Reset Answer Required"
+                    >
+                      Password Reset Answer *
+                    </FieldTitle> */}
                   <Controller
                     control={control}
                     name="securityAnswer"
                     render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                       <SparkLightInput
+                        ref={securityAnswerRef}
                         onBlur={onBlur}
+                        label="Password Reset Answer *"
                         onChangeText={onChange}
-                        label="Password Reset Answer"
                         value={value}
                         error={error?.message}
-                        accessibilityLabel="Security question answer input"
+                        accessibilityLabel="Password Reset Answer"
                         accessibilityHint="Enter your answer to the security question"
                       />
                     )}
@@ -262,27 +318,17 @@ const PasswordSecurityEdit = () => {
               </View>
             </View>
           </View>
-          <View
-            style={styles.frameParent1}
-          >
-            <Pressable
-              style={[styles.buttons, styles.buttonsLayout]}
+          <View style={styles.frameParent1} >
+            <PrimaryButton
+              title="Save"
               onPress={handleSubmit(handleSave, handleValidationError)}
-              accessibilityLabel="Save changes"
-              accessibilityRole="button"
-              accessible={!dropdownFocused}
-            >
-              <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
-            </Pressable>
-            <Pressable
-              style={[styles.buttons1, styles.buttonsLayout]}
+              buttonType="submit"
+            />
+            <PrimaryButton
+              title="Cancel"
               onPress={() => navigation.navigate("PasswordSecurity")}
-              accessibilityLabel="Cancel and return"
-              accessibilityRole="button"
-              accessible={!dropdownFocused}
-            >
-              <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
-            </Pressable>
+              buttonType="cancel"
+            />
           </View>
 
           <LoadingOverlay
@@ -307,7 +353,7 @@ const styles = StyleSheet.create({
   },
   bulletPoiint: {
     color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_xs,
     fontStyle: 'normal',
     fontWeight: '400',
@@ -320,13 +366,13 @@ const styles = StyleSheet.create({
   },
   passwordFlexBox: {
     textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
   },
   firstTypo: {
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.RadioCanadaSemiBold_size,
     textAlign: "left",
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
   },
   wrapperSpaceBlock: {
@@ -346,7 +392,7 @@ const styles = StyleSheet.create({
   makeTypo: {
     width: 282,
     fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
   },
 
@@ -367,7 +413,7 @@ const styles = StyleSheet.create({
   },
   firstName: {
     color: Color.sparklightGray1,
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.RadioCanadaSemiBold_size,
     flex: 1,
   },
   eyeIcon: {
@@ -422,7 +468,7 @@ const styles = StyleSheet.create({
   },
   firstName1: {
     color: Color.sparklightGray1,
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.RadioCanadaSemiBold_size,
     alignSelf: "stretch",
   },
   frameParent1: {
@@ -468,7 +514,7 @@ const styles = StyleSheet.create({
   },
   Btn: {
     color: colors.snow_white,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     padding: 16,
     fontSize: 16,

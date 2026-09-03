@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Text,
   SafeAreaView,
-  Pressable,
   Dimensions,
   Image,
   StatusBar,
@@ -14,8 +13,12 @@ import LinearGradient from 'react-native-linear-gradient';
 import Pdf from 'react-native-pdf';
 import sharePDF from 'react-native-share-pdf';
 import { Padding, Color, FontFamily, Border, FontSize } from '../../../GlobalStyles';
+import { A11Y } from '../../styles/theme';
+import Xclose from "../../../src/res/svgIcons/Xclose";
+import Share from "../../../src/res/svgIcons/Share";
+import Touchable from "../common/customui/Touchable";
 
-const PDFViewModal = ({ url, onClose }) => {
+const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [iconPressed, setIconPressed] = useState(false);
   const convertUrl = 'data:application/pdf;base64,' + url;
@@ -26,11 +29,8 @@ const PDFViewModal = ({ url, onClose }) => {
   };
 
   const loadAndSharePDF = async () => {
-    const showError = await sharePDF(url, 'billinghistory.pdf');
-    if (showError !== undefined) {
-      console.log(showError);
-    }
-  };  
+    await sharePDF(url, 'billinghistory.pdf');
+  };
 
   return (
     <Modal
@@ -42,7 +42,9 @@ const PDFViewModal = ({ url, onClose }) => {
       <LinearGradient
           style={[styles.profileSettingsChild, { paddingTop: 40 }]}
           locations={[0, 1]}
-          colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1.3, y: 0}}
+          colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
           useAngle={true}
           angle={90}
       ></LinearGradient>      
@@ -52,48 +54,44 @@ const PDFViewModal = ({ url, onClose }) => {
             <LinearGradient
                 style={[styles.profileSettingsChild, { paddingTop: 40 }]}
                 locations={[0, 1]}
-                colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+                start={{ x: 0, y: 0 }}
+          end={{ x: 1.3, y: 0}}
+                colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
                 useAngle={true}
                 angle={90}
             >
                 <View style={[styles.navBar]}>
-                    <Pressable
+                    <Touchable
                         style={[styles.navIcon, styles.chevronLayout]}
                         onPress={closeModal}
                         accessibilityLabel="Back"
                         accessibilityHint="Go back to the previous screen"
-                        accessibilityRole="button"
-                        accessible={true}
                         hitSlop={20}
                         onPressIn={() => setIconPressed(true)}
                         onPressOut={() => setIconPressed(false)}
                     >
-                      <Image
-                          style={[styles.icon, iconPressed ? styles.iconPressed : null]}
-                          resizeMode="cover"
-                          source={require("../../../assets/xclose.png")}
-                          accessible={false}
-                      />
-                    </Pressable>
-                    <Text style={styles.title}>Billing History</Text>
-                    <Pressable
+
+                      <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+                          accessible={false} importantForAccessibility="no">
+                         <Xclose/>
+                      </View>
+                    </Touchable>
+                    <Text style={styles.title}>{title}</Text>
+                    <Touchable
                         style={[styles.navIcon, styles.chevronLayout]}
                         onPress={loadAndSharePDF}
                         accessibilityLabel="Share"
                         accessibilityHint="Share your Billing History"
-                        accessibilityRole="button"
-                        accessible={true}
                         hitSlop={20}
                         onPressIn={() => setIconPressed(true)}
                         onPressOut={() => setIconPressed(false)}
                     >
-                        <Image
-                            style={[styles.icon, iconPressed ? styles.iconPressed : null]}
-                            resizeMode="cover"
-                            source={require("../../../assets/share.png")}
-                            accessible={false}
-                        />
-                    </Pressable>                 
+
+                        <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+                          accessible={false} importantForAccessibility="no">
+                         <Share color={'#FFF'}/>
+                      </View>
+                    </Touchable>                 
                 </View>
           </LinearGradient>      
           <View style={{width:'100%',height:'100%',}}>
@@ -122,7 +120,7 @@ const styles = StyleSheet.create({
   closeBtn: {
     textAlign: "center",
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.RadioCanadaRegular,
   },
   buttons: {
     marginLeft: 10,
@@ -161,7 +159,7 @@ const styles = StyleSheet.create({
       textAlign: 'center',
       fontWeight: '600',
       color: Color.sparklightWhite,
-      fontFamily: FontFamily.openSansSemiBold,
+      fontFamily: FontFamily.RadioCanadaSemiBold,
       padding: 8,
   },
   chevronLeft: {
@@ -175,8 +173,8 @@ const styles = StyleSheet.create({
   chevronLayout: {
       justifyContent: 'center',
       alignItems: 'center',
-      height: 24,
-      width: 24,
+      minHeight: A11Y.minTouch,
+      minWidth: A11Y.minTouch,
       zIndex: 1
   },
   chevronLeftLayout: {
