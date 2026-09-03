@@ -9,6 +9,7 @@ const BillingIcon = ({ color = "#767676", filled = false, ...props }) => {
         xmlns="http://www.w3.org/2000/svg"
         width={36}
         height={26}
+        viewBox="0 0 36 26"
         fill="none"
         {...props}
       >
@@ -26,6 +27,7 @@ const BillingIcon = ({ color = "#767676", filled = false, ...props }) => {
       xmlns="http://www.w3.org/2000/svg"
       width={36}
       height={32}
+      viewBox="0 0 36 32"
       fill="none"
       {...props}
     >

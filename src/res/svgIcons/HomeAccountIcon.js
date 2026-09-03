@@ -9,6 +9,7 @@ const HomeAccountIcon = ({ color = "#767676", filled = false, ...props }) => {
         xmlns="http://www.w3.org/2000/svg"
         width={28}
         height={28}
+        viewBox="0 0 28 28"
         fill="none"
         {...props}
       >
@@ -26,6 +27,7 @@ const HomeAccountIcon = ({ color = "#767676", filled = false, ...props }) => {
       xmlns="http://www.w3.org/2000/svg"
       width={26}
       height={26}
+      viewBox="0 0 26 26"
       fill="none"
       {...props}
     >
