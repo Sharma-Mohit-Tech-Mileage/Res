@@ -244,7 +244,7 @@ const SplashScreen = ({ navigation, route }) => {
       };
       console.log("🔐 ID Token refreshed from session:", data.idToken);
       setLoadingState(LoadingState.LOADING_DATA);
-      storeSsoToken(data);
+      await storeSsoToken(data);
       callSSOLoginApi(data);
     } catch (error) {
       logError("SplashScreen", error);
@@ -295,7 +295,18 @@ const SplashScreen = ({ navigation, route }) => {
         });
         return;
       }else if (error.status === 422) {
-         navigation.reset({ index: 0, routes: [{ name: "UserNameUpdate", params: { isLoginError: true } }] });
+        const recoveryData = error.data || {};
+         navigation.reset({
+           index: 0,
+           routes: [{
+             name: "UserNameUpdate",
+             params: {
+               isLoginError: true,
+               recoveryAccountNumber: recoveryData.accountNumber,
+               recoveryUserName: recoveryData.userId,
+             },
+           }],
+         });
         return;
       }
 
@@ -521,7 +532,7 @@ const SplashScreen = ({ navigation, route }) => {
         refreshToken: result.data.refreshToken,
       };
 
-      storeSsoToken(data);
+      await storeSsoToken(data);
       setLoadingState(LoadingState.AUTHENTICATING);
       callSSOLoginApi(data);
     } catch (error) {

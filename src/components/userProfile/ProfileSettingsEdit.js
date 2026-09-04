@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
+import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle, Platform } from "react-native";
 import { usernameTerms, validateUsername } from "../utility/constant";
 import { ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import PrimaryButton from "../common/customui/PrimaryButton";
@@ -15,8 +15,8 @@ import {
 } from "../../../GlobalStyles";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { PostApiRequest } from "../../network/RestApiClient";
-import { getUser, getSsoToken } from "../../redux/utils/LocalStorage";
+import { PostApiRequest, _axios } from "../../network/RestApiClient";
+import { getUser, getSsoToken, storeSsoToken } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { usernameSchema } from "../utility/validationSchema";
 import AppStyles from "../../styles/AppStyles";
@@ -29,13 +29,24 @@ import {
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import UsernameSuccessModal from "./UsernameSuccessModal";
 import { RefreshToken } from '../../components/user/Session';
+import AuthenticationManager from "../../utils/AuthenticationManager";
+import Config from "react-native-config";
 
+const authConfig = {
+  issuer: Config.SSO_LOGIN,
+  clientId: Config.SSO_CLIENT_ID,
+  redirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
+  scopes: ["openid", "profile", "email", "phone", "address"],
+  iosPrefersEphemeralSession: true,
+};
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const isFocused = useIsFocused();
   const isLoginError = route?.params?.isLoginError || false;
+  const recoveryAccountNumber = route?.params?.recoveryAccountNumber;
+  const recoveryUserName = route?.params?.recoveryUserName;
   const [displaySuccessAlert, setDisplaySuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(isLoginError);
@@ -46,6 +57,7 @@ const ProfileSettingsEdit = () => {
   const confirmNewUsernameInputRef = useRef(null);
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const [hasValidationError, setHasValidationError] = useState(false);
+  const refreshPromiseRef = useRef(null);
 
   const handleSave = async (data) => {
     const newData = { ...data };
@@ -92,12 +104,29 @@ function decodeIdToken(idToken) {
   const updateUsername = async (newUsername) => {
     setLoading(true);
     try {
+      if (!isLoginError && refreshPromiseRef.current) {
+        await refreshPromiseRef.current;
+      } else if (isLoginError) {
+        if (refreshPromiseRef.current) {
+          await refreshPromiseRef.current;
+        } else {
+          await refreshLoginErrorSession();
+        }
+      }
       const user = await getUser();
       const sso = await getSsoToken();
+      const claims = decodeIdToken(sso?.idToken || sso?.token) || {};
       const accountNumber =
-        isLoginError? decodeIdToken(sso.idToken || sso.token).account_number : user?.accountNumber || user?.userInfo?.accountNumber || "";
-      const userName =  isLoginError? decodeIdToken(sso.idToken || sso.token).preferred_username : user?.userInfo?.userName || user?.userName || "";
+        isLoginError
+          ? recoveryAccountNumber || claims.account_number
+          : user?.accountNumber || user?.userInfo?.accountNumber || "";
+      const userName = isLoginError
+        ? recoveryUserName || claims.preferred_username
+        : user?.userInfo?.userName || user?.userName || "";
       const idToken = (sso && (sso.idToken || sso.token)) || "";
+      const authorizationToken = isLoginError
+        ? sso?.accessToken || sso?.token || sso?.idToken
+        : null;
 
       const payload = {
         accountNumber: accountNumber,
@@ -118,34 +147,80 @@ function decodeIdToken(idToken) {
         return;
       }
 
+      const onSuccess = (Response) => {
+        setLoading(false);
+        console.log(
+          "Username updated successfully:",
+          JSON.stringify(Response),
+        );
+        if (Response?.status === "success") {
+          setDisplaySuccessAlert(true);
+        } else if (Response?.status === "error") {
+          setErrorMessage(Response?.errors[0] || "Profile update failed. Please try again.");
+          setShowErrorAlert(true);
+        }
+      };
+      const onError = (error) => {
+        setLoading(false);
+        console.warn("Update username error:", error);
+        setErrorMessage(
+          error?.data?.message ||
+          error?.data?.error ||
+          error?.message ||
+          "Profile update failed. Please try again."
+        );
+        setShowErrorAlert(true);
+      };
+
+      if (isLoginError && authorizationToken) {
+        const response = await fetchUsernameUpdate(payload, authorizationToken);
+        onSuccess(response);
+        return;
+      }
+
       PostApiRequest(
         ENDPOINTS.UPDATE_USERNAME,
         payload,
-        (Response) => {
-          setLoading(false);
-          console.log(
-            "Username updated successfully:",
-            JSON.stringify(Response),
-          );
-          if (Response?.status === "success") {
-            setDisplaySuccessAlert(true);
-          } else if (Response?.status === "error") {
-            setErrorMessage(Response?.errors[0] || "Profile update failed. Please try again.");
-            setShowErrorAlert(true);
-          }
-        },
-        (error) => {
-          setLoading(false);
-          console.warn("Update username error:", error);
-          setErrorMessage("Profile update failed. Please try again.");
-          setShowErrorAlert(true);
-        },
+        onSuccess,
+        onError,
       );
     } catch (err) {
       console.warn("Error preparing username payload:", err);
       setLoading(false);
       setShowErrorAlert(true);
     }
+  };
+
+  const refreshLoginErrorSession = async () => {
+    const user = await getUser();
+    const sso = await getSsoToken();
+    const refreshToken = user?.refreshToken || sso?.refreshToken;
+    if (!refreshToken) {
+      throw new Error("No refresh token available for username update");
+    }
+
+    const result = await AuthenticationManager.refreshWithTimeout(authConfig, refreshToken);
+    if (!result.success) {
+      throw new Error(result.error || "SSO token refresh failed");
+    }
+
+    const refreshedSso = {
+      idToken: result.data.idToken,
+      accessToken: result.data.accessToken,
+      idTokenGuid: result.data.additionalParameters?.session_state || "",
+      refreshToken: result.data.refreshToken || refreshToken,
+    };
+    await storeSsoToken(refreshedSso);
+    return refreshedSso;
+  };
+
+  const fetchUsernameUpdate = async (payload, authorizationToken) => {
+    const response = await _axios.post(ENDPOINTS.UPDATE_USERNAME, payload, {
+      headers: {
+        Authorization: `Bearer ${authorizationToken}`,
+      },
+    });
+    return response.data;
   };
 
   
@@ -210,8 +285,10 @@ function decodeIdToken(idToken) {
      
       if(!isLoginError) {
       console.log("Refreshing token...");
-      Promise.resolve(RefreshToken()).catch((error) => {
+      refreshPromiseRef.current = Promise.resolve(RefreshToken()).catch((error) => {
         console.warn("Refresh token error:", error);
+      }).finally(() => {
+        refreshPromiseRef.current = null;
         });
       }
     };
