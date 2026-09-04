@@ -262,7 +262,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              key: 'npm | "$(Agent.OS)" | package.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -313,7 +313,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              key: 'npm | "$(Agent.OS)" | package.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -386,7 +386,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              key: 'npm | "$(Agent.OS)" | package.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -805,7 +805,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              key: 'npm | "$(Agent.OS)" | package.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -850,12 +850,57 @@ stages:
               echo "✅ Keystore fingerprint matches expected Play upload key."
             displayName: 'Validate Android upload keystore fingerprint'
 
+          - script: |
+              set -euo pipefail
+              TARGET_BRANCH="${SYSTEM_PULLREQUEST_TARGETBRANCH:-}"
+              SOURCE_BRANCH="${BUILD_SOURCEBRANCHNAME:-}"
+              CHANNEL="Demo"
+              ANDROID_TASK="bundleDemoRelease"
+
+              if [ "${BUILD_REASON:-}" = "PullRequest" ]; then
+                case "$TARGET_BRANCH" in
+                  refs/heads/Dev|Dev)
+                    CHANNEL="Demo"
+                    ANDROID_TASK="bundleDemoRelease"
+                    ;;
+                  refs/heads/Demo|Demo)
+                    CHANNEL="Demo"
+                    ANDROID_TASK="bundleDemoRelease"
+                    ;;
+                  refs/heads/Prod|Prod|refs/heads/main|main)
+                    CHANNEL="Prod"
+                    ANDROID_TASK="bundleProdRelease"
+                    ;;
+                esac
+              else
+                case "$SOURCE_BRANCH" in
+                  Dev)
+                    CHANNEL="Demo"
+                    ANDROID_TASK="bundleDemoRelease"
+                    ;;
+                  Demo)
+                    CHANNEL="Demo"
+                    ANDROID_TASK="bundleDemoRelease"
+                    ;;
+                  Prod|main)
+                    CHANNEL="Prod"
+                    ANDROID_TASK="bundleProdRelease"
+                    ;;
+                esac
+              fi
+
+              echo "Resolved channel: $CHANNEL"
+              echo "Resolved Android task: $ANDROID_TASK"
+              echo "##vso[task.setvariable variable=RELEASE_CHANNEL]$CHANNEL"
+              echo "##vso[task.setvariable variable=ANDROID_BUILD_TASK]$ANDROID_TASK"
+            displayName: 'Resolve release channel and Android flavor'
+
           - task: Gradle@4
             displayName: 'Build Android App Bundle (Demo Release)'
             inputs:
               workingDirectory: 'android'
               gradleWrapperFile: 'android/gradlew'
-              tasks: 'clean bundleDemoRelease'
+              tasks: 'clean $(ANDROID_BUILD_TASK)'
               options: >
                 -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
                 -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
@@ -949,7 +994,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package-lock.json'
+              key: 'npm | "$(Agent.OS)" | package.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -1068,6 +1113,42 @@ stages:
 
           - script: |
               set -euo pipefail
+              TARGET_BRANCH="${SYSTEM_PULLREQUEST_TARGETBRANCH:-}"
+              SOURCE_BRANCH="$(Build.SourceBranchName)"
+              IOS_SCHEME="SparklightDemo"
+
+              if [ "$(Build.Reason)" = "PullRequest" ]; then
+                case "$TARGET_BRANCH" in
+                  refs/heads/Dev|Dev)
+                    IOS_SCHEME="SparklightDemo"
+                    ;;
+                  refs/heads/Demo|Demo)
+                    IOS_SCHEME="SparklightDemo"
+                    ;;
+                  refs/heads/Prod|Prod|refs/heads/main|main)
+                    IOS_SCHEME="SparklightProd"
+                    ;;
+                esac
+              else
+                case "$SOURCE_BRANCH" in
+                  Dev)
+                    IOS_SCHEME="SparklightDemo"
+                    ;;
+                  Demo)
+                    IOS_SCHEME="SparklightDemo"
+                    ;;
+                  Prod|main)
+                    IOS_SCHEME="SparklightProd"
+                    ;;
+                esac
+              fi
+
+              echo "Resolved iOS scheme: $IOS_SCHEME"
+              echo "##vso[task.setvariable variable=IOS_SCHEME]$IOS_SCHEME"
+            displayName: 'Resolve iOS scheme'
+
+          - script: |
+              set -euo pipefail
               NODE_BIN="$(command -v node)"
               echo "export NODE_BINARY=$NODE_BIN" > ios/.xcode.env.local
               ARCHIVE_PATH="$(Build.ArtifactStagingDirectory)/My Sparklight.xcarchive"
@@ -1097,7 +1178,7 @@ stages:
               echo "Archiving with Xcode..."
               if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
                   -workspace "ios/My Sparklight.xcworkspace" \
-                  -scheme "Sparklight Demo" \
+                  -scheme "$(IOS_SCHEME)" \
                   -configuration Release \
                   -sdk iphoneos \
                   -archivePath "$ARCHIVE_PATH" \
