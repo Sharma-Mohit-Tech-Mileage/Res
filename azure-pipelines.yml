@@ -741,6 +741,7 @@ stages:
                   echo "Action: Check gradle build log above for detailed errors."
                 } >> "$SUMMARY_FILE"
               else
+              
                 {
                   echo "✓ Lint Report Status: Report files generated successfully"
                 } >> "$SUMMARY_FILE"
