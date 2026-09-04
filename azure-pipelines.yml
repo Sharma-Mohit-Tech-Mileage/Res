@@ -238,7 +238,7 @@ stages:
   - stage: UnitTests
     displayName: 'Unit Tests'
     dependsOn: InitialCommit
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
+    condition: succeeded()
     jobs:
       - job: RunAndroidUnitTests
         displayName: 'Run Android Unit Tests'
@@ -370,7 +370,7 @@ stages:
   - stage: SecurityAndQuality
     displayName: 'Security & Code Quality'
     dependsOn: InitialCommit  # runs in parallel with UnitTests to shorten total pipeline time
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
+    condition: succeeded()
     jobs:
       # -------- Job 1: Lint Quality Checks --------
       - job: LintQualityChecks
@@ -764,7 +764,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
+    condition: succeeded()
     jobs:
       - job: BuildAndroid
         displayName: 'Build Android App Bundle'
@@ -934,7 +934,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
+    condition: succeeded()
     jobs:
       - job: RunIOSBuild
         displayName: 'Build iOS IPA (Xcode Archive)'
@@ -1276,7 +1276,7 @@ stages:
     dependsOn:
       - Build
       - IOSBuild
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
+    condition: succeeded()
     jobs:
       - job: CodeReviewGates
         displayName: 'Code Review Quality Gates'
@@ -1310,7 +1310,7 @@ stages:
   - stage: IOSStaging
     displayName: 'iOS Staging'
     dependsOn: CodeReview
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
+    condition: succeeded()
     jobs:
       - job: PrepareIOSStaging
         displayName: 'Validate IPA for Staging'
@@ -1342,7 +1342,7 @@ stages:
   - stage: AndroidStaging
     displayName: 'Android Staging'
     dependsOn: CodeReview
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
+    condition: succeeded()
     jobs:
       - job: PrepareAndroidStaging
         displayName: 'Validate Android AAB for Staging'
@@ -1376,7 +1376,7 @@ stages:
   - stage: IOSTestFlight
     displayName: 'iOS TestFlight'
     dependsOn: IOSStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
+    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'))
     jobs:
       - job: IOSTestFlightStage
         displayName: 'Upload IPA to TestFlight'
@@ -1631,7 +1631,7 @@ stages:
   - stage: InternalTestingDeployment
     displayName: 'Internal Testing Android'
     dependsOn: AndroidStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
+    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'))
     jobs:
       - job: DeployToInternalTesting
         displayName: 'Deploy to Play Store Internal Testing'
