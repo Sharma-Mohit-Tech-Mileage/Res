@@ -74,8 +74,6 @@ variables:
     value: ''  # e.g. smtp.office365.com or smtp.gmail.com
   - name: SMTP_PORT
     value: '587'
-  - name: INTERNAL_RELEASE_NOTES
-    value: 'Automated build from $(Build.SourceBranchName)'
 
 parameters:
   - name: runSecurityChecks
@@ -448,23 +446,12 @@ stages:
             inputs:
               secureFile: 'Sparklight.keystore'
 
-          - script: |
-              set -euo pipefail
-              if [ "$(Build.SourceBranchName)" = "main" ]; then
-                ANDROID_BUILD_TASK="bundleProdRelease"
-              else
-                ANDROID_BUILD_TASK="bundleDemoRelease"
-              fi
-              echo "Resolved Android task: $ANDROID_BUILD_TASK"
-              echo "##vso[task.setvariable variable=ANDROID_BUILD_TASK]$ANDROID_BUILD_TASK"
-            displayName: 'Resolve Android release channel'
-
           - task: Gradle@4
             displayName: 'Rebuild Android App Bundle with Demo version code'
             inputs:
               workingDirectory: 'android'
               gradleWrapperFile: 'android/gradlew'
-              tasks: 'clean $(ANDROID_BUILD_TASK)'
+              tasks: 'clean bundleDemoRelease'
               options: >
                 -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
                 -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
@@ -1298,7 +1285,7 @@ stages:
   - stage: UnitTests
     displayName: 'Unit Tests'
     dependsOn: InitialCommit
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: RunAndroidUnitTests
         displayName: 'Run Android Unit Tests'
@@ -1430,7 +1417,7 @@ stages:
   - stage: SecurityAndQuality
     displayName: 'Security & Code Quality'
     dependsOn: InitialCommit  # runs in parallel with UnitTests to shorten total pipeline time
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       # -------- Job 1: Lint Quality Checks --------
       - job: LintQualityChecks
@@ -1824,7 +1811,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: BuildAndroid
         displayName: 'Build Android App Bundle'
@@ -1910,23 +1897,12 @@ stages:
               echo "✅ Keystore fingerprint matches expected Play upload key."
             displayName: 'Validate Android upload keystore fingerprint'
 
-          - script: |
-              set -euo pipefail
-              if [ "$(Build.SourceBranchName)" = "main" ]; then
-                ANDROID_BUILD_TASK="bundleProdRelease"
-              else
-                ANDROID_BUILD_TASK="bundleDemoRelease"
-              fi
-              echo "Resolved Android task: $ANDROID_BUILD_TASK"
-              echo "##vso[task.setvariable variable=ANDROID_BUILD_TASK]$ANDROID_BUILD_TASK"
-            displayName: 'Resolve Android release channel'
-
           - task: Gradle@4
             displayName: 'Build Android App Bundle (Demo Release)'
             inputs:
               workingDirectory: 'android'
               gradleWrapperFile: 'android/gradlew'
-              tasks: 'clean $(ANDROID_BUILD_TASK)'
+              tasks: 'clean bundleDemoRelease'
               options: >
                 -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
                 -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
@@ -1960,7 +1936,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: RunIOSBuild
         displayName: 'Build iOS IPA (Xcode Archive)'
@@ -2130,17 +2106,6 @@ stages:
 
           - script: |
               set -euo pipefail
-              if [ "$(Build.SourceBranchName)" = "main" ]; then
-                IOS_SCHEME="SparklightProd"
-              else
-                IOS_SCHEME="SparklightDemo"
-              fi
-              echo "Resolved iOS scheme: $IOS_SCHEME"
-              echo "##vso[task.setvariable variable=IOS_SCHEME]$IOS_SCHEME"
-            displayName: 'Resolve iOS release channel'
-
-          - script: |
-              set -euo pipefail
               APP_INFO_PLIST="ios/Sparklight/Info.plist"
               BUILD_NUMBER="$(iosBuildNumber)"
               /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$APP_INFO_PLIST" \
@@ -2179,7 +2144,7 @@ stages:
               echo "Archiving with Xcode..."
               if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
                   -workspace "ios/My Sparklight.xcworkspace" \
-                  -scheme "$(IOS_SCHEME)" \
+                  -scheme "Sparklight Demo" \
                   -configuration Release \
                   -sdk iphoneos \
                   -archivePath "$ARCHIVE_PATH" \
@@ -2277,7 +2242,7 @@ stages:
     dependsOn:
       - Build
       - IOSBuild
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: CodeReviewGates
         displayName: 'Code Review Quality Gates'
@@ -2311,7 +2276,7 @@ stages:
   - stage: IOSStaging
     displayName: 'iOS Staging'
     dependsOn: CodeReview
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: PrepareIOSStaging
         displayName: 'Validate IPA for Staging'
@@ -2343,7 +2308,7 @@ stages:
   - stage: AndroidStaging
     displayName: 'Android Staging'
     dependsOn: CodeReview
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: PrepareAndroidStaging
         displayName: 'Validate Android AAB for Staging'
@@ -2377,7 +2342,7 @@ stages:
   - stage: IOSTestFlight
     displayName: 'iOS TestFlight'
     dependsOn: IOSStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'))
+    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: IOSTestFlightStage
         displayName: 'Upload IPA to TestFlight'
@@ -2443,25 +2408,14 @@ stages:
               cp "$KEY_PATH" "$HOME/.appstoreconnect/private_keys/$KEY_FILE_NAME"
               cp "$KEY_PATH" "$(Agent.TempDirectory)/private_keys/$KEY_FILE_NAME"
 
-              COMMIT_MESSAGE=$(git log -1 --pretty=%B "$(Build.SourceVersion)" | sed '/^[[:space:]]*$/d' | tr '\n' ' ' | sed 's/[[:space:]]*$//')
-              if [ -z "$COMMIT_MESSAGE" ]; then
-                COMMIT_MESSAGE="$(INTERNAL_RELEASE_NOTES)"
-              fi
               echo "Uploading $IPA_PATH to TestFlight..."
-              if ! command -v fastlane >/dev/null 2>&1; then
-                sudo gem install fastlane --no-document
-              fi
-              API_KEY_JSON="$(Agent.TempDirectory)/app-store-connect-api-key.json"
-              jq -n \
-                --arg key_id "$(IOS_ASC_API_KEY_ID)" \
-                --arg issuer_id "$(IOS_ASC_API_ISSUER_ID)" \
-                --arg key "$(cat "$KEY_PATH")" \
-                '{key_id: $key_id, issuer_id: $issuer_id, key: $key, in_house: false}' > "$API_KEY_JSON"
-              fastlane pilot upload \
-                --ipa "$IPA_PATH" \
-                --api_key_path "$API_KEY_JSON" \
-                --changelog "$COMMIT_MESSAGE" \
-                --skip_waiting_for_build_processing true
+              xcrun altool \
+                --upload-app \
+                --type ios \
+                --file "$IPA_PATH" \
+                --apiKey "$(IOS_ASC_API_KEY_ID)" \
+                --apiIssuer "$(IOS_ASC_API_ISSUER_ID)" \
+                --show-progress
               echo "✅ IPA submitted to App Store Connect / TestFlight"
             displayName: 'Upload IPA to TestFlight'
 
@@ -2643,7 +2597,7 @@ stages:
   - stage: InternalTestingDeployment
     displayName: 'Internal Testing Android'
     dependsOn: AndroidStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'))
+    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: DeployToInternalTesting
         displayName: 'Deploy to Play Store Internal Testing'
@@ -2696,26 +2650,13 @@ stages:
               COMMIT_MESSAGE: $(Build.SourceVersionMessage)
 
           - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
-            displayName: 'Publish AAB to Play Store Staging'
-            condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'main'))
+            displayName: 'Publish AAB to Play Store Internal Testing'
             inputs:
-              serviceConnection: 'SparklightDemo'
+              serviceConnection: 'PlaystoreRessiConnection'
               applicationId: 'com.sparklight'
               action: 'SingleBundle'
               bundleFile: '$(AAB_FILE_PATH)'
               track: 'internal'
-              releaseName: 'MySparklight Residential $(androidVersionName)'
-              changeLogFile: '$(GOOGLE_PLAY_RELEASE_NOTES)'
-
-          - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
-            displayName: 'Publish AAB to Play Store Production'
-            condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
-            inputs:
-              serviceConnection: 'SparklightProd'
-              applicationId: 'com.sparklight'
-              action: 'SingleBundle'
-              bundleFile: '$(AAB_FILE_PATH)'
-              track: 'production'
               releaseName: 'MySparklight Residential $(androidVersionName)'
               changeLogFile: '$(GOOGLE_PLAY_RELEASE_NOTES)'
 
