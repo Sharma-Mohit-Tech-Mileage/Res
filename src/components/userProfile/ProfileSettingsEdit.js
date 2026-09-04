@@ -163,13 +163,13 @@ function decodeIdToken(idToken) {
     
   };
 
-  useEffect(() => {
-    if (route.params?.updateFailed) {
-      setShowErrorAlert(true);
-      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-      navigation.setParams({ updateFailed: undefined });
-    }
-  }, [route.params?.updateFailed, navigation]);
+  // useEffect(() => {
+  //   if (route.params?.updateFailed) {
+  //     setShowErrorAlert(true);
+  //     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+  //     navigation.setParams({ updateFailed: undefined });
+  //   }
+  // }, [route.params?.updateFailed, navigation]);
 
   // Focus on error icon when error alert is shown
     useEffect(() => {
