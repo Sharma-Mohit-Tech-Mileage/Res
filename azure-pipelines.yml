@@ -1097,7 +1097,7 @@ stages:
               echo "Archiving with Xcode..."
               if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
                   -workspace "ios/My Sparklight.xcworkspace" \
-                  -scheme "Sparklight Demo" \
+                  -scheme "SparklightDemo" \
                   -configuration Release \
                   -sdk iphoneos \
                   -archivePath "$ARCHIVE_PATH" \
