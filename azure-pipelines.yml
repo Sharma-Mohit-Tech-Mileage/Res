@@ -239,7 +239,6 @@ stages:
   # ==========================================
 
   - stage: DemoPromotion
-    displayName: 'Legacy Demo Promotion (disabled)'
     dependsOn:
       - InitialCommit
     condition: and(succeeded(), false)
@@ -774,7 +773,6 @@ stages:
   # ==========================================
 
   - stage: ProdPromotion
-    displayName: 'Legacy Prod Promotion (disabled)'
     dependsOn:
       - InitialCommit
     condition: and(succeeded(), false)
