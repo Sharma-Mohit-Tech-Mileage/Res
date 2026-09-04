@@ -2,14 +2,20 @@ trigger:
   branches:
     include:
       - 'Dev'
+      - 'Demo'
       - 'main'
+      - 'main-dev'
+      - 'Sparklight'
 
 pr:
   autoCancel: true
   branches:
     include:
       - 'Dev'
+      - 'Demo'
       - 'main'
+      - 'main-dev'
+      - 'Sparklight'
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -26,15 +32,9 @@ variables:
   - name: androidVersionName
     value: '29.0.1'  # Dynamic version from project.VERSION_NAME
   - name: deploymentEnvironment
-    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-      value: 'production'
-    ${{ else }}:
-      value: 'staging'
+    value: 'staging'  # staging for Dev/Demo, production for main
   - name: apiEndpoint
-    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-      value: 'https://api.sparklight.com'
-    ${{ else }}:
-      value: 'https://staging-api.sparklight.com'
+    value: 'https://staging-api.sparklight.com'  # Staging for Dev/Demo branch
   - name: ANDROID_UPLOAD_CERT_SHA1
     value: '53:91:E0:AC:75:92:E7:BD:4F:2A:24:6C:D3:66:7E:37:2D:3C:45:2A'
   - name: NPM_CONFIG_LEGACY_PEER_DEPS
@@ -74,26 +74,6 @@ variables:
     value: ''  # e.g. smtp.office365.com or smtp.gmail.com
   - name: SMTP_PORT
     value: '587'
-  - name: androidFlavor
-    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-      value: 'Prod'
-    ${{ else }}:
-      value: 'Demo'
-  - name: iosScheme
-    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-      value: 'SparklightProd'
-    ${{ else }}:
-      value: 'SparklightDemo'
-  - name: playStoreServiceConnection
-    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-      value: 'SparklightProd'
-    ${{ else }}:
-      value: 'SparklightDemo'
-  - name: playStoreTrack
-    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-      value: 'production'
-    ${{ else }}:
-      value: 'internal'
 
 parameters:
   - name: runSecurityChecks
@@ -167,7 +147,9 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)'
 
           - script: |
-              # Publish runtime version values as an artifact for any manually queued legacy job.
+              # Azure DevOps Build REST API does not expose runtime-expression pipeline variables
+              # (like counter()-based androidVersionCode/iosBuildNumber) via `.variables`, so DemoPromotion/
+              # ProdPromotion cannot read them from build details. Publish them as a small artifact instead.
               VERSION_INFO_DIR="$(Build.ArtifactStagingDirectory)/version-info"
               mkdir -p "$VERSION_INFO_DIR"
               cat > "$VERSION_INFO_DIR/version-info.json" <<EOF
@@ -257,10 +239,10 @@ stages:
   # ==========================================
 
   - stage: DemoPromotion
-    displayName: 'Legacy Demo Promotion (disabled)'
+    displayName: 'Demo Promotion Deploy'
     dependsOn:
       - InitialCommit
-    condition: and(succeeded(), false)
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'Demo'))
     jobs:
       - job: DeployPreviousDevArtifacts
         displayName: 'Deploy Previous Dev Artifacts'
@@ -416,7 +398,8 @@ stages:
 
           - script: |
               set -euo pipefail
-              # Preserve the version artifact for compatibility with previously queued runs.
+              # Published so ProdPromotion can read the REAL version actually baked into this Demo
+              # build's rebuilt AAB/IPA, instead of the throwaway counter value from this run's InitialCommit stage.
               VERSION_INFO_DIR="$(Build.ArtifactStagingDirectory)/demo-version-info"
               mkdir -p "$VERSION_INFO_DIR"
               cat > "$VERSION_INFO_DIR/version-info.json" <<EOF
@@ -468,7 +451,7 @@ stages:
             inputs:
               workingDirectory: 'android'
               gradleWrapperFile: 'android/gradlew'
-              tasks: 'clean bundle$(androidFlavor)Release'
+              tasks: 'clean bundleDemoRelease'
               options: >
                 -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
                 -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
@@ -521,11 +504,11 @@ stages:
             displayName: 'Publish AAB to Play Store Internal Testing'
             condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'))
             inputs:
-              serviceConnection: '$(playStoreServiceConnection)'
+              serviceConnection: 'PlaystoreRessiConnection'
               applicationId: 'com.sparklight'
               action: 'SingleBundle'
               bundleFile: '$(AAB_FILE_PATH)'
-              track: '$(playStoreTrack)'
+              track: 'internal'
               releaseName: 'MySparklight Residential $(androidVersionName)'
               changeLogFile: '$(Build.ArtifactStagingDirectory)/play-release-notes.txt'
 
@@ -791,10 +774,10 @@ stages:
   # ==========================================
 
   - stage: ProdPromotion
-    displayName: 'Legacy Prod Promotion (disabled)'
+    displayName: 'Prod Promotion Deploy'
     dependsOn:
       - InitialCommit
-    condition: and(succeeded(), false)
+    condition: and(succeeded(), eq(variables['Build.SourceBranchName'], 'main'))
     jobs:
       - job: DeployPreviousDemoArtifacts
         displayName: 'Deploy Previous Demo Artifacts'
@@ -1302,7 +1285,7 @@ stages:
   - stage: UnitTests
     displayName: 'Unit Tests'
     dependsOn: InitialCommit
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo'))
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: RunAndroidUnitTests
         displayName: 'Run Android Unit Tests'
@@ -1434,7 +1417,7 @@ stages:
   - stage: SecurityAndQuality
     displayName: 'Security & Code Quality'
     dependsOn: InitialCommit  # runs in parallel with UnitTests to shorten total pipeline time
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo'))
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       # -------- Job 1: Lint Quality Checks --------
       - job: LintQualityChecks
@@ -1828,7 +1811,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo'))
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: BuildAndroid
         displayName: 'Build Android App Bundle'
@@ -1919,7 +1902,7 @@ stages:
             inputs:
               workingDirectory: 'android'
               gradleWrapperFile: 'android/gradlew'
-              tasks: 'clean bundle$(androidFlavor)Release'
+              tasks: 'clean bundleDemoRelease'
               options: >
                 -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
                 -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
@@ -1953,7 +1936,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo'))
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: RunIOSBuild
         displayName: 'Build iOS IPA (Xcode Archive)'
@@ -2161,7 +2144,7 @@ stages:
               echo "Archiving with Xcode..."
               if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
                   -workspace "ios/My Sparklight.xcworkspace" \
-                  -scheme "$(iosScheme)" \
+                  -scheme "Sparklight Dev" \
                   -configuration Release \
                   -sdk iphoneos \
                   -archivePath "$ARCHIVE_PATH" \
@@ -2259,7 +2242,7 @@ stages:
     dependsOn:
       - Build
       - IOSBuild
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo'))
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: CodeReviewGates
         displayName: 'Code Review Quality Gates'
@@ -2293,7 +2276,7 @@ stages:
   - stage: IOSStaging
     displayName: 'iOS Staging'
     dependsOn: CodeReview
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo'))
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: PrepareIOSStaging
         displayName: 'Validate IPA for Staging'
@@ -2325,7 +2308,7 @@ stages:
   - stage: AndroidStaging
     displayName: 'Android Staging'
     dependsOn: CodeReview
-    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo'))
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: PrepareAndroidStaging
         displayName: 'Validate Android AAB for Staging'
@@ -2359,7 +2342,7 @@ stages:
   - stage: IOSTestFlight
     displayName: 'iOS TestFlight'
     dependsOn: IOSStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/main'), eq(variables['System.PullRequest.TargetBranch'], 'main')))
+    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: IOSTestFlightStage
         displayName: 'Upload IPA to TestFlight'
@@ -2614,7 +2597,7 @@ stages:
   - stage: InternalTestingDeployment
     displayName: 'Internal Testing Android'
     dependsOn: AndroidStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranch'], 'refs/heads/main'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['Build.SourceBranchName'], 'main'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/main'), eq(variables['System.PullRequest.TargetBranch'], 'main')))
+    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: DeployToInternalTesting
         displayName: 'Deploy to Play Store Internal Testing'
@@ -2669,11 +2652,11 @@ stages:
           - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
             displayName: 'Publish AAB to Play Store Internal Testing'
             inputs:
-              serviceConnection: '$(playStoreServiceConnection)'
+              serviceConnection: 'PlaystoreRessiConnection'
               applicationId: 'com.sparklight'
               action: 'SingleBundle'
               bundleFile: '$(AAB_FILE_PATH)'
-              track: '$(playStoreTrack)'
+              track: 'internal'
               releaseName: 'MySparklight Residential $(androidVersionName)'
               changeLogFile: '$(GOOGLE_PLAY_RELEASE_NOTES)'
 
