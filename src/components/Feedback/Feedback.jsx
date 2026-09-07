@@ -12,7 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import Touchable from "../common/customui/Touchable";
+
 import Animated, {
   FadeInDown,
   FadeInUp,

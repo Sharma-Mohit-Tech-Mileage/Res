@@ -146,7 +146,7 @@ function decodeIdToken(idToken) {
         console.log("Missing required fields for username update. AccountNumber:",decodeIdToken(idToken)?.preferred_username, "UserName:", decodeIdToken(idToken)?.preferred_username, "NewUsername:", newUsername, "IdToken:", idToken);
         return;
       }
-
+      
       const onSuccess = (Response) => {
         setLoading(false);
         console.log(
@@ -178,6 +178,7 @@ function decodeIdToken(idToken) {
         return;
       }
 
+    
       PostApiRequest(
         ENDPOINTS.UPDATE_USERNAME,
         payload,

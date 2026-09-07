@@ -68,7 +68,7 @@ const renderErrorMessage = (errorCode, navigation) => {
           </Text>
         </View>
       </View>
-      <Touchable
+      {/* <Touchable
         style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]}
         onPress={() => {
           navigation.goBack();
@@ -78,8 +78,17 @@ const renderErrorMessage = (errorCode, navigation) => {
         <Text style={[styles.makePayment, styles.makeTypo]}>
           {"Return to Billing Services"}
         </Text>
-      </Touchable>
+      </Touchable> */}
+      
       <View style={styles.buttonsParent}>
+
+         <SecondaryButton
+          title="Return to Billing Services"
+          buttonType="submit"
+          onPress={() => navigation.goBack()}
+          accessibilityLabel="Return to Billing Services"
+          accessibilityHint="Double tap to return to billing services screen"
+        />
         <SecondaryButton
           title="Cancel"
           onPress={() => navigation.goBack()}
@@ -736,6 +745,7 @@ const styles = StyleSheet.create({
   },
   buttonsParent: {
     marginTop: Padding.p_base,
+    marginHorizontal: 16,
     alignSelf: "stretch",
   },
   billPlanermainContainer: {
