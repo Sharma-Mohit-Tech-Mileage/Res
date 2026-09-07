@@ -357,7 +357,7 @@ function decodeIdToken(idToken) {
                 styles.informationWrapperFlexBox,
               ]}
             >
-              <SectionTitle>Update Username</SectionTitle>
+              <SectionTitle>Username</SectionTitle>
 
               
             </View>
