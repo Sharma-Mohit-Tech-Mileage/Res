@@ -74,7 +74,7 @@ const SplashScreen = ({ navigation, route }) => {
   const [deviceSize, setDeviceSize] = useState(getDeviceSize());
   const [networkState, setNetworkState] = useState({ isConnected: true, type: "unknown", });
   const [showConnectedBanner, setShowConnectedBanner] = useState(false);
-
+  const [retryLogin, setRetryLogin] = useState(false);
   const networkUnsubscribe = useRef(null);
   const sessionCheckTimeout = useRef(null);
   const wasDisconnected = useRef(false);
@@ -485,8 +485,7 @@ const SplashScreen = ({ navigation, route }) => {
         if (result.code === "USER_CANCELLED") {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
-        } else if (result.code === "AUTH_TIMEOUT") {
-          logWarn("SplashScreen", "Login timed out");
+        } else if (result.code ==='AUTH_FAILED' || result.code === "AUTH_TIMEOUT") {
           setErrorState({
             visible: true,
             type: ErrorType.AUTH_TIMEOUT,
@@ -494,6 +493,10 @@ const SplashScreen = ({ navigation, route }) => {
           });
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
+          //logWarn("SplashScreen", "Login timed out");
+          await clearAuthCookies();
+          cleanUserData();
+          return;
         } else if (result.code === "BROWSER_UNAVAILABLE") {
           logWarn("SplashScreen", "Browser unavailable for login");
           setErrorState({
