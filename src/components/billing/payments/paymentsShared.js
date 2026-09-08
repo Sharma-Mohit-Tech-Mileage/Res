@@ -4,6 +4,7 @@ import moment from "moment";
 import { digitsToWords } from "../../../utils/a11y";
 import RemoteConfigManager from "../../../config/Remoteconfigmanager";
 import { calculateFee } from "../../../network/apis/account/paymentMethods.service";
+import { trackApiError, errorStatus } from "./paymentAnalytics";
 
 export const contentMaxWidth = { width: "100%", maxWidth: 640, alignSelf: "center" };
 
@@ -65,8 +66,9 @@ export const useSurchargeFee = (amount, method, { enabled = true, onError } = {}
     let cancelled = false;
     calculateFee(amount, method)
       .then((value) => !cancelled && setFee(value))
-      .catch(() => {
+      .catch((error) => {
         if (cancelled) return;
+        trackApiError("fee-calculator", errorStatus(error), "surcharge");
         if (onError) {
           setFee(0);
           onError();
@@ -148,5 +150,5 @@ export const openOrbipayEdit = (navigation, method, { returnTo, headerTitle } = 
 export const openOrbipaySecureCapture = (navigation, { returnTo, headerTitle } = {}) =>
   navigation.navigate("OrbipayWidget", { mode: "add", returnTo, headerTitle });
 
-export const openOrbipayPaymentExecution = (navigation, { amount, headerTitle, email }) =>
-  navigation.navigate("OrbipayWidget", { mode: "pay", amount, headerTitle, email });
+export const openOrbipayPaymentExecution = (navigation, { amount, headerTitle, email, paymentType }) =>
+  navigation.navigate("OrbipayWidget", { mode: "pay", amount, headerTitle, email, paymentType });

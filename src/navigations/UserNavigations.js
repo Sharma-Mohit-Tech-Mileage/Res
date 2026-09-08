@@ -41,6 +41,9 @@ const UserNavigations = (props) => {
     const currentRouteName = currentRoute?.name;
 
     if (previousRouteName !== currentRouteName && currentRouteName && currentRouteName.trim() !== "") {
+      // Update the ref before the await so a re-entrant state event cannot pass the guard twice.
+      routeNameRef.current = currentRouteName;
+
       // ArticleWindowUtility fires its own screen_view with the real page label
       // ("Make a Payment", "Privacy Policy", etc.) — skip the generic one here to avoid
       // double-counting and to keep the route-named bucket out of the dashboard.
@@ -54,8 +57,6 @@ const UserNavigations = (props) => {
           console.warn('Analytics error:', error);
         }
       }
-
-      routeNameRef.current = currentRouteName;
     }
   };
 
@@ -90,14 +91,11 @@ const UserNavigations = (props) => {
 
   useEffect(() => {
     // Add safety checks and delay listener setup
-    let unsubscribe = null;
     let backHandler = null;
 
+    // Only the NavigationContainer onStateChange prop drives screen_view; a second 'state' listener double-fires it.
     const setupListeners = () => {
       try {
-        if (navigationRef.current) {
-          unsubscribe = navigationRef.current.addListener('state', onStateChange);
-        }
         backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
       } catch (error) {
         console.warn('Error setting up listeners:', error);
@@ -112,13 +110,6 @@ const UserNavigations = (props) => {
 
     return () => {
       clearTimeout(timeoutId);
-      if (unsubscribe) {
-        try {
-          unsubscribe();
-        } catch (error) {
-          console.warn('Error removing listener:', error);
-        }
-      }
       if (backHandler) {
         backHandler.remove();
       }
