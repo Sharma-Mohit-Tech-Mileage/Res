@@ -9,7 +9,7 @@ import DeviceInfo from "react-native-device-info";
 import VersionCheck from "react-native-version-check";
 import AppUpdateAlert from "./src/components/utility/AppUpdateAlert";
 import { initializeApp } from "./src/firebase/FirebaseUtils";
-import { getAnalytics, logEvent, setAnalyticsCollectionEnabled, setUserProperty } from "@react-native-firebase/analytics";
+import { getAnalytics, logEvent, setAnalyticsCollectionEnabled } from "@react-native-firebase/analytics";
 import { getMessaging, onTokenRefresh } from "@react-native-firebase/messaging";
 import { syncDeviceToken } from "./src/network/apis/account/profile.service";
 import Config from "react-native-config";
@@ -26,12 +26,8 @@ const App = () => {
 
   useEffect(() => {
     const enableAnalytics = async () => {
-      // ANALYTICS_DEBUG is set only on special QA builds; the production gate is unchanged.
-      const isQaBuild = Config.ANALYTICS_DEBUG === 'true';
-      const enabled = (!__DEV__ && Config.ENV === 'production') || isQaBuild;
+      const enabled = Config.ANALYTICS_ENABLED === 'true';
       await setAnalyticsCollectionEnabled(getAnalytics(), enabled);
-      // Tags QA-build traffic so the Analytics team can filter it out of prod reports; clears itself on normal builds.
-      await setUserProperty(getAnalytics(), 'test_traffic', isQaBuild ? 'true' : null);
     };
     enableAnalytics();
     Appearance.setColorScheme('light');
