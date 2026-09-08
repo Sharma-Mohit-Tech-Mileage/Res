@@ -127,12 +127,13 @@ export const trackStepDuration = (step, startedAt, attemptIdOverride) => {
 };
 
 // Per-screen wiring: guarantees an attempt id while in a flow and times the step on blur.
+// The id is captured on focus because Back/Cancel end the attempt before this cleanup runs.
 export const usePaymentStep = (step) => {
   useFocusEffect(
     useCallback(() => {
-      ensurePaymentAttempt();
+      const attempt = ensurePaymentAttempt();
       const startedAt = Date.now();
-      return () => trackStepDuration(step, startedAt);
+      return () => trackStepDuration(step, startedAt, attempt);
     }, [step])
   );
 };

@@ -258,8 +258,8 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
           if (returnTo) navigation.navigate(returnTo, { paymentFlash: { type: "success", message: "Your payment method has been updated." } });
           else navigation.goBack();
         } else {
-          await confirmBankToken(token, digiSign);
-          trackPaymentMethodAdded(null);
+          const added = await confirmBankToken(token, digiSign);
+          trackPaymentMethodAdded(added);
           if (!navigation.isFocused()) return;
           announceA11y("Payment method added.");
           if (returnTo) navigation.navigate(returnTo, { paymentFlash: { type: "success", message: "Your payment method has been added." } });
