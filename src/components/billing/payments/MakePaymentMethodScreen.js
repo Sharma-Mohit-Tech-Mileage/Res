@@ -23,17 +23,27 @@ import {
   surchargeTitle,
   surchargeMessage,
 } from "./paymentsShared";
+import {
+  usePaymentStep,
+  endPaymentAttempt,
+  trackPaymentMethodSelected,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 
 const MakePaymentMethodScreen = ({ navigation, route }) => {
   const surchargeRate = useSurchargeRate();
   const amount = Number(route.params?.amount) || 0;
+  const paymentType = route.params?.paymentType || "";
   const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
   const [selectedId, setSelectedId] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
   const abortRef = useRef(null);
+
+  usePaymentStep("payment_method");
 
   useFocusEffect(
     useCallback(() => {
@@ -50,10 +60,11 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
           setAutoPay(details);
           setSelectedId((prev) => prev || list.find((m) => m.isDefault && !isMethodUnusable(m))?.id || "");
         })
-        .catch(() => {
+        .catch((error) => {
           setMethods([]);
           setAutoPay({ enrolled: false });
           setErrorAlert("We could not load your payment methods. Please try again.");
+          trackApiError("payment-methods", errorStatus(error), "payment_method");
         });
       return () => abortRef.current?.abort();
     }, [route.params?.paymentFlash, navigation])
@@ -71,16 +82,25 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
     let cancelled = false;
     calculateFee(amount, selectedMethod)
       .then((fee) => !cancelled && setSurcharge(fee))
-      .catch(() => !cancelled && setSurcharge(null));
+      .catch((error) => {
+        if (cancelled) return;
+        setSurcharge(null);
+        trackApiError("fee-calculator", errorStatus(error), "payment_method");
+      });
     return () => {
       cancelled = true;
     };
   }, [selectedId, amount]);
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
+  const onSelectMethod = (method) => {
+    if (method.id !== selectedId) trackPaymentMethodSelected(method);
+    setSelectedId(method.id);
+  };
+
   const onPayWithNewMethod = () => {
     // email is resolved downstream (account primary email) — portal parity: no entry field here
-    openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: autoPay?.email || "" });
+    openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: autoPay?.email || "", paymentType });
   };
 
   return (
@@ -123,7 +143,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
                 method={method}
                 variant="radio"
                 selected={method.id === selectedId}
-                onPress={() => setSelectedId(method.id)}
+                onPress={() => onSelectMethod(method)}
                 showAutoPayBadge={isAutoPayLinked(method)}
                 positionLabel={`${index + 1} of ${methods.length}`}
               />
@@ -147,12 +167,18 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
               buttonType="submit"
               disabled={!canContinue}
               accessibilityLabel="Continue"
-              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle, surcharge })}
+              onPress={() =>
+                canContinue &&
+                navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle, surcharge, paymentType })
+              }
             />
             <PrimaryButton
               title="Cancel"
               accessibilityLabel="Cancel payment"
-              onPress={() => navigation.popToTop()}
+              onPress={() => {
+                endPaymentAttempt();
+                navigation.popToTop();
+              }}
             />
           </>
         )}

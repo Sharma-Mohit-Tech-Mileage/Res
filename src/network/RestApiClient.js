@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import Config from "react-native-config";
+import { getAnalytics, resetAnalyticsData } from "@react-native-firebase/analytics";
 import { getUser, cleanUserData } from "../redux/utils/LocalStorage";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
@@ -68,6 +69,8 @@ const retryRequest = async (axiosInstance, originalRequest, retryCount = 0, last
 
 const redirectToLogin = async () => {
     try {
+        // Clear the analytics identifier so post-logout events are not attributed to the previous account.
+        try { resetAnalyticsData(getAnalytics()).catch(() => {}); } catch (_) {}
         await clearAuthCookies();
         await cleanUserData();
         if (navigationRef.current) {

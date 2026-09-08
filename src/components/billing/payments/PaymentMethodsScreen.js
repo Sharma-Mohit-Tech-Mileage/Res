@@ -18,6 +18,14 @@ import {
 } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, describePaymentMethod, openOrbipaySecureCapture, openOrbipayEdit } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
+import {
+  usePaymentStep,
+  endPaymentAttempt,
+  trackPaymentMethodDeleted,
+  trackPaymentMethodFailed,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 const PaymentMethodsScreen = ({ navigation, route }) => {
   const [methods, setMethods] = useState(null);
@@ -27,6 +35,8 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
   const deletingRef = useRef(false);
   const [alert, setAlert] = useState(null);
   const abortRef = useRef(null);
+
+  usePaymentStep("manage_payment_methods");
 
   useFocusEffect(
     useCallback(() => {
@@ -43,7 +53,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
           setMethods(list);
           setAutoPay(details);
         })
-        .catch(() => {
+        .catch((error) => {
           setMethods([]);
           setAutoPay({ enrolled: false });
           setAlert({
@@ -51,6 +61,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
             title: "Unable to load payment methods",
             message: "Please try again later.",
           });
+          trackApiError("payment-methods", errorStatus(error), "manage_payment_methods");
         });
       return () => abortRef.current?.abort();
     }, [route.params?.paymentFlash, navigation])
@@ -79,12 +90,15 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
       setMethods((prev) => prev?.filter((m) => m.id !== method.id));
       setAlert({ type: "success", message: `${describePaymentMethod(method)} has been deleted` });
       announceA11y("Payment method deleted.");
+      trackPaymentMethodDeleted(method);
     } catch (error) {
       setAlert({
         type: "error",
         title: "Something went wrong",
         message: "We could not delete this payment method. Please try again.",
       });
+      trackPaymentMethodFailed(method, "delete_failed");
+      trackApiError("delete-payment-method", errorStatus(error), "manage_payment_methods");
     } finally {
       deletingRef.current = false;
       setBusy(false);
@@ -93,7 +107,13 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Manage Payment Method" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader
+        title="Manage Payment Method"
+        onPressBack={() => {
+          endPaymentAttempt();
+          navigation.goBack();
+        }}
+      />
       <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{marginBottom: 140}]} showsVerticalScrollIndicator={false}>
          <>
         {!!alert && (

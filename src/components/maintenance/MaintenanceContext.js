@@ -11,6 +11,7 @@ import {
   getUser,
 } from "../../redux/utils/LocalStorage";
 import { logout } from "react-native-app-auth";
+import { getAnalytics, resetAnalyticsData } from "@react-native-firebase/analytics";
 import Config from "react-native-config";
 import { navigationRef } from "../../navigations/UserNavigations";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
@@ -337,6 +338,8 @@ export const MaintenanceProvider = ({ children }) => {
   };
 
   const performLogout = async (isBlockingLogout = false) => {
+    // Clear the analytics identifier so post-logout events are not attributed to the previous account.
+    try { resetAnalyticsData(getAnalytics()).catch(() => {}); } catch (_) {}
     try {
       if (isBlockingLogout) {
         try {

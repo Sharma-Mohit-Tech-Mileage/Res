@@ -32,12 +32,21 @@ import {
   useSurchargeFee,
 } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
+import {
+  usePaymentStep,
+  trackAutoPayEnabled,
+  trackAutoPayFailed,
+  trackValidationError,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AutoPayReviewScreen = ({ navigation, route }) => {
   const mode = route.params?.mode === "update" ? "update" : "enroll";
   const methodId = route.params?.methodId || "";
+  const entryPoint = route.params?.entryPoint || "";
   const fromOffer = !!route.params?.fromOffer;
   const headerTitle = route.params?.headerTitle || (mode === "enroll" ? "Set Up Auto Pay" : "Manage Auto Pay");
   const [method, setMethod] = useState(null);
@@ -52,6 +61,8 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
   const emailRef = useRef(null);
   const abortRef = useRef(null);
 
+  usePaymentStep("autopay_review");
+
   useFocusEffect(
     useCallback(() => {
       abortRef.current = new AbortController();
@@ -62,9 +73,10 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
           setDetails(autoPay);
           setEmail((prev) => prev || autoPay.email || "");
         })
-        .catch(() => {
+        .catch((error) => {
           setDetails({});
           setErrorAlert("We could not load your payment information. Please try again.");
+          trackApiError("autopay-details", errorStatus(error), "autopay_review");
         });
       return () => abortRef.current?.abort();
     }, [methodId])
@@ -89,6 +101,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
     if (!EMAIL_PATTERN.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       emailRef.current?.focus();
+      trackValidationError("email", "invalid_format");
       return;
     }
     inFlightRef.current = true;
@@ -96,6 +109,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
     try {
       const submit = mode === "update" ? updateAutoPayPaymentMethod : enrollAutoPay;
       const result = await submit(methodId, email.trim());
+      if (mode === "enroll") trackAutoPayEnabled(method, entryPoint);
       navigation.replace("PaymentConfirmation", {
         headerTitle,
         kind: mode === "update" ? "autopay-updated" : "autopay-activated",
@@ -107,6 +121,8 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
             : null,
       });
     } catch (error) {
+      trackAutoPayFailed(mode === "update" ? "update_failed" : "enroll_failed");
+      trackApiError(mode === "update" ? "update-autopay" : "enroll-autopay", errorStatus(error), "autopay_review");
       setErrorAlert(
         mode === "update"
           ? "We could not update your Auto Pay payment method. Please try again."

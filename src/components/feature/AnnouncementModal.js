@@ -14,7 +14,8 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDismiss, onLearnMoreNavigate, navigationRef }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [startTime] = useState(Date.now());
+  // Set when the modal becomes visible — the component itself mounts hidden at app launch.
+  const startTimeRef = useRef(null);
 
   const overlayFade = useRef(new Animated.Value(0)).current;
   const modalSlide = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
@@ -27,6 +28,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
 
   useEffect(() => {
     if (visible && campaign) {
+      startTimeRef.current = Date.now();
       Animated.parallel([
         Animated.timing(overlayFade, {
           toValue: 1,
@@ -40,15 +42,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
           useNativeDriver: true,
         }),
       ]).start();
-
-      // Track first step view safely
-      try {
-        if (steps[0]?.title) {
-          trackStepViewed(campaign.id, 1, steps[0].title);
-        }
-      } catch (error) {
-        console.warn('[AnnouncementModal] Error tracking step view:', error);
-      }
+      // Step 1 is tracked by the step-view effect below — tracking it here too double-fires.
     }
   }, [visible, campaign]);
 
@@ -94,7 +88,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
 
 
   const handleComplete = () => {
-    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    const timeSpent = startTimeRef.current ? Math.floor((Date.now() - startTimeRef.current) / 1000) : 0;
     exitAnimation(() => {
       if (onComplete && typeof onComplete === 'function') {
         try {
