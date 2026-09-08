@@ -95,6 +95,20 @@ const SplashScreen = ({ navigation, route }) => {
     return styles[sizeStyle] || styles[baseStyle];
   };
 
+   useEffect(() => {
+    console.log("Retry login state changed:", retryLogin);
+    if (retryLogin) {
+    setLoginEnable(true);
+     setErrorState({
+            visible: true,
+            type: ErrorType.AUTH_TIMEOUT,
+            message: 'Login failed. Please try again.',
+          });
+          setLoadingState(LoadingState.NONE);
+        }
+          
+   }, [retryLogin]);
+
   useEffect(() => {
     const networkManager = NetworkManager.getInstance();
 
@@ -493,6 +507,7 @@ const SplashScreen = ({ navigation, route }) => {
           });
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
+          setRetryLogin(true);
           //logWarn("SplashScreen", "Login timed out");
           await clearAuthCookies();
           cleanUserData();
