@@ -671,7 +671,7 @@ const SplashScreen = ({ navigation, route }) => {
           )}&refresh_token=${encodeURIComponent(res.refreshToken)}`,
         }).catch(() => {});
       }
-      await analytics().resetAnalyticsData();
+      await resetAnalyticsData(getAnalytics());
     } catch (error) {
       logWarn("SplashScreen", "Transfer sign-in cleanup error");
     }
