@@ -255,16 +255,16 @@ const PaymentHistoryScreen = ({ navigation }) => {
             {/* A TextInput's native placeholder cannot shrink to fit, so render the hint
                 as Text and let it scale down instead of truncating. */}
             {!searchQuery ? (
-              <Text
-                style={styles.searchPlaceholder}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.75}
-                pointerEvents="none"
-                importantForAccessibility="no-hide-descendants"
-              >
-                Search by Confirmation ID
-              </Text>
+              <View style={styles.searchPlaceholderFill} pointerEvents="none" importantForAccessibility="no-hide-descendants">
+                <Text
+                  style={styles.searchPlaceholder}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.75}
+                >
+                  Search by Confirmation ID
+                </Text>
+              </View>
             ) : null}
             </View>
           </View>
@@ -367,10 +367,16 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginRight: 8,
   },
-  searchPlaceholder: {
+  // Absolute fill with centred content: an absolute Text with no top/bottom pins itself to the top edge.
+  searchPlaceholderFill: {
     position: "absolute",
     left: 0,
     right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+  },
+  searchPlaceholder: {
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     color: Color.sparklightGray1,

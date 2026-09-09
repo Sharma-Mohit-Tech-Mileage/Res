@@ -2,12 +2,12 @@
 import { NativeModules } from 'react-native';
 const { RNZendeskChatModule } = NativeModules;
 import { getZendeskData } from "../../redux/utils/LocalStorage";
-import analytics from '@react-native-firebase/analytics';
+import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 
 export const startChatWithConfig = async(config) => {
   console.log("startChat called with config:", config);
   try {
-    await analytics().logEvent("zendesk_chat_start", { chat_initiation_page: config.Initiation_Page });
+    await logEvent(getAnalytics(), "zendesk_chat_start", { chat_initiation_page: config.Initiation_Page });
   } catch (e) {
     console.warn("analytics logEvent error (startChatWithConfig):", e);
   }
@@ -34,7 +34,7 @@ export const clearChatData = () => {
 export const startChat = async (config) => {
   console.log("startChat called with config:", config);
   try {
-    await analytics().logEvent("zendesk_chat_start", { chat_initiation_page: config.Initiation_Page });
+    await logEvent(getAnalytics(), "zendesk_chat_start", { chat_initiation_page: config.Initiation_Page });
   } catch (e) {
     console.warn("analytics logEvent error (startChat):", e);
   }

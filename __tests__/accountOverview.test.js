@@ -76,13 +76,12 @@ jest.mock('react-native-app-auth', () => ({
   logout: (...args) => mockLogout(...args),
 }));
 
-jest.mock('@react-native-firebase/analytics', () => {
-  const analyticsFn = () => ({
-    setUserId: (...args) => mockSetUserId(...args),
-    setUserProperty: (...args) => mockSetUserProperty(...args),
-  });
-  return analyticsFn;
-});
+jest.mock('@react-native-firebase/analytics', () => ({
+  __esModule: true,
+  getAnalytics: jest.fn(() => ({})),
+  setUserId: (...args) => mockSetUserId(...args),
+  setUserProperty: (...args) => mockSetUserProperty(...args),
+}));
 
 jest.mock('react-native-linear-gradient', () => 'LinearGradient');
 jest.mock('react-native-config', () => ({
