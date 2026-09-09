@@ -25,14 +25,18 @@ import {
   surchargeMessage,
   useSurchargeRate,
 } from "./paymentsShared";
+import { usePaymentStep, endPaymentAttempt, trackApiError, errorStatus } from "./paymentAnalytics";
 
 const AutoPayScreen = ({ navigation, route }) => {
   const surchargeRate = useSurchargeRate();
+  const entryPoint = route.params?.entryPoint || "";
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
   const [selectedId, setSelectedId] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
   const abortRef = useRef(null);
+
+  usePaymentStep("autopay");
 
   useFocusEffect(
     useCallback(() => {
@@ -49,10 +53,11 @@ const AutoPayScreen = ({ navigation, route }) => {
           setAutoPay(details);
           setSelectedId((prev) => prev || (details.enrolled ? details.paymentMethodId : ""));
         })
-        .catch(() => {
+        .catch((error) => {
           setMethods([]);
           setAutoPay({ enrolled: false });
           setErrorAlert("We could not load your payment information. Please try again.");
+          trackApiError("payment-methods", errorStatus(error), "autopay");
         });
       return () => abortRef.current?.abort();
     }, [route.params?.paymentFlash, navigation])
@@ -78,12 +83,19 @@ const AutoPayScreen = ({ navigation, route }) => {
       mode: enrolled ? "update" : "enroll",
       methodId: selectedId,
       headerTitle,
+      entryPoint,
     });
   };
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader
+        title={headerTitle}
+        onPressBack={() => {
+          endPaymentAttempt();
+          navigation.goBack();
+        }}
+      />
       <ScrollView contentContainerStyle={[ contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
         <>
         <View style={styles.surchargeAlert}>

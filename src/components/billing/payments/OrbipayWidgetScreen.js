@@ -15,6 +15,16 @@ import { formatCurrency } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 import { useFeatureFlag } from "../../../contexts/Featureflagscontext";
 import FeatureFlags from "../../../config/Featureflags";
+import {
+  usePaymentStep,
+  trackPaymentSubmitted,
+  trackPaymentSuccess,
+  trackPaymentFailed,
+  trackPaymentMethodAdded,
+  trackPaymentMethodFailed,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 // hcaptcha.com is the widget's captcha provider; blocking its iframe fails checkout with a captcha error.
 const ORBIPAY_HOSTS = ["billerpayments.com", "hcaptcha.com"];
@@ -146,6 +156,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   const paymentOptionReadOnly = route.params?.paymentOptionReadOnly || "";
   const returnTo = route.params?.returnTo || "";
   const emailParam = route.params?.email || "";
+  const paymentTypeParam = route.params?.paymentType || "";
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const formHeight = initialFormHeight(width);
@@ -164,6 +175,8 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   const hostModeRef = useRef(null);
   const portalUrlRef = useRef(null);
   const widgetParamsRef = useRef(null);
+
+  usePaymentStep("orbipay_widget");
 
   const hostFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_HOST, Config.ORBIPAY_DEFAULT_HOST || "app");
   const portalPathFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_PORTAL_PATH, Config.ORBIPAY_PORTAL_WIDGET_PATH || "/orbipayhost.html");
@@ -208,7 +221,10 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     if (widgetReady) return undefined;
-    const timer = setTimeout(() => setLoadFailed(true), WIDGET_TIMEOUT_MS);
+    const timer = setTimeout(() => {
+      setLoadFailed(true);
+      trackApiError("orbipay-widget", "timeout", "orbipay_widget");
+    }, WIDGET_TIMEOUT_MS);
     return () => clearTimeout(timer);
   }, [widgetReady, retryKey]);
 
@@ -221,7 +237,9 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
       setBusy(true);
       try {
         if (mode === "pay") {
+          trackPaymentSubmitted(amount, null, paymentTypeParam);
           const result = await confirmPaymentToken(token, digiSign, amount, emailParam);
+          trackPaymentSuccess(null);
           if (!navigation.isFocused()) return;
           // The customer is charged amount + surcharge, so the confirmation must report the total.
           const total = result?.fee != null ? amount + result.fee : amount;
@@ -240,7 +258,8 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
           if (returnTo) navigation.navigate(returnTo, { paymentFlash: { type: "success", message: "Your payment method has been updated." } });
           else navigation.goBack();
         } else {
-          await confirmBankToken(token, digiSign);
+          const added = await confirmBankToken(token, digiSign);
+          trackPaymentMethodAdded(added);
           if (!navigation.isFocused()) return;
           announceA11y("Payment method added.");
           if (returnTo) navigation.navigate(returnTo, { paymentFlash: { type: "success", message: "Your payment method has been added." } });
@@ -249,6 +268,15 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
       } catch (error) {
         handledRef.current = false;
         setBusy(false);
+        const rawReason = String(error?.message || "");
+        const reason = error?.code || (/timeout|network/i.test(rawReason) ? "network" : "confirm_failed");
+        if (mode === "pay") trackPaymentFailed(null, reason);
+        else trackPaymentMethodFailed(null, mode === "edit" ? "update_failed" : "add_failed");
+        trackApiError(
+          mode === "pay" ? "confirm-payment-token" : mode === "edit" ? "update-funding-account" : "confirm-bank-token",
+          errorStatus(error),
+          "orbipay_widget"
+        );
         if (!navigation.isFocused()) return;
         const raw = String(error?.message || "");
         const message = /timeout|network/i.test(raw)
@@ -264,7 +292,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
         else navigation.goBack();
       }
     },
-    [mode, amount, fundingAccountId, navigation, returnTo]
+    [mode, amount, fundingAccountId, navigation, returnTo, paymentTypeParam]
   );
 
   const onMessage = useCallback(
@@ -285,6 +313,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
         if (!handledRef.current) navigation.goBack();
       } else if (msg.type === "widget_failed") {
         setErrorAlert("The secure payment form could not be loaded. Please try again later.");
+        trackApiError("orbipay-widget", "load_failed", "orbipay_widget");
       }
     },
     [navigation, onCheckoutToken]

@@ -238,7 +238,7 @@ stages:
   - stage: UnitTests
     displayName: 'Unit Tests'
     dependsOn: InitialCommit
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: RunAndroidUnitTests
         displayName: 'Run Android Unit Tests'
@@ -262,7 +262,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package.json'
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -313,7 +313,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package.json'
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -358,8 +358,17 @@ stages:
         steps:
           - checkout: self
 
+          # coverage/ is generated, not committed, so pull the report this build published.
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Coverage Reports'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'coverage-reports'
+              downloadPath: '$(System.DefaultWorkingDirectory)'
+
           - script: |
-              node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
+              node -e "const fs=require('fs'); const p='coverage-reports/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
             displayName: 'Evaluate Coverage Summary'
             workingDirectory: '.'
 
@@ -370,7 +379,7 @@ stages:
   - stage: SecurityAndQuality
     displayName: 'Security & Code Quality'
     dependsOn: InitialCommit  # runs in parallel with UnitTests to shorten total pipeline time
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       # -------- Job 1: Lint Quality Checks --------
       - job: LintQualityChecks
@@ -386,7 +395,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package.json'
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -741,7 +750,6 @@ stages:
                   echo "Action: Check gradle build log above for detailed errors."
                 } >> "$SUMMARY_FILE"
               else
-              
                 {
                   echo "✓ Lint Report Status: Report files generated successfully"
                 } >> "$SUMMARY_FILE"
@@ -765,7 +773,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: BuildAndroid
         displayName: 'Build Android App Bundle'
@@ -806,7 +814,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package.json'
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -851,57 +859,12 @@ stages:
               echo "✅ Keystore fingerprint matches expected Play upload key."
             displayName: 'Validate Android upload keystore fingerprint'
 
-          - script: |
-              set -euo pipefail
-              TARGET_BRANCH="${SYSTEM_PULLREQUEST_TARGETBRANCH:-}"
-              SOURCE_BRANCH="${BUILD_SOURCEBRANCHNAME:-}"
-              CHANNEL="Demo"
-              ANDROID_TASK="bundleDemoRelease"
-
-              if [ "${BUILD_REASON:-}" = "PullRequest" ]; then
-                case "$TARGET_BRANCH" in
-                  refs/heads/Dev|Dev)
-                    CHANNEL="Demo"
-                    ANDROID_TASK="bundleDemoRelease"
-                    ;;
-                  refs/heads/Demo|Demo)
-                    CHANNEL="Demo"
-                    ANDROID_TASK="bundleDemoRelease"
-                    ;;
-                  refs/heads/Prod|Prod|refs/heads/main|main)
-                    CHANNEL="Prod"
-                    ANDROID_TASK="bundleProdRelease"
-                    ;;
-                esac
-              else
-                case "$SOURCE_BRANCH" in
-                  Dev)
-                    CHANNEL="Demo"
-                    ANDROID_TASK="bundleDemoRelease"
-                    ;;
-                  Demo)
-                    CHANNEL="Demo"
-                    ANDROID_TASK="bundleDemoRelease"
-                    ;;
-                  Prod|main)
-                    CHANNEL="Prod"
-                    ANDROID_TASK="bundleProdRelease"
-                    ;;
-                esac
-              fi
-
-              echo "Resolved channel: $CHANNEL"
-              echo "Resolved Android task: $ANDROID_TASK"
-              echo "##vso[task.setvariable variable=RELEASE_CHANNEL]$CHANNEL"
-              echo "##vso[task.setvariable variable=ANDROID_BUILD_TASK]$ANDROID_TASK"
-            displayName: 'Resolve release channel and Android flavor'
-
           - task: Gradle@4
             displayName: 'Build Android App Bundle (Demo Release)'
             inputs:
               workingDirectory: 'android'
               gradleWrapperFile: 'android/gradlew'
-              tasks: 'clean $(ANDROID_BUILD_TASK)'
+              tasks: 'clean bundleDemoRelease'
               options: >
                 -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
                 -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
@@ -935,7 +898,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: RunIOSBuild
         displayName: 'Build iOS IPA (Xcode Archive)'
@@ -995,7 +958,7 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm packages'
             inputs:
-              key: 'npm | "$(Agent.OS)" | package.json'
+              key: 'npm | "$(Agent.OS)" | package-lock.json'
               restoreKeys: 'npm | "$(Agent.OS)"'
               path: '$(System.DefaultWorkingDirectory)/node_modules'
 
@@ -1114,42 +1077,6 @@ stages:
 
           - script: |
               set -euo pipefail
-              TARGET_BRANCH="${SYSTEM_PULLREQUEST_TARGETBRANCH:-}"
-              SOURCE_BRANCH="$(Build.SourceBranchName)"
-              IOS_SCHEME="SparklightDemo"
-
-              if [ "$(Build.Reason)" = "PullRequest" ]; then
-                case "$TARGET_BRANCH" in
-                  refs/heads/Dev|Dev)
-                    IOS_SCHEME="SparklightDemo"
-                    ;;
-                  refs/heads/Demo|Demo)
-                    IOS_SCHEME="SparklightDemo"
-                    ;;
-                  refs/heads/Prod|Prod|refs/heads/main|main)
-                    IOS_SCHEME="SparklightProd"
-                    ;;
-                esac
-              else
-                case "$SOURCE_BRANCH" in
-                  Dev)
-                    IOS_SCHEME="SparklightDemo"
-                    ;;
-                  Demo)
-                    IOS_SCHEME="SparklightDemo"
-                    ;;
-                  Prod|main)
-                    IOS_SCHEME="SparklightProd"
-                    ;;
-                esac
-              fi
-
-              echo "Resolved iOS scheme: $IOS_SCHEME"
-              echo "##vso[task.setvariable variable=IOS_SCHEME]$IOS_SCHEME"
-            displayName: 'Resolve iOS scheme'
-
-          - script: |
-              set -euo pipefail
               NODE_BIN="$(command -v node)"
               echo "export NODE_BINARY=$NODE_BIN" > ios/.xcode.env.local
               ARCHIVE_PATH="$(Build.ArtifactStagingDirectory)/My Sparklight.xcarchive"
@@ -1179,7 +1106,7 @@ stages:
               echo "Archiving with Xcode..."
               if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
                   -workspace "ios/My Sparklight.xcworkspace" \
-                  -scheme "$(IOS_SCHEME)" \
+                  -scheme "Sparklight UAT" \
                   -configuration Release \
                   -sdk iphoneos \
                   -archivePath "$ARCHIVE_PATH" \
@@ -1277,7 +1204,7 @@ stages:
     dependsOn:
       - Build
       - IOSBuild
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: CodeReviewGates
         displayName: 'Code Review Quality Gates'
@@ -1311,7 +1238,7 @@ stages:
   - stage: IOSStaging
     displayName: 'iOS Staging'
     dependsOn: CodeReview
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: PrepareIOSStaging
         displayName: 'Validate IPA for Staging'
@@ -1343,7 +1270,7 @@ stages:
   - stage: AndroidStaging
     displayName: 'Android Staging'
     dependsOn: CodeReview
-    condition: succeeded()
+    condition: and(succeeded(), notIn(variables['Build.SourceBranchName'], 'Demo', 'main'))
     jobs:
       - job: PrepareAndroidStaging
         displayName: 'Validate Android AAB for Staging'
@@ -1377,7 +1304,7 @@ stages:
   - stage: IOSTestFlight
     displayName: 'iOS TestFlight'
     dependsOn: IOSStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'))
+    condition: and(succeeded(), eq('${{ parameters.deployToTestFlight }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: IOSTestFlightStage
         displayName: 'Upload IPA to TestFlight'
@@ -1632,7 +1559,7 @@ stages:
   - stage: InternalTestingDeployment
     displayName: 'Internal Testing Android'
     dependsOn: AndroidStaging
-    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'))
+    condition: and(succeeded(), eq('${{ parameters.deployToInternalTesting }}', 'true'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Dev'), eq(variables['Build.SourceBranchName'], 'Dev'), eq(variables['System.PullRequest.TargetBranch'], 'refs/heads/Dev'), eq(variables['System.PullRequest.TargetBranch'], 'Dev')))
     jobs:
       - job: DeployToInternalTesting
         displayName: 'Deploy to Play Store Internal Testing'

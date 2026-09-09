@@ -11,6 +11,7 @@ import { FontFamily,Color } from "../../../GlobalStyles";
 
 import Touchable from "./customui/Touchable";
 import PrimaryButton from "./customui/PrimaryButton";
+import { getAnalytics, setUserId, setUserProperty } from "@react-native-firebase/analytics";
 
 
 // Simple error manager
@@ -47,12 +48,21 @@ export const GlobalErrorModal = () => {
 
   const dialSupport = () => Linking.openURL(`tel:${SUPPORT_NUMBER_RAW}`);
 
+  // Login failed, so clear the analytics identifier left from the previous session.
+  const handleClose = () => {
+    try {
+      setUserId(getAnalytics(), null).catch(() => {});
+      setUserProperty(getAnalytics(), "Sparklight_user_id", null).catch(() => {});
+    } catch (_) {}
+    globalErrorManager.hide();
+  };
+
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={() => globalErrorManager.hide()}
+      onRequestClose={handleClose}
     >
       <View style={styles.overlay}>
         <View style={styles.alertContainer}>
@@ -86,7 +96,7 @@ export const GlobalErrorModal = () => {
           <PrimaryButton
             title="Close"
             buttonType="cancel"
-            onPress={() => globalErrorManager.hide()}
+            onPress={handleClose}
             accessibilityLabel="Close"
             style={[ { marginTop: 24 }]}
             accessibilityHint="Double tap to close the error modal"

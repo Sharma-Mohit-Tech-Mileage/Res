@@ -24,7 +24,7 @@ const AutoPayCard = ({
   const showSkeleton = isStatusLoading || isAutoPayStatus === undefined;
   const handleCardPress = () => {
     if (!showSkeleton) {
-      navigation.navigate("AutoPay");
+      navigation.navigate("AutoPay", { entryPoint: "autopay_card" });
     }
   };
 

@@ -31,12 +31,22 @@ import {
   surchargeMessage,
 } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
+import {
+  usePaymentStep,
+  trackPaymentSubmitted,
+  trackPaymentSuccess,
+  trackPaymentFailed,
+  trackValidationError,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const MakePaymentReviewScreen = ({ navigation, route }) => {
   const surchargeRate = useSurchargeRate();
   const amount = Number(route.params?.amount) || 0;
+  const paymentType = route.params?.paymentType || "";
   const fromOffer = !!route.params?.fromOffer;
   const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [method, setMethod] = useState(route.params?.method || null);
@@ -60,6 +70,8 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
   const abortRef = useRef(null);
   const paymentDate = moment().format("M/D/YYYY");
 
+  usePaymentStep("payment_review");
+
   useFocusEffect(
     useCallback(() => {
       const flash = route.params?.paymentFlash;
@@ -77,7 +89,10 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           const paramMethodId = route.params?.methodId || route.params?.method?.id;
           setMethod(list.find((m) => m.id === paramMethodId) || route.params?.method || null);
         })
-        .catch(() => setAutoPay({ enrolled: true }))
+        .catch((error) => {
+          setAutoPay({ enrolled: true });
+          trackApiError("payment-review-load", errorStatus(error), "payment_review");
+        })
         .finally(() => setLoading(false));
       return () => abortRef.current?.abort();
     }, [route.params?.methodId, route.params?.method, route.params?.paymentFlash, navigation])
@@ -89,16 +104,20 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
     if (!EMAIL_PATTERN.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       emailRef.current?.focus();
+      trackValidationError("email", "invalid_format");
       return;
     }
     if (!method?.id) {
-      openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: email.trim() });
+      // Widget-hosted payment: payment_submitted fires in OrbipayWidgetScreen at token receipt.
+      openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: email.trim(), paymentType });
       return;
     }
     inFlightRef.current = true;
     setSubmitting(true);
+    trackPaymentSubmitted(amount, method, paymentType);
     try {
       const result = await submitPayment(amount, method, email.trim());
+      trackPaymentSuccess(method);
       navigation.replace("PaymentConfirmation", {
         headerTitle,
         kind: "payment-submitted",
@@ -113,6 +132,8 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
             : null,
       });
     } catch (error) {
+      trackPaymentFailed(method, error?.code || "submit_error");
+      trackApiError("submit-payment", errorStatus(error), "payment_review");
       setErrorAlert(
         error?.code === "PAYMENT_DECLINED"
           ? "There was a problem making your payment. Please verify all information entered is correct and try again or call us at 1-877-692-2253."
