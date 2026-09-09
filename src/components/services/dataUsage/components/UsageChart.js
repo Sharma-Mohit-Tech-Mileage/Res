@@ -965,13 +965,13 @@ const styles = StyleSheet.create({
   dropdown: {
     backgroundColor: theme.colors.surfaceVariant,
     borderColor: theme.colors.borderLight,
-    borderRadius: theme.radius.xs,
+    borderRadius: theme.radius.base,
     height: 48,
   },
   listToggle: {
     width: 44,
     height: 48,
-    borderRadius: theme.radius.xs,
+    borderRadius: theme.radius.base,
     backgroundColor: theme.colors.surfaceVariant,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
@@ -1014,7 +1014,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.xs,
     backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: theme.radius.xs,
+    borderRadius: theme.radius.base,
     marginBottom: theme.spacing.sm,
   },
   lastListItem: {

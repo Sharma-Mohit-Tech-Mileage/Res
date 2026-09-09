@@ -435,7 +435,7 @@ function decodeIdToken(idToken) {
                                 flexDirection: "row",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                paddingTop: 6,
+                                marginTop: 6,
                               }}
                             >
                               <View
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   bulletPointContainer: {
     flexDirection: "row",
     alignItems: "flex-start",
-    marginBottom: 16,
+    marginBottom: 5,
     marginRight: 24,
   },
   passwordFlexBox: {

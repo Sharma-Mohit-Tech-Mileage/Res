@@ -74,7 +74,6 @@ const SplashScreen = ({ navigation, route }) => {
   const [deviceSize, setDeviceSize] = useState(getDeviceSize());
   const [networkState, setNetworkState] = useState({ isConnected: true, type: "unknown", });
   const [showConnectedBanner, setShowConnectedBanner] = useState(false);
-  const [retryLogin, setRetryLogin] = useState(false);
   const networkUnsubscribe = useRef(null);
   const sessionCheckTimeout = useRef(null);
   const wasDisconnected = useRef(false);
@@ -94,20 +93,6 @@ const SplashScreen = ({ navigation, route }) => {
     const sizeStyle = `${baseStyle}_${deviceSize}`;
     return styles[sizeStyle] || styles[baseStyle];
   };
-
-   useEffect(() => {
-    console.log("Retry login state changed:", retryLogin);
-    if (retryLogin) {
-    setLoginEnable(true);
-     setErrorState({
-            visible: true,
-            type: ErrorType.AUTH_TIMEOUT,
-            message: 'Login failed. Please try again.',
-          });
-          setLoadingState(LoadingState.NONE);
-        }
-          
-   }, [retryLogin]);
 
   useEffect(() => {
     const networkManager = NetworkManager.getInstance();
@@ -499,7 +484,7 @@ const SplashScreen = ({ navigation, route }) => {
         if (result.code === "USER_CANCELLED") {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
-        } else if (result.code ==='AUTH_FAILED' || result.code === "AUTH_TIMEOUT") {
+        } else if (result.code === "AUTH_TIMEOUT") {
           setErrorState({
             visible: true,
             type: ErrorType.AUTH_TIMEOUT,
@@ -507,10 +492,10 @@ const SplashScreen = ({ navigation, route }) => {
           });
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
-          setRetryLogin(true);
-          //logWarn("SplashScreen", "Login timed out");
-          await clearAuthCookies();
-          cleanUserData();
+          void clearAuthCookies().catch((cleanupError) =>
+            logWarn("SplashScreen", "Auth cookie cleanup failed", cleanupError),
+          );
+          void cleanUserData();
           return;
         } else if (result.code === "BROWSER_UNAVAILABLE") {
           logWarn("SplashScreen", "Browser unavailable for login");
@@ -554,6 +539,7 @@ const SplashScreen = ({ navigation, route }) => {
       setLoadingState(LoadingState.AUTHENTICATING);
       callSSOLoginApi(data);
     } catch (error) {
+      console.error("Login authorization error:", error);
       logError("SplashScreen", error);
       logWarn("SplashScreen", "Authorization failed");
       setLoadingState(LoadingState.NONE);

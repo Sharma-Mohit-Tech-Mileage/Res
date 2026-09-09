@@ -5,11 +5,18 @@ import { logDebug, logWarn, logError } from "./logger";
 class AuthenticationManager {
   static AUTH_TIMEOUT = 120000;
   static REFRESH_TIMEOUT = 30000;
+  static authorizationInFlight = null;
 
   static async authorizeWithTimeout(config) {
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("AUTH_TIMEOUT")), this.AUTH_TIMEOUT)
-    );
+    if (this.authorizationInFlight) {
+      logWarn("AuthenticationManager", "Authorization already in progress");
+      return {
+        success: false,
+        error: "Login is already in progress.",
+        code: "AUTH_IN_PROGRESS",
+        userAction: "RETRY",
+      };
+    }
 
     try {
       const canOpenURL = await this.checkBrowserAvailability();
@@ -17,14 +24,51 @@ class AuthenticationManager {
         throw new Error("BROWSER_UNAVAILABLE");
       }
 
-      // Force a fresh login on Android so the shared Custom Tab session (same SSO realm as the other app) can't bleed across apps and error out the second login.
       const authConfig =
         Platform.OS === "android"
-          ? { ...config, additionalParameters: { ...(config.additionalParameters || {}), prompt: "login" } }
+          ? {
+              ...config,
+              additionalParameters: {
+                ...(config.additionalParameters || {}),
+                prompt: "login",
+              },
+            }
           : config;
-      logDebug("AuthenticationManager", "Starting auth flow", { platform: Platform.OS });
+      logDebug("AuthenticationManager", "Starting auth flow", {
+        platform: Platform.OS,
+      });
       const authPromise = authorize(authConfig);
-      const result = await Promise.race([authPromise, timeoutPromise]);
+      this.authorizationInFlight = authPromise;
+      authPromise
+        .finally(() => {
+          if (this.authorizationInFlight === authPromise) {
+            this.authorizationInFlight = null;
+          }
+        })
+        .catch(() => {});
+
+      // AppAuth owns the native SFAuthenticationViewController. Do not reject
+      // while it is still presented or React Native may present over it.
+      let authTimedOut = false;
+      const timeoutId = setTimeout(() => {
+        authTimedOut = true;
+        logWarn(
+          "AuthenticationManager",
+          "Authorization exceeded timeout; waiting for native completion",
+        );
+      }, this.AUTH_TIMEOUT);
+
+      let result;
+      try {
+        result = await authPromise;
+      } catch (error) {
+        if (authTimedOut) {
+          throw new Error("AUTH_TIMEOUT");
+        }
+        throw error;
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       logDebug("AuthenticationManager", "Authorization completed successfully");
       return {
@@ -121,7 +165,11 @@ class AuthenticationManager {
     }
 
     // Parse different error types
-    if (errorMessage.includes("AUTH_TIMEOUT")) {
+    if (
+      errorMessage.includes("auth_timeout") ||
+      errorMessage.includes("auth timed out") ||
+      errorMessage.includes("authentication timed out")
+    ) {
       return {
         success: false,
         error: "Login timed out. Please try again.",
