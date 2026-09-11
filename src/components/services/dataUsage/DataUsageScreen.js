@@ -132,7 +132,7 @@ const DataUsageContent = ({ navigation, route }) => {
           loading={activeTab === "monthly" ? monthlyUsageLoading : dailyUsageLoading}
         />
 
-        <ManageEquipmentCard equipment={equipment} />
+        <ManageEquipmentCard equipment={equipment} navigation={navigation} />
 
         {/* eero Promo */}
         <EeroPromoCard

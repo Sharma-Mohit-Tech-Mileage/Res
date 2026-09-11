@@ -6,6 +6,7 @@ import Search from "../../components/support/Search";
 import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 import MyServices from "../../components/services/MyServices";
 import DataUsageScreen from "../../components/services/dataUsage/DataUsageScreen";
+import ManageEquipmentScreen from "../../components/services/manageEquipment/ManageEquipmentScreen";
 
 const ServiceStack = createNativeStackNavigator();
 
@@ -29,6 +30,16 @@ function MyServicesStack({ route }) {
         name="DataUsage"
         component={DataUsageScreen}
         options={{ 
+          headerShown: false,
+          animation: 'slide_from_right',
+          gestureEnabled: true
+        }}
+      />
+
+       <ServiceStack.Screen
+        name="manageEquipment"
+        component={ManageEquipmentScreen}
+         options={{ 
           headerShown: false,
           animation: 'slide_from_right',
           gestureEnabled: true
