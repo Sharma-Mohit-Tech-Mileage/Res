@@ -236,6 +236,10 @@ const NotificationAlert = ({
   iconRef = null,
   iconComponent = null,
   iconColor = null,
+  iconSize = 24,
+  layout = "inline",
+  containerStyle,
+  titleStyle,
   contentStyle = {},
   children = null,
 }) => {
@@ -600,12 +604,14 @@ const NotificationAlert = ({
             backgroundColor: config.backgroundColor,
             borderColor: config.borderColor,
           },
+          layout === "centered" && styles.centeredContainer,
+          containerStyle,
         ]}
       >
         <A11y.Index index={0}>
         <View
           ref={internalIconRef}
-          style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
+          style={[styles.iconWrapper, !title && styles.iconWithoutTitle, layout === "centered" && styles.centeredIcon]}
           accessible={true}
           importantForAccessibility="yes"
           accessibilityRole="text"
@@ -615,8 +621,8 @@ const NotificationAlert = ({
           accessibilityHint={undefined}
         >
           <IconComponent
-            width={24}
-            height={24}
+            width={iconSize}
+            height={iconSize}
             color={iconColor || config.iconColor}
             accessible={false}
           />
@@ -625,7 +631,7 @@ const NotificationAlert = ({
        
         <View 
           ref={contentRef}
-          style={[styles.content, !showCloseIcon && styles.contentNoClose]}
+          style={[styles.content, !showCloseIcon && styles.contentNoClose, layout === "centered" && styles.centeredContent, contentStyle]}
           accessible={false}
           importantForAccessibility="yes"
         >
@@ -634,7 +640,7 @@ const NotificationAlert = ({
             <A11y.Index index={1}>
             <View ref={titleRef} accessible={true} accessibilityRole="header">
               <FieldTitle
-              style={[ { color: config.titleColor }]}
+              style={[ { color: config.titleColor }, layout === "centered" && styles.centeredTitle, titleStyle]}
               accessible={true}
               accessibilityRole="header" accessibilityLevel={2}
             >
@@ -693,6 +699,23 @@ const NotificationAlert = ({
 };
 
 const styles = StyleSheet.create({
+  centeredContainer: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  centeredIcon: {
+    marginTop: 0,
+    marginEnd: 0,
+  },
+  centeredContent: {
+    flex: 0,
+    alignSelf: "stretch",
+    marginLeft: 0,
+    marginTop: 24,
+  },
+  centeredTitle: {
+    textAlign: "center",
+  },
   outer: {
     position: "relative",
     width: "100%",

@@ -16,6 +16,7 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 
 import AppStyles from "../../../styles/AppStyles";
 import MyModemCard from "./MyModemCard";
+import MyAddons from "./MyAddons";
 
 const ManageEquipmentScreen = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
@@ -55,7 +56,8 @@ const ManageEquipmentScreen = ({ navigation, route }) => {
         }
       >
 
-        <MyModemCard/>
+        <MyModemCard onReboot={() => navigation.navigate('RebootModem')} />
+        <MyAddons />
 
 
 
@@ -65,11 +67,7 @@ const ManageEquipmentScreen = ({ navigation, route }) => {
   );
 };
 
-const DataUsageScreen = (props) => (
-  <SafeAreaProvider>
-    <DataUsageContent {...props} />
-  </SafeAreaProvider>
-);
+
 
 const styles = StyleSheet.create({
   safeArea: {

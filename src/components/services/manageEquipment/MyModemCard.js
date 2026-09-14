@@ -1,108 +1,116 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, Platform, useWindowDimensions } from "react-native";
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { theme } from '../../../styles/theme';
+import Icon from '../../common/Icon';
+import SurfaceCard from '../../common/customui/SurfaceCard';
+import Touchable from '../../common/customui/Touchable';
+import {
+  SectionTitle,
+  FieldTitle,
+  FieldContent,
+  Caption,
+} from '../../common/customui/Typography';
 
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { theme } from '../../../styles/theme'
-import { cardHeader } from "../../../styles/compositions";
-import AppStyles from "../../../styles/AppStyles";
-import { SectionTitle } from "../../common/customui/Typography"
-
-
-
-
-const MyModemCard = ({ currentUsage, loading = false }) => {
-  const { width: windowWidth } = useWindowDimensions();
-  const donutSize = Math.min(220, Math.max(140, Math.floor(windowWidth * 0.32)));
-
-  if (!currentUsage || loading) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <View style={styles.header}>
-            <View style={styles.iconWrapper} accessible={false} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden={true}>
-              <MaterialCommunityIcons name="chart-donut" size={20} color={theme.colors.primary} />
-            </View>
-            <Text style={styles.headerTitle} accessibilityRole="header">DATA USAGE</Text>
-          </View>
-          <View style={{ height: 200, alignItems: "center", justifyContent: "center" }}>
-            <Text style={styles.statLabel}>Loading usage data...</Text>
-          </View>
-        </View>
-      </View>
-    );
-  }
-
- 
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.header}>
-          
-          <SectionTitle accessibilityRole="header">
-            My Modem
-          </SectionTitle>
-        </View>
-
-       
-      </View>
+const MyModemCard = ({ loading = false, onReboot }) => (
+  <SurfaceCard style={styles.card}>
+    <View style={styles.header}>
+     
+      <SectionTitle style={styles.title} accessibilityRole="header">My Modem</SectionTitle>
+      
     </View>
-  );
-};
+
+    {loading ? (
+      <View style={styles.loading} accessibilityLiveRegion="polite">
+        <FieldContent style={styles.text}>Loading modem details...</FieldContent>
+      </View>
+    ) : (
+      <>
+        <View style={styles.details}>
+          <FieldContent style={styles.text}>
+            <FieldTitle style={styles.text}>Modem: </FieldTitle>Hitron CODA-57
+          </FieldContent>
+          <FieldContent style={styles.text}>
+            <FieldTitle style={styles.text}>Mac Id: </FieldTitle>DA:12:34:56:78:90
+          </FieldContent>
+        </View>
+        <View style={styles.badge}>
+          <Caption style={styles.badgeText}>LEASED</Caption>
+        </View>
+        <View style={styles.statusRow}>
+          <View style={styles.statusDot} accessible={false} />
+          <FieldContent style={styles.text}>Connected</FieldContent>
+        </View>
+        <View style={styles.separator} />
+        <Touchable onPress={onReboot} style={styles.rebootCta} accessibilityRole="button" accessibilityLabel="Reboot modem">
+          <FieldTitle style={styles.rebootText}>Reboot modem</FieldTitle>
+          <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            <Icon name="right-chevron" size={theme.iconSize.sm} />
+          </View>
+        </Touchable>
+      </>
+    )}
+  </SurfaceCard>
+);
 
 const styles = StyleSheet.create({
-  container: {
+  card: {
+    ...theme.shadows.none,
     marginHorizontal: theme.spacing.base,
     marginBottom: theme.spacing.base,
+    padding: theme.spacing.lg,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.xs,
   },
-  card: {
-     ...AppStyles.card,
-    padding: theme.spacing.base,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.xl,
   },
-  header: cardHeader.container,
-  headerTitle: cardHeader.title,
-  textLabel: {
-    alignItems: 'flex-start',
-  },
-  labelText: {
-    fontSize: theme.typography.size.base,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.secondary,
-    fontWeight: '700',
-  },
-  labelSubtext: {
-    fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.secondary,
-    marginTop: 1,
-  },
-  stats: {
-    flexDirection: "row",
-    gap: theme.spacing.xs,
-  },
-  statBox: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing["2xs"],
+  iconWrapper: {
+    width: theme.iconSize.xl,
+    height: theme.iconSize.xl,
+    borderRadius: theme.radius.full,
     backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: theme.radius.base,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: theme.spacing.md,
   },
-  statValue: {
-    fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.text.primary,
-    textAlign: "center",
-    marginVertical: 2,
-  },
-  statLabel: {
-    fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.regular,
+  title: {
+    flex: 1,
+    fontSize: theme.typography.size.xbl,
     color: theme.colors.text.secondary,
-    textAlign: "center",
   },
-  iconWrapper: cardHeader.iconWrapper,
+  details: { gap: theme.spacing.sm },
+  text: {
+    fontSize: theme.typography.size.base,
+    lineHeight: theme.typography.lineHeight.normal,
+    color: theme.colors.text.secondary,
+  },
+  badge: {
+    alignSelf: 'flex-start',
+    backgroundColor: theme.colors.surfaceVariant,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.base,
+    padding: theme.spacing['2xs'],
+    marginVertical: theme.spacing.md,
+  },
+  badgeText: {
+    fontSize: theme.typography.size.xs,
+    fontFamily: theme.typography.family.semiBold,
+    color: theme.colors.text.secondary,
+  },
+  statusRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
+  statusDot: {
+    width: theme.spacing.md,
+    height: theme.spacing.md,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.status.success,
+  },
+  separator: { height: 1, backgroundColor: theme.colors.border, marginTop: theme.spacing.base },
+  rebootCta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: theme.spacing.sm },
+  rebootText: { fontSize: theme.typography.size.base, color: theme.colors.primary },
+  loading: { paddingVertical: theme.spacing['2xl'], alignItems: 'center' },
 });
 
 export default MyModemCard;

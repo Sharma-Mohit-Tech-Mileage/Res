@@ -7,6 +7,7 @@ import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility"
 import MyServices from "../../components/services/MyServices";
 import DataUsageScreen from "../../components/services/dataUsage/DataUsageScreen";
 import ManageEquipmentScreen from "../../components/services/manageEquipment/ManageEquipmentScreen";
+import RebootModemScreen from "../../components/services/manageEquipment/RebootModemScreen";
 
 const ServiceStack = createNativeStackNavigator();
 
@@ -46,6 +47,11 @@ function MyServicesStack({ route }) {
         }}
       />
       
+      <ServiceStack.Screen
+        name="RebootModem"
+        component={RebootModemScreen}
+        options={{ headerShown: false, animation: 'slide_from_right' }}
+      />
       <ServiceStack.Screen
         name="ArticleWindowUtility"
         component={ArticleWindowUtility}
