@@ -85,7 +85,7 @@ const TextNotifications = ({ navigation }) => {
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isTermRequired, setIsTermRequired] = useState(false);
   const [message1, setMessage1] = useState(
-    "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply.",
+    "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply. Message frequency may vary.",
   );
   const [message, setMessage] = useState(
     "Please enter your mobile phone number below and then select the type of message you would like to receive.",
@@ -193,7 +193,7 @@ const TextNotifications = ({ navigation }) => {
         "Please enter the mobile phone number you would like to receive all future customer communications. You may opt out at any time.",
       );
       setMessage1(
-        "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply.",
+        "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply. Message frequency may vary.",
       );
     } else {
       setIsCheckboxVisible(true);
@@ -413,8 +413,8 @@ const TextNotifications = ({ navigation }) => {
                   iconColor="#F88700"
                   accessibilityLabel={
                     formatedData?.phoneNumber
-                      ? "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply."
-                      : "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply."
+                      ? "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply. Message frequency may vary."
+                      : "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply. Message frequency may vary."
                   }
                   accessibilityLiveRegion="polite"
                   accessibilityRole="alert"
