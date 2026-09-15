@@ -17,6 +17,7 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import AppStyles from "../../../styles/AppStyles";
 import MyModemCard from "./MyModemCard";
 import MyAddons from "./MyAddons";
+import MySpeedCard from "./MySpeedCard";
 
 const ManageEquipmentScreen = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
@@ -58,6 +59,7 @@ const ManageEquipmentScreen = ({ navigation, route }) => {
 
         <MyModemCard onReboot={() => navigation.navigate('RebootModem')} />
         <MyAddons />
+        <MySpeedCard navigation={navigation} />
 
 
 

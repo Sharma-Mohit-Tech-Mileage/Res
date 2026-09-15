@@ -2,8 +2,10 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { theme } from '../../../styles/theme';
 import Icon from '../../common/Icon';
+import ModemIcon from '../../../res/svgIcons/ModemIcon';
 import SurfaceCard from '../../common/customui/SurfaceCard';
 import Touchable from '../../common/customui/Touchable';
+import AppStyles from '../../../styles/AppStyles';
 import {
   SectionTitle,
   FieldTitle,
@@ -14,7 +16,9 @@ import {
 const MyModemCard = ({ loading = false, onReboot }) => (
   <SurfaceCard style={styles.card}>
     <View style={styles.header}>
-     
+      <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <ModemIcon />
+      </View>
       <SectionTitle style={styles.title} accessibilityRole="header">My Modem</SectionTitle>
       
     </View>
@@ -40,9 +44,8 @@ const MyModemCard = ({ loading = false, onReboot }) => (
           <View style={styles.statusDot} accessible={false} />
           <FieldContent style={styles.text}>Connected</FieldContent>
         </View>
-        <View style={styles.separator} />
-        <Touchable onPress={onReboot} style={styles.rebootCta} accessibilityRole="button" accessibilityLabel="Reboot modem">
-          <FieldTitle style={styles.rebootText}>Reboot modem</FieldTitle>
+        <Touchable onPress={onReboot} style={styles.rebootCta} accessibilityRole="button" accessibilityLabel="Reboot Modem">
+          <FieldContent style={styles.rebootText}>Reboot Modem</FieldContent>
           <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
             <Icon name="right-chevron" size={theme.iconSize.sm} />
           </View>
@@ -54,12 +57,12 @@ const MyModemCard = ({ loading = false, onReboot }) => (
 
 const styles = StyleSheet.create({
   card: {
-    ...theme.shadows.none,
+    ...AppStyles.card,
     marginHorizontal: theme.spacing.base,
     marginBottom: theme.spacing.base,
     padding: theme.spacing.lg,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radius.xs,
+    paddingBottom: theme.spacing['2xl'],
+
   },
   header: {
     flexDirection: 'row',
@@ -107,9 +110,26 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.status.success,
   },
-  separator: { height: 1, backgroundColor: theme.colors.border, marginTop: theme.spacing.base },
-  rebootCta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: theme.spacing.sm },
-  rebootText: { fontSize: theme.typography.size.base, color: theme.colors.primary },
+  rebootCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 60,
+    marginTop: theme.spacing.xl,
+    marginHorizontal: -theme.spacing.lg,
+    marginBottom: -theme.spacing.lg,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.base,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  rebootText: {
+    flex: 1,
+    marginRight: theme.spacing.base,
+    fontSize: theme.typography.size.base,
+    fontFamily: theme.typography.family.regular,
+    color: theme.colors.text.primary,
+  },
   loading: { paddingVertical: theme.spacing['2xl'], alignItems: 'center' },
 });
 

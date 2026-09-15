@@ -1,83 +1,132 @@
-import React, { useRef, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import ProfileSettingsHeader from '../../common/ProfileSettingsHeader';
-import SurfaceCard from '../../common/customui/SurfaceCard';
-import NotificationAlert from '../../common/customui/NotificationAlert';
-import PrimaryButton from '../../common/customui/PrimaryButton';
-import LinkText from '../../common/customui/LinkText';
-import { Body, SectionTitle, FieldTitle } from '../../common/customui/Typography';
-import InfoIcon from '../../../../assets/svgs/InfoIcon';
-import { theme } from '../../../styles/theme';
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet } from "react-native";
+import NotificationAlert from "../../common/customui/NotificationAlert";
+import PrimaryButton from "../../common/customui/PrimaryButton";
+import { Body } from "../../common/customui/Typography";
+import { theme } from "../../../styles/theme";
+import RebootModemLayout from "./RebootModemLayout";
+import RebootModemLoading from "./RebootModemLoading";
+import RebootModemSuccess from "./RebootModemSuccess";
+import RebootModemFailure from "./RebootModemFailure";
 
-// Supply onReboot when the equipment reboot service is available.
+// UI demo: first attempt fails after 2 seconds; retry succeeds.
+// An injected onReboot can replace the demo when the service is ready.
 const RebootModemScreen = ({ navigation, onReboot }) => {
-  const insets = useSafeAreaInsets();
-  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState("confirmation");
   const pending = useRef(false);
+  const mounted = useRef(true);
+  const demoTimer = useRef(null);
+  const demoAttempts = useRef(0);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      clearTimeout(demoTimer.current);
+    };
+  }, []);
   const handleReboot = async () => {
     if (pending.current) return;
+    pending.current = true;
+    setStatus("loading");
     if (!onReboot) {
-      Alert.alert('Reboot unavailable', 'Modem reboot is not available in the app yet. Please contact support for assistance.');
+      demoAttempts.current += 1;
+      demoTimer.current = setTimeout(() => {
+        if (mounted.current) {
+          setStatus(demoAttempts.current === 1 ? "failure" : "success");
+        }
+        pending.current = false;
+      }, 2000);
       return;
     }
-    pending.current = true;
-    setSubmitting(true);
     try {
       await onReboot();
-      Alert.alert('Reboot requested', 'Your service will be briefly interrupted while your modem restarts.');
+      if (mounted.current) setStatus("success");
     } catch (error) {
-      Alert.alert('Unable to reboot modem', 'Please try again or contact support for assistance.');
+      if (mounted.current) setStatus("failure");
     } finally {
       pending.current = false;
-      setSubmitting(false);
     }
   };
 
+  if (status === "loading")
+    return <RebootModemLoading navigation={navigation} />;
+  if (status === "success")
+    return <RebootModemSuccess navigation={navigation} />;
+  if (status === "failure")
+    return (
+      <RebootModemFailure navigation={navigation} onRetry={handleReboot} />
+    );
+
   return (
-    <View style={styles.screen}>
-      <ProfileSettingsHeader title="Manage Equipment" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[ { paddingBottom: theme.spacing.xl + insets.bottom }]}>
-        <SurfaceCard style={styles.card}>
-          <SectionTitle accessibilityRole="header" style={styles.title}>Reboot Modem</SectionTitle>
-          <NotificationAlert
-            type="info"
-            layout="centered"
-            showCloseIcon={false}
-            iconSize={40}
-            iconColor="#006AC3"
-            containerStyle={styles.confirmation}
-            title="You are about to reboot your modem."
-          >
-            <Body style={styles.message}>During this process, your service will be briefly interrupted.</Body>
-            <Body style={styles.prompt}>Would you like to continue?</Body>
-          </NotificationAlert>
-          <PrimaryButton title={submitting ? 'Rebooting…' : 'Reboot Modem'} buttonType="submit" onPress={handleReboot} disabled={submitting} style={styles.button} containerStyle={styles.reboot} />
-          <PrimaryButton title="Cancel" buttonType="outline" onPress={() => navigation.goBack()} disabled={submitting} style={styles.button} containerStyle={styles.cancel} />
-          <LinkText accessibilityLabel="Modem Help" onPress={() => navigation.navigate('searchArticles')} style={styles.help}>
-            <FieldTitle style={styles.helpTitle}>Modem Help</FieldTitle>
-            <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-              <InfoIcon size={18} color={theme.colors.primaryDark} />
-            </View>
-          </LinkText>
-        </SurfaceCard>
-      </ScrollView>
-    </View>
+    <RebootModemLayout navigation={navigation}>
+      <NotificationAlert
+        type="info"
+        layout="centered"
+        showCloseIcon={false}
+        iconSize={40}
+        iconColor="#006AC3"
+        containerStyle={styles.confirmation}
+        title="You are about to reboot your modem."
+      >
+        <Body style={styles.message}>
+          During this process, your service will be briefly interrupted.
+        </Body>
+        <Body style={styles.prompt}>Would you like to continue?</Body>
+      </NotificationAlert>
+      <PrimaryButton
+        title={"Reboot Modem"}
+        buttonType="submit"
+        onPress={handleReboot}
+        style={styles.button}
+        containerStyle={styles.reboot}
+      />
+      <PrimaryButton
+        title="Cancel"
+        buttonType="outline"
+        onPress={() => navigation.goBack()}
+        style={styles.button}
+        containerStyle={styles.cancel}
+      />
+    </RebootModemLayout>
   );
 };
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.colors.background },
   content: { padding: theme.spacing.xl },
-  card: { paddingHorizontal: theme.spacing.base, paddingTop: theme.spacing.xl, paddingBottom: theme.spacing['3xl'],margin:16 },
-  title: { fontSize: theme.typography.size['2xl'], color: theme.colors.text.secondary },
-  confirmation: { marginTop: 44, marginBottom: 0, paddingVertical: theme.spacing.xl, borderColor: '#007AFF', borderRadius: theme.radius.sm },
-  message: { textAlign: 'center', marginTop: theme.spacing.xl },
-  prompt: { textAlign: 'center', marginTop: theme.spacing.xl, color: theme.colors.primaryDark },
+  card: {
+    paddingHorizontal: theme.spacing.base,
+    paddingTop: theme.spacing.xl,
+    paddingBottom: theme.spacing["3xl"],
+    margin: 16,
+  },
+  title: {
+    fontSize: theme.typography.size["2xl"],
+    color: theme.colors.text.secondary,
+  },
+  confirmation: {
+    marginTop: 44,
+    marginBottom: 0,
+    paddingVertical: theme.spacing.xl,
+    borderColor: "#007AFF",
+    borderRadius: theme.radius.sm,
+  },
+  message: { textAlign: "center", marginTop: theme.spacing.xl },
+  prompt: {
+    textAlign: "center",
+    marginTop: theme.spacing.xl,
+    color: theme.colors.primaryDark,
+  },
   button: { paddingVertical: theme.spacing.md },
   reboot: { marginTop: 38 },
   cancel: { marginTop: theme.spacing.xl },
-  help: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.sm, paddingHorizontal: 0, marginTop: theme.spacing['3xl'] },
+  help: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
+    paddingHorizontal: 0,
+    marginTop: theme.spacing["3xl"],
+  },
   helpTitle: { fontSize: theme.typography.size.xbl },
 });
 

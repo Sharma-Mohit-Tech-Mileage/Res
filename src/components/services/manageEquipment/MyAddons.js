@@ -4,6 +4,7 @@ import SurfaceCard from '../../common/customui/SurfaceCard';
 import Icon from '../../common/Icon';
 import { SectionTitle, FieldTitle, FieldContent } from '../../common/customui/Typography';
 import { theme } from '../../../styles/theme';
+import AppStyles from '../../../styles/AppStyles';
 
 // Static equipment examples matching the design reference.
 const ADDONS = [
@@ -14,9 +15,9 @@ const ADDONS = [
 const MyAddons = () => (
   <SurfaceCard style={styles.card}>
     <View style={styles.header}>
-      {/* <View style={styles.iconBackground} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <View style={styles.iconBackground} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         <Icon name="wifi" size={20} />
-      </View> */}
+      </View>
       <SectionTitle style={styles.title} accessibilityRole="header">My Add-ons</SectionTitle>
       <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         <Icon name="down-chevron" size={16} />
@@ -41,12 +42,11 @@ const MyAddons = () => (
 
 const styles = StyleSheet.create({
   card: {
-    ...theme.shadows.none,
+    ...AppStyles.card,
     marginHorizontal: theme.spacing.base,
     marginBottom: theme.spacing.base,
     padding: theme.spacing.lg,
     paddingBottom: theme.spacing['2xl'],
-    borderRadius: theme.radius.xs,
   },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xl },
   iconBackground: {

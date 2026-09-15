@@ -9,6 +9,8 @@ import DataUsageScreen from "../../components/services/dataUsage/DataUsageScreen
 import ManageEquipmentScreen from "../../components/services/manageEquipment/ManageEquipmentScreen";
 import RebootModemScreen from "../../components/services/manageEquipment/RebootModemScreen";
 
+import ModemSpeedTestScreen from "../../components/services/speedTest/ModemSpeedTestScreen";
+
 const ServiceStack = createNativeStackNavigator();
 
 function MyServicesStack({ route }) {
@@ -47,6 +49,7 @@ function MyServicesStack({ route }) {
         }}
       />
       
+      <ServiceStack.Screen name="ModemSpeedTest" component={ModemSpeedTestScreen} options={{ headerShown: false }} />
       <ServiceStack.Screen
         name="RebootModem"
         component={RebootModemScreen}
