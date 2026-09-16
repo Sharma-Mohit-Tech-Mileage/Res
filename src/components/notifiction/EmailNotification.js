@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   saveButton: {
-    backgroundColor: "#3F51B5",
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   cancelButton: {
     backgroundColor: Color.Gray300,

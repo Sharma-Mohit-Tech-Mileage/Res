@@ -10,6 +10,7 @@ import ManageEquipmentScreen from "../../components/services/manageEquipment/Man
 import RebootModemScreen from "../../components/services/manageEquipment/RebootModemScreen";
 
 import ModemSpeedTestScreen from "../../components/services/speedTest/ModemSpeedTestScreen";
+import WiFiSpeedTestScreen from "../../components/services/speedTest/WifiSpeedTestRunning";
 
 const ServiceStack = createNativeStackNavigator();
 
@@ -50,6 +51,7 @@ function MyServicesStack({ route }) {
       />
       
       <ServiceStack.Screen name="ModemSpeedTest" component={ModemSpeedTestScreen} options={{ headerShown: false }} />
+      <ServiceStack.Screen name="WifiSpeedTest" component={WiFiSpeedTestScreen} options={{ headerShown: false }} />
       <ServiceStack.Screen
         name="RebootModem"
         component={RebootModemScreen}

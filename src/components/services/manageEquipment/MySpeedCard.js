@@ -18,6 +18,7 @@ import {
 } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 import AppStyles from "../../../styles/AppStyles";
+import { dataUsageTabs } from "../../../styles/compositions";
 
 
 const SAMPLE_RESULTS = {
@@ -38,7 +39,7 @@ const DecorativeIcon = ({ name, size = 20, color = theme.colors.primary }) => (
 const SpeedResult = ({ label, value, icon: ResultIcon }) => (
   <View style={styles.result}>
     <View style={styles.resultValue}>
-      <ResultIcon width={24} height={24} accessible={false} />
+      <ResultIcon width={12} height={12} accessible={false} />
       <Body style={styles.number}>
         {value.split(".")[0]}
         <Body style={styles.decimal}>.{value.split(".")[1]}</Body>
@@ -109,22 +110,18 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
               key={value}
               accessibilityRole="tab"
               accessibilityLabel={
-                value === "wifi" ? "Wifi Speed" : "Modem Speed"
+                value === "wifi" ? "WiFi Speed" : "Modem Speed"
               }
               accessibilityState={{ selected: tab === value }}
               disabled={testing}
               onPress={() => setTab(value)}
-              style={[styles.tab, tab !== value && styles.inactiveTab]}
+              minSize={0}
+              style={[styles.tab, tab === value && styles.activeTab]}
             >
               <FieldTitle
-                style={{
-                  color:
-                    tab === value
-                      ? theme.colors.primary
-                      : theme.colors.text.secondary,
-                }}
+                style={[styles.tabText, tab === value && styles.activeTabText]}
               >
-                {value === "wifi" ? "Wifi Speed" : "Modem Speed"}
+                {value === "wifi" ? "WiFi Speed" : "Modem Speed"}
               </FieldTitle>
             </Touchable>
           ))}
@@ -220,13 +217,24 @@ const styles = StyleSheet.create({
     color: theme.colors.primaryDark,
   },
   panel: { borderWidth: 1, borderColor: theme.colors.border },
-  tabs: { flexDirection: "row" },
-  tab: { flex: 1, paddingHorizontal: theme.spacing["2xs"] },
-  inactiveTab: {
-    backgroundColor: theme.colors.surfaceVariant,
-    borderBottomWidth: 1,
-    borderColor: theme.colors.border,
+  tabs: {
+    ...dataUsageTabs.tabsContainer,
+    padding: 3,
+    marginBottom: theme.spacing.sm,
   },
+  tab: {
+    ...dataUsageTabs.tab,
+    paddingVertical: 10,
+    minHeight: 44,
+    justifyContent: "center",
+  },
+  activeTab: dataUsageTabs.activeTab,
+  tabText: {
+    ...dataUsageTabs.tabText,
+    fontSize: theme.typography.size.base,
+    fontWeight: "700",
+  },
+  activeTabText: { color: theme.colors.primaryDark },
   testContent: { padding: theme.spacing.sm },
   description: {
     textAlign: "center",

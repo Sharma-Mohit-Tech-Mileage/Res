@@ -5,23 +5,30 @@ import { View, StyleSheet } from "react-native";
 import { Body, FieldContent } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 
-const SpeedTestResults = ({ download, upload }) => (
+
+
+const SpeedTestResults = ({ download, upload }) => {
+const downloadIcon = <DownloadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
+const uploadIcon = <UploadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
+
+  return (
   <View style={styles.row}>
     {[
-      ["DOWNLOAD", download, DownloadcircleIcon],
-      ["UPLOAD", upload, UploadcircleIcon],
+      ["DOWNLOAD", download, downloadIcon],
+      ["UPLOAD", upload, uploadIcon],
     ].map(([label, value, ResultIcon], index) => (
       <View key={label} style={[styles.cell, index === 1 && styles.divider]}>
         <Body style={styles.value}>{value}</Body>
         <FieldContent>Mbps</FieldContent>
         <View style={styles.tag}>
-          <ResultIcon width={12} height={12} accessible={false} />
+          {label === "DOWNLOAD" ? downloadIcon : uploadIcon}
           <Body style={styles.label}>{label}</Body>
         </View>
       </View>
     ))}
   </View>
-);
+  )
+}
 const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
@@ -44,6 +51,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: theme.typography.size.xs,
+    color: theme.colors.primary,
+  },speedTagArrow: {
+    fontSize: theme.typography.size.xs,
+    fontWeight: "700",
+    marginRight: 4,
     color: theme.colors.primary,
   },
 });

@@ -7,8 +7,9 @@ const ModemSpeedTestComplete = () => (
   <>
     <NotificationAlert
       type="success"
+      layout="centered"
       showCloseIcon={false}
-      iconSize={44}
+      iconSize={22}
       containerStyle={styles.flatNotice}
     >
       <Body>
@@ -18,9 +19,13 @@ const ModemSpeedTestComplete = () => (
     </NotificationAlert>
     <NotificationAlert
       type="info"
+      iconSize={22}
+      layout="centered"
       showCloseIcon={false}
-      message="Pull down screen to refresh content."
       containerStyle={styles.flatNotice}
+      message="Pull down screen to refresh content."
+     
+      
     />
   </>
 );
