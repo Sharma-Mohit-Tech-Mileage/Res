@@ -9,6 +9,7 @@ import ModemSpeedTestProgress from "./ModemSpeedTestProgress";
 import ModemSpeedTestComplete from "./ModemSpeedTestComplete";
 import ClockIcon from "../../../res/svgIcons/ClockIcon";
 import styles from "./speedTestStyles";
+import AppStyles from "../../../styles/AppStyles";
 
 // Hardcoded preview; no network speed measurement is performed.
 const ModemSpeedTestScreen = ({ navigation }) => {
@@ -39,7 +40,7 @@ const ModemSpeedTestScreen = ({ navigation }) => {
         />
       }
     >
-      <SurfaceCard style={styles.card}>
+      <SurfaceCard style={AppStyles.card}>
         {complete ? <ModemSpeedTestComplete /> : <ModemSpeedTestProgress />}
         <SpeedTestResults
           download={complete ? "963" : "---"}

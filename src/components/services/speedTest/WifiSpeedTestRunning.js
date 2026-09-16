@@ -3,6 +3,7 @@ import { Animated, Easing, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Body } from "../../common/customui/Typography";
 import styles from "./wifiSpeedStyles";
+import theme from "../../../styles/theme";
 
 const WifiSpeedTestRunning = () => {
   const value = useRef(new Animated.Value(0)).current;
@@ -35,7 +36,7 @@ const WifiSpeedTestRunning = () => {
         <Path
           d="M 55 210 A 115 115 0 1 1 225 210"
           fill="none"
-          stroke="#1968B4"
+          stroke={theme.colors.upload}
           strokeWidth={22}
         />
       </Svg>

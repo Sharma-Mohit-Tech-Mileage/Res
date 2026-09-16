@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
     paddingVertical: theme.spacing.base,
     marginVertical: theme.spacing.lg,
+    marginHorizontal: theme.spacing.xl,
   },
   cell: { flex: 1, alignItems: "center" },
   divider: { borderLeftWidth: 1, borderColor: theme.colors.primaryLight },

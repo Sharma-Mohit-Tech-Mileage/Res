@@ -35,9 +35,9 @@ const ERROR_MESSAGES = {
     ],
   },
   [ErrorType.AUTH_TIMEOUT]: {
-    title: "Login Timeout",
+    title: "Unable to sign in",
     message:
-      "The login process took too long. This may happen if the browser did not open properly.",
+      "The sign-in process timed out. Check your connection and try again.",
     actions: [
       { label: "Try Again", action: "RETRY", primary: true },
       { label: "Cancel", action: "CANCEL", primary: false },

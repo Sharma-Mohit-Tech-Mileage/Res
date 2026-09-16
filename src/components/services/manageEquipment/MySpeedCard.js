@@ -59,7 +59,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
   useEffect(() => () => clearTimeout(timer.current), []);
   const testSpeed = () => {
     if (navigation) {
-      navigation.navigate(tab === "wifi" ? "WifiSpeedTest" : "ModemSpeedTest");
+      navigation.navigate(tab === "wifi" ? "WifiSpeedTest1" : "ModemSpeedTest");
       return;
     }
     if (timer.current) return;

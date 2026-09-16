@@ -2,12 +2,13 @@ import React from "react";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import { Body, FieldTitle } from "../../common/customui/Typography";
 import styles from "./speedTestStyles";
+import { View } from "react-native";
+import { theme } from "../../../styles/theme";  
 
 const ModemSpeedTestComplete = () => (
-  <>
+  <View style={{margin: 16,}}>
     <NotificationAlert
       type="success"
-      layout="centered"
       showCloseIcon={false}
       iconSize={22}
       containerStyle={styles.flatNotice}
@@ -20,13 +21,13 @@ const ModemSpeedTestComplete = () => (
     <NotificationAlert
       type="info"
       iconSize={22}
-      layout="centered"
       showCloseIcon={false}
       containerStyle={styles.flatNotice}
-      message="Pull down screen to refresh content."
-     
-      
-    />
-  </>
+    >
+       <Body>
+        Pull down screen to refresh content.
+      </Body>
+      </NotificationAlert>
+  </View>
 );
 export default ModemSpeedTestComplete;

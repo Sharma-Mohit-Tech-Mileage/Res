@@ -456,7 +456,7 @@ const NotificationAlert = ({
             accessible={true}
             accessibilityRole="text"
             accessibilityLabel={plainText}
-            style={[styles.blockWrapper, styles.actionableBlock, index === 0 && styles.firstBlock]}
+            style={[styles.blockWrapper, styles.actionableBlock, !title && styles.noTitleBlock, index === 0 && styles.firstBlock]}
           >
             {hasBoldOnly ? (
               <BannerAlertText>
@@ -474,7 +474,7 @@ const NotificationAlert = ({
                 ))}
               </BannerAlertText>
             ) : (
-              <BannerAlertText style={[{ color: config.textColor }]}>
+              <BannerAlertText style={[{ color: config.textColor }, !title && styles.noTitleText]}>
                 {plainText}
               </BannerAlertText>
             )}
@@ -506,7 +506,7 @@ const NotificationAlert = ({
                 : "Double tap to contact support"
             }
             onPress={() => executeAction(action)}
-            style={[styles.blockWrapper, styles.actionableBlock]}
+            style={[styles.blockWrapper, styles.actionableBlock, !title && styles.noTitleBlock]}
             hitSlop={A11Y.hitSlop}
           >
             <BannerAlertText>
@@ -563,7 +563,7 @@ const NotificationAlert = ({
           accessibilityActions={accessibilityActions}
           onAccessibilityAction={handleAccessibilityAction}
           onPress={() => showActionSelection(actionSegments, plainText)}
-          style={[styles.blockWrapper, styles.actionableBlock]}
+          style={[styles.blockWrapper, styles.actionableBlock, !title && styles.noTitleBlock]}
           hitSlop={A11Y.hitSlop}
         >
           <BannerAlertText>
@@ -582,7 +582,7 @@ const NotificationAlert = ({
         </Touchable>
       );
     },
-    [config, executeAction, showActionSelection]
+    [config, executeAction, showActionSelection, title]
   );
 
   if (!isVisible) return null;
@@ -605,6 +605,7 @@ const NotificationAlert = ({
             borderColor: config.borderColor,
           },
           layout === "centered" && styles.centeredContainer,
+          !title && styles.containerWithoutTitle,
           containerStyle,
         ]}
       >
@@ -631,7 +632,7 @@ const NotificationAlert = ({
        
         <View 
           ref={contentRef}
-          style={[styles.content, !showCloseIcon && styles.contentNoClose, layout === "centered" && styles.centeredContent, contentStyle]}
+          style={[styles.content, !title && styles.contentWithoutTitle, !showCloseIcon && styles.contentNoClose, layout === "centered" && styles.centeredContent, contentStyle]}
           accessible={false}
           importantForAccessibility="yes"
         >
@@ -729,6 +730,9 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     position: "relative",
   },
+  containerWithoutTitle: {
+    alignItems: "center",
+  },
   iconWrapper: {
     marginTop: 1,
     marginEnd: 4,
@@ -740,6 +744,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     paddingRight: 32,
+  },
+  contentWithoutTitle: {
+    alignItems: "center",
   },
     contentNoClose: {
     paddingRight: 0,
@@ -760,6 +767,13 @@ const styles = StyleSheet.create({
   actionableBlock: {
     justifyContent: "center",
     alignItems: "flex-start",
+  },
+  noTitleBlock: {
+    width: "100%",
+    alignItems: "flex-start",
+  },
+  noTitleText: {
+    textAlign: "left",
   },
   messageText: {
     fontSize: FontSize.size_sm,

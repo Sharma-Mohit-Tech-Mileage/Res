@@ -1,7 +1,9 @@
 import { StyleSheet } from "react-native";
 import { theme } from "../../../styles/theme";
+import { Color } from "../../../../GlobalStyles";
+import AppStyles from "../../../styles/AppStyles";
 export default StyleSheet.create({
-  card: { ...theme.shadows.none, padding: theme.spacing.lg, borderRadius: 0 },
+  card: { ...AppStyles.card, padding: theme.spacing.lg },
   notice: {
     flexDirection: "row",
     alignItems: "center",
@@ -16,7 +18,7 @@ export default StyleSheet.create({
   },
   flatNotice: {
     borderWidth: 0,
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: Color.colorWhitesmoke_100,
     borderRadius: theme.radius.md,
   },
   success: { color: theme.colors.status.success },
@@ -24,7 +26,7 @@ export default StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.lg,
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: Color.colorWhitesmoke_100,
     borderRadius: theme.radius.md,
     padding: theme.spacing.base,
   },

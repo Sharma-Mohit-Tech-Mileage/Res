@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet } from "react-native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import { theme } from "../../../styles/theme";
+import AppStyles from "../../../styles/AppStyles";
 
 const SpeedTestLayout = ({
   navigation,
@@ -28,6 +29,6 @@ const SpeedTestLayout = ({
 );
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.colors.background },
-  content: { padding: theme.spacing.xl, paddingBottom: theme.spacing["3xl"] },
+  content: { margin:16 },
 });
 export default SpeedTestLayout;
