@@ -544,10 +544,12 @@ const SplashScreen = ({ navigation, route }) => {
       logWarn("SplashScreen", "Authorization failed");
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
+      const isAuthTimeout =
+        AuthenticationManager.handleAuthError(error).code === "AUTH_TIMEOUT";
       setErrorState({
         visible: true,
-        type: ErrorType.UNKNOWN_ERROR,
-        message: error.message,
+        type: isAuthTimeout ? ErrorType.AUTH_TIMEOUT : ErrorType.UNKNOWN_ERROR,
+        message: isAuthTimeout ? null : error.message,
       });
     } finally {
       authLockRef.current = false;

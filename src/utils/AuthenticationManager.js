@@ -166,13 +166,13 @@ class AuthenticationManager {
 
     // Parse different error types
     if (
-      errorMessage.includes("auth_timeout") ||
-      errorMessage.includes("auth timed out") ||
-      errorMessage.includes("authentication timed out")
+      String(errorCode).toLowerCase().includes("timeout") ||
+      errorMessage.includes("timeout") ||
+      errorMessage.includes("timed out")
     ) {
       return {
         success: false,
-        error: "Login timed out. Please try again.",
+        error: "The sign-in process timed out. Check your connection and try again.",
         code: "AUTH_TIMEOUT",
         userAction: "RETRY",
       };

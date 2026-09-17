@@ -7,7 +7,6 @@ import {
   ScrollView,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import Touchable from "../common/customui/Touchable";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Color,
@@ -21,7 +20,6 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { Hyperlink } from "../common/customui/Typography";
 import moment from "moment";
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import {card} from '../../styles/utilities'
 import { PostApiRequest } from "../../network/RestApiClient";
 import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
 
@@ -56,49 +54,33 @@ const ERROR_404 =
       renderErrorMessage - Renders an error message if there is an error.
      */
 
-const renderErrorMessage = (errorCode, navigation) => {
-  console.log("Error Code:", errorCode);
-  return (
-    <View style={{ flexDirection: "column", margin: 8 }}>
-      <View style={[card, { margin: 16 }]}>
-        <View style={styles.errorContainer}>
-          <BillErrorIcon color="red" size={24} style={{ marginBottom: 8 }} />
-          <Text style={styles.errorTxt}>
-            {errorCode.includes("404") ? ERROR_404 : ERROR_204}
-          </Text>
-        </View>
-      </View>
-      {/* <Touchable
-        style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]}
-        onPress={() => {
-          navigation.goBack();
-        }}
-        accessibilityLabel="Return to Billing Services"
-      >
-        <Text style={[styles.makePayment, styles.makeTypo]}>
-          {"Return to Billing Services"}
+const renderErrorMessage = (errorCode, navigation) => (
+  <View style={styles.errorBackground}>
+    <View style={styles.errorCard}>
+      <View style={styles.errorContainer}>
+        <BillErrorIcon />
+        <Text style={styles.errorTxt} accessibilityLiveRegion="polite">
+          {String(errorCode).includes("404") ? ERROR_404 : ERROR_204}
         </Text>
-      </Touchable> */}
-      
-      <View style={styles.buttonsParent}>
-
-         <SecondaryButton
-          title="Return to Billing Services"
-          buttonType="submit"
-          onPress={() => navigation.goBack()}
-          accessibilityLabel="Return to Billing Services"
-          accessibilityHint="Double tap to return to billing services screen"
-        />
-        <SecondaryButton
-          title="Cancel"
-          onPress={() => navigation.goBack()}
-          accessibilityLabel="Cancel"
-          accessibilityHint="Double tap to return to notifications screen"
-        />
       </View>
     </View>
-  );
-};
+    <View style={styles.buttonsParent}>
+      <SecondaryButton
+        title="Return to Billing Services"
+        buttonType="submit"
+        onPress={() => navigation.goBack()}
+        accessibilityLabel="Return to Billing Services"
+        accessibilityHint="Double tap to return to billing services screen"
+      />
+      <SecondaryButton
+        title="Cancel"
+        onPress={() => navigation.goBack()}
+        accessibilityLabel="Cancel"
+        accessibilityHint="Double tap to return to billing services screen"
+      />
+    </View>
+  </View>
+);
 
 const DetailItem = memo(({ detail }) => {
   const hasExpiryDate = !detail.endDate.startsWith(MIN_DATE_PREFIX);
@@ -566,7 +548,10 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontWeight: "400",
     fontFamily: FontFamily.RadioCanadaRegular,
-    marginTop: 8,
+    marginTop: 18,
+    lineHeight: 21,
+    textAlign: "left",
+    alignSelf: "stretch",
   },
   loadingContainer: {
     flex: 1,
@@ -596,13 +581,30 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginBottom: 100,
   },
-  errorContainer: {
+  errorBackground: {
+    flex: 1,
+    backgroundColor: "#F2F2F2",
+    paddingHorizontal: 24,
+    paddingVertical: 18,
+  },
+  errorCard: {
+    backgroundColor: Color.sparklightWhite,
     borderWidth: 1,
-    borderColor: Color.sparklightGray,
+    borderColor: "#EEEEEE",
     borderRadius: 2,
     padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  errorContainer: {
+    borderWidth: 1,
+    borderColor: "#DEDEDE",
+    borderRadius: 1,
+    padding: 25,
     alignItems: "center",
-    margin: 24,
   },
   paymentRow: {
     paddingHorizontal: Padding.p_base,
