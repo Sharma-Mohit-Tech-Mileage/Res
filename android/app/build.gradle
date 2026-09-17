@@ -114,7 +114,7 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode project.hasProperty("VERSION_CODE") ? project.VERSION_CODE.toInteger() : 562
+        versionCode project.hasProperty("VERSION_CODE") ? project.VERSION_CODE.toInteger() : 561
         versionName project.hasProperty("VERSION_NAME") ? project.VERSION_NAME : "30.0.1"
     }
 
@@ -177,8 +177,6 @@ repositories {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
-    // Animated GIF support for React Native Image (matches RN 0.77's Fresco version).
-    implementation("com.facebook.fresco:animated-gif:3.4.0")
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:32.5.0')
     // Add the dependencies for the Firebase products you want to use
@@ -191,6 +189,7 @@ dependencies {
 //    }
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
+    implementation 'androidx.browser:browser:1.9.0'
     implementation("zendesk.messaging:messaging-android:2.36.1")
 
    // debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
@@ -201,12 +200,5 @@ dependencies {
     }
 }
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
-
-// Force the browser library to 1.8.0 to resolve AGP 8.9.1 / SDK 36 requirement conflict
-configurations.all {
-    resolutionStrategy {
-        force 'androidx.browser:browser:1.8.0'
-    }
-}
 
 //apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
