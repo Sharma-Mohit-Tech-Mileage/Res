@@ -140,6 +140,12 @@ class AuthenticationManager {
     const errorDomain = error?.domain || "";
     const underlyingErrorCode = error?.userInfo?.NSUnderlyingError?.code;
     const underlyingDomain = error?.userInfo?.NSUnderlyingError?.domain || "";
+    // Android AppAuth exposes the underlying connection failure separately
+    // from its generic authorization/token-exchange message.
+    const timeoutDetails = [errorCode, errorMessage, error?.userInfo?.nativeError]
+      .filter((value) => typeof value === "string")
+      .join(" ")
+      .toLowerCase();
 
     const isCancelled =
       errorCode === "user_cancelled" ||
@@ -166,9 +172,8 @@ class AuthenticationManager {
 
     // Parse different error types
     if (
-      String(errorCode).toLowerCase().includes("timeout") ||
-      errorMessage.includes("timeout") ||
-      errorMessage.includes("timed out")
+      timeoutDetails.includes("timeout") ||
+      timeoutDetails.includes("timed out")
     ) {
       return {
         success: false,
