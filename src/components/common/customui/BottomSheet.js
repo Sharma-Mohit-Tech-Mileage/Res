@@ -8,7 +8,7 @@ import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import { theme } from "../../../styles/theme";
 import { setFocusToRef } from "../../../utils/a11y";
 
-const BottomSheet = ({ visible, title, onClose, children }) => {
+const BottomSheet = ({ visible, title, onClose, children, sheetStyle, headerStyle, titleStyle, contentContainerStyle }) => {
   const insets = useSafeAreaInsets();
   const titleRef = useRef(null);
   return (
@@ -28,16 +28,17 @@ const BottomSheet = ({ visible, title, onClose, children }) => {
         <View
           style={[
             styles.sheet,
+            sheetStyle,
             { paddingBottom: Math.max(insets.bottom, theme.spacing.xl) },
           ]}
           accessibilityViewIsModal
           onAccessibilityEscape={onClose}
         >
           <View style={styles.handle} accessible={false} />
-          <View style={styles.header}>
+          <View style={[styles.header, headerStyle]}>
             <FieldTitle
               ref={titleRef}
-              style={styles.title}
+              style={[styles.title, titleStyle]}
               accessibilityRole="header"
             >
               {title}
@@ -48,7 +49,7 @@ const BottomSheet = ({ visible, title, onClose, children }) => {
           </View>
           <ScrollView
             style={styles.scroll}
-            contentContainerStyle={styles.content}
+            contentContainerStyle={[styles.content, contentContainerStyle]}
           >
             {children}
           </ScrollView>
