@@ -773,7 +773,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: and(succeeded()
+    condition: succeeded()
     jobs:
       - job: BuildAndroid
         displayName: 'Build Android App Bundle'
@@ -898,7 +898,7 @@ stages:
     dependsOn:
       - UnitTests
       - SecurityAndQuality
-    condition: and(succeeded()
+    condition: succeeded()
     jobs:
       - job: RunIOSBuild
         displayName: 'Build iOS IPA (Xcode Archive)'
@@ -1204,7 +1204,7 @@ stages:
     dependsOn:
       - Build
       - IOSBuild
-    condition: and(succeeded()
+    condition: succeeded()
     jobs:
       - job: CodeReviewGates
         displayName: 'Code Review Quality Gates'
@@ -1238,7 +1238,7 @@ stages:
   - stage: IOSStaging
     displayName: 'iOS Staging'
     dependsOn: CodeReview
-    condition: and(succeeded()
+    condition: succeeded()
     jobs:
       - job: PrepareIOSStaging
         displayName: 'Validate IPA for Staging'
@@ -1270,7 +1270,7 @@ stages:
   - stage: AndroidStaging
     displayName: 'Android Staging'
     dependsOn: CodeReview
-    condition: and(succeeded()
+    condition: succeeded()
     jobs:
       - job: PrepareAndroidStaging
         displayName: 'Validate Android AAB for Staging'
