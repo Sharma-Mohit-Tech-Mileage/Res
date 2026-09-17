@@ -238,7 +238,7 @@ stages:
   - stage: UnitTests
     displayName: 'Unit Tests'
     dependsOn: InitialCommit
-    condition: and(succeeded()
+    condition: succeeded()
     jobs:
       - job: RunAndroidUnitTests
         displayName: 'Run Android Unit Tests'
@@ -379,7 +379,7 @@ stages:
   - stage: SecurityAndQuality
     displayName: 'Security & Code Quality'
     dependsOn: InitialCommit  # runs in parallel with UnitTests to shorten total pipeline time
-    condition: and(succeeded()
+    condition: succeeded()
     jobs:
       # -------- Job 1: Lint Quality Checks --------
       - job: LintQualityChecks
