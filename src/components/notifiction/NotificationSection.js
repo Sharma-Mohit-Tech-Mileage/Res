@@ -148,13 +148,13 @@ const BoldPhoneText = ({ phoneNum }) => {
       style={styles.infoText}
       accessibilityLabel={
         phoneNum
-          ? `Text alert are sent to ${phoneNumWords}`
+          ? `Text alerts are sent to ${phoneNumWords}`
           : "You have not enabled text notifications"
       }
     >
       <Text style={styles.infoText}>
         {phoneNum
-          ? "Text alert are sent to "
+          ? "Text alerts are sent to "
           : "You have not enabled text notifications"}
       </Text>
       {phoneNum && (

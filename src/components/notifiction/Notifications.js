@@ -106,7 +106,7 @@ const Notifications = () => {
         isComingSoon: false,
         settings: TextNotifSettings,
         infoMessage: phoneNumber
-          ? `Text alert are sent to ${phoneNumber}`
+          ? `Text alerts are sent to ${phoneNumber}`
           : "You have not enabled text notifications.",
         isLoading: textNotificationLoading,
       },
