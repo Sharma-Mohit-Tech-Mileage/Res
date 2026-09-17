@@ -10,7 +10,7 @@ const RebootModemSuccess = ({ navigation }) => (
       type="success"
       layout="centered"
       showCloseIcon={false}
-      iconSize={40}
+      iconSize={20}
       containerStyle={styles.alert}
       title="Modem Reboot Successful!"
     />

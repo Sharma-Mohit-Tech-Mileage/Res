@@ -10,6 +10,9 @@ export default StyleSheet.create({
     backgroundColor: theme.colors.surfaceVariant,
     borderRadius: theme.radius.md,
     padding: theme.spacing.sm,
+    marginBottom: theme.spacing.base,
+    marginHorizontal: theme.spacing.base,
+    marginTop: theme.spacing.base,
   },
   noticeText: {
     flex: 1,
@@ -29,6 +32,8 @@ export default StyleSheet.create({
     backgroundColor: Color.colorWhitesmoke_100,
     borderRadius: theme.radius.md,
     padding: theme.spacing.base,
+    marginHorizontal: theme.spacing.base,
+    marginBottom: theme.spacing.base,
   },
   updatedTitle: {
     fontSize: theme.typography.size.lg,

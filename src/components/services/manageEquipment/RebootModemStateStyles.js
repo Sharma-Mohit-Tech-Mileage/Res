@@ -3,19 +3,20 @@ import { theme } from "../../../styles/theme";
 
 export default StyleSheet.create({
   alert: {
-    marginTop: theme.spacing["3xl"],
+    marginTop: theme.spacing.md,
     marginBottom: 0,
-    paddingVertical: theme.spacing.xl,
+    paddingVertical: theme.spacing.base,
     borderRadius: theme.radius.sm,
   },
   message: {
-    textAlign: "center",
-    marginTop: theme.spacing.xl,
+    textAlign: "left",
+    marginTop: theme.spacing["3xs"],
+    marginBottom: theme.spacing.sm,
     lineHeight: theme.typography.lineHeight.normal,
   },
   button: { paddingVertical: theme.spacing.md },
-  primary: { marginTop: 38 },
-  secondary: { marginTop: theme.spacing.xl },
+  primary: { marginTop: theme.spacing["2xl"] },
+  secondary: { marginTop: theme.spacing.md },
   loading: {
     alignItems: "center",
     paddingTop: theme.spacing["3xl"],

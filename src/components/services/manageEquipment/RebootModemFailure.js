@@ -10,16 +10,14 @@ const RebootModemFailure = ({ navigation, onRetry }) => (
   <RebootModemLayout navigation={navigation}>
     <NotificationAlert
       type="error"
-      layout="centered"
       showCloseIcon={false}
       iconComponent={WarningIcon}
-      iconSize={40}
+      iconSize={20}
       containerStyle={styles.alert}
-      title="Modem Reboot Failed"
+      title="Modem reboot failed"
     >
       <Body style={styles.message}>
-        We have encountered an error. Please retry or refer to the Modem Help
-        Instructions.
+        We couldn't reboot your modem. Try again, or see Modem Help.
       </Body>
     </NotificationAlert>
     <PrimaryButton

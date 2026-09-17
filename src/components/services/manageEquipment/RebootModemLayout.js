@@ -24,7 +24,7 @@ const RebootModemLayout = ({ navigation, children }) => {
         ]}
       >
         <SurfaceCard style={styles.card}>
-          <SectionTitle accessibilityRole="header" style={styles.title}>
+          <SectionTitle accessibilityRole="header">
             Reboot Modem
           </SectionTitle>
           {children}
@@ -33,7 +33,8 @@ const RebootModemLayout = ({ navigation, children }) => {
             onPress={() => setHelpVisible(true)}
             style={styles.help}
           >
-            <FieldTitle style={styles.helpTitle}>Modem Help</FieldTitle>
+            <FieldTitle
+             >Modem Help</FieldTitle>
             <View
               accessible={false}
               accessibilityElementsHidden

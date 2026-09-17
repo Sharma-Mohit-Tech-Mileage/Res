@@ -4,6 +4,7 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import { Body } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
+import {Color} from "../../../../GlobalStyles"
 import RebootModemLayout from "./RebootModemLayout";
 import RebootModemLoading from "./RebootModemLoading";
 import RebootModemSuccess from "./RebootModemSuccess";
@@ -61,17 +62,15 @@ const RebootModemScreen = ({ navigation, onReboot }) => {
     <RebootModemLayout navigation={navigation}>
       <NotificationAlert
         type="info"
-        layout="centered"
         showCloseIcon={false}
-        iconSize={40}
-        iconColor="#006AC3"
+        iconSize={20}
+        iconColor={Color.sparklight_blue}
         containerStyle={styles.confirmation}
-        title="You are about to reboot your modem."
+        title="Reboot your modem?"
       >
         <Body style={styles.message}>
           During this process, your service will be briefly interrupted.
         </Body>
-        <Body style={styles.prompt}>Would you like to continue?</Body>
       </NotificationAlert>
       <PrimaryButton
         title={"Reboot Modem"}
@@ -105,17 +104,16 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
   },
   confirmation: {
-    marginTop: 44,
+    marginTop: theme.spacing.md,
     marginBottom: 0,
-    paddingVertical: theme.spacing.xl,
-    borderColor: "#007AFF",
+    paddingVertical: theme.spacing.base,
+    borderColor: Color.sparklight_blue,
     borderRadius: theme.radius.sm,
   },
-  message: { textAlign: "center", marginTop: theme.spacing.xl },
-  prompt: {
-    textAlign: "center",
-    marginTop: theme.spacing.xl,
-    color: theme.colors.primaryDark,
+  message: {
+    textAlign: "left",
+    marginTop: theme.spacing["3xs"],
+    lineHeight: theme.typography.lineHeight.normal,
   },
   button: { paddingVertical: theme.spacing.md },
   reboot: { marginTop: 38 },

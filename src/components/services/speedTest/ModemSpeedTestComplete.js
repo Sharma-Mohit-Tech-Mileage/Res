@@ -25,7 +25,8 @@ const ModemSpeedTestComplete = () => (
       containerStyle={styles.flatNotice}
     >
        <Body>
-        Pull down screen to refresh content.
+    {'Pull down screen to refresh content.'}{"\n"}
+
       </Body>
       </NotificationAlert>
   </View>
