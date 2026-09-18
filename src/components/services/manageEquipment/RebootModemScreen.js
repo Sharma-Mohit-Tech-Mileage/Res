@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet } from "react-native";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import PrimaryButton from "../../common/customui/PrimaryButton";
-import { theme } from "../../../styles/theme";
+import styles from "./RebootModemStateStyles";
 import RebootModemLayout from "./RebootModemLayout";
 import RebootModemLoading from "./RebootModemLoading";
 import RebootModemSuccess from "./RebootModemSuccess";
@@ -57,32 +56,34 @@ const RebootModemScreen = ({ navigation, onReboot }) => {
     );
 
   return (
-    <RebootModemLayout navigation={navigation}>
+    <RebootModemLayout
+      navigation={navigation}
+      actions={
+        <>
+          <PrimaryButton
+            title={"Reboot Modem"}
+            buttonType="submit"
+            onPress={handleReboot}
+            containerStyle={styles.primary}
+          />
+          <PrimaryButton
+            title="Cancel"
+            buttonType="outline"
+            containerStyle={styles.secondary}
+            onPress={() => navigation.goBack()}
+          />
+        </>
+      }
+    >
       <NotificationAlert
         type="info"
         showCloseIcon={false}
-        containerStyle={styles.confirmation}
+        containerStyle={styles.alert}
         title="Reboot your modem?"
         message="During this process, your service will be briefly interrupted."
-      />
-      <PrimaryButton
-        title={"Reboot Modem"}
-        buttonType="submit"
-        onPress={handleReboot}
-        containerStyle={styles.reboot}
-      />
-      <PrimaryButton
-        title="Cancel"
-        buttonType="cancel"
-        onPress={() => navigation.goBack()}
       />
     </RebootModemLayout>
   );
 };
-
-const styles = StyleSheet.create({
-  confirmation: { marginTop: theme.spacing.base, marginBottom: 0 },
-  reboot: { marginTop: theme.spacing.xl },
-});
 
 export default RebootModemScreen;

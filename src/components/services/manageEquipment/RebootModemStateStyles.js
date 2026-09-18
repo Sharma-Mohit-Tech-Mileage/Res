@@ -2,23 +2,13 @@ import { StyleSheet } from "react-native";
 import { theme } from "../../../styles/theme";
 
 export default StyleSheet.create({
-  alert: {
-    marginTop: theme.spacing.base,
-    marginBottom: 0,
-  },
-  message: {
-    textAlign: "left",
-    marginTop: theme.spacing["3xs"],
-    marginBottom: theme.spacing.sm,
-    lineHeight: theme.typography.lineHeight.normal,
-  },
-  button: { paddingVertical: theme.spacing.md },
-  primary: { marginTop: theme.spacing.xl },
-  secondary: { marginTop: theme.spacing.md },
+  alert: { marginTop: 0, marginBottom: 0 },
+  // Edit Username: 24px action wrapper + the button's standard 16px margin.
+  primary: { marginTop: theme.spacing.base },
+  // Edit Username: 8px spacer + the standard 16px button margin.
+  secondary: { marginTop: theme.spacing.xl },
   loading: {
     alignItems: "center",
-    paddingTop: theme.spacing["3xl"],
-    paddingBottom: theme.spacing.md,
+    paddingVertical: theme.spacing.xl,
   },
-  loadingTitle: { textAlign: "center", marginTop: theme.spacing.xl },
 });

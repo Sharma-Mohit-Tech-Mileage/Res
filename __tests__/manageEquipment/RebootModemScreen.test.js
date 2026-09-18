@@ -2,7 +2,13 @@ import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import RebootModemScreen from '../../src/components/services/manageEquipment/RebootModemScreen';
 
-jest.mock('../../src/components/services/manageEquipment/RebootModemLayout', () => 'Layout');
+jest.mock('../../src/components/services/manageEquipment/RebootModemLayout', () => {
+  const React = require('react');
+  return ({children, actions}) => React.createElement('Layout', null,
+    React.createElement('Card', null, children,
+      React.createElement('Actions', null, actions)));
+});
+jest.mock('../../src/components/common/customui/ServiceLoader', () => 'Loader');
 jest.mock('../../src/components/services/manageEquipment/RebootModemLoading', () => 'Loading');
 jest.mock('../../src/components/services/manageEquipment/RebootModemSuccess', () => 'Success');
 jest.mock('../../src/components/services/manageEquipment/RebootModemFailure', () => 'Failure');
@@ -50,4 +56,17 @@ it('previews loading, failure, and retry success without an API', () => {
   expect(screen.root.findByType('Success')).toBeTruthy();
   act(() => screen.unmount());
   jest.useRealTimers();
+});
+
+it('keeps both actions visible and disabled inside the card while rebooting', () => {
+  const Loading = jest.requireActual('../../src/components/services/manageEquipment/RebootModemLoading').default;
+  let screen;
+  act(() => { screen = renderer.create(<Loading navigation={{}} />); });
+  const actions = screen.root.findByType('Actions').findAllByType('Button');
+  expect(actions.map(button => button.props.title)).toEqual(['Reboot Modem', 'Cancel']);
+  actions.forEach(button => expect(button.props.disabled).toBe(true));
+  expect(actions[1].props.buttonType).toBe('outline');
+  expect(screen.root.findByType('Card').findAllByType('Button')).toHaveLength(2);
+  expect(screen.root.findByType('Loader').props.label).toBe('Rebooting');
+  act(() => screen.unmount());
 });

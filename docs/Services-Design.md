@@ -29,3 +29,5 @@ Manage Equipment speed readings now use SpeedBanner with `plain`: the Internet-c
 Current speed-test reference: Manage Equipment and modem test results share SpeedTestResults: purple values with smaller decimals, DownloadcircleIcon/UploadcircleIcon before values, and Download/Upload with gray Mbps below, without background fills. The completion refresh hint has the existing SVG InfoIcon before its text.
 
 Correction: the modem speed-test screen retains its Internet-card SpeedBanner. Manage Equipment uses a separate EquipmentSpeedResults component. Its circle icons receive a padded viewBox so their outer strokes are not clipped; fixed icon boxes and shrinkable values keep both columns aligned on narrow screens.
+
+Reboot layout now follows Edit Username: 24px screen top inset, 16px side gutters, card padding of 24px horizontally and 32px vertically, 16px title-to-banner gap, 40px state-to-primary-action gap, and 24px between actions. Actions sit inside the card, before Modem Help; Cancel is outlined. Loading retains disabled Reboot Modem and Cancel actions. Confirmation, loading, failure, and success share this layout.
