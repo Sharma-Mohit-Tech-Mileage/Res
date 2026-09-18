@@ -1,3 +1,4 @@
+import ServiceIcon from "../../../res/svgIcons/PhoneServiceIcon";
 import React from "react";
 import { View, Text, StyleSheet, Linking, Alert } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -7,7 +8,7 @@ import { getPhonePortalURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../../styles/AppStyles";
-import {SectionTitle} from "../../common/customui/Typography";
+import {FieldTitle} from "../../common/customui/Typography";
 const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   const phonePortalURL = getPhonePortalURL(legacyBrand);
   const showManageButton = phonePortalURL !== null;
@@ -47,21 +48,8 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
       <View style={[styles.card, styles.cardSpacing]}>
         {/* Service Header */}
         <View style={styles.cardHreader}>
-          {/* <View
-            style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no"
-            accessibilityElementsHidden={true}
-          >
-            <MaterialCommunityIcons
-              name="phone"
-              size={16}
-              color={theme.colors.primary}
-              accessible={false}
-              importantForAccessibility="no"
-            />
-          </View> */}
-          <SectionTitle
+          <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
+          <FieldTitle
             style={{marginLeft: 8}}
             accessible={true}
             accessibilityLabel="Phone Service"
@@ -69,7 +57,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
             accessibilityRole="header"
           >
             Phone Service
-          </SectionTitle>
+          </FieldTitle>
         </View>
 
         {/* Plan Name & Action */}
@@ -110,6 +98,7 @@ const styles = StyleSheet.create({
   }, 
   cardHreader: {
     flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#F8F8F8",
     width: "100%",
     borderTopLeftRadius: 8,

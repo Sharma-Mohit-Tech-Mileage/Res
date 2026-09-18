@@ -15,6 +15,7 @@ const AppStyles = StyleSheet.create({
   },
    cardHreader: {
     flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#F8F8F8",
     width: "100%",
     borderTopLeftRadius: 8,

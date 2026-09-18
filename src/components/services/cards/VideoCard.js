@@ -1,3 +1,4 @@
+import ServiceIcon from "../../../res/svgIcons/VideoServiceIcon";
 import React from "react";
 import { View, Text, StyleSheet, Linking, Alert } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -7,7 +8,7 @@ import { getChannelLineupURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../../styles/AppStyles";
-import { SectionTitle } from "../../common/customui/Typography";
+import { FieldTitle } from "../../common/customui/Typography";
 const VideoCard = ({ planName, zipCode, loading = false }) => {
   const handleChannelLineup = async () => {
     const url = getChannelLineupURL(zipCode);
@@ -44,21 +45,8 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
       <View style={[AppStyles.card, { marginHorizontal: 16 }]}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          {/* <View
-            style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no"
-            accessibilityElementsHidden={true}
-          >
-            <MaterialCommunityIcons
-              name="television"
-              size={16}
-              color={theme.colors.primary}
-              accessible={false}
-              importantForAccessibility="no"
-            />
-          </View> */}
-          <SectionTitle
+          <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
+          <FieldTitle
             accessible={true}
             style={{marginLeft: 8}}
             accessibilityLabel="TV & Video"
@@ -66,7 +54,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
             accessibilityRole="header"
           >
             TV & Video
-          </SectionTitle>
+          </FieldTitle>
         </View>
 
         {/* Plan Name & Action */}

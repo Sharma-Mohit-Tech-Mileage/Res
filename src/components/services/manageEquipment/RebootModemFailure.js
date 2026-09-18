@@ -29,7 +29,7 @@ const RebootModemFailure = ({ navigation, onRetry }) => (
     />
     <PrimaryButton
       title="Cancel"
-      buttonType="outline"
+      buttonType="cancel"
       onPress={() => navigation.goBack()}
       style={styles.button}
       containerStyle={styles.secondary}

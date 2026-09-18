@@ -1,9 +1,8 @@
 import ClockIcon from "../../../res/svgIcons/ClockIcon";
 import SpeedometerIcon from "../../../res/svgIcons/SpeedometerIcon";
-import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
-import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
+import SpeedBanner from "../cards/SpeedBanner";
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, Linking, StyleSheet, View } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import SpeedAnimation from "../../common/SpeedAnimation";
 import SurfaceCard from "../../common/customui/SurfaceCard";
@@ -36,21 +35,6 @@ const DecorativeIcon = ({ name, size = 20, color = theme.colors.primary }) => (
   </View>
 );
 
-const SpeedResult = ({ label, value, icon: ResultIcon }) => (
-  <View style={styles.result}>
-    <View style={styles.resultValue}>
-      <ResultIcon width={12} height={12} accessible={false} />
-      <Body style={styles.number}>
-        {value.split(".")[0]}
-        <Body style={styles.decimal}>.{value.split(".")[1]}</Body>
-      </Body>
-    </View>
-    <FieldContent style={styles.resultLabel}>
-      <FieldTitle>{label}</FieldTitle> Mbps
-    </FieldContent>
-  </View>
-);
-
 // Static preview only: these values do not measure the device's connection.
 const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
   const [tab, setTab] = useState("wifi");
@@ -59,7 +43,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
   useEffect(() => () => clearTimeout(timer.current), []);
   const testSpeed = () => {
     if (navigation) {
-      navigation.navigate(tab === "wifi" ? "WifiSpeedTest1" : "ModemSpeedTest");
+      navigation.navigate(tab === "wifi" ? "WifiSpeedTest" : "ModemSpeedTest");
       return;
     }
     if (timer.current) return;
@@ -94,12 +78,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
             text="Learn More"
             style={styles.learnMore}
             textStyle={styles.learnMoreText}
-            onPress={() =>
-              Alert.alert(
-                "About WiFi speed",
-                "WiFi speeds vary with distance from your router, interference, and your device. A wired modem connection can provide higher speeds. The results shown here are sample values for this UI preview.",
-              )
-            }
+            onPress={() => Linking.openURL("https://support.sparklight.com/hc/en-us/articles/115010349927-Can-I-Run-an-Internet-Speed-Test").catch(() => Alert.alert("Unable to open link", "Please try again."))}
           />
         </View>
       </View>
@@ -127,11 +106,13 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
           ))}
         </View>
         <View style={styles.testContent}>
+          <View style={styles.descriptionContainer}>
           <Body style={styles.description}>
             {tab === "wifi"
               ? "Wifi speed reported by your mobile device"
               : "Speed reported by your modem"}
           </Body>
+          </View>
           <SurfaceCard style={styles.connection}>
             <SpeedAnimation speedType={tab} hasEeroDevice={hasEeroDevice} />
             {testing && (
@@ -140,17 +121,8 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
               </Body>
             )}
           </SurfaceCard>
-          <View style={styles.results} accessibilityLiveRegion="polite">
-            <SpeedResult
-              label="Download"
-              value={result.download}
-              icon={DownloadcircleIcon}
-            />
-            <SpeedResult
-              label="Upload"
-              value={result.upload}
-              icon={UploadcircleIcon}
-            />
+          <View accessibilityLiveRegion="polite">
+            <SpeedBanner downloadSpeed={result.download} uploadSpeed={result.upload} />
           </View>
           <PrimaryButton
             title={testing ? "Testing Speed..." : "Test Speed"}
@@ -191,18 +163,19 @@ const styles = StyleSheet.create({
     width: theme.iconSize.xl,
     height: theme.iconSize.xl,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     alignItems: "center",
     justifyContent: "center",
   },
   title: { flex: 1, color: theme.colors.text.secondary },
   plan: { color: theme.colors.primaryDark },
   notice: {
+    alignItems: "center",
     flexDirection: "row",
     gap: theme.spacing.sm,
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     borderRadius: theme.radius.base,
-    padding: theme.spacing.md,
+    padding: theme.spacing.base,
     marginBottom: theme.spacing.base,
   },
   noticeContent: { flex: 1 },
@@ -212,9 +185,9 @@ const styles = StyleSheet.create({
   },
   learnMore: { paddingHorizontal: 0, paddingVertical: theme.spacing.sm },
   learnMoreText: {
-    textDecorationLine: "none",
+    ...AppStyles.hyperlink,
     fontSize: theme.typography.size.sm,
-    color: theme.colors.primaryDark,
+    color: theme.colors.purpleBright,
   },
   panel: { borderWidth: 1, borderColor: theme.colors.border },
   tabs: {
@@ -234,10 +207,12 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.size.base,
     fontWeight: "700",
   },
-  activeTabText: { color: theme.colors.primaryDark },
+  activeTabText: { color: theme.colors.purpleBright },
   testContent: { padding: theme.spacing.sm },
+  descriptionContainer: { minHeight: 48, justifyContent: "center" },
   description: {
     textAlign: "center",
+    textAlignVertical: "center",
     fontSize: theme.typography.size.sm,
     marginVertical: theme.spacing.sm,
   },
@@ -249,26 +224,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   testingLabel: { textAlign: "center", marginTop: theme.spacing.sm },
-  results: { flexDirection: "row", marginTop: theme.spacing.lg },
-  result: { flex: 1, alignItems: "center" },
-  resultValue: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing["2xs"],
-  },
-  number: {
-    color: theme.colors.primary,
-    fontSize: theme.typography.size["2xl"],
-  },
-  decimal: {
-    color: theme.colors.primary,
-    fontSize: theme.typography.size.base,
-  },
-  resultLabel: {
-    fontSize: theme.typography.size.sm,
-    color: theme.colors.text.secondary,
-    marginTop: theme.spacing["2xs"],
-  },
   testButton: { paddingVertical: theme.spacing.sm },
   footer: {
     flexDirection: "row",

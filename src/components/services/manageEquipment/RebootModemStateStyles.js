@@ -3,7 +3,7 @@ import { theme } from "../../../styles/theme";
 
 export default StyleSheet.create({
   alert: {
-    marginTop: theme.spacing.md,
+    marginTop: theme.spacing.base,
     marginBottom: 0,
     paddingVertical: theme.spacing.base,
     borderRadius: theme.radius.sm,

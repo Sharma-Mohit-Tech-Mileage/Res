@@ -1,0 +1,11 @@
+/* Web equivalents of src/styles/theme.js; React Native uses StyleSheet. */
+:root {
+  --secondary-surface: #f8f8f8;
+  --purple-bright: #8d3b90;
+  --blue-bright: #00b8d8;
+  --gray-medium: #4c5458;
+  --speed-panel-background: #8d3b900c;
+}
+.speed-panel { background-color: var(--speed-panel-background); }
+.secondary-surface { background-color: var(--secondary-surface); }
+.hyperlink { color: var(--purple-bright); text-decoration: underline; font-weight: 700; }

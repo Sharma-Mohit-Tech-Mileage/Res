@@ -1,3 +1,4 @@
+import ServiceIcon from "../../../../res/svgIcons/EquipmentServiceIcon";
 import React, { memo, useMemo, useCallback } from "react";
 import { View, Text, StyleSheet,Pressable } from "react-native";
 import { theme } from "../../../../styles/theme";
@@ -88,19 +89,8 @@ const ManageEquipmentCard = ({ equipment, navigation }) => {
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={[styles.header,{justifyContent: 'space-between'}]} accessibilityRole="header">
-          {/* <View
-            style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            accessibilityElementsHidden={true}
-          >
-            <MaterialCommunityIcons
-              name="router-wireless"
-              size={18}
-              color={theme.colors.primary}
-            />
-          </View> */}
-          <SectionTitle  accessibilityRole="header">
+          <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
+          <SectionTitle style={{flex: 1}} accessibilityRole="header">
             My Equipment
           </SectionTitle>
           <Pressable onPress={() => navigation.navigate("manageEquipment")} accessibilityRole="button" accessibilityLabel="Manage Equipment">

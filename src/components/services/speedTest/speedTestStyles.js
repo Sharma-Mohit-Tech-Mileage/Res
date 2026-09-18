@@ -7,7 +7,7 @@ export default StyleSheet.create({
   notice: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     borderRadius: theme.radius.md,
     padding: theme.spacing.sm,
     marginBottom: theme.spacing.base,
@@ -19,7 +19,10 @@ export default StyleSheet.create({
     fontSize: theme.typography.size.sm,
     lineHeight: theme.typography.lineHeight.tight,
   },
+  successNotice: { marginBottom: theme.spacing.sm },
   flatNotice: {
+    paddingVertical: theme.spacing.sm,
+    marginVertical: 0,
     borderWidth: 0,
     backgroundColor: Color.colorWhitesmoke_100,
     borderRadius: theme.radius.md,
@@ -40,5 +43,6 @@ export default StyleSheet.create({
     color: theme.colors.text.secondary,
   },
   action: { marginTop: theme.spacing.xl },
-  disabled: { backgroundColor: theme.colors.border },
+  disabled: { backgroundColor: "#D9D9D9" },
+  disabledText: { color: theme.colors.text.secondary },
 });

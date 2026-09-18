@@ -1,3 +1,4 @@
+import ServiceIcon from "../../../../res/svgIcons/HistoryServiceIcon";
 import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, Dimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
 import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
@@ -563,14 +564,7 @@ const UsageChart = ({
       <View style={styles.card}>
         {/* Header icon — decorative */}
         <View style={styles.header}>
-          {/* <View
-            style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            accessibilityElementsHidden={true}
-          >
-            <MaterialCommunityIcons name="chart-bar" size={20} color={theme.colors.primary} />
-          </View> */}
+          <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
           <SectionTitle accessibilityRole="header">Historical Usage</SectionTitle>
         </View>
         <View style={styles.tabsContainer} accessibilityRole="tablist">
@@ -953,7 +947,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.size.base,
     fontWeight: "700",
   },
-  activeTabText: { color: theme.colors.primaryDark },
+  activeTabText: { color: theme.colors.purpleBright },
 
   controlsRow: {
     flexDirection: "row",
@@ -963,7 +957,7 @@ const styles = StyleSheet.create({
   },
   dropdownWrapper: { flex: 1 },
   dropdown: {
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     borderColor: theme.colors.borderLight,
     borderRadius: theme.radius.base,
     height: 48,
@@ -972,7 +966,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 48,
     borderRadius: theme.radius.base,
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
     alignItems: "center",
@@ -1013,7 +1007,7 @@ const styles = StyleSheet.create({
   listItem: {
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.xs,
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     borderRadius: theme.radius.base,
     marginBottom: theme.spacing.sm,
   },

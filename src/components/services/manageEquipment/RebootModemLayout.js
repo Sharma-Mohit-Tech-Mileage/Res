@@ -6,7 +6,7 @@ import SurfaceCard from "../../common/customui/SurfaceCard";
 import Touchable from "../../common/customui/Touchable";
 import ModemHelpOverlay from "./ModemHelpOverlay";
 import { SectionTitle, FieldTitle } from "../../common/customui/Typography";
-import InfoIcon from "../../../../assets/svgs/InfoIcon";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
 
 const RebootModemLayout = ({ navigation, children }) => {
@@ -33,15 +33,14 @@ const RebootModemLayout = ({ navigation, children }) => {
             onPress={() => setHelpVisible(true)}
             style={styles.help}
           >
-            <FieldTitle
-             >Modem Help</FieldTitle>
             <View
               accessible={false}
               accessibilityElementsHidden
               importantForAccessibility="no-hide-descendants"
             >
-              <InfoIcon size={18} color={theme.colors.primaryDark} />
+              <MaterialCommunityIcons name="help-circle-outline" size={20} color={theme.colors.text.secondary} />
             </View>
+            <FieldTitle style={{color: theme.colors.text.secondary}}>Modem Help</FieldTitle>
           </Touchable>
         </SurfaceCard>
       </ScrollView>
@@ -59,7 +58,7 @@ const styles = StyleSheet.create({
   card: {
     paddingHorizontal: theme.spacing.base,
     paddingTop: theme.spacing.xl,
-    paddingBottom: theme.spacing["3xl"],
+    paddingBottom: theme.spacing.base,
     margin: 16,
   },
   title: {
@@ -83,12 +82,12 @@ const styles = StyleSheet.create({
   reboot: { marginTop: 38 },
   cancel: { marginTop: theme.spacing.xl },
   help: {
-    alignSelf: "flex-start",
+    alignSelf: "center",
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.sm,
     paddingHorizontal: 0,
-    marginTop: theme.spacing["3xl"],
+    marginTop: theme.spacing.xl,
   },
   helpTitle: { fontSize: theme.typography.size.xbl },
 });

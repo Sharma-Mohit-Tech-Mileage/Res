@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.base,
     marginBottom: theme.spacing.base,
     padding: theme.spacing.lg,
-    paddingBottom: theme.spacing['2xl'],
+    paddingBottom: theme.spacing.lg,
 
   },
   header: {
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     width: theme.iconSize.xl,
     height: theme.iconSize.xl,
     borderRadius: theme.radius.full,
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: theme.spacing.md,
@@ -91,17 +91,18 @@ const styles = StyleSheet.create({
   },
   badge: {
     alignSelf: 'flex-start',
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: theme.radius.base,
-    padding: theme.spacing['2xs'],
+    paddingVertical: theme.spacing['2xs'],
+    paddingHorizontal: theme.spacing.md,
     marginVertical: theme.spacing.md,
   },
   badgeText: {
     fontSize: theme.typography.size.xs,
     fontFamily: theme.typography.family.semiBold,
-    color: theme.colors.text.secondary,
+    color: theme.colors.grayMedium,
   },
   statusRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
   statusDot: {

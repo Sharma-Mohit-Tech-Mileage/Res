@@ -1,3 +1,4 @@
+import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import React, { useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -150,7 +151,7 @@ const SparkLightDropdown = ({
                   style={styles.closeButton}
                   accessibilityLabel="Close dropdown"
                 >
-                  <Text style={styles.closeButtonText} accessible={false}>✕</Text>
+                  <CloseIcon width={24} height={24} viewBox="0 0 18 18" accessible={false} />
                 </IconButton>
               </View>
             </View>

@@ -1,7 +1,8 @@
+import AppStyles from "../../../styles/AppStyles";
 import React from "react";
 import { Alert, Linking, StyleSheet, View } from "react-native";
 import BottomSheet from "../../common/customui/BottomSheet";
-import { FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { SectionTitle, FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 
 const openVideoGuide = async () => {
@@ -25,9 +26,9 @@ const ModemHelpOverlay = ({ visible, onClose, onContactUs }) => (
     contentContainerStyle={styles.content}
   >
     <View style={styles.section}>
-      <FieldTitle style={styles.heading} accessibilityRole="header">
-        Soft reboot
-      </FieldTitle>
+      <SectionTitle style={styles.heading} accessibilityRole="header">
+        Modem reboot
+      </SectionTitle>
       <FieldContent style={styles.body}>
         Tap <FieldTitle>“Reboot Modem”</FieldTitle> in the app.
         Your internet will drop briefly and the lights will flash. Your modem is
@@ -35,9 +36,9 @@ const ModemHelpOverlay = ({ visible, onClose, onContactUs }) => (
       </FieldContent>
     </View>
     <View style={styles.section}>
-      <FieldTitle style={styles.heading} accessibilityRole="header">
+      <SectionTitle style={styles.heading} accessibilityRole="header">
         Manual reboot
-      </FieldTitle>
+      </SectionTitle>
 
       <FieldContent style={styles.body}>
         Unplug the power cord from the back of the modem, wait 30 seconds, then
@@ -46,9 +47,9 @@ const ModemHelpOverlay = ({ visible, onClose, onContactUs }) => (
       </FieldContent>
     </View>
     <View style={styles.section}>
-      <FieldTitle style={styles.heading} accessibilityRole="header">
+      <SectionTitle style={styles.heading} accessibilityRole="header">
         Watch the video
-      </FieldTitle>
+      </SectionTitle>
       <FieldContent style={styles.body}>
         See our{" "}
         <FieldContent onPress={openVideoGuide} accessibilityRole="link" style={styles.link}>
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 20,
   },
-  title: { fontSize: 30 },
+  title: { ...AppStyles.H2 },
   content: { paddingHorizontal: 28, paddingBottom: 8 },
   section: { marginBottom: 28 },
   heading: {
@@ -89,14 +90,14 @@ const styles = StyleSheet.create({
     lineHeight: theme.typography.lineHeight.relaxed,
   },
   link: {
-    fontSize: theme.typography.size.lg,
-    color: theme.colors.primary,
-    textDecorationLine: "underline",
+    ...AppStyles.hyperlink,
+    fontSize: theme.typography.size.base,
   },
   footer: {
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
-    paddingTop: 18,
+    paddingTop: theme.spacing.xl,
+    paddingBottom: theme.spacing.xl,
   },
 });
 

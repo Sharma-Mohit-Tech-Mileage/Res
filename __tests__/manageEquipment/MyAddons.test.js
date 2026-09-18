@@ -1,0 +1,20 @@
+import React from 'react';
+import renderer, {act} from 'react-test-renderer';
+import MyAddons from '../../src/components/services/manageEquipment/MyAddons';
+jest.mock('../../src/components/common/customui/SurfaceCard', () => 'Card');
+jest.mock('../../src/components/common/customui/Touchable', () => 'Touchable');
+jest.mock('../../src/components/common/Icon', () => 'Icon');
+jest.mock('../../src/components/common/customui/Typography', () => ({SectionTitle: 'Title', FieldTitle: 'Field', FieldContent: 'Content'}));
+it('collapses and expands devices through the accessible header', () => {
+  let screen;
+  act(() => {screen = renderer.create(<MyAddons />);});
+  const header = () => screen.root.findByType('Touchable');
+  expect(header().props.accessibilityState.expanded).toBe(true);
+  expect(screen.root.findAllByType('Content').length).toBe(6);
+  act(() => header().props.onPress());
+  expect(header().props.accessibilityState.expanded).toBe(false);
+  expect(screen.root.findAllByType('Content')).toHaveLength(0);
+  act(() => header().props.onPress());
+  expect(screen.root.findAllByType('Content').length).toBe(6);
+  act(() => screen.unmount());
+});

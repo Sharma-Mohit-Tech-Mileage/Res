@@ -10,7 +10,7 @@ import ManageEquipmentScreen from "../../components/services/manageEquipment/Man
 import RebootModemScreen from "../../components/services/manageEquipment/RebootModemScreen";
 
 import ModemSpeedTestScreen from "../../components/services/speedTest/ModemSpeedTestScreen";
-import WiFiSpeedTestScreen from "../../components/services/speedTest/WifiSpeedTestRunning";
+import WiFiSpeedTestScreen from "../../components/services/speedTest/WifiSpeedTestScreen";
 
 const ServiceStack = createNativeStackNavigator();
 

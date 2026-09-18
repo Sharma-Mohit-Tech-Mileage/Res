@@ -3,7 +3,6 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import { Body, FieldTitle } from "../../common/customui/Typography";
 import styles from "./speedTestStyles";
 import { View } from "react-native";
-import { theme } from "../../../styles/theme";  
 
 const ModemSpeedTestComplete = () => (
   <View style={{margin: 16,}}>
@@ -11,7 +10,7 @@ const ModemSpeedTestComplete = () => (
       type="success"
       showCloseIcon={false}
       iconSize={22}
-      containerStyle={styles.flatNotice}
+      containerStyle={styles.successNotice}
     >
       <Body>
         <FieldTitle style={styles.success}>Speed test complete.</FieldTitle>{" "}
@@ -25,7 +24,7 @@ const ModemSpeedTestComplete = () => (
       containerStyle={styles.flatNotice}
     >
        <Body>
-    {'Pull down screen to refresh content.'}{"\n"}
+    {'Pull down screen to refresh content.'}
 
       </Body>
       </NotificationAlert>

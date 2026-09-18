@@ -44,7 +44,7 @@ const BottomSheet = ({ visible, title, onClose, children, sheetStyle, headerStyl
               {title}
             </FieldTitle>
             <IconButton accessibilityLabel={`Close ${title}`} onPress={onClose}>
-              <CloseIcon width={24} height={24} />
+              <CloseIcon width={24} height={24} viewBox="0 0 18 18" accessible={false} />
             </IconButton>
           </View>
           <ScrollView

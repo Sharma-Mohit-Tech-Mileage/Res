@@ -1,3 +1,4 @@
+import NotificationAlert from "../../common/customui/NotificationAlert";
 import React, { useEffect, useRef, useState } from "react";
 import { View, RefreshControl } from "react-native";
 import SurfaceCard from "../../common/customui/SurfaceCard";
@@ -12,17 +13,47 @@ import styles from "./speedTestStyles";
 import AppStyles from "../../../styles/AppStyles";
 
 // Hardcoded preview; no network speed measurement is performed.
-const ModemSpeedTestScreen = ({ navigation }) => {
+const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
   const [complete, setComplete] = useState(false);
   const timer = useRef(null);
-  const run = () => {
+  const mounted = useRef(false);
+  const pending = useRef(false);
+  const [error, setError] = useState(false);
+  const [results, setResults] = useState(null);
+  const run = async () => {
+    if (pending.current) return;
+    pending.current = true;
     clearTimeout(timer.current);
     setComplete(false);
-    timer.current = setTimeout(() => setComplete(true), 3000);
+    setError(false);
+    setResults(null);
+    if (!onRunSpeedTest) {
+      timer.current = setTimeout(() => {
+        if (mounted.current) {
+          setResults({download: "963", upload: "59", updated: new Date().toLocaleString()});
+          setComplete(true);
+        }
+        pending.current = false;
+      }, 3000);
+      return;
+    }
+    try {
+      const result = await onRunSpeedTest();
+      if (result?.download == null || result?.upload == null) throw new Error("Missing speed results");
+      if (mounted.current) {
+        setResults({...result, updated: new Date().toLocaleString()});
+        setComplete(true);
+      }
+    } catch {
+      if (mounted.current) setError(true);
+    } finally {
+      pending.current = false;
+    }
   };
   useEffect(() => {
+    mounted.current = true;
     run();
-    return () => clearTimeout(timer.current);
+    return () => { mounted.current = false; clearTimeout(timer.current); };
   }, []);
   return (
     <SpeedTestLayout
@@ -31,26 +62,29 @@ const ModemSpeedTestScreen = ({ navigation }) => {
       refreshControl={<RefreshControl refreshing={false} onRefresh={run} />}
       action={
         <PrimaryButton
-          title={complete ? "Run Speed Test Again" : "Run Speed Test"}
+          title={error ? "Retry Speed Test" : complete ? "Run Speed Test Again" : "Run Speed Test"}
           buttonType="submit"
-          disabled={!complete}
+          disabled={!complete && !error}
           onPress={run}
           containerStyle={styles.action}
-          style={!complete && styles.disabled}
+          style={!complete && !error && styles.disabled}
+          textStyle={!complete && !error && styles.disabledText}
         />
       }
     >
       <SurfaceCard style={AppStyles.card}>
-        {complete ? <ModemSpeedTestComplete /> : <ModemSpeedTestProgress />}
+        {error ? <NotificationAlert type="error" title="Speed test failed" showCloseIcon={false} containerStyle={{margin: 16}}>
+          <Body>We couldn't complete your speed test. Check your connection and try again.</Body>
+        </NotificationAlert> : complete ? <ModemSpeedTestComplete /> : <ModemSpeedTestProgress />}
         <SpeedTestResults
-          download={complete ? "963" : "---"}
-          upload={complete ? "59" : "---"}
+          download={results?.download ?? "---"}
+          upload={results?.upload ?? "---"}
         />
         <View style={styles.updated}>
           <ClockIcon />
           <View>
             <FieldTitle style={styles.updatedTitle}>Updated</FieldTitle>
-            <Body>{complete ? "07/24/24   4:46pm" : "---"}</Body>
+            <Body>{results?.updated ?? "---"}</Body>
           </View>
         </View>
       </SurfaceCard>

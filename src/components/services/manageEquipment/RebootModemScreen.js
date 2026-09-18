@@ -64,7 +64,6 @@ const RebootModemScreen = ({ navigation, onReboot }) => {
         type="info"
         showCloseIcon={false}
         iconSize={20}
-        iconColor={Color.sparklight_blue}
         containerStyle={styles.confirmation}
         title="Reboot your modem?"
       >
@@ -81,7 +80,7 @@ const RebootModemScreen = ({ navigation, onReboot }) => {
       />
       <PrimaryButton
         title="Cancel"
-        buttonType="outline"
+        buttonType="cancel"
         onPress={() => navigation.goBack()}
         style={styles.button}
         containerStyle={styles.cancel}
@@ -104,10 +103,9 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
   },
   confirmation: {
-    marginTop: theme.spacing.md,
+    marginTop: theme.spacing.base,
     marginBottom: 0,
     paddingVertical: theme.spacing.base,
-    borderColor: Color.sparklight_blue,
     borderRadius: theme.radius.sm,
   },
   message: {
@@ -116,7 +114,7 @@ const styles = StyleSheet.create({
     lineHeight: theme.typography.lineHeight.normal,
   },
   button: { paddingVertical: theme.spacing.md },
-  reboot: { marginTop: 38 },
+  reboot: { marginTop: theme.spacing.xl },
   cancel: { marginTop: theme.spacing.xl },
   help: {
     flexDirection: "row",

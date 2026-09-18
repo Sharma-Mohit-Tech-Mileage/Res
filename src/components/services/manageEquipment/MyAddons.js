@@ -1,4 +1,5 @@
-import React from "react";
+import Touchable from "../../common/customui/Touchable";
+import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import SurfaceCard from "../../common/customui/SurfaceCard";
 import Icon from "../../common/Icon";
@@ -16,9 +17,11 @@ const ADDONS = [
   { id: "addon-2", model: "eero7", macId: "00:1A:2B:3C:4D:5E" },
 ];
 
-const MyAddons = () => (
+const MyAddons = () => {
+ const [expanded, setExpanded] = useState(true);
+ return (
   <SurfaceCard style={styles.card}>
-    <View style={styles.header}>
+    <Touchable style={styles.header} onPress={() => setExpanded(value => !value)} accessibilityRole="button" accessibilityLabel="My Add-ons" accessibilityState={{ expanded }}>
       <View
         style={styles.iconBackground}
         accessible={false}
@@ -35,10 +38,10 @@ const MyAddons = () => (
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
       >
-        <Icon name="down-chevron" size={16} />
+        <View style={{transform: [{rotate: expanded ? "180deg" : "0deg"}]}}><Icon name="down-chevron" size={16} /></View>
       </View>
-    </View>
-    {ADDONS.map((addon, index) => (
+    </Touchable>
+    {expanded && ADDONS.map((addon, index) => (
       <View key={addon.id} style={[styles.device, index > 0 && styles.divider]}>
         <FieldContent style={styles.text}>
           <FieldTitle style={styles.text}>Model: </FieldTitle>
@@ -56,6 +59,7 @@ const MyAddons = () => (
     ))}
   </SurfaceCard>
 );
+};
 
 const styles = StyleSheet.create({
   card: {
@@ -74,7 +78,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: theme.radius.full,
-    backgroundColor: "#F8F7F7",
+    backgroundColor: theme.colors.secondarySurface,
     alignItems: "center",
     justifyContent: "center",
     marginRight: theme.spacing.md,

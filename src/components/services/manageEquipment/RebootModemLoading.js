@@ -1,7 +1,6 @@
 import React from "react";
 import { View } from "react-native";
-import ServiceStatusSpinner from "../../common/ServiceStatusSpinner";
-import { FieldTitle } from "../../common/customui/Typography";
+import ServiceLoader from "../../common/customui/ServiceLoader";
 import RebootModemLayout from "./RebootModemLayout";
 import styles from "./RebootModemStateStyles";
 
@@ -12,8 +11,7 @@ const RebootModemLoading = ({ navigation }) => (
       accessibilityLiveRegion="polite"
       accessibilityState={{ busy: true }}
     >
-      <ServiceStatusSpinner isAnimating />
-      <FieldTitle style={styles.loadingTitle}>Rebooting Modem...</FieldTitle>
+      <ServiceLoader ring label="Rebooting" />
     </View>
   </RebootModemLayout>
 );
