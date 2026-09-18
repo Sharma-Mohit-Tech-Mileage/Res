@@ -222,6 +222,10 @@ const TextNotifications = ({ navigation }) => {
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     formatedData[name] = value;
+    if(value) {
+       setShowErrorAlert(false);
+
+    }
   };
 
   useEffect(() => {
@@ -281,6 +285,7 @@ const TextNotifications = ({ navigation }) => {
         formatedData.outageOptOut ||
         formatedData.optOut
       ) {
+        setShowErrorAlert(false);
         postRequestTextNotification();
       } else {
         setErrorText(
