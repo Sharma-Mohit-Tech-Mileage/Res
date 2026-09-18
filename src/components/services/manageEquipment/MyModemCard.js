@@ -1,53 +1,79 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { theme } from '../../../styles/theme';
-import Icon from '../../common/Icon';
-import ModemIcon from '../../../res/svgIcons/ModemIcon';
-import SurfaceCard from '../../common/customui/SurfaceCard';
-import Touchable from '../../common/customui/Touchable';
-import AppStyles from '../../../styles/AppStyles';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { theme } from "../../../styles/theme";
+import Icon from "../../common/Icon";
+import ModemIcon from "../../../res/svgIcons/ModemIcon";
+import SurfaceCard from "../../common/customui/SurfaceCard";
+import Touchable from "../../common/customui/Touchable";
+import AppStyles from "../../../styles/AppStyles";
 import {
   SectionTitle,
   FieldContent,
   Caption,
-} from '../../common/customui/Typography';
+} from "../../common/customui/Typography";
 
-const MyModemCard = ({ loading = false, onReboot, showConnectionStatus = false }) => (
+const MyModemCard = ({
+  loading = false,
+  onReboot,
+  showConnectionStatus = false,
+}) => (
   <SurfaceCard style={styles.card}>
     <View style={styles.header}>
-      <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <View
+        style={styles.iconWrapper}
+        accessible={false}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+      >
         <ModemIcon />
       </View>
-      <SectionTitle style={styles.title} accessibilityRole="header">My Modem</SectionTitle>
-      
+      <SectionTitle style={styles.title} accessibilityRole="header">
+        My Modem
+      </SectionTitle>
     </View>
 
     {loading ? (
       <View style={styles.loading} accessibilityLiveRegion="polite">
-        <FieldContent style={styles.text}>Loading modem details...</FieldContent>
+        <FieldContent style={styles.text}>
+          Loading modem details...
+        </FieldContent>
       </View>
     ) : (
       <>
         <View style={styles.details}>
           <FieldContent style={styles.text}>
-            <SectionTitle style={styles.text}>Modem: </SectionTitle>Hitron CODA-57
+            <SectionTitle style={styles.text}>Modem: </SectionTitle>Hitron
+            CODA-57
           </FieldContent>
           <FieldContent style={styles.text}>
-            <SectionTitle style={styles.text}>Mac Id: </SectionTitle>DA:12:34:56:78:90
+            <SectionTitle style={styles.text}>Mac Id: </SectionTitle>
+            DA:12:34:56:78:90
           </FieldContent>
         </View>
         <View style={styles.badge}>
           <Caption style={styles.badgeText}>LEASED</Caption>
         </View>
         {showConnectionStatus && (
-        <View style={styles.statusRow}>
-          <View style={styles.statusDot} accessible={false} />
-          <FieldContent style={styles.text}>Connected</FieldContent>
-        </View>
+          <View style={styles.statusRow}>
+            <View style={styles.statusDot} accessible={false} />
+            <FieldContent style={styles.text}>Connected</FieldContent>
+          </View>
         )}
-        <Touchable onPress={onReboot} style={styles.rebootCta} accessibilityRole="button" accessibilityLabel="Reboot Modem">
+        <Touchable
+          onPress={onReboot}
+          style={[
+            styles.rebootCta,
+            !showConnectionStatus && styles.rebootWithoutStatus,
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Reboot Modem"
+        >
           <FieldContent style={styles.rebootText}>Reboot Modem</FieldContent>
-          <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <View
+            accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
             <Icon name="right-chevron" size={theme.iconSize.sm} />
           </View>
         </Touchable>
@@ -63,20 +89,20 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.base,
     padding: theme.spacing.lg,
     paddingBottom: theme.spacing.lg,
-
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: theme.spacing.xl,
   },
   iconWrapper: {
+    marginLeft: -(theme.iconSize.xl - 25) / 2,
     width: theme.iconSize.xl,
     height: theme.iconSize.xl,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.secondarySurface,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: theme.spacing.md,
   },
   title: {
@@ -91,12 +117,12 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
   },
   badge: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     backgroundColor: theme.colors.secondarySurface,
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: theme.radius.base,
-    paddingVertical: theme.spacing['2xs'],
+    paddingVertical: theme.spacing["2xs"],
     paddingHorizontal: theme.spacing.md,
     marginVertical: theme.spacing.md,
   },
@@ -105,7 +131,11 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.family.semiBold,
     color: theme.colors.grayMedium,
   },
-  statusRow: { flexDirection: 'row', alignItems: 'center', gap: theme.spacing.xs },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.xs,
+  },
   statusDot: {
     width: theme.spacing.md,
     height: theme.spacing.md,
@@ -113,9 +143,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.status.success,
   },
   rebootCta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     minHeight: 60,
     marginTop: theme.spacing.xl,
     marginHorizontal: -theme.spacing.lg,
@@ -125,6 +155,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
   },
+  rebootWithoutStatus: { marginTop: theme.spacing.sm },
   rebootText: {
     flex: 1,
     marginRight: theme.spacing.base,
@@ -132,7 +163,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.primary,
   },
-  loading: { paddingVertical: theme.spacing['2xl'], alignItems: 'center' },
+  loading: { paddingVertical: theme.spacing["2xl"], alignItems: "center" },
 });
 
 export default MyModemCard;

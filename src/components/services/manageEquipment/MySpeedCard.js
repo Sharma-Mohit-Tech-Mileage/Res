@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.base,
   },
   badge: {
+    marginLeft: -(theme.iconSize.xl - 18) / 2,
     width: theme.iconSize.xl,
     height: theme.iconSize.xl,
     borderRadius: theme.radius.full,

@@ -19,7 +19,7 @@ const ADDONS = [
 const MyAddons = ({ showConnectionStatus = false }) => {
  const [expanded, setExpanded] = useState(true);
  return (
-  <SurfaceCard style={styles.card}>
+  <SurfaceCard style={[styles.card, !showConnectionStatus && styles.cardWithoutStatus]}>
     <Touchable style={styles.header} onPress={() => setExpanded(value => !value)} accessibilityRole="button" accessibilityLabel="My Add-ons" accessibilityState={{ expanded }}>
       <View
         style={styles.iconBackground}
@@ -70,12 +70,14 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
     paddingBottom: theme.spacing["2xl"],
   },
+  cardWithoutStatus: { paddingBottom: theme.spacing.lg },
   header: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: theme.spacing.xl,
   },
   iconBackground: {
+    marginLeft: -(theme.iconSize.xl - 20) / 2,
     width: 40,
     height: 40,
     borderRadius: theme.radius.full,

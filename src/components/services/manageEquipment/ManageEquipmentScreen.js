@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useContext } from "react";
 import {
   View,
   ScrollView,
@@ -7,20 +7,20 @@ import {
   StatusBar,
 } from "react-native";
 import {
-  SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { theme } from "../../../styles/theme";
 import { container } from "../../../styles/utilities";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 
-import AppStyles from "../../../styles/AppStyles";
+import { BottomTabBarHeightContext } from "@react-navigation/bottom-tabs";
 import MyModemCard from "./MyModemCard";
 import MyAddons from "./MyAddons";
 import MySpeedCard from "./MySpeedCard";
 
 const ManageEquipmentScreen = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
+  const tabBarHeight = useContext(BottomTabBarHeightContext) ?? 0;
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
@@ -45,7 +45,7 @@ const ManageEquipmentScreen = ({ navigation, route }) => {
       <ProfileSettingsHeader title="Manage Equipment" onPressBack={handleBack} />
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingBottom: theme.spacing["3xl"] + theme.spacing["2xl"] + insets.bottom }]}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: Math.max(tabBarHeight, insets.bottom) + theme.spacing["3xl"] + theme.spacing["2xl"] }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
