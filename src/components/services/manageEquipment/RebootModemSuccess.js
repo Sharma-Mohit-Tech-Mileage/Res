@@ -8,9 +8,7 @@ const RebootModemSuccess = ({ navigation }) => (
   <RebootModemLayout navigation={navigation}>
     <NotificationAlert
       type="success"
-      layout="centered"
       showCloseIcon={false}
-      iconSize={20}
       containerStyle={styles.alert}
       title="Modem Reboot Successful!"
     />
@@ -18,7 +16,6 @@ const RebootModemSuccess = ({ navigation }) => (
       title="Return to manage equipment"
       buttonType="submit"
       onPress={() => navigation.navigate("manageEquipment")}
-      style={styles.button}
       containerStyle={styles.primary}
     />
   </RebootModemLayout>

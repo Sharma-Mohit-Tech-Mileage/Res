@@ -1,6 +1,6 @@
 import ClockIcon from "../../../res/svgIcons/ClockIcon";
 import SpeedometerIcon from "../../../res/svgIcons/SpeedometerIcon";
-import SpeedBanner from "../cards/SpeedBanner";
+import EquipmentSpeedResults from "./EquipmentSpeedResults";
 import React, { useEffect, useRef, useState } from "react";
 import { Alert, Linking, StyleSheet, View } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -17,7 +17,6 @@ import {
 } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 import AppStyles from "../../../styles/AppStyles";
-import { dataUsageTabs } from "../../../styles/compositions";
 
 
 const SAMPLE_RESULTS = {
@@ -122,7 +121,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
             )}
           </SurfaceCard>
           <View accessibilityLiveRegion="polite">
-            <SpeedBanner downloadSpeed={result.download} uploadSpeed={result.upload} />
+            <EquipmentSpeedResults download={result.download} upload={result.upload} style={{marginHorizontal: 0, marginTop: theme.spacing.md}} />
           </View>
           <PrimaryButton
             title={testing ? "Testing Speed..." : "Test Speed"}
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
   title: { flex: 1, color: theme.colors.text.secondary },
   plan: { color: theme.colors.primaryDark },
   notice: {
-    alignItems: "center",
+    alignItems: "flex-start",
     flexDirection: "row",
     gap: theme.spacing.sm,
     backgroundColor: theme.colors.secondarySurface,
@@ -190,25 +189,21 @@ const styles = StyleSheet.create({
     color: theme.colors.purpleBright,
   },
   panel: { borderWidth: 1, borderColor: theme.colors.border },
-  tabs: {
-    ...dataUsageTabs.tabsContainer,
-    padding: 3,
-    marginBottom: theme.spacing.sm,
-  },
+  tabs: { flexDirection: "row" },
   tab: {
-    ...dataUsageTabs.tab,
-    paddingVertical: 10,
-    minHeight: 44,
+    flex: 1,
+    minHeight: 48,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.secondarySurface,
+    borderBottomWidth: 1,
+    borderColor: theme.colors.border,
+    alignItems: "center",
     justifyContent: "center",
   },
-  activeTab: dataUsageTabs.activeTab,
-  tabText: {
-    ...dataUsageTabs.tabText,
-    fontSize: theme.typography.size.base,
-    fontWeight: "700",
-  },
+  activeTab: { backgroundColor: theme.colors.white, borderBottomColor: theme.colors.white },
+  tabText: { color: theme.colors.text.secondary },
   activeTabText: { color: theme.colors.purpleBright },
-  testContent: { padding: theme.spacing.sm },
+  testContent: { padding: theme.spacing.md, paddingBottom: theme.spacing.lg },
   descriptionContainer: { minHeight: 48, justifyContent: "center" },
   description: {
     textAlign: "center",
@@ -224,7 +219,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   testingLabel: { textAlign: "center", marginTop: theme.spacing.sm },
-  testButton: { paddingVertical: theme.spacing.sm },
+  testButton: { paddingVertical: theme.spacing.md },
   footer: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -233,8 +228,8 @@ const styles = StyleSheet.create({
     gap: theme.spacing.xs,
     borderTopWidth: 1,
     borderColor: theme.colors.border,
-    padding: theme.spacing.sm,
-    marginTop: theme.spacing.sm,
+    padding: theme.spacing.md,
+    marginTop: 0,
   },
   muted: { color: theme.colors.text.secondary },
 });

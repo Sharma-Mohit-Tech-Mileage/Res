@@ -30,7 +30,11 @@ const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
     if (!onRunSpeedTest) {
       timer.current = setTimeout(() => {
         if (mounted.current) {
-          setResults({download: "963", upload: "59", updated: new Date().toLocaleString()});
+          setResults({
+            download: "963",
+            upload: "59",
+            updated: new Date().toLocaleString(),
+          });
           setComplete(true);
         }
         pending.current = false;
@@ -39,9 +43,10 @@ const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
     }
     try {
       const result = await onRunSpeedTest();
-      if (result?.download == null || result?.upload == null) throw new Error("Missing speed results");
+      if (result?.download == null || result?.upload == null)
+        throw new Error("Missing speed results");
       if (mounted.current) {
-        setResults({...result, updated: new Date().toLocaleString()});
+        setResults({ ...result, updated: new Date().toLocaleString() });
         setComplete(true);
       }
     } catch {
@@ -53,7 +58,10 @@ const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
   useEffect(() => {
     mounted.current = true;
     run();
-    return () => { mounted.current = false; clearTimeout(timer.current); };
+    return () => {
+      mounted.current = false;
+      clearTimeout(timer.current);
+    };
   }, []);
   return (
     <SpeedTestLayout
@@ -62,7 +70,13 @@ const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
       refreshControl={<RefreshControl refreshing={false} onRefresh={run} />}
       action={
         <PrimaryButton
-          title={error ? "Retry Speed Test" : complete ? "Run Speed Test Again" : "Run Speed Test"}
+          title={
+            error
+              ? "Retry Speed Test"
+              : complete
+              ? "Run Speed Test Again"
+              : "Run Speed Test"
+          }
           buttonType="submit"
           disabled={!complete && !error}
           onPress={run}
@@ -73,9 +87,19 @@ const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
       }
     >
       <SurfaceCard style={AppStyles.card}>
-        {error ? <NotificationAlert type="error" title="Speed test failed" showCloseIcon={false} containerStyle={{margin: 16}}>
-          <Body>We couldn't complete your speed test. Check your connection and try again.</Body>
-        </NotificationAlert> : complete ? <ModemSpeedTestComplete /> : <ModemSpeedTestProgress />}
+        {error ? (
+          <NotificationAlert
+            type="error"
+            title="Speed test failed"
+            showCloseIcon={false}
+            containerStyle={{ margin: 16 }}
+            message="We couldn't complete your speed test. Check your connection and try again."
+          />
+        ) : complete ? (
+          <ModemSpeedTestComplete />
+        ) : (
+          <ModemSpeedTestProgress />
+        )}
         <SpeedTestResults
           download={results?.download ?? "---"}
           upload={results?.upload ?? "---"}

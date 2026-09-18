@@ -5,8 +5,6 @@ export default StyleSheet.create({
   alert: {
     marginTop: theme.spacing.base,
     marginBottom: 0,
-    paddingVertical: theme.spacing.base,
-    borderRadius: theme.radius.sm,
   },
   message: {
     textAlign: "left",
@@ -15,7 +13,7 @@ export default StyleSheet.create({
     lineHeight: theme.typography.lineHeight.normal,
   },
   button: { paddingVertical: theme.spacing.md },
-  primary: { marginTop: theme.spacing["2xl"] },
+  primary: { marginTop: theme.spacing.xl },
   secondary: { marginTop: theme.spacing.md },
   loading: {
     alignItems: "center",

@@ -5,8 +5,8 @@ import { theme } from "../../../styles/theme";
 import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
 import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
 
-const SpeedBanner = ({ downloadSpeed, uploadSpeed, style }) => (
-  <View style={[styles.speedBanner, style]}>
+const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false }) => (
+  <View style={[styles.speedBanner, plain && styles.plain, style]}>
     {/* Download */}
     <View
       style={styles.speedColumn}
@@ -17,7 +17,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed, style }) => (
     >
       <Text style={styles.speedHeroValue}>{downloadSpeed ?? "--"}</Text>
       <Text style={styles.speedHeroUnit}>Mbps</Text>
-      <View style={styles.speedTagRow}>
+      <View style={[styles.speedTagRow, plain && styles.plainTag]}>
         <DownloadcircleIcon
           width={12}
           height={12}
@@ -40,7 +40,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed, style }) => (
     >
       <Text style={styles.speedHeroValue}>{uploadSpeed ?? "--"}</Text>
       <Text style={styles.speedHeroUnit}>Mbps</Text>
-      <View style={styles.speedTagRow}>
+      <View style={[styles.speedTagRow, plain && styles.plainTag]}>
         <UploadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
         <Text style={styles.speedTagText}>Upload</Text>
       </View>
@@ -60,6 +60,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: `${theme.colors.primary}20`,
   },
+  plain: { backgroundColor: "transparent", borderWidth: 0, paddingHorizontal: 0 },
+  plainTag: { backgroundColor: "transparent" },
   speedColumn: {
     flex: 1,
     alignItems: "center",

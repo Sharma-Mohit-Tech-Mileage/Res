@@ -1,8 +1,6 @@
 import React from "react";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import PrimaryButton from "../../common/customui/PrimaryButton";
-import { Body } from "../../common/customui/Typography";
-import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import RebootModemLayout from "./RebootModemLayout";
 import styles from "./RebootModemStateStyles";
 
@@ -11,28 +9,20 @@ const RebootModemFailure = ({ navigation, onRetry }) => (
     <NotificationAlert
       type="error"
       showCloseIcon={false}
-      iconComponent={WarningIcon}
-      iconSize={20}
       containerStyle={styles.alert}
       title="Modem reboot failed"
-    >
-      <Body style={styles.message}>
-        We couldn't reboot your modem. Try again, or see Modem Help.
-      </Body>
-    </NotificationAlert>
+      message="We couldn't reboot your modem. Try again, or see Modem Help."
+    />
     <PrimaryButton
       title="Retry Modem Reboot"
       buttonType="submit"
       onPress={onRetry}
-      style={styles.button}
       containerStyle={styles.primary}
     />
     <PrimaryButton
       title="Cancel"
       buttonType="cancel"
       onPress={() => navigation.goBack()}
-      style={styles.button}
-      containerStyle={styles.secondary}
     />
   </RebootModemLayout>
 );

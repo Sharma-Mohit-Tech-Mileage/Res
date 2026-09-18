@@ -4,7 +4,6 @@ import { WebView } from "react-native-webview";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
-import { Body } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 
 export default function WifiSpeedTestScreen({ navigation }) {
@@ -13,9 +12,7 @@ export default function WifiSpeedTestScreen({ navigation }) {
   return <View style={styles.screen}>
     <ProfileSettingsHeader title="WiFi Speed Test" onPressBack={() => navigation.goBack()} />
     {failed ? <View style={styles.error}>
-      <NotificationAlert type="error" title="Unable to load speed test" showCloseIcon={false}>
-        <Body>Check your connection and try again.</Body>
-      </NotificationAlert>
+      <NotificationAlert type="error" title="Unable to load speed test" showCloseIcon={false} message="Check your connection and try again." />
       <PrimaryButton title="Retry" buttonType="submit" onPress={() => { setFailed(false); setAttempt(value => value + 1); }} />
     </View> : <WebView key={attempt} source={{uri: "https://cableone.speedtestcustom.com"}} style={styles.webview}
       startInLoadingState onError={() => setFailed(true)} onHttpError={() => setFailed(true)} accessibilityLabel="Sparklight WiFi speed test" />}

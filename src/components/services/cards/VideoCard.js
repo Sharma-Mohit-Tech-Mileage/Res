@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   // Service Header
-  serviceHeader: AppStyles.cardHreader,
+  serviceHeader: { ...AppStyles.cardHreader, backgroundColor: theme.colors.white },
   iconWrapper: serviceCard.iconWrapper,
   serviceType: serviceCard.serviceType,
 

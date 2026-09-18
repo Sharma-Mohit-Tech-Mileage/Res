@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   cardHreader: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F8F8F8",
+    backgroundColor: theme.colors.white,
     width: "100%",
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
