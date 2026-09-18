@@ -2,7 +2,7 @@ import AppStyles from "../../../styles/AppStyles";
 import React from "react";
 import { Alert, Linking, StyleSheet, View } from "react-native";
 import BottomSheet from "../../common/customui/BottomSheet";
-import { SectionTitle, FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { SectionTitle, FieldContent } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 
 const openVideoGuide = async () => {
@@ -30,7 +30,7 @@ const ModemHelpOverlay = ({ visible, onClose, onContactUs }) => (
         Modem reboot
       </SectionTitle>
       <FieldContent style={styles.body}>
-        Tap <FieldTitle>“Reboot Modem”</FieldTitle> in the app.
+        Tap <SectionTitle>“Reboot Modem”</SectionTitle> in the app.
         Your internet will drop briefly and the lights will flash. Your modem is
         ready when the status light is solid — up to 10 minutes.
       </FieldContent>

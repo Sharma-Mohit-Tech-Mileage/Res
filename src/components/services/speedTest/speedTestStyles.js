@@ -19,6 +19,8 @@ export default StyleSheet.create({
     fontSize: theme.typography.size.sm,
     lineHeight: theme.typography.lineHeight.tight,
   },
+  statusContent: { marginHorizontal: theme.spacing.base, marginTop: theme.spacing.base, marginBottom: theme.spacing.xl, gap: theme.spacing.xl },
+  statusNotice: { marginTop: 0, marginBottom: 0 },
   refreshHint: { flexDirection: "row", alignItems: "center", gap: theme.spacing.sm, backgroundColor: theme.colors.secondarySurface, padding: theme.spacing.sm, borderRadius: theme.radius.base },
   refreshHintText: { flex: 1, fontSize: theme.typography.size.sm },
   successNotice: { marginBottom: theme.spacing.sm },

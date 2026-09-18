@@ -6,7 +6,7 @@ import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SecondaryButton from "../../common/customui/PrimaryButton";
-import { FieldTitle } from "../../common/customui/Typography";
+import { SectionTitle } from "../../common/customui/Typography";
 import AppStyles from "../../../styles/AppStyles";
 import SpeedBanner from "./SpeedBanner";
 
@@ -69,7 +69,7 @@ const InternetCard = ({
           >
             <ServiceIcon />
           </View>
-          <FieldTitle
+          <SectionTitle
             style={{ paddingLeft: 8 }}
             accessible={true}
             accessibilityLabel="Internet"
@@ -77,7 +77,7 @@ const InternetCard = ({
             accessibilityRole="header"
           >
             Internet
-          </FieldTitle>
+          </SectionTitle>
         </View>
         <View style={{ padding: 16 }}>
           {/* Plan Name */}

@@ -3,8 +3,9 @@ import { View, Text, Modal, StyleSheet, Pressable } from "react-native";
 import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import Touchable from "../../common/customui/Touchable";
+import CancelButton from "../../common/customui/CancelButton";
 import { setFocusToRef } from "../../../utils/a11y";
-import {SectionTitle,SectionContent,Hyperlink} from "../../common/customui/Typography";
+import {SectionTitle,SectionContent} from "../../common/customui/Typography";
 
 const ConfirmActionModal = ({
   visible,
@@ -43,9 +44,7 @@ const ConfirmActionModal = ({
           >
             <Text style={styles.confirmText}>{confirmLabel}</Text>
           </Touchable>
-          <Touchable style={styles.cancelButton} onPress={onCancel} accessibilityLabel={cancelLabel}>
-            <Hyperlink >{cancelLabel}</Hyperlink>
-          </Touchable>
+          <CancelButton title={cancelLabel} onPress={onCancel} accessibilityLabel={cancelLabel} />
         </View>
       </View>
     </Modal>
@@ -83,18 +82,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
-  },
-  cancelButton: {
-    minHeight: A11Y.minTouch,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  cancelText: {
-    color: Color.colorMidnightblue,
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontWeight: "600",
-    textDecorationLine: "underline",
   },
 });
 

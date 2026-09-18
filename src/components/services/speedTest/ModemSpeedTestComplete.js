@@ -3,15 +3,15 @@ import InfoIcon from "../../../res/svgIcons/InfoIcon";
 import { View } from "react-native";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import { Body } from "../../common/customui/Typography";
-import { theme } from "../../../styles/theme";
 import styles from "./speedTestStyles";
 
-const ModemSpeedTestComplete = () => (
-  <View style={{margin: theme.spacing.base}}>
+const ModemSpeedTestComplete = ({ error = false }) => (
+  <View style={styles.statusContent}>
     <NotificationAlert
-      type="success"
-      title="Speed test complete"
-      message="Thank you for your patience."
+      type={error ? "error" : "success"}
+      title={error ? "Speed test failed" : "Speed test complete"}
+      message={error ? "We couldn't complete your speed test. Check your connection and try again." : "Thank you for your patience."}
+      containerStyle={styles.statusNotice}
       showCloseIcon={false}
     />
     <View style={styles.refreshHint}>

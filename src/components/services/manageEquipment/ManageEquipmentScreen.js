@@ -45,7 +45,7 @@ const ManageEquipmentScreen = ({ navigation, route }) => {
       <ProfileSettingsHeader title="Manage Equipment" onPressBack={handleBack} />
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: theme.spacing["3xl"] + theme.spacing["2xl"] + insets.bottom }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -63,7 +63,7 @@ const ManageEquipmentScreen = ({ navigation, route }) => {
 
 
 
-        <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
+
       </ScrollView>
     </View>
   );

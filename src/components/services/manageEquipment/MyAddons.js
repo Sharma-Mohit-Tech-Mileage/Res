@@ -5,7 +5,6 @@ import SurfaceCard from "../../common/customui/SurfaceCard";
 import Icon from "../../common/Icon";
 import {
   SectionTitle,
-  FieldTitle,
   FieldContent,
 } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
@@ -17,7 +16,7 @@ const ADDONS = [
   { id: "addon-2", model: "eero7", macId: "00:1A:2B:3C:4D:5E" },
 ];
 
-const MyAddons = () => {
+const MyAddons = ({ showConnectionStatus = false }) => {
  const [expanded, setExpanded] = useState(true);
  return (
   <SurfaceCard style={styles.card}>
@@ -44,17 +43,19 @@ const MyAddons = () => {
     {expanded && ADDONS.map((addon, index) => (
       <View key={addon.id} style={[styles.device, index > 0 && styles.divider]}>
         <FieldContent style={styles.text}>
-          <FieldTitle style={styles.text}>Model: </FieldTitle>
+          <SectionTitle style={styles.text}>Model: </SectionTitle>
           {addon.model}
         </FieldContent>
         <FieldContent style={styles.text}>
-          <FieldTitle style={styles.text}>Mac Id: </FieldTitle>
+          <SectionTitle style={styles.text}>Mac Id: </SectionTitle>
           {addon.macId}
         </FieldContent>
+        {showConnectionStatus && (
         <View style={styles.status}>
           <View style={styles.statusDot} accessible={false} />
           <FieldContent style={styles.text}>Connected</FieldContent>
         </View>
+        )}
       </View>
     ))}
   </SurfaceCard>

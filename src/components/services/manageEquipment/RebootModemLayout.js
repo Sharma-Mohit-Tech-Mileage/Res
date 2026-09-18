@@ -5,7 +5,7 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SurfaceCard from "../../common/customui/SurfaceCard";
 import Touchable from "../../common/customui/Touchable";
 import ModemHelpOverlay from "./ModemHelpOverlay";
-import { SectionTitle, FieldTitle } from "../../common/customui/Typography";
+import { SectionTitle } from "../../common/customui/Typography";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
 
@@ -44,9 +44,9 @@ const RebootModemLayout = ({ navigation, children, actions }) => {
                 color={theme.colors.text.secondary}
               />
             </View>
-            <FieldTitle style={{ color: theme.colors.text.secondary }}>
+            <SectionTitle style={{ color: theme.colors.text.secondary }}>
               Modem Help
-            </FieldTitle>
+            </SectionTitle>
           </Touchable>
         </SurfaceCard>
       </ScrollView>

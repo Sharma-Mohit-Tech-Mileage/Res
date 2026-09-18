@@ -8,12 +8,11 @@ import Touchable from '../../common/customui/Touchable';
 import AppStyles from '../../../styles/AppStyles';
 import {
   SectionTitle,
-  FieldTitle,
   FieldContent,
   Caption,
 } from '../../common/customui/Typography';
 
-const MyModemCard = ({ loading = false, onReboot }) => (
+const MyModemCard = ({ loading = false, onReboot, showConnectionStatus = false }) => (
   <SurfaceCard style={styles.card}>
     <View style={styles.header}>
       <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -31,19 +30,21 @@ const MyModemCard = ({ loading = false, onReboot }) => (
       <>
         <View style={styles.details}>
           <FieldContent style={styles.text}>
-            <FieldTitle style={styles.text}>Modem: </FieldTitle>Hitron CODA-57
+            <SectionTitle style={styles.text}>Modem: </SectionTitle>Hitron CODA-57
           </FieldContent>
           <FieldContent style={styles.text}>
-            <FieldTitle style={styles.text}>Mac Id: </FieldTitle>DA:12:34:56:78:90
+            <SectionTitle style={styles.text}>Mac Id: </SectionTitle>DA:12:34:56:78:90
           </FieldContent>
         </View>
         <View style={styles.badge}>
           <Caption style={styles.badgeText}>LEASED</Caption>
         </View>
+        {showConnectionStatus && (
         <View style={styles.statusRow}>
           <View style={styles.statusDot} accessible={false} />
           <FieldContent style={styles.text}>Connected</FieldContent>
         </View>
+        )}
         <Touchable onPress={onReboot} style={styles.rebootCta} accessibilityRole="button" accessibilityLabel="Reboot Modem">
           <FieldContent style={styles.rebootText}>Reboot Modem</FieldContent>
           <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">

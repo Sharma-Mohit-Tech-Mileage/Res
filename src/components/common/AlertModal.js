@@ -11,6 +11,7 @@ import { FontFamily, Border, Color, Padding } from "../../../GlobalStyles";
 
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "./customui/Touchable";
+import CancelButton from "./customui/CancelButton";
 import { A11Y } from "../../styles/theme";
 
 // Shared presentation for errors and required updates. Callers own the actions.
@@ -93,7 +94,13 @@ const AlertModal = ({ visible, title, message, actions, onRequestClose, iconColo
           {renderMessage(message)}
 
           <View style={styles.buttonContainer}>
-            {actions.map((action, index) => (
+            {actions.map((action, index) => action.label.trim().toLowerCase() === "cancel" ? (
+              <CancelButton key={action.action} title={action.label}
+                onPress={action.onPress}
+                containerStyle={index > 0 && styles.buttonSpacing}
+                accessibilityLabel={action.accessibilityLabel || action.label}
+                accessibilityHint={action.accessibilityHint} />
+            ) : (
               <Touchable
                 key={action.action}
                 minSize={0}

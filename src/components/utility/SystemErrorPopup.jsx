@@ -9,6 +9,7 @@ import {
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "../common/customui/Touchable";
+import CancelButton from "../common/customui/CancelButton";
 
 
 const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClose }) => {
@@ -56,17 +57,8 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               </Text>
             </Touchable>
            {onClose!=undefined && (
-            <Touchable
-              style={styles.closeBtn}
-              onPress={onClose}
-              accessibilityLabel="Cancel"
-            >
-              <Text
-                style={styles.closeAlertTxt}
-              >
-                Cancel
-              </Text>
-            </Touchable>
+            <CancelButton onPress={onClose} accessibilityLabel="Cancel"
+              containerStyle={{ marginTop: 15 }} />
            )}
           </View>
         </View>

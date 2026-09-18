@@ -11,9 +11,8 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import LinkText from "../../common/customui/LinkText";
 import {
   Body,
-  FieldTitle,
-  FieldContent,
   SectionTitle,
+  FieldContent,
 } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 import AppStyles from "../../../styles/AppStyles";
@@ -61,7 +60,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
           <SpeedometerIcon />
         </View>
         <SectionTitle style={styles.title}>My Speed</SectionTitle>
-        <FieldTitle style={styles.plan}>300 Mbps</FieldTitle>
+        <SectionTitle style={styles.plan}>300 Mbps</SectionTitle>
       </View>
       <View style={styles.notice}>
         <DecorativeIcon
@@ -96,11 +95,11 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
               minSize={0}
               style={[styles.tab, tab === value && styles.activeTab]}
             >
-              <FieldTitle
+              <SectionTitle
                 style={[styles.tabText, tab === value && styles.activeTabText]}
               >
                 {value === "wifi" ? "WiFi Speed" : "Modem Speed"}
-              </FieldTitle>
+              </SectionTitle>
             </Touchable>
           ))}
         </View>
@@ -155,7 +154,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.md,
-    padding: theme.spacing.sm,
     marginBottom: theme.spacing.base,
   },
   badge: {
@@ -175,7 +173,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.secondarySurface,
     borderRadius: theme.radius.base,
     padding: theme.spacing.base,
-    marginBottom: theme.spacing.base,
+    marginBottom: 0,
+    paddingBottom: 0,
   },
   noticeContent: { flex: 1 },
   body: {
@@ -203,13 +202,13 @@ const styles = StyleSheet.create({
   activeTab: { backgroundColor: theme.colors.white, borderBottomColor: theme.colors.white },
   tabText: { color: theme.colors.text.secondary },
   activeTabText: { color: theme.colors.purpleBright },
-  testContent: { padding: theme.spacing.md, paddingBottom: theme.spacing.lg },
-  descriptionContainer: { minHeight: 48, justifyContent: "center" },
+  testContent: { paddingHorizontal: theme.spacing.md, paddingTop: 0, paddingBottom: theme.spacing.lg },
+  descriptionContainer: { minHeight: 48, justifyContent: "center", alignItems: "center" },
   description: {
     textAlign: "center",
     textAlignVertical: "center",
     fontSize: theme.typography.size.sm,
-    marginVertical: theme.spacing.sm,
+    marginVertical: 0,
   },
   connection: {
     ...theme.shadows.sm,

@@ -1,4 +1,3 @@
-import NotificationAlert from "../../common/customui/NotificationAlert";
 import React, { useEffect, useRef, useState } from "react";
 import { View, RefreshControl } from "react-native";
 import SurfaceCard from "../../common/customui/SurfaceCard";
@@ -88,13 +87,7 @@ const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
     >
       <SurfaceCard style={AppStyles.card}>
         {error ? (
-          <NotificationAlert
-            type="error"
-            title="Speed test failed"
-            showCloseIcon={false}
-            containerStyle={{ margin: 16 }}
-            message="We couldn't complete your speed test. Check your connection and try again."
-          />
+          <ModemSpeedTestComplete error />
         ) : complete ? (
           <ModemSpeedTestComplete />
         ) : (
