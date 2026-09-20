@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.base,
   },
   badge: {
-    marginLeft: -(theme.iconSize.xl - 18) / 2,
+    marginLeft: -(theme.iconSize.xl - 25) / 2,
     width: theme.iconSize.xl,
     height: theme.iconSize.xl,
     borderRadius: theme.radius.full,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.secondarySurface,
     borderRadius: theme.radius.base,
     padding: theme.spacing.base,
-    marginBottom: 0,
+    marginBottom: theme.spacing.base,
     paddingBottom: 0,
   },
   noticeContent: { flex: 1 },

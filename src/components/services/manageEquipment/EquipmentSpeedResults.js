@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
 import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
+import { HintText } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 
 const SpeedReading = ({ label, value, Icon }) => {
@@ -13,7 +14,7 @@ const SpeedReading = ({ label, value, Icon }) => {
         <View style={styles.icon}><Icon width={24} height={24} viewBox="-1 -1 24 24" accessible={false} /></View>
         <Text style={styles.value} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{whole}<Text style={styles.decimal}>{decimal ? `.${decimal}` : ""}</Text></Text>
       </View>
-      <Text style={styles.label} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{label}<Text style={styles.unit}> Mbps</Text></Text>
+      <Text style={styles.label} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{label}<HintText> Mbps</HintText></Text>
     </View>
   );
 };
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
   valueRow: { maxWidth: "100%", flexDirection: "row", alignItems: "center", gap: theme.spacing.xs },
   value: { flexShrink: 1, includeFontPadding: false, fontFamily: theme.typography.family.regular, fontSize: 28, lineHeight: 36, color: theme.colors.purpleBright },
   decimal: { fontSize: theme.typography.size.lg },
-  label: { marginTop: theme.spacing.sm, fontFamily: theme.typography.family.semiBold, fontSize: theme.typography.size.base, color: theme.colors.text.primary },
+  label: { marginTop: theme.spacing.sm, fontFamily: theme.typography.family.semiBold, fontSize: theme.typography.size.base, color: theme.colors.text.secondary },
   unit: { fontFamily: theme.typography.family.regular, color: theme.colors.text.secondary },
 });
 

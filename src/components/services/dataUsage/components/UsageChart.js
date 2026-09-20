@@ -1056,9 +1056,9 @@ const styles = StyleSheet.create({
   },
   detailValue: {
     fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.text.primaryDark,
+    fontFamily: theme.typography.family.regular,
+    fontWeight: "400",
+    color: theme.colors.text.secondary,
   },
 
   srSummary: {

@@ -1,7 +1,9 @@
 import React from "react";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import { View } from "react-native";
-import ServiceLoader from "../../common/customui/ServiceLoader";
+import SmallLoader from "../../common/customui/SmallLoader";
+import { Body } from "../../common/customui/Typography";
+import { theme } from "../../../styles/theme";
 import RebootModemLayout from "./RebootModemLayout";
 import styles from "./RebootModemStateStyles";
 
@@ -30,7 +32,10 @@ const RebootModemLoading = ({ navigation }) => (
       accessibilityLiveRegion="polite"
       accessibilityState={{ busy: true }}
     >
-      <ServiceLoader ring label="Rebooting" />
+      <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <SmallLoader width={120} height={120} />
+      </View>
+      <Body style={{ color: theme.colors.text.secondary, textAlign: "center", marginTop: theme.spacing.base }}>Rebooting Modem...</Body>
     </View>
   </RebootModemLayout>
 );

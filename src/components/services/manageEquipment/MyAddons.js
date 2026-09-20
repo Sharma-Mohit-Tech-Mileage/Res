@@ -77,9 +77,9 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xl,
   },
   iconBackground: {
-    marginLeft: -(theme.iconSize.xl - 20) / 2,
-    width: 40,
-    height: 40,
+    marginLeft: -(theme.iconSize.xl - 25) / 2,
+    width: theme.iconSize.xl,
+    height: theme.iconSize.xl,
     borderRadius: theme.radius.full,
     backgroundColor: theme.colors.secondarySurface,
     alignItems: "center",

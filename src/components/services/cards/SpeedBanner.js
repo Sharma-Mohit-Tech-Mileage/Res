@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Color } from "../../../../GlobalStyles";
+import { HintText } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
 import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
@@ -16,7 +16,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false }) => (
       } Megabits per second`}
     >
       <Text style={styles.speedHeroValue}>{downloadSpeed ?? "--"}</Text>
-      <Text style={styles.speedHeroUnit}>Mbps</Text>
+      <HintText style={styles.speedHeroUnit}>Mbps</HintText>
       <View style={[styles.speedTagRow, plain && styles.plainTag]}>
         <DownloadcircleIcon
           width={12}
@@ -39,7 +39,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false }) => (
       } Megabits per second`}
     >
       <Text style={styles.speedHeroValue}>{uploadSpeed ?? "--"}</Text>
-      <Text style={styles.speedHeroUnit}>Mbps</Text>
+      <HintText style={styles.speedHeroUnit}>Mbps</HintText>
       <View style={[styles.speedTagRow, plain && styles.plainTag]}>
         <UploadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
         <Text style={styles.speedTagText}>Upload</Text>
@@ -70,16 +70,10 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
-    color: Color.colorblack_100,
+    color: theme.colors.text.secondary,
     lineHeight: 40,
   },
-  speedHeroUnit: {
-    fontSize: theme.typography.size.xs,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.secondary,
-    marginTop: 2,
-    letterSpacing: 0.5,
-  },
+  speedHeroUnit: { marginTop: 2 },
   speedTagRow: {
     flexDirection: "row",
     alignItems: "center",
