@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Modal,
 } from "react-native";
-import colors from "../../res/Colors";
+
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "../common/customui/Touchable";
@@ -79,7 +79,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.splash_bg,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   alertContainer: {
     backgroundColor: "white",
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   message: {
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttons: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.Gray300,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
@@ -124,33 +124,33 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     textAlign:'center',
     fontWeight: "400",
   },
   openBtn: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.colorMidnightblue,
     justifyContent: "center",
     width: "100%",
     marginTop: 20,
   },
   closeBtn: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: Color.Gray300,
     justifyContent: "center",
     width: "100%",
     marginTop: 15,
   },
   openPortaltxt: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   closeAlertTxt: {
-    color: colors.sparklight_purple_blue,
+    color: Color.colorMidnightblue,
     textAlign: "center",
     padding: 8,
     fontSize: 16,

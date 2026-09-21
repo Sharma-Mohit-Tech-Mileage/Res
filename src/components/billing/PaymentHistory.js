@@ -331,7 +331,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   contentContainer: {
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   paymentRow: {
     padding: Padding.p_base,
     borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_300,
+    borderBottomColor: Color.Gray300,
   },
   paymentDetails: {
     flex: 1,

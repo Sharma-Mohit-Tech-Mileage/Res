@@ -356,7 +356,7 @@ const Survey = ({ route }) => {
 const styles = {
   rootContainer: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   buttonsLayout: {
@@ -382,7 +382,7 @@ const styles = {
   },
   buttons1: {
     marginTop: Padding.p_base,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     paddingHorizontal: 0,
     width: 382,
   },

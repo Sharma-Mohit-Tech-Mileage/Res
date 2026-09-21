@@ -20,7 +20,6 @@ import {
   FontFamily,
   FontSize,
 } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
 import Logo from "../../res/images/LogoSmall";
 
 const MaintenancePage = ({
@@ -242,7 +241,7 @@ const MaintenancePage = ({
               FontFamily: FontFamily.RadioCanadaRegular,
               fontSize: 14,
               fontWeight: "400",
-              color: colors.snow_white,
+              color: Color.sparklightWhite,
               alignSelf: "center",
             },
           ]}
@@ -347,7 +346,7 @@ const styles = StyleSheet.create({
     marginBottom: hp("2%"),
   },
   estimatedTimeSection: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     padding: wp("4%"),
     borderRadius: Border.br_5xs,
     marginBottom: hp("2%"),

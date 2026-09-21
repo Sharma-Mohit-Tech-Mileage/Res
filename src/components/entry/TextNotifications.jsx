@@ -375,10 +375,10 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   buttonDisabled: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.Gray300,
   },
   buttonDisabledText: {
-    color: Color.sparklightaddGray,
+    color: Color.sparklightGray1,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
@@ -514,12 +514,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerTabOne: {
-    backgroundColor: Color.sparklightSecondaryPurple + "1A",
+    backgroundColor: Color.colorMidnightblue + "1A",
     width: 100,
     height: 5,
   },
   headerTabTwo: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.colorMidnightblue,
     width: 100,
     height: 5,
     marginLeft: 10,
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   headerTabThree: {
-    backgroundColor: Color.sparklightSecondaryPurple + "1A",
+    backgroundColor: Color.colorMidnightblue + "1A",
     width: 100,
     height: 5,
     marginLeft: 10,

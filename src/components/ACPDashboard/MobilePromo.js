@@ -7,8 +7,10 @@ import {
   Text,
   useWindowDimensions,
 } from "react-native";
+
+import DeviceInfo from 'react-native-device-info';
 import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
-import { card } from "../../styles/utilities";
+
 import FeatureCard from "./FeatureCardMobile";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";

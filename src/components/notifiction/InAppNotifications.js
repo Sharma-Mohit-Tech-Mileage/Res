@@ -443,14 +443,14 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue,
   },
   cancelButton: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
   inAppNotificationsInner: {
     width: "100%",
   },
   inAppNotifications: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
 });
 

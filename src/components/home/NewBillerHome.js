@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
-import colors from "../../res/Colors";
+
 import { Color, Padding } from "../../../GlobalStyles";
 import { fetchACPUserAccountDetails, updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
@@ -35,6 +35,21 @@ import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import AppStyles from "../../styles/AppStyles";
 import { ScreenScroll } from "../common/customui/Screen";
+
+import {
+  getAnalytics,
+  setAnalyticsCollectionEnabled,
+} from '@react-native-firebase/analytics';
+
+const analytics = getAnalytics();
+
+setAnalyticsCollectionEnabled(analytics, true)
+  .then(() => {
+    console.log('Analytics collection enabled');
+  })
+  .catch(error => {
+    console.error('Failed to enable Analytics:', error);
+  });
 
 const NewBillerHome = ({ navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
@@ -283,7 +298,7 @@ const NewBillerHome = ({ navigation }) => {
             appVersion: VersionCheck.getCurrentVersion(),
             timezoneOffsetId: new Date().getTimezoneOffset().toString(),
             platform: Platform.OS,
-            locationHrefId: Config.URL,
+            locationHrefId: "",
             ipAddress: IPAddress || "",
             accountNumber: user?.userInfo.accountNumber,
             email: defaultPaymentDetails.email || "",
@@ -519,7 +534,7 @@ const NewBillerHome = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.splash_bg,
+    backgroundColor: Color.sparklightPrimaryPurple,
     marginBottom: 30,
   },
   headerContainer: {
@@ -534,7 +549,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   mainContentContainer: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: Color.Gray300,
     flex: 2,
     alignItems: "center",
     marginTop: 50,

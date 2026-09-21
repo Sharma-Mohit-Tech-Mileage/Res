@@ -21,11 +21,8 @@ export const FontSize = {
 
 /* Colors */
 export const Color = {
-    gray50: "#f9fafb",
     Black_100: "#101828",
-    colorWhitesmoke_100: "#f8f8f8",
-    colorWhitesmoke_200: "#ebeef1",
-    colorWhitesmoke_300: "#eaecf0",
+    colorWhitesmoke_100: "#F8F8F8",
     sparklightWhite: "#fff",
     colorGainsboro_200: "#d9d9d9",
     colorMidnightblue: "#353091",
@@ -33,23 +30,19 @@ export const Color = {
     colorblack_100: "#000000",
     sparklightGreen: "#2ba948",
     sparklightGray: "#e1e1e1",
-    sparklightDarkGray: "#767676",
-    sparklightaddGray:"#666666",
     colorGray_100: "#101828",
     sparklightGray1: "#4C5458",
     sparklightPrimaryPurple: "#8D3B90",
-    sparklightSecondaryPurple: "#353091",
     success50: "#ecfdf3",
-    colorAquamarine: "#abefc6",
-    success700: "#067647",
-    gray600: "#475467",
     sparkLightRed: "#EF4E3E",
     sparkLightInfo:'#F88700',
     Gray300: '#EAEAEA',
     colorlightRed: '#EF4E3E33',
-    backgroundBlur: "#F8F8F8",
     sparklight_yellow:'#FFCE51',
     sparklight_blue:'#00B8D8',
+
+
+    
 };
 
 export const Padding = {

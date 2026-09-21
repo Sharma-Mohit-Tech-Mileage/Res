@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import colors from "../../../res/Colors";
+
 import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import { card } from "../../../styles/utilities";

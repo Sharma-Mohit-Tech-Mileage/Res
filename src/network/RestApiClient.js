@@ -203,7 +203,7 @@ const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     try {
         const user = await getUser();
         const res = await _axios.post(endpoint, body, {
-            headers: { Authorization: `Bearer ${user.token}` },
+            headers: { Authorization: `Bearer ${user?.token}` },
         });
         handleResponse(res, onSuccess, onError, endpoint);
     } catch (err) {
@@ -215,7 +215,7 @@ const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
     try {
         const user = await getUser();
         const res = await _axios.put(endpoint, body, {
-            headers: { Authorization: `Bearer ${user.token}` },
+            headers: { Authorization: `Bearer ${user?.token}` },
         });
         handleResponse(res, onSuccess, onError, endpoint);
     } catch (err) {

@@ -211,18 +211,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerTabOne: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.colorMidnightblue,
     width: 100,
     height: 5,
   },
   headerTabTwo: {
-    backgroundColor: Color.sparklightSecondaryPurple + "1A",
+    backgroundColor: Color.colorMidnightblue + "1A",
     width: 100,
     height: 5,
     marginLeft: 10,
   },
   headerTabThree: {
-    backgroundColor: Color.sparklightSecondaryPurple + "1A",
+    backgroundColor: Color.colorMidnightblue + "1A",
     width: 100,
     height: 5,
     marginLeft: 10,

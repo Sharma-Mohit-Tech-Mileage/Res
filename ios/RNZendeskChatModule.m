@@ -121,6 +121,11 @@ RCT_EXPORT_METHOD(logoutZendesk:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
   });
 }
 
+
+RCT_EXPORT_METHOD(clearChatSession)
+{
+    [[Zendesk instance].messaging clearConversationFields];
+}
   
 RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
                   resolver:(RCTPromiseResolveBlock)resolve

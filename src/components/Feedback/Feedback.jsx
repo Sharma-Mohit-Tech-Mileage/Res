@@ -5,13 +5,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
 import {
+  ScrollView,
   StyleSheet,
   View,
   Text,
+  KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
-import Touchable from "../common/customui/Touchable";
+
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -189,12 +190,15 @@ const Feedback = () => {
   }, [route.params?.updateFailed, navigation]);
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
       <ProfileSettingsHeader
         title="Feedback"
         onPressBack={() => navigation.goBack()}
       />
-      <KeyboardAwareScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
         <Animated.View
           entering={FadeInUp.delay(100).springify()}
           style={styles.content}
@@ -498,8 +502,8 @@ const Feedback = () => {
             
           </Animated.View>
         </Animated.View>
-      </KeyboardAwareScrollView>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -523,12 +527,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 28,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.gray600,
+    color: Color.sparklightGray1,
   },
   requiredFieldsText: {
     fontSize: 14,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.gray600,
+    color: Color.sparklightGray1,
     marginTop: Padding.p_base,
     textAlign: "left",
   },
@@ -548,7 +552,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "400",
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     fontSize: FontSize.size_xs,
     marginTop: Padding.p_5xs,
   },

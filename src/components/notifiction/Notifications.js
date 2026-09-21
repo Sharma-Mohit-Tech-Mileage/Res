@@ -107,7 +107,7 @@ const Notifications = () => {
         isComingSoon: false,
         settings: TextNotifSettings,
         infoMessage: phoneNumber
-          ? `Text alert are sent to ${phoneNumber}`
+          ? `Text alerts are sent to ${phoneNumber}`
           : "You have not enabled text notifications.",
         isLoading: textNotificationLoading,
       },
@@ -255,7 +255,7 @@ const Notifications = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
   content: { flex: 1 },
 

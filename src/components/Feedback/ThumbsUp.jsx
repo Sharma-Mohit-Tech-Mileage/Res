@@ -13,6 +13,7 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalStyles";
 import ThumbsupIcon from "../../../assets/svgs/Thumbsup";
+import PrimaryButton from "../common/customui/PrimaryButton";
 import Touchable from "../common/customui/Touchable";
 import { ScreenScroll } from "../common/customui/Screen";
 
@@ -85,7 +86,7 @@ const ThumbsUp = () => {
             </Animated.View>
           </Animated.View>
 
-          <AnimatedTouchable
+          {/* <AnimatedTouchable
             entering={FadeInDown.delay(700).springify()}
             style={[styles.button, animatedButtonStyle]}
             onPress={handlePress}
@@ -93,8 +94,24 @@ const ThumbsUp = () => {
             onPressOut={handlePressOut}
             accessibilityLabel="Done button. Return to Account screen"
           >
-            <Text style={styles.buttonText}>Done</Text>
-          </AnimatedTouchable>
+           
+            <PrimaryButton />
+          </AnimatedTouchable> */}
+          <View style={{ margin: 24 }}>
+          <Animated.View
+            entering={FadeInDown.delay(700).springify()}
+            style={{...animatedButtonStyle}}
+          >
+            <PrimaryButton
+              title="Done"
+              buttonType="submit"
+              onPress={handlePress}
+              onPressIn={handlePressIn}
+              onPressOut={handlePressOut}
+              accessibilityLabel="Done button. Return to Account screen"
+            />
+          </Animated.View>
+          </View>
         </View>
       </ScreenScroll>
     </View>
@@ -157,7 +174,7 @@ const styles = StyleSheet.create({
   },
   yourFeedbackMeans: {
     marginTop: 24,
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
     lineHeight: 28,

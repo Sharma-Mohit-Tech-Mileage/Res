@@ -567,7 +567,7 @@ const AddNotificationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     paddingBottom: 100,
   },
   frameContainer: {
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
   toggleDescription: {
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_sm,
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     marginTop: 4,
   },
   buttonContainer: {
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#3F51B5",
   },
   cancelButton: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
   spaceBottom: {
     marginBottom: 16,

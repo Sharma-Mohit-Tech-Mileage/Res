@@ -1,8 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import colors from "../../../res/Colors";
-import { wp } from "../../../utils/responsive";
-import { FontFamily, Padding } from "../../../../GlobalStyles";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { FontFamily, Padding,Color } from "../../../../GlobalStyles";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import { card } from "../../../styles/utilities";
 import Config from "react-native-config";
@@ -33,7 +32,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             <Text
               style={[
                 styles.dueDate,
-                { fontWeight: "400", color: colors.dark_grey },
+                { fontWeight: "400", color: Color.sparklightGray1 },
               ]}
             >
               {"on: "}
@@ -89,7 +88,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
               styles.label,
               {
                 fontWeight: "400",
-                color: colors.Black_100,
+                color: Color.colorblack_100_100,
                 fontSize: 18,
                 paddingBottom: 5,
                 alignSelf: "center",
@@ -142,8 +141,8 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
                 {
                   color:
                     dueDate == "Immediately"
-                      ? colors.sparklight_red
-                      : colors.darkest_grey,
+                      ? Color.sparkLightRed
+                      : Color. colorGray_200,
                   fontWeight: dueDate == "Immediately" ? "400" : "700",
                 },
               ]}
@@ -164,8 +163,8 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
                     fontWeight: "400",
                     color:
                       dueDate == "Immediately"
-                        ? colors.sparklight_red
-                        : colors.darkest_grey,
+                        ? Color.sparkLightRed
+                        : Color. colorGray_200,
                   },
                 ]}
               >
@@ -223,12 +222,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingBottom: 5,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: colors.sp_black,
+    color: Color.Black_100,
   },
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     alignSelf: "center",
     paddingBottom: 5,
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -237,11 +236,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "400",
-    color: colors.gray600,
+    color: Color.sparklightGray1,
   },
   
   paymentButtonText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontSize: 16,
     fontWeight: "600",
     alignSelf: "center",

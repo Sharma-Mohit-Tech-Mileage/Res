@@ -222,6 +222,10 @@ const TextNotifications = ({ navigation }) => {
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     formatedData[name] = value;
+    if(value) {
+       setShowErrorAlert(false);
+
+    }
   };
 
   useEffect(() => {
@@ -281,6 +285,7 @@ const TextNotifications = ({ navigation }) => {
         formatedData.outageOptOut ||
         formatedData.optOut
       ) {
+        setShowErrorAlert(false);
         postRequestTextNotification();
       } else {
         setErrorText(
@@ -338,7 +343,7 @@ const TextNotifications = ({ navigation }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
+    <View style={{ flex: 1, backgroundColor: Color.Gray300 }}>
       <ProfileSettingsHeader
         title={
           formatedData?.phoneNumber
@@ -734,7 +739,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   receiveTextNotifications1: {
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     lineHeight: 22,
     fontWeight: "400",
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -744,7 +749,7 @@ const styles = StyleSheet.create({
   },
   byOptingInContainer: {
     fontSize: FontSize.RadioCanadaSemiBold_size,
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "left",
     alignSelf: "stretch",

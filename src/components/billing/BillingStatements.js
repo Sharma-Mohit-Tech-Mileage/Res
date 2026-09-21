@@ -265,7 +265,7 @@ const BillingStatementsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   account: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   contentContainer: {
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: Padding.p_base,
     borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_300,
+    borderBottomColor: Color.Gray300,
   },
   statementDate: {
     fontSize: FontSize.size_base,

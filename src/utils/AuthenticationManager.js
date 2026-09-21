@@ -3,37 +3,72 @@ import { Linking, Alert, Platform } from "react-native";
 import { logDebug, logWarn, logError } from "./logger";
 
 class AuthenticationManager {
-  static AUTH_TIMEOUT = 45000;
+  static AUTH_TIMEOUT = 120000;
   static REFRESH_TIMEOUT = 30000;
-
-  static async withTimeout(promise, ms, code) {
-    let timer;
-    try {
-      return await Promise.race([
-        promise,
-        new Promise((_, reject) => {
-          timer = setTimeout(() => reject(new Error(code)), ms);
-        }),
-      ]);
-    } finally {
-      clearTimeout(timer);
-    }
-  }
+  static authorizationInFlight = null;
 
   static async authorizeWithTimeout(config) {
+    if (this.authorizationInFlight) {
+      logWarn("AuthenticationManager", "Authorization already in progress");
+      return {
+        success: false,
+        error: "Login is already in progress.",
+        code: "AUTH_IN_PROGRESS",
+        userAction: "RETRY",
+      };
+    }
+
     try {
       const canOpenURL = await this.checkBrowserAvailability();
       if (!canOpenURL) {
         throw new Error("BROWSER_UNAVAILABLE");
       }
 
-      // Force a fresh login on Android so the shared Custom Tab session (same SSO realm as the other app) can't bleed across apps and error out the second login.
       const authConfig =
         Platform.OS === "android"
-          ? { ...config, additionalParameters: { ...(config.additionalParameters || {}), prompt: "login" } }
+          ? {
+              ...config,
+              additionalParameters: {
+                ...(config.additionalParameters || {}),
+                prompt: "login",
+              },
+            }
           : config;
-      logDebug("AuthenticationManager", "Starting auth flow", { platform: Platform.OS });
-      const result = await this.withTimeout(authorize(authConfig), this.AUTH_TIMEOUT, "AUTH_TIMEOUT");
+      logDebug("AuthenticationManager", "Starting auth flow", {
+        platform: Platform.OS,
+      });
+      const authPromise = authorize(authConfig);
+      this.authorizationInFlight = authPromise;
+      authPromise
+        .finally(() => {
+          if (this.authorizationInFlight === authPromise) {
+            this.authorizationInFlight = null;
+          }
+        })
+        .catch(() => {});
+
+      // AppAuth owns the native SFAuthenticationViewController. Do not reject
+      // while it is still presented or React Native may present over it.
+      let authTimedOut = false;
+      const timeoutId = setTimeout(() => {
+        authTimedOut = true;
+        logWarn(
+          "AuthenticationManager",
+          "Authorization exceeded timeout; waiting for native completion",
+        );
+      }, this.AUTH_TIMEOUT);
+
+      let result;
+      try {
+        result = await authPromise;
+      } catch (error) {
+        if (authTimedOut) {
+          throw new Error("AUTH_TIMEOUT");
+        }
+        throw error;
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       logDebug("AuthenticationManager", "Authorization completed successfully");
       return {
@@ -47,13 +82,17 @@ class AuthenticationManager {
   }
 
   static async refreshWithTimeout(config, refreshToken) {
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(
+        () => reject(new Error("REFRESH_TIMEOUT")),
+        this.REFRESH_TIMEOUT
+      )
+    );
+
     try {
       logDebug("AuthenticationManager", "Starting token refresh");
-      const result = await this.withTimeout(
-        refresh(config, { refreshToken }),
-        this.REFRESH_TIMEOUT,
-        "REFRESH_TIMEOUT"
-      );
+      const refreshPromise = refresh(config, { refreshToken });
+      const result = await Promise.race([refreshPromise, timeoutPromise]);
 
       logDebug("AuthenticationManager", "Token refresh completed successfully");
       return {
@@ -101,6 +140,12 @@ class AuthenticationManager {
     const errorDomain = error?.domain || "";
     const underlyingErrorCode = error?.userInfo?.NSUnderlyingError?.code;
     const underlyingDomain = error?.userInfo?.NSUnderlyingError?.domain || "";
+    // Android AppAuth exposes the underlying connection failure separately
+    // from its generic authorization/token-exchange message.
+    const timeoutDetails = [errorCode, errorMessage, error?.userInfo?.nativeError]
+      .filter((value) => typeof value === "string")
+      .join(" ")
+      .toLowerCase();
 
     const isCancelled =
       errorCode === "user_cancelled" ||
@@ -125,16 +170,20 @@ class AuthenticationManager {
       };
     }
 
-    if (errorMessage.includes("auth_timeout")) {
+    // Parse different error types
+    if (
+      timeoutDetails.includes("timeout") ||
+      timeoutDetails.includes("timed out")
+    ) {
       return {
         success: false,
-        error: "Login timed out. Please try again.",
+        error: "The sign-in process timed out. Check your connection and try again.",
         code: "AUTH_TIMEOUT",
         userAction: "RETRY",
       };
     }
 
-    if (errorMessage.includes("browser_unavailable")) {
+    if (errorMessage.includes("BROWSER_UNAVAILABLE")) {
       return {
         success: false,
         error:
@@ -144,7 +193,10 @@ class AuthenticationManager {
       };
     }
 
-    if (errorMessage.includes("network")) {
+    if (
+      errorMessage.includes("Network request failed") ||
+      errorMessage.includes("network")
+    ) {
       return {
         success: false,
         error: "Network error. Please check your internet connection.",

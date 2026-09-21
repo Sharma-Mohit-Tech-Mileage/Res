@@ -59,6 +59,7 @@ export const ENDPOINTS = {
     USERS_REMOVE: 'api/users/remove/:accountNumber/:userName',
     CHANGE_PASSWORD: 'api/profile/password/:accountNumber',
     PROFILE_INFO_UPDATE: 'api/profile',
+    UPDATE_USERNAME:'/api/mobile/UpdateUserSpecChar',
 
     // Email / Paperless (notification service)
     PAPERLESS_GET_ALL_EMAILS: 'api/Paperless/GetAllEmails?account=:accountNumber',

@@ -26,7 +26,7 @@ import {
 import { card } from "../../styles/utilities";
 import SecondaryButton from "../common/customui/SecondaryButton";
 import ConfimationPopup from "./ConfirmationPopup";
-import colors from "../../res/Colors";
+
 import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
@@ -88,7 +88,7 @@ const CancellationSummary = ({ navigation, route }) => {
   const [devices, setDevices] = useState([]);
   const myTheme = {
     arrowColor: Color.sparklightPrimaryPurple,
-    textSectionTitleColor: Color.sparklightDarkGray,
+    textSectionTitleColor: Color.sparklightGray1,
   };
 
   const {
@@ -125,7 +125,7 @@ const CancellationSummary = ({ navigation, route }) => {
       customStyles: {
         container: {
           backgroundColor: Color.sparklightGray,
-          borderColor: Color.sparklightDarkGray,
+          borderColor: Color.sparklightGray1,
           borderWidth: 1,
           elevation: 2,
         },
@@ -140,7 +140,7 @@ const CancellationSummary = ({ navigation, route }) => {
       customStyles: {
         container: {
           backgroundColor: Color.sparklightGray,
-          borderColor: Color.sparklightDarkGray,
+          borderColor: Color.sparklightGray1,
           borderWidth: 1,
           elevation: 2,
         },
@@ -155,7 +155,7 @@ const CancellationSummary = ({ navigation, route }) => {
       customStyles: {
         container: {
           backgroundColor: Color.sparklightGray,
-          borderColor: Color.sparklightDarkGray,
+          borderColor: Color.sparklightGray1,
           borderWidth: 1,
           elevation: 2,
         },
@@ -506,7 +506,7 @@ const CancellationSummary = ({ navigation, route }) => {
         customStyles: {
           container: {
             backgroundColor: Color.sparklightGray,
-            borderColor: Color.sparklightDarkGray,
+            borderColor: Color.sparklightGray1,
             borderWidth: 1,
             elevation: 2,
           },
@@ -524,7 +524,7 @@ const CancellationSummary = ({ navigation, route }) => {
         customStyles: {
           container: {
             backgroundColor: Color.sparklightPrimaryPurple,
-            borderColor: Color.sparklightDarkGray,
+            borderColor: Color.sparklightGray1,
             borderWidth: 1,
             elevation: 0,
           },
@@ -618,7 +618,7 @@ const CancellationSummary = ({ navigation, route }) => {
               <Text
                 style={[
                   styles.valueTxt1,
-                  { color: colors.sparklight_bright_purple },
+                  { color: Color.sparklightPrimaryPurple },
                 ]}
               >
                 EQUIPMENT RETURN POLICY
@@ -629,7 +629,7 @@ const CancellationSummary = ({ navigation, route }) => {
                 }}
               >
                 {showTerms ? (
-                  <UpArrow color={colors.sparklight_bright_purple} />
+                  <UpArrow color={Color.sparklightPrimaryPurple} />
                 ) : (
                   <DownArrow />
                 )}
@@ -809,7 +809,7 @@ const CancellationSummary = ({ navigation, route }) => {
                     true: Color.sparklightPrimaryPurple,
                     false:
                       Platform.OS === "ios"
-                        ? Color.colorWhitesmoke_300
+                        ? Color.Gray300
                         : "#D0D5DD",
                   }}
                   accessible={false}
@@ -948,7 +948,7 @@ const CancellationSummary = ({ navigation, route }) => {
 const styles = {
   rootContainer: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   buttonsLayout: {
@@ -974,7 +974,7 @@ const styles = {
   },
   buttons1: {
     marginTop: Padding.p_base,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     paddingHorizontal: 0,
     width: 382,
   },

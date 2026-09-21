@@ -17,8 +17,6 @@ import { GetApiRequest} from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
-import colors from "../../res/Colors";
-import { requiredField } from "../../styles/utilities";
 import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
 import AppStyles from '../../styles/AppStyles'
@@ -508,13 +506,13 @@ const styles = StyleSheet.create({
   },
   passwordSecurityEdit: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   }, BtnContainer: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.colorMidnightblue,
     justifyContent: "center",
   },
   Btn: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     padding: 16,

@@ -1,5 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+} from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
@@ -22,17 +27,16 @@ import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
-import Icon from "../common/Icon";
-import colors from "../../res/Colors";
-import { card } from "../../styles/utilities";
-import { hp as heightPercentageToDP } from "../../utils/responsive";
+import {
+  widthPercentageToDP,
+  heightPercentageToDP,
+} from "react-native-responsive-screen";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import AppStyles from "../../styles/AppStyles";
 import { SectionTitle,Title,MenuText } from "../common/customui/Typography";
-import { ScreenScroll } from "../common/customui/Screen";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -169,7 +173,7 @@ const BillingScreen = ({ navigation }) => {
           Billing Services</Title>
         </View>
 
-        <ScreenScroll
+        <ScrollView
           showsVerticalScrollIndicator={false}
           
         >
@@ -322,7 +326,7 @@ const BillingScreen = ({ navigation }) => {
               </>
             )}
           </View>
-        </ScreenScroll>
+        </ScrollView>
       </View>
     </View>
   );
@@ -351,7 +355,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   rightActionable: {
-    borderColor: Color.colorWhitesmoke_200,
+    borderColor: Color.Gray300,
     borderWidth: 4,
     width: 72,
     height: 72,
@@ -379,7 +383,7 @@ const styles = StyleSheet.create({
   },
   account: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   card: {

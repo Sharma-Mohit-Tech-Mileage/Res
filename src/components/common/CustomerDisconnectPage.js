@@ -7,8 +7,8 @@ import {
   Modal,
 } from "react-native";
 import Touchable from "./customui/Touchable";
-import colors from "../../res/Colors";
-import { FontFamily } from "../../../GlobalStyles";
+
+import { Color, FontFamily } from "../../../GlobalStyles";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
 
 import logo from "../../../assets/sparklightlogo-01.png";
@@ -48,7 +48,7 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
             </View>
             <Text
               style={{
-                color: colors.darkest_grey,
+                color: Color. colorGray_200,
                 textAlign: "center",
                 marginLeft: 5,
                 alignSelf: "center",
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: "85%",
   },
   message: {
-    color: colors.darkest_grey,
+    color: Color.colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
@@ -91,21 +91,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   alertTitle: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     fontWeight: "600",
     marginTop: 20,
   },
   closeBtn: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: Color.Gray300,
     justifyContent: "center",
     width: "100%",
     borderRadius: 25,
     marginTop: 15,
   },
   closeAlertTxt: {
-    color: colors.sparklight_bright_purple,
+    color: Color.sparklightPrimaryPurple,
     textAlign: "center",
     padding: 8,
     fontSize: 16,

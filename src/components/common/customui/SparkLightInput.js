@@ -117,7 +117,7 @@ const SparkLightInput = React.forwardRef(({
     revealValue && { paddingRight: 52 },
     !editable && styles.disabledInput,
     error && { borderColor: "red" },
-    !isFocused && !error && { borderColor: Color.sparklightDarkGray },
+    !isFocused && !error && { borderColor: Color.sparklightGray1 },
   ];
 
   return (
@@ -177,7 +177,7 @@ const SparkLightInput = React.forwardRef(({
             borderColor:
               isFocused && error != undefined
                 ? "red"
-                : Color.sparklightDarkGray,
+                : Color.sparklightGray1,
           },
         ]}
       >

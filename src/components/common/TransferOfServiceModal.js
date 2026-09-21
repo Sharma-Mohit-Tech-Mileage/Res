@@ -10,9 +10,8 @@ import {
 import Touchable from "./customui/Touchable";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CopyIcon from "../../../assets/svgs/CopyIcon";
-import colors from "../../res/Colors";
-import { FontFamily } from "../../../GlobalStyles";
-import ModalCard from "./customui/ModalCard";
+
+import { FontFamily,Color } from "../../../GlobalStyles";
 
 const groupDigits = (value) =>
   String(value || "")
@@ -39,7 +38,7 @@ const TransferOfServiceModal = ({
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
-        <ModalCard style={styles.card} accessibilityViewIsModal={true}>
+        <View style={styles.card} accessibilityViewIsModal={true}>
           <View style={styles.titleRow}>
             <AlertIcon color="#DD6D02" />
             <Text
@@ -119,7 +118,7 @@ const TransferOfServiceModal = ({
               </Touchable>
             </>
           )}
-        </ModalCard>
+        </View>
       </View>
     </Modal>
   );
@@ -134,7 +133,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   card: {
-    backgroundColor: colors.snow_white,
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 24,
     paddingVertical: 32,
     paddingHorizontal: 32,
@@ -146,14 +145,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 20,
     fontWeight: "700",
     marginLeft: 8,
   },
   body: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 18,
     lineHeight: 22,
@@ -171,7 +170,7 @@ const styles = StyleSheet.create({
     marginTop: 36,
   },
   accountNumber: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaMedium,
     fontSize: 16,
     fontWeight: "500",
@@ -212,26 +211,26 @@ const styles = StyleSheet.create({
     borderTopColor: "#34744B",
   },
   copiedTipText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 13,
   },
   primaryBtn: {
-    backgroundColor: colors.sparklight_bright_purple,
+    backgroundColor: Color.sparklightPrimaryPurple,
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 44,
   },
   primaryTxt: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaBold,
     fontSize: 15,
     fontWeight: "700",
     paddingVertical: 14,
   },
   notRegistered: {
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 16,
     textAlign: "center",
@@ -245,7 +244,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   secondaryTxt: {
-    color: colors.sparklight_bright_purple,
+    color: Color.sparklightPrimaryPurple,
     fontFamily: FontFamily.RadioCanadaBold,
     fontSize: 15,
     fontWeight: "700",
