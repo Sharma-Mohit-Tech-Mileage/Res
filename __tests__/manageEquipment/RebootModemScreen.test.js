@@ -8,7 +8,7 @@ jest.mock('../../src/components/services/manageEquipment/RebootModemLayout', () 
     React.createElement('Card', null, children,
       React.createElement('Actions', null, actions)));
 });
-jest.mock('../../src/components/common/customui/ServiceLoader', () => 'Loader');
+jest.mock('../../src/components/common/customui/SmallLoader', () => 'Loader');
 jest.mock('../../src/components/services/manageEquipment/RebootModemLoading', () => 'Loading');
 jest.mock('../../src/components/services/manageEquipment/RebootModemSuccess', () => 'Success');
 jest.mock('../../src/components/services/manageEquipment/RebootModemFailure', () => 'Failure');
@@ -67,6 +67,8 @@ it('keeps both actions visible and disabled inside the card while rebooting', ()
   actions.forEach(button => expect(button.props.disabled).toBe(true));
   expect(actions[1].props.buttonType).toBe('outline');
   expect(screen.root.findByType('Card').findAllByType('Button')).toHaveLength(2);
-  expect(screen.root.findByType('Loader').props.label).toBe('Rebooting');
+  expect(screen.root.findByType('Loader')).toBeTruthy();
+  expect(screen.root.findByType('Body').props.children).toBe('Rebooting Modem...');
+  expect(screen.root.findAll(node => node.props.accessibilityLiveRegion === 'polite' && node.props.accessibilityState?.busy === true).length).toBeGreaterThan(0);
   act(() => screen.unmount());
 });

@@ -30,9 +30,14 @@ jest.mock("../../src/components/common/customui/SurfaceCard", () => "Card");
 jest.mock("../../src/components/common/customui/PrimaryButton", () => "Button");
 jest.mock("../../src/components/common/customui/Typography", () => ({
   Body: "Body",
+  HintText: "Hint",
   FieldTitle: "Title",
   FieldContent: "Content",
 }));
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({top: 0, right: 0, bottom: 0, left: 0}),
+}));
+jest.mock("../../src/components/common/customui/CancelButton", () => "CancelButton");
 jest.mock("react-native-webview", () => ({WebView: "WebView"}));
 jest.mock("../../src/components/common/ProfileSettingsHeader", () => "Header");
 jest.mock("../../src/components/common/customui/NotificationAlert", () => "Notification");
@@ -46,7 +51,7 @@ it("completes modem preview and allows rerun", () => {
   expect(screen.root.findByType("Progress")).toBeTruthy();
   act(() => jest.advanceTimersByTime(3000));
   expect(screen.root.findByType("Complete")).toBeTruthy();
-  act(() => screen.root.findByType("Layout").props.action.props.onPress());
+  act(() => { screen.root.findByType("Layout").props.action.props.onPress(); });
   expect(screen.root.findByType("Progress")).toBeTruthy();
   act(() => screen.unmount());
   expect(jest.getTimerCount()).toBe(0);
@@ -60,7 +65,7 @@ it("opens the requested WiFi test in a web view and retries a load failure", () 
   expect(screen.root.findByType("Notification").props.type).toBe("error");
   act(() => screen.root.findAllByType("Button").find(button => button.props.title === "Retry").props.onPress());
   expect(screen.root.findByType("WebView")).toBeTruthy();
-  act(() => screen.root.findAllByType("Button").find(button => button.props.title === "Cancel").props.onPress());
+  act(() => screen.root.findByType("CancelButton").props.onPress());
   expect(navigation.goBack).toHaveBeenCalledTimes(1);
   act(() => screen.unmount());
 });
@@ -68,10 +73,10 @@ it("shows a modem failure and allows a successful retry", async () => {
   const onRunSpeedTest = jest.fn().mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce({download: 500, upload: 50});
   let screen;
   await act(async () => { screen = renderer.create(<ModemScreen navigation={{}} onRunSpeedTest={onRunSpeedTest} />); });
-  expect(screen.root.findByType("Notification").props.type).toBe("error");
+  expect(screen.root.findByType("Complete").props.error).toBe(true);
   expect(screen.root.findByType("Layout").props.action.props.disabled).toBe(false);
   await act(async () => { await screen.root.findByType("Layout").props.action.props.onPress(); });
-  expect(screen.root.findByType("Complete")).toBeTruthy();
+  expect(screen.root.findByType("Complete").props.error).toBeUndefined();
   expect(onRunSpeedTest).toHaveBeenCalledTimes(2);
   act(() => screen.unmount());
 });
@@ -81,7 +86,7 @@ it("prevents overlapping modem requests during pull to refresh", async () => {
   let screen;
   act(() => { screen = renderer.create(<ModemScreen navigation={{}} onRunSpeedTest={onRunSpeedTest} />); });
   expect(screen.root.findByType("Layout").props.action.props.disabled).toBe(true);
-  act(() => screen.root.findByType("Layout").props.refreshControl.props.onRefresh());
+  act(() => { screen.root.findByType("Layout").props.refreshControl.props.onRefresh(); });
   expect(onRunSpeedTest).toHaveBeenCalledTimes(1);
   await act(async () => resolve({download: 500, upload: 50}));
   act(() => screen.unmount());
