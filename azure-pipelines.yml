@@ -358,8 +358,17 @@ stages:
         steps:
           - checkout: self
 
+          # coverage/ is generated, not committed, so pull the report this build published.
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Coverage Reports'
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'coverage-reports'
+              downloadPath: '$(System.DefaultWorkingDirectory)'
+
           - script: |
-              node -e "const fs=require('fs'); const p='coverage/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
+              node -e "const fs=require('fs'); const p='coverage-reports/coverage-summary.json'; if(!fs.existsSync(p)){console.error('coverage-summary.json not found'); process.exit(1);} const data=JSON.parse(fs.readFileSync(p,'utf8')); const t=data.total||{}; const keys=['lines','statements','functions','branches']; const fullRaw=String('${{ parameters.enforceFullCoverage }}'); const full=fullRaw.toLowerCase()==='true'; const minRaw=String('${{ parameters.minCoveragePercent }}'); const min=Number(minRaw); const target=full?100:(Number.isFinite(min)?min:0); const coverageByKey=Object.fromEntries(keys.map((k)=>[k,{total:Number((t[k]||{}).total||0),pct:Number((t[k]||{}).pct||0)}])); const hasInstrumentedCoverage=keys.some((k)=>coverageByKey[k].total>0); const hasNonZeroCoverage=keys.some((k)=>coverageByKey[k].pct>0); if(!hasInstrumentedCoverage||!hasNonZeroCoverage){console.warn('No usable JS coverage data found (totals or percentages are all zero). Skipping coverage gate.'); process.exit(0);} let failed=false; console.log('Coverage mode: '+(full?'strict':'threshold')); console.log('Coverage target: '+target+'%'); for(const k of keys){const pct=coverageByKey[k].pct; console.log(k+': '+pct+'%'); if(pct<target){failed=true;}} if(failed){console.error('Coverage gate failed: required '+target+'% for lines/statements/functions/branches.'); process.exit(1);} console.log('Coverage gate passed.');"
             displayName: 'Evaluate Coverage Summary'
             workingDirectory: '.'
 
@@ -1097,7 +1106,7 @@ stages:
               echo "Archiving with Xcode..."
               if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
                   -workspace "ios/My Sparklight.xcworkspace" \
-                  -scheme "SparklightDemo" \
+                  -scheme "Sparklight UAT" \
                   -configuration Release \
                   -sdk iphoneos \
                   -archivePath "$ARCHIVE_PATH" \
