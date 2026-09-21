@@ -1,15 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  Easing,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, Animated, Easing } from "react-native";;
 import Svg, { Circle } from 'react-native-svg';
 
-const { width } = Dimensions.get('window');
 const SIZE = 130;
 const STROKE_WIDTH = 18;
 const RADIUS = (SIZE - STROKE_WIDTH) / 2;

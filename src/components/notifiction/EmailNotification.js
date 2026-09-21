@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Animated, Platform, AccessibilityInfo, findNodeHandle} from "react-native";
+import { StyleSheet, Text, View, Animated, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { A11Y } from "../../styles/theme";
@@ -24,6 +24,7 @@ import { A11y } from "react-native-a11y-order";
 import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import AppStyles from "../../styles/AppStyles";
 import Alerttriangle from "../../res/svgIcons/AlertIcon";
+import { ScreenScroll } from "../common/customui/Screen";
 import {
   HintText,
   IndicatorText,
@@ -302,7 +303,7 @@ const AddNotificationScreen = () => {
           accessibilityLiveRegion="polite"
         />
       )}
-      <ScrollView ref={scrollViewRef}>
+      <ScreenScroll ref={scrollViewRef}>
       
         <View style={[AppStyles.card,{margin: Padding.p_base}]}>
           <View style={{ paddingVertical: 16 }}>
@@ -559,7 +560,7 @@ const AddNotificationScreen = () => {
             disabled={isSubmitting}
           />
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };

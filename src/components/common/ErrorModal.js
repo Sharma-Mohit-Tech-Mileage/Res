@@ -12,6 +12,8 @@ import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "./customui/Touchable";
 import { A11Y } from "../../styles/theme";
+import ModalCard from "./customui/ModalCard";
+import ModalOverlay from "./customui/ModalOverlay";
 
 export const ErrorType = {
   NETWORK_ERROR: "NETWORK_ERROR",
@@ -178,8 +180,8 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
       animationType="fade"
       onRequestClose={() => onAction("CANCEL")}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
+      <ModalOverlay>
+        <ModalCard style={styles.container}>
           <View style={styles.header}>
             <AlertIcon
               color={
@@ -222,19 +224,13 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
               </Touchable>
             ))}
           </View>
-        </View>
-      </View>
+        </ModalCard>
+      </ModalOverlay>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
   container: {
     backgroundColor: "white",
     padding: 20,

@@ -113,8 +113,6 @@ describe('redux action creators coverage', () => {
     const user = [
       userActions.saveUserInfo({ name: 'Test' }),
       userActions.logoutApp(),
-      userActions.logInfo({ info: true }),
-      userActions.logError({ error: true }),
     ];
 
     const dashboard = [

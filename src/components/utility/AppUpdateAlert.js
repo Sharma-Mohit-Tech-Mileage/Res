@@ -11,6 +11,8 @@ import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import { Color, Padding, FontFamily, Border } from "../../../GlobalStyles";
 import Touchable from "../common/customui/Touchable";
+import ModalCard from "../common/customui/ModalCard";
+import ModalOverlay from "../common/customui/ModalOverlay";
 
 const AppUpdateAlert = ({ visible, onClose }) => {
   return (
@@ -20,8 +22,8 @@ const AppUpdateAlert = ({ visible, onClose }) => {
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.alertContainer}>
+      <ModalOverlay>
+        <ModalCard style={styles.alertContainer}>
           <View
             style={{ flexDirection: "row", justifyContent: "center" }}
           >
@@ -56,8 +58,8 @@ const AppUpdateAlert = ({ visible, onClose }) => {
           >
             <Text style={styles.closeAlertTxt}>Update Now</Text>
           </Touchable>
-        </View>
-      </View>
+        </ModalCard>
+      </ModalOverlay>
     </Modal>
   );
 };
@@ -65,12 +67,6 @@ const AppUpdateAlert = ({ visible, onClose }) => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   alertContainer: {
     backgroundColor: "white",

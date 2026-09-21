@@ -8,10 +8,7 @@ import {
   Keyboard,
 } from "react-native";
 import { Padding, Color, FontSize, FontFamily, Border } from "../../../../GlobalStyles";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { wp, hp } from "../../../utils/responsive";
 import SearchIcon from "../../../../assets/svgs/SearchIcon";
 import Rightactionable from "../../../res/svgIcons/RightArrow";
 import File05 from "../../../../assets/svgs/File05";

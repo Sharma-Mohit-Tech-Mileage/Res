@@ -1,10 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-} from "react-native";
+import { View, Text, Image, Keyboard, Platform } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -39,6 +34,7 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { getPrimaryEmail } from "../utility/constant";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -494,10 +490,6 @@ const CancellationSummary = ({ navigation, route }) => {
     );
   };
 
-  onCancel = () => {
-    navigation.navigate("account", { screen: "Account" });
-  };
-
   const onDaySelected = (selectedDate) => {
     // Deselect all dates first
     const updatedMarkedDates = {};
@@ -555,7 +547,7 @@ const CancellationSummary = ({ navigation, route }) => {
         end={{ x: 1.3, y: 0}}
         colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
       />
-      <ScrollView style={{ flex: 1, marginBottom: 100 }} ref={MyRef}>
+      <ScreenScroll style={{ flex: 1, marginBottom: 100 }} ref={MyRef}>
         <View style={[card.elevated, { margin: 16 }]}>
           {isSuccessMessageVisible && renderSuccessMessage()}
           {renderErrorMessage()}
@@ -941,7 +933,7 @@ const CancellationSummary = ({ navigation, route }) => {
             />
           )}
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -962,7 +954,6 @@ const styles = {
     height: 56,
   },
   makeTypo: {
-    width: 282,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     fontSize: FontSize.size_base,
@@ -970,13 +961,12 @@ const styles = {
   },
   makePayment: {
     color: Color.sparklightWhite,
-    width: 282,
   },
   buttons1: {
     marginTop: Padding.p_base,
     backgroundColor: Color.colorWhitesmoke_200,
     paddingHorizontal: 0,
-    width: 382,
+    width: "100%",
   },
   buttonsParent: {
     marginTop: Padding.p_base,

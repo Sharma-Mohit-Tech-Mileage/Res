@@ -4,9 +4,10 @@ import moment from "moment";
 import { digitsToWords } from "../../../utils/a11y";
 import RemoteConfigManager from "../../../config/Remoteconfigmanager";
 import { calculateFee } from "../../../network/apis/account/paymentMethods.service";
+import { LAYOUT } from "../../../utils/responsive";
 import { trackApiError, errorStatus } from "./paymentAnalytics";
 
-export const contentMaxWidth = { width: "100%", maxWidth: 640, alignSelf: "center" };
+export const contentMaxWidth = { width: "100%", maxWidth: LAYOUT.maxContentWidth, alignSelf: "center" };
 
 export const radioA11yProps = (label, checked) => ({
   accessibilityRole: "radio",

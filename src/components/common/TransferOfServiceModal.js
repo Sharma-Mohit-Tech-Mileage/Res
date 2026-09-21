@@ -12,6 +12,7 @@ import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CopyIcon from "../../../assets/svgs/CopyIcon";
 import colors from "../../res/Colors";
 import { FontFamily } from "../../../GlobalStyles";
+import ModalCard from "./customui/ModalCard";
 
 const groupDigits = (value) =>
   String(value || "")
@@ -38,7 +39,7 @@ const TransferOfServiceModal = ({
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
-        <View style={styles.card} accessibilityViewIsModal={true}>
+        <ModalCard style={styles.card} accessibilityViewIsModal={true}>
           <View style={styles.titleRow}>
             <AlertIcon color="#DD6D02" />
             <Text
@@ -118,7 +119,7 @@ const TransferOfServiceModal = ({
               </Touchable>
             </>
           )}
-        </View>
+        </ModalCard>
       </View>
     </Modal>
   );

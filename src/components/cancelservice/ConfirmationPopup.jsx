@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet,Modal } from "react-native";
+import { Text, StyleSheet, Modal } from "react-native";;
 import {
   Color,
   Padding,
@@ -8,6 +8,8 @@ import {
 } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import Touchable from "../common/customui/Touchable";
+import ModalCard from "../common/customui/ModalCard";
+import ModalOverlay from "../common/customui/ModalOverlay";
 
 const ConfimationPopup = ({
   visible,
@@ -24,8 +26,8 @@ const ConfimationPopup = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.alertContainer}>
+      <ModalOverlay>
+        <ModalCard style={styles.alertContainer}>
           <Text style={{textAlign:'center',alignSelf:'center',fontFamily:FontFamily.RadioCanadaRegular, color:colors.sparklight_grey,fontSize:22,fontWeight:'500'}}> {title} </Text>
           <Text style={styles.message}>{message}</Text>
           <Touchable
@@ -42,8 +44,8 @@ const ConfimationPopup = ({
           >
             <Text style={styles.closeAlertTxt}>Update Info</Text>
           </Touchable>
-        </View>
-      </View>
+        </ModalCard>
+      </ModalOverlay>
     </Modal>
   );
 };
@@ -52,12 +54,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   alertContainer: {
     backgroundColor: "white",

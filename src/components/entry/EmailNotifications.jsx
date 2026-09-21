@@ -1,13 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  Pressable,
-  Keyboard,
-  AccessibilityInfo,
-} from "react-native";
+import { View, StyleSheet, Text, Pressable, Keyboard, AccessibilityInfo } from "react-native";
 import {
   Color,
   FontFamily,
@@ -24,7 +16,8 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import {FieldTitle,HintText} from "../common/customui/Typography";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const EmailNotifications = ({ navigation }) => {
   const [input, setInput] = useState("");
@@ -133,7 +126,7 @@ const EmailNotifications = ({ navigation }) => {
           <View style={styles.headerTabTwo} />
           <View style={styles.headerTabThree} />
         </View> */}
-      <ScrollView
+      <ScreenScroll
         style={styles.inner}
         contentContainerStyle={styles.innerContent}
         ref={scrollRef}
@@ -241,7 +234,7 @@ const EmailNotifications = ({ navigation }) => {
         {!keyboardHidden && <View style={styles.textBottomHeight} />}
         
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };

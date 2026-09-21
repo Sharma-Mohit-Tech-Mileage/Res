@@ -36,6 +36,7 @@ import AreaOfConcernSelector from "./AreaOfConcernSelector";
 import { Radio } from "native-base";
 import {HintText,FieldTitle} from "../common/customui/Typography";
 import PrimaryButton from "../common/customui/PrimaryButton";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const Feedback = () => {
   const navigation = useNavigation();
@@ -198,7 +199,7 @@ const Feedback = () => {
         title="Feedback"
         onPressBack={() => navigation.goBack()}
       />
-      <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
+      <ScreenScroll ref={scrollViewRef} showsVerticalScrollIndicator={false}>
         <Animated.View
           entering={FadeInUp.delay(100).springify()}
           style={styles.content}
@@ -503,7 +504,7 @@ const Feedback = () => {
             
           </Animated.View>
         </Animated.View>
-      </ScrollView>
+      </ScreenScroll>
     </KeyboardAvoidingView>
   );
 };

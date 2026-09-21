@@ -9,6 +9,8 @@ import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "../common/customui/Touchable";
+import ModalCard from "../common/customui/ModalCard";
+import ModalOverlay from "../common/customui/ModalOverlay";
 
 
 const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClose }) => {
@@ -21,8 +23,8 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
         animationType="fade"
         onRequestClose={onClose}
       >
-        <View style={styles.overlay}>
-          <View style={styles.alertContainer}>
+        <ModalOverlay>
+          <ModalCard style={styles.alertContainer}>
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
@@ -68,8 +70,8 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               </Text>
             </Touchable>
            )}
-          </View>
-        </View>
+          </ModalCard>
+        </ModalOverlay>
       </Modal>
      );
 };
@@ -78,12 +80,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   alertContainer: {
     backgroundColor: "white",
