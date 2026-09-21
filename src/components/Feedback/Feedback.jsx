@@ -5,13 +5,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
 import {
-  ScrollView,
   StyleSheet,
   View,
   Text,
-  KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import Touchable from "../common/customui/Touchable";
 import Animated, {
   FadeInDown,
@@ -36,7 +35,6 @@ import AreaOfConcernSelector from "./AreaOfConcernSelector";
 import { Radio } from "native-base";
 import {HintText,FieldTitle} from "../common/customui/Typography";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import { ScreenScroll } from "../common/customui/Screen";
 
 const Feedback = () => {
   const navigation = useNavigation();
@@ -191,15 +189,12 @@ const Feedback = () => {
   }, [route.params?.updateFailed, navigation]);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <ProfileSettingsHeader
         title="Feedback"
         onPressBack={() => navigation.goBack()}
       />
-      <ScreenScroll ref={scrollViewRef} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
         <Animated.View
           entering={FadeInUp.delay(100).springify()}
           style={styles.content}
@@ -465,7 +460,6 @@ const Feedback = () => {
                   onBlur={onBlur}
                   value={value ? value.toLowerCase() : ""}
                   error={errors.feedbackEmail?.message}
-                  revealValue
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
@@ -504,8 +498,8 @@ const Feedback = () => {
             
           </Animated.View>
         </Animated.View>
-      </ScreenScroll>
-    </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
+    </View>
   );
 };
 

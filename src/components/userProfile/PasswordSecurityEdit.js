@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { StyleSheet, Text, View, AccessibilityInfo, findNodeHandle } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
@@ -22,7 +23,6 @@ import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
 import AppStyles from '../../styles/AppStyles'
 import { HintText, SectionTitle, FieldTitle } from "../common/customui/Typography";
-import { ScreenScroll } from "../common/customui/Screen";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
@@ -203,7 +203,7 @@ const PasswordSecurityEdit = () => {
         title="Edit Security Question"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
-      <ScreenScroll ref={scrollViewRef} >
+      <KeyboardAwareScrollView ref={scrollViewRef} >
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -338,7 +338,7 @@ const PasswordSecurityEdit = () => {
             onRequestClose={() => setLoading(false)}
           />
         </View>
-      </ScreenScroll>
+      </KeyboardAwareScrollView>
     </View>
   );
 };
@@ -391,6 +391,7 @@ const styles = StyleSheet.create({
     height: 56,
   },
   makeTypo: {
+    width: 282,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",

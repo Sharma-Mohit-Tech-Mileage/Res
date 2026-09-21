@@ -1,5 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Animated, StyleSheet, Text, View, Keyboard, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  View,
+  Keyboard,
+  Platform,
+  AccessibilityInfo,
+  findNodeHandle,
+} from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -31,8 +41,10 @@ import {
 import Toggle from "../common/Toggle";
 import AlertIcon from "../../../assets/svgs/Alerttriangle";
 import Alerttriangle from "../../res/svgIcons/AlertIcon";
-import { hp } from "../../utils/responsive";
-import { ScreenScroll } from "../common/customui/Screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 
 import {
   SectionTitle,
@@ -342,7 +354,7 @@ const TextNotifications = ({ navigation }) => {
           accessibilityLiveRegion="polite"
         />
       )}
-      <ScreenScroll ref={scrollViewRef} keyboardShouldPersistTaps="always">
+      <KeyboardAwareScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always">
         <View style={styles.textNotificationsInner}>
           <View style={[AppStyles.card, { margin: 16, paddingBottom: 16 }]}>
             {notification && (
@@ -558,7 +570,7 @@ const TextNotifications = ({ navigation }) => {
             />
           </View>
         </View>
-      </ScreenScroll>
+      </KeyboardAwareScrollView>
     </View>
   );
 };
@@ -842,6 +854,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   makeTypo: {
+    width: 282,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
     textAlign: "center",

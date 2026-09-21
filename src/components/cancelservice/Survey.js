@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Platform, Linking } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Platform,
+  Linking,
+} from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
 import { formatInputA11yReadout } from "../../utils/a11y";
@@ -22,7 +29,6 @@ import LoadingOverlay from "../common/customui/LoadingOverlay";
 import SmallLoader from "../common/customui/SmallLoader";
 import moment from "moment";
 import { useNavigation } from "@react-navigation/native";
-import { ScreenScroll } from "../common/customui/Screen";
 
 const errorRes = {
   error: "DISCONNECT_ERROR",
@@ -51,6 +57,9 @@ const Survey = ({ route }) => {
     moment().add(10, "days").format("YYYY-MM-DDTHH:mm:ssZ")
   );
   const [loadingData, setLoadingData] = useState(false);
+  onCancel = () => {
+    navigation.navigate("account", { screen: "Account" });
+  };
   const onContinue = (option) => {
     if (option) {
       requestPostDisconnect();
@@ -177,7 +186,7 @@ const Survey = ({ route }) => {
         end={{ x: 1.3, y: 0}}
         colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
       />
-      <ScreenScroll style={{ flex: 1, marginBottom: 100 }}>
+      <KeyboardAwareScrollView style={{ flex: 1, marginBottom: 100 }}>
         <View>
           <View style={[card.elevated, { margin: 16 }]}>
             {renderErrorMessage()}
@@ -340,7 +349,7 @@ const Survey = ({ route }) => {
 
           {loading && <LoadingOverlay loadingTxt={"Loading"} />}
         </View>
-      </ScreenScroll>
+      </KeyboardAwareScrollView>
     </View>
   );
 };
@@ -361,6 +370,7 @@ const styles = {
     height: 56,
   },
   makeTypo: {
+    width: 282,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
     fontSize: FontSize.size_base,
@@ -368,12 +378,13 @@ const styles = {
   },
   makePayment: {
     color: Color.sparklightWhite,
+    width: 282,
   },
   buttons1: {
     marginTop: Padding.p_base,
     backgroundColor: Color.colorWhitesmoke_200,
     paddingHorizontal: 0,
-    width: "100%",
+    width: 382,
   },
   buttonsParent: {
     marginTop: Padding.p_base,

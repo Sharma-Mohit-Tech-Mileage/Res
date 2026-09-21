@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { StyleSheet, Text, View, Platform, AccessibilityInfo } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Platform,
+  AccessibilityInfo,
+} from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -31,7 +38,6 @@ import PrimaryButton from "../common/customui/PrimaryButton";
 import { requiredField } from "../../styles/utilities";
 import AppStyles from '../../styles/AppStyles';
 import { SectionTitle,HintText } from "../common/customui/Typography";
-import { ScreenScroll } from "../common/customui/Screen";
 const ChangePassword = () => {
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
@@ -211,7 +217,7 @@ const ChangePassword = () => {
         title="Edit Password"
         onPressBack={() => navigation.navigate("PasswordSecurity")}
       />
-      <ScreenScroll ref={scrollViewRef}>
+      <KeyboardAwareScrollView ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -353,7 +359,7 @@ const ChangePassword = () => {
             }}
           />
         </View>
-      </ScreenScroll>
+      </KeyboardAwareScrollView>
     </View>
   );
 };
@@ -396,6 +402,7 @@ const styles = StyleSheet.create({
     height: 56,
   },
   makeTypo: {
+    width: 282,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",

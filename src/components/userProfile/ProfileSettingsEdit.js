@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { StyleSheet, Text, View } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -18,7 +19,6 @@ import { updateProfileRequest } from "../../redux/actions/ProfileActionSuite";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { profileSchema } from "../utility/validationSchema";
 import { isPrimaryAdmin } from "../utility/constant";
-import { ScreenScroll } from "../common/customui/Screen";
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
@@ -89,7 +89,7 @@ const ProfileSettingsEdit = () => {
         title="Edit Profile"
         onPressBack={() => navigation.navigate("ProfileSettings")}
       />
-      <ScreenScroll ref={scrollViewRef}>
+      <KeyboardAwareScrollView ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
             <View style={styles.infoWrapper}>
@@ -214,7 +214,7 @@ const ProfileSettingsEdit = () => {
             </Touchable>
           </View>
         </View>
-      </ScreenScroll>
+      </KeyboardAwareScrollView>
     </View>
   );
 };
