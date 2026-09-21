@@ -5,7 +5,9 @@ import MaintenancePage from './MaintenancePage';
 
 const MaintenanceWrapper = ({ children }) => {
   const { 
-    showMaintenancePage, 
+    showMaintenancePage,
+    internalAccessConfig,
+    submitBypassCode,
     pageConfig, 
     blockingState, 
     clearBlockingState
@@ -19,6 +21,8 @@ const MaintenanceWrapper = ({ children }) => {
     
     return (
       <MaintenancePage
+        internalAccessConfig={internalAccessConfig}
+        submitBypassCode={submitBypassCode}
         title={activeConfig?.title || "System Maintenance in Progress"}
         message={activeConfig?.message || "We're updating our systems to serve you better."}
         estimatedTime={activeConfig?.estimatedTime}
