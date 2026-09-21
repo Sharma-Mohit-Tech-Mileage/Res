@@ -27,18 +27,17 @@ const authContext = async () => {
 const cleanName = (value) =>
   String(value || "").replace(/\b(?:null|undefined)\b/gi, "").replace(/\s+/g, " ").trim();
 
-const normalizePaymentMethod = (raw = {}) => {
+const normalizePaymentMethod = (raw = {}, customerId = "") => {
   const accountType = (raw.account_type || raw.accountType || "").toLowerCase();
   const subtype = (raw.account_subtype || raw.accountSubType || "").toLowerCase();
   const isCard = accountType.includes("card") || subtype.includes("credit") || subtype.includes("debit");
   const masked = String(raw.display_text || raw.displayText || "");
-  const customerMatch = String(raw.url || "").match(/customers\/(\d+)/);
   const fallbackName = isCard
     ? subtype.includes("credit") ? "Credit Card" : "Debit Card"
     : subtype === "savings" ? "Savings Account" : "Checking Account";
   return {
     id: String(raw.id || raw.fundingAccountId || raw.funding_account_id || ""),
-    idCustomer: customerMatch ? customerMatch[1] : "",
+    idCustomer: customerId,
     type: isCard ? "card" : "bank",
     // Surcharge applies to credit cards only, so the credit/debit subtype has to survive normalisation.
     cardType: isCard ? (subtype.includes("credit") ? "credit" : subtype.includes("debit") ? "debit" : "") : "",
@@ -69,12 +68,39 @@ const ensureServiceOk = (res) => {
   }
 };
 
+// Defect 55051: the customer id comes from RetrieveCustomerData only — urls are never parsed for it, since a stale url is what sent US Bank an invalid CustomerId.
+// RetrieveCustomerData returns an Orbipay paged envelope; the customer sits in list[0] and "id" is the authoritative field (per Portals team).
+const pickCustomerId = (data) => {
+  const customer = data?.list?.[0] || data?.customer || data || {};
+  return String(customer.id ?? "");
+};
+
+let cachedCustomerId = { accountNumber: "", id: "" };
+
+// Resolves once per account; a failed lookup returns "" rather than throwing, so the payment methods list still renders.
+const fetchCustomerId = async () => {
+  const { accountNumber, config } = await authContext();
+  if (!accountNumber) return "";
+  if (cachedCustomerId.accountNumber === accountNumber && cachedCustomerId.id) return cachedCustomerId.id;
+  try {
+    const res = await _axios.get(getEndpoint(ENDPOINTS.PAYMENT_RETRIEVE_CUSTOMER_DATA, { accountNumber }), config);
+    const id = pickCustomerId(res?.data);
+    if (id) cachedCustomerId = { accountNumber, id };
+    return id;
+  } catch (err) {
+    return "";
+  }
+};
+
 export const fetchPaymentMethods = async () => {
   const { accountNumber, config } = await authContext();
-  const res = await _axios.get(getEndpoint(ENDPOINTS.FUNDING_ACCOUNTS, { accountNumber }), config);
+  const [res, customerId] = await Promise.all([
+    _axios.get(getEndpoint(ENDPOINTS.FUNDING_ACCOUNTS, { accountNumber }), config),
+    fetchCustomerId(),
+  ]);
   ensureServiceOk(res);
   const list = Array.isArray(res.data) ? res.data : res.data?.fundingAccounts || [];
-  return list.map(normalizePaymentMethod).filter((m) => m.id && m.status !== "deleted");
+  return list.map((raw) => normalizePaymentMethod(raw, customerId)).filter((m) => m.id && m.status !== "deleted");
 };
 
 export const fetchAutoPayDetails = async () => {
@@ -106,10 +132,10 @@ const pickFeeAmount = (data) => {
   return isFinite(value) ? value : null;
 };
 
-// Orbipay Fee Calculator. CustomerId and FundingAccountId both come off the funding
-// account we already fetched, so no extra lookup is needed.
+// Orbipay Fee Calculator. FundingAccountId comes off the funding account, CustomerId from RetrieveCustomerData.
 export const calculateFee = async (amount, method, paymentScheduleType = "one_time_payment") => {
   const { config } = await authContext();
+  const customerId = method?.idCustomer || (await fetchCustomerId());
   const res = await _axios.post(
     getEndpoint(ENDPOINTS.PAYMENT_CALCULATE_FEE),
     {
@@ -117,7 +143,7 @@ export const calculateFee = async (amount, method, paymentScheduleType = "one_ti
       // $0 payment and return fee 0.00 (portal sends "amount" and gets 0.66).
       amount: Number(amount),
       paymentScheduleType,
-      CustomerId: method?.idCustomer || "",
+      CustomerId: customerId,
       FundingAccountId: method?.id || "",
     },
     config
