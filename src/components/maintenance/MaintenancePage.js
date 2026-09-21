@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   Linking,
+  TextInput,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
@@ -34,7 +35,27 @@ const MaintenancePage = ({
   showLoginButton = false,
   isBlockingUser = false,
   pageType = "NORMAL",
+  internalAccessConfig,
+  submitBypassCode,
 }) => {
+  // 52452: internal testers can unlock the app during a maintenance window. The link
+  // only renders when internalAccess is switched on in Remote Config, so customers
+  // never see it during a normal window.
+  const [showCodeEntry, setShowCodeEntry] = useState(false);
+  const [code, setCode] = useState("");
+  const [codeError, setCodeError] = useState("");
+
+  const canEnterCode = Boolean(
+    internalAccessConfig?.enabled && internalAccessConfig?.bypassCode
+  );
+
+  const handleSubmitCode = () => {
+    if (submitBypassCode?.(code)) {
+      setCodeError("");
+      return;
+    }
+    setCodeError("That code was not recognised.");
+  };
   const handleContactPress = () => {
     if (!contactLink) {
       return;
@@ -170,6 +191,49 @@ const MaintenancePage = ({
             )}
           </View>
         </View>
+
+        {/* 52452: inside contentContainer so it stays on screen - the footer below is absolutely positioned. */}
+        {canEnterCode && !showCodeEntry && (
+          <Touchable
+            onPress={() => setShowCodeEntry(true)}
+            style={styles.internalLinkBtn}
+            accessibilityRole="button"
+            accessibilityLabel="Internal access"
+            accessibilityHint="Double tap to enter an internal access code"
+          >
+            <Text style={styles.internalLinkText}>Internal access</Text>
+          </Touchable>
+        )}
+        {canEnterCode && showCodeEntry && (
+          <View style={styles.internalEntry}>
+            <TextInput
+              value={code}
+              onChangeText={(t) => { setCode(t); setCodeError(""); }}
+              placeholder="Access code"
+              placeholderTextColor={colors.snow_white}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              returnKeyType="go"
+              onSubmitEditing={handleSubmitCode}
+              style={styles.internalInput}
+              accessibilityLabel="Internal access code"
+            />
+            <Touchable
+              onPress={handleSubmitCode}
+              style={styles.internalSubmitBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Unlock"
+              accessibilityHint="Double tap to unlock the app with this code"
+            >
+              <Text style={styles.internalSubmitText}>Unlock</Text>
+            </Touchable>
+          {!!codeError && (
+              <Text style={styles.internalError} accessibilityLiveRegion="polite">
+              {codeError}
+              </Text>
+            )}
+          </View>
+        )}
       </View>
 
       <View style={styles.copyrightContainer}>
@@ -194,6 +258,27 @@ const MaintenancePage = ({
 };
 
 const styles = StyleSheet.create({
+  // 52452: internal access affordance - only rendered when Remote Config enables it.
+  internalLinkBtn: { alignSelf: "center", marginTop: 8, minHeight: 44, justifyContent: "center" },
+  internalLinkText: {
+    color: colors.snow_white,
+    fontSize: 13,
+    textDecorationLine: "underline",
+    opacity: 0.85,
+  },
+  internalEntry: { alignSelf: "center", marginTop: 8, width: "80%" },
+  internalInput: {
+    borderWidth: 1,
+    borderColor: colors.snow_white,
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    minHeight: 44,
+    color: colors.snow_white,
+    fontSize: 14,
+  },
+  internalSubmitBtn: { marginTop: 8, minHeight: 44, alignItems: "center", justifyContent: "center" },
+  internalSubmitText: { color: colors.snow_white, fontSize: 14, textDecorationLine: "underline" },
+  internalError: { marginTop: 6, color: colors.snow_white, fontSize: 12, textAlign: "center" },
   container: {
     flex: 1,
   },

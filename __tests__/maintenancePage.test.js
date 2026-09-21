@@ -176,3 +176,53 @@ describe('MaintenancePage', () => {
     expect(openSpy).toHaveBeenCalledWith('https://support.example.com');
   });
 });
+
+
+// --- 52452: internal access affordance ---
+describe("MaintenancePage — internal access link (52452)", () => {
+  const findByLabel = (tree, label) =>
+    tree.root.findAll((n) => n.props?.accessibilityLabel === label);
+  const linkVisible = (tree) => findByLabel(tree, "Internal access").length > 0;
+
+  const render = (cfg, submit = jest.fn()) => {
+    let tree;
+    act(() => {
+      tree = renderer.create(
+        <MaintenancePage
+          title="System Maintenance in Progress"
+          internalAccessConfig={cfg}
+          submitBypassCode={submit}
+        />
+      );
+    });
+    return tree;
+  };
+
+  it("hides the link when internal access is off", () => {
+    expect(linkVisible(render({ enabled: false, bypassCode: "SPK" }))).toBe(false);
+  });
+
+  it("hides the link when no code is configured", () => {
+    expect(linkVisible(render({ enabled: true, bypassCode: "" }))).toBe(false);
+  });
+
+  it("shows the link when enabled with a code", () => {
+    expect(linkVisible(render({ enabled: true, bypassCode: "SPK" }))).toBe(true);
+  });
+
+  it("reveals the code field when the link is tapped", () => {
+    const tree = render({ enabled: true, bypassCode: "SPK" });
+    expect(findByLabel(tree, "Internal access code").length).toBe(0);
+    act(() => findByLabel(tree, "Internal access")[0].props.onPress());
+    expect(findByLabel(tree, "Internal access code").length).toBeGreaterThan(0);
+  });
+
+  it("reports an error for a wrong code", () => {
+    const submit = jest.fn(() => false);
+    const tree = render({ enabled: true, bypassCode: "SPK" }, submit);
+    act(() => findByLabel(tree, "Internal access")[0].props.onPress());
+    act(() => findByLabel(tree, "Internal access code")[0].props.onChangeText("nope"));
+    act(() => findByLabel(tree, "Unlock")[0].props.onPress());
+    expect(submit).toHaveBeenCalledWith("nope");
+  });
+});
