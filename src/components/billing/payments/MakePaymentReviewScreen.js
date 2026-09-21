@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Modal } from "react-native";
+import { View, Text, StyleSheet, Modal } from "react-native";
+import KeyboardAwareScrollView from "../../common/customui/KeyboardAwareScrollView";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import moment from "moment";
@@ -151,7 +152,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView ref={scrollRef} contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <KeyboardAwareScrollView ref={scrollRef} contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -248,7 +249,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           onPress={onSubmit}
         />
         <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
 

@@ -2,9 +2,9 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  ScrollView,
   Image,
 } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -555,7 +555,7 @@ const CancellationSummary = ({ navigation, route }) => {
         end={{ x: 1.3, y: 0}}
         colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
       />
-      <ScrollView style={{ flex: 1, marginBottom: 100 }} ref={MyRef}>
+      <KeyboardAwareScrollView style={{ flex: 1, marginBottom: 100 }} ref={MyRef}>
         <View style={[card.elevated, { margin: 16 }]}>
           {isSuccessMessageVisible && renderSuccessMessage()}
           {renderErrorMessage()}
@@ -941,7 +941,7 @@ const CancellationSummary = ({ navigation, route }) => {
             />
           )}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import KeyboardAwareScrollView from "../../common/customui/KeyboardAwareScrollView";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -138,7 +139,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={[styles.content, contentMaxWidth]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -292,7 +293,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
             />
             <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
         </>
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
     </View>
