@@ -1,0 +1,9 @@
+steps:
+  - task: Cache@2
+    displayName: 'Cache Gradle dependencies and build cache'
+    inputs:
+      key: 'gradle-v1 | "$(Agent.OS)" | android/gradle/wrapper/gradle-wrapper.properties | android/**/*.gradle | package-lock.json | "$(Build.SourceVersion)"'
+      restoreKeys: |
+        gradle-v1 | "$(Agent.OS)" | android/gradle/wrapper/gradle-wrapper.properties | android/**/*.gradle | package-lock.json
+        gradle-v1 | "$(Agent.OS)"
+      path: $(Pipeline.Workspace)/.gradle
