@@ -18,6 +18,7 @@ import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
   submitPayment,
+  paymentErrorMessage,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
   contentMaxWidth,
@@ -134,11 +135,8 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
     } catch (error) {
       trackPaymentFailed(method, error?.code || "submit_error");
       trackApiError("submit-payment", errorStatus(error), "payment_review");
-      setErrorAlert(
-        error?.code === "PAYMENT_DECLINED"
-          ? "There was a problem making your payment. Please verify all information entered is correct and try again or call us at 1-877-692-2253."
-          : "We could not submit your payment right now. Please try again."
-      );
+      // 55255: decline / duplicate / unconfirmed carry portal copy; transport errors fall back to the portal's request-failed copy.
+      setErrorAlert(paymentErrorMessage(error));
       announceA11y("Error, your payment was not submitted.");
       // The error banner renders at the top of the scroll view, so bring it into view.
       scrollRef.current?.scrollTo({ y: 0, animated: true });
