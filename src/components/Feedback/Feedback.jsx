@@ -464,6 +464,7 @@ const Feedback = () => {
                   onBlur={onBlur}
                   value={value ? value.toLowerCase() : ""}
                   error={errors.feedbackEmail?.message}
+                  revealValue
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />

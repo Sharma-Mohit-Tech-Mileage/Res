@@ -380,6 +380,7 @@ const AddNotificationScreen = () => {
                     error={errors.email?.message}
                     label="Email Address *"
                     required={true}
+                    revealValue
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
