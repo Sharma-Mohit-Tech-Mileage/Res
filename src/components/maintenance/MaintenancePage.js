@@ -84,8 +84,8 @@ const MaintenancePage = ({
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
-      end={{ x: 1.3, y: 0}}
-      colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
+      end={{ x: 1.3, y: 0 }}
+      colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
       style={styles.container}
     >
       <View style={styles.contentContainer}>
@@ -206,7 +206,7 @@ const MaintenancePage = ({
               value={code}
               onChangeText={(t) => { setCode(t); setCodeError(""); }}
               placeholder="Access code"
-              placeholderTextColor={colors.snow_white}
+              placeholderTextColor={Color.sparklightWhite}
               autoCapitalize="characters"
               autoCorrect={false}
               returnKeyType="go"
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   // 52452: internal access affordance - only rendered when Remote Config enables it.
   internalLinkBtn: { alignSelf: "center", marginTop: 8, minHeight: 44, justifyContent: "center" },
   internalLinkText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontSize: 13,
     textDecorationLine: "underline",
     opacity: 0.85,
@@ -265,16 +265,16 @@ const styles = StyleSheet.create({
   internalEntry: { alignSelf: "center", marginTop: 8, width: "80%" },
   internalInput: {
     borderWidth: 1,
-    borderColor: colors.snow_white,
+    borderColor: Color.sparklightWhite,
     borderRadius: 6,
     paddingHorizontal: 12,
     minHeight: 44,
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontSize: 14,
   },
   internalSubmitBtn: { marginTop: 8, minHeight: 44, alignItems: "center", justifyContent: "center" },
-  internalSubmitText: { color: colors.snow_white, fontSize: 14, textDecorationLine: "underline" },
-  internalError: { marginTop: 6, color: colors.snow_white, fontSize: 12, textAlign: "center" },
+  internalSubmitText: { color: Color.sparklightWhite, fontSize: 14, textDecorationLine: "underline" },
+  internalError: { marginTop: 6, color: Color.sparklightWhite, fontSize: 12, textAlign: "center" },
   container: {
     flex: 1,
   },
