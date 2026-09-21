@@ -833,13 +833,15 @@ stages:
               echo "##vso[task.setvariable variable=XCODE_CACHE_INPUTS]$XCODE_CACHE_INPUTS"
               mkdir -p "$(Pipeline.Workspace)/xcode-derived-data"
             displayName: Resolve Xcode cache version
-          - task: Cache@2
-            displayName: Cache Xcode build intermediates
-            inputs:
-              key: xcode-v2 | "$(Agent.OS)" | "$(XCODE_CACHE_VERSION)" | "$(XCODE_CACHE_INPUTS)" | "$(XCODE_CACHE_BRANCH)" | "$(Build.SourceVersion)"
-              restoreKeys: |
-                xcode-v2 | "$(Agent.OS)" | "$(XCODE_CACHE_VERSION)" | "$(XCODE_CACHE_INPUTS)" | "$(XCODE_CACHE_BRANCH)"
-              path: $(Pipeline.Workspace)/xcode-derived-data
+          # Self-hosted Mac retains DerivedData locally; avoid uploading it after every commit.
+          - ${{ if not(or(eq(parameters.agentPool, 'Sparklight-Mac'), and(eq(parameters.agentPool, 'auto'), eq(variables['Build.RequestedForEmail'], 'Mohit.Sharma@cableone.biz')))) }}:
+              - task: Cache@2
+                displayName: Cache Xcode build intermediates
+                inputs:
+                  key: xcode-v2 | "$(Agent.OS)" | "$(XCODE_CACHE_VERSION)" | "$(XCODE_CACHE_INPUTS)" | "$(XCODE_CACHE_BRANCH)" | "$(Build.SourceVersion)"
+                  restoreKeys: |
+                    xcode-v2 | "$(Agent.OS)" | "$(XCODE_CACHE_VERSION)" | "$(XCODE_CACHE_INPUTS)" | "$(XCODE_CACHE_BRANCH)"
+                  path: $(Pipeline.Workspace)/xcode-derived-data
           - script: |
               set -euo pipefail
               PODS_DOWNLOADS_PATH="$HOME/Library/Caches/CocoaPods"

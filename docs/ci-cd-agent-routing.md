@@ -27,3 +27,5 @@ Commit messages become TestFlight notes and Android notes (maximum 300 character
 npm, Gradle, CocoaPods downloads and Xcode intermediate caches reduce repeated work. CI Metro bypasses Watchman to avoid stale indexes. Separate stages still perform their own dependency setup. The 30–40-minute runtime is a target, not a verified limit; stage timeouts are independent. Attaching TestFlight notes can wait for Apple to expose the uploaded build.
 
 Local validation covers YAML parsing, embedded shell syntax, sequential dependencies, Residential paths/IDs, mocked Apple pagination/version selection, and release-note limits. A real Azure run is required to verify pool authorization, signing, store access and total duration. Lint/security reports retain the reference pipeline's advisory behavior.
+
+On `Sparklight-Mac`, Xcode DerivedData stays in `$(Pipeline.Workspace)/xcode-derived-data` and the Azure Xcode Cache task is omitted, avoiding its large post-job upload. Hosted macOS jobs still restore/save the remote Xcode cache. Local reuse requires the same agent workspace to remain available; a new or cleaned workspace rebuilds it.
