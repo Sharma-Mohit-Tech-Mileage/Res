@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firebase Payment Analytics — Tracking Specification</title>
+<style>
+  :root { --ink:#1b1b1f; --muted:#5c5c66; --line:#e3e3e8; --accent:#632965; --warn:#DD6D02; --warnbg:#FFFAEB; --ok:#1D7832; --okbg:#F1FCF2; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:40px 24px 80px; font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; }
+  .wrap { max-width:900px; margin:0 auto; }
+  h1 { font-size:27px; margin:0 0 4px; letter-spacing:-.02em; }
+  .sub { color:var(--muted); margin:0 0 28px; font-size:15px; }
+  h2 { font-size:18px; margin:36px 0 10px; padding-bottom:6px; border-bottom:2px solid var(--accent); }
+  h3 { font-size:13px; margin:22px 0 6px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); }
+  p, li { font-size:15px; }
+  table { width:100%; border-collapse:collapse; margin:10px 0 18px; font-size:14px; }
+  th { text-align:left; background:#f6f6f8; padding:8px 10px; border:1px solid var(--line); font-weight:600; }
+  td { padding:8px 10px; border:1px solid var(--line); vertical-align:top; }
+  code { background:#f4f4f7; padding:1px 5px; border-radius:3px; font-size:13px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  pre { background:#f4f4f7; padding:12px 14px; border-radius:4px; font-size:13px; overflow-x:auto; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; line-height:1.5; }
+  .box { padding:12px 16px; margin:14px 0; border-radius:0 4px 4px 0; font-size:14.5px; }
+  .warn { background:var(--warnbg); border-left:4px solid var(--warn); }
+  .ok { background:var(--okbg); border-left:4px solid var(--ok); }
+  ul { padding-left:20px; margin:8px 0; } li { margin:3px 0; }
+  ol { padding-left:22px; margin:8px 0; } ol li { margin:5px 0; }
+  .meta { font-size:13.5px; color:var(--muted); border:1px solid var(--line); padding:10px 14px; border-radius:4px; background:#fafafb; margin-bottom:4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>Firebase Payment Analytics — Tracking Specification</h1>
+<p class="sub">Deliverable for <strong>53800</strong> · input to <strong>53472</strong> · Residential &amp; Business mobile apps</p>
+
+<div class="meta">
+<strong>Scope:</strong> Make a Payment, Manage Payment Methods, Manage AutoPay.<br>
+<strong>Goal:</strong> measure funnel drop-off, reconstruct individual payment journeys, and detect when customers get stuck or hit errors — without sending personal data to Firebase.
+</div>
+
+<h2>1. Current state</h2>
+<p>Both apps today emit <strong>8 event names</strong> and <strong>1 user property</strong>:</p>
+<table>
+<tr><th style="width:50%">Events</th><th>User property</th></tr>
+<tr>
+<td><code>screen_view</code>, <code>business_screen_view</code>, <code>login</code>, <code>Zendesk_Chat_Start</code>, <code>feature_announcement_impression</code>, <code>feature_announcement_step_viewed</code>, <code>feature_announcement_completed</code>, <code>feature_announcement_dismissed</code></td>
+<td><code>Sparklight_user_id</code> (set to the account number)</td>
+</tr>
+</table>
+<p><strong>No payment analytics exist.</strong> Everything in this document is new.</p>
+<ul>
+  <li><code>screen_view</code> fires automatically on every navigation (<code>UserNavigations.js</code>), carrying <code>screen_name</code>.</li>
+  <li><code>ga_session_id</code> and <code>ga_session_number</code> are attached by Firebase to every event automatically.</li>
+</ul>
+<p>The payment flow is a linear chain of uniquely-named routes — <code>MakePayment → MakePaymentMethod → MakePaymentReview → PaymentConfirmation</code> — so <strong>step-by-step drop-off is already measurable today with no new code.</strong></p>
+
+<h2>2. Impact on existing analytics</h2>
+<div class="box ok">
+<strong>No impact. The change is additive only.</strong>
+</div>
+<table>
+<tr><th style="width:230px">Concern</th><th>Assessment</th></tr>
+<tr><td>Name collisions</td><td><strong>None.</strong> All 14 new names are distinct from the 8 in use.</td></tr>
+<tr><td>Reserved names</td><td><strong>None.</strong> No use of the reserved <code>firebase_</code>, <code>google_</code> or <code>ga_</code> prefixes.</td></tr>
+<tr><td>Firebase event-name limit (500/app)</td><td>8 → 22. Well within.</td></tr>
+<tr><td>Parameter limit (25/event)</td><td>Maximum 4 parameters on any event proposed here.</td></tr>
+<tr><td>Existing events &amp; dashboards</td><td>Untouched. <code>screen_view</code>, <code>login</code> and the announcement events keep firing exactly as now.</td></tr>
+<tr><td>Historical data</td><td>Unaffected. No retroactive change.</td></tr>
+<tr><td>User identifier</td><td><strong>Retained.</strong> <code>setUserId</code> / <code>Sparklight_user_id</code> continue to carry the account number, so no report or audience loses continuity.</td></tr>
+<tr><td>App performance / payment processing</td><td>No impact — calls are fire-and-forget and wrapped in try/catch.</td></tr>
+</table>
+
+<h2>3. Approach</h2>
+<p><strong>Funnel steps come from the existing <code>screen_view</code>. Custom events are added only where they carry information a screen cannot.</strong></p>
+<p>A screen tells you <em>where</em> a customer was. It cannot tell you <em>what they chose</em> or <em>what happened</em> — for example, success and failure both land on <code>PaymentConfirmation</code>, so <code>screen_view</code> records them identically. Custom events fill exactly that gap.</p>
+<p>Applying that rule, seven events from 53472 are not implemented because <code>screen_view</code> already records the same fact:</p>
+<table>
+<tr><th style="width:280px">Excluded event</th><th>Reason</th></tr>
+<tr><td><code>payment_flow_started</code></td><td>Duplicate of <code>screen_view: MakePayment</code></td></tr>
+<tr><td><code>payment_reviewed</code></td><td>Duplicate of <code>screen_view: MakePaymentReview</code></td></tr>
+<tr><td><code>payment_method_viewed</code></td><td>Duplicate of <code>screen_view: PaymentMethods</code></td></tr>
+<tr><td><code>autopay_viewed</code></td><td>Duplicate of <code>screen_view: AutoPay</code></td></tr>
+<tr><td><code>payment_amount_selected</code></td><td>Renamed to <code>payment_type_selected</code> for consistency</td></tr>
+<tr><td><code>payment_method_updated</code>, <code>payment_method_default_changed</code></td><td>Not supported by the current app — no update or default-selection flow exists</td></tr>
+<tr><td><code>payment_flow_abandoned</code></td><td>Cannot be fired reliably — app kill, backgrounding and navigation-away are indistinguishable. Derived instead (see §8).</td></tr>
+</table>
+<div class="box ok">
+Emitting an event that restates a screen means two systems reporting the same fact, kept in sync across two apps forever. They drift the first time someone adds a screen and updates only one.
+</div>
+
+<h2>4. Session &amp; journey model</h2>
+<table>
+<tr><th style="width:190px">Identifier</th><th style="width:230px">Source</th><th>Purpose</th></tr>
+<tr><td><code>ga_session_id</code></td><td>Firebase, automatic</td><td>Groups all events in one app session (30-min inactivity window).</td></tr>
+<tr><td><code>payment_attempt_id</code></td><td><strong>New.</strong> Random UUID generated on entering a flow, discarded on exit or completion.</td><td>Groups one attempt. Distinguishes two failed tries and a success within a single session, which <code>ga_session_id</code> alone cannot.</td></tr>
+</table>
+<p>Attach <code>payment_attempt_id</code> to every payment event; ordering by timestamp within it reconstructs the journey. It identifies an <em>attempt</em>, not a person — no personal data is involved. Satisfies AC4, AC5 and AC6 of 53800.</p>
+
+<h2>5. Event specification — 14 events</h2>
+
+<h3>Make a Payment</h3>
+<table>
+<tr><th style="width:225px">Event</th><th style="width:215px">Fires when</th><th>Parameters</th></tr>
+<tr><td><code>payment_type_selected</code></td><td>Amount option chosen<br><span style="color:var(--muted)">MakePaymentScreen</span></td><td><code>payment_type</code>: full | due | custom</td></tr>
+<tr><td><code>payment_method_selected</code></td><td>Method chosen<br><span style="color:var(--muted)">MakePaymentMethodScreen</span></td><td><code>payment_method_type</code>: card | bank<br><code>card_type</code>: credit | debit</td></tr>
+<tr><td><code>payment_submitted</code></td><td>Submit pressed<br><span style="color:var(--muted)">MakePaymentReviewScreen</span></td><td><code>payment_type</code>, <code>payment_method_type</code>, <code>amount_bucket</code></td></tr>
+<tr><td><code>payment_success</code></td><td>Submission succeeds</td><td><code>payment_method_type</code></td></tr>
+<tr><td><code>payment_failed</code></td><td>Submission rejected or errors</td><td><code>failure_reason</code>, <code>payment_method_type</code></td></tr>
+</table>
+
+<h3>Manage Payment Methods</h3>
+<table>
+<tr><th style="width:225px">Event</th><th style="width:215px">Fires when</th><th>Parameters</th></tr>
+<tr><td><code>payment_method_added</code></td><td>Method saved successfully</td><td><code>payment_method_type</code></td></tr>
+<tr><td><code>payment_method_deleted</code></td><td>Method removed</td><td><code>payment_method_type</code></td></tr>
+<tr><td><code>payment_method_failed</code></td><td>Add or update fails</td><td><code>payment_method_type</code>, <code>failure_reason</code></td></tr>
+</table>
+
+<h3>Manage AutoPay</h3>
+<table>
+<tr><th style="width:225px">Event</th><th style="width:215px">Fires when</th><th>Parameters</th></tr>
+<tr><td><code>autopay_enabled</code></td><td>Enrollment succeeds</td><td><code>payment_method_type</code>, <code>entry_point</code></td></tr>
+<tr><td><code>autopay_disabled</code></td><td>Deactivation succeeds</td><td><code>payment_method_type</code></td></tr>
+<tr><td><code>autopay_failed</code></td><td>Enroll or update fails</td><td><code>failure_reason</code></td></tr>
+</table>
+
+<h3>Health — detecting stuck and broken journeys</h3>
+<table>
+<tr><th style="width:225px">Event</th><th style="width:215px">Fires when</th><th>Parameters</th></tr>
+<tr><td><code>payment_api_error</code></td><td>Any payment API call fails</td><td><code>endpoint</code>, <code>status</code>, <code>step</code></td></tr>
+<tr><td><code>payment_validation_error</code></td><td>Client-side block: invalid email, expired card, amount out of range</td><td><code>field</code>, <code>reason</code></td></tr>
+<tr><td><code>payment_step_duration</code></td><td>Leaving any payment step</td><td><code>step</code>, <code>seconds</code></td></tr>
+</table>
+<p>A drop in <code>payment_success</code> reveals a problem days later. <code>payment_api_error</code> names the endpoint, status and step within minutes. <code>payment_step_duration</code> surfaces friction no funnel count shows — a step whose median time doubles after a release is a defect.</p>
+
+<h2>6. Privacy &amp; customer identifier</h2>
+<p><strong>Never send:</strong> account number, email address, card last-four, cardholder name, confirmation number, exact payment amount.</p>
+<p><strong>Amounts</strong> are sent as <code>amount_bucket</code> — <code>0-50</code>, <code>50-100</code>, <code>100-250</code>, <code>250+</code>. Reporting needs the distribution, not a financial record per customer.</p>
+
+<h3>Identifier — retained, with reset gaps to close</h3>
+<p><code>SplashScreen.js</code> sends the account number to Firebase three ways: <code>setUserId(accountNumber)</code>, <code>setUserProperty("Sparklight_user_id", …)</code>, and as a <code>login</code> event parameter. <strong>The decision is to retain this</strong> — it preserves reporting continuity and avoids repointing existing audiences.</p>
+<p>Two controls keep that acceptable, and both are already in this spec: amounts are bucketed rather than exact, and no new identifier is added to any payment event.</p>
+<p>The remaining requirement is that the identifier is <strong>reliably cleared when a session ends</strong>. It currently is not:</p>
+<table>
+<tr><th style="width:340px">Exit path</th><th>Clears identifier?</th></tr>
+<tr><td>Logout via Account screen</td><td>Yes — <code>setUserId(null)</code> + property null</td></tr>
+<tr><td>Logout via <code>SplashScreen.logoutAction</code></td><td>Yes — <code>resetAnalyticsData()</code></td></tr>
+<tr><td><code>GlobalErrorModal</code> close</td><td>Yes — Business only; <strong>missing in Residential</strong></td></tr>
+<tr><td><code>RestApiClient.redirectToLogin()</code> — 401 refresh failure</td><td><strong>No</strong></td></tr>
+<tr><td><code>MaintenanceContext.performLogout()</code></td><td><strong>No</strong></td></tr>
+</table>
+<div class="box warn">
+<strong>Why this matters once payment events exist.</strong> The two paths that do not clear leave the identifier pointing at the previous account. Any event fired before the next login is attributed to the wrong customer — with payment events, that means a payment journey recorded against someone who did not make it. The token-expiry failures that trigger <code>redirectToLogin()</code> are known to occur in production.
+</div>
+<p><strong>Fix:</strong> add the reset to <code>redirectToLogin()</code> and <code>MaintenanceContext.performLogout()</code> in both apps, and add the missing <code>GlobalErrorModal</code> reset in Residential. Roughly ten lines per app. This is a defect in existing behaviour rather than new scope.</p>
+
+<h2>7. How to view the data</h2>
+
+<h3>A. During development and QA — DebugView (real time)</h3>
+<p>DebugView shows events from a single device within seconds. This is how QA validates the implementation.</p>
+<ol>
+  <li>Enable debug mode on the test device:
+    <ul>
+      <li><strong>Android</strong> — <code>adb shell setprop debug.firebase.analytics.app com.sparklight</code> (Residential) or <code>com.sparklight.customer.business.app</code> (Business)</li>
+      <li><strong>iOS</strong> — add the launch argument <code>-FIRDebugEnabled</code> in the Xcode scheme</li>
+    </ul>
+  </li>
+  <li>Firebase Console → select the project → <strong>Analytics → DebugView</strong></li>
+  <li>Select the device in the top-left dropdown</li>
+  <li>Walk the payment flow — events appear in a live timeline, and clicking one shows its parameters</li>
+</ol>
+<p>Turn debug mode off afterwards (<code>adb shell setprop debug.firebase.analytics.app .none.</code>), or that device's data stays excluded from normal reporting.</p>
+
+<h3>B. In reporting — Firebase Console (24-hour delay)</h3>
+<ul>
+  <li><strong>Analytics → Events</strong> — count per event name, per day. Confirms events are arriving in volume.</li>
+  <li><strong>Analytics → Explore → Funnel exploration</strong> — build the drop-off funnel. Use <code>screen_view</code> with <code>screen_name</code> as each step: <code>MakePayment → MakePaymentMethod → MakePaymentReview → PaymentConfirmation</code>.</li>
+  <li><strong>Analytics → Explore → Free form</strong> — cross-tabulate, e.g. <code>payment_failed</code> broken down by <code>failure_reason</code>.</li>
+</ul>
+
+<div class="box warn">
+<strong>Required setup — parameters are not reportable until registered.</strong> Firebase collects custom parameters immediately, but they will <strong>not</strong> appear in Console reports until each one is registered as a custom definition. Without this step the events show up with no usable breakdowns, which reads like a broken implementation.
+<br><br>
+Go to <strong>Analytics → Custom definitions → Create custom dimension</strong> and register each parameter, event-scoped:
+<br><br>
+<code>payment_type</code>, <code>payment_method_type</code>, <code>card_type</code>, <code>amount_bucket</code>, <code>failure_reason</code>, <code>entry_point</code>, <code>payment_attempt_id</code>, <code>endpoint</code>, <code>status</code>, <code>step</code>, <code>field</code>, <code>reason</code>, <code>seconds</code>
+<br><br>
+13 dimensions against a limit of 50. Data only becomes available from the moment of registration — it is not backfilled, so register these <em>before</em> release.
+</div>
+
+<h3>C. Journey replay — BigQuery</h3>
+<p>Console reports are aggregated. To see one customer's exact sequence — the AC5 requirement — you need event-level rows, which means the BigQuery export.</p>
+<ol>
+  <li>Firebase Console → <strong>Project settings → Integrations → BigQuery</strong> → link, and enable the daily export for both apps.</li>
+  <li>Query a single attempt:</li>
+</ol>
+<pre>SELECT event_timestamp, event_name,
+       (SELECT value.string_value FROM UNNEST(event_params)
+        WHERE key = 'payment_attempt_id') AS attempt_id
+FROM `&lt;project&gt;.analytics_&lt;id&gt;.events_*`
+WHERE event_name LIKE 'payment%'
+ORDER BY event_timestamp</pre>
+<p>Export begins from the day it is linked; there is no historical backfill.</p>
+
+<h3>D. Who does what</h3>
+<table>
+<tr><th style="width:180px">Task</th><th style="width:150px">Owner</th><th>When</th></tr>
+<tr><td>Register the 13 custom dimensions</td><td>Analytics</td><td><strong>Before release</strong> — not backfilled</td></tr>
+<tr><td>Link BigQuery export</td><td>Analytics</td><td>Before release, if journey replay is required</td></tr>
+<tr><td>Validate events in DebugView</td><td>QA</td><td>During test cycle, both apps</td></tr>
+<tr><td>Build funnel and dashboards</td><td>Analytics</td><td>After 24–48h of production data</td></tr>
+</table>
+
+<h2>8. Dashboard views enabled</h2>
+<ul>
+  <li><strong>Funnel</strong> — <code>screen_view</code> counts per step, grouped by <code>ga_session_id</code>.</li>
+  <li><strong>Abandonment</strong> — sessions with <code>MakePayment</code> but no <code>payment_success</code>. Derived, so correct by construction.</li>
+  <li><strong>Conversion by choice</strong> — success rate split by <code>payment_type</code> and <code>payment_method_type</code>.</li>
+  <li><strong>Failure breakdown</strong> — <code>payment_failed</code> by <code>failure_reason</code>; <code>payment_api_error</code> by endpoint and status.</li>
+  <li><strong>Friction</strong> — median <code>payment_step_duration</code> per step, tracked across releases.</li>
+  <li><strong>Journey replay</strong> — all events for one <code>payment_attempt_id</code> in timestamp order (BigQuery).</li>
+</ul>
+
+<h2>9. Implementation notes</h2>
+<ul>
+  <li>One shared helper per app (<code>paymentAnalytics.js</code>), identical in both repos, so Residential and Business cannot drift. All events route through it.</li>
+  <li>Every call wrapped in try/catch and never awaited in a user-blocking path.</li>
+  <li>Naming: <code>snake_case</code> throughout. Existing <code>Zendesk_Chat_Start</code> and Business-only <code>business_screen_view</code> break this convention; worth aligning separately.</li>
+  <li>Parameter sources already in code: <code>amountOption</code> → <code>payment_type</code>; <code>method.type</code> → <code>payment_method_type</code>; <code>method.cardType</code> → <code>card_type</code>.</li>
+  <li>Validate in Firebase DebugView on both apps before release.</li>
+</ul>
+
+<h2>10. Decisions required</h2>
+<table>
+<tr><th style="width:60px">#</th><th style="width:50%">Decision</th><th>Owner</th></tr>
+<tr><td>1</td><td>Confirm <code>payment_flow_abandoned</code> is derived, not fired</td><td>Analytics</td></tr>
+<tr><td>2</td><td>Approve <code>amount_bucket</code> instead of exact amounts</td><td>Analytics / Privacy</td></tr>
+<tr><td>3</td><td>Register the 13 custom dimensions before release (§7)</td><td>Analytics</td></tr>
+<tr><td>4</td><td>Confirm whether BigQuery export is required for journey replay</td><td>Analytics</td></tr>
+<tr><td>5</td><td>Confirm <code>entry_point</code> values. Actual entries today are dashboard (<code>BillerSummary</code>), billing (<code>BillingScreen</code>) and the AutoPay card. "reminder" does not exist in the app.</td><td>Product</td></tr>
+</table>
+<p><strong>Decided:</strong> Approach — funnel from <code>screen_view</code>, 14 custom events (§3). Customer identifier retained, with the reset gaps in §6 to be closed by Engineering.</p>
+
+</div>
+</body>
+</html>

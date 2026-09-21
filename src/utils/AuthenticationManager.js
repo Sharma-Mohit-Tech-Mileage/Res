@@ -3,14 +3,24 @@ import { Linking, Alert, Platform } from "react-native";
 import { logDebug, logWarn, logError } from "./logger";
 
 class AuthenticationManager {
-  static AUTH_TIMEOUT = 120000;
+  static AUTH_TIMEOUT = 45000;
   static REFRESH_TIMEOUT = 30000;
 
-  static async authorizeWithTimeout(config) {
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("AUTH_TIMEOUT")), this.AUTH_TIMEOUT)
-    );
+  static async withTimeout(promise, ms, code) {
+    let timer;
+    try {
+      return await Promise.race([
+        promise,
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(new Error(code)), ms);
+        }),
+      ]);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
 
+  static async authorizeWithTimeout(config) {
     try {
       const canOpenURL = await this.checkBrowserAvailability();
       if (!canOpenURL) {
@@ -23,8 +33,7 @@ class AuthenticationManager {
           ? { ...config, additionalParameters: { ...(config.additionalParameters || {}), prompt: "login" } }
           : config;
       logDebug("AuthenticationManager", "Starting auth flow", { platform: Platform.OS });
-      const authPromise = authorize(authConfig);
-      const result = await Promise.race([authPromise, timeoutPromise]);
+      const result = await this.withTimeout(authorize(authConfig), this.AUTH_TIMEOUT, "AUTH_TIMEOUT");
 
       logDebug("AuthenticationManager", "Authorization completed successfully");
       return {
@@ -38,17 +47,13 @@ class AuthenticationManager {
   }
 
   static async refreshWithTimeout(config, refreshToken) {
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(
-        () => reject(new Error("REFRESH_TIMEOUT")),
-        this.REFRESH_TIMEOUT
-      )
-    );
-
     try {
       logDebug("AuthenticationManager", "Starting token refresh");
-      const refreshPromise = refresh(config, { refreshToken });
-      const result = await Promise.race([refreshPromise, timeoutPromise]);
+      const result = await this.withTimeout(
+        refresh(config, { refreshToken }),
+        this.REFRESH_TIMEOUT,
+        "REFRESH_TIMEOUT"
+      );
 
       logDebug("AuthenticationManager", "Token refresh completed successfully");
       return {
@@ -120,8 +125,7 @@ class AuthenticationManager {
       };
     }
 
-    // Parse different error types
-    if (errorMessage.includes("AUTH_TIMEOUT")) {
+    if (errorMessage.includes("auth_timeout")) {
       return {
         success: false,
         error: "Login timed out. Please try again.",
@@ -130,7 +134,7 @@ class AuthenticationManager {
       };
     }
 
-    if (errorMessage.includes("BROWSER_UNAVAILABLE")) {
+    if (errorMessage.includes("browser_unavailable")) {
       return {
         success: false,
         error:
@@ -140,10 +144,7 @@ class AuthenticationManager {
       };
     }
 
-    if (
-      errorMessage.includes("Network request failed") ||
-      errorMessage.includes("network")
-    ) {
+    if (errorMessage.includes("network")) {
       return {
         success: false,
         error: "Network error. Please check your internet connection.",

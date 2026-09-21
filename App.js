@@ -26,7 +26,8 @@ const App = () => {
 
   useEffect(() => {
     const enableAnalytics = async () => {
-      await setAnalyticsCollectionEnabled(getAnalytics(), !__DEV__ && Config.ENV === 'production');
+      const enabled = Config.ANALYTICS_ENABLED === 'true';
+      await setAnalyticsCollectionEnabled(getAnalytics(), enabled);
     };
     enableAnalytics();
     Appearance.setColorScheme('light');

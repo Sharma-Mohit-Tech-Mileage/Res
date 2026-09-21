@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import NextActionCard from "./NextActionCard";
 import NotificationAlert from "../../common/customui/NotificationAlert";
@@ -9,6 +10,7 @@ import { FieldTitle, FieldContent,HeadingH2 } from "../../common/customui/Typogr
 import { card } from "../../../styles/utilities";
 import { contentMaxWidth, formatCurrency } from "./paymentsShared";
 import { setFocusToRef, announceA11y } from "../../../utils/a11y";
+import { currentPaymentAttempt, endPaymentAttempt, trackStepDuration } from "./paymentAnalytics";
 
 const KIND_COPY = {
   "autopay-activated": {
@@ -46,6 +48,17 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
     setFocusToRef(titleRef, { delay: 600 });
   }, [message]);
 
+  // Journey complete: close out the attempt so a follow-up flow gets a fresh id,
+  // but keep this attempt's id on the confirmation dwell so the journey stays whole.
+  useFocusEffect(
+    useCallback(() => {
+      const attemptId = currentPaymentAttempt();
+      endPaymentAttempt();
+      const startedAt = Date.now();
+      return () => trackStepDuration("confirmation", startedAt, attemptId);
+    }, [])
+  );
+
   const messageParts = message.split(/(\$[\d,]+\.?\d*)/g);
 
   const followUp =
@@ -62,6 +75,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               methodId: nextAction.methodId,
               fromOffer: true,
               headerTitle: "Make a Payment",
+              paymentType: "due",
             }),
         }
       : nextAction?.type === "setupAutoPay"
@@ -75,6 +89,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               methodId: nextAction.methodId,
               fromOffer: true,
               headerTitle: "Set Up Auto Pay",
+              entryPoint: "payment_confirmation",
             }),
         }
       : null;

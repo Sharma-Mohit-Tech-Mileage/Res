@@ -41,6 +41,7 @@ export const ENDPOINTS = {
     EASYPAY_SETUP: 'api/Payment/SetupAutoPay',
     EASYPAY_DELETE: 'api/Payment/DeleteEasyPayAccount/:accountNumber',
     FUNDING_ACCOUNTS: 'api/Payment/RetrieveFundingAccounts/:accountNumber',
+    PAYMENT_RETRIEVE_CUSTOMER_DATA: 'api/Payment/RetrieveCustomerData/:accountNumber',
     FUNDING_ACCOUNT_DELETE: 'api/Payment/DeleteFundingAccount',
     PAYMENT_ONE_TIME: 'api/Payment/Submit',
     PAYMENT_MAKE_ONETIME: 'api/Payment/MakeAOneTimePayment',

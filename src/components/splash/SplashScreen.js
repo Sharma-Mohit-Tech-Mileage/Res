@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { View, StyleSheet, Text, Linking, Platform, Animated, Easing, Dimensions, } from "react-native";
+import { View, StyleSheet, Text, Linking, Platform, Animated, Easing, Dimensions, AppState, } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { logout } from "react-native-app-auth";
@@ -41,6 +41,8 @@ const config = {
 
 const ANIMATION_DURATION = 2000;
 const SESSION_CHECK_TIMEOUT = 10000;
+const LOGIN_WATCHDOG_TIMEOUT = 150000;
+const FOREGROUND_GRACE = 8000;
 
 // The tier table lives in utils/responsive so screens never redefine their own breakpoints.
 const getDeviceSize = () => getVerticalSizeTier(Dimensions.get("window").height);
@@ -72,6 +74,8 @@ const SplashScreen = ({ navigation, route }) => {
 
   const networkUnsubscribe = useRef(null);
   const sessionCheckTimeout = useRef(null);
+  const loginTimeout = useRef(null);
+  const foregroundGrace = useRef(null);
   const wasDisconnected = useRef(false);
 
   const logoFade = useRef(new Animated.Value(0)).current;
@@ -204,7 +208,7 @@ const SplashScreen = ({ navigation, route }) => {
       sessionCheckTimeout.current = setTimeout(() => {
         setLoadingState(LoadingState.NONE);
         setLoginEnable(true);
-        console.warn("Session check timeout");
+        logWarn("SplashScreen", "Session check timeout");
       }, SESSION_CHECK_TIMEOUT);
 
       const user = await getUser();
@@ -261,17 +265,30 @@ const SplashScreen = ({ navigation, route }) => {
 
   const onSuccess = useCallback(
     async (res) => {
+      clearTimeout(loginTimeout.current);
       logDebug("SplashScreen", "SSO login API succeeded", {
         hasJwtToken: Boolean(res?.jwtToken),
         userName: res?.userInfo?.userName,
       });
-      handleLogin(res);
+      try {
+        await handleLogin(res);
+      } catch (error) {
+        logError("SplashScreen", error);
+        logWarn("SplashScreen", "Login response could not be processed");
+        releaseLogin();
+        setErrorState({
+          visible: true,
+          type: ErrorType.API_ERROR,
+          message: null,
+        });
+      }
     },
     [dispatch]
   );
 
   const onError = useCallback(
     (error) => {
+      clearTimeout(loginTimeout.current);
       logError("SplashScreen", error);
       logWarn("SplashScreen", "SSO login API failed", {
         status: error?.status,
@@ -427,6 +444,31 @@ const SplashScreen = ({ navigation, route }) => {
     }
   };
 
+  const releaseLogin = () => {
+    clearTimeout(loginTimeout.current);
+    authLockRef.current = false;
+    setAuthInProgress(false);
+    setLoadingState(LoadingState.NONE);
+    setLoginEnable(true);
+  };
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState !== "active" || !authLockRef.current) return;
+      clearTimeout(foregroundGrace.current);
+      foregroundGrace.current = setTimeout(() => {
+        if (!authLockRef.current) return;
+        logWarn("SplashScreen", "Auth did not resume after foreground; releasing UI");
+        releaseLogin();
+      }, FOREGROUND_GRACE);
+    });
+    return () => {
+      subscription.remove();
+      clearTimeout(foregroundGrace.current);
+      clearTimeout(loginTimeout.current);
+    };
+  }, []);
+
   const loginAuth = async () => {
     if (
       authLockRef.current ||
@@ -455,6 +497,17 @@ const SplashScreen = ({ navigation, route }) => {
     setAuthInProgress(true);
     setLoadingState(LoadingState.OPENING_BROWSER);
     setLoginEnable(false);
+
+    clearTimeout(loginTimeout.current);
+    loginTimeout.current = setTimeout(() => {
+      logWarn("SplashScreen", "Login timed out; releasing UI");
+      releaseLogin();
+      setErrorState({
+        visible: true,
+        type: ErrorType.AUTH_TIMEOUT,
+        message: null,
+      });
+    }, LOGIN_WATCHDOG_TIMEOUT);
 
     try {
       const result = await AuthenticationManager.authorizeWithTimeout(config);
@@ -500,6 +553,7 @@ const SplashScreen = ({ navigation, route }) => {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
         }
+        clearTimeout(loginTimeout.current);
         return;
       }
 
@@ -516,6 +570,7 @@ const SplashScreen = ({ navigation, route }) => {
     } catch (error) {
       logError("SplashScreen", error);
       logWarn("SplashScreen", "Authorization failed");
+      clearTimeout(loginTimeout.current);
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
       setErrorState({
