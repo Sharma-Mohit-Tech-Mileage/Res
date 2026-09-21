@@ -269,6 +269,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                   label="Email Address (required)"
                   accessibilityLabel="Email Address"
                   placeholder="Email Address"
+                  revealValue
                   value={email}
                   required
                   error={emailError}
