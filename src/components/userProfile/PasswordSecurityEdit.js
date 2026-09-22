@@ -3,6 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { StyleSheet, Text, View, AccessibilityInfo, findNodeHandle } from "react-native";
 import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
@@ -201,7 +202,7 @@ const PasswordSecurityEdit = () => {
         title="Edit Security Question"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
-      <KeyboardAwareScrollView ref={scrollViewRef} >
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} >
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -336,7 +337,7 @@ const PasswordSecurityEdit = () => {
             onRequestClose={() => setLoading(false)}
           />
         </View>
-      </KeyboardAwareScrollView>
+      </ScreenScroll>
     </View>
   );
 };

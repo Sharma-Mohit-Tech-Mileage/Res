@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StyleSheet, Text, View, Animated, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
 import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import Touchable from "../common/customui/Touchable";
 import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { A11Y } from "../../styles/theme";
@@ -303,7 +304,7 @@ const AddNotificationScreen = () => {
           accessibilityLiveRegion="polite"
         />
       )}
-      <KeyboardAwareScrollView ref={scrollViewRef}>
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
       
         <View style={[AppStyles.card,{margin: Padding.p_base}]}>
           <View style={{ paddingVertical: 16 }}>
@@ -381,6 +382,7 @@ const AddNotificationScreen = () => {
                     error={errors.email?.message}
                     label="Email Address *"
                     required={true}
+                    revealValue
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
@@ -559,7 +561,7 @@ const AddNotificationScreen = () => {
             disabled={isSubmitting}
           />
         </View>
-      </KeyboardAwareScrollView>
+      </ScreenScroll>
     </View>
   );
 };

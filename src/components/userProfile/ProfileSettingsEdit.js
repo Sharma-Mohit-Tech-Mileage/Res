@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle, Platform } from "react-native";
+import { StyleSheet, Text, View, AccessibilityInfo, findNodeHandle, Platform } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import { usernameTerms, validateUsername } from "../utility/constant";
 import { ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import PrimaryButton from "../common/customui/PrimaryButton";
@@ -337,7 +339,7 @@ function decodeIdToken(idToken) {
         onPressBack={handleBackPress}
         showIcon={!isLoginError}
       />
-      <ScrollView ref={scrollViewRef}>
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
           <View style={[AppStyles.card, styles.frameGroupSpaceBlock]}>
             <View style={styles.infoWrapper}>
@@ -488,7 +490,7 @@ function decodeIdToken(idToken) {
             }}
           />
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
