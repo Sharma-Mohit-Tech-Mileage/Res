@@ -93,5 +93,23 @@ target 'My Sparklight' do
       # :ccache_enabled => true
     )
     #__apply_Xcode_12_5_M1_post_install_workaround(installer)
+    # Xcode 27 refuses deployment targets below 15.0, and several pods still declare 9.0-13.4.
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |bc|
+        bc.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1' if bc.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 15.1
+      end
+    end
+    # fmt 11's consteval path does not compile under Apple Clang (Xcode 16+); force it off, idempotently.
+    fmt_base = File.join(installer.sandbox.root, 'fmt', 'include', 'fmt', 'base.h')
+    if File.exist?(fmt_base) && !File.read(fmt_base).include?('FMT_APPLE_CONSTEVAL_WORKAROUND')
+      guard = "#if !defined(__cpp_lib_is_constant_evaluated)\n#  define FMT_USE_CONSTEVAL 0\n"
+      src = File.read(fmt_base)
+      if src.include?(guard)
+        File.chmod(0644, fmt_base)
+        File.write(fmt_base, src.sub(guard, "// FMT_APPLE_CONSTEVAL_WORKAROUND\n#if defined(__APPLE__)\n#  define FMT_USE_CONSTEVAL 0\n#elif !defined(__cpp_lib_is_constant_evaluated)\n#  define FMT_USE_CONSTEVAL 0\n"))
+      else
+        Pod::UI.warn 'fmt/base.h changed upstream; the Apple consteval workaround was not applied.'
+      end
+    end
   end
 end

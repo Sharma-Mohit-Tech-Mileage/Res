@@ -13,6 +13,9 @@
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
+  // SceneDelegate creates the window from the scene, as the iOS 27 SDK requires.
+  self.automaticallyLoadReactNativeWindow = NO;
+  self.launchOptions = launchOptions;
   [FIRApp configure];
   [RNZendeskChatModule configure];
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
