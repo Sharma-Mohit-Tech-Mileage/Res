@@ -11,6 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		2A1705A512C0224297121F3E /* Sparklight/SceneDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13420895DB4A25DAB92B3112 /* Sparklight/SceneDelegate.mm */; };
 		3F1CC01C2EA834490065957B /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1CC01B2EA834490065957B /* File.swift */; };
 		5AA4F6F9711A10F5FF37F603 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 54FB1A3F0D81553C57C22FFA /* PrivacyInfo.xcprivacy */; };
 		6CE6FB97BEE719BE45FCBBF4 /* Pods_My_Sparklight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20538EB60AA90B60C171A757 /* Pods_My_Sparklight.framework */; };
@@ -39,6 +40,7 @@
 		00E356EE1AD99517003FC87E /* My SparklightTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "My SparklightTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* SparklightTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SparklightTests.m; sourceTree = "<group>"; };
+		13420895DB4A25DAB92B3112 /* Sparklight/SceneDelegate.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = Sparklight/SceneDelegate.mm; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* My Sparklight.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "My Sparklight.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Sparklight/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = Sparklight/AppDelegate.mm; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 		91F2150D2CE700540069587B /* RNZendeskChatModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNZendeskChatModule.h; sourceTree = "<group>"; };
 		91F2150E2CE700540069587B /* RNZendeskChatModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNZendeskChatModule.m; sourceTree = "<group>"; };
 		C9F209CFC7418B870974590E /* Pods-My Sparklight.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-My Sparklight.debug.xcconfig"; path = "Target Support Files/Pods-My Sparklight/Pods-My Sparklight.debug.xcconfig"; sourceTree = "<group>"; };
+		E0CB8F384A00EB498128E08B /* Sparklight/SceneDelegate.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = Sparklight/SceneDelegate.h; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -129,6 +132,8 @@
 				91F2150E2CE700540069587B /* RNZendeskChatModule.m */,
 				3F1CC01B2EA834490065957B /* File.swift */,
 				3F1CC01A2EA834480065957B /* My Sparklight-Bridging-Header.h */,
+				E0CB8F384A00EB498128E08B /* Sparklight/SceneDelegate.h */,
+				13420895DB4A25DAB92B3112 /* Sparklight/SceneDelegate.mm */,
 			);
 			name = Sparklight;
 			sourceTree = "<group>";
@@ -525,6 +530,7 @@
 				3F1CC01C2EA834490065957B /* File.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				91F2150F2CE700540069587B /* RNZendeskChatModule.m in Sources */,
+				2A1705A512C0224297121F3E /* Sparklight/SceneDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -549,7 +555,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = SparklightTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -573,7 +579,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = SparklightTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -611,7 +617,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 30.0.1;
+				MARKETING_VERSION = 30.1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -650,7 +656,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 30.0.1;
+				MARKETING_VERSION = 30.1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -752,7 +758,7 @@
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/components/view/platform/cxx",
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD = "";
 				LDPLUSPLUS = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -858,7 +864,7 @@
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/components/view/platform/cxx",
 					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD = "";
 				LDPLUSPLUS = "";
 				LD_RUNPATH_SEARCH_PATHS = (
