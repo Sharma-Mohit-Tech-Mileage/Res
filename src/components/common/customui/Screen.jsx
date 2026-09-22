@@ -4,7 +4,8 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { LAYOUT, contentWidthStyle, useResponsive } from "../../../utils/responsive";
 
 // clearTabBar: true uses the token, a number carries an existing 100/120/150 through the migration.
-export const ScreenScroll = ({
+// ScrollComponent lets a screen supply its own scroller (54136's KeyboardAwareScrollView) while keeping this geometry.
+export const ScreenScroll = React.forwardRef(function ScreenScroll({
   children,
   style,
   contentContainerStyle,
@@ -12,14 +13,16 @@ export const ScreenScroll = ({
   gutter = true,
   fill = false,
   clearTabBar = false,
+  ScrollComponent = ScrollView,
   ...rest
-}) => {
+}, ref) {
   const { sizeClass, gutterStyle } = useResponsive();
   const clearance = clearTabBar === true ? LAYOUT.tabBarClearance : clearTabBar;
   // maxWidth on a ScrollView's contentContainerStyle does not constrain it, so cap an inner wrapper instead.
   const cap = contentWidthStyle(sizeClass, maxWidth);
   return (
-    <ScrollView
+    <ScrollComponent
+      ref={ref}
       style={[fill ? styles.fill : null, style]}
       contentContainerStyle={[
         cap ? styles.centerContent : null,
@@ -30,9 +33,9 @@ export const ScreenScroll = ({
       {...rest}
     >
       {cap ? <View style={cap}>{children}</View> : children}
-    </ScrollView>
+    </ScrollComponent>
   );
-};
+});
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },

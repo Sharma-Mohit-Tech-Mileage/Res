@@ -11,6 +11,8 @@ import { FontFamily, Border, Color, Padding } from "../../../GlobalStyles";
 
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "./customui/Touchable";
+import ModalCard from "./customui/ModalCard";
+import ModalOverlay from "./customui/ModalOverlay";
 import { A11Y } from "../../styles/theme";
 
 // Shared presentation for errors and required updates. Callers own the actions.
@@ -81,8 +83,8 @@ const AlertModal = ({ visible, title, message, actions, onRequestClose, iconColo
       animationType="fade"
       onRequestClose={onRequestClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container} accessibilityViewIsModal={true}>
+      <ModalOverlay>
+        <ModalCard style={styles.container} accessibilityViewIsModal={true}>
           <View style={styles.header}>
             <AlertIcon color={iconColor} />
             <Text accessibilityRole="header" style={styles.title}>{title}</Text>
@@ -122,8 +124,8 @@ const AlertModal = ({ visible, title, message, actions, onRequestClose, iconColo
               </Touchable>
             ))}
           </View>
-        </View>
-      </View>
+        </ModalCard>
+      </ModalOverlay>
     </Modal>
   );
 };

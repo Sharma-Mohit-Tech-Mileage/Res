@@ -20,6 +20,7 @@ import { formatCurrency } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 import { useFeatureFlag } from "../../../contexts/Featureflagscontext";
 import FeatureFlags from "../../../config/Featureflags";
+import { calculateTabBarHeight } from "../../utility/walkthroughHelpers";
 import {
   usePaymentStep,
   trackPaymentSubmitted,
@@ -49,6 +50,10 @@ const HOST_CONTRACT_VERSION = 1;
 const NO_ACCOUNT = {};
 
 const initialFormHeight = (width) => (width < 400 ? 500 : 680);
+
+// 55098: the SDK hands data-form_height to the inner form, so a flat 680px left the tablet Pay button below the fold; size it to the measured frame, never below the phone floor.
+const resolveFormHeight = (width, frameHeight, bottomPad) =>
+  Math.max(initialFormHeight(width), Math.floor(frameHeight - bottomPad));
 
 const esc = (value) =>
   String(value == null ? "" : value)
@@ -166,7 +171,10 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   const paymentTypeParam = route.params?.paymentType || "";
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const formHeight = initialFormHeight(width);
+  const [frameHeight, setFrameHeight] = useState(0);
+  // 55098: pad by the tab-bar estimate (>= the real absolute bar on every screen size) so the widget footer never sits under it.
+  const bottomPad = calculateTabBarHeight(insets) + 16;
+  const formHeight = resolveFormHeight(width, frameHeight, bottomPad);
   const accountDetails = useSelector((state) => state.profile?.accountDetails || NO_ACCOUNT);
   const userInfo = useSelector((state) => state.user?.userData?.userInfo) || {};
   const [busy, setBusy] = useState(false);
@@ -193,7 +201,8 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   }
   const portalHosted = hostModeRef.current === "portal";
 
-  if (widgetParamsRef.current === null) {
+  // Params (and the HTML built from them) wait for the first layout pass so formHeight reflects the real frame.
+  if (widgetParamsRef.current === null && frameHeight > 0) {
     const billing = accountDetails.bill_to_address || {};
     widgetParamsRef.current = {
       apiEvent: mode === "pay" ? "create_payment" : mode === "edit" ? "update_funding_account" : "create_funding_account",
@@ -214,10 +223,10 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
       paymentOption,
       paymentOptionReadOnly,
       formHeight,
-      bottomPad: insets.bottom + 65,
+      bottomPad,
     };
   }
-  if (htmlRef.current === null && !portalHosted) {
+  if (htmlRef.current === null && widgetParamsRef.current !== null && !portalHosted) {
     htmlRef.current = buildWidgetHtml({
       scriptUrl: Config.ORBIPAY_SCRIPT_URL || "",
       clientKey: Config.ORBIPAY_CLIENT_KEY || "",
@@ -225,6 +234,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
     });
   }
   const html = htmlRef.current;
+  const widgetReadyToMount = widgetParamsRef.current !== null;
 
   useEffect(() => {
     if (widgetReady) return undefined;
@@ -374,7 +384,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <View style={styles.body}>
+      <View style={styles.body} onLayout={(e) => setFrameHeight((h) => h || e.nativeEvent.layout.height)}>
       {!!errorAlert && (
         <NotificationAlert
           type="error"
@@ -389,7 +399,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
           <Text style={styles.loadingText}>The secure payment form is taking too long to load.</Text>
           <PrimaryButton title="Try Again" buttonType="submit" accessibilityLabel="Try Again" onPress={onRetry} />
         </View>
-      ) : (
+      ) : widgetReadyToMount && (
         <WebView
           key={retryKey}
           ref={webRef}

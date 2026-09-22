@@ -9,6 +9,7 @@ import {
   AccessibilityInfo,
 } from "react-native";
 import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -215,7 +216,7 @@ const ChangePassword = () => {
         title="Edit Password"
         onPressBack={() => navigation.navigate("PasswordSecurity")}
       />
-      <KeyboardAwareScrollView ref={scrollViewRef}>
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -357,7 +358,7 @@ const ChangePassword = () => {
             }}
           />
         </View>
-      </KeyboardAwareScrollView>
+      </ScreenScroll>
     </View>
   );
 };

@@ -8,6 +8,8 @@ import {
   AccessibilityInfo,
 } from "react-native";
 import Touchable from "./customui/Touchable";
+import ModalCard from "./customui/ModalCard";
+import ModalOverlay from "./customui/ModalOverlay";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CopyIcon from "../../../assets/svgs/CopyIcon";
 
@@ -37,8 +39,8 @@ const TransferOfServiceModal = ({
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.overlay}>
-        <View style={styles.card} accessibilityViewIsModal={true}>
+      <ModalOverlay>
+        <ModalCard style={styles.card} accessibilityViewIsModal={true}>
           <View style={styles.titleRow}>
             <AlertIcon color="#DD6D02" />
             <Text
@@ -118,8 +120,8 @@ const TransferOfServiceModal = ({
               </Touchable>
             </>
           )}
-        </View>
-      </View>
+        </ModalCard>
+      </ModalOverlay>
     </Modal>
   );
 };

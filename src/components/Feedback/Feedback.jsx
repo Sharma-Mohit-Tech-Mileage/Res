@@ -5,13 +5,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
 import {
-  ScrollView,
   StyleSheet,
   View,
   Text,
-  KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 
 import Animated, {
   FadeInDown,
@@ -190,15 +190,12 @@ const Feedback = () => {
   }, [route.params?.updateFailed, navigation]);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <ProfileSettingsHeader
         title="Feedback"
         onPressBack={() => navigation.goBack()}
       />
-      <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} showsVerticalScrollIndicator={false}>
         <Animated.View
           entering={FadeInUp.delay(100).springify()}
           style={styles.content}
@@ -464,6 +461,7 @@ const Feedback = () => {
                   onBlur={onBlur}
                   value={value ? value.toLowerCase() : ""}
                   error={errors.feedbackEmail?.message}
+                  revealValue
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
@@ -502,8 +500,8 @@ const Feedback = () => {
             
           </Animated.View>
         </Animated.View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </ScreenScroll>
+    </View>
   );
 };
 

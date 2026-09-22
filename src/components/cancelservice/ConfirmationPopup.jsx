@@ -8,6 +8,8 @@ import {
 } from "../../../GlobalStyles";
 
 import Touchable from "../common/customui/Touchable";
+import ModalCard from "../common/customui/ModalCard";
+import ModalOverlay from "../common/customui/ModalOverlay";
 
 const ConfimationPopup = ({
   visible,
@@ -24,8 +26,8 @@ const ConfimationPopup = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.alertContainer}>
+      <ModalOverlay>
+        <ModalCard style={styles.alertContainer}>
           <Text style={{textAlign:'center',alignSelf:'center',fontFamily:FontFamily.RadioCanadaRegular, color:Color.sparklightGray,fontSize:22,fontWeight:'500'}}> {title} </Text>
           <Text style={styles.message}>{message}</Text>
           <Touchable
@@ -42,8 +44,8 @@ const ConfimationPopup = ({
           >
             <Text style={styles.closeAlertTxt}>Update Info</Text>
           </Touchable>
-        </View>
-      </View>
+        </ModalCard>
+      </ModalOverlay>
     </Modal>
   );
 };
