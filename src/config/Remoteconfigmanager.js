@@ -21,6 +21,12 @@ const DEFAULT_MAINTENANCE = {
   sessionManagement: {
     invalidateSessionsForAudience: "NONE",
     redirectToSplash: false,
+  },
+  // 52452: lets internal users keep using the app while maintenance blocks everyone else.
+  // Entirely Remote Config driven - set enabled:false to switch every bypass off at once.
+  internalAccess: {
+    enabled: false,
+    bypassCode: "",
   }
 };
 
@@ -167,8 +173,7 @@ class RemoteConfigManager {
         // dev_config wraps maintenance_configuration; unwrap it
         if (parsedMaintenance.maintenance_configuration) {
           parsedMaintenance = parsedMaintenance.maintenance_configuration;
-        }
-      } catch (e) {
+        }      } catch (e) {
         console.warn('[RemoteConfig] Failed to parse maintenance config:', e.message);
         parsedMaintenance = this._maintenanceCache || DEFAULT_MAINTENANCE;
       }

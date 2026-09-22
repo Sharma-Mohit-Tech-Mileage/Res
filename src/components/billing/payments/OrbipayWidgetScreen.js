@@ -9,7 +9,12 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import SmallLoader from "../../common/customui/SmallLoader";
 import { Color } from "../../../../GlobalStyles";
-import { confirmBankToken, confirmPaymentToken, updateFundingAccount } from "../../../network/apis/account/paymentMethods.service";
+import {
+  confirmBankToken,
+  confirmPaymentToken,
+  updateFundingAccount,
+  paymentErrorMessage,
+} from "../../../network/apis/account/paymentMethods.service";
 import { getPrimaryEmail } from "../../utility/constant";
 import { formatCurrency } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
@@ -40,6 +45,8 @@ const WIDGET_TIMEOUT_MS = 20000;
 const WIDGET_SETTLE_MS = 2400;
 
 const HOST_CONTRACT_VERSION = 1;
+// Stable fallback so the selector result can sit in hook dependency lists without re-creating callbacks every render.
+const NO_ACCOUNT = {};
 
 const initialFormHeight = (width) => (width < 400 ? 500 : 680);
 
@@ -160,7 +167,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const formHeight = initialFormHeight(width);
-  const accountDetails = useSelector((state) => state.profile?.accountDetails) || {};
+  const accountDetails = useSelector((state) => state.profile?.accountDetails || NO_ACCOUNT);
   const userInfo = useSelector((state) => state.user?.userData?.userInfo) || {};
   const [busy, setBusy] = useState(false);
   const [widgetReady, setWidgetReady] = useState(false);
@@ -278,12 +285,10 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
           "orbipay_widget"
         );
         if (!navigation.isFocused()) return;
-        const raw = String(error?.message || "");
-        const message = /timeout|network/i.test(raw)
+        // 55255: typed codes and backend error text pass through; HTTP failures get the portal's per-flow copy.
+        const message = /timeout|network/i.test(String(error?.message || ""))
           ? "Please check your internet connection and try again."
-          : raw && !raw.includes("<")
-          ? raw
-          : "We could not complete this request. Please try again.";
+          : paymentErrorMessage(error, mode === "pay" ? "PAYMENT_SUBMIT_FAILED" : "METHOD_NOT_SAVED");
         const flash = { type: "error", title: "Something went wrong", message };
         const state = navigation.getState();
         const prev = state?.routes?.[state.index - 1];
@@ -292,8 +297,17 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
         else navigation.goBack();
       }
     },
-    [mode, amount, fundingAccountId, navigation, returnTo, paymentTypeParam]
+    [mode, amount, fundingAccountId, navigation, returnTo, paymentTypeParam, headerTitle, emailParam, accountDetails]
   );
+
+  const onRetry = useCallback(() => {
+    clearTimeout(settleTimerRef.current);
+    settleTimerRef.current = null;
+    setLoadFailed(false);
+    setWidgetReady(false);
+    initialLoadRef.current = false;
+    setRetryKey((k) => k + 1);
+  }, []);
 
   const onMessage = useCallback(
     ({ nativeEvent }) => {
@@ -303,7 +317,15 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
       if (msg.type === "checkout_event" || msg.type === "orbipay_message") {
         const parsed = parseCheckoutPayload(msg.payload);
         if (parsed?.cancelled) { navigation.goBack(); return; }
-        if (parsed?.token) onCheckoutToken(parsed);
+        if (!parsed?.token) return;
+        // 55255: portal rule — a payment token without its digiSign is not submittable; reload the form so "try again" is possible.
+        if (mode === "pay" && !parsed.digiSign) {
+          setErrorAlert(paymentErrorMessage({ code: "PAYMENT_TOKEN_MISSING" }));
+          trackApiError("orbipay-widget", "token_incomplete", "orbipay_widget");
+          onRetry();
+          return;
+        }
+        onCheckoutToken(parsed);
       } else if (msg.type === "host_ready") {
         const payload = JSON.stringify({ ...widgetParamsRef.current, contract: HOST_CONTRACT_VERSION });
         webRef.current?.injectJavaScript(`window.__orbipayHostInit && window.__orbipayHostInit(${payload}); true;`);
@@ -316,7 +338,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
         trackApiError("orbipay-widget", "load_failed", "orbipay_widget");
       }
     },
-    [navigation, onCheckoutToken]
+    [navigation, onCheckoutToken, mode, onRetry]
   );
 
   const onShouldStartLoadWithRequest = useCallback(
@@ -348,15 +370,6 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
     },
     [onCheckoutToken, portalHosted]
   );
-
-  const onRetry = () => {
-    clearTimeout(settleTimerRef.current);
-    settleTimerRef.current = null;
-    setLoadFailed(false);
-    setWidgetReady(false);
-    initialLoadRef.current = false;
-    setRetryKey((k) => k + 1);
-  };
 
   return (
     <View style={styles.container}>

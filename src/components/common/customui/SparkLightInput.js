@@ -43,10 +43,13 @@ const SparkLightInput = React.forwardRef(({
   required = false,
   onBlur: parentOnBlur,
   onFocus: parentOnFocus,
+  revealValue = false,
   ...props
 }, ref) => {
   const [isFocused, setIsFocused] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(!secure);
+  // 46381: long addresses are clipped by the field, so an eye toggle opens a popover under it showing the whole value.
+  const [revealOpen, setRevealOpen] = useState(false);
   const inputRef = useRef(null);
   const fieldRef = useRef(null);
   const hasBlurred = useRef(false);
@@ -102,6 +105,8 @@ const SparkLightInput = React.forwardRef(({
     setIsFocused(false);
     isFocusedRef.current = false;
     hasBlurred.current = true;
+    // 46381: scroll a long value back to its start so the field shows the head of the address, not the tail.
+    if (revealValue) inputRef.current?.setNativeProps({ selection: { start: 0, end: 0 } });
 
     if (parentOnBlur) parentOnBlur();
   };
@@ -109,6 +114,7 @@ const SparkLightInput = React.forwardRef(({
   // Common input styles
   const getInputStyles = () => [
     styles.textInput,
+    revealValue && { paddingRight: 52 },
     !editable && styles.disabledInput,
     error && { borderColor: "red" },
     !isFocused && !error && { borderColor: Color.sparklightGray1 },
@@ -197,9 +203,31 @@ const SparkLightInput = React.forwardRef(({
           returnKeyType="done"
           keyboardAppearance="default"
           maxFontSizeMultiplier={1.25}
+          selection={revealValue && !isFocused ? { start: 0, end: 0 } : undefined}
           {...props}
         />
+        {revealValue && !!value && (
+          <Touchable
+            onPress={() => setRevealOpen(!revealOpen)}
+            style={styles.revealEyeBtn}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: revealOpen }}
+            accessibilityLabel={revealOpen ? "Hide full email address" : "Show full email address"}
+            accessibilityHint="Double tap to see the full email address"
+          >
+            {revealOpen ? <EyeSlashIcon /> : <EyeIcon />}
+          </Touchable>
+        )}
       </View>
+
+      {revealValue && revealOpen && !!value && (
+        <View style={styles.revealPopover} accessibilityLiveRegion="polite">
+          <View style={styles.revealArrow} />
+          <Text style={styles.revealText} selectable>
+            {value}
+          </Text>
+        </View>
+      )}
 
       {error && (
         <View
@@ -250,6 +278,49 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderColor:'#C7C7CC',
     width: "100%",
+  },
+  // 46381: eye toggle inside the field + popover beneath it.
+  revealEyeBtn: {
+    position: "absolute",
+    right: 8,
+    top: 0,
+    bottom: 0,
+    minWidth: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  revealPopover: {
+    marginTop: 8,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#C7C7CC",
+    borderRadius: Border.br_5xs,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    shadowColor: "#000",
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  // little pointer up towards the eye toggle
+  revealArrow: {
+    position: "absolute",
+    top: -6,
+    right: 18,
+    width: 10,
+    height: 10,
+    backgroundColor: "#FFFFFF",
+    borderLeftWidth: 1,
+    borderTopWidth: 1,
+    borderColor: "#C7C7CC",
+    transform: [{ rotate: "45deg" }],
+  },
+  revealText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    color: Color.colorGray_200,
+    flexWrap: "wrap",
   },
   textInputContainer: {
     borderWidth: 0,

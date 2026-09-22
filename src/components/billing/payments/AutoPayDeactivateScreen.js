@@ -6,8 +6,8 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
-import { SectionTitle, HintText, SectionContent } from "../../common/customui/Typography";
-import { fetchAutoPayDetails, cancelAutoPay } from "../../../network/apis/account/paymentMethods.service";
+import { SectionTitle, SectionContent } from "../../common/customui/Typography";
+import { fetchAutoPayDetails, cancelAutoPay, paymentErrorMessage } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, ordinal } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 import AppStyles from "../../../styles/AppStyles";
@@ -55,9 +55,10 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
       trackAutoPayDisabled(null);
       navigation.replace("PaymentConfirmation", { kind: "autopay-deactivated", headerTitle });
     } catch (error) {
-      trackAutoPayFailed("deactivate_failed");
+      trackAutoPayFailed(error?.code || "deactivate_failed");
       trackApiError("cancel-autopay", errorStatus(error), "autopay_deactivate");
-      setErrorAlert("We could not deactivate Auto Pay right now. Please try again.");
+      // 55255: "deleted": false carries the portal's deactivation copy; transport errors get the request-failed copy.
+      setErrorAlert(paymentErrorMessage(error));
       announceA11y("Error, Auto Pay was not deactivated.");
     } finally {
       inFlightRef.current = false;
@@ -76,6 +77,11 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
             type="error"
             title="Something went wrong"
             message={errorAlert}
+            splitKey={
+              errorAlert.includes("1-877-692-2253")
+                ? [{ text: "1-877-692-2253", action: "call", value: "1-877-692-2253" }]
+                : ""
+            }
             onClose={() => setErrorAlert("")}
             autoFocusTitle
           />

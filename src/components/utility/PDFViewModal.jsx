@@ -1,14 +1,5 @@
 import React, { useState } from "react";
-import {
-  Modal,
-  View,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  Dimensions,
-  Image,
-  StatusBar,
-} from "react-native";
+import { Modal, View, StyleSheet, Text, SafeAreaView, Image, StatusBar } from "react-native";;
 import LinearGradient from 'react-native-linear-gradient';
 import Pdf from 'react-native-pdf';
 import sharePDF from 'react-native-share-pdf';
@@ -138,8 +129,8 @@ const styles = StyleSheet.create({
   },
   pdf: {
     flex:1,
-    width:Dimensions.get('window').width,
-    height:Dimensions.get('window').height,
+    width:"100%",
+    height:"100%",
   },
   profileSettingsChild: {
     overflow: "hidden",

@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -15,6 +15,7 @@ import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalSty
 import ThumbsupIcon from "../../../assets/svgs/Thumbsup";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import Touchable from "../common/customui/Touchable";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(Touchable);
 
@@ -50,7 +51,7 @@ const ThumbsUp = () => {
         accessibilityRole="text"
         accessibilityLabel="Feedback header"
       />
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <ScreenScroll contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.content}>
           <Animated.View
             entering={FadeInUp.delay(100).springify()}
@@ -112,7 +113,7 @@ const ThumbsUp = () => {
           </Animated.View>
           </View>
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };

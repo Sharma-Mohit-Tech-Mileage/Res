@@ -1,16 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  Keyboard,
-  Pressable,
-  Platform,
-  TouchableOpacity,
-  Linking,
-  AccessibilityInfo,
-} from "react-native";
+import { View, StyleSheet, Text, Keyboard, Pressable, Platform, TouchableOpacity, Linking, AccessibilityInfo } from "react-native";
 import {
   Color,
   FontFamily,
@@ -31,7 +20,8 @@ import { FieldTitle, Hyperlink, HintText } from "../common/customui/Typography";
 import Touchable from "../common/customui/Touchable";
 import { A11Y } from "../../styles/theme";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const TextNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -204,7 +194,7 @@ const TextNotifications = ({ navigation }) => {
           <View style={styles.headerTabTwo} />
           <View style={styles.headerTabThree} />
         </View> */}
-      <ScrollView
+      <ScreenScroll
         style={styles.inner}
         contentContainerStyle={styles.innerContent}
         ref={scrollRef}
@@ -365,7 +355,7 @@ const TextNotifications = ({ navigation }) => {
         </View>
 
         {!keyboardHidden && <View style={styles.textBottomHeight} />}
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };

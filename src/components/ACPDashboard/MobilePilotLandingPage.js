@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, Linking, ScrollView, StyleSheet } from "react-native";
+import { View, Text, Linking, StyleSheet } from "react-native";
 import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
 import PilotServiceStatus from "./PilotServiceStatus";
 import Infocircle from "../../../assets/svgs/Infocircle";
@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const DEFAULT_DATE_FORMAT = "MM/DD/YYYY";
 
@@ -199,7 +200,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScreenScroll>
         <View style={styles.infoBox}>
           <View style={styles.infoBoxContent}>
             <View
@@ -228,7 +229,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
 
         {isMobileServiceActive && <MobilePromo />}
         <PilotFaqs />
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };

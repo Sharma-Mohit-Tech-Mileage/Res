@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Animated, Platform, AccessibilityInfo, findNodeHandle} from "react-native";
+import { StyleSheet, Text, View, Animated, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import Touchable from "../common/customui/Touchable";
 import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { A11Y } from "../../styles/theme";
@@ -302,7 +303,7 @@ const AddNotificationScreen = () => {
           accessibilityLiveRegion="polite"
         />
       )}
-      <ScrollView ref={scrollViewRef}>
+      <KeyboardAwareScrollView ref={scrollViewRef}>
       
         <View style={[AppStyles.card,{margin: Padding.p_base}]}>
           <View style={{ paddingVertical: 16 }}>
@@ -558,7 +559,7 @@ const AddNotificationScreen = () => {
             disabled={isSubmitting}
           />
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, TextInput, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
+import KeyboardAwareScrollView from "../../common/customui/KeyboardAwareScrollView";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -129,7 +130,7 @@ const MakePaymentScreen = ({ navigation }) => {
           navigation.goBack();
         }}
       />
-      <ScrollView
+      <KeyboardAwareScrollView
         contentContainerStyle={[contentMaxWidth, { paddingBottom: 140 }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -269,7 +270,7 @@ const MakePaymentScreen = ({ navigation }) => {
         )}
         </View>
         </>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };

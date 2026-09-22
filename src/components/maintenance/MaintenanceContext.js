@@ -1,6 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Platform } from "react-native";
 import RemoteConfigManager from "../../config/Remoteconfigmanager";
+import {
+  isValidBypassCode,
+  readInstallSource,
+  shouldSkipMaintenance,
+} from "../../utils/internalAccess";
 import { useSelector, useDispatch } from "react-redux";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import {
@@ -36,6 +41,20 @@ export const MaintenanceProvider = ({ children }) => {
 
   const [showBanner, setShowBanner] = useState(false);
   const [showMaintenancePage, setShowMaintenancePage] = useState(false);
+  // 52452: internal testers keep access while maintenance blocks everyone else.
+  const [installSource, setInstallSource] = useState(null);
+  const [codeAccepted, setCodeAccepted] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const src = await readInstallSource();
+      if (!cancelled) setInstallSource(src);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
 
   const [blockingState, setBlockingState] = useState({
@@ -440,11 +459,28 @@ export const MaintenanceProvider = ({ children }) => {
     }
   };
 
+  const internalAccessConfig =
+    RemoteConfigManager.getMaintenanceConfig()?.internalAccess || null;
+
+  const hasInternalAccess = shouldSkipMaintenance(internalAccessConfig, installSource, codeAccepted);
+
+  const submitBypassCode = (entered) => {
+    const ok = isValidBypassCode(internalAccessConfig, entered);
+    if (ok) setCodeAccepted(true);
+    return ok;
+  };
+
   return (
     <MaintenanceContext.Provider
       value={{
         showBanner,
-        showMaintenancePage,
+        // 52452: internal testers skip the page. Silent signal = TestFlight or a non-store install;
+        // the code covers store builds. Set enabled:false for a window to turn every bypass off, so
+        // maintenance itself can be tested from an internal build.
+        showMaintenancePage: showMaintenancePage && !hasInternalAccess,
+        hasInternalAccess,
+        internalAccessConfig,
+        submitBypassCode,
         bannerConfig: maintenanceConfig.bannerConfig,
         pageConfig: maintenanceConfig.pageConfig,
         dismissBanner,

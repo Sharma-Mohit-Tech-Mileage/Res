@@ -1,12 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Linking,
-  Platform,
-} from "react-native";
+import { StyleSheet, Text, View, Linking, Platform } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import {
   useNavigation,
@@ -42,6 +35,7 @@ import {
 } from "../common/customui/Typography";
 import { A11y } from "react-native-a11y-order";
 import AddIcon from "../../res/svgIcons/AddIcon";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -273,7 +267,7 @@ const ProfileSettings = () => {
         title="Profile"
         onPressBack={() => navigation.goBack()}
       />
-      <ScrollView accessibilityLabel="Profile settings page.">
+      <ScreenScroll accessibilityLabel="Profile settings page.">
         <View style={{ flexDirection: "column", marginBottom: 300 }}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card]}>
@@ -669,7 +663,7 @@ const ProfileSettings = () => {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };

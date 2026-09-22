@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import NotificationSection from "./NotificationSection";
@@ -11,6 +11,7 @@ import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import AppStyles from "../../styles/AppStyles";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const Notifications = () => {
   const navigation = useNavigation();
@@ -233,7 +234,7 @@ const Notifications = () => {
         title="Notifications"
         onPressBack={handleBackPress}
       />
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScreenScroll style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.sectionsContainer}>
           {sections.map((section) => (
             <NotificationSection
@@ -246,7 +247,7 @@ const Notifications = () => {
             />
           ))}
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };

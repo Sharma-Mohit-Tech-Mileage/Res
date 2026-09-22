@@ -1,19 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  StyleSheet,
-  View,
-  Animated,
-  ScrollView,
-  Platform,
-  Linking,
-  Alert,
-  AccessibilityInfo,
-} from "react-native";
+import { StyleSheet, View, Animated, Platform, Linking, Alert, AccessibilityInfo } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { Color, Padding } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
-import { widthPercentageToDP } from "react-native-responsive-screen";
+import { wp as widthPercentageToDP } from "../../utils/responsive";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
 import Toggle from "../common/Toggle";
@@ -30,6 +21,7 @@ import {
   requestUserPermission,
 } from "../../firebase/FirebaseUtils";
 import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const initialFormState = {
   optOut: false,
@@ -241,7 +233,7 @@ const InAppNotifications = ({ navigation }) => {
         />
       )}
 
-      <ScrollView ref={scrollViewRef}>
+      <ScreenScroll ref={scrollViewRef}>
         <View style={styles.inAppNotificationsInner}>
           <View style={[AppStyles.card, { margin: 16 }]}>
             <View >
@@ -332,7 +324,7 @@ const InAppNotifications = ({ navigation }) => {
             />
           </View>
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };

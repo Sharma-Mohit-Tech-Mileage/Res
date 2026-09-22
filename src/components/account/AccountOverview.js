@@ -1,5 +1,5 @@
 import React, { useEffect, useState,useCallback} from "react";
-import {  StyleSheet, Text, View, Alert, ScrollView,Platform } from "react-native";
+import { StyleSheet, Text, View, Alert, Platform } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useNavigation , useFocusEffect} from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
@@ -28,10 +28,8 @@ import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
 import { getAnalytics, setUserId, setUserProperty } from '@react-native-firebase/analytics';
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { wp } from "../../utils/responsive";
+import { ScreenScroll } from "../common/customui/Screen";
 
 import {
   logoutZendesk,
@@ -205,7 +203,7 @@ const AccountOverview = () => {
             {fullName}
           </HeadingH1>
         </View>
-        <ScrollView style={{ flex: 1 }}>
+        <ScreenScroll style={{ flex: 1 }}>
           <View style={{ marginBottom: '30%' }}>
             <View style={styles.frameGroup}>
               <View style={AppStyles.card}>
@@ -295,7 +293,7 @@ const AccountOverview = () => {
                 {`©${moment().year()} Cable One, Inc. All rights reserved.`}
             </Text>
           </View>
-        </ScrollView>
+        </ScreenScroll>
       </View>
     </View>
   );
@@ -440,7 +438,6 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightGray,
   },
   makePayment: {
-    width: 282,
     color: Color.colorMidnightblue,
     textAlign: "center",
   },

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { View, ScrollView, RefreshControl, StyleSheet } from "react-native";
+import { View, RefreshControl, StyleSheet } from "react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -20,6 +20,7 @@ import { useAnnouncement } from '../../hooks/useAnnouncement';
 import { extractZipCode } from "../utility/constant";
 import { SERVICE_HEADER_GRADIENT } from "./utils/constants";
 import { fetchCurrentUsageRequest } from "../../redux/actions/servicesActions";
+import { ScreenScroll } from "../common/customui/Screen";
 import {
   selectCurrentUsage,
   selectCurrentUsageLoading,
@@ -119,7 +120,7 @@ const MyServicesContent = ({ route }) => {
       </View>
       </View>
 
-      <ScrollView
+      <ScreenScroll
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -171,7 +172,7 @@ const MyServicesContent = ({ route }) => {
         />
 
         <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };

@@ -12,7 +12,7 @@ import Icon from "../common/Icon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
-import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
 import SmallLoader from "../common/customui/SmallLoader";

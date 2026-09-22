@@ -5,11 +5,11 @@ import {
   Text,
   View,
   Keyboard,
-  ScrollView,
   Platform,
   AccessibilityInfo,
   findNodeHandle,
 } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -359,7 +359,7 @@ const TextNotifications = ({ navigation }) => {
           accessibilityLiveRegion="polite"
         />
       )}
-      <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always">
+      <KeyboardAwareScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always">
         <View style={styles.textNotificationsInner}>
           <View style={[AppStyles.card, { margin: 16, paddingBottom: 16 }]}>
             {notification && (
@@ -575,7 +575,7 @@ const TextNotifications = ({ navigation }) => {
             />
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   );
 };

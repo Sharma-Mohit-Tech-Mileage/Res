@@ -17,7 +17,7 @@ import Icon from "../common/Icon";
 import { Hyperlink } from "../common/customui/Typography";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
 import {
   fetchPaymentHistory,
   downloadPaymentReceipt,
@@ -247,13 +247,25 @@ const PaymentHistoryScreen = ({ navigation }) => {
               accessibilityLabel="Search by Confirmation ID, text field, double tap to edit">
             <TextInput
               style={styles.searchInput}
-              placeholder="Search by Confirmation ID"
               value={searchQuery}
               onChangeText={handleSearchChange}
-              placeholderTextColor={Color.sparklightGray1}
               accessible={false}
               importantForAccessibility="no"
             />
+            {/* A TextInput's native placeholder cannot shrink to fit, so render the hint
+                as Text and let it scale down instead of truncating. */}
+            {!searchQuery ? (
+              <View style={styles.searchPlaceholderFill} pointerEvents="none" importantForAccessibility="no-hide-descendants">
+                <Text
+                  style={styles.searchPlaceholder}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.75}
+                >
+                  Search by Confirmation ID
+                </Text>
+              </View>
+            ) : null}
             </View>
           </View>
           
@@ -338,7 +350,7 @@ const styles = StyleSheet.create({
     gap: 10, // Add some gap between the elements
   },
   searchContainer: {
-    width: "65%", // Increased width from 48% to 65%
+    width: "65%",
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Color.sparklightWhite,
@@ -354,6 +366,20 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     marginRight: 8,
+  },
+  // Absolute fill with centred content: an absolute Text with no top/bottom pins itself to the top edge.
+  searchPlaceholderFill: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+  },
+  searchPlaceholder: {
+    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: FontSize.size_base,
+    color: Color.sparklightGray1,
   },
   searchInput: {
     flex: 1,
