@@ -12,6 +12,7 @@ import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 import Touchable from "../../../common/customui/Touchable";
 import AppStyles from "../../../../styles/AppStyles";
 import {SectionTitle} from "../../../common/customui/Typography";
+import { Color } from "../../../../../GlobalStyles";
 
 
 const CHART_HEIGHT = 205;
@@ -957,7 +958,7 @@ const styles = StyleSheet.create({
   },
   dropdownWrapper: { flex: 1 },
   dropdown: {
-    backgroundColor: theme.colors.secondarySurface,
+    backgroundColor: Color.Gray300,
     borderColor: theme.colors.borderLight,
     borderRadius: theme.radius.base,
     height: 48,

@@ -42,7 +42,7 @@ const MyModemCard = ({
       <>
         <View style={styles.details}>
           <FieldContent style={styles.text}>
-            <SectionTitle style={styles.text}>Modem: </SectionTitle>Hitron
+            <SectionTitle style={styles.text}>Model: </SectionTitle>Hitron
             CODA-57
           </FieldContent>
           <FieldContent style={styles.text}>

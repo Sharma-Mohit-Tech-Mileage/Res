@@ -4,6 +4,7 @@ import { HintText } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
 import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
+import { Color } from "../../../../GlobalStyles";
 
 const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false }) => (
   <View style={[styles.speedBanner, plain && styles.plain, style]}>
@@ -23,7 +24,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false }) => (
           height={12}
           style={styles.speedTagArrow}
         />
-        <Text style={styles.speedTagText}>Download</Text>
+        <Text style={styles.speedTagText}>DOWNLOAD</Text>
       </View>
     </View>
 
@@ -42,7 +43,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false }) => (
       <HintText style={styles.speedHeroUnit}>Mbps</HintText>
       <View style={[styles.speedTagRow, plain && styles.plainTag]}>
         <UploadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
-        <Text style={styles.speedTagText}>Upload</Text>
+        <Text style={styles.speedTagText}>UPLOAD</Text>
       </View>
     </View>
   </View>
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
-    color: theme.colors.text.secondary,
+    color: Color.Black_100,
     lineHeight: 40,
   },
   speedHeroUnit: { marginTop: 2 },
