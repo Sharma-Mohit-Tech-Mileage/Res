@@ -1,171 +1,114 @@
-import React, { useEffect, useRef } from "react";
-import { Modal, View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import AnimatedSuccessIcon from "../../components/billing/payments/AnimatedSuccessIcon";
-import {
-  HeadingH2,
-  FieldContent,
-  FieldTitle,
-} from "../common/customui/Typography";
-import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import React from "react";
+import { Modal, View, StyleSheet, ScrollView } from "react-native";
+import AnimatedSuccessIcon from "../billing/payments/AnimatedSuccessIcon";
+import { HeadingH2, Body } from "../common/customui/Typography";
+import ModalOverlay from "../common/customui/ModalOverlay";
+import ModalCard from "../common/customui/ModalCard";
+import AppStyles from "../../styles/AppStyles";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
-const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => {
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View style={styles.backdrop}>
-        <View
-          style={styles.card}
-          accessibilityViewIsModal
-          importantForAccessibility="yes"
-        >
-          <View
-            style={styles.iconWrap}
-            accessible
-            accessibilityRole="image"
-            accessibilityLabel="Success icon"
-            importantForAccessibility="yes"
-          >
-            <View accessible={false} importantForAccessibility="no-hide-descendants">
-              <AnimatedSuccessIcon size={64} />
-            </View>
-          </View>
-          <HeadingH2
-            style={styles.title}
-            accessibilityRole="header"
-            accessibilityLevel={1}
-            accessible
-          >
-            Success!
-          </HeadingH2>
-          <Text
-            style={[
-              styles.message,
-              {
-                marginHorizontal: 16,
-                fontFamily: FontFamily.RadioCanadaBold,
-                fontWeight: "700",
-                fontSize: FontSize.size_sm,
-                marginTop: 12,
-                marginBottom: 12,
-                paddingHorizontal: 16,
-                textAlign: "center",
-              },
-            ]}
-            accessible
-            accessibilityRole="text"
-          >
-            Your account username has been successfully updated.
-          </Text>
-
-          <View
-            style={{
-              marginTop: 16,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "#EAF7ED",
-              borderBottomLeftRadius: 8,
-              borderBottomRightRadius: 8,
-            }}
-          >
-            <View
-              style={{
-                marginVertical: 16,
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-                width: "100%",
-              }}
-            >
-              <HeadingH2
-                style={[styles.title]}
-                accessibilityRole="header"
-                accessibilityLevel={2}
+const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => (
+  <Modal
+    visible={visible}
+    transparent
+    animationType="fade"
+    onRequestClose={onClose}
+  >
+    <ModalOverlay style={styles.backdrop}>
+      <ModalCard
+        style={[AppStyles.card, styles.card]}
+        accessibilityViewIsModal
+        importantForAccessibility="yes"
+      >
+        <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+          <View style={styles.panel}>
+            <View style={styles.summary}>
+              <View
+                style={styles.iconWrap}
                 accessible
+                accessibilityRole="image"
+                accessibilityLabel="Success"
               >
-                Signing back in to finish
+                <View
+                  accessible={false}
+                  importantForAccessibility="no-hide-descendants"
+                >
+                  <AnimatedSuccessIcon size={64} />
+                </View>
+              </View>
+              <HeadingH2 style={styles.title} accessibilityRole="header">
+                Success!
               </HeadingH2>
-              <Text
-                style={[
-                  styles.message,
-                  {
-                    fontFamily: FontFamily.RadioCanadaBold,
-                    fontWeight: "700",
-                    fontSize: FontSize.size_sm,
-                    marginTop: 12,
-                    marginBottom: 12,
-                    paddingHorizontal: 16,
-                    textAlign: "center",
-                  },
-                ]}
-                accessible
-                accessibilityRole="text"
-              >
+              <Body style={styles.message}>
+                Your account username has been successfully updated.
+              </Body>
+            </View>
+            <View style={styles.actionNotice}>
+              <HeadingH2 style={styles.title} accessibilityRole="header">
+                Sign back in to finish
+              </HeadingH2>
+              <Body style={[styles.message, styles.instructions]}>
                 Please sign out and sign back into your account to apply your
                 recent changes. Your updates will take effect immediately upon
                 re-login.
-              </Text>
-              <View
-                style={{
-                  marginTop: 16,
-                  width: wp("86%"),
-                  paddingHorizontal: 16,
-                }}
-              >
-                <PrimaryButton
-                  title="Sign Out"
-                  buttonType="submit"
-                  style={{ width: "100%" }}
-                  accessibilityLabel="Sign Out"
-                  onPress={onClose}
-                />
-              </View>
+              </Body>
             </View>
           </View>
-        </View>
-      </View>
-    </Modal>
-  );
-};
-
+          <PrimaryButton
+            title="Sign Out"
+            buttonType="submit"
+            onPress={onClose}
+            containerStyle={styles.buttonContainer}
+          />
+        </ScrollView>
+      </ModalCard>
+    </ModalOverlay>
+  </Modal>
+);
 const styles = StyleSheet.create({
   backdrop: {
-    flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
+    paddingVertical: 32,
   },
   card: {
-    width: wp("90%"),
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    width: "90%",
+    maxWidth: 420,
+    maxHeight: "90%",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+    overflow: "hidden",
+  },
+  panel: { overflow: "hidden" },
+  summary: {
     alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 24,
   },
-  iconWrap: { marginBottom: 16, marginTop: 16 },
-  title: { textAlign: "center", marginBottom: 4 },
-  message: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.colorGray_200,
+  iconWrap: {
+    width: 64,
+    height: 64,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  title: {
     textAlign: "center",
-    marginTop: 12,
+    marginBottom: 8,
+    color: "#000000",
   },
-  detailBlock: { alignSelf: "stretch", marginTop: 8 },
-  detailLabel: { marginBottom: 6 },
-  detailValue: {},
-  closeButton: {
-    marginTop: 16,
-    backgroundColor: Color.colorPrimary,
-    paddingVertical: 10,
-    paddingHorizontal: 28,
-    borderRadius: 6,
+  message: {
+    lineHeight: 20,
+    color: "#000000",
+    textAlign: "center",
   },
-  closeButtonText: { color: "#fff", fontWeight: "600" },
+  actionNotice: {
+    backgroundColor: "#EAF7ED",
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+  },
+  instructions: { marginTop: 12 },
+  buttonContainer: { marginTop: 24, marginHorizontal: 20, marginBottom: 16 },
 });
-
 export default UsernameSuccessModal;

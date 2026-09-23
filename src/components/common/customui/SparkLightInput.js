@@ -156,56 +156,59 @@ const SparkLightInput = React.forwardRef(({
         )}
       </View>
 
-      <View
-        ref={fieldRef}
-        accessible={true}
-        accessibilityRole="text"
-        accessibilityLabel={`${formatInputA11yReadout({
-          label: accessibilityLabel || label || placeholder,
-          required,
-          value,
-          isPhoneNumber: getKeyboardType() === "phone-pad",
-          isSecure: secure,
-          // The real TextInput is a11y-hidden, so iOS never auto-reads the value — compose it here.
-          osAddsValue: false,
-        })}${editable ? ", double tap to edit" : ""}`}
-        accessibilityHint={error ? (errorHint || error) : undefined}
-        importantForAccessibility="yes"
-        style={[
-          styles.textInputContainer,
-          {
-            borderColor:
-              isFocused && error != undefined
-                ? "red"
-                : Color.sparklightGray1,
-          },
-        ]}
-      >
-        {showTextIcon && (
-          <View style={styles.lockIcon}>
-            <Passwordlock />
-          </View>
-        )}
+      {/* Not accessible on purpose: inside the accessible field iOS merges the eye toggle into one element and VoiceOver cannot reach it. */}
+      <View style={styles.fieldRow}>
+        <View
+          ref={fieldRef}
+          accessible={true}
+          accessibilityRole="text"
+          accessibilityLabel={`${formatInputA11yReadout({
+            label: accessibilityLabel || label || placeholder,
+            required,
+            value,
+            isPhoneNumber: getKeyboardType() === "phone-pad",
+            isSecure: secure,
+            // The real TextInput is a11y-hidden, so iOS never auto-reads the value — compose it here.
+            osAddsValue: false,
+          })}${editable ? ", double tap to edit" : ""}`}
+          accessibilityHint={error ? (errorHint || error) : undefined}
+          importantForAccessibility="yes"
+          style={[
+            styles.textInputContainer,
+            {
+              borderColor:
+                isFocused && error != undefined
+                  ? "red"
+                  : Color.sparklightGray1,
+            },
+          ]}
+        >
+          {showTextIcon && (
+            <View style={styles.lockIcon}>
+              <Passwordlock />
+            </View>
+          )}
 
-        <TextInput
-          placeholder={placeholder}
-          value={value}
-          ref={inputRef}
-          onChangeText={handleInputChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          editable={editable}
-          secureTextEntry={secure && !passwordVisible}
-          style={getInputStyles()}
-          accessible={false}
-          importantForAccessibility="no"
-          keyboardType={getKeyboardType()}
-          returnKeyType="done"
-          keyboardAppearance="default"
-          maxFontSizeMultiplier={1.25}
-          selection={revealValue && !isFocused ? { start: 0, end: 0 } : undefined}
-          {...props}
-        />
+          <TextInput
+            placeholder={placeholder}
+            value={value}
+            ref={inputRef}
+            onChangeText={handleInputChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            editable={editable}
+            secureTextEntry={secure && !passwordVisible}
+            style={getInputStyles()}
+            accessible={false}
+            importantForAccessibility="no"
+            keyboardType={getKeyboardType()}
+            returnKeyType="done"
+            keyboardAppearance="default"
+            maxFontSizeMultiplier={1.25}
+            selection={revealValue && !isFocused ? { start: 0, end: 0 } : undefined}
+            {...props}
+          />
+        </View>
         {revealValue && !!value && (
           <Touchable
             onPress={() => setRevealOpen(!revealOpen)}
@@ -280,6 +283,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   // 46381: eye toggle inside the field + popover beneath it.
+  fieldRow: {
+    position: "relative",
+    justifyContent: "center",
+  },
   revealEyeBtn: {
     position: "absolute",
     right: 8,
