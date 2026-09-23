@@ -88,7 +88,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
               styles.label,
               {
                 fontWeight: "400",
-                color: Color.colorblack_100_100,
+                color: Color.colorblack_100,
                 fontSize: 18,
                 paddingBottom: 5,
                 alignSelf: "center",
