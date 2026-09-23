@@ -3,9 +3,9 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
+import { ScreenScroll } from "../common/customui/Screen";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
@@ -173,7 +173,7 @@ const BillingScreen = ({ navigation }) => {
           Billing Services</Title>
         </View>
 
-        <ScrollView
+        <ScreenScroll
           showsVerticalScrollIndicator={false}
           
         >
@@ -219,7 +219,7 @@ const BillingScreen = ({ navigation }) => {
               </>
             )}
           </View>
-        </ScrollView>
+        </ScreenScroll>
       </View>
     </View>
   );

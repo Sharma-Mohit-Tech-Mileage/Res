@@ -11,7 +11,8 @@ import { FontFamily, Border, Color, Padding } from "../../../GlobalStyles";
 
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "./customui/Touchable";
-import CancelButton from "./customui/CancelButton";
+import ModalCard from "./customui/ModalCard";
+import ModalOverlay from "./customui/ModalOverlay";
 import { A11Y } from "../../styles/theme";
 
 // Shared presentation for errors and required updates. Callers own the actions.
@@ -82,8 +83,8 @@ const AlertModal = ({ visible, title, message, actions, onRequestClose, iconColo
       animationType="fade"
       onRequestClose={onRequestClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.container} accessibilityViewIsModal={true}>
+      <ModalOverlay>
+        <ModalCard style={styles.container} accessibilityViewIsModal={true}>
           <View style={styles.header}>
             <AlertIcon color={iconColor} />
             <Text accessibilityRole="header" style={styles.title}>{title}</Text>
@@ -94,13 +95,7 @@ const AlertModal = ({ visible, title, message, actions, onRequestClose, iconColo
           {renderMessage(message)}
 
           <View style={styles.buttonContainer}>
-            {actions.map((action, index) => action.label.trim().toLowerCase() === "cancel" ? (
-              <CancelButton key={action.action} title={action.label}
-                onPress={action.onPress}
-                containerStyle={index > 0 && styles.buttonSpacing}
-                accessibilityLabel={action.accessibilityLabel || action.label}
-                accessibilityHint={action.accessibilityHint} />
-            ) : (
+            {actions.map((action, index) => (
               <Touchable
                 key={action.action}
                 minSize={0}
@@ -129,8 +124,8 @@ const AlertModal = ({ visible, title, message, actions, onRequestClose, iconColo
               </Touchable>
             ))}
           </View>
-        </View>
-      </View>
+        </ModalCard>
+      </ModalOverlay>
     </Modal>
   );
 };

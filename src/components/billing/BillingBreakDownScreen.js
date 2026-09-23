@@ -4,9 +4,9 @@ import {
   Text,
   View,
   FlatList,
-  ScrollView,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { ScreenScroll } from "../common/customui/Screen";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Color,
@@ -491,7 +491,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         <View
           style={[AppStyles.card, styles.cardContainer, { marginBottom: 32 }]}
         >
-          <ScrollView
+          <ScreenScroll
             contentContainerStyle={{ paddingBottom: 24 }}
             showsVerticalScrollIndicator={false}
           >
@@ -512,7 +512,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
             </View>
             {/* Main content */}
             {renderContent()}
-          </ScrollView>
+          </ScreenScroll>
         </View>
       )}
     </View>
@@ -523,7 +523,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.white,
+    backgroundColor: Color.sparklightWhite,
   },
   cardContainer: {
     margin: 16,
@@ -535,13 +535,13 @@ const styles = StyleSheet.create({
     paddingBottom: hp("45%"),
   },
   header: {
-    backgroundColor: Color.white,
+    backgroundColor: Color.sparklightWhite,
     paddingTop: hp(5),
   },
   headerText: {
     fontSize: FontSize.size_3xl,
     fontFamily: FontFamily.poppinsBold,
-    color: Color.black,
+    color: Color.colorblack_100,
   },
   errorTxt: {
     color: "#001321",
