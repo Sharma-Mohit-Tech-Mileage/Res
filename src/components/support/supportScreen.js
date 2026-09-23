@@ -1,6 +1,6 @@
 import React, { useRef, useState, useCallback } from "react";
 import { StyleSheet, View } from "react-native";
-import Touchable from "../common/customui/Touchable";
+import MenuRow, { MenuCard } from "../common/customui/MenuRow";
 import { useSelector } from "react-redux";
 import {
   Border,
@@ -148,129 +148,25 @@ const Support = ({ route }) => {
            
           >
           
-              <View style={styles.supportCard}>
-                <View
-                  style={[
-                    styles.headingContainer,
-                    styles.headingContainerSpaceBlock,
-                  ]}
-                >
-                  <SectionTitle style={{flex: 1}} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Knowledgebase">
-                    Knowledgebase
-                  </SectionTitle>
-                </View>
-                <View style={styles.frameChild} />
-                {items.map((item, index) => (
-                  <React.Fragment key={item.name}>
-                    <Touchable
-                      key={index+item.key}
-                      minSize={0}
-                      style={[styles.search, styles.navigationBorder, { alignItems: 'stretch' }]}
-                      accessibilityRole="button"
-                      accessibilityLabel={item.accessibilityLabel}
-                      onPress={() => {
-                        if (item.iconAlignment === "left") {
-                          navigation.navigate(item.navigateTo);
-                        } else {
-                          navigation.navigate(item.navigateTo, {
-                            url: item.url,
-                            name: item.text,
-                          });
-                        }
-                      }}
-                    >
-                      <View style={styles.pressableContent}>
-                        {item.iconAlignment === "left" && (
-                          <View
-                            style={[
-                              styles.iconStyle,
-                              styles.iconLeft,
-                            ]}
-                          >
-                            <item.icon />
-                          </View>
-                        )}
-                        <MenuText
-                          style={
-                            item.iconAlignment === "right"
-                              ? [styles.searchChild, styles.textTypoRight]
-                              : [
-                                  {
-                                    paddingHorizontal: Padding.p_3xs,
-                                  },
-                                ]
-                          }
-                        >
-                          {item.text}
-                        </MenuText>
-                        {item.iconAlignment === "right" && (
-                          <View style={styles.rightIconLayout}>
-                            <item.icon />
-                          </View>
-                        )}
-                      </View>
-                    </Touchable>
-                    {index < items.length - 1 && (
-                      <View key={index + 1} style={[styles.frameChild]} />
-                    )}
-                  </React.Fragment>
-                ))}
-              </View>
-              
-            
-              <View style={[styles.supportCardWithSpacing]}>
-                <View
-                  style={[
-                    styles.headingContainer,
-                    styles.headingContainerSpaceBlock,
-                    { flexDirection: "column",paddingHorizontal:0 },
-                  ]}
-                >
-                  <SectionTitle style={[{  paddingHorizontal: Padding.p_5xl}]} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Contact Us">
-                    Contact Us
-                  </SectionTitle>
-                  <View style={styles.separator} />
-                  <Touchable
-                    minSize={0}
-                    style={[styles.search, styles.navigationBorder, { alignItems: 'stretch' }]}
-                    accessibilityLabel="Sparklight Customer Support"
-                    accessibilityRole="button"
-                    onPress={() => {
-                      navigation.navigate("ArticleWindowUtility", {
-                        url: "https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT?isMobile=true",
-                        name: "Sparklight Customer Support",
-                      });
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                        paddingRight: Padding.p_5xl,
-                        marginTop: Padding.p_3xs,
-                      }}
-                    >
-                      <MenuText
-                        style={[
-                          styles.textTypoRight,
-                          { paddingVertical: Padding.p_xs, paddingHorizontal: Padding.p_5xl },
-                        ]}
-                      >
-                        {"Sparklight Customer Support"}
-                      </MenuText>
-                      <View style={[styles.rightIconLayout]}> 
-                        <RighIcon />
-                      </View>
-                    </View>
-                  </Touchable>
-                </View>
-              </View>
-           
-          
-            
-            
+              <MenuCard title="Knowledgebase">
+                {items.map((item) => <MenuRow key={item.text} label={item.text.trim()}
+                  accessibilityLabel={item.accessibilityLabel}
+                  leadingIcon={item.iconAlignment === "left" ? <Searchmd /> : undefined}
+                  showChevron={item.iconAlignment !== "left"}
+                  onPress={() => item.iconAlignment === "left"
+                    ? navigation.navigate(item.navigateTo)
+                    : navigation.navigate(item.navigateTo, { url: item.url, name: item.text })}
+                />)}
+              </MenuCard>
+              <MenuCard title="Contact Us" style={{ marginTop: 16, marginBottom: 150 }}>
+                <MenuRow label="Sparklight Customer Support" onPress={() => {
+                  navigation.navigate("ArticleWindowUtility", {
+                    url: "https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT?isMobile=true",
+                    name: "Sparklight Customer Support",
+                  });
+                }} />
+              </MenuCard>
+
             <CustomerErrorPage
               visible={isAgentNotAvailable}
               message={

@@ -1,3 +1,5 @@
+jest.mock('../../src/network/apis/services/speedTest.service', () => ({ rebootModem: jest.fn() }));
+import speedTestApi from '../../src/network/apis/services/speedTest.service';
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
 import RebootModemScreen from '../../src/components/services/manageEquipment/RebootModemScreen';
@@ -43,19 +45,15 @@ it('shows failure and retries the same reboot callback', async () => {
   act(() => screen.unmount());
 });
 
-it('previews loading, failure, and retry success without an API', () => {
-  jest.useFakeTimers();
+it('uses the reboot API and retries failure', async () => {
+  speedTestApi.rebootModem.mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce(true);
   let screen;
-  act(() => { screen = renderer.create(<RebootModemScreen navigation={{}} />); });
-  act(() => { screen.root.findAllByType('Button')[0].props.onPress(); });
-  expect(screen.root.findByType('Loading')).toBeTruthy();
-  act(() => jest.advanceTimersByTime(2000));
-  act(() => { screen.root.findByType('Failure').props.onRetry(); });
-  expect(screen.root.findByType('Loading')).toBeTruthy();
-  act(() => jest.advanceTimersByTime(2000));
+  act(() => { screen = renderer.create(<RebootModemScreen navigation={{}} route={{params: {ip: '10.1.2.3'}}} />); });
+  await act(async () => { await screen.root.findAllByType('Button')[0].props.onPress(); });
+  await act(async () => { await screen.root.findByType('Failure').props.onRetry(); });
+  expect(speedTestApi.rebootModem).toHaveBeenCalledWith('10.1.2.3');
   expect(screen.root.findByType('Success')).toBeTruthy();
   act(() => screen.unmount());
-  jest.useRealTimers();
 });
 
 it('keeps both actions visible and disabled inside the card while rebooting', () => {

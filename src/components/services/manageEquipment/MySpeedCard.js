@@ -1,7 +1,8 @@
-import ClockIcon from "../../../res/svgIcons/ClockIcon";
+import SpeedTestTimestamp from "../speedTest/SpeedTestTimestamp";
+import ServiceLoader from "../../common/customui/ServiceLoader";
 import SpeedometerIcon from "../../../res/svgIcons/SpeedometerIcon";
 import EquipmentSpeedResults from "./EquipmentSpeedResults";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, Linking, StyleSheet, View } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import SpeedAnimation from "../../common/SpeedAnimation";
@@ -12,16 +13,12 @@ import LinkText from "../../common/customui/LinkText";
 import {
   Body,
   SectionTitle,
-  FieldContent,
 } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 import AppStyles from "../../../styles/AppStyles";
 
 
-const SAMPLE_RESULTS = {
-  wifi: { download: "220.74", upload: "216.29" },
-  modem: { download: "300.00", upload: "285.50" },
-};
+import speedTestApi from "../../../network/apis/services/speedTest.service";
 
 const DecorativeIcon = ({ name, size = 20, color = theme.colors.primary }) => (
   <View
@@ -33,25 +30,33 @@ const DecorativeIcon = ({ name, size = 20, color = theme.colors.primary }) => (
   </View>
 );
 
-// Static preview only: these values do not measure the device's connection.
-const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
+const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd }) => {
   const [tab, setTab] = useState("wifi");
-  const [testing, setTesting] = useState(false);
-  const timer = useRef(null);
-  useEffect(() => () => clearTimeout(timer.current), []);
-  const testSpeed = () => {
-    if (navigation) {
-      navigation.navigate(tab === "wifi" ? "WifiSpeedTest" : "ModemSpeedTest");
-      return;
-    }
-    if (timer.current) return;
-    setTesting(true);
-    timer.current = setTimeout(() => {
-      setTesting(false);
-      timer.current = null;
-    }, 2000);
-  };
-  const result = SAMPLE_RESULTS[tab];
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [result, setResult] = useState(null);
+  useEffect(() => {
+    let active = true;
+    let request = 0;
+    const load = async () => {
+      const current = ++request;
+      setLoading(true);
+      setError(false);
+      setResult(null);
+      try {
+        const latest = await (tab === "wifi" ? speedTestApi.getOoklaResult() : speedTestApi.getEeroDetails());
+        if (active && current === request) setResult(latest);
+      } catch {
+        if (active && current === request) setError(true);
+      } finally {
+        if (active && current === request) { setLoading(false); onLoadEnd?.(); }
+      }
+    };
+    load();
+    const unsubscribe = navigation?.addListener?.("focus", load);
+    return () => { active = false; unsubscribe?.(); };
+  }, [tab, navigation, refreshKey, onLoadEnd]);
+  const testSpeed = () => navigation?.navigate(tab === "wifi" ? "WifiSpeedTest" : "ModemSpeedTest");
 
   return (
     <SurfaceCard style={styles.card}>
@@ -60,7 +65,6 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
           <SpeedometerIcon />
         </View>
         <SectionTitle style={styles.title}>My Speed</SectionTitle>
-        <SectionTitle style={styles.plan}>300 Mbps</SectionTitle>
       </View>
       <View style={styles.notice}>
         <DecorativeIcon
@@ -90,7 +94,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
                 value === "wifi" ? "WiFi Speed" : "Modem Speed"
               }
               accessibilityState={{ selected: tab === value }}
-              disabled={testing}
+              disabled={loading}
               onPress={() => setTab(value)}
               minSize={0}
               style={[styles.tab, tab === value && styles.activeTab]}
@@ -113,30 +117,30 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation }) => {
           </View>
           <SurfaceCard style={styles.connection}>
             <SpeedAnimation speedType={tab} hasEeroDevice={hasEeroDevice} />
-            {testing && (
-              <Body style={styles.testingLabel} accessibilityLiveRegion="polite">
-                Testing speed...
+            {loading && (
+              <Body style={styles.loadingLabel} accessibilityLiveRegion="polite">
+                Loading latest result...
               </Body>
             )}
           </SurfaceCard>
           <View accessibilityLiveRegion="polite">
-            <EquipmentSpeedResults download={result.download} upload={result.upload} style={{marginHorizontal: 0, marginTop: theme.spacing.md}} />
+            <EquipmentSpeedResults download={result?.download ?? "---"} upload={result?.upload ?? "---"} style={{marginHorizontal: 0, marginTop: theme.spacing.md}} />
           </View>
-          <PrimaryButton
-            title={testing ? "Testing Speed..." : "Test Speed"}
+          {error && <Body accessibilityLiveRegion="polite">Unable to load the latest result.</Body>}
+          {!loading && !error && !result && <Body>No speed test results yet.</Body>}
+          {loading ? (
+            <View style={styles.testLoader} accessible accessibilityRole="progressbar"
+              accessibilityLabel="Loading speed test data" accessibilityState={{ busy: true }}>
+              <ServiceLoader />
+            </View>
+          ) : <PrimaryButton
+            title="Test Speed"
             buttonType="submit"
-            disabled={testing}
             onPress={testSpeed}
             style={styles.testButton}
-          />
+          />}
         </View>
-        <View style={styles.footer}>
-          <ClockIcon color={theme.colors.text.secondary} />
-          <FieldContent>
-            <FieldContent style={styles.muted}>Last run </FieldContent>10/05/23
-            11:32am
-          </FieldContent>
-        </View>
+        <SpeedTestTimestamp label="Last run" value={result?.updated} />
       </View>
     </SurfaceCard>
   );
@@ -218,20 +222,9 @@ const styles = StyleSheet.create({
     minHeight: 104,
     justifyContent: "center",
   },
-  testingLabel: { textAlign: "center", marginTop: theme.spacing.sm },
+  loadingLabel: { textAlign: "center", marginTop: theme.spacing.sm },
   testButton: { paddingVertical: theme.spacing.md },
-  footer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: theme.spacing.xs,
-    borderTopWidth: 1,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.md,
-    marginTop: 0,
-  },
-  muted: { color: theme.colors.text.secondary },
+  testLoader: { minHeight: 60, alignItems: "center", justifyContent: "center" },
 });
 
 export default MySpeedCard;

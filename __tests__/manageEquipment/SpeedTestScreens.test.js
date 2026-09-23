@@ -1,3 +1,7 @@
+jest.mock("../../src/network/apis/services/speedTest.service", () => ({
+  runEeroSpeedTest: jest.fn(), saveOoklaResult: jest.fn(),
+}));
+import speedTestApi from "../../src/network/apis/services/speedTest.service";
 import React from "react";
 import renderer, { act } from "react-test-renderer";
 import ModemScreen from "../../src/components/services/speedTest/ModemSpeedTestScreen";
@@ -43,24 +47,20 @@ jest.mock("../../src/components/common/ProfileSettingsHeader", () => "Header");
 jest.mock("../../src/components/common/customui/NotificationAlert", () => "Notification");
 beforeEach(() => jest.useFakeTimers());
 afterEach(() => jest.useRealTimers());
-it("completes modem preview and allows rerun", () => {
+it("runs the modem API and allows rerun", async () => {
+  speedTestApi.runEeroSpeedTest.mockResolvedValue({download: 400, upload: 20});
   let screen;
-  act(() => {
-    screen = renderer.create(<ModemScreen navigation={{}} />);
-  });
-  expect(screen.root.findByType("Progress")).toBeTruthy();
-  act(() => jest.advanceTimersByTime(3000));
+  await act(async () => { screen = renderer.create(<ModemScreen navigation={{}} />); });
   expect(screen.root.findByType("Complete")).toBeTruthy();
-  act(() => { screen.root.findByType("Layout").props.action.props.onPress(); });
-  expect(screen.root.findByType("Progress")).toBeTruthy();
+  await act(async () => { await screen.root.findByType("Layout").props.action.props.onPress(); });
+  expect(speedTestApi.runEeroSpeedTest).toHaveBeenCalledTimes(2);
   act(() => screen.unmount());
-  expect(jest.getTimerCount()).toBe(0);
 });
 it("opens the requested WiFi test in a web view and retries a load failure", () => {
   let screen;
   const navigation = {goBack: jest.fn()};
   act(() => { screen = renderer.create(<WifiScreen navigation={navigation} />); });
-  expect(screen.root.findByType("WebView").props.source.uri).toBe("https://cableone.speedtestcustom.com");
+  expect(screen.root.findByType("WebView").props.source.html).toContain("https://cableone.speedtestcustom.com");
   act(() => screen.root.findByType("WebView").props.onError());
   expect(screen.root.findByType("Notification").props.type).toBe("error");
   act(() => screen.root.findAllByType("Button").find(button => button.props.title === "Retry").props.onPress());
@@ -89,5 +89,22 @@ it("prevents overlapping modem requests during pull to refresh", async () => {
   act(() => { screen.root.findByType("Layout").props.refreshControl.props.onRefresh(); });
   expect(onRunSpeedTest).toHaveBeenCalledTimes(1);
   await act(async () => resolve({download: 500, upload: 50}));
+  act(() => screen.unmount());
+});
+
+it("saves completed WiFi results once and retries a failed save", async () => {
+  speedTestApi.saveOoklaResult.mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce(true);
+  let screen;
+  act(() => { screen = renderer.create(<WifiScreen navigation={{}} />); });
+  const event = { nativeEvent: { data: JSON.stringify({ type: "ookla-complete", result: {
+    config: {testId: "test-1"}, device: {platform: "speedtest-custom"},
+    end: {timestamp: "2026-09-22"}, units: "Mbps", download: 200, upload: 20,
+  } }) } };
+  const onMessage = screen.root.findByType("WebView").props.onMessage;
+  await act(async () => { onMessage(event); onMessage(event); });
+  expect(speedTestApi.saveOoklaResult).toHaveBeenCalledTimes(1);
+  await act(async () => { await screen.root.findAllByType("Button").find(b => b.props.title === "Retry Saving Result").props.onPress(); });
+  expect(speedTestApi.saveOoklaResult).toHaveBeenCalledTimes(2);
+  expect(screen.root.findByType("Notification").props.title).toBe("Speed test result saved");
   act(() => screen.unmount());
 });

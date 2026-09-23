@@ -21,6 +21,7 @@ const ProfileSettingsHeader = ({
   iconAlignment = "right",
   iconSource = LeftIcon,
   showIcon = true,
+  showChat = true,
   autoFocusBack = false,
 }) => {
   const [iconPressed, setIconPressed] = useState(false);
@@ -72,9 +73,9 @@ const ProfileSettingsHeader = ({
                 {title}
               </Text>
             </View>
-            <View style={styles.chatContainer}>
+            {showChat && <View style={styles.chatContainer}>
               <ZendeskChatIcon screenName={title} />
-            </View>
+            </View>}
 
             {showIcon && (
               <View style={styles.buttonContainer} pointerEvents="box-none">

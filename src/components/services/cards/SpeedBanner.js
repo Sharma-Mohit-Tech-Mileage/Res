@@ -1,22 +1,30 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import SmallLoader from "../../common/customui/SmallLoader";
 import { HintText } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
 import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
 import { Color } from "../../../../GlobalStyles";
 
-const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false }) => (
+const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false, loading = false }) => (
   <View style={[styles.speedBanner, plain && styles.plain, style]}>
     {/* Download */}
     <View
       style={styles.speedColumn}
       accessible={true}
-      accessibilityLabel={`Download Speed: ${
+      accessibilityState={{ busy: loading }}
+      accessibilityLabel={loading ? "Download speed loading" : `Download Speed: ${
         downloadSpeed ?? "--"
       } Megabits per second`}
     >
-      <Text style={styles.speedHeroValue}>{downloadSpeed ?? "--"}</Text>
+      <View style={styles.valueContainer}>
+        {loading ? (
+          <SmallLoader width={48} height={36} />
+        ) : (
+          <Text style={styles.speedHeroValue}>{downloadSpeed ?? "--"}</Text>
+        )}
+      </View>
       <HintText style={styles.speedHeroUnit}>Mbps</HintText>
       <View style={[styles.speedTagRow, plain && styles.plainTag]}>
         <DownloadcircleIcon
@@ -35,11 +43,18 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false }) => (
     <View
       style={styles.speedColumn}
       accessible={true}
-      accessibilityLabel={`Upload Speed: ${
+      accessibilityState={{ busy: loading }}
+      accessibilityLabel={loading ? "Upload speed loading" : `Upload Speed: ${
         uploadSpeed ?? "--"
       } Megabits per second`}
     >
-      <Text style={styles.speedHeroValue}>{uploadSpeed ?? "--"}</Text>
+      <View style={styles.valueContainer}>
+        {loading ? (
+          <SmallLoader width={48} height={36} />
+        ) : (
+          <Text style={styles.speedHeroValue}>{uploadSpeed ?? "--"}</Text>
+        )}
+      </View>
       <HintText style={styles.speedHeroUnit}>Mbps</HintText>
       <View style={[styles.speedTagRow, plain && styles.plainTag]}>
         <UploadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
@@ -67,6 +82,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
+  valueContainer: { minHeight: 40, justifyContent: "center" },
   speedHeroValue: {
     fontSize: 36,
     fontFamily: theme.typography.family.semiBold,

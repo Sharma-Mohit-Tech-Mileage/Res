@@ -21,15 +21,14 @@ import MySpeedCard from "./MySpeedCard";
 const ManageEquipmentScreen = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useContext(BottomTabBarHeightContext) ?? 0;
+  const [refreshKey, setRefreshKey] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = useCallback(async () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
-    refetchAll();
-    // Give APIs a moment, then clear refreshing
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setRefreshing(false);
+    setRefreshKey(value => value + 1);
   }, []);
+  const onSpeedLoaded = useCallback(() => setRefreshing(false), []);
 
   const handleBack = () => {
     navigation.goBack();
@@ -59,7 +58,7 @@ const ManageEquipmentScreen = ({ navigation, route }) => {
 
         <MyModemCard onReboot={() => navigation.navigate('RebootModem')} />
         <MyAddons />
-        <MySpeedCard navigation={navigation} />
+        <MySpeedCard onLoadEnd={onSpeedLoaded} refreshKey={refreshKey} navigation={navigation} />
 
 
 

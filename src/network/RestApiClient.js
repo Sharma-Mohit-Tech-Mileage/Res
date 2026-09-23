@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
+import { installApiLogging } from './apiLogging';
 import Config from "react-native-config";
 import { getAnalytics, resetAnalyticsData } from "@react-native-firebase/analytics";
 import { getUser, cleanUserData } from "../redux/utils/LocalStorage";
@@ -16,6 +17,8 @@ const _axios = axios.create({
     timeout: 15000,
     headers: { 'Content-Type': 'application/json', 'CallingApp': 'MobileApp' },
 });
+
+installApiLogging(_axios);
 
 let isRefreshing = false;
 let failedQueue = [];
@@ -125,7 +128,7 @@ const AxiosInterceptorProvider = ({ children }) => {
                     }
                 }
 
-                if (isRetryableError(error) && !originalRequest._retryAttempted) {
+                if (isRetryableError(error) && !originalRequest.skipRetry && !originalRequest._retryAttempted) {
                     originalRequest._retryAttempted = true;
                     try { return await retryRequest(_axios, originalRequest); }
                     catch (retryError) { return Promise.reject(retryError); }

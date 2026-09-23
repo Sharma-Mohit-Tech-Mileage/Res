@@ -3,8 +3,8 @@ import { StyleSheet } from "react-native";
 import SpeedBanner from "../cards/SpeedBanner";
 import { theme } from "../../../styles/theme";
 
-const SpeedTestResults = ({ download, upload }) => (
-  <SpeedBanner downloadSpeed={download} uploadSpeed={upload} style={styles.spacing} />
+const SpeedTestResults = ({ download, upload, loading = false }) => (
+  <SpeedBanner loading={loading} downloadSpeed={download} uploadSpeed={upload} style={styles.spacing} />
 );
 
 const styles = StyleSheet.create({

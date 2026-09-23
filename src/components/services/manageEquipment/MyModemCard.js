@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { theme } from "../../../styles/theme";
-import Icon from "../../common/Icon";
+import MenuRow from "../../common/customui/MenuRow";
 import ModemIcon from "../../../res/svgIcons/ModemIcon";
 import SurfaceCard from "../../common/customui/SurfaceCard";
 import Touchable from "../../common/customui/Touchable";
@@ -50,7 +50,7 @@ const MyModemCard = ({
             DA:12:34:56:78:90
           </FieldContent>
         </View>
-        <View style={styles.badge}>
+        <View style={styles.lease}>
           <Caption style={styles.badgeText}>LEASED</Caption>
         </View>
         {showConnectionStatus && (
@@ -59,24 +59,8 @@ const MyModemCard = ({
             <FieldContent style={styles.text}>Connected</FieldContent>
           </View>
         )}
-        <Touchable
-          onPress={onReboot}
-          style={[
-            styles.rebootCta,
-            !showConnectionStatus && styles.rebootWithoutStatus,
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel="Reboot Modem"
-        >
-          <FieldContent style={styles.rebootText}>Reboot Modem</FieldContent>
-          <View
-            accessible={false}
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-          >
-            <Icon name="right-chevron" size={theme.iconSize.sm} />
-          </View>
-        </Touchable>
+        <MenuRow label="Reboot Modem" onPress={onReboot}
+          style={[styles.rebootCta, !showConnectionStatus && styles.rebootWithoutStatus]} />
       </>
     )}
   </SurfaceCard>
@@ -126,6 +110,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     marginVertical: theme.spacing.md,
   },
+   lease: {
+    alignSelf: "flex-start",
+    backgroundColor: theme.colors.surfaceVariant,
+    borderWidth: 1,
+    borderColor: theme.colors.grayMedium,
+    borderRadius: theme.radius.base,
+    paddingVertical: theme.spacing["2xs"],
+    paddingHorizontal: theme.spacing.md,
+    marginVertical: theme.spacing.md,
+  },
   badgeText: {
     fontSize: theme.typography.size.xs,
     fontFamily: theme.typography.family.semiBold,
@@ -150,10 +144,7 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xl,
     marginHorizontal: -theme.spacing.lg,
     marginBottom: -theme.spacing.lg,
-    paddingHorizontal: theme.spacing.base,
-    paddingVertical: theme.spacing.base,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
+
   },
   rebootWithoutStatus: { marginTop: theme.spacing.sm },
   rebootText: {

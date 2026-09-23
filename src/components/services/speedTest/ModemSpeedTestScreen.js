@@ -1,51 +1,39 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, RefreshControl } from "react-native";
+import { RefreshControl } from "react-native";
+import SpeedTestTimestamp from "./SpeedTestTimestamp";
 import SurfaceCard from "../../common/customui/SurfaceCard";
 import PrimaryButton from "../../common/customui/PrimaryButton";
-import { Body, FieldTitle } from "../../common/customui/Typography";
 import SpeedTestLayout from "./SpeedTestLayout";
 import SpeedTestResults from "./SpeedTestResults";
 import ModemSpeedTestProgress from "./ModemSpeedTestProgress";
 import ModemSpeedTestComplete from "./ModemSpeedTestComplete";
-import ClockIcon from "../../../res/svgIcons/ClockIcon";
 import styles from "./speedTestStyles";
 import AppStyles from "../../../styles/AppStyles";
 
-// Hardcoded preview; no network speed measurement is performed.
-const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
+import speedTestApi from "../../../network/apis/services/speedTest.service";
+import NotificationAlert from "../../common/customui/NotificationAlert";
+const ModemSpeedTestScreen = ({ navigation, route, onRunSpeedTest }) => {
   const [complete, setComplete] = useState(false);
-  const timer = useRef(null);
   const mounted = useRef(false);
   const pending = useRef(false);
   const [error, setError] = useState(false);
   const [results, setResults] = useState(null);
+  const loading = !complete && !error;
   const run = async () => {
     if (pending.current) return;
     pending.current = true;
-    clearTimeout(timer.current);
     setComplete(false);
     setError(false);
     setResults(null);
-    if (!onRunSpeedTest) {
-      timer.current = setTimeout(() => {
-        if (mounted.current) {
-          setResults({
-            download: "963",
-            upload: "59",
-            updated: new Date().toLocaleString(),
-          });
-          setComplete(true);
-        }
-        pending.current = false;
-      }, 3000);
-      return;
-    }
     try {
-      const result = await onRunSpeedTest();
+      const result = await (onRunSpeedTest ? onRunSpeedTest() : speedTestApi.runEeroSpeedTest({
+        idType: route?.params?.idType || "account",
+        isCancelled: () => !mounted.current,
+      }));
       if (result?.download == null || result?.upload == null)
         throw new Error("Missing speed results");
       if (mounted.current) {
-        setResults({ ...result, updated: new Date().toLocaleString() });
+        setResults({ ...result, updated: result.updated || new Date().toLocaleString() });
         setComplete(true);
       }
     } catch {
@@ -59,7 +47,6 @@ const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
     run();
     return () => {
       mounted.current = false;
-      clearTimeout(timer.current);
     };
   }, []);
   return (
@@ -93,17 +80,16 @@ const ModemSpeedTestScreen = ({ navigation, onRunSpeedTest }) => {
         ) : (
           <ModemSpeedTestProgress />
         )}
+        {results?.historySaved === false && <NotificationAlert
+          type="error" title="Result not saved" showCloseIcon={false}
+          message="Your test completed, but its history could not be saved."
+        />}
         <SpeedTestResults
+          loading={loading}
           download={results?.download ?? "---"}
           upload={results?.upload ?? "---"}
         />
-        <View style={styles.updated}>
-          <ClockIcon />
-          <View>
-            <FieldTitle style={styles.updatedTitle}>Updated</FieldTitle>
-            <Body>{results?.updated ?? "---"}</Body>
-          </View>
-        </View>
+        <SpeedTestTimestamp variant="updated" label="Updated" value={results?.updated} loading={loading} />
       </SurfaceCard>
     </SpeedTestLayout>
   );

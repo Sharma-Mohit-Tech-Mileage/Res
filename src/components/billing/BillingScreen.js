@@ -33,7 +33,7 @@ import {
 } from "react-native-responsive-screen";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
-import RightIcon from "../../../assets/svgs/Chevonright";
+import MenuRow, { MenuCard } from "../common/customui/MenuRow";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import AppStyles from "../../styles/AppStyles";
 import { SectionTitle,Title,MenuText } from "../common/customui/Typography";
@@ -207,122 +207,15 @@ const BillingScreen = ({ navigation }) => {
                   navigation={navigation}
                   isStatusLoading={paperlessLoading}
                 />
-                <View style={[AppStyles.card,{paddingBottom:16}]}>
-                  <>
-                  <View
-                    style={[
-                      styles.myModemWrapper,
-                      styles.frameParentSpaceBlock1,
-                    ]}
-                  >
-                    <SectionTitle style={[styles.leftTitle]} 
-                    accessible={true}
-                    accessibilityLabel="Billing Options"
-                    accessibilityRole="header" accessibilityLevel={2}>
-                      Billing Options
-                      </SectionTitle>
-                  </View>
-                  <View
-                    style={[
-                      styles.supportAccordionParent,
-                      styles.supportParentFlexBox,
-                    ]}
-                  >
-                    <View style={styles.frameLayout} />
-                    <Touchable
-                      minSize={0}
-                      style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
-                      onPress={() => {
-                        navigation.navigate("PaymentMethods");
-                      }}
-                      accessible={true}
-                      accessibilityRole="button"
-                      accessibilityLabel="Manage Payment Method"
-                    >
-                     
-                      <MenuText style={styles.modemHealthSupport}>
-                        Manage Payment Method
-                      </MenuText>
-                      <View
-                        style={styles.rightIconLayout}
-                      >
-                        <RightIcon />
-                      </View>
- 
-                    </Touchable>
-
-                    <View style={styles.frameLayout} />
-                    {
-                      <Touchable
-                        minSize={0}
-                        style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
-                        onPress={() => {
-                          navigation.navigate("BillingBreakDown");
-                        }}
-                        accessible={true}
-                        accessibilityRole="button"
-                        accessibilityLabel="View Bill Breakdown"
-                      >
-                        
-                        <MenuText style={styles.modemHealthSupport}>
-                          {"View Bill Breakdown"}
-                        </MenuText>
-                        <View
-                          style={styles.rightIconLayout}
-                        >
-                          <RightIcon />
-                        </View>
-                      </Touchable>
-                    }
-                    <View style={styles.frameLayout} />
-                    <Touchable
-                      minSize={0}
-                      style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
-                      onPress={() => {
-                        navigation.navigate("PaymentHistory");
-                      }}
-                      accessible={true}
-                      accessibilityRole="button"
-                      accessibilityLabel="View Payment History"
-                    >
-                      
-
-                      <MenuText style={styles.modemHealthSupport}>
-                        View Payment History
-                      </MenuText>
-                      <View
-                        style={styles.rightIconLayout}
-                      >
-                        <RightIcon />
-                      </View>
- 
-                    </Touchable>
-                    <View style={styles.frameLayout} />
-
-                    <Touchable
-                      minSize={0}
-                      style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
-                      onPress={() => {
-                        navigation.navigate("BillingStatements");
-                      }}
-                      accessible={true}
-                      accessibilityRole="button"
-                      accessibilityLabel="View Billing Statements"
-                    >
-                      
-                      <MenuText style={styles.modemHealthSupport}>
-                        View Billing Statements
-                      </MenuText>
-                      <View
-                        style={styles.rightIconLayout}
-                      >
-                        <RightIcon />
-                      </View>
- 
-                    </Touchable>
-                  </View>
-                  </>
-                </View>
+                <MenuCard title="Billing Options">
+                  {[
+                    ["Manage Payment Method", "PaymentMethods"],
+                    ["View Bill Breakdown", "BillingBreakDown"],
+                    ["View Payment History", "PaymentHistory"],
+                    ["View Billing Statements", "BillingStatements"],
+                  ].map(([label, screen]) => <MenuRow key={screen} label={label}
+                    onPress={() => navigation.navigate(screen)} />)}
+                </MenuCard>
               </>
             )}
           </View>

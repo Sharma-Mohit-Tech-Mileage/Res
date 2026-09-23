@@ -7,37 +7,26 @@ import RebootModemLoading from "./RebootModemLoading";
 import RebootModemSuccess from "./RebootModemSuccess";
 import RebootModemFailure from "./RebootModemFailure";
 
-// UI demo: first attempt fails after 2 seconds; retry succeeds.
-// An injected onReboot can replace the demo when the service is ready.
-const RebootModemScreen = ({ navigation, onReboot }) => {
+import speedTestApi from "../../../network/apis/services/speedTest.service";
+const RebootModemScreen = ({ navigation, route, onReboot }) => {
   const [status, setStatus] = useState("confirmation");
   const pending = useRef(false);
   const mounted = useRef(true);
-  const demoTimer = useRef(null);
-  const demoAttempts = useRef(0);
   useEffect(() => {
     mounted.current = true;
     return () => {
       mounted.current = false;
-      clearTimeout(demoTimer.current);
     };
   }, []);
   const handleReboot = async () => {
     if (pending.current) return;
     pending.current = true;
     setStatus("loading");
-    if (!onReboot) {
-      demoAttempts.current += 1;
-      demoTimer.current = setTimeout(() => {
-        if (mounted.current) {
-          setStatus(demoAttempts.current === 1 ? "failure" : "success");
-        }
-        pending.current = false;
-      }, 2000);
-      return;
-    }
     try {
-      await onReboot();
+      const result = await (onReboot
+        ? onReboot()
+        : speedTestApi.rebootModem(route?.params?.ip));
+      if (result === false) throw new Error("Reboot failed");
       if (mounted.current) setStatus("success");
     } catch (error) {
       if (mounted.current) setStatus("failure");

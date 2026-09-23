@@ -6,7 +6,7 @@ import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalSty
 import { A11Y } from "../../styles/theme";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import LinearGradient from "react-native-linear-gradient";
-import RightIcon from '../../../assets/svgs/Chevonright';
+import MenuRow from "../common/customui/MenuRow";
 import ProfileSettingsIcon from '../../../assets/svgs/Rightactionable15';
 import PasswordSecurityIcon from '../../../assets/svgs/Rightactionable16';
 import NotificationsIcon from '../../../assets/svgs/Rightactinable17';
@@ -208,34 +208,11 @@ const AccountOverview = () => {
             <View style={styles.frameGroup}>
               <View style={AppStyles.card}>
                 {/* Mapping through menu items */}
-                {menues.map((item, index) => (
-                  item.includeInMenu && (<React.Fragment key={item.name}>
-                    <Touchable
-                      minSize={0}
-                      style={[styles.rightActionableGroup, styles.tabsFlexBox]}
-                      onPress={item.onPress}
-                      accessibilityLabel={`${item.name} Button`}
-                      accessibilityHint={`Navigates to ${item.name}`}
-                      accessibilityRole="button"
-                    >
-                      {/* Menu item icon */}
-                     {/* <View accessible={true} accessibilityLabel={`${item.name} icon`}
-                          style={{alignSelf:'center'}}>
-                            <item.icon width={24} height={24}/>
-                          </View> */}
-                      {/* Menu item text */}
-                      <MenuText style={[styles.profileSettings]}>
-                        {item.name}
-                      </MenuText>
-                      {/* Chevron/Arrow icon */}
-                        <View style={styles.rightIconLayout}>
-                          <RightIcon />
-                          </View>
-                    </Touchable>
-                    {/* Divider, if not the last item */}
-                    {item.includeInMenu && index < menuItems1.length - 1 && <View style={styles.frameChild} />}
-                  </React.Fragment>
-                  )))}
+                {menues.filter(item => item.includeInMenu).map((item, index) => (
+                  <MenuRow key={item.name} label={item.name} onPress={item.onPress}
+                    divider={index > 0} accessibilityLabel={`${item.name} Button`}
+                    accessibilityHint={`Navigates to ${item.name}`} />
+                ))}
               </View>
               <View style={{paddingTop: Padding.p_5xl}}>
                 <PrimaryButton
