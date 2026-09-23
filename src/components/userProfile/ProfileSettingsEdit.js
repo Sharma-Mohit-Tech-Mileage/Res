@@ -20,10 +20,9 @@ import { getUser, getSsoToken, storeSsoToken } from "../../redux/utils/LocalStor
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { usernameSchema } from "../utility/validationSchema";
 import AppStyles from "../../styles/AppStyles";
-import AlertIconV2 from "../../../src/res/svgIcons/AlertIconV2";
+import WarningIcon from "../../../assets/svgs/Alerttriangle";
 import {
   SectionTitle,
-  SectionContent,
   HintText,
 } from "../common/customui/Typography";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
@@ -304,20 +303,18 @@ function decodeIdToken(idToken) {
 
   
 
-  const renderErrorMessage = () => {
-    return (
-      <View style={[styles.errorMain]}>
-        <View style={styles.errorInner}>
-          <AlertIconV2 />
-
-          <Text style={styles.errorText}>Your Account Needs Attention</Text>
-          <Text style={styles.errorSubText}>
-            Your current username is no longer supported. Please create a new username using only letters and numbers.
-          </Text>
-        </View>
-      </View>
-    );
-  };
+  const renderErrorMessage = () => (
+    <NotificationAlert
+      type="error"
+      title="Your Account Needs Attention"
+      message="Your current username is no longer supported. Please create a new username using only letters and numbers."
+      iconComponent={WarningIcon}
+      iconSize={18}
+      showCloseIcon
+      isVisible={showValidationAlert}
+      onClose={() => setShowValidationAlert(false)}
+    />
+  );
 
   const handleBackPress = () => {
     if (!isLoginError) {
@@ -339,6 +336,7 @@ function decodeIdToken(idToken) {
       />
       <ScrollView ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
+          {isLoginError && showValidationAlert && renderErrorMessage()}
           <View style={[AppStyles.card, styles.frameGroupSpaceBlock]}>
             <View style={styles.infoWrapper}>
               <NotificationAlert
@@ -349,7 +347,6 @@ function decodeIdToken(idToken) {
                 isVisible={showErrorAlert}
                 onClose={() => setShowErrorAlert(false)}
               />
-              {isLoginError && renderErrorMessage()}
             </View>
             <View
               style={[
@@ -602,38 +599,6 @@ const styles = StyleSheet.create({
   profileSettingsEdit: {
     flex: 1,
     backgroundColor: Color.Gray300,
-  },
-  errorMain: {
-    
-    marginBottom: 16,
-   
-  },
-  errorInner: {
-    backgroundColor: "#FEF3F2",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-    borderColor: "#DF2600",
-    borderWidth: 1,
-     borderRadius: 8,
-  },
-  errorText: {
-    color: "##000000",
-    fontFamily: FontFamily.RadioCanadaMedium,
-    fontSize: FontSize.size_lg,
-    padding: Padding.p_5xs,
-    fontWeight: "500",
-    lineHeight: 16,
-    marginTop: 8,
-  },
-  errorSubText: {
-    color: "##000000",
-    fontFamily: FontFamily.RadioCanadaRegular,
-    fontSize: FontSize.size_sm,
-    lineHeight: 18,
-    textAlign: "center",
-    marginTop: 4,
   },
   requiredFieldsText: {
     textAlign: "left",
