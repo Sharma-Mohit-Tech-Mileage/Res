@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
+import { StyleSheet, Text, View, AccessibilityInfo, findNodeHandle } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
@@ -16,8 +18,6 @@ import { GetApiRequest} from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
-import colors from "../../res/Colors";
-import { requiredField } from "../../styles/utilities";
 import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
 import AppStyles from '../../styles/AppStyles'
@@ -202,7 +202,7 @@ const PasswordSecurityEdit = () => {
         title="Edit Security Question"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
-      <ScrollView ref={scrollViewRef} >
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} >
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -337,7 +337,7 @@ const PasswordSecurityEdit = () => {
             onRequestClose={() => setLoading(false)}
           />
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -507,13 +507,13 @@ const styles = StyleSheet.create({
   },
   passwordSecurityEdit: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   }, BtnContainer: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.colorMidnightblue,
     justifyContent: "center",
   },
   Btn: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     padding: 16,

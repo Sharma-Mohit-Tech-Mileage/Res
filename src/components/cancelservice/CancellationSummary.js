@@ -2,9 +2,10 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   View,
   Text,
-  ScrollView,
   Image,
 } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -26,7 +27,7 @@ import {
 import { card } from "../../styles/utilities";
 import SecondaryButton from "../common/customui/SecondaryButton";
 import ConfimationPopup from "./ConfirmationPopup";
-import colors from "../../res/Colors";
+
 import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
@@ -88,7 +89,7 @@ const CancellationSummary = ({ navigation, route }) => {
   const [devices, setDevices] = useState([]);
   const myTheme = {
     arrowColor: Color.sparklightPrimaryPurple,
-    textSectionTitleColor: Color.sparklightDarkGray,
+    textSectionTitleColor: Color.sparklightGray1,
   };
 
   const {
@@ -125,7 +126,7 @@ const CancellationSummary = ({ navigation, route }) => {
       customStyles: {
         container: {
           backgroundColor: Color.sparklightGray,
-          borderColor: Color.sparklightDarkGray,
+          borderColor: Color.sparklightGray1,
           borderWidth: 1,
           elevation: 2,
         },
@@ -140,7 +141,7 @@ const CancellationSummary = ({ navigation, route }) => {
       customStyles: {
         container: {
           backgroundColor: Color.sparklightGray,
-          borderColor: Color.sparklightDarkGray,
+          borderColor: Color.sparklightGray1,
           borderWidth: 1,
           elevation: 2,
         },
@@ -155,7 +156,7 @@ const CancellationSummary = ({ navigation, route }) => {
       customStyles: {
         container: {
           backgroundColor: Color.sparklightGray,
-          borderColor: Color.sparklightDarkGray,
+          borderColor: Color.sparklightGray1,
           borderWidth: 1,
           elevation: 2,
         },
@@ -506,7 +507,7 @@ const CancellationSummary = ({ navigation, route }) => {
         customStyles: {
           container: {
             backgroundColor: Color.sparklightGray,
-            borderColor: Color.sparklightDarkGray,
+            borderColor: Color.sparklightGray1,
             borderWidth: 1,
             elevation: 2,
           },
@@ -524,7 +525,7 @@ const CancellationSummary = ({ navigation, route }) => {
         customStyles: {
           container: {
             backgroundColor: Color.sparklightPrimaryPurple,
-            borderColor: Color.sparklightDarkGray,
+            borderColor: Color.sparklightGray1,
             borderWidth: 1,
             elevation: 0,
           },
@@ -555,7 +556,7 @@ const CancellationSummary = ({ navigation, route }) => {
         end={{ x: 1.3, y: 0}}
         colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
       />
-      <ScrollView style={{ flex: 1, marginBottom: 100 }} ref={MyRef}>
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} style={{ flex: 1, marginBottom: 100 }} ref={MyRef}>
         <View style={[card.elevated, { margin: 16 }]}>
           {isSuccessMessageVisible && renderSuccessMessage()}
           {renderErrorMessage()}
@@ -618,7 +619,7 @@ const CancellationSummary = ({ navigation, route }) => {
               <Text
                 style={[
                   styles.valueTxt1,
-                  { color: colors.sparklight_bright_purple },
+                  { color: Color.sparklightPrimaryPurple },
                 ]}
               >
                 EQUIPMENT RETURN POLICY
@@ -629,7 +630,7 @@ const CancellationSummary = ({ navigation, route }) => {
                 }}
               >
                 {showTerms ? (
-                  <UpArrow color={colors.sparklight_bright_purple} />
+                  <UpArrow color={Color.sparklightPrimaryPurple} />
                 ) : (
                   <DownArrow />
                 )}
@@ -809,7 +810,7 @@ const CancellationSummary = ({ navigation, route }) => {
                     true: Color.sparklightPrimaryPurple,
                     false:
                       Platform.OS === "ios"
-                        ? Color.colorWhitesmoke_300
+                        ? Color.Gray300
                         : "#D0D5DD",
                   }}
                   accessible={false}
@@ -941,14 +942,14 @@ const CancellationSummary = ({ navigation, route }) => {
             />
           )}
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
 const styles = {
   rootContainer: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   buttonsLayout: {
@@ -974,7 +975,7 @@ const styles = {
   },
   buttons1: {
     marginTop: Padding.p_base,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     paddingHorizontal: 0,
     width: 382,
   },

@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing["2xs"],
     backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: theme.radius.xs,
+    borderRadius: theme.radius.base,
   },
   statValue: {
     fontSize: theme.typography.size.sm,

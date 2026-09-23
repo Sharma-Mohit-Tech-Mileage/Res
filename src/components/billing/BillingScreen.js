@@ -3,9 +3,9 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
+import { ScreenScroll } from "../common/customui/Screen";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
@@ -27,9 +27,6 @@ import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
-import Icon from "../common/Icon";
-import colors from "../../res/Colors";
-import { card } from "../../styles/utilities";
 import {
   widthPercentageToDP,
   heightPercentageToDP,
@@ -176,7 +173,7 @@ const BillingScreen = ({ navigation }) => {
           Billing Services</Title>
         </View>
 
-        <ScrollView
+        <ScreenScroll
           showsVerticalScrollIndicator={false}
           
         >
@@ -329,7 +326,7 @@ const BillingScreen = ({ navigation }) => {
               </>
             )}
           </View>
-        </ScrollView>
+        </ScreenScroll>
       </View>
     </View>
   );
@@ -358,7 +355,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   rightActionable: {
-    borderColor: Color.colorWhitesmoke_200,
+    borderColor: Color.Gray300,
     borderWidth: 4,
     width: 72,
     height: 72,
@@ -386,7 +383,7 @@ const styles = StyleSheet.create({
   },
   account: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   card: {

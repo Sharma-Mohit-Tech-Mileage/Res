@@ -5,14 +5,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
 import {
-  ScrollView,
   StyleSheet,
   View,
   Text,
-  KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import Touchable from "../common/customui/Touchable";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
+
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -190,15 +190,12 @@ const Feedback = () => {
   }, [route.params?.updateFailed, navigation]);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <ProfileSettingsHeader
         title="Feedback"
         onPressBack={() => navigation.goBack()}
       />
-      <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} showsVerticalScrollIndicator={false}>
         <Animated.View
           entering={FadeInUp.delay(100).springify()}
           style={styles.content}
@@ -503,8 +500,8 @@ const Feedback = () => {
             
           </Animated.View>
         </Animated.View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </ScreenScroll>
+    </View>
   );
 };
 
@@ -528,12 +525,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 28,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.gray600,
+    color: Color.sparklightGray1,
   },
   requiredFieldsText: {
     fontSize: 14,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.gray600,
+    color: Color.sparklightGray1,
     marginTop: Padding.p_base,
     textAlign: "left",
   },
@@ -553,7 +550,7 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "400",
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     fontSize: FontSize.size_xs,
     marginTop: Padding.p_5xs,
   },

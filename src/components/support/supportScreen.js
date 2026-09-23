@@ -1,9 +1,5 @@
 import React, { useRef, useState, useCallback } from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useSelector } from "react-redux";
 import {
@@ -17,7 +13,7 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
 
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
@@ -26,6 +22,7 @@ import Searchmd from "../../../assets/svgs/Searchmd";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import {Title,MenuText, SectionTitle} from "../common/customui/Typography";
 import AppStyles from "../../styles/AppStyles";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const Support = ({ route }) => {
   const navigation = useNavigation();
@@ -145,7 +142,7 @@ const Support = ({ route }) => {
               <Title style={styles.wereHereTo} accessible={true} accessibilityRole="header" accessibilityLevel={1} accessibilityLabel="Let's Connect!">Let's Connect!</Title>
             </View>
           </View>
-          <ScrollView
+          <ScreenScroll
             style={{ width: "100%", padding: Padding.p_base,marginBottom:hp('42%') }}
             ref={scrollViewRef}
            
@@ -286,7 +283,7 @@ const Support = ({ route }) => {
               }}
               onClose={undefined}
             />
-          </ScrollView>
+          </ScreenScroll>
         </View>
       </View>
     </View>
@@ -355,7 +352,7 @@ const styles = StyleSheet.create({
   },
   featuredIcon: {
     backgroundColor: Color.colorMidnightblue,
-    borderColor: Color.colorWhitesmoke_200,
+    borderColor: Color.Gray300,
     borderWidth: 4,
     width: 72,
     height: 72,
@@ -411,7 +408,7 @@ const styles = StyleSheet.create({
   },
   support: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   linearGradientStyle: {

@@ -15,6 +15,7 @@ import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
   deletePaymentMethod,
+  paymentErrorMessage,
 } from "../../../network/apis/account/paymentMethods.service";
 import { contentMaxWidth, describePaymentMethod, openOrbipaySecureCapture, openOrbipayEdit } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
@@ -92,12 +93,13 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
       announceA11y("Payment method deleted.");
       trackPaymentMethodDeleted(method);
     } catch (error) {
+      // 55255: portal copy for a delete that the service did not confirm.
       setAlert({
         type: "error",
         title: "Something went wrong",
-        message: "We could not delete this payment method. Please try again.",
+        message: paymentErrorMessage(error, "METHOD_NOT_DELETED"),
       });
-      trackPaymentMethodFailed(method, "delete_failed");
+      trackPaymentMethodFailed(method, error?.code || "delete_failed");
       trackApiError("delete-payment-method", errorStatus(error), "manage_payment_methods");
     } finally {
       deletingRef.current = false;
@@ -121,6 +123,11 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
             type={alert.type}
             title={alert.title}
             message={alert.message}
+            splitKey={
+              String(alert.message || "").includes("1-877-692-2253")
+                ? [{ text: "1-877-692-2253", action: "call", value: "1-877-692-2253" }]
+                : ""
+            }
             onClose={() => setAlert(null)}
             autoFocusTitle
           />

@@ -1,9 +1,9 @@
 PODS:
-  - AppAuth (2.1.0):
-    - AppAuth/Core (= 2.1.0)
-    - AppAuth/ExternalUserAgent (= 2.1.0)
-  - AppAuth/Core (2.1.0)
-  - AppAuth/ExternalUserAgent (2.1.0):
+  - AppAuth (3.0.0):
+    - AppAuth/Core (= 3.0.0)
+    - AppAuth/ExternalUserAgent (= 3.0.0)
+  - AppAuth/Core (3.0.0)
+  - AppAuth/ExternalUserAgent (3.0.0):
     - AppAuth/Core
   - BEMCheckBox (1.4.1)
   - boost (1.84.0)
@@ -144,7 +144,7 @@ PODS:
     - GoogleUtilities/Network (~> 8.1)
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
     - nanopb (~> 3.30910.0)
-  - GoogleDataTransport (10.1.0):
+  - GoogleDataTransport (10.1.1):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
   - GoogleUtilities (8.1.0):
@@ -1444,8 +1444,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-app-auth (7.2.0):
-    - AppAuth (>= 1.7.3)
+  - react-native-app-auth (8.4.1):
+    - AppAuth (>= 1.7.6)
     - React-Core
   - react-native-blob-util (0.23.2):
     - React-Core
@@ -2397,7 +2397,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  AppAuth: ef4da5a3fc2e10b90c09a0a94a9baeaedc0341d5
+  AppAuth: 5dec4b6a833eb0342b26bacbc5f3af694f71274a
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
@@ -2421,7 +2421,7 @@ SPEC CHECKSUMS:
   glog: eb93e2f488219332457c3c4eafd2738ddc7e80b8
   GoogleAdsOnDeviceConversion: 2be6297a4f048459e0ae17fad9bfd2844e10cf64
   GoogleAppMeasurement: 700dce7541804bec33db590a5c496b663fbe2539
-  GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
+  GoogleDataTransport: a24e58982ab3ba2f64d79613e027fe7f57e88539
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   hermes-engine: 8eb265241fa1d7095d3a40d51fd90f7dce68217c
   lottie-ios: a881093fab623c467d3bce374367755c272bdd59
@@ -2459,7 +2459,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 9af3695e354816d30d4429992714e0c8cefac25f
   React-microtasksnativemodule: ab4c1c9d4841e71a4116f167a4cd3f8dc1ab50ba
   react-native-a11y-order: 569facf581bf65c74590365b0c0242937053f5c6
-  react-native-app-auth: 63fa4e58c5bd29aeb974d3a06a23c5858322d533
+  react-native-app-auth: 44cb8404015adc0767beeb66bb238b46a4633c12
   react-native-blob-util: bc94dcdb71053802bfaa1caaf2c6a84ba7f9d22e
   react-native-config: 86038147314e2e6d10ea9972022aa171e6b1d4d8
   react-native-cookies: f54fcded06bb0cda05c11d86788020b43528a26c
@@ -2532,6 +2532,6 @@ SPEC CHECKSUMS:
   ZendeskSDKStorage: 31d8acf44b5990da425bbfc77206931b2741e397
   ZendeskSDKUIComponents: 9177b164671ce19a6da48a16ba9e7a8bef62c774
 
-PODFILE CHECKSUM: 0b53523fc2b6b034a72ccfe9650f38607b078a7e
+PODFILE CHECKSUM: 6cf9e96b2f2fd2fcdc16a84b99cab1d3772cc254
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

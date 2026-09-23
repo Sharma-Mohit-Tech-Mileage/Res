@@ -5,10 +5,12 @@ import {
   StyleSheet,
   Modal,
 } from "react-native";
-import colors from "../../res/Colors";
+
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "../common/customui/Touchable";
+import ModalCard from "../common/customui/ModalCard";
+import ModalOverlay from "../common/customui/ModalOverlay";
 
 
 const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClose }) => {
@@ -21,8 +23,8 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
         animationType="fade"
         onRequestClose={onClose}
       >
-        <View style={styles.overlay}>
-          <View style={styles.alertContainer}>
+        <ModalOverlay>
+          <ModalCard style={styles.alertContainer}>
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
@@ -68,8 +70,8 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               </Text>
             </Touchable>
            )}
-          </View>
-        </View>
+          </ModalCard>
+        </ModalOverlay>
       </Modal>
      );
 };
@@ -77,13 +79,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.splash_bg,
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   alertContainer: {
     backgroundColor: "white",
@@ -104,7 +100,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   message: {
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
@@ -115,7 +111,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttons: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.Gray300,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
@@ -128,33 +124,33 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     textAlign:'center',
     fontWeight: "400",
   },
   openBtn: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.colorMidnightblue,
     justifyContent: "center",
     width: "100%",
     marginTop: 20,
   },
   closeBtn: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: Color.Gray300,
     justifyContent: "center",
     width: "100%",
     marginTop: 15,
   },
   openPortaltxt: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   closeAlertTxt: {
-    color: colors.sparklight_purple_blue,
+    color: Color.colorMidnightblue,
     textAlign: "center",
     padding: 8,
     fontSize: 16,

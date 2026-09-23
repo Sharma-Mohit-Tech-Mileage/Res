@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Animated, Platform, AccessibilityInfo, findNodeHandle} from "react-native";
+import { StyleSheet, Text, View, Animated, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import Touchable from "../common/customui/Touchable";
 import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { A11Y } from "../../styles/theme";
@@ -302,7 +304,7 @@ const AddNotificationScreen = () => {
           accessibilityLiveRegion="polite"
         />
       )}
-      <ScrollView ref={scrollViewRef}>
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
       
         <View style={[AppStyles.card,{margin: Padding.p_base}]}>
           <View style={{ paddingVertical: 16 }}>
@@ -559,7 +561,7 @@ const AddNotificationScreen = () => {
             disabled={isSubmitting}
           />
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -567,7 +569,7 @@ const AddNotificationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     paddingBottom: 100,
   },
   frameContainer: {
@@ -631,7 +633,7 @@ const styles = StyleSheet.create({
   toggleDescription: {
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_sm,
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     marginTop: 4,
   },
   buttonContainer: {
@@ -642,7 +644,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#3F51B5",
   },
   cancelButton: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
   spaceBottom: {
     marginBottom: 16,

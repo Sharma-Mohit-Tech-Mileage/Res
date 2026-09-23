@@ -5,10 +5,11 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
   Platform,
   AccessibilityInfo,
 } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -33,9 +34,7 @@ import { GetApiRequest, PutApiRequest , PostApiRequest} from "../../network/Rest
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { passwordSchema } from "../utility/validationSchema"; 
-import colors from "../../res/Colors";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import { requiredField } from "../../styles/utilities";
 import AppStyles from '../../styles/AppStyles';
 import { SectionTitle,HintText } from "../common/customui/Typography";
 const ChangePassword = () => {
@@ -217,7 +216,7 @@ const ChangePassword = () => {
         title="Edit Password"
         onPressBack={() => navigation.navigate("PasswordSecurity")}
       />
-      <ScrollView ref={scrollViewRef}>
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -359,7 +358,7 @@ const ChangePassword = () => {
             }}
           />
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -466,7 +465,7 @@ const styles = StyleSheet.create({
   },
   passwordSecurityEdit: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
 });
 

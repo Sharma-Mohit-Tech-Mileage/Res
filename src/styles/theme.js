@@ -13,8 +13,8 @@ export const theme = {
     primaryDark: Color.colorMidnightblue,
     white: Color.sparklightWhite,
     surface: Color.sparklightWhite,
-    surfaceVariant: Color.gray50,
-    background: Color.colorWhitesmoke_200,
+    surfaceVariant:Color.Gray300,
+    background: Color.Gray300,
     freedatabackground:Color.sparklight_blue,
     upload:Color.sparklight_blue,
     Black_100: Color.Black_100,
@@ -23,13 +23,13 @@ export const theme = {
     text: {
       primary: Color.colorGray_200,
       secondary: Color.sparklightGray1,
-      tertiary: Color.sparklightDarkGray,
+      tertiary: Color.sparklightGray1,
       onPrimary: Color.sparklightWhite,
     },
 
     // Border colors
-    border: Color.colorWhitesmoke_200,
-    borderLight: Color.colorWhitesmoke_300,
+    border: Color.Gray300,
+    borderLight: Color.Gray300,
 
    skeleton: {
       base: '#E1E9EE',
@@ -130,6 +130,16 @@ export const theme = {
     base: 24,
     lg: 32,
     xl: 40,
+  },
+
+  // [51768] Large-screen geometry. Per-class maps are sparse — utils/responsive.js cascades a missing class down to the nearest smaller one.
+  layout: {
+    maxContentWidth: 640,
+    modalMaxWidth: 480,
+    // Extra horizontal breathing room once the window stops being phone-width; 0 keeps compact byte-identical to today.
+    gutter: { compact: 0, medium: 24, expanded: 32 },
+    // Clearance for the absolutely-positioned tab bar; screens currently hard-code 100/120/140/150 by hand.
+    tabBarClearance: 140,
   },
 };
 

@@ -1,25 +1,26 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, Modal, ScrollView, StyleSheet, Pressable, Animated, Easing, Dimensions } from "react-native";
+import { View, Text, Modal, ScrollView, StyleSheet, Pressable, Animated, Easing, useWindowDimensions } from "react-native";
 import Touchable from "../../common/customui/Touchable";
 import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 import { setFocusToRef } from "../../../utils/a11y";
+import { LAYOUT } from "../../../utils/responsive";
 
 const TERMS_COPY = `By clicking 'Submit,' I authorize Sparklight to charge the payment method I specified for the full amount due in my monthly billing statement, including monthly service fees, installation and equipment charges, and any applicable taxes or government fees. If I set up recurring payments, this authorization is to remain in effect until this authorization is canceled by me, my bank, or Sparklight. I may cancel this authorization, or change the payment method to be charged, via the online Bill Pay Center or by calling Sparklight customer service at 1-877-692-2253 (between the hours of 8 a.m. and 5 p.m., local time) at least three banking days before the due date on my billing statement. It is my responsibility to keep my payment method information current, and Sparklight may obtain updated information from my bank. In the event that a payment is returned for insufficient funds, I authorize Sparklight to electronically debit my bank account for the original amount of the transaction, as well as a returned item fee, up to the maximum amount allowed by law.`;
 
-const SLIDE_DISTANCE = Dimensions.get("window").height;
 
 const TermsModal = ({ visible, onClose }) => {
   const titleRef = useRef(null);
-  const slideY = useRef(new Animated.Value(SLIDE_DISTANCE)).current;
+  const { height: windowHeight } = useWindowDimensions();
+  const slideY = useRef(new Animated.Value(windowHeight)).current;
 
   useEffect(() => {
     if (visible) {
-      slideY.setValue(SLIDE_DISTANCE);
+      slideY.setValue(windowHeight);
       Animated.timing(slideY, { toValue: 0, duration: 280, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
       setFocusToRef(titleRef, { delay: 350 });
     }
-  }, [visible, slideY]);
+  }, [visible, slideY, windowHeight]);
 
   return (
     <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
     maxHeight: "80%",
     overflow: "hidden",
     width: "100%",
-    maxWidth: 640,
+    maxWidth: LAYOUT.maxContentWidth,
     alignSelf: "center",
   },
   dragHandle: {

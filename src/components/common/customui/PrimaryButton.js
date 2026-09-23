@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightPrimaryPurple,
   },
   cancelButton: {
-   // backgroundColor: Color.colorWhitesmoke_200, // Adjust color as needed
+   // backgroundColor: Color.Gray300, // Adjust color as needed
   },
   submitText: {
     textAlign: "center",

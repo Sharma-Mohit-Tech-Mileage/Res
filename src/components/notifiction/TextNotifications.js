@@ -5,11 +5,12 @@ import {
   Text,
   View,
   Keyboard,
-  ScrollView,
   Platform,
   AccessibilityInfo,
   findNodeHandle,
 } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -222,6 +223,10 @@ const TextNotifications = ({ navigation }) => {
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     formatedData[name] = value;
+    if(value) {
+       setShowErrorAlert(false);
+
+    }
   };
 
   useEffect(() => {
@@ -281,6 +286,7 @@ const TextNotifications = ({ navigation }) => {
         formatedData.outageOptOut ||
         formatedData.optOut
       ) {
+        setShowErrorAlert(false);
         postRequestTextNotification();
       } else {
         setErrorText(
@@ -338,7 +344,7 @@ const TextNotifications = ({ navigation }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
+    <View style={{ flex: 1, backgroundColor: Color.Gray300 }}>
       <ProfileSettingsHeader
         title={
           formatedData?.phoneNumber
@@ -354,7 +360,7 @@ const TextNotifications = ({ navigation }) => {
           accessibilityLiveRegion="polite"
         />
       )}
-      <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always">
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} keyboardShouldPersistTaps="always">
         <View style={styles.textNotificationsInner}>
           <View style={[AppStyles.card, { margin: 16, paddingBottom: 16 }]}>
             {notification && (
@@ -570,7 +576,7 @@ const TextNotifications = ({ navigation }) => {
             />
           </View>
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -734,7 +740,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   receiveTextNotifications1: {
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     lineHeight: 22,
     fontWeight: "400",
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -744,7 +750,7 @@ const styles = StyleSheet.create({
   },
   byOptingInContainer: {
     fontSize: FontSize.RadioCanadaSemiBold_size,
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "left",
     alignSelf: "stretch",

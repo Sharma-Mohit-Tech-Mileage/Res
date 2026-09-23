@@ -1,4 +1,4 @@
-import { getUser, storeUser } from "../../redux/utils/LocalStorage";
+import { getUser, storeUser, storeSsoToken } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
 import store from "../../redux/configureStore";
 import { saveUserInfo } from "../../redux/actions/UserAction";
@@ -36,7 +36,13 @@ const onSuccess = async (res, idToken = null) => {
     jwtTimestamp: now,
     idTokenTimestamp: now,
   };
-
+  const data = {
+    idToken: user.idToken,
+    accessToken: user.token,
+    idTokenGuid: user.tokenGuid,
+    refreshToken: user.refreshToken,
+  }; 
+   storeSsoToken(data);
   await storeUser(user);
   store.dispatch(saveUserInfo(user));
   return token;

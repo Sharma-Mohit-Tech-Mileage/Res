@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   disabledText: {
-    color: Color.sparklightDarkGray, 
+    color: Color.sparklightGray1, 
     opacity: 0.6,
   },
 });

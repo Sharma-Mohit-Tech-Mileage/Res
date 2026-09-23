@@ -12,7 +12,7 @@ import Icon from "../common/Icon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
-import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
 import SmallLoader from "../common/customui/SmallLoader";
@@ -265,7 +265,7 @@ const BillingStatementsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   account: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   contentContainer: {
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: Padding.p_base,
     borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_300,
+    borderBottomColor: Color.Gray300,
   },
   statementDate: {
     fontSize: FontSize.size_base,

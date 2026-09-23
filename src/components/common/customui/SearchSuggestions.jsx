@@ -8,10 +8,7 @@ import {
   Keyboard,
 } from "react-native";
 import { Padding, Color, FontSize, FontFamily, Border } from "../../../../GlobalStyles";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { wp, hp } from "../../../utils/responsive";
 import SearchIcon from "../../../../assets/svgs/SearchIcon";
 import Rightactionable from "../../../res/svgIcons/RightArrow";
 import File05 from "../../../../assets/svgs/File05";
@@ -103,7 +100,7 @@ const SearchSuggestions = memo(
             placeholder={placeholder}
             value={input}
             onChangeText={setInput}
-            placeholderTextColor={Color.gray600}
+            placeholderTextColor={Color.sparklightGray1}
             autoCorrect={false}
             clearButtonMode="always"
             returnKeyType="done"

@@ -8,6 +8,7 @@ import ArticleWindowUtility from '../components/utility/ArticleWindowUtility';
 import EmailNotifications from '../components/entry/EmailNotifications';
 import PushNotifications from '../components/entry/PushNotifications';
 import TextNotifications from '../components/entry/TextNotifications';
+import ProfileSettingsEdit from "../components/userProfile/ProfileSettingsEdit";
 import Terms from '../components/entry/Terms';
 import MyTabs from "./MyTab";
 import { AxiosInterceptorProvider } from '../network/RestApiClient';
@@ -160,6 +161,11 @@ const UserNavigations = (props) => {
               headerBackVisible: false,
               headerShown: false
             }}
+          />
+          <Stack.Screen
+          name="UserNameUpdate"
+          component={ProfileSettingsEdit}
+          options={{ headerShown: false }}
           />
         </Stack.Navigator>
         </AnnouncementProvider>

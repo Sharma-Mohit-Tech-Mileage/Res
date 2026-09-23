@@ -3,10 +3,11 @@ import {
   View,
   Text,
   TextInput,
-  ScrollView,
   Platform,
   Linking,
 } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
 import { formatInputA11yReadout } from "../../utils/a11y";
@@ -186,7 +187,7 @@ const Survey = ({ route }) => {
         end={{ x: 1.3, y: 0}}
         colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
       />
-      <ScrollView style={{ flex: 1, marginBottom: 100 }}>
+      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} style={{ flex: 1, marginBottom: 100 }}>
         <View>
           <View style={[card.elevated, { margin: 16 }]}>
             {renderErrorMessage()}
@@ -349,14 +350,14 @@ const Survey = ({ route }) => {
 
           {loading && <LoadingOverlay loadingTxt={"Loading"} />}
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
 const styles = {
   rootContainer: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   buttonsLayout: {
@@ -382,7 +383,7 @@ const styles = {
   },
   buttons1: {
     marginTop: Padding.p_base,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     paddingHorizontal: 0,
     width: 382,
   },

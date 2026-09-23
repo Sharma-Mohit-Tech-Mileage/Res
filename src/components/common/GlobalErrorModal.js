@@ -7,10 +7,12 @@ import {
   Linking,
 } from "react-native";
 import AlertIcon from "../../res/svgIcons/AlertIconV2";
-import { FontFamily } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
+import { FontFamily,Color } from "../../../GlobalStyles";
+
 import Touchable from "./customui/Touchable";
 import PrimaryButton from "./customui/PrimaryButton";
+import ModalCard from "./customui/ModalCard";
+import ModalOverlay from "./customui/ModalOverlay";
 import { getAnalytics, setUserId, setUserProperty } from "@react-native-firebase/analytics";
 
 
@@ -64,8 +66,8 @@ export const GlobalErrorModal = () => {
       animationType="fade"
       onRequestClose={handleClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.alertContainer}>
+      <ModalOverlay>
+        <ModalCard style={styles.alertContainer}>
           <View style={styles.iconWrapper}>
             <AlertIcon />
           </View>
@@ -101,19 +103,13 @@ export const GlobalErrorModal = () => {
             style={[ { marginTop: 24 }]}
             accessibilityHint="Double tap to close the error modal"
           />
-        </View>
-      </View>
+        </ModalCard>
+      </ModalOverlay>
     </Modal>
   );
 }
            
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
   alertContainer: {
     backgroundColor: "white",
     padding: 24,
@@ -132,7 +128,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "600",
     marginBottom: 20,
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
   },
@@ -142,7 +138,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   message: {
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
@@ -151,7 +147,7 @@ const styles = StyleSheet.create({
   },
   // Using EXACT button styles from CustomAlertModal
   closeBtn: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: Color.Gray300,
     paddingHorizontal: 30,
     paddingVertical: 10,
     width: "100%",
@@ -160,14 +156,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   closeAlertTxt: {
-    color: colors.sparklight_purple_blue,
+    color: Color.colorMidnightblue,
     fontWeight: "400",
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     fontSize: 16,
   },
   phoneNumber: {
-    color: colors.sparklight_bright_purple,
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
     textDecorationLine: "underline",
   },

@@ -17,7 +17,7 @@ import Icon from "../common/Icon";
 import { Hyperlink } from "../common/customui/Typography";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
 import {
   fetchPaymentHistory,
   downloadPaymentReceipt,
@@ -331,7 +331,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   contentContainer: {
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   paymentRow: {
     padding: Padding.p_base,
     borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_300,
+    borderBottomColor: Color.Gray300,
   },
   paymentDetails: {
     flex: 1,

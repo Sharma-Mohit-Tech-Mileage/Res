@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { FontFamily } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
+import { FontFamily,Color } from "../../../GlobalStyles";
+
 import LottieView from "lottie-react-native";
 
 export const LoadingState = {
@@ -65,12 +65,12 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 16,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     marginTop: 10,
     textAlign: "center",
   },
   whiteText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
   },
 });
 

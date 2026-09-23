@@ -2,8 +2,8 @@ import * as React from "react";
 import { Svg, Path } from "react-native-svg";
 
 const AlertIconV2 = ({
-  width = 38,
-  height = 32,
+  width = 36,
+  height = 30,
   stroke = "#EF4E3E",
   ...props
 }) => (

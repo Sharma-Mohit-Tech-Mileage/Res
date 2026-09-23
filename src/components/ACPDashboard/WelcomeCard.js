@@ -12,7 +12,7 @@ import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
 import PlayIcon from "../../../assets/svgs/PlayIcon";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { wp } from "../../utils/responsive";
 import Touchable from "../common/customui/Touchable";
 import { Title } from '../common/customui/Typography';
 
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   watchVideoButton: {
     marginVertical: Padding.p_sm,
     fontSize: FontSize.RadioCanadaSemiBold_size,
-    color: Color.sparklightaddGray,
+    color: Color.sparklightGray1,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   offerDesclaimer: {
