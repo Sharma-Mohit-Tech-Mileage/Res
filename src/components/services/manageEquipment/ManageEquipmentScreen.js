@@ -1,3 +1,4 @@
+import AppStyles from "../../../styles/AppStyles";
 import React, { useState, useCallback, useContext } from "react";
 import {
   View,
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
   },
   scrollView: container.page,
   scrollContent: {
-    paddingTop: theme.spacing.md,
+    ...AppStyles.headerCardSpacing,
   },
 });
 

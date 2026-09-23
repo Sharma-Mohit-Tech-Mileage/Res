@@ -806,7 +806,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   frameParent: {
-    paddingVertical: Padding.p_base,
+    paddingBottom: Padding.p_base,
+    ...AppStyles.headerCardSpacing,
     paddingHorizontal: Padding.p_base,
     width: "100%",
   },

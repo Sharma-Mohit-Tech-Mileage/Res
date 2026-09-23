@@ -140,8 +140,8 @@ const speedTestApi = {
       {
         accountId: context.account,
         userId: context.userId,
-        download_MBs: Math.round(number(result.download)),
-        upload_MBs: Math.round(number(result.upload)),
+        download_MBs: number(result.download),
+        upload_MBs: number(result.upload),
         ping_ms: optionalNumber(result.ping),
         jitter_ms: optionalNumber(result.jitter),
         host: result.host ?? null,

@@ -1,3 +1,4 @@
+import AppStyles from "../../../styles/AppStyles";
 import React, { useCallback, useRef, useState } from "react";
 import { View, Text, StyleSheet, Modal } from "react-native";
 import KeyboardAwareScrollView from "../../common/customui/KeyboardAwareScrollView";
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     marginLeft: 10,
   },
-  content: { padding: 20, paddingBottom: 140 },
+  content: { padding: 20, paddingBottom: 140, ...AppStyles.headerCardSpacing },
   heading: {
     marginBottom: 12,
   },

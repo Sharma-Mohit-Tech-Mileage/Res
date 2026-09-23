@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: "#E9EEF2" },
   content: { flex: 1 },
   scrollContent: {
-    paddingTop: theme.spacing["2xl"],
+    ...AppStyles.headerCardSpacing,
     paddingHorizontal: theme.spacing.base,
   },
   card: {

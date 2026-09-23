@@ -1,3 +1,4 @@
+import AppStyles from "../../../styles/AppStyles";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -154,8 +155,8 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
-  successCard: { paddingVertical: 32, paddingHorizontal: 16, alignItems: "center", marginTop: 16 },
+  content: { padding: 20, paddingBottom: 140, ...AppStyles.headerCardSpacing },
+  successCard: { paddingVertical: 32, paddingHorizontal: 16, alignItems: "center", marginTop: 0 },
   iconWrap: { marginBottom: 20 },
   title: {
     textAlign: "center",

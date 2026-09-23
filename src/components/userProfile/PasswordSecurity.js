@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   passwordSecurityInner: {
-    paddingTop: Padding.p_5xl,
+    ...AppStyles.headerCardSpacing,
   },
   passwordSecurity: {
     backgroundColor: Color.Gray300,

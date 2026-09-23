@@ -1,3 +1,4 @@
+import AppStyles from "../../../styles/AppStyles";
 import React, { useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -65,7 +66,7 @@ const RebootModemLayout = ({ navigation, children, actions }) => {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.colors.background },
   content: {
-    paddingTop: theme.spacing.xl,
+    ...AppStyles.headerCardSpacing,
     paddingHorizontal: theme.spacing.base,
   },
   state: { marginTop: theme.spacing.base },

@@ -29,6 +29,6 @@ const SpeedTestLayout = ({
 );
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.colors.background },
-  content: { margin:16 },
+  content: { marginHorizontal: 16, marginBottom: 16, ...AppStyles.headerCardSpacing },
 });
 export default SpeedTestLayout;

@@ -6,7 +6,11 @@ import { HintText } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 
 const SpeedReading = ({ label, value, Icon }) => {
-  const display = String(value ?? "---");
+  const hasMeasurement =
+    (typeof value === "number" || typeof value === "string") &&
+    String(value).trim() !== "" &&
+    Number.isFinite(Number(value)) && Number(value) >= 0;
+  const display = hasMeasurement ? Number(value).toFixed(2) : "---";
   const [whole, decimal] = display.split(".");
   return (
     <View

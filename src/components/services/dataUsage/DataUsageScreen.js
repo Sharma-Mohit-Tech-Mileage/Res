@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   },
   scrollView: container.page,
   scrollContent: {
-    paddingTop: theme.spacing.md,
+    ...AppStyles.headerCardSpacing,
   },
 });
 

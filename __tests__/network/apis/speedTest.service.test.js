@@ -90,7 +90,7 @@ test('missing session prevents requests', async () => {
   expect(_axios.get).not.toHaveBeenCalled();
 });
 
-test.each([[316.112, 41.235, 316, 41], [316.8, 41.5, 317, 42], [0, 41, 0, 41]])('Ookla posts whole-number speeds for %s and %s', async (download, upload, expectedDownload, expectedUpload) => {
+test.each([[316.112, 41.235, 316.112, 41.235], [316.8, 41.5, 316.8, 41.5], [0, 41, 0, 41]])('Ookla preserves measured decimal speeds for %s and %s', async (download, upload, expectedDownload, expectedUpload) => {
   _axios.post.mockResolvedValue({ data: true });
   await api.saveOoklaResult({ download, upload, ping: 19.5, jitter: 6.777778, host: 'Host3' });
   expect(_axios.post).toHaveBeenCalledWith('api/post/OoklaSpeedtest', expect.objectContaining({

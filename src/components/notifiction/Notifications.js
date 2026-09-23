@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
 
   sectionsContainer: {
     paddingHorizontal: Padding.p_base,
-    paddingTop: Padding.p_5xl,
+    ...AppStyles.headerCardSpacing,
     paddingBottom: Padding.p_13xl,
     marginBottom: 200,
   },

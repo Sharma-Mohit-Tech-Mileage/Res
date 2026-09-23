@@ -29,13 +29,17 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { GetApiRequest, PutApiRequest , PostApiRequest} from "../../network/RestApiClient";
-import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import {
+  GetApiRequest,
+  PutApiRequest,
+  PostApiRequest,
+} from "../../network/RestApiClient";
+import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
-import { passwordSchema } from "../utility/validationSchema"; 
+import { passwordSchema } from "../utility/validationSchema";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import AppStyles from '../../styles/AppStyles';
-import { SectionTitle,HintText } from "../common/customui/Typography";
+import AppStyles from "../../styles/AppStyles";
+import { SectionTitle, HintText } from "../common/customui/Typography";
 const ChangePassword = () => {
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
@@ -55,7 +59,8 @@ const ChangePassword = () => {
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
   const passwordInputRef = useRef(null);
-  const [accessibilityLabelInput, setAccessibilityLabelInput] = useState(undefined);
+  const [accessibilityLabelInput, setAccessibilityLabelInput] =
+    useState(undefined);
 
   const handleSavePass = (formData) => {
     setLoading(true);
@@ -112,7 +117,7 @@ const ChangePassword = () => {
       },
       (error) => {
         console.warn(error);
-      }
+      },
     );
   };
 
@@ -126,7 +131,7 @@ const ChangePassword = () => {
         userName: user.userInfo?.userName || user.userName,
       });
 
-      const body = { newPass:newPassword,confirmNewPass:newPassword };
+      const body = { newPass: newPassword, confirmNewPass: newPassword };
 
       setLoading(true);
 
@@ -136,23 +141,23 @@ const ChangePassword = () => {
         body,
         (res) => {
           setLoading(false);
-          if(res.code=="204" || res.code=="200" ){
-          navigation.navigate("PasswordSecurity", {
-            updateSuccess: true,
-            isPassword: true,
-          });
-        } else if(res===true  ){
-         navigation.navigate("PasswordSecurity", {
-            updateSuccess: true,
-            isPassword: true,
-          });
-        }else{
-          setShowErrorAlert(true); // Show an error alert if the response code is not 200 or 204  
-        }
-      },
+          if (res.code == "204" || res.code == "200") {
+            navigation.navigate("PasswordSecurity", {
+              updateSuccess: true,
+              isPassword: true,
+            });
+          } else if (res === true) {
+            navigation.navigate("PasswordSecurity", {
+              updateSuccess: true,
+              isPassword: true,
+            });
+          } else {
+            setShowErrorAlert(true); // Show an error alert if the response code is not 200 or 204
+          }
+        },
         (error) => {
           setLoading(false);
-           console.warn("Error updating password", error);
+          console.warn("Error updating password", error);
 
           // Handle specific errors, such as '204 No Content' or others
           if (error.code == "204") {
@@ -163,7 +168,7 @@ const ChangePassword = () => {
           } else {
             setShowErrorAlert(true); // Show an error alert for other errors
           }
-        }
+        },
       );
     } catch (err) {
       setLoading(false);
@@ -246,7 +251,7 @@ const ChangePassword = () => {
                     Password
                   </SectionTitle>
                   <HintText
-                    style={[{ marginTop: 10, marginVertical: 5}]}
+                    style={[{ marginTop: 10, marginVertical: 5 }]}
                     accessible={true}
                     importantForAccessibility="yes"
                     accessibilityRole="text"
@@ -286,12 +291,17 @@ const ChangePassword = () => {
                           value={value}
                           secure={true}
                           error={error?.message}
-                          errorHint={getPasswordPriorityHint(value, profileDetails.userName)}
+                          errorHint={getPasswordPriorityHint(
+                            value,
+                            profileDetails.userName,
+                          )}
                         />
                         <View
                           accessible={true}
                           accessibilityRole="text"
-                          accessibilityLabel={`Password requirements: ${passwordTerms.join('. ')}`}
+                          accessibilityLabel={`Password requirements: ${passwordTerms.join(
+                            ". ",
+                          )}`}
                           style={[
                             styles.passwordFlexBox,
                             { marginTop: Padding.p_base },
@@ -315,13 +325,11 @@ const ChangePassword = () => {
                                     ]}
                                   />
                                 </View>
-                                <Text
-                                  style={styles.bulletPoiint}
-                                >
+                                <Text style={styles.bulletPoiint}>
                                   {passwordTerms[index]}
                                 </Text>
                               </View>
-                            )
+                            ),
                           )}
                         </View>
                       </>
@@ -331,14 +339,11 @@ const ChangePassword = () => {
               </View>
             </View>
           </View>
-         <View
-            style={styles.frameParent1}
-            
-          >
+          <View style={styles.frameParent1}>
             <PrimaryButton
               buttonType={"submit"}
               title={"Save"}
-             onPress={handleSubmit(handleSavePass, handleValidationError)}
+              onPress={handleSubmit(handleSavePass, handleValidationError)}
               disabled={loading}
             />
 
@@ -456,7 +461,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   passwordSecurityEditInner: {
-    paddingVertical: Padding.p_5xl,
+    ...AppStyles.headerCardSpacing,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",

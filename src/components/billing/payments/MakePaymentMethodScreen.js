@@ -1,3 +1,4 @@
+import AppStyles from "../../../styles/AppStyles";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -190,7 +191,7 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
+  content: { padding: 20, paddingBottom: 140, ...AppStyles.headerCardSpacing },
   heading: {
     marginBottom: 24,
   },

@@ -69,9 +69,9 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[contentMaxWidth, { paddingBottom: 140 }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[contentMaxWidth, AppStyles.headerCardSpacing, { paddingBottom: 140 }]} showsVerticalScrollIndicator={false}>
         <>
-        <View style={[AppStyles.card, { padding: 16, margin: 16 }]}>
+        <View style={[AppStyles.card, { padding: 16, marginHorizontal: 16, marginBottom: 16 }]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"

@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   profileSettingsEditInner: {
-    paddingTop: Padding.p_5xl,
+    ...AppStyles.headerCardSpacing,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",

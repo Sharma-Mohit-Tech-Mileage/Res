@@ -277,7 +277,7 @@ const MakePaymentScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
+  content: { padding: 20, paddingBottom: 140, ...AppStyles.headerCardSpacing },
   heading: {
     marginBottom: 16,
     marginTop: 8,
