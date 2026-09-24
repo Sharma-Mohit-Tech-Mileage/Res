@@ -68,7 +68,9 @@ const logoutAction = (dispatch, navigation) => {
       idToken: token,
       postLogoutRedirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
     }).then(async (result) => {
-      // Zendesk.logout();
+      // Finish resetting the chat identity before another account can sign in.
+      clearChatData();
+      await logoutZendesk();
       try {
         await setUserId(getAnalytics(), null);
         await setUserProperty(getAnalytics(), 'Sparklight_user_id', null);
@@ -85,8 +87,6 @@ const logoutAction = (dispatch, navigation) => {
       dispatch(saveUserInfo({}))
       dispatch(logoutApp());
       cleanUserData();
-      clearChatData();
-      logoutZendesk();
     });
   });
 };

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import kotlin.Unit;
 import zendesk.android.FailureCallback;
 import zendesk.android.SuccessCallback;
 import zendesk.android.Zendesk;
@@ -33,6 +35,7 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
 
     private static final String TAG = "RNZendeskChatModule";
     private static ReactApplicationContext reactContext;
+    private volatile boolean chatLogoutPending = false;
 
     RNZendeskChatModule(ReactApplicationContext context) {
         super(context);
@@ -61,7 +64,7 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
                         }
                     }
                 };
-          Zendesk.getInstance().addEventListener(zendeskEventListener);
+        Zendesk.getInstance().addEventListener(zendeskEventListener);
         //Logger.setLoggable(true);
 
     }
@@ -71,22 +74,44 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
         return "RNZendeskChatModule";
     }
 
-//    @ReactMethod
-//    public void clearChatSession() {
-//        VisitorInfo visitorInfo = VisitorInfo.builder()
-//                .withName("")
-//                .withEmail("")
-//                .withPhoneNumber("")
-//                .build();
-//        Chat.INSTANCE.providers().profileProvider().setVisitorInfo(visitorInfo, null);
-//        Chat.INSTANCE.resetIdentity();
-//
-//    }
+    @ReactMethod
+    public void clearChatSession() {
+        Zendesk.getInstance().getMessaging().clearConversationFields();
+    }
 
     @ReactMethod
     public void startChatWithConfig(ReadableMap config) {
+        // Never expose the previous identity while logout is pending or has failed.
+        if (chatLogoutPending) {
+            Log.w(TAG, "Chat unavailable until Zendesk logout succeeds");
+            return;
+        }
         Zendesk.getInstance().getMessaging().showMessaging(getReactApplicationContext(), Intent.FLAG_ACTIVITY_NEW_TASK);
 
+    }
+
+    @ReactMethod
+    public void logoutZendesk(Promise promise){
+        chatLogoutPending = true;
+        try {
+            Zendesk.getInstance().getMessaging().clearConversationFields();
+            Zendesk.getInstance().logoutUser(new SuccessCallback<Unit>() {
+                @Override
+                public void onSuccess(Unit unit) {
+                    Log.d("Zendesk", "Logout successful");
+                    chatLogoutPending = false;
+                    promise.resolve(null);
+                }
+            }, new FailureCallback<Throwable>() {
+                @Override
+                public void onFailure(@NonNull Throwable throwable) {
+                    Log.e("Zendesk", "Logout failed: " + throwable.getMessage());
+                    promise.reject("ZendeskLogoutError", throwable);
+                }
+            });
+        } catch (Exception exception) {
+            promise.reject("ZendeskLogoutError", exception);
+        }
     }
 
     @ReactMethod
