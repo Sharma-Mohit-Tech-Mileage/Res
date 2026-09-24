@@ -20,7 +20,11 @@ const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => (
         accessibilityViewIsModal
         importantForAccessibility="yes"
       >
-        <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           <View style={styles.panel}>
             <View style={styles.summary}>
               <View
@@ -79,6 +83,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   panel: { overflow: "hidden" },
+  scrollContent: { paddingBottom: 20 },
   summary: {
     alignItems: "center",
     paddingHorizontal: 24,
