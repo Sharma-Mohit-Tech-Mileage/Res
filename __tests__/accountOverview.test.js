@@ -275,6 +275,10 @@ describe('AccountOverview behavior', () => {
   });
 
   it('executes logout action when OK is pressed in confirmation', async () => {
+    let finishChatLogout;
+    mockLogoutZendesk.mockImplementationOnce(() => new Promise((resolve) => {
+      finishChatLogout = resolve;
+    }));
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, msg, buttons) => {
       const okAction = buttons.find((b) => b.text?.toLowerCase() === 'ok');
       okAction.onPress();
@@ -296,6 +300,15 @@ describe('AccountOverview behavior', () => {
 
     expect(mockGetSsoToken).toHaveBeenCalled();
     expect(mockLogout).toHaveBeenCalled();
+    expect(mockClearChatData).toHaveBeenCalled();
+    expect(mockLogoutZendesk).toHaveBeenCalled();
+    expect(mockReset).not.toHaveBeenCalled();
+
+    await act(async () => {
+      finishChatLogout();
+      await flushPromises();
+    });
+
     expect(mockReset).toHaveBeenCalledWith({
       index: 0,
       routes: [{ name: 'Splash', params: { isLogout: true } }],

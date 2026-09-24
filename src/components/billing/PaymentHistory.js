@@ -260,7 +260,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
                   style={styles.searchPlaceholder}
                   numberOfLines={1}
                   adjustsFontSizeToFit
-                  minimumFontScale={0.75}
+                  minimumFontScale={0.65}
                 >
                   Search by Confirmation ID
                 </Text>
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     minHeight: A11Y.minTouch,
   },
   sortContainer: {
-    width: "30%", // Adjusted to take the remaining width (after gap)
+    flex: 1, // Take all width left after the search box and gap so "Sort date" stays on one line where it fits
     alignItems: "flex-end", // Align content to the right side
   },
   searchIcon: {
@@ -393,9 +393,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end", // Align items to the right
     minHeight: A11Y.minTouch,
-    paddingHorizontal: Padding.p_5xs,
+    paddingLeft: Padding.p_5xs, // No right padding so the arrow lines up with the cards' right edge
+    maxWidth: "100%", // Keep the button inside its column so it never overlaps the search box
   },
   sortText: {
+    flexShrink: 1, // New Architecture does not shrink text by default; let "Sort date" wrap instead of overflowing
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,

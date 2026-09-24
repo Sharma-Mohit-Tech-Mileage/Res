@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   },
   modemHealthSupport: {
     textAlign: "left",
-    lineHeight: 28,
+    // No lineHeight: on Android it makes some labels measure an extra blank line at certain display sizes
     flex: 1,
   },
 });
