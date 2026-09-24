@@ -1,3 +1,4 @@
+jest.mock("react-native-skeleton-placeholder", () => "SkeletonPlaceholder");
 jest.mock("../../src/network/apis/services/speedTest.service", () => ({
   runEeroSpeedTest: jest.fn(), saveOoklaResult: jest.fn(),
 }));

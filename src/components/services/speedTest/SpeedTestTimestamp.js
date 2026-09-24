@@ -1,4 +1,5 @@
 import React from "react";
+import formatSpeedTestTimestamp from "./formatSpeedTestTimestamp";
 import { View, StyleSheet } from "react-native";
 import ClockIcon from "../../../res/svgIcons/ClockIcon";
 import { FieldContent } from "../../common/customui/Typography";
@@ -11,11 +12,11 @@ export default function SpeedTestTimestamp({ label, value, loading = false, vari
   return (
     <View style={isUpdated ? timestampStyles.updated : styles.footer}>
       <ClockIcon color={isUpdated ? theme.colors.purpleBright : theme.colors.text.secondary} />
-      <FieldContent numberOfLines={1} style={styles.timestamp}>
+      <FieldContent style={styles.timestamp}>
         <FieldContent style={isUpdated ? [timestampStyles.updatedTitle, styles.updatedLabel] : styles.muted}>{label} </FieldContent>
-        {!loading && (value || "---")}
+        {!loading && formatSpeedTestTimestamp(value)}
       </FieldContent>
-      {loading && <View accessible accessibilityRole="progressbar"
+      {loading && !isUpdated && <View accessible accessibilityRole="progressbar"
         accessibilityLabel={`${label} time loading`} accessibilityState={{ busy: true }}>
         <SmallLoader width={32} height={24} />
       </View>}

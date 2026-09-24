@@ -44,7 +44,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd }
       setError(false);
       setResult(null);
       try {
-        const latest = await (tab === "wifi" ? speedTestApi.getOoklaResult() : speedTestApi.getEeroDetails());
+        const latest = await (tab === "wifi" ? speedTestApi.getOoklaResult() : speedTestApi.getEeroHistory());
         if (active && current === request) setResult(latest);
       } catch {
         if (active && current === request) setError(true);
@@ -124,7 +124,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd }
             )}
           </SurfaceCard>
           <View accessibilityLiveRegion="polite">
-            <EquipmentSpeedResults download={result?.download ?? "---"} upload={result?.upload ?? "---"} style={{marginHorizontal: 0, marginTop: theme.spacing.md}} />
+            <EquipmentSpeedResults loading={loading} download={result?.download ?? "---"} upload={result?.upload ?? "---"} style={{marginHorizontal: 0, marginTop: theme.spacing.md}} />
           </View>
           {error && <Body accessibilityLiveRegion="polite">Unable to load the latest result.</Body>}
           {!loading && !error && !result && <Body>No speed test results yet.</Body>}
@@ -140,7 +140,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd }
             style={styles.testButton}
           />}
         </View>
-        <SpeedTestTimestamp label="Last run" value={result?.updated} />
+        <SpeedTestTimestamp label="Last run" value={result?.updated} loading={loading} />
       </View>
     </SurfaceCard>
   );

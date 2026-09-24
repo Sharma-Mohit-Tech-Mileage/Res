@@ -7,7 +7,7 @@ export default StyleSheet.create({
   notice: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: theme.colors.secondarySurface,
+    backgroundColor: theme.colors.surfaceVariant,
     borderRadius: theme.radius.md,
     padding: theme.spacing.sm,
     marginBottom: theme.spacing.base,
@@ -18,10 +18,12 @@ export default StyleSheet.create({
     flex: 1,
     fontSize: theme.typography.size.sm,
     lineHeight: theme.typography.lineHeight.tight,
+    marginLeft: theme.spacing.sm,
   },
   statusContent: { marginHorizontal: theme.spacing.base, marginTop: theme.spacing.base, marginBottom: theme.spacing.xl, gap: theme.spacing.xl },
+  historyError: { marginHorizontal: theme.spacing.base, marginTop: 0, marginBottom: theme.spacing.base, alignSelf: "stretch" },
   statusNotice: { marginTop: 0, marginBottom: 0 },
-  refreshHint: { flexDirection: "row", alignItems: "center", gap: theme.spacing.sm, backgroundColor: theme.colors.secondarySurface, padding: theme.spacing.sm, borderRadius: theme.radius.base },
+  refreshHint: { flexDirection: "row", alignItems: "center", gap: theme.spacing.sm, backgroundColor: theme.colors.surfaceVariant, padding: theme.spacing.sm, borderRadius: theme.radius.base },
   refreshHintText: { flex: 1, fontSize: theme.typography.size.sm },
   successNotice: { marginBottom: theme.spacing.sm },
   flatNotice: {

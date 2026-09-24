@@ -57,7 +57,7 @@ const ManageEquipmentScreen = ({ navigation, route }) => {
         }
       >
 
-        <MyModemCard onReboot={() => navigation.navigate('RebootModem')} />
+        <MyModemCard onReboot={() => navigation.navigate('RebootModem', { ip: route?.params?.ip })} />
         <MyAddons />
         <MySpeedCard onLoadEnd={onSpeedLoaded} refreshKey={refreshKey} navigation={navigation} />
 

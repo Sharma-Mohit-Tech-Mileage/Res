@@ -4,8 +4,9 @@ import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
 import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
 import { HintText } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
+import SpeedValueSkeleton from "../speedTest/SpeedValueSkeleton";
 
-const SpeedReading = ({ label, value, Icon }) => {
+const SpeedReading = ({ label, value, Icon, loading }) => {
   const hasMeasurement =
     (typeof value === "number" || typeof value === "string") &&
     String(value).trim() !== "" &&
@@ -16,7 +17,8 @@ const SpeedReading = ({ label, value, Icon }) => {
     <View
       style={styles.column}
       accessible
-      accessibilityLabel={`${label} ${display} megabits per second`}
+      accessibilityState={{ busy: loading }}
+      accessibilityLabel={loading ? `${label} speed loading` : `${label} ${display} megabits per second`}
     >
       <View style={styles.valueRow}>
         <View style={styles.icon}>
@@ -27,7 +29,7 @@ const SpeedReading = ({ label, value, Icon }) => {
             accessible={false}
           />
         </View>
-        <Text
+        {loading ? <SpeedValueSkeleton /> : <Text
           style={styles.value}
           numberOfLines={1}
           adjustsFontSizeToFit
@@ -35,7 +37,7 @@ const SpeedReading = ({ label, value, Icon }) => {
         >
           {whole}
           <Text style={styles.decimal}>{decimal ? `.${decimal}` : ""}</Text>
-        </Text>
+        </Text>}
       </View>
       <Text
         style={styles.label}
@@ -50,10 +52,10 @@ const SpeedReading = ({ label, value, Icon }) => {
   );
 };
 
-const EquipmentSpeedResults = ({ download, upload, style }) => (
+const EquipmentSpeedResults = ({ download, upload, style, loading = false }) => (
   <View style={[styles.row, style]} accessibilityLiveRegion="polite">
-    <SpeedReading label="Download" value={download} Icon={DownloadcircleIcon} />
-    <SpeedReading label="Upload" value={upload} Icon={UploadcircleIcon} />
+    <SpeedReading label="Download" value={download} Icon={DownloadcircleIcon} loading={loading} />
+    <SpeedReading label="Upload" value={upload} Icon={UploadcircleIcon} loading={loading} />
   </View>
 );
 

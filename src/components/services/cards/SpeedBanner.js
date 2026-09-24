@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import SmallLoader from "../../common/customui/SmallLoader";
+import SpeedValueSkeleton from "../speedTest/SpeedValueSkeleton";
 import { HintText } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
@@ -20,7 +20,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false, loading
     >
       <View style={styles.valueContainer}>
         {loading ? (
-          <SmallLoader width={48} height={36} />
+          <SpeedValueSkeleton />
         ) : (
           <Text style={styles.speedHeroValue}>{downloadSpeed ?? "--"}</Text>
         )}
@@ -50,7 +50,7 @@ const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false, loading
     >
       <View style={styles.valueContainer}>
         {loading ? (
-          <SmallLoader width={48} height={36} />
+          <SpeedValueSkeleton />
         ) : (
           <Text style={styles.speedHeroValue}>{uploadSpeed ?? "--"}</Text>
         )}

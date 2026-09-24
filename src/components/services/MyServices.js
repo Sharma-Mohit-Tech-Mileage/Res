@@ -12,6 +12,7 @@ import InternetCard from "./cards/InternetCard";
 import VideoCard from "./cards/VideoCard";
 import PhoneCard from "./cards/PhoneCard";
 import StatusSection from "./sections/StatusSection";
+import PrimaryButton from "../common/customui/PrimaryButton";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector, useDispatch } from "react-redux";
@@ -27,7 +28,7 @@ import {
 } from "../../redux/selectors/servicesSelectors";
  import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
-const MyServicesContent = ({ route }) => {
+const MyServicesContent = ({ route, navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
   const insets = useSafeAreaInsets();
 
@@ -171,6 +172,13 @@ const MyServicesContent = ({ route }) => {
           hasUserInitiatedCheck={hasUserInitiatedCheck}
         />
 
+        <PrimaryButton
+          title="Manage Equipment"
+          buttonType="outline"
+          onPress={() => navigation.navigate("manageEquipment")}
+          containerStyle={styles.manageEquipmentButton}
+        />
+
         <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
       </ScreenScroll>
     </View>
@@ -201,6 +209,10 @@ const styles = StyleSheet.create({
   servicesContainer: {
     backgroundColor: theme.colors.background,
     paddingTop: theme.spacing.base,
+  },
+  manageEquipmentButton: {
+    marginHorizontal: theme.spacing.base,
+    marginTop: theme.spacing.base,
   },
 });
 

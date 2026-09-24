@@ -28,12 +28,13 @@ const ModemSpeedTestScreen = ({ navigation, route, onRunSpeedTest }) => {
     try {
       const result = await (onRunSpeedTest ? onRunSpeedTest() : speedTestApi.runEeroSpeedTest({
         idType: route?.params?.idType || "account",
+        networkId: route?.params?.networkId,
         isCancelled: () => !mounted.current,
       }));
       if (result?.download == null || result?.upload == null)
         throw new Error("Missing speed results");
       if (mounted.current) {
-        setResults({ ...result, updated: result.updated || new Date().toLocaleString() });
+        setResults(result);
         setComplete(true);
       }
     } catch {
@@ -82,6 +83,7 @@ const ModemSpeedTestScreen = ({ navigation, route, onRunSpeedTest }) => {
         )}
         {results?.historySaved === false && <NotificationAlert
           type="error" title="Result not saved" showCloseIcon={false}
+          containerStyle={styles.historyError}
           message="Your test completed, but its history could not be saved."
         />}
         <SpeedTestResults

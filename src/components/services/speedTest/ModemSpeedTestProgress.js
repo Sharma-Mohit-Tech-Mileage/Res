@@ -8,7 +8,7 @@ const ModemSpeedTestProgress = () => (
   <View style={styles.notice} accessibilityLiveRegion="polite">
     <ServiceLoader />
     <Body style={styles.noticeText}>
-      Speed test in progress, one moment, please. This may take up to a minute
+      Speed test in progress, one moment, please. This may take a few minutes
       to complete.
     </Body>
   </View>

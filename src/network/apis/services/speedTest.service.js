@@ -16,7 +16,8 @@ const number = (value) => {
   ) {
     throw new Error("Invalid speed test measurement");
   }
-  return Number(value);
+  // Validate without coercing or rounding the original measurement.
+  return value;
 };
 const optionalNumber = (value) => (value == null ? null : number(value));
 const session = async (needsUser = false) => {
@@ -40,16 +41,15 @@ const check = (data, codes) => {
     throw new Error("Service request failed");
   return data;
 };
-const identity = (account, idType) => {
+const identity = (account, idType, networkId) => {
   if (!["account", "network"].includes(idType))
     throw new Error("Invalid ID type");
-  // Network mode also requires the account number, per the API contract.
-  return { idType, id: account, accountNumber: account };
+  return { idType, id: idType === "network" ? required(networkId, "Network ID") : account, accountNumber: account };
 };
-const details = async (context, idType) => {
+const details = async (context, idType, networkId) => {
   const response = await _axios.get(ENDPOINTS.EERO_SPEED_DETAILS, {
     ...context.config,
-    params: identity(context.account, idType),
+    params: identity(context.account, idType, networkId),
   });
   const detail = check(response.data, [200]).detail;
   return detail == null
@@ -95,23 +95,52 @@ const speedTestApi = {
       throw new Error("Unable to reboot modem");
     return true;
   },
-  getEeroDetails: async (idType = "account") =>
-    details(await session(), idType),
+  getEeroDetails: async (idType = "account", networkId) =>
+    details(await session(), idType, networkId),
+  getEeroHistory: async () => {
+    const context = await session();
+    const response = await _axios.get(
+      getEndpoint(ENDPOINTS.EERO_SPEED_HISTORY_GET, { accountId: encodeURIComponent(context.account) }),
+      context.config,
+    );
+    if (response.status === 204 || response.data == null) return null;
+    return {
+      download: number(response.data.download_MBs),
+      upload: number(response.data.upload_MBs),
+      updated: response.data.createdOn,
+    };
+  },
+  getEeroResults: async (idType = "account", networkId) => {
+    const context = await session();
+    const response = await _axios.get(ENDPOINTS.EERO_SPEED_RESULTS, {
+      ...context.config,
+      params: identity(context.account, idType, networkId),
+    });
+    const rows = check(response.data, [200]).data;
+    if (rows == null || (Array.isArray(rows) && !rows.length)) return null;
+    if (!Array.isArray(rows)) throw new Error("Invalid speed test results");
+    const latest = rows.reduce((newest, row) => {
+      if (!Number.isFinite(Date.parse(row.date))) throw new Error("Invalid speed test date");
+      return !newest || Date.parse(row.date) > Date.parse(newest.date) ? row : newest;
+    }, null);
+    return { download: number(latest.down_Mbps), upload: number(latest.up_Mbps), updated: latest.date, id: latest.id };
+  },
   insertEeroHistory: async (result) => insert(await session(true), result),
   runEeroSpeedTest: async ({
     idType = "account",
+    networkId,
     history = {},
     isCancelled = () => false,
   } = {}) => {
     const context = await session(true);
     // Record the previous timestamp so a 202 cannot cause old results to be saved.
-    const previous = await details(context, idType);
+    const previous = await details(context, idType, networkId);
     if (isCancelled()) throw new Error("Speed test cancelled");
     const response = await _axios.post(
       ENDPOINTS.EERO_SPEED_TEST,
       {
         idType,
-        id: context.account,
+        id: identity(context.account, idType, networkId).id,
         AccountNumber: context.account,
       },
       context.config,
@@ -120,7 +149,7 @@ const speedTestApi = {
     for (let attempt = 0; attempt < 24; attempt += 1) {
       if (attempt) await delay(5000);
       if (isCancelled()) throw new Error("Speed test cancelled");
-      const result = await details(context, idType);
+      const result = await details(context, idType, networkId);
       if (isCancelled()) throw new Error("Speed test cancelled");
       if (!result?.updated || (previous && result.updated === previous.updated))
         continue;

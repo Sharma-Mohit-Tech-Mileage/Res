@@ -28,7 +28,7 @@ const servicesApi = {
   checkOutageStatus: async () => {
     try {
       let user = await getUser();
-      const accountNumber = user.userInfo.accountNumber;
+      const accountNumber = "8160130400213637";
       const config = {
         headers: {
           Authorization: "Bearer " + user.token
