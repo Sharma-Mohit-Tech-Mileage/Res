@@ -44,7 +44,8 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd }
       setError(false);
       setResult(null);
       try {
-        const latest = await (tab === "wifi" ? speedTestApi.getOoklaResult() : speedTestApi.getEeroHistory());
+        const latest = await (tab === "wifi" ? speedTestApi.getOoklaResult() : speedTestApi.getLatestEeroResult());
+        console.log('final speed result',JSON.stringify(result))
         if (active && current === request) setResult(latest);
       } catch {
         if (active && current === request) setError(true);

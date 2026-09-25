@@ -1,6 +1,7 @@
 import { ENDPOINTS, getEndpoint } from "../endpoints/Endpoints";
 import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
+import { logDebug } from "../../../utils/logger";
 
 const required = (value, name) => {
   if (value == null || String(value).trim() === "")
@@ -24,7 +25,9 @@ const session = async (needsUser = false) => {
   const user = await getUser();
   return {
     account: required(user?.userInfo?.accountNumber, "Account number"),
-    userId: needsUser
+    userId: needsUser === "eero"
+      ? required(user?.userInfo?.userId ?? user?.userInfo?.accountNumber, "User ID")
+      : needsUser
       ? required(user?.userInfo?.userName, "User name")
       : undefined,
     config: {
@@ -37,9 +40,20 @@ const session = async (needsUser = false) => {
   };
 };
 const check = (data, codes) => {
-  if (!data || data.error || !codes.includes(Number(data.statusCode)))
-    throw new Error("Service request failed");
+  if (!data || data.error || !codes.includes(Number(data.statusCode))) {
+    const error = new Error("Service request failed");
+    error.serviceStatus = data?.statusCode;
+    throw error;
+  }
   return data;
+};
+const atStage = async (stage, execute) => {
+  try {
+    return await execute();
+  } catch (error) {
+    error.speedTestStage = stage;
+    throw error;
+  }
 };
 const identity = (account, idType, networkId) => {
   if (!["account", "network"].includes(idType))
@@ -51,6 +65,7 @@ const details = async (context, idType, networkId) => {
     ...context.config,
     params: identity(context.account, idType, networkId),
   });
+  if (response.status === 204 || response.data == null) return null;
   const detail = check(response.data, [200]).detail;
   return detail == null
     ? null
@@ -110,6 +125,16 @@ const speedTestApi = {
       updated: response.data.createdOn,
     };
   },
+  getLatestEeroResult: async () => {
+    try {
+      const saved = await speedTestApi.getEeroHistory();
+      if (saved) return saved;
+    } catch (error) {
+      // Expired sessions must still be handled by authentication, not a fallback.
+      if ([401, 403].includes(error?.response?.status)) throw error;
+    }
+    return speedTestApi.getEeroDetails();
+  },
   getEeroResults: async (idType = "account", networkId) => {
     const context = await session();
     const response = await _axios.get(ENDPOINTS.EERO_SPEED_RESULTS, {
@@ -125,42 +150,47 @@ const speedTestApi = {
     }, null);
     return { download: number(latest.down_Mbps), upload: number(latest.up_Mbps), updated: latest.date, id: latest.id };
   },
-  insertEeroHistory: async (result) => insert(await session(true), result),
+  insertEeroHistory: async (result) => insert(await session("eero"), result),
   runEeroSpeedTest: async ({
     idType = "account",
     networkId,
     history = {},
     isCancelled = () => false,
   } = {}) => {
-    const context = await session(true);
+    const context = await atStage("session", () => session("eero"));
     // Record the previous timestamp so a 202 cannot cause old results to be saved.
-    const previous = await details(context, idType, networkId);
+    const previous = await atStage("previous-result", () => details(context, idType, networkId));
     if (isCancelled()) throw new Error("Speed test cancelled");
-    const response = await _axios.post(
-      ENDPOINTS.EERO_SPEED_TEST,
-      {
-        idType,
-        id: identity(context.account, idType, networkId).id,
-        AccountNumber: context.account,
-      },
-      context.config,
-    );
-    check(response.data, [200, 202]);
+    await atStage("start", async () => {
+      const response = await _axios.post(
+        ENDPOINTS.EERO_SPEED_TEST,
+        {
+          idType,
+          id: identity(context.account, idType, networkId).id,
+          AccountNumber: context.account,
+        },
+        context.config,
+      );
+      check(response.data, [200, 202]);
+    });
     for (let attempt = 0; attempt < 24; attempt += 1) {
       if (attempt) await delay(5000);
       if (isCancelled()) throw new Error("Speed test cancelled");
-      const result = await details(context, idType, networkId);
+      const result = await atStage("result", () => details(context, idType, networkId));
       if (isCancelled()) throw new Error("Speed test cancelled");
       if (!result?.updated || (previous && result.updated === previous.updated))
         continue;
       try {
         await insert(context, { ...history, ...result });
         return { ...result, historySaved: true };
-      } catch {
+      } catch (error) {
+        logDebug("Eero history save failed", { status: error?.response?.status, code: error?.code, reason: error?.response ? "HTTP failure" : error?.message });
         return { ...result, historySaved: false };
       }
     }
-    throw new Error("No new speed test result is available yet");
+    const error = new Error("No new speed test result is available yet");
+    error.speedTestStage = "waiting-result";
+    throw error;
   },
   saveOoklaResult: async (result) => {
     const context = await session(true);
@@ -192,10 +222,25 @@ const speedTestApi = {
     );
     if (response.status === 204 || response.data == null) return null;
     return {
-      download: number(response.data.download_MBs),
-      upload: number(response.data.upload_MBs),
-      updated: response.data.createdOn,
+      download: number(response.data.testResults?.download_MBs),
+      upload: number(response.data.testResults?.upload_MBs),
+      updated: response.data.testResults?.createdOn,
     };
   },
 };
-export default speedTestApi;
+// Include pre-request validation failures without logging session credentials.
+export default Object.fromEntries(Object.entries(speedTestApi).map(([operation, execute]) => [
+  operation,
+  async (...args) => {
+    logDebug("Speed test operation started", { operation });
+    try {
+      return await execute(...args);
+    } catch (error) {
+      logDebug("Speed test operation failed", {
+        operation, stage: error?.speedTestStage, status: error?.response?.status ?? error?.serviceStatus, code: error?.code,
+        reason: error?.response ? "HTTP failure" : error?.message,
+      });
+      throw error;
+    }
+  },
+]));

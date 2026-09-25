@@ -14,11 +14,38 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
+test('Eero starts with no prior details and no username, then posts raw history', async () => {
+  getUser.mockResolvedValue({ token: 'test-token', userInfo: { accountNumber: 'account-1', userId: 'user-123' } });
+  _axios.get.mockResolvedValueOnce({ status: 204, data: '' }).mockResolvedValueOnce(result());
+  _axios.post.mockResolvedValueOnce({ data: { statusCode: 202 } }).mockResolvedValueOnce({ data: true });
+  await expect(api.runEeroSpeedTest()).resolves.toMatchObject({ historySaved: true });
+  expect(_axios.post).toHaveBeenNthCalledWith(1, 'api/post/EeroSpeedtest', {
+    idType: 'account', id: 'account-1', AccountNumber: 'account-1',
+  }, expect.any(Object));
+  expect(_axios.post).toHaveBeenNthCalledWith(2, 'api/InsertEeroSpeedTestHistory', expect.objectContaining({
+    UserId: 'user-123', Download_MBs: '980.4000244140625', Upload_MBs: '0',
+  }), expect.any(Object));
+});
+
+test('modem display falls back to live details when saving history failed', async () => {
+  _axios.get.mockRejectedValueOnce({ response: { status: 500 } }).mockResolvedValueOnce(result());
+  await expect(api.getLatestEeroResult()).resolves.toMatchObject({ download: '980.4000244140625' });
+  expect(_axios.get.mock.calls.map(([path]) => path)).toEqual([
+    'api/GetEeroSpeedTestHistory/account-1', 'api/Eerospeedtest/details',
+  ]);
+});
+
+test('modem history authentication failure is not hidden by a fallback', async () => {
+  _axios.get.mockRejectedValueOnce({ response: { status: 401 } });
+  await expect(api.getLatestEeroResult()).rejects.toMatchObject({ response: { status: 401 } });
+  expect(_axios.get).toHaveBeenCalledTimes(1);
+});
+
 test('POST keeps raw measurement strings and full precision unchanged', async () => {
   _axios.post.mockResolvedValue({ data: true });
   const raw = { download: '980.4000244140625', upload: '54.689998626708984', ping: '11.00', jitter: '22.00' };
   await api.saveOoklaResult(raw);
-  expect(_axios.post).toHaveBeenLastCalledWith('post/OoklaSpeedtest', expect.objectContaining({
+  expect(_axios.post).toHaveBeenLastCalledWith('api/post/OoklaSpeedtest', expect.objectContaining({
     download_MBs: raw.download, upload_MBs: raw.upload, ping_ms: raw.ping, jitter_ms: raw.jitter,
   }), expect.any(Object));
   await api.insertEeroHistory(raw);
@@ -72,7 +99,7 @@ test('successful Eero run, details and history execute sequentially with nullabl
   await expect(api.runEeroSpeedTest()).resolves.toMatchObject({ historySaved: true });
   expect(_axios.post.mock.calls[0]).toEqual(['api/post/EeroSpeedtest', { idType: 'account', id: 'account-1', AccountNumber: 'account-1' }, expect.any(Object)]);
   expect(_axios.post.mock.calls[1]).toEqual(['api/InsertEeroSpeedTestHistory', {
-    AccountId: 'account-1', UserId: 'user/name', Download_MBs: '980.4000244140625',
+    AccountId: 'account-1', UserId: 'account-1', Download_MBs: '980.4000244140625',
     Upload_MBs: '0', Ping_Ms: null, Jitter_Ms: null, Host: null,
   }, expect.any(Object)]);
   expect(_axios.post.mock.invocationCallOrder[0]).toBeLessThan(_axios.get.mock.invocationCallOrder[1]);
@@ -107,13 +134,13 @@ test('cancelled test does not start or insert history', async () => {
 test('Ookla payload uses exact casing; false is rejected; retrieval encodes user identity', async () => {
   _axios.post.mockResolvedValue({ data: false });
   await expect(api.saveOoklaResult({ download: 333, upload: 444, ping: 99.9, jitter: 88.8, host: 'Host3' })).rejects.toThrow('save');
-  expect(_axios.post).toHaveBeenCalledWith('post/OoklaSpeedtest', {
+  expect(_axios.post).toHaveBeenCalledWith('api/post/OoklaSpeedtest', {
     accountId: 'account-1', userId: 'user/name', download_MBs: 333, upload_MBs: 444,
     ping_ms: 99.9, jitter_ms: 88.8, host: 'Host3',
   }, expect.objectContaining({ headers: { Authorization: 'Bearer test-token' } }));
   _axios.get.mockResolvedValue({ data: { download_MBs: 0, upload_MBs: 231, createdOn: 'today' } });
   await expect(api.getOoklaResult()).resolves.toEqual({ download: 0, upload: 231, updated: 'today' });
-  expect(_axios.get).toHaveBeenCalledWith('get/OoklaSpeedtest/account-1/user%2Fname', expect.objectContaining({ headers: { Authorization: 'Bearer test-token' } }));
+  expect(_axios.get).toHaveBeenCalledWith('api/get/OoklaSpeedtest/account-1/user%2Fname', expect.objectContaining({ headers: { Authorization: 'Bearer test-token' } }));
 });
 test.each([null, '', ' ', 'invalid', false, -1])('invalid measured speed %p never becomes a fabricated zero', async download => {
   await expect(api.saveOoklaResult({ download, upload: 1 })).rejects.toThrow();
@@ -128,7 +155,7 @@ test('missing session prevents requests', async () => {
 test.each([[316.112, 41.235, 316.112, 41.235], [316.8, 41.5, 316.8, 41.5], [0, 41, 0, 41]])('Ookla preserves measured decimal speeds for %s and %s', async (download, upload, expectedDownload, expectedUpload) => {
   _axios.post.mockResolvedValue({ data: true });
   await api.saveOoklaResult({ download, upload, ping: 19.5, jitter: 6.777778, host: 'Host3' });
-  expect(_axios.post).toHaveBeenCalledWith('post/OoklaSpeedtest', expect.objectContaining({
+  expect(_axios.post).toHaveBeenCalledWith('api/post/OoklaSpeedtest', expect.objectContaining({
     download_MBs: expectedDownload, upload_MBs: expectedUpload, ping_ms: 19.5, jitter_ms: 6.777778,
   }), expect.any(Object));
 });

@@ -12,11 +12,13 @@ import AppStyles from "../../../styles/AppStyles";
 
 import speedTestApi from "../../../network/apis/services/speedTest.service";
 import NotificationAlert from "../../common/customui/NotificationAlert";
+import speedTestErrorMessage from "./speedTestErrorMessage";
 const ModemSpeedTestScreen = ({ navigation, route, onRunSpeedTest }) => {
   const [complete, setComplete] = useState(false);
   const mounted = useRef(false);
   const pending = useRef(false);
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [results, setResults] = useState(null);
   const loading = !complete && !error;
   const run = async () => {
@@ -37,8 +39,11 @@ const ModemSpeedTestScreen = ({ navigation, route, onRunSpeedTest }) => {
         setResults(result);
         setComplete(true);
       }
-    } catch {
-      if (mounted.current) setError(true);
+    } catch (failure) {
+      if (mounted.current) {
+        setErrorMessage(speedTestErrorMessage(failure));
+        setError(true);
+      }
     } finally {
       pending.current = false;
     }
@@ -75,7 +80,7 @@ const ModemSpeedTestScreen = ({ navigation, route, onRunSpeedTest }) => {
     >
       <SurfaceCard style={AppStyles.card}>
         {error ? (
-          <ModemSpeedTestComplete error />
+          <ModemSpeedTestComplete error message={errorMessage} />
         ) : complete ? (
           <ModemSpeedTestComplete />
         ) : (

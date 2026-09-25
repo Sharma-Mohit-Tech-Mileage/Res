@@ -5,12 +5,12 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import { Body } from "../../common/customui/Typography";
 import styles from "./speedTestStyles";
 
-const ModemSpeedTestComplete = ({ error = false }) => (
+const ModemSpeedTestComplete = ({ error = false, message }) => (
   <View style={styles.statusContent}>
     <NotificationAlert
       type={error ? "error" : "success"}
       title={error ? "Speed test failed" : "Speed test complete"}
-      message={error ? "We couldn't complete your speed test. Check your connection and try again." : "Thank you for your patience."}
+      message={error ? message || "We couldn't complete your speed test. Please try again." : "Thank you for your patience."}
       containerStyle={styles.statusNotice}
       showCloseIcon={false}
     />
