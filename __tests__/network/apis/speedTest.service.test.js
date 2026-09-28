@@ -4,8 +4,9 @@ import api from '../../../src/network/apis/services/speedTest.service';
 import { _axios } from '../../../src/network/RestApiClient';
 import { getUser } from '../../../src/redux/utils/LocalStorage';
 
-const result = (tstamp = '09/21/2026 09:20:52') => ({ data: {
+const result = (tstamp = '2026-09-25T08:20:52-07:00') => ({ data: {
   statusCode: 200, error: null,
+  data: [{ id: '1', down_Mbps: '980.4000244140625', up_Mbps: '0', date: tstamp }],
   detail: { id: '1', download_Result: '980.4000244140625', upload_Result: '0', tstamp },
 } });
 beforeEach(() => {
@@ -14,16 +15,38 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
+test('accepts the observed GET envelope and nested history success', async () => {
+  _axios.get.mockResolvedValue({ data: { results: null, detail: null, data: [
+    { id: 21299029, down_Mbps: 973.24, up_Mbps: 54.71, date: '2026-09-25T07:07:26-07:00' },
+  ] } });
+  const latest = await api.getEeroResults();
+  expect(latest).toMatchObject({ download: 973.24, upload: 54.71 });
+  _axios.post.mockResolvedValue({ data: {
+    historyResults: { statusCode: 200, error: 'Success', result: 'true' },
+    download_MBs: 0, upload_MBs: 0,
+  } });
+  await expect(api.insertEeroHistory(latest)).resolves.toBe(true);
+  expect(_axios.post).toHaveBeenCalledWith('api/InsertEeroSpeedTestHistory', {
+    accountId: 'account-1', userId: 'account-1', download_MBs: 973.24, upload_MBs: 54.71,
+    ping_Ms: 0, jitter_Ms: 0, host: '',
+  }, expect.any(Object));
+});
+
+test.each(['false', false])('rejects nested history result %p', async result => {
+  _axios.post.mockResolvedValue({ data: { historyResults: { statusCode: 200, result } } });
+  await expect(api.insertEeroHistory({ download: 1, upload: 2 })).rejects.toThrow('save');
+});
+
 test('Eero starts with no prior details and no username, then posts raw history', async () => {
   getUser.mockResolvedValue({ token: 'test-token', userInfo: { accountNumber: 'account-1', userId: 'user-123' } });
   _axios.get.mockResolvedValueOnce({ status: 204, data: '' }).mockResolvedValueOnce(result());
   _axios.post.mockResolvedValueOnce({ data: { statusCode: 202 } }).mockResolvedValueOnce({ data: true });
   await expect(api.runEeroSpeedTest()).resolves.toMatchObject({ historySaved: true });
   expect(_axios.post).toHaveBeenNthCalledWith(1, 'api/post/EeroSpeedtest', {
-    idType: 'account', id: 'account-1', AccountNumber: 'account-1',
+    idType: 'account', id: 'account-1', accountNumber: 'account-1',
   }, expect.any(Object));
   expect(_axios.post).toHaveBeenNthCalledWith(2, 'api/InsertEeroSpeedTestHistory', expect.objectContaining({
-    UserId: 'user-123', Download_MBs: '980.4000244140625', Upload_MBs: '0',
+    userId: 'user-123', download_MBs: '980.4000244140625', upload_MBs: '0',
   }), expect.any(Object));
 });
 
@@ -31,7 +54,7 @@ test('modem display falls back to live details when saving history failed', asyn
   _axios.get.mockRejectedValueOnce({ response: { status: 500 } }).mockResolvedValueOnce(result());
   await expect(api.getLatestEeroResult()).resolves.toMatchObject({ download: '980.4000244140625' });
   expect(_axios.get.mock.calls.map(([path]) => path)).toEqual([
-    'api/GetEeroSpeedTestHistory/account-1', 'api/Eerospeedtest/details',
+    'api/GetEeroSpeedTestHistory/account-1', 'api/get/EeroSpeedtest',
   ]);
 });
 
@@ -50,7 +73,7 @@ test('POST keeps raw measurement strings and full precision unchanged', async ()
   }), expect.any(Object));
   await api.insertEeroHistory(raw);
   expect(_axios.post).toHaveBeenLastCalledWith('api/InsertEeroSpeedTestHistory', expect.objectContaining({
-    Download_MBs: raw.download, Upload_MBs: raw.upload, Ping_Ms: raw.ping, Jitter_Ms: raw.jitter,
+    download_MBs: raw.download, upload_MBs: raw.upload, ping_Ms: raw.ping, jitter_Ms: raw.jitter,
   }), expect.any(Object));
 });
 
@@ -67,7 +90,7 @@ test('option one selects the newest measurement even when results are unordered'
     { id: 2, down_Mbps: 980.4, up_Mbps: 54.69, date: '2026-09-14T09:20:52-07:00' },
   ] } });
   await expect(api.getEeroResults()).resolves.toMatchObject({ id: 2, download: 980.4, upload: 54.69 });
-  expect(_axios.get).toHaveBeenCalledWith('api/get/EeroSpeedtest', expect.objectContaining({ params: {
+  expect(_axios.get).toHaveBeenCalledWith('api/get/EeroSpeedtest', expect.objectContaining({ timeout: 0, params: {
     idType: 'account', id: 'account-1', accountNumber: 'account-1',
   } }));
 });
@@ -94,13 +117,13 @@ test('network mode sends the network ID and account number and retains zero', as
   expect(_axios.get).toHaveBeenCalledWith('api/Eerospeedtest/details', expect.objectContaining({ params: { idType: 'network', id: 'network-1', accountNumber: 'account-1' } }));
 });
 test('successful Eero run, details and history execute sequentially with nullable telemetry', async () => {
-  _axios.get.mockResolvedValueOnce(result('previous')).mockResolvedValueOnce(result());
+  _axios.get.mockResolvedValueOnce(result('2026-09-25T07:07:26-07:00')).mockResolvedValueOnce(result());
   _axios.post.mockResolvedValueOnce({ data: { statusCode: 202, error: null } }).mockResolvedValueOnce({ data: true });
   await expect(api.runEeroSpeedTest()).resolves.toMatchObject({ historySaved: true });
-  expect(_axios.post.mock.calls[0]).toEqual(['api/post/EeroSpeedtest', { idType: 'account', id: 'account-1', AccountNumber: 'account-1' }, expect.any(Object)]);
+  expect(_axios.post.mock.calls[0]).toEqual(['api/post/EeroSpeedtest', { idType: 'account', id: 'account-1', accountNumber: 'account-1' }, expect.any(Object)]);
   expect(_axios.post.mock.calls[1]).toEqual(['api/InsertEeroSpeedTestHistory', {
-    AccountId: 'account-1', UserId: 'account-1', Download_MBs: '980.4000244140625',
-    Upload_MBs: '0', Ping_Ms: null, Jitter_Ms: null, Host: null,
+    accountId: 'account-1', userId: 'account-1', download_MBs: '980.4000244140625',
+    upload_MBs: '0', ping_Ms: 0, jitter_Ms: 0, host: '',
   }, expect.any(Object)]);
   expect(_axios.post.mock.invocationCallOrder[0]).toBeLessThan(_axios.get.mock.invocationCallOrder[1]);
   expect(_axios.get.mock.invocationCallOrder[1]).toBeLessThan(_axios.post.mock.invocationCallOrder[1]);
@@ -122,7 +145,7 @@ test('failed start does not retrieve another result or insert history', async ()
   expect(_axios.post).toHaveBeenCalledTimes(1);
 });
 test('history failure preserves the measurement with an unsaved flag', async () => {
-  _axios.get.mockResolvedValueOnce(result('old')).mockResolvedValueOnce(result());
+  _axios.get.mockResolvedValueOnce(result('2026-09-25T07:07:26-07:00')).mockResolvedValueOnce(result());
   _axios.post.mockResolvedValueOnce({ data: { statusCode: 202 } }).mockResolvedValueOnce({ data: false });
   await expect(api.runEeroSpeedTest()).resolves.toMatchObject({ upload: '0', historySaved: false });
 });
@@ -138,7 +161,7 @@ test('Ookla payload uses exact casing; false is rejected; retrieval encodes user
     accountId: 'account-1', userId: 'user/name', download_MBs: 333, upload_MBs: 444,
     ping_ms: 99.9, jitter_ms: 88.8, host: 'Host3',
   }, expect.objectContaining({ headers: { Authorization: 'Bearer test-token' } }));
-  _axios.get.mockResolvedValue({ data: { download_MBs: 0, upload_MBs: 231, createdOn: 'today' } });
+  _axios.get.mockResolvedValue({ data: { testResults: { download_MBs: 0, upload_MBs: 231, createdOn: 'today' } } });
   await expect(api.getOoklaResult()).resolves.toEqual({ download: 0, upload: 231, updated: 'today' });
   expect(_axios.get).toHaveBeenCalledWith('api/get/OoklaSpeedtest/account-1/user%2Fname', expect.objectContaining({ headers: { Authorization: 'Bearer test-token' } }));
 });

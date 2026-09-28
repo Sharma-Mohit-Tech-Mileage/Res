@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 561,
-      "versionName": "30.0.1",
+      "versionCode": 601,
+      "versionName": "30.1.0",
       "outputFile": "app-Demo-release.apk"
     }
   ],

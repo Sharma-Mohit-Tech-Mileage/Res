@@ -25,11 +25,15 @@ const session = async (needsUser = false) => {
   const user = await getUser();
   return {
     account: required(user?.userInfo?.accountNumber, "Account number"),
-    userId: needsUser === "eero"
-      ? required(user?.userInfo?.userId ?? user?.userInfo?.accountNumber, "User ID")
-      : needsUser
-      ? required(user?.userInfo?.userName, "User name")
-      : undefined,
+    userId:
+      needsUser === "eero"
+        ? required(
+            user?.userInfo?.userId ?? user?.userInfo?.accountNumber,
+            "User ID",
+          )
+        : needsUser
+        ? required(user?.userInfo?.userName, "User name")
+        : undefined,
     config: {
       headers: {
         Authorization: `Bearer ${required(user?.token, "Session token")}`,
@@ -58,7 +62,11 @@ const atStage = async (stage, execute) => {
 const identity = (account, idType, networkId) => {
   if (!["account", "network"].includes(idType))
     throw new Error("Invalid ID type");
-  return { idType, id: idType === "network" ? required(networkId, "Network ID") : account, accountNumber: account };
+  return {
+    idType,
+    id: idType === "network" ? required(networkId, "Network ID") : account,
+    accountNumber: account,
+  };
 };
 const details = async (context, idType, networkId) => {
   const response = await _axios.get(ENDPOINTS.EERO_SPEED_DETAILS, {
@@ -76,21 +84,58 @@ const details = async (context, idType, networkId) => {
         id: detail.id,
       };
 };
+const results = async (context, idType, networkId) => {
+  const response = await _axios.get(ENDPOINTS.EERO_SPEED_RESULTS, {
+    ...context.config,
+    timeout: 0,
+    params: identity(context.account, idType, networkId),
+  });
+  if (response.status === 204 || response.data == null) return null;
+  const payload = response.data;
+  if (
+    payload.error ||
+    (payload.statusCode != null && Number(payload.statusCode) !== 200)
+  )
+    throw new Error("Unable to retrieve Eero results");
+  const rows = payload.data;
+  if (rows == null || (Array.isArray(rows) && !rows.length)) return null;
+  if (!Array.isArray(rows)) throw new Error("Invalid speed test results");
+  const latest = rows.reduce((newest, row) => {
+    if (!Number.isFinite(Date.parse(row.date)))
+      throw new Error("Invalid speed test date");
+    return !newest || Date.parse(row.date) > Date.parse(newest.date)
+      ? row
+      : newest;
+  }, null);
+  return {
+    download: number(latest.down_Mbps),
+    upload: number(latest.up_Mbps),
+    updated: latest.date,
+    id: latest.id,
+  };
+};
 const insert = async (context, result) => {
   const response = await _axios.post(
     ENDPOINTS.EERO_SPEED_HISTORY,
     {
-      AccountId: context.account,
-      UserId: context.userId,
-      Download_MBs: number(result.download),
-      Upload_MBs: number(result.upload),
-      Ping_Ms: optionalNumber(result.ping),
-      Jitter_Ms: optionalNumber(result.jitter),
-      Host: result.host ?? null,
+      accountId: context.account,
+      userId: context.userId,
+      download_MBs: number(result.download),
+      upload_MBs: number(result.upload),
+      ping_Ms: optionalNumber(result.ping) ?? 0,
+      jitter_Ms: optionalNumber(result.jitter) ?? 0,
+      host: result.host ?? "",
     },
     context.config,
   );
-  if (response.data !== true)
+  const saved = response.data?.historyResults;
+  if (
+    response.data !== true &&
+    !(
+      Number(saved?.statusCode) === 200 &&
+      (saved?.result === true || saved?.result === "true")
+    )
+  )
     throw new Error("Unable to save speed test history");
   return true;
 };
@@ -115,7 +160,9 @@ const speedTestApi = {
   getEeroHistory: async () => {
     const context = await session();
     const response = await _axios.get(
-      getEndpoint(ENDPOINTS.EERO_SPEED_HISTORY_GET, { accountId: encodeURIComponent(context.account) }),
+      getEndpoint(ENDPOINTS.EERO_SPEED_HISTORY_GET, {
+        accountId: encodeURIComponent(context.account),
+      }),
       context.config,
     );
     if (response.status === 204 || response.data == null) return null;
@@ -133,23 +180,10 @@ const speedTestApi = {
       // Expired sessions must still be handled by authentication, not a fallback.
       if ([401, 403].includes(error?.response?.status)) throw error;
     }
-    return speedTestApi.getEeroDetails();
+    return speedTestApi.getEeroResults();
   },
-  getEeroResults: async (idType = "account", networkId) => {
-    const context = await session();
-    const response = await _axios.get(ENDPOINTS.EERO_SPEED_RESULTS, {
-      ...context.config,
-      params: identity(context.account, idType, networkId),
-    });
-    const rows = check(response.data, [200]).data;
-    if (rows == null || (Array.isArray(rows) && !rows.length)) return null;
-    if (!Array.isArray(rows)) throw new Error("Invalid speed test results");
-    const latest = rows.reduce((newest, row) => {
-      if (!Number.isFinite(Date.parse(row.date))) throw new Error("Invalid speed test date");
-      return !newest || Date.parse(row.date) > Date.parse(newest.date) ? row : newest;
-    }, null);
-    return { download: number(latest.down_Mbps), upload: number(latest.up_Mbps), updated: latest.date, id: latest.id };
-  },
+  getEeroResults: async (idType = "account", networkId) =>
+    results(await session(), idType, networkId),
   insertEeroHistory: async (result) => insert(await session("eero"), result),
   runEeroSpeedTest: async ({
     idType = "account",
@@ -159,7 +193,9 @@ const speedTestApi = {
   } = {}) => {
     const context = await atStage("session", () => session("eero"));
     // Record the previous timestamp so a 202 cannot cause old results to be saved.
-    const previous = await atStage("previous-result", () => details(context, idType, networkId));
+    const previous = await atStage("previous-result", () =>
+      results(context, idType, networkId),
+    );
     if (isCancelled()) throw new Error("Speed test cancelled");
     await atStage("start", async () => {
       const response = await _axios.post(
@@ -167,7 +203,7 @@ const speedTestApi = {
         {
           idType,
           id: identity(context.account, idType, networkId).id,
-          AccountNumber: context.account,
+          accountNumber: context.account,
         },
         context.config,
       );
@@ -176,15 +212,24 @@ const speedTestApi = {
     for (let attempt = 0; attempt < 24; attempt += 1) {
       if (attempt) await delay(5000);
       if (isCancelled()) throw new Error("Speed test cancelled");
-      const result = await atStage("result", () => details(context, idType, networkId));
+      const result = await atStage("result", () =>
+        results(context, idType, networkId),
+      );
       if (isCancelled()) throw new Error("Speed test cancelled");
-      if (!result?.updated || (previous && result.updated === previous.updated))
+      if (
+        !result?.updated ||
+        (previous && Date.parse(result.updated) <= Date.parse(previous.updated))
+      )
         continue;
       try {
         await insert(context, { ...history, ...result });
         return { ...result, historySaved: true };
       } catch (error) {
-        logDebug("Eero history save failed", { status: error?.response?.status, code: error?.code, reason: error?.response ? "HTTP failure" : error?.message });
+        logDebug("Eero history save failed", {
+          status: error?.response?.status,
+          code: error?.code,
+          reason: error?.response ? "HTTP failure" : error?.message,
+        });
         return { ...result, historySaved: false };
       }
     }
@@ -229,18 +274,23 @@ const speedTestApi = {
   },
 };
 // Include pre-request validation failures without logging session credentials.
-export default Object.fromEntries(Object.entries(speedTestApi).map(([operation, execute]) => [
-  operation,
-  async (...args) => {
-    logDebug("Speed test operation started", { operation });
-    try {
-      return await execute(...args);
-    } catch (error) {
-      logDebug("Speed test operation failed", {
-        operation, stage: error?.speedTestStage, status: error?.response?.status ?? error?.serviceStatus, code: error?.code,
-        reason: error?.response ? "HTTP failure" : error?.message,
-      });
-      throw error;
-    }
-  },
-]));
+export default Object.fromEntries(
+  Object.entries(speedTestApi).map(([operation, execute]) => [
+    operation,
+    async (...args) => {
+      logDebug("Speed test operation started", { operation });
+      try {
+        return await execute(...args);
+      } catch (error) {
+        logDebug("Speed test operation failed", {
+          operation,
+          stage: error?.speedTestStage,
+          status: error?.response?.status ?? error?.serviceStatus,
+          code: error?.code,
+          reason: error?.response ? "HTTP failure" : error?.message,
+        });
+        throw error;
+      }
+    },
+  ]),
+);
