@@ -252,8 +252,20 @@ const speedTestApi = {
       },
       context.config,
     );
-    if (response.data !== true)
-      throw new Error("Unable to save speed test history");
+    // The wrapper returns historyResults; older deployments return a boolean.
+    // Its error field contains "Success" on successful saves, so use status/result.
+    const saved = response.data?.historyResults;
+    if (
+      response.data !== true &&
+      !(
+        Number(saved?.statusCode) === 200 &&
+        (saved?.result === true || saved?.result === "true")
+      )
+    ) {
+      const error = new Error("Unable to save speed test history");
+      error.serviceStatus = saved?.statusCode;
+      throw error;
+    }
     return true;
   },
   getOoklaResult: async () => {

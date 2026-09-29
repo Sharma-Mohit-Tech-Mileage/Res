@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   navBar: {
-    height: 56,
+    height: 80,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

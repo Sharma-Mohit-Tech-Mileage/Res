@@ -26,6 +26,7 @@ export default function WifiSpeedTestScreen({ navigation }) {
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [saveState, setSaveState] = useState(null);
+  const scrollRef = useRef(null);
   const submissions = useRef(new Map());
   const mounted = useRef(true);
   useEffect(() => {
@@ -34,6 +35,11 @@ export default function WifiSpeedTestScreen({ navigation }) {
       mounted.current = false;
     };
   }, []);
+  useEffect(() => {
+    if (saveState?.status === "failed" || saveState?.status === "invalid") {
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+    }
+  }, [saveState?.status]);
   const saveResult = async (result, retry = false) => {
     const previous = submissions.current.get(result.testId);
     if (previous && (!retry || previous !== "failed")) return;
@@ -77,6 +83,7 @@ export default function WifiSpeedTestScreen({ navigation }) {
         onPressBack={() => navigation.goBack()}
       />
       <ScrollView
+        ref={scrollRef}
         style={styles.content}
         contentContainerStyle={[
           styles.scrollContent,
@@ -87,6 +94,34 @@ export default function WifiSpeedTestScreen({ navigation }) {
         ]}
         showsVerticalScrollIndicator={false}
       >
+        {saveState && (
+          <View style={styles.saveStatus}>
+            <NotificationAlert
+              type={
+                saveState.status === "failed" || saveState.status === "invalid"
+                  ? "error"
+                  : "info"
+              }
+              showCloseIcon={false}
+              title={
+                saveState.status === "saving"
+                  ? "Saving speed test result"
+                  : saveState.status === "saved"
+                  ? "Speed test result saved"
+                  : "Unable to save speed test result"
+              }
+              message={
+                saveState.status === "failed"
+                  ? "Your test completed. Retry saving without running another test."
+                  : saveState.status === "invalid"
+                  ? "The widget returned an incomplete result. Please run the test again."
+                  : saveState.status === "saved"
+                  ? "Your result is available in My Speed."
+                  : "Please wait while your result is saved."
+              }
+            />
+          </View>
+        )}
         <View
           style={[
             styles.card,
@@ -136,39 +171,13 @@ export default function WifiSpeedTestScreen({ navigation }) {
             )}
           </View>
         </View>
-        {saveState && (
-          <View style={styles.saveStatus}>
-            <NotificationAlert
-              type={
-                saveState.status === "failed" || saveState.status === "invalid"
-                  ? "error"
-                  : "info"
-              }
-              showCloseIcon={false}
-              title={
-                saveState.status === "saving"
-                  ? "Saving speed test result"
-                  : saveState.status === "saved"
-                  ? "Speed test result saved"
-                  : "Unable to save speed test result"
-              }
-              message={
-                saveState.status === "failed"
-                  ? "Your test completed. Retry saving without running another test."
-                  : saveState.status === "invalid"
-                  ? "The widget returned an incomplete result. Please run the test again."
-                  : saveState.status === "saved"
-                  ? "Your result is available in My Speed."
-                  : "Please wait while your result is saved."
-              }
+        {saveState?.status === "failed" && (
+          <View style={styles.retryAction}>
+            <PrimaryButton
+              title="Retry Saving Result"
+              buttonType="submit"
+              onPress={() => saveResult(saveState.result, true)}
             />
-            {saveState.status === "failed" && (
-              <PrimaryButton
-                title="Retry Saving Result"
-                buttonType="submit"
-                onPress={() => saveResult(saveState.result, true)}
-              />
-            )}
           </View>
         )}
         <View style={styles.footer}>
@@ -203,7 +212,8 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xl,
     paddingHorizontal: theme.spacing.base,
   },
-  saveStatus: { paddingTop: theme.spacing.base },
+  retryAction: { paddingTop: theme.spacing.base },
+  saveStatus: { paddingBottom: theme.spacing.base },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
