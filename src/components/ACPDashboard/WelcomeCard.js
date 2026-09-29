@@ -19,7 +19,7 @@ import { Title } from "../common/customui/Typography";
 const WelcomeCard = () => {
   const isNewDashboardEnabled = useFeatureFlag(
     FeatureFlags.DASHBOARD_NEW_LAYOUT,
-    false
+    false,
   );
   const videoId = "C3cMQoWxv6I";
   const { width: screenWidth } = useWindowDimensions();
@@ -99,7 +99,11 @@ const WelcomeCard = () => {
 
   return (
     <View style={styles.container}>
-      {isNewDashboardEnabled ? <SitecoreBanner /> : renderWelcomeBanner()}
+      {isNewDashboardEnabled ? (
+        <SitecoreBanner presentation="phone-left-white" />
+      ) : (
+        renderWelcomeBanner()
+      )}
     </View>
   );
 };

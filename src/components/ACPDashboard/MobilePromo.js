@@ -24,7 +24,7 @@ const MobilePromo = () => {
   };
 
   if (showSparklightMobile) {
-    return <SitecoreBanner />;
+    return <SitecoreBanner presentation="phone-left-white" />;
   }
 
   return (

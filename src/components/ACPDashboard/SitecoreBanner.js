@@ -13,7 +13,7 @@ import { getBanner } from "../../network/apis/sitecore/banner.service";
 import Touchable from "../common/customui/Touchable";
 import { Color, FontFamily } from "../../../GlobalStyles";
 
-export default function SitecoreBanner() {
+export default function SitecoreBanner({ presentation = "cms" }) {
   const [banner, setBanner] = useState(null);
   const [failedImage, setFailedImage] = useState(null);
   const [linkError, setLinkError] = useState(false);
@@ -48,7 +48,7 @@ export default function SitecoreBanner() {
         mounted = false;
         subscription.remove();
       };
-    }, [])
+    }, []),
   );
 
   if (!banner) {
@@ -59,18 +59,25 @@ export default function SitecoreBanner() {
     ? banner.tabletImage || banner.phoneImage
     : banner.phoneImage || banner.tabletImage;
   const uri = selectedImage !== failedImage ? selectedImage : null;
+  // These placements use the approved phone-left, white-background design.
+  // Other placements can continue using CMS-controlled alignment and theme.
+  const referencePresentation = presentation === "phone-left-white";
+  const alignment = referencePresentation ? "right" : banner.alignment;
+  const lightText = referencePresentation ? false : banner.lightText;
   const position = { left: "flex-start", center: "center", right: "flex-end" }[
-    banner.alignment
+    alignment
   ];
+  // Alignment selects the content column. Side columns retain a shared
+  // leading edge for copy and CTA, matching the CMS banner compositions.
+  const textAlignment = alignment === "center" ? "center" : "left";
+  const contentAlignment = alignment === "center" ? "center" : "flex-start";
   // CMS theme describes foreground contrast; do not infer colors from image pixels.
-  const foreground = banner.lightText ? "#FFFFFF" : Color.colorMidnightblue;
-  const eyebrowColor = banner.lightText
+  const foreground = lightText ? "#FFFFFF" : Color.colorMidnightblue;
+  const eyebrowColor = lightText ? "#FFFFFF" : Color.sparklightPrimaryPurple;
+  const buttonBackground = lightText
     ? "#FFFFFF"
     : Color.sparklightPrimaryPurple;
-  const buttonBackground = banner.lightText
-    ? "#FFFFFF"
-    : Color.sparklightPrimaryPurple;
-  const buttonForeground = banner.lightText
+  const buttonForeground = lightText
     ? Color.sparklightPrimaryPurple
     : "#FFFFFF";
   const compact = (cardWidth || width) < 340;
@@ -83,7 +90,10 @@ export default function SitecoreBanner() {
     }
   };
   return (
-    <View onLayout={(event) => setCardWidth(event.nativeEvent.layout.width)}>
+    <View
+      style={styles.container}
+      onLayout={(event) => setCardWidth(event.nativeEvent.layout.width)}
+    >
       <ImageBackground
         testID="sitecore-banner"
         source={uri ? { uri } : undefined}
@@ -93,7 +103,7 @@ export default function SitecoreBanner() {
           styles.card,
           {
             minHeight: Math.max(225, (cardWidth * 225) / 354),
-            backgroundColor: banner.lightText ? "#79246C" : "#FFFFFF",
+            backgroundColor: lightText ? "#79246C" : "#FFFFFF",
             alignItems: position,
           },
         ]}
@@ -102,7 +112,7 @@ export default function SitecoreBanner() {
           testID="sitecore-banner-content"
           style={[
             styles.content,
-            { alignItems: position },
+            { alignItems: contentAlignment },
             compact && styles.compactContent,
           ]}
         >
@@ -110,7 +120,7 @@ export default function SitecoreBanner() {
             <Text
               style={[
                 styles.eyebrow,
-                { color: eyebrowColor, textAlign: banner.alignment },
+                { color: eyebrowColor, textAlign: textAlignment },
               ]}
             >
               {banner.eyebrow}
@@ -122,7 +132,7 @@ export default function SitecoreBanner() {
               style={[
                 styles.headline,
                 compact && styles.compactHeadline,
-                { color: foreground, textAlign: banner.alignment },
+                { color: foreground, textAlign: textAlignment },
               ]}
             >
               {banner.headline}
@@ -155,16 +165,28 @@ export default function SitecoreBanner() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+    alignSelf: "stretch",
+    backgroundColor: Color.sparklightWhite,
+    borderWidth: 0,
+    borderRadius: 0,
+    overflow: "hidden",
+  },
   card: { width: "100%", justifyContent: "center", overflow: "hidden" },
-  content: { width: "60%", paddingVertical: 24, paddingHorizontal: 16 },
+  content: { width: "60%", paddingVertical: 28, paddingHorizontal: 16 },
   compactContent: { width: "64%", paddingHorizontal: 12 },
   eyebrow: {
+    width: "100%",
+    flexShrink: 1,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 8,
   },
   headline: {
+    width: "100%",
+    flexShrink: 1,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: 22,
     lineHeight: 26,
@@ -173,6 +195,7 @@ const styles = StyleSheet.create({
   },
   compactHeadline: { fontSize: 20, lineHeight: 24 },
   button: {
+    maxWidth: "100%",
     minHeight: 44,
     borderRadius: 50,
     paddingHorizontal: 22,
@@ -180,18 +203,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonText: {
+    flexShrink: 1,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: 16,
     fontWeight: "600",
     textAlign: "center",
   },
   disclaimer: {
+    width: "84%",
+    alignSelf: "center",
+    flexShrink: 1,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 12,
     lineHeight: 16,
     marginTop: 10,
     marginBottom: 8,
-    marginHorizontal: 16,
     textAlign: "center",
     color: Color.colorblack_100,
   },
