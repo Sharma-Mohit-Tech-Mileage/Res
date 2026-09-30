@@ -100,6 +100,16 @@ export const ENDPOINTS = {
     INTERNET_USAGE: 'api/Internet/Usage',
     EQUIPMENT_BY_ACCOUNT: 'api/Services/GetInternetData?account=:account',
 
+    // Modem and speed tests
+    MODEM_REBOOT: 'api/ModemReboot',
+    EERO_SPEED_TEST: 'api/post/EeroSpeedtest',
+    EERO_SPEED_DETAILS: 'api/Eerospeedtest/details',
+    EERO_SPEED_RESULTS: 'api/get/EeroSpeedtest',
+    EERO_SPEED_HISTORY_GET: 'api/GetEeroSpeedTestHistory/:accountId',
+    EERO_SPEED_HISTORY: 'api/InsertEeroSpeedTestHistory',
+    OOKLA_SPEED_SAVE: 'api/post/OoklaSpeedtest',
+    OOKLA_SPEED_DETAILS: 'api/get/OoklaSpeedtest/:accountId/:userId',
+
     // Security / Password
     SECURITY_QUESTIONS: 'api/Security/GetSecurityQuestions',
     GET_SECURTY_ANSWERS: 'api/Security/GetSecurityQuestion?userName=:userName&accountNumber=:accountNumber',

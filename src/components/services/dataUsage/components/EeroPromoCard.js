@@ -140,8 +140,10 @@ const EeroPromoCard = ({ promoData }) => {
 };
 
 const styles = StyleSheet.create({
-  // Screen frame and card gap now come from ScreenScroll; the card sets no outer margins.
-  container: {},
+  container: {
+    marginHorizontal: theme.spacing.base,
+    marginBottom: 50,
+  },
 
   cardWrapper: {
     borderRadius: theme.radius.lg,

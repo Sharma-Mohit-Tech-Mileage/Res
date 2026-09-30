@@ -1,3 +1,4 @@
+import ServiceIcon from "../../../res/svgIcons/VideoServiceIcon";
 import React from "react";
 import { View, Text, StyleSheet, Linking, Alert } from "react-native";
 import { theme } from "../../../styles/theme";
@@ -6,7 +7,7 @@ import { getChannelLineupURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../../styles/AppStyles";
-import { SectionTitle } from "../../common/customui/Typography";
+import { FieldTitle } from "../../common/customui/Typography";
 const VideoCard = ({ planName, zipCode, loading = false }) => {
   const handleChannelLineup = async () => {
     const url = getChannelLineupURL(zipCode);
@@ -22,7 +23,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-       <View style={[AppStyles.card,{ padding: 16 }]}>
+       <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
           <SkeletonPlaceholder
             backgroundColor={theme.colors.skeleton.base}
             highlightColor={theme.colors.skeleton.highlight}
@@ -40,24 +41,11 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
 
   return (
     <View style={[styles.container]}>
-      <View style={AppStyles.card}>
+      <View style={[AppStyles.card, { marginHorizontal: 16 }]}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          {/* <View
-            style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no"
-            accessibilityElementsHidden={true}
-          >
-            <MaterialCommunityIcons
-              name="television"
-              size={16}
-              color={theme.colors.primary}
-              accessible={false}
-              importantForAccessibility="no"
-            />
-          </View> */}
-          <SectionTitle
+          <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
+          <FieldTitle
             accessible={true}
             style={{marginLeft: 8}}
             accessibilityLabel="TV & Video"
@@ -65,7 +53,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
             accessibilityRole="header"
           >
             TV & Video
-          </SectionTitle>
+          </FieldTitle>
         </View>
 
         {/* Plan Name & Action */}
@@ -95,15 +83,16 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
 
 const styles = StyleSheet.create({
   // Container & Card
-  container: serviceCard.container,
+  container: { ...serviceCard.container, marginBottom: theme.spacing.base },
   card: {
     ...AppStyles.card,
   },
   bottomButton: {
+    marginHorizontal: 16,
     marginBottom: 16,
   },
   // Service Header
-  serviceHeader: AppStyles.cardHreader,
+  serviceHeader: { ...AppStyles.cardHreader, backgroundColor: theme.colors.white },
   iconWrapper: serviceCard.iconWrapper,
   serviceType: serviceCard.serviceType,
 

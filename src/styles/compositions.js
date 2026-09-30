@@ -15,10 +15,10 @@ export const serviceCard = {
   },
 
   iconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: `${theme.colors.primary}12`,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.secondarySurface,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -122,7 +122,7 @@ export const cardHeader = {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: `${theme.colors.primary}12`,
+    backgroundColor: theme.colors.secondarySurface,
     alignItems: "center",
     justifyContent: "center",
     marginRight: theme.spacing.sm,
@@ -144,7 +144,7 @@ export const cardHeader = {
 export const dataUsageTabs = {
   tabsContainer: {
     flexDirection: "row",
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     borderRadius: theme.radius.sm,
     padding: 2,
   },
@@ -164,7 +164,7 @@ export const dataUsageTabs = {
     fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
-    color: theme.colors.text.secondary,
+    color: theme.colors.purpleBright,
   },
 };
 

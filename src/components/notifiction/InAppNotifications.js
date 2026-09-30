@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   saveButton: {
-    backgroundColor: Color.colorMidnightblue,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   cancelButton: {
     backgroundColor: Color.Gray300,

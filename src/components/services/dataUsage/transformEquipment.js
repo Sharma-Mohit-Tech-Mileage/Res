@@ -7,6 +7,13 @@ const isPresent = (v) => {
 const modelLine = (e) =>
   [e?.manufacturer, e?.model_code].filter(isPresent).join(" - ");
 
+export const isEeroEquipment = (equipment) =>
+  isPresent(equipment?.serial_number) &&
+  String(equipment?.equipment_category ?? "").trim() === "05" &&
+  String(equipment?.manufacturer ?? "")
+    .trim()
+    .toUpperCase() === "EERO";
+
 // Eero: equipment_category 05 + manufacturer EERO. Modem: equipment_category 03. serial_number must not be * for either.
 export const transformEquipment = (apiData) => {
   const list = Array.isArray(apiData?.equipments) ? apiData.equipments : [];
@@ -15,9 +22,8 @@ export const transformEquipment = (apiData) => {
       const serial = e?.serial_number;
       if (!isPresent(serial)) return null;
       const category = String(e?.equipment_category ?? "").trim();
-      const manufacturer = String(e?.manufacturer ?? "").trim().toUpperCase();
 
-      if (category === "05" && manufacturer === "EERO") {
+      if (isEeroEquipment(e)) {
         return {
           id: e?.internal_id || serial || `eero-${i}`,
           name: e?.equipment_description || e?.model || "Eero",

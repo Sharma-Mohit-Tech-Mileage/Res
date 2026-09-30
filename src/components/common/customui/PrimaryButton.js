@@ -4,13 +4,19 @@ import { Color, FontFamily, FontSize, Padding, Border } from "../../../styles/Gl
 import { A11Y } from "../../../styles/theme";
 import { interaction } from "../../../styles/utilities";
 import Touchable from "./Touchable";
+import CancelButton from "./CancelButton";
 
-const PrimaryButton = ({ title, onPress, buttonType, disabled, textStyle }) => {
-  const buttonStyles = [buttonType === 'submit' ? styles.button : styles.canbutton, buttonType === 'submit' ? styles.submitButton : styles.cancelButton];
+const PrimaryButton = ({ title, onPress, buttonType, disabled, textStyle, style, containerStyle, ...accessibilityProps }) => {
+  if (typeof title === 'string' && title.trim().toLowerCase() === 'cancel') {
+    return <CancelButton title={title} onPress={onPress} disabled={disabled}
+      style={style} textStyle={textStyle} containerStyle={[styles.margin, containerStyle]}
+      accessibilityLabel={title} {...accessibilityProps} />;
+  }
+  const buttonStyles = [buttonType === 'submit' ? styles.button : styles.canbutton, buttonType === 'submit' ? styles.submitButton : styles.cancelButton, buttonType === 'outline' && styles.outlineButton, style];
   const textStyles = [buttonType === 'submit' ? styles.submitText : styles.cancelText, textStyle];
 
   return (
-    <View style={styles.margin}>
+    <View style={[styles.margin, containerStyle]}>
     <Touchable style={({ pressed }) => [
       ...buttonStyles,
       disabled ? { opacity: 0.6 } : null,
@@ -21,13 +27,21 @@ const PrimaryButton = ({ title, onPress, buttonType, disabled, textStyle }) => {
      accessibilityLabel={title}
      disabled={disabled}
      onPress={onPress}>
-      <Text style={textStyles}>{title}</Text>
+      <Text style={[textStyles, buttonType === 'outline' && styles.outlineText]}>{title}</Text>
     </Touchable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  outlineButton: {
+    borderWidth: 1,
+    borderColor: Color.sparklightPrimaryPurple,
+    borderRadius: Border.br_81xl,
+  },
+  outlineText: {
+    textDecorationLine: 'none',
+  },
   button: {
     //marginTop: Border.p_base,
     alignSelf: "stretch",

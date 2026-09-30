@@ -9,8 +9,7 @@ import {
 import { Color, Padding, Border, FontFamily } from "../../styles/GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "../common/customui/Touchable";
-import ModalCard from "../common/customui/ModalCard";
-import ModalOverlay from "../common/customui/ModalOverlay";
+import CancelButton from "../common/customui/CancelButton";
 
 
 const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClose }) => {
@@ -23,8 +22,8 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
         animationType="fade"
         onRequestClose={onClose}
       >
-        <ModalOverlay>
-          <ModalCard style={styles.alertContainer}>
+        <View style={styles.overlay}>
+          <View style={styles.alertContainer}>
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
@@ -58,20 +57,11 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               </Text>
             </Touchable>
            {onClose!=undefined && (
-            <Touchable
-              style={styles.closeBtn}
-              onPress={onClose}
-              accessibilityLabel="Cancel"
-            >
-              <Text
-                style={styles.closeAlertTxt}
-              >
-                Cancel
-              </Text>
-            </Touchable>
+            <CancelButton onPress={onClose} accessibilityLabel="Cancel"
+              containerStyle={{ marginTop: 15 }} />
            )}
-          </ModalCard>
-        </ModalOverlay>
+          </View>
+        </View>
       </Modal>
      );
 };
@@ -80,6 +70,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Color.sparklightPrimaryPurple,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   alertContainer: {
     backgroundColor: "white",

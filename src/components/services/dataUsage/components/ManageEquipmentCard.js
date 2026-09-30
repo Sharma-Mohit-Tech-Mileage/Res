@@ -1,11 +1,12 @@
+import ServiceIcon from "../../../../res/svgIcons/EquipmentServiceIcon";
 import React, { memo, useMemo, useCallback } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet,Pressable } from "react-native";
 import { theme } from "../../../../styles/theme";
 import { cardHeader } from "../../../../styles/compositions";
 import { spellOutChars } from "../../../../utils/a11y";
 import AppStyles from "../../../../styles/AppStyles";
 import {SectionTitle} from "../../../common/customui/Typography";
-import { Color } from "../../../../styles/GlobalStyles";
+import GearIcon from "../../../../res/svgIcons/SettingsIcon";
 const safeText = (v, fallback = "\u2014") =>
   v === null || v === undefined || String(v).trim() === "" ? fallback : String(v);
 
@@ -74,7 +75,8 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
   );
 });
 
-const ManageEquipmentCard = ({ equipment }) => {
+const ManageEquipmentCard = ({ equipment, navigation }) => {
+
   const list = useMemo(() => (Array.isArray(equipment) ? equipment : []), [equipment]);
   const getKey = useCallback(
     (item, index) => String(item?.id ?? index),
@@ -86,22 +88,14 @@ const ManageEquipmentCard = ({ equipment }) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <View style={styles.header} accessibilityRole="header">
-          {/* <View
-            style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            accessibilityElementsHidden={true}
-          >
-            <MaterialCommunityIcons
-              name="router-wireless"
-              size={18}
-              color={theme.colors.primary}
-            />
-          </View> */}
-          <SectionTitle  accessibilityRole="header">
+        <View style={[styles.header,{justifyContent: 'space-between'}]} accessibilityRole="header">
+          <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
+          <SectionTitle style={{flex: 1}} accessibilityRole="header">
             My Equipment
           </SectionTitle>
+          <Pressable onPress={() => navigation.navigate("manageEquipment")} accessibilityRole="button" accessibilityLabel="Manage Equipment">
+            <GearIcon/>
+          </Pressable>
         </View>
 
         {list.map((item, index) => (
@@ -117,8 +111,10 @@ const ManageEquipmentCard = ({ equipment }) => {
 };
 
 const styles = StyleSheet.create({
-  // Screen frame and card gap now come from ScreenScroll; the card sets no outer margins.
-  container: {},
+  container: {
+    marginBottom: theme.spacing.base,
+    marginHorizontal: theme.spacing.base,
+  },
   card: {
     ...AppStyles.card,
     padding: theme.spacing.base,
@@ -144,7 +140,7 @@ const styles = StyleSheet.create({
   equipmentName: {
     fontSize: theme.typography.size.base,
     fontWeight: "600",
-    color: Color.colorblack_100,
+    color: "#000",
     marginBottom: 4,
   },
   equipmentDetails: { gap: 2 },

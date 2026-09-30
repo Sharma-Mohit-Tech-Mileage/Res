@@ -1,0 +1,142 @@
+/* Sparklight component color styles · 2026-09-30
+   Web documentation translation; not a React Native stylesheet.
+   Guide-only alternatives and native differences are documented in the HTML. */
+:root {
+  --sl-primary: #8D3B90;
+  --sl-primary-dark: #353091;
+  --sl-text: #101828;
+  --sl-text-input: #001321;
+  --sl-muted: #4C5458;
+  --sl-white: #FFFFFF;
+  --sl-black: #000000;
+  --sl-surface: #F8F8F8;
+  --sl-gray-300: #EAEAEA;
+  --sl-divider: #E1E1E1;
+  --sl-card-border: #E5E7EB;
+  --sl-input-border: #C7C7CC;
+  --sl-dropdown-border: #767676;
+  --sl-option-divider: #C6C6C8;
+  --sl-success: #2BA948;
+  --sl-error: #EF4E3E;
+  --sl-input-error: #FF0000;
+  --sl-warning: #F88700;
+  --sl-yellow: #FFCE51;
+  --sl-blue: #00B8D8;
+  --sl-success-surface: #F1FCF2;
+  --sl-success-border: #1D7832;
+  --sl-error-surface: #FEF3F2;
+  --sl-error-border: #B92A1C;
+  --sl-info-surface: #F0F8FF;
+  --sl-warning-surface: #FFFAEB;
+  --sl-primary-light: #E6D5F5;
+  --sl-speed-panel: #8D3B900C;
+  --sl-loader-inner: #D9A3DC;
+  --sl-loader-track: #DDDDDD;
+  --sl-step-complete: #9CA3AF;
+  --sl-skeleton-base: #E1E9EE;
+  --sl-skeleton-highlight: #F2F8FC;
+}
+
+/* Typography & text | GlobalStyles.js · src/styles/AppStyles.js · customui/LinkText.js */
+.sl-body { color:var(--sl-text); font-family:"Radio Canada",sans-serif; font-size:16px; }
+.sl-h1 { font-size:24px; font-weight:700; }
+.sl-h2 { font-size:20px; font-weight:700; }
+.sl-h3 { font-size:18px; font-weight:400; }
+.sl-section-title { font-size:18px; font-weight:600; }
+.sl-field-label { font-size:16px; font-weight:600; }
+.sl-hint { font-size:14px; color:var(--sl-muted); }
+.sl-link { color:var(--sl-primary); font-weight:700; text-decoration:underline; }
+.sl-link-component { color:var(--sl-primary-dark); }
+
+/* Buttons & action states | customui/PrimaryButton.js · SecondaryButton.js · CancelButton.js · SparkLightLoginButton.js */
+.sl-button { border:0; font:700 18px "Radio Canada",sans-serif; min-height:48px; padding:16px; border-radius:100px; background:var(--sl-primary); color:var(--sl-white); }
+.sl-button:active:not(:disabled), .sl-button.is-pressed { opacity:.85; transform:scale(.97); }
+.sl-button:disabled { opacity:.6; }
+.sl-cancel { background:transparent; color:var(--sl-primary); text-decoration:underline; }
+.sl-secondary { background:var(--sl-gray-300); color:var(--sl-primary-dark); border-radius:2px; padding:10px; font-size:16px; font-weight:400; }
+.sl-login { background:var(--sl-white); color:var(--sl-primary); border-radius:25px; }
+.sl-login--guide { border-radius:100px; }
+
+/* Inputs, password & feedback | customui/SparkLightInput.js · Feedback/Feedback.jsx */
+.sl-input { box-sizing:border-box; width:100%; min-height:48px; padding:12px 16px; border:1px solid var(--sl-muted); border-radius:8px; background:var(--sl-white); color:var(--sl-text-input); font:16px "Radio Canada",sans-serif; }
+.sl-input:focus { border-color:var(--sl-input-border); }
+.sl-input:disabled { background:var(--sl-gray-300); color:var(--sl-text-input); opacity:1; }
+.sl-input[aria-invalid="true"] { border-color:var(--sl-input-error); }
+.sl-input-error { color:var(--sl-input-error); font-size:14px; }
+.sl-textarea { height:130px; }
+.sl-password-reveal { background:var(--sl-white); border:1px solid var(--sl-input-border); color:var(--sl-text-input); border-radius:8px; padding:12px 14px; }
+
+/* Dropdown & bottom sheet | customui/SparkLightDropdown.js */
+.sl-dropdown { background:var(--sl-white); color:var(--sl-text-input); border:1px solid var(--sl-dropdown-border); border-radius:8px; padding:12px 16px; min-height:48px; }
+.sl-chevron { color:var(--sl-primary-dark); }
+.sl-sheet-backdrop { background:rgba(0,0,0,.4); padding:24px 12px 0; }
+.sl-sheet { background:var(--sl-white); border-radius:28px 28px 0 0; overflow:hidden; }
+.sl-sheet-header { background:var(--sl-white); padding:20px 28px; }
+.sl-grabber { width:48px; height:4px; border-radius:3px; background:var(--sl-gray-300); margin:auto; }
+.sl-option { background:var(--sl-white); color:var(--sl-black); border-bottom:1px solid var(--sl-option-divider); padding:16px; }
+.sl-option.is-selected { background:var(--sl-surface); color:var(--sl-primary); }
+
+/* Checkboxes, toggles & status | customui/SparklightCheckBox.js · common/Toggle.js · supplied guide */
+.sl-checkbox { accent-color:var(--sl-primary-dark); width:20px; height:20px; }
+.sl-switch-target { min-width:48px; min-height:48px; display:inline-flex; align-items:center; }
+.sl-switch { width:36px; height:20px; border-radius:10px; background:var(--sl-muted); display:inline-flex; align-items:center; padding:2px; box-sizing:border-box; }
+.sl-switch::before { content:""; width:16px; height:16px; border-radius:50%; background:var(--sl-white); }
+.sl-switch.is-on { background:var(--sl-success); }
+.sl-switch.is-on::before { transform:translateX(16px); }
+.sl-status-on { color:var(--sl-success); }
+.sl-status-off { color:var(--sl-muted); }
+
+/* Banners & contextual messages | customui/NotificationAlert.jsx · TYPE_CONFIG */
+.sl-alert { padding:16px; border:1px solid var(--alert-border); border-radius:8px; background:var(--alert-bg); color:var(--sl-black); margin:12px 0; }
+.sl-alert-icon { color:var(--alert-icon); }
+.sl-alert--info { --alert-bg:var(--sl-info-surface); --alert-border:var(--sl-primary-dark); --alert-icon:var(--sl-primary-dark); }
+.sl-alert--success { --alert-bg:var(--sl-success-surface); --alert-border:var(--sl-success-border); --alert-icon:var(--sl-success); }
+.sl-alert--error { --alert-bg:var(--sl-error-surface); --alert-border:var(--sl-error-border); --alert-icon:var(--sl-error); }
+.sl-alert--warning { --alert-bg:var(--sl-warning-surface); --alert-border:var(--sl-warning); --alert-icon:var(--sl-warning); }
+
+/* Menus, feature lists & search | AppStyles.js · customui/MenuRow.js · SearchSuggestions.jsx · supplied guide */
+.sl-menu-row { padding:16px 24px; color:var(--sl-muted); border-bottom:1px solid var(--sl-divider); font-size:18px; display:flex; justify-content:space-between; }
+.sl-feature-check { color:var(--sl-success); }
+.sl-validation { color:var(--sl-muted); font-size:12px; line-height:19px; }
+.sl-validation li { margin-bottom:5px; }
+.sl-search { background:var(--sl-surface); border:1px solid var(--sl-divider); color:var(--sl-muted); padding:12px; }
+.sl-search-result { color:var(--sl-primary); background:var(--sl-white); }
+
+/* Navigation, icons & brand surfaces | supplied guide · GlobalStyles.js · theme.js */
+.sl-header { background:linear-gradient(90deg,var(--sl-primary) 0%,var(--sl-primary-dark) 130%); color:var(--sl-white); padding:24px; border-radius:8px; }
+.sl-bottom-nav { display:flex; justify-content:space-around; background:var(--sl-white); color:var(--sl-muted); padding:16px 4px; }
+.sl-nav-item.is-selected { color:var(--sl-primary-dark); }
+.sl-action-icon { color:var(--sl-primary); }
+.sl-icon-badge { background:var(--sl-primary-dark); color:var(--sl-white); border:4px solid var(--sl-gray-300); border-radius:50%; padding:12px; }
+
+/* Cards, tooltips & modal overlays | src/styles/AppStyles.js · customui/ModalOverlay.jsx · supplied guide */
+.sl-card { background:var(--sl-white); border:1px solid var(--sl-card-border); border-radius:8px; box-shadow:0 0 4px rgba(0,0,0,.2); overflow:hidden; }
+.sl-card-heading { background:var(--sl-surface); color:var(--sl-text); padding:10px; font-size:20px; font-weight:700; }
+.sl-card-content { padding:24px; color:var(--sl-text); }
+.sl-tooltip { background:var(--sl-muted); color:var(--sl-white); padding:12px; border-radius:8px; }
+.sl-modal-backdrop { background:rgba(0,0,0,.5); padding:24px; }
+.sl-modal { background:var(--sl-white); color:var(--sl-text); border-radius:12px; padding:24px; }
+
+/* Tabs, usage charts & speed panels | supplied guide · src/styles/compositions.js · theme.js */
+/* Reference-guide tab treatment */
+.sl-tabs { display:flex; padding:3px; border-radius:6px; background:var(--sl-gray-300); gap:0; }
+.sl-tab { flex:1; min-height:44px; padding:10px 6px; border:0; border-radius:2px; background:transparent; color:var(--sl-muted); font:700 16px "Radio Canada",sans-serif; }
+.sl-tab.is-selected { background:var(--sl-white); color:var(--sl-primary-dark); box-shadow:0 1px 2px #0000000D; }
+/* Current shared composition, before screen overrides */
+.sl-tabs--composition { background:var(--sl-surface); padding:2px; }
+.sl-tabs--composition .sl-tab { font-size:14px; font-weight:600; color:var(--sl-primary); padding:8px 6px; }
+.sl-chart-used, .sl-chart-download { stroke:var(--sl-primary-dark); }
+.sl-chart-remaining, .sl-chart-upload { stroke:var(--sl-blue); }
+.sl-speed-panel { background:var(--sl-speed-panel); }
+.sl-chart-legend-used { color:var(--sl-primary-dark); }
+.sl-chart-legend-remaining { color:var(--sl-blue); }
+
+/* Loading, skeletons & step progress | supplied guide · LoadingSpinner.jsx · theme.js · WalkthroughProgress.js · AnnouncementProgress.js */
+.sl-loading-ring { width:130px; height:130px; box-sizing:border-box; border:18px solid var(--sl-loader-track); border-top-color:var(--sl-primary); border-radius:50%; }
+.sl-loader-colored { color:var(--sl-primary); --inner-arc:var(--sl-loader-inner); }
+.sl-loader-white { color:var(--sl-white); --inner-arc:#C6C6C6; }
+.sl-skeleton { background:linear-gradient(90deg,var(--sl-skeleton-base),var(--sl-skeleton-highlight),var(--sl-skeleton-base)); height:20px; border-radius:6px; }
+.sl-steps { display:flex; gap:8px; align-items:center; }
+.sl-step { width:6px; height:6px; border-radius:3px; background:var(--sl-card-border); }
+.sl-step.is-complete { background:var(--sl-step-complete); }
+.sl-step.is-active { width:32px; background:var(--sl-primary-dark); }
