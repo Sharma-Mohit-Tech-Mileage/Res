@@ -573,10 +573,10 @@
           <div class="card">
             <div class="eyebrow">Android build</div>
             <p>
-              The main pipeline installs JDK 17, installs Node 20.6.1, cleans npm cache, runs <code>npm install --legacy-peer-deps</code>, downloads the Android keystore, validates the SHA1 fingerprint, and runs <code>clean bundleDemoRelease</code> in Gradle.
+              The main pipeline installs JDK 17, installs Node 20.6.1, cleans npm cache, runs <code>npm install --legacy-peer-deps</code>, downloads the Android keystore, validates the SHA1 fingerprint, and runs <code>clean bundleStagingRelease</code> in Gradle.
             </p>
             <p class="muted">
-              The Android Gradle file shows product flavors <code>Dev</code>, <code>Demo</code>, and <code>Prod</code>, with the main pipeline building the <code>DemoRelease</code> variant.
+              The Android Gradle file shows product flavors <code>Dev</code>, <code>Staging</code>, and <code>Prod</code>, with the main pipeline building the <code>StagingRelease</code> variant.
             </p>
           </div>
           <div class="card">
@@ -608,7 +608,7 @@
             <ul style="margin: 0; padding-left: 18px; line-height: 1.7;">
               <li><code>npx eslint src/ --ext .js,.jsx,.ts,.tsx --format json --output-file eslint-report.json</code></li>
               <li><code>npx prettier --check src/ 2>&amp;1 | tee prettier-report.txt</code></li>
-              <li><code>cd android &amp;&amp; ./gradlew lintDemoRelease --no-daemon</code></li>
+              <li><code>cd android &amp;&amp; ./gradlew lintStagingRelease --no-daemon</code></li>
             </ul>
           </div>
         </div>
@@ -718,7 +718,7 @@
 ✓ Test suites passed
 ✓ Coverage artifact published
 
-<span class="ok">$ cd android && ./gradlew lintDemoRelease --no-daemon</span>
+<span class="ok">$ cd android && ./gradlew lintStagingRelease --no-daemon</span>
 ✓ Android lint report staged
                 </pre>
               </div>

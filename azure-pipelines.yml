@@ -283,7 +283,7 @@ stages:
           - script: |
               echo "Running Android unit tests..."
               cd android
-              ./gradlew testDemoReleaseUnitTest --no-daemon --build-cache
+              ./gradlew testStagingReleaseUnitTest --no-daemon --build-cache
             displayName: 'Run Android Unit Tests'
 
           - task: PublishTestResults@2
@@ -688,8 +688,8 @@ stages:
           - script: |
               set -euo pipefail
               cd android
-              echo "Starting Android Lint for Demo Release variant..."
-              if ./gradlew lintDemoRelease --no-daemon 2>&1 | tee lint-build.log; then
+              echo "Starting Android Lint for Staging Release variant..."
+              if ./gradlew lintStagingRelease --no-daemon 2>&1 | tee lint-build.log; then
                 echo "✓ Android Lint completed successfully"
               else
                 echo "⚠️ Android Lint encountered issues (check detailed logs below)"
@@ -706,7 +706,7 @@ stages:
               
               {
                 echo "=== Android Lint Report Summary ==="
-                echo "Variant: demoRelease"
+                echo "Variant: stagingRelease"
                 echo "Timestamp: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
                 echo ""
               } > "$SUMMARY_FILE"
@@ -860,11 +860,11 @@ stages:
             displayName: 'Validate Android upload keystore fingerprint'
 
           - task: Gradle@4
-            displayName: 'Build Android App Bundle (Demo Release)'
+            displayName: 'Build Android App Bundle (Staging Release)'
             inputs:
               workingDirectory: 'android'
               gradleWrapperFile: 'android/gradlew'
-              tasks: 'clean bundleDemoRelease'
+              tasks: 'clean bundleStagingRelease'
               options: >
                 -PKEYSTORE_PATH=$(keystoreFile.secureFilePath)
                 -PKEYSTORE_PASSWORD=$(jarsignerKeystorePassword)
@@ -1106,7 +1106,7 @@ stages:
               echo "Archiving with Xcode..."
               if ! RCT_NO_LAUNCH_PACKAGER=1 xcodebuild \
                   -workspace "ios/My Sparklight.xcworkspace" \
-                  -scheme "Sparklight UAT" \
+                  -scheme "Sparklight Staging" \
                   -configuration Release \
                   -sdk iphoneos \
                   -archivePath "$ARCHIVE_PATH" \
