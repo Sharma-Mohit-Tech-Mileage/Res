@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import NextActionCard from "./NextActionCard";
-import NotificationAlert from "../../common/customui/NotificationAlert";
 import AnimatedSuccessIcon from "./AnimatedSuccessIcon";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { FieldTitle, FieldContent,HeadingH2 } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
-import { contentMaxWidth, formatCurrency } from "./paymentsShared";
+import { formatCurrency } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { setFocusToRef, announceA11y } from "../../../utils/a11y";
 import { currentPaymentAttempt, endPaymentAttempt, trackStepDuration } from "./paymentAnalytics";
 
@@ -97,8 +97,8 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.popToTop()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
-        <View style={[card.elevated, styles.successCard]}>
+      <ScreenScroll framed showsVerticalScrollIndicator={false}>
+        <View style={[card.base, styles.successCard]}>
           <View style={styles.iconWrap} accessible={false} importantForAccessibility="no-hide-descendants">
             <AnimatedSuccessIcon size={64} />
           </View>
@@ -147,15 +147,14 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
           />
         )}
 
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
-  successCard: { paddingVertical: 32, paddingHorizontal: 16, alignItems: "center", marginTop: 16 },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
+  successCard: { paddingVertical: 32, paddingHorizontal: 16, alignItems: "center" },
   iconWrap: { marginBottom: 20 },
   title: {
     textAlign: "center",

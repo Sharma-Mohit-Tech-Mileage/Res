@@ -4,7 +4,7 @@ import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import CircleAlertIcon from "../../../../assets/svgs/CircleAlertIcon";
 import IconButton from "../../common/customui/IconButton";
 import { FieldTitle, FieldContent } from "../../common/customui/Typography";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 
 const ReviewField = ({ label, value, a11yValue, last, loading, showLabelIcon, onLabelIconPress, labelIconExpanded }) => {
   const interactive = showLabelIcon && !!onLabelIconPress;
@@ -19,7 +19,7 @@ const ReviewField = ({ label, value, a11yValue, last, loading, showLabelIcon, on
           <FieldTitle style={styles.fieldLabel}>{label}</FieldTitle>
           {interactive ? (
             <IconButton
-              icon={<CircleAlertIcon size={16} color="#4C5458" accessible={false} />}
+              icon={<CircleAlertIcon size={16} color={Color.sparklightGray1} accessible={false} />}
               onPress={onLabelIconPress}
               accessibilityLabel={`${label} information`}
               accessibilityHint={labelIconExpanded ? "Collapses the surcharge details." : "Expands the surcharge details."}
@@ -27,7 +27,7 @@ const ReviewField = ({ label, value, a11yValue, last, loading, showLabelIcon, on
               style={styles.labelIconButton}
             />
           ) : (
-            <CircleAlertIcon size={16} color="#4C5458" accessible={false} style={styles.labelIcon} />
+            <CircleAlertIcon size={16} color={Color.sparklightGray1} accessible={false} style={styles.labelIcon} />
           )}
         </View>
       ) : (

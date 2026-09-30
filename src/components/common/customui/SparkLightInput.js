@@ -11,7 +11,7 @@ import {
   Color,
   FontSize,
   Border,
-} from "../../../../GlobalStyles";
+} from "../../../styles/GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import { formatInputA11yReadout, setFocusToRef } from "../../../utils/a11y";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
@@ -244,7 +244,7 @@ const SparkLightInput = React.forwardRef(({
             accessible={false}
             importantForAccessibility="no"
           >
-            <WarningIcon color="#EF4E3E" />
+            <WarningIcon color={Color.sparkLightRed} />
           </View>
           <Text
             style={styles.errorText}
@@ -278,8 +278,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingVertical: 12,
     borderRadius: Border.br_5xs,
-    backgroundColor: '#FFFFFF',
-    borderColor:'#C7C7CC',
+    backgroundColor: Color.sparklightWhite,
+    borderColor:Color.inputBorder,
     width: "100%",
   },
   // 46381: eye toggle inside the field + popover beneath it.
@@ -298,13 +298,13 @@ const styles = StyleSheet.create({
   },
   revealPopover: {
     marginTop: 8,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderWidth: 1,
-    borderColor: "#C7C7CC",
+    borderColor: Color.inputBorder,
     borderRadius: Border.br_5xs,
     paddingVertical: 12,
     paddingHorizontal: 14,
-    shadowColor: "#000",
+    shadowColor: Color.colorblack_100,
     shadowOpacity: 0.12,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
@@ -317,10 +317,10 @@ const styles = StyleSheet.create({
     right: 18,
     width: 10,
     height: 10,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderLeftWidth: 1,
     borderTopWidth: 1,
-    borderColor: "#C7C7CC",
+    borderColor: Color.inputBorder,
     transform: [{ rotate: "45deg" }],
   },
   revealText: {
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     borderRadius: Border.br_5xs,
 
-    borderColor: "#C7C7CC",
+    borderColor: Color.inputBorder,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -389,9 +389,9 @@ const styles = StyleSheet.create({
   eyeText: {
     marginLeft: 6,
     lineHeight: 28,
-    color: "#8D3B90",
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: "underline",
-    textDecorationColor: "#8D3B90",
+    textDecorationColor: Color.sparklightPrimaryPurple,
   },
   lockIcon: {
     width: 20,

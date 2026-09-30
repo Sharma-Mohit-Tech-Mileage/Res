@@ -5,12 +5,9 @@ import {
   StyleSheet,
   Text,
   View,
-  Platform,
-  AccessibilityInfo,
 } from "react-native";
 import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import { ScreenScroll } from "../common/customui/Screen";
-import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   FontFamily,
@@ -18,7 +15,7 @@ import {
   Color,
   FontSize,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import {
   validatePassword,
   passwordTerms,
@@ -30,13 +27,14 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { GetApiRequest, PutApiRequest , PostApiRequest} from "../../network/RestApiClient";
+import { GetApiRequest, PostApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { passwordSchema } from "../utility/validationSchema"; 
 import PrimaryButton from "../common/customui/PrimaryButton";
 import AppStyles from '../../styles/AppStyles';
 import { SectionTitle,HintText } from "../common/customui/Typography";
+import { logWarn } from "../../utils/logger";
 const ChangePassword = () => {
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
@@ -98,7 +96,7 @@ const ChangePassword = () => {
       "";
 
     if (!userName.trim()) {
-      console.warn("Skipping security questions API call: userName is missing");
+      logWarn("Skipping security questions API call: userName is missing");
       return;
     }
 
@@ -112,7 +110,7 @@ const ChangePassword = () => {
         }
       },
       (error) => {
-        console.warn(error);
+        logWarn(error);
       }
     );
   };
@@ -153,7 +151,7 @@ const ChangePassword = () => {
       },
         (error) => {
           setLoading(false);
-           console.warn("Error updating password", error);
+           logWarn("Error updating password", error);
 
           // Handle specific errors, such as '204 No Content' or others
           if (error.code == "204") {
@@ -168,7 +166,7 @@ const ChangePassword = () => {
       );
     } catch (err) {
       setLoading(false);
-      console.warn("Error retrieving user information", err);
+      logWarn("Error retrieving user information", err);
       setShowErrorAlert(true); // Show an error alert if getUser fails
     }
   };
@@ -216,7 +214,7 @@ const ChangePassword = () => {
         title="Edit Password"
         onPressBack={() => navigation.navigate("PasswordSecurity")}
       />
-      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
+      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -457,11 +455,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   passwordSecurityEditInner: {
-    paddingVertical: Padding.p_5xl,
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 300,
   },
   passwordSecurityEdit: {
     flex: 1,

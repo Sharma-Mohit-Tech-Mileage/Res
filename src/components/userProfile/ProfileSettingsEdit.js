@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle, Platform } from "react-native";
+import { StyleSheet, Text, View, AccessibilityInfo, findNodeHandle, Platform } from "react-native";
 import { usernameTerms, validateUsername } from "../utility/constant";
 import { ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import PrimaryButton from "../common/customui/PrimaryButton";
@@ -12,9 +12,10 @@ import {
   Color,
   FontFamily,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { ScreenScroll } from "../common/customui/Screen";
 import { PostApiRequest, _axios } from "../../network/RestApiClient";
 import { getUser, getSsoToken, storeSsoToken } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
@@ -30,6 +31,7 @@ import UsernameSuccessModal from "./UsernameSuccessModal";
 import { RefreshToken } from '../../components/user/Session';
 import AuthenticationManager from "../../utils/AuthenticationManager";
 import Config from "react-native-config";
+import { logWarn, logError } from "../../utils/logger";
 
 const authConfig = {
   issuer: Config.SSO_LOGIN,
@@ -60,7 +62,6 @@ const ProfileSettingsEdit = () => {
 
   const handleSave = async (data) => {
     const newData = { ...data };
-    console.log("New Data to be saved:", newData);
     // call updateUsername with validated value
     if (newData?.newUsername) {
       await updateUsername(newData.newUsername);
@@ -95,7 +96,7 @@ function decodeIdToken(idToken) {
     // 4. Return parsed user information (e.g., email, name, sub)
     return JSON.parse(jsonPayload); 
   } catch (error) {
-    console.error("Failed to parse ID Token claims", error);
+    logError("Failed to parse ID Token claims", error);
     return null;
   }
 }
@@ -136,22 +137,15 @@ function decodeIdToken(idToken) {
         idToken: idToken,
       };
       
-      console.log("Decoded ID Token:", decodeIdToken(idToken));
-      console.log("Updating username with payload:", payload);
 
       if (!accountNumber || !userName || !newUsername || !idToken) {
         // throw new Error("Missing required fields for username update");
        
-        console.log("Missing required fields for username update. AccountNumber:",decodeIdToken(idToken)?.preferred_username, "UserName:", decodeIdToken(idToken)?.preferred_username, "NewUsername:", newUsername, "IdToken:", idToken);
         return;
       }
       
       const onSuccess = (Response) => {
         setLoading(false);
-        console.log(
-          "Username updated successfully:",
-          JSON.stringify(Response),
-        );
         if (Response?.status === "success") {
           setDisplaySuccessAlert(true);
         } else if (Response?.status === "error") {
@@ -161,7 +155,7 @@ function decodeIdToken(idToken) {
       };
       const onError = (error) => {
         setLoading(false);
-        console.warn("Update username error:", error);
+        logWarn("Update username error:", error);
         setErrorMessage(
           error?.data?.message ||
           error?.data?.error ||
@@ -185,7 +179,7 @@ function decodeIdToken(idToken) {
         onError,
       );
     } catch (err) {
-      console.warn("Error preparing username payload:", err);
+      logWarn("Error preparing username payload:", err);
       setLoading(false);
       setShowErrorAlert(true);
     }
@@ -226,7 +220,6 @@ function decodeIdToken(idToken) {
   
   const handleValidationError = (errors) => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    console.log("Validation errors:", errors);
     setHasValidationError(true);
     const fieldOrder = [
       { key: "newUsername", ref: newUsernameInputRef },
@@ -260,7 +253,7 @@ function decodeIdToken(idToken) {
               }
             }
           } catch (e) {
-            console.warn("Accessibility focus error:", e);
+            logWarn("Accessibility focus error:", e);
           }
         }, 300);
   
@@ -284,9 +277,8 @@ function decodeIdToken(idToken) {
     const refreshToken = () => {
      
       if(!isLoginError) {
-      console.log("Refreshing token...");
       refreshPromiseRef.current = Promise.resolve(RefreshToken()).catch((error) => {
-        console.warn("Refresh token error:", error);
+        logWarn("Refresh token error:", error);
       }).finally(() => {
         refreshPromiseRef.current = null;
         });
@@ -334,7 +326,7 @@ function decodeIdToken(idToken) {
         onPressBack={handleBackPress}
         showIcon={!isLoginError}
       />
-      <ScrollView ref={scrollViewRef}>
+      <ScreenScroll framed ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
           {isLoginError && showValidationAlert && renderErrorMessage()}
           <View style={[AppStyles.card, styles.frameGroupSpaceBlock]}>
@@ -485,7 +477,7 @@ function decodeIdToken(idToken) {
             }}
           />
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -586,11 +578,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   profileSettingsEditInner: {
-    ...AppStyles.headerCardSpacing,
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 300,
   },
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,

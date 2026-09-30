@@ -1,7 +1,7 @@
 // components/FeatureCard.js
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { FontFamily, FontSize, Color, Padding, Border } from "../../../GlobalStyles";
+import { FontFamily, FontSize, Color, Padding, Border } from "../../styles/GlobalStyles";
 import AppStyles from "../../styles/AppStyles";
 import Icon from "../common/Icon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightPrimaryPurple,
   },
   buttonSuccess: {
-    backgroundColor: "#C8E9D0",
+    backgroundColor: Color.successTint,
     borderWidth: 1,
     borderColor: Color.sparklightGreen,
   },
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     color: Color.sparklightWhite,
   },
   buttonTextSuccess: {
-    color: "#000",
+    color: Color.colorblack_100,
   },
 });
 

@@ -1,10 +1,8 @@
 import { theme } from "./theme";
-import { card, iconBadge, typography, container } from "./utilities";
+import { card, iconBadge, typography } from "./utilities";
 
 export const serviceCard = {
-  container: {
-    ...container.section,
-  },
+  container: {},
 
   card: {
     ...card.base,
@@ -54,9 +52,7 @@ export const serviceCard = {
 };
 
 export const statusSection = {
-  container: {
-    marginBottom: theme.spacing["3xl"],
-  },
+  container: {},
   card: {
     ...card.base,
     ...theme.shadows.base,
@@ -79,33 +75,6 @@ export const statusSection = {
   subtitle: {
     ...typography.body,
     textAlign: "center",
-  },
-};
-
-export const header = {
-  container: {
-    paddingHorizontal: theme.spacing.base,
-    paddingTop: theme.spacing.xl,
-    alignItems: 'center',
-  },
-  iconWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
-  },
-  iconBadge: {
-    borderColor: theme.colors.border,
-    borderWidth: 4,
-    width: 72,
-    height: 72,
-    backgroundColor: theme.colors.primaryDark,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    ...typography.h1,
-    textAlign: 'center',
   },
 };
 
@@ -203,7 +172,6 @@ export const dataUsageTabs = {
 export default {
   serviceCard,
   statusSection,
-  header,
   skeletonLoader,
   cardHeader,
   dataUsageTabs,

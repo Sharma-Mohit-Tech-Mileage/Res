@@ -1,4 +1,3 @@
-import { UPDATE_TEXT_NOTIFICATION } from "src/redux/constants";
 
 export const ENDPOINTS = {
     // Auth / Session
@@ -107,11 +106,6 @@ export const ENDPOINTS = {
     SECURITY_QUESTION_UPDATE: 'api/Security/UpdateSecurityAnswer/:userName/:accountNumber',
     RESET_PASSWORD: 'api/Security/ResetPassword?accountNumber=:accountNumber&userName=:userName',
     PROFILE_PASSWORD_UPDATE: 'api/profile/password/:accountNumber',
-
-    // Survey / Cancellation
-    SURVEY: 'api/Survey',
-    SERVICE_DISCONNECT_SURVEY: 'api/Order/Disconnect',
-    ORDER_COMMIT_DISCONNECT: 'api/Order/CommitDisconnect',
 
     //Payment methods
     PAYMENTS_HISTORY: 'api/payments/:accountNumber/paymentHistory',

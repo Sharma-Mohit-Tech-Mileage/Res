@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, Text, Platform } from "react-native";
-import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border, } from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import Touchable from "../common/customui/Touchable";
 import BellRingingIcon from "../../res/svgIcons/BellRingingIcon";
@@ -192,12 +192,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerIconView: {
-    backgroundColor: "#FEFEFE",
+    backgroundColor: Color.offWhite,
     padding: 20,
     borderRadius: 100,
-    borderColor: "#EEE",
+    borderColor: Color.dividerLight,
     borderWidth: 1,
-    shadowColor: "#171717",
+    shadowColor: Color.shadowDark,
     shadowOffset: { width: -2, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 10,

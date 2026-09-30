@@ -10,7 +10,6 @@ import Animated, {
 import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
-import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
 import AppStyles from "../../../../styles/AppStyles";
 import { SectionTitle } from "../../../common/customui/Typography";
@@ -268,10 +267,8 @@ const UsageSummaryCard = ({ currentUsage, loading = false }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: theme.spacing.base,
-    marginBottom: theme.spacing.base,
-  },
+  // Screen frame and card gap now come from ScreenScroll; the card sets no outer margins.
+  container: {},
   card: {
      ...AppStyles.card,
     padding: theme.spacing.base,

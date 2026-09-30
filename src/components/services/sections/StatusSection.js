@@ -3,17 +3,17 @@ import { View, Text, StyleSheet, Animated, Easing } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { statusSection } from "../../../styles/compositions";
-import { theme } from "../../../styles/theme";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import AppStyles from "../../../styles/AppStyles";
+import { Color } from "../../../styles/GlobalStyles";
 
 const MATCHED_CARD_MIN_HEIGHT = 220;
 
 // Sparklight brand purples
 const RING_OUTER = "#ba92bf";
 const RING_MIDDLE = "#9e61a2";
-const DOT_INNER = "#8e3c91";
+const DOT_INNER = Color.sparklightPrimaryPurple;
 
 const ICON_SIZE = 88;
 const RING_WIDTH = 4;
@@ -149,7 +149,7 @@ const StatusSection = ({
 
   return (
     <View style={[styles.container]}>
-      <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16, minHeight: MATCHED_CARD_MIN_HEIGHT  }]}>
+      <View style={[AppStyles.card,{ padding: 16, minHeight: MATCHED_CARD_MIN_HEIGHT  }]}>
         {hasUserInitiatedCheck && outageData && (
           <View style={styles.alertInsideCard}>
             <NotificationAlert

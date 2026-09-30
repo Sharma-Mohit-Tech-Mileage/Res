@@ -43,6 +43,36 @@ export const Color = {
 
 
     
+  // [55104] Semantic colours extracted from hard-coded hex values in screens.
+  shadowDark: "#171717",
+  surfaceMuted: "#F7F7F7",
+  inputBorder: "#C7C7CC",
+  dropdownDivider: "#C6C6C8",
+  dropdownPressed: "#F2F2F7",
+  successTint: "#C8E9D0",
+  successGreenDark: "#0C8306",
+  successText: "#1D7832",
+  successBanner: "#34744B",
+  warningTint: "#FFFAEB",
+  warningAccent: "#FF9800",
+  warningText: "#DD6D02",
+  errorTint: "#FEF3F2",
+  errorText: "#B92A1C",
+  errorIcon: "#DC3626",
+  infoTint: "#F0F8FF",
+  neutralTint: "#EDF1F4",
+  dividerLight: "#EEEEEE",
+  dividerGray: "#E0E0E0",
+  borderMuted: "#CCCCCC",
+  cardBorder: "#E5E7EB",
+  borderSubtle: "#D0D5DD",
+  offWhite: "#FEFEFE",
+  progressInactive: "#9CA3AF",
+  eeroNavy: "#0F142D",
+  sparklightaddGray: "#767676",
+  selectedTint: "#F3F2FF",
+  primaryTint: "#8D3B901A",
+  dialogSurface: "#F4F4F5",
 };
 
 export const Padding = {

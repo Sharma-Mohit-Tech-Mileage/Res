@@ -17,6 +17,7 @@ import { logError } from '../../utils/logger';
 import { getPrimaryEmail } from './constant';
 import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import CryptoJS from 'crypto-js';
+import { Color } from "../../styles/GlobalStyles";
 
 const TAG = '[ArticalWindow]';
 const JS_COOKIE_DOMAIN = Config.COOKIE_DOMAIN;
@@ -713,15 +714,15 @@ const styles = StyleSheet.create({
     webView: { flex: 1 },
     loadingOverlay: {
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff', zIndex: 1000,
+        justifyContent: 'center', alignItems: 'center', backgroundColor: Color.sparklightWhite, zIndex: 1000,
     },
     errorContainer: {
         position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#ffffff',
+        justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: Color.sparklightWhite,
     },
     errorTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 10 },
     errorText: { fontSize: 16, color: '#666', textAlign: 'center', marginBottom: 20, lineHeight: 24 },
-    retryText: { fontSize: 16, color: '#8D3B90', fontWeight: '600', textDecorationLine: 'underline' },
+    retryText: { fontSize: 16, color: Color.sparklightPrimaryPurple, fontWeight: '600', textDecorationLine: 'underline' },
 });
 
 export default ArticleWindowUtility;

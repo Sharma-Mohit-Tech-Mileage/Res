@@ -1,12 +1,11 @@
 import React, { memo, useMemo, useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
-import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
 import { spellOutChars } from "../../../../utils/a11y";
 import AppStyles from "../../../../styles/AppStyles";
 import {SectionTitle} from "../../../common/customui/Typography";
+import { Color } from "../../../../styles/GlobalStyles";
 const safeText = (v, fallback = "\u2014") =>
   v === null || v === undefined || String(v).trim() === "" ? fallback : String(v);
 
@@ -118,10 +117,8 @@ const ManageEquipmentCard = ({ equipment }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: theme.spacing.base,
-    marginHorizontal: theme.spacing.base,
-  },
+  // Screen frame and card gap now come from ScreenScroll; the card sets no outer margins.
+  container: {},
   card: {
     ...AppStyles.card,
     padding: theme.spacing.base,
@@ -147,7 +144,7 @@ const styles = StyleSheet.create({
   equipmentName: {
     fontSize: theme.typography.size.base,
     fontWeight: "600",
-    color: "#000",
+    color: Color.colorblack_100,
     marginBottom: 4,
   },
   equipmentDetails: { gap: 2 },

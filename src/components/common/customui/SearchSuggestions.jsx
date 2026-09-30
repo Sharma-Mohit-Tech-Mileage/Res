@@ -7,7 +7,7 @@ import {
   Text,
   Keyboard,
 } from "react-native";
-import { Padding, Color, FontSize, FontFamily, Border } from "../../../../GlobalStyles";
+import { Padding, Color, FontSize, FontFamily, Border } from "../../../styles/GlobalStyles";
 import { wp, hp } from "../../../utils/responsive";
 import SearchIcon from "../../../../assets/svgs/SearchIcon";
 import Rightactionable from "../../../res/svgIcons/RightArrow";
@@ -134,7 +134,7 @@ container: {
 inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8F8F8', // Example background color
+    backgroundColor: Color.colorWhitesmoke_100, // Example background color
     borderBottomWidth: 1,
     borderColor: Color.sparklightGray, // Example border color
     borderRadius: Border.br_5xs,
@@ -176,12 +176,12 @@ searchContainer: {
 
 leftIcon: {
     marginRight: 8, // Space between the icon and the text input
-    backgroundColor: '#F8F8F8', // Hex color from the design
+    backgroundColor: Color.colorWhitesmoke_100, // Hex color from the design
     // Set the size if needed, e.g. width: 20, height: 20
 },
 rightIcon: {
     marginLeft: 8, // Space between the text input and the icon
-    backgroundColor: '#F8F8F8', // Hex color from the design
+    backgroundColor: Color.colorWhitesmoke_100, // Hex color from the design
 },
 suggestionItem: {
     flexDirection: 'row', // To align icons and text
@@ -190,7 +190,7 @@ suggestionItem: {
     paddingHorizontal: 24, // Horizontal padding from the design
     borderBottomWidth: 1,
     borderColor: Color.sparklightGray, // Sparklight Dark Gray from the design
-    backgroundColor: '#F8F8F8', // Hex color from the design
+    backgroundColor: Color.colorWhitesmoke_100, // Hex color from the design
     
 },
 iconStyle: {

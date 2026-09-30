@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
 import SparklightCheckBox from "../../common/customui/SparklightCheckBox";
 import Touchable from "../../common/customui/Touchable";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 
 const AgreeTermsRow = ({ value, onValueChange, onViewTerms }) => (
   <View style={styles.row}>

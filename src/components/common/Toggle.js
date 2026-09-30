@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Animated, View, StyleSheet, Easing, AccessibilityInfo, Platform, findNodeHandle } from 'react-native';
-import { Color } from "../../../GlobalStyles";
+import { Color } from "../../styles/GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import Touchable from "./customui/Touchable";
 

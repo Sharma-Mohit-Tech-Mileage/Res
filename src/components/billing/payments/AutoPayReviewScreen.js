@@ -9,7 +9,7 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
-import { FontFamily,Color,FontSize } from "../../../../GlobalStyles";
+import { FontFamily,Color,FontSize } from "../../../styles/GlobalStyles";
 import { SectionTitle, SectionContent, FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
 import {
@@ -20,7 +20,6 @@ import {
   paymentErrorMessage,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
-  contentMaxWidth,
   ordinal,
   describePaymentMethod,
   paymentMethodA11yLabel,
@@ -32,6 +31,7 @@ import {
   useSurchargeRate,
   useSurchargeFee,
 } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { announceA11y } from "../../../utils/a11y";
 import {
   usePaymentStep,
@@ -136,8 +136,9 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <KeyboardAwareScrollView
-        contentContainerStyle={[styles.content, contentMaxWidth]}
+      <ScreenScroll
+        framed
+        ScrollComponent={KeyboardAwareScrollView}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -169,7 +170,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
         </SectionContent>
 
         <>
-            <View style={[card.elevated, styles.summaryCard]}>
+            <View style={[card.base, styles.summaryCard]}>
               <View
                 style={styles.fieldGroup}
                 accessible={!loading}
@@ -259,7 +260,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
               )}
             </View>
 
-            <View style={[card.elevated, styles.emailCard]}>
+            <View style={[card.base, styles.emailCard]}>
               {loading ? (
                 <SkeletonPlaceholder>
                   <View style={styles.labelSkeleton} />
@@ -296,7 +297,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
             />
             <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
         </>
-      </KeyboardAwareScrollView>
+      </ScreenScroll>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
     </View>
@@ -304,16 +305,13 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   heading: {
     marginBottom: 8,
     lineHeight: 50,
   },
-  introText: { lineHeight: 20, marginBottom: 16 },
   instructions: { marginBottom: 0 },
   introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
-  cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
   valueSkeleton: { height: 18, borderRadius: 4, width: "60%" },
   labelSkeleton: { height: 14, borderRadius: 4, width: "45%", marginBottom: 10 },
   inputSkeleton: { height: 44, borderRadius: 6, width: "100%" },
@@ -341,7 +339,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
-    color: "#000000",
+    color: Color.colorblack_100,
   },
 });
 

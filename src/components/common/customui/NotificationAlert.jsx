@@ -9,7 +9,7 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import { Color, FontSize, FontFamily, Border,Padding } from "../../../../GlobalStyles";
+import { Color, FontSize, FontFamily, Border,Padding } from "../../../styles/GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -25,45 +25,45 @@ import {BannerAlertText,FieldTitle} from "./Typography";
 
 const TYPE_CONFIG = {
   info: {
-    backgroundColor: "#F0F8FF",
-    borderColor: "#353091",
-    iconColor: "#353091",
-    textColor: "#000000",
-    titleColor: "#000000",
-    closeButtonColor: "#000000",
+    backgroundColor: Color.infoTint,
+    borderColor: Color.colorMidnightblue,
+    iconColor: Color.colorMidnightblue,
+    textColor: Color.colorblack_100,
+    titleColor: Color.colorblack_100,
+    closeButtonColor: Color.colorblack_100,
     IconComponent: InfoIcon,
     iconLabel: "Information icon",
     labelPrefix: "Information: ",
   },
   error: {
-    backgroundColor: "#FEF3F2",
-    borderColor: "#B92A1C",
+    backgroundColor: Color.errorTint,
+    borderColor: Color.errorText,
     iconColor: Color.sparkLightRed,
-    textColor: "#000000",
-    titleColor: "#000000",
-    closeButtonColor: "#000000",
+    textColor: Color.colorblack_100,
+    titleColor: Color.colorblack_100,
+    closeButtonColor: Color.colorblack_100,
     IconComponent: InfoIcon,
     iconLabel: "Error icon",
     labelPrefix: "Error: ",
   },
   success: {
     backgroundColor: "#F1FCF2",
-    borderColor: "#1D7832",
+    borderColor: Color.successText,
     iconColor: Color.sparklightGreen,
-    textColor: "#000000",
-    titleColor: "#000000",
-    closeButtonColor: "#000000",
+    textColor: Color.colorblack_100,
+    titleColor: Color.colorblack_100,
+    closeButtonColor: Color.colorblack_100,
     IconComponent: SuccessIcon,
     iconLabel: "Success icon",
     labelPrefix: "Success: ",
   },
   warning: {
-    backgroundColor: "#FFFAEB",
-    borderColor: "#F88700",
+    backgroundColor: Color.warningTint,
+    borderColor: Color.sparkLightInfo,
     iconColor: Color.sparkLightInfo,
-    textColor: "#000000",
-    titleColor: "#000000",
-    closeButtonColor: "#000000",
+    textColor: Color.colorblack_100,
+    titleColor: Color.colorblack_100,
+    closeButtonColor: Color.colorblack_100,
     IconComponent: WarningIcon,
     iconLabel: "Warning icon",
     labelPrefix: "Warning: ",
@@ -755,7 +755,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   resendText: {
-    color: "#000000",
+    color: Color.colorblack_100,
     fontWeight: "700",
     paddingTop: 8,
     textDecorationLine: "underline",

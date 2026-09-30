@@ -9,15 +9,15 @@ import {
 import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding } from "../../styles/GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { ScreenFrame } from "../common/customui/Screen";
 import moment from "moment";
 import Icon from "../common/Icon";
 import { Hyperlink } from "../common/customui/Typography";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
-import { hp } from "../../utils/responsive";
 import {
   fetchPaymentHistory,
   downloadPaymentReceipt,
@@ -145,7 +145,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
   // Render payment item
   const renderPaymentItem = ({ item, index }) => {
     // Alternate background color for rows
-    const backgroundColor = index % 2 === 0 ? Color.sparklightWhite :  '#F8F8F8';
+    const backgroundColor = index % 2 === 0 ? Color.sparklightWhite :  Color.colorWhitesmoke_100;
     const isDownloading = downloading && downloadingPaymentId === item.extTransactionId;
 
     return (
@@ -212,7 +212,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         onPressBack={() => navigation.goBack()}
       />
 
-      <View style={styles.contentContainer}>
+      <ScreenFrame>
         {/* Display error notifications */}
         <View style={styles.notificationsContainer}>
           {error && showFetchError && (
@@ -293,7 +293,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         </View>
 
         {/* Payment History List */}
-         <View style={{ flex: 1,...AppStyles.card }}>
+         <View style={[AppStyles.card, styles.listCard]}>
         {loading && payments.length === 0 ? (
           <LoadingOverlay
           loading={loading}/>
@@ -316,7 +316,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
           </View>
         )}
         </View>
-      </View>
+      </ScreenFrame>
 
       {showPDFModal && (
         <PDFViewModal
@@ -333,11 +333,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.Gray300,
     width: "100%",
-  },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: Padding.p_base,
-    marginBottom: hp("8%"),
   },
   notificationsContainer: {
     marginBottom: 16,
@@ -403,11 +398,11 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     marginRight: 1,
   },
+  listCard: {
+    flex: 1,
+  },
   paymentsList: {
     flex: 1,
-    backgroundColor: Color.sparklightWhite,
-    ...AppStyles.card, // Use card style from AppStyles
-    marginBottom: 20,
   },
   paymentRow: {
     padding: Padding.p_base,
@@ -440,12 +435,10 @@ const styles = StyleSheet.create({
     ...AppStyles.card, // Use card style from AppStyles
   },
   emptyContainer: {
-    ...AppStyles.card, // Use card style from AppStyles
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
     height: 60,
-    marginBottom: 20,
   },
   emptyText: {
     fontSize: FontSize.size_base,

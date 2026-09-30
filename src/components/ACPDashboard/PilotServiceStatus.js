@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
 import PilotTick from "../../res/svgIcons/PilotTick";
-import { FontFamily } from "../../../GlobalStyles";
+import { Color, FontFamily } from "../../styles/GlobalStyles";
 import Touchable from "../common/customui/Touchable";
 
 const DEFAULT_STAGES = [
@@ -156,16 +156,16 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   iconWrapFilled: {
-    borderColor: "#8D3B90",
-    backgroundColor: "#8D3B90",
+    borderColor: Color.sparklightPrimaryPurple,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   iconFilledBg: {
-    backgroundColor: "#8D3B90",
+    backgroundColor: Color.sparklightPrimaryPurple,
     borderRadius: 22,
     padding: 8,
   },
   iconUnfilledBg: {
-    backgroundColor: "#CCCCCC",
+    backgroundColor: Color.borderMuted,
     borderRadius: 22,
     padding: 8,
   },
@@ -175,10 +175,10 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   connectorFilled: {
-    backgroundColor: "#8D3B90",
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   connectorUnfilled: {
-    backgroundColor: "#E0E0E0",
+    backgroundColor: Color.dividerGray,
   },
   label: {
     fontSize: 16,
@@ -187,6 +187,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   labelFilled: {
-    color: "#8D3B90",
+    color: Color.sparklightPrimaryPurple,
   },
 });

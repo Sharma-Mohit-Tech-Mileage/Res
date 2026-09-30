@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import LinkText from "../../common/customui/LinkText";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { card } from "../../../styles/utilities";
 import AppStyles from "../../../styles/AppStyles";
 import { SectionTitle, SectionContent } from "../../common/customui/Typography";

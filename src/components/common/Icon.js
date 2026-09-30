@@ -25,7 +25,8 @@ import SearchIcon from "../../../assets/svgs/SearchIcon";
 import ChevronRight from "../../../assets/svgs/Chevonright";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import HomeIcone from "../../../assets/svgs/Home";
-const Icon = ({ name, size = 24, color = "#000", style }) => {
+import { Color } from "../../styles/GlobalStyles";
+const Icon = ({ name, size = 24, color = Color.colorblack_100, style }) => {
   const iconMap = {
     "credit-card": { library: "SVG", source: creditCard },
     wifi: { library: "SVG", source: ServiceIconNew },

@@ -3,35 +3,28 @@
  * Only includes utilities actually used in the codebase
  */
 
-import { Color, FontFamily, FontSize } from "../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "./GlobalStyles";
 import { theme } from "./theme";
 
 /**
  * Card Style Utilities
  */
 export const card = {
+  // The one card look (white, 8 radius, hairline border, one shadow); AppStyles.card points here.
   base: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.xs,
-    padding: theme.spacing.base,
+    backgroundColor: Color.sparklightWhite,
+    borderRadius: theme.radius.base,
     borderWidth: 1,
-    borderColor: theme.colors.border,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    borderColor: Color.cardBorder,
+    shadowColor: Color.colorblack_100,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 4,
-    shadowColor: '#000',
+    elevation: 6,
   },
-  elevated: {
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowRadius: 3.84,
-    elevation: 5,
+  // Standard inner padding for content cards; list-style cards pad their rows instead.
+  content: {
+    padding: theme.spacing.base,
   },
 };
 
@@ -105,15 +98,20 @@ export const typography = {
  * Container Utilities
  */
 export const container = {
+  // App-wide frame: side inset and space above the first card (ScreenScroll `framed`, ScreenFrame).
+  frame: {
+    paddingHorizontal: theme.layout.cardInset,
+    paddingTop: theme.layout.contentTop,
+  },
+  // Vertical list of cards: the one app-wide gap between cards.
+  stack: {
+    gap: theme.layout.cardGap,
+  },
   page: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
 
-  section: {
-  marginBottom: theme.spacing.base,
-  
-  },
 };
 
 // Shared press-down feedback for Pressable buttons. Apply via `pressed && interaction.pressed`.

@@ -11,11 +11,12 @@ import Animated, {
 } from "react-native-reanimated";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
-import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalStyles";
+import { Padding, Border, FontSize, Color, FontFamily } from "../../styles/GlobalStyles";
 import ThumbsupIcon from "../../../assets/svgs/Thumbsup";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import Touchable from "../common/customui/Touchable";
 import { ScreenScroll } from "../common/customui/Screen";
+import AppStyles from "../../styles/AppStyles";
 
 const AnimatedTouchable = Animated.createAnimatedComponent(Touchable);
 
@@ -51,7 +52,7 @@ const ThumbsUp = () => {
         accessibilityRole="text"
         accessibilityLabel="Feedback header"
       />
-      <ScreenScroll contentContainerStyle={styles.scrollViewContent}>
+      <ScreenScroll framed>
         <View style={styles.content}>
           <Animated.View
             entering={FadeInUp.delay(100).springify()}
@@ -121,21 +122,15 @@ const ThumbsUp = () => {
 const styles = StyleSheet.create({
   feedback: {
     flex: 1,
-    backgroundColor: Color.sparklightWhite,
+    backgroundColor: Color.Gray300,
   },
   content: {
-    flex: 1,
-    justifyContent: "space-between",
-    backgroundColor: Color.sparklightWhite,
-    marginBottom: "20%",
-  },
-  scrollViewContent: {
-    flexGrow: 1,
+    ...AppStyles.card,
   },
   frameParent: {
     backgroundColor: Color.sparklightWhite,
     borderStyle: "solid",
-    borderColor: "#e1e1e1",
+    borderColor: Color.sparklightGray,
     borderRadius: Border.br_11xs,
     alignSelf: "stretch",
     overflow: "hidden",
@@ -149,8 +144,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ffffff",
-    shadowColor: "#101828",
+    backgroundColor: Color.sparklightWhite,
+    shadowColor: Color.colorGray_100,
     shadowOffset: {
       width: 0,
       height: 6,
@@ -190,7 +185,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
     alignSelf: "center",
     marginBottom: Padding.p_base,
-    shadowColor: "#000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
