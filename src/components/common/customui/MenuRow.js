@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import Touchable from "./Touchable";
 import { MenuText, SectionTitle } from "./Typography";
-import { Color, Padding } from "../../../../GlobalStyles";
+import { Color, Padding } from "../../../styles/GlobalStyles";
 import AppStyles from "../../../styles/AppStyles";
 import RightIcon from '../../../../assets/svgs/Chevonright';
 

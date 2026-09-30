@@ -12,6 +12,7 @@ import UsageChart from "./components/UsageChart";
 import ManageEquipmentCard from "./components/ManageEquipmentCard";
 import EeroPromoCard from "./components/EeroPromoCard";
 import { useDataUsage } from "../hooks/useDataUsage";
+import AppStyles from "../../../styles/AppStyles";
 import { ScreenScroll } from "../../common/customui/Screen";
 
 const DataUsageContent = ({ navigation, route }) => {
@@ -91,9 +92,8 @@ const DataUsageContent = ({ navigation, route }) => {
       />
       <ProfileSettingsHeader title="Data Usage" onPressBack={handleBack} />
       <ScreenScroll
-        framed
-        stack
         style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -127,7 +127,7 @@ const DataUsageContent = ({ navigation, route }) => {
           loading={activeTab === "monthly" ? monthlyUsageLoading : dailyUsageLoading}
         />
 
-        <ManageEquipmentCard equipment={equipment} />
+        <ManageEquipmentCard equipment={equipment} navigation={navigation} />
 
         {/* eero Promo */}
         <EeroPromoCard
@@ -141,6 +141,7 @@ const DataUsageContent = ({ navigation, route }) => {
           }}
         />
 
+        <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
       </ScreenScroll>
     </View>
   );
@@ -158,6 +159,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   },
   scrollView: container.page,
+  scrollContent: {
+    ...AppStyles.headerCardSpacing,
+  },
 });
 
 export default DataUsageScreen;

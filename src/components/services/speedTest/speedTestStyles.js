@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 import { theme } from "../../../styles/theme";
-import { Color } from "../../../../GlobalStyles";
+import { Color } from "../../../styles/GlobalStyles";
 import AppStyles from "../../../styles/AppStyles";
 export default StyleSheet.create({
   card: { ...AppStyles.card, padding: theme.spacing.lg },

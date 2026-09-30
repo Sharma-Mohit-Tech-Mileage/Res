@@ -6,7 +6,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import {Color} from "../../../GlobalStyles";
+import {Color} from "../../styles/GlobalStyles";
 import Svg, { Circle, G, Line, Path, Rect } from "react-native-svg";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);

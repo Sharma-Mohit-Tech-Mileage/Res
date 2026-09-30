@@ -9,7 +9,7 @@ import ModemHelpOverlay from "./ModemHelpOverlay";
 import { SectionTitle } from "../../common/customui/Typography";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
-import { Color } from "../../../../GlobalStyles";
+import { Color } from "../../../styles/GlobalStyles";
 
 const RebootModemLayout = ({ navigation, children, actions }) => {
   const insets = useSafeAreaInsets();

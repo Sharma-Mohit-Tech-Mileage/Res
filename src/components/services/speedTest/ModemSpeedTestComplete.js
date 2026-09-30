@@ -1,5 +1,5 @@
 import React from "react";
-import InfoIcon from "../../../res/svgIcons/InfoIcon";
+import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import { View } from "react-native";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import { Body } from "../../common/customui/Typography";
@@ -16,7 +16,7 @@ const ModemSpeedTestComplete = ({ error = false, message }) => (
     />
     <View style={styles.refreshHint}>
       <View accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        <InfoIcon width={18} height={18} viewBox="0 0 16 16" />
+        <InfoIcon size={18} />
       </View>
       <Body style={styles.refreshHintText}>Pull down screen to refresh content.</Body>
     </View>
