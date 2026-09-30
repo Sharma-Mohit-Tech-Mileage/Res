@@ -1,7 +1,6 @@
 import ServiceIcon from "../../../res/svgIcons/VideoServiceIcon";
 import React from "react";
 import { View, Text, StyleSheet, Linking, Alert } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getChannelLineupURL } from "../utils/constants";
@@ -24,7 +23,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-       <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
+       <View style={[AppStyles.card,{ padding: 16 }]}>
           <SkeletonPlaceholder
             backgroundColor={theme.colors.skeleton.base}
             highlightColor={theme.colors.skeleton.highlight}
@@ -42,7 +41,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
 
   return (
     <View style={[styles.container]}>
-      <View style={[AppStyles.card, { marginHorizontal: 16 }]}>
+      <View style={AppStyles.card}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
           <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
@@ -89,7 +88,6 @@ const styles = StyleSheet.create({
     ...AppStyles.card,
   },
   bottomButton: {
-    marginHorizontal: 16,
     marginBottom: 16,
   },
   // Service Header

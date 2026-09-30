@@ -1,18 +1,17 @@
 import React from "react";
 import { View, Text, StyleSheet, Platform } from "react-native";
-import Touchable from "../common/customui/Touchable";
 import {
   Color,
   Padding,
   FontSize,
   FontFamily,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import InfoICon from "../../../assets/svgs/InfoIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 import AppStyles from "../../styles/AppStyles";
-import {SectionTitle,FieldContent, IndicatorText,BannerAlertText} from "../common/customui/Typography";
+import {SectionTitle, FieldContent, IndicatorText} from "../common/customui/Typography";
 import EditActionButton from "../common/customui/EditActionButton";
 import { A11y } from "react-native-a11y-order";
 const digitToWord = {
@@ -40,7 +39,7 @@ function phoneNumberToWords(phoneNum) {
 
 const StatusIcon = ({ status }) => (
   <View style={styles.icon}>
-    {status === "On" ? <SuccessIcon /> : <SuccessIcon color={"#4C5458"} />}
+    {status === "On" ? <SuccessIcon /> : <SuccessIcon color={Color.sparklightGray1} />}
   </View>
 );
 const getEditAccessibilityLabel = (id) => {
@@ -173,7 +172,7 @@ const BoldPhoneText = ({ phoneNum }) => {
 const InfoMessage = ({ message, phoneNumber, id }) => (
   <View style={styles.infoMessage}>
     <View style={styles.iconContainer}>
-      <InfoICon color="#353091" />
+      <InfoICon color={Color.colorMidnightblue} />
     </View>
     <View style={styles.textContainer}>
       {id == "text" ? (
@@ -222,7 +221,7 @@ const NotificationSection = ({
   })();
 
   return (
-    <View style={[AppStyles.card,{marginBottom: Padding.p_base}]}>
+    <View style={AppStyles.card}>
       <A11y.Order style={styles.header}>
         <A11y.Index index={0} >
         <View
@@ -344,8 +343,8 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_base,
     borderRadius: Border.br_5xs,
     borderWidth: 1,
-    borderColor: "#353091",
-    backgroundColor: "#F0F8FF",
+    borderColor: Color.colorMidnightblue,
+    backgroundColor: Color.infoTint,
   },
   iconContainer: {
     width: 18,

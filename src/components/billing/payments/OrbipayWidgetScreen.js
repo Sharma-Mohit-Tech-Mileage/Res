@@ -8,7 +8,7 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import SmallLoader from "../../common/customui/SmallLoader";
-import { Color } from "../../../../GlobalStyles";
+import { Color } from "../../../styles/GlobalStyles";
 import {
   confirmBankToken,
   confirmPaymentToken,
@@ -51,9 +51,9 @@ const NO_ACCOUNT = {};
 
 const initialFormHeight = (width) => (width < 400 ? 500 : 680);
 
-// 55098: the SDK hands data-form_height to the inner form, so a flat 680px left the tablet Pay button below the fold; size it to the measured frame, never below the phone floor.
+// 55104: the SDK pins its form like a modal and Android won't pass swipes from it to the page, so the form must fit above the tab bar and scroll inside itself.
 const resolveFormHeight = (width, frameHeight, bottomPad) =>
-  Math.max(initialFormHeight(width), Math.floor(frameHeight - bottomPad));
+  frameHeight > 0 ? Math.floor(frameHeight - bottomPad) : initialFormHeight(width);
 
 const esc = (value) =>
   String(value == null ? "" : value)
@@ -442,13 +442,13 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFFFFF" },
+  container: { flex: 1, backgroundColor: Color.sparklightWhite },
 
   body: { flex: 1 },
   webview: { flex: 1, backgroundColor: "transparent" },
   loadingWrap: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 32,
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
 
   busyOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     justifyContent: "center",
     alignItems: "center",
   },

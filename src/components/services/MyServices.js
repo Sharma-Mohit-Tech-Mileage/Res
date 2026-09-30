@@ -4,31 +4,28 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import LinearGradient from "react-native-linear-gradient";
 import { theme } from "../../styles/theme";
 import { container } from "../../styles/utilities";
-import ServiceHeader from "./sections/ServiceHeader";
+import SupportIcon from "../../res/svgIcons/SupportIcon";
 import InternetCard from "./cards/InternetCard";
 import VideoCard from "./cards/VideoCard";
 import PhoneCard from "./cards/PhoneCard";
 import StatusSection from "./sections/StatusSection";
-import PrimaryButton from "../common/customui/PrimaryButton";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import { extractZipCode } from "../utility/constant";
-import { SERVICE_HEADER_GRADIENT } from "./utils/constants";
 import { fetchCurrentUsageRequest } from "../../redux/actions/servicesActions";
 import { ScreenScroll } from "../common/customui/Screen";
 import {
   selectCurrentUsage,
   selectCurrentUsageLoading,
 } from "../../redux/selectors/servicesSelectors";
- import ZendeskChatIcon from "../utility/ZendeskChatIcon";
+ import TabRootHeader from "../common/TabRootHeader";
 
-const MyServicesContent = ({ route, navigation }) => {
+const MyServicesContent = ({ route }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
   const insets = useSafeAreaInsets();
 
@@ -106,24 +103,17 @@ const MyServicesContent = ({ route, navigation }) => {
 
   return (
     <View style={styles.safeArea}>
-      <LinearGradient
-        style={[styles.gradientHeader, { height: 88 + insets.top }]}
-        locations={[0, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1.3, y: 0}}
-        colors={SERVICE_HEADER_GRADIENT}
+      <TabRootHeader
+        chatScreenName="My Services"
+        icon={<SupportIcon color={theme.colors.text.onPrimary} filled={true} />}
+        title="Services"
+        titleProps={{ accessible: true, accessibilityLabel: "Services", accessibilityLevel: 2, accessibilityRole: "header", nativeID: "services-header" }}
       />
 
-      <View style={{ paddingTop: insets.top + 27 }}>
-        <ServiceHeader />
-        <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-      <ZendeskChatIcon  screenName="My Services" />
-      </View>
-      </View>
-
       <ScreenScroll
+        framed
+        stack
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -134,34 +124,32 @@ const MyServicesContent = ({ route, navigation }) => {
           />
         }
       >
-        <View style={styles.servicesContainer}>
-          {showInternet && (
-            <InternetCard
-              planName={data?.internet?.planName?.toLowerCase()}
-              downloadSpeed={data?.internet?.downloadSpeed}
-              uploadSpeed={data?.internet?.uploadSpeed}
-              loading={loading}
-              dataPlan={dataPlan}
-            />
-          )}
+        {showInternet && (
+          <InternetCard
+            planName={data?.internet?.planName?.toLowerCase()}
+            downloadSpeed={data?.internet?.downloadSpeed}
+            uploadSpeed={data?.internet?.uploadSpeed}
+            loading={loading}
+            dataPlan={dataPlan}
+          />
+        )}
 
-          {showVideo && (
-            <VideoCard
-              planName={data?.video?.planName?.toLowerCase()}
-              zipCode={zipCodeFromAccount}
-              legacySpa={legacySPA}
-              loading={loading}
-            />
-          )}
+        {showVideo && (
+          <VideoCard
+            planName={data?.video?.planName?.toLowerCase()}
+            zipCode={zipCodeFromAccount}
+            legacySpa={legacySPA}
+            loading={loading}
+          />
+        )}
 
-          {showPhone && (
-            <PhoneCard
-              planName={data?.phone?.planName?.toLowerCase()}
-              legacyBrand={legacySPA}
-              loading={loading}
-            />
-          )}
-        </View>
+        {showPhone && (
+          <PhoneCard
+            planName={data?.phone?.planName?.toLowerCase()}
+            legacyBrand={legacySPA}
+            loading={loading}
+          />
+        )}
 
         {/* Service Status Section */}
         <StatusSection
@@ -172,14 +160,6 @@ const MyServicesContent = ({ route, navigation }) => {
           hasUserInitiatedCheck={hasUserInitiatedCheck}
         />
 
-        <PrimaryButton
-          title="Manage Equipment"
-          buttonType="outline"
-          onPress={() => navigation.navigate("manageEquipment")}
-          containerStyle={styles.manageEquipmentButton}
-        />
-
-        <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
       </ScreenScroll>
     </View>
   );
@@ -196,24 +176,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  gradientHeader: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-  },
   scrollView: container.page,
-  scrollContent: {
-    paddingBottom: theme.spacing["3xl"],
-  },
-  servicesContainer: {
-    backgroundColor: theme.colors.background,
-    paddingTop: theme.spacing.base,
-  },
-  manageEquipmentButton: {
-    marginHorizontal: theme.spacing.base,
-    marginTop: theme.spacing.base,
-  },
 });
 
 export default MyServices;

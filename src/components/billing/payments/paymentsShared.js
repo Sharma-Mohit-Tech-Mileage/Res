@@ -7,7 +7,8 @@ import { calculateFee } from "../../../network/apis/account/paymentMethods.servi
 import { LAYOUT } from "../../../utils/responsive";
 import { trackApiError, errorStatus } from "./paymentAnalytics";
 
-export const contentMaxWidth = { width: "100%", maxWidth: LAYOUT.maxContentWidth, alignSelf: "center" };
+// Payment button blocks sit 24 from the screen edge; inside a framed ScreenScroll that is the list-row inset minus the frame inset.
+export const buttonsInFrame = { marginHorizontal: LAYOUT.listRowInset - LAYOUT.cardInset };
 
 export const radioA11yProps = (label, checked) => ({
   accessibilityRole: "radio",

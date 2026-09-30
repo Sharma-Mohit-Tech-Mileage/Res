@@ -14,20 +14,19 @@ import {
   FontSize,
   Padding,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { Hyperlink } from "../common/customui/Typography";
 import moment from "moment";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { hp, wp } from "../../utils/responsive";
 import { PostApiRequest } from "../../network/RestApiClient";
-import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
+import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActions";
 
 import {
   selectBillingBreakDownLoading,
   selectBillingBreakDownData,
   selectBillingBreakDownError,
-  selectBillExplainerData,
 } from "../../redux/selectors/billingBreakdownSelectors";
 
 import { InfoIcon } from "native-base";
@@ -36,6 +35,7 @@ import SecondaryButton from "../common/customui/PrimaryButton";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../styles/AppStyles";
+import { logError } from "../../utils/logger";
 
 
 // Constants
@@ -280,7 +280,7 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
  */
 const renderBillExplainerLink = (data, navigation) => {
   if (!data?.be_url) {  
-    console.error("Bill Explainer link is not available");
+    logError("Bill Explainer link is not available");
     return;
   }
   navigation.navigate('ArticleWindowUtility', {
@@ -381,7 +381,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
 
   // useEffect(() => {
-  //   console.log("Bill Explainer Data:", billExplainerData);
   //   if(!billExplainerData?.eligibility){
   //     setShowBillExplainer(false);
   //   }else{
@@ -404,7 +403,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
       }, (error) => { 
         setShowBillExplainer(false);
         setExplainerLoading(false);
-        console.error("Bill Explainer Error:", error);
+        logError("Bill Explainer Error:", error);
       }
 
     )
@@ -458,7 +457,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
     }
 
     return (
-      <View style={[ {borderTopLeftRadius: 0, borderTopRightRadius: 0, marginBottom: 32}]}>
+      <View>
       <FlatList
         data={billingData}
         renderItem={({ item, index }) => <BreakDownItem item={item} />}
@@ -470,7 +469,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
         initialNumToRender={5}
         windowSize={5}
         ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={explainerLoading} />}
-        contentContainerStyle={{ paddingBottom: 120 }}
       />
       </View>
     );
@@ -488,13 +486,8 @@ const BillingBreakDownScreen = ({ navigation }) => {
       {errorCode ? (
         renderErrorMessage(errorCode, navigation)
       ) : (
-        <View
-          style={[AppStyles.card, styles.cardContainer, { marginBottom: 32 }]}
-        >
-          <ScreenScroll
-            contentContainerStyle={{ paddingBottom: 24 }}
-            showsVerticalScrollIndicator={false}
-          >
+        <ScreenScroll framed showsVerticalScrollIndicator={false}>
+          <View style={AppStyles.card}>
             {/* Warning message */}
             <View style={styles.alertContainer}>
               <NotificationAlert
@@ -512,8 +505,8 @@ const BillingBreakDownScreen = ({ navigation }) => {
             </View>
             {/* Main content */}
             {renderContent()}
-          </ScreenScroll>
-        </View>
+          </View>
+        </ScreenScroll>
       )}
     </View>
   );
@@ -523,10 +516,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.sparklightWhite,
-  },
-  cardContainer: {
-    margin: 16,
+    backgroundColor: Color.Gray300,
   },
   alertContainer: {
     margin: Padding.p_5xl,
@@ -544,7 +534,7 @@ const styles = StyleSheet.create({
     color: Color.colorblack_100,
   },
   errorTxt: {
-    color: "#001321",
+    color: Color.colorGray_200,
     fontSize: FontSize.size_base,
     fontWeight: "400",
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -579,7 +569,6 @@ const styles = StyleSheet.create({
   paymentsList: {
     backgroundColor: Color.sparklightWhite,
     borderRadius: 4,
-    marginBottom: 100,
   },
   errorBackground: {
     flex: 1,
@@ -590,10 +579,10 @@ const styles = StyleSheet.create({
   errorCard: {
     backgroundColor: Color.sparklightWhite,
     borderWidth: 1,
-    borderColor: "#EEEEEE",
+    borderColor: Color.dividerLight,
     borderRadius: 2,
     padding: 24,
-    shadowColor: "#000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
@@ -680,7 +669,7 @@ const styles = StyleSheet.create({
   discountExpiryContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#C8E9D0",
+    backgroundColor: Color.successTint,
     paddingHorizontal: 4,
     paddingVertical: 2,
     marginTop: 5,
@@ -712,7 +701,7 @@ const styles = StyleSheet.create({
   },
   warningAlert: {
     borderLeftWidth: 4,
-    borderLeftColor: "#FF9800",
+    borderLeftColor: Color.warningAccent,
     marginBottom: 0,
     borderRadius: 0,
   },
@@ -778,10 +767,10 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 
-  colorGreen: "#0C8306",
+  colorGreen: Color.successGreenDark,
 });
 
 // Define color constants
-styles.colorGreen = "#0C8306";
+styles.colorGreen = Color.successGreenDark;
 
 export default BillingBreakDownScreen;

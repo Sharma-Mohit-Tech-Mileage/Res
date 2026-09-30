@@ -19,7 +19,7 @@ import BillingIcon from "../res/svgIcons/BillingIcon";
 import SupportIcon from "../res/svgIcons/SupportIcon";
 import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
 import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
-import { FontFamily, Color, FontSize } from "../../GlobalStyles";
+import { FontFamily, Color, FontSize } from "../styles/GlobalStyles";
 const Tab = createBottomTabNavigator();
 
 

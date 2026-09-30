@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { theme } from '../../styles/theme';
+import { Color } from "../../styles/GlobalStyles";
 
 const AnnouncementProgress = ({ totalSteps, currentStep }) => {
   return (
@@ -34,7 +35,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Color.cardBorder,
   },
   dotActive: {
     width: 32,
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
   },
   dotCompleted: {
     width: 6,
-    backgroundColor: '#9CA3AF',
+    backgroundColor: Color.progressInactive,
   },
 });
 

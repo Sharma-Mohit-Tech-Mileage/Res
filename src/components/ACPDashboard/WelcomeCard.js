@@ -8,7 +8,7 @@ import {
   Linking,
   ImageBackground,
 } from "react-native";
-import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
+import { FontFamily, FontSize, Color, Padding } from "../../styles/GlobalStyles";
 import PlayIcon from "../../../assets/svgs/PlayIcon";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";

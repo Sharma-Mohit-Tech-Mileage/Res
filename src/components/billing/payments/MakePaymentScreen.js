@@ -7,11 +7,13 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import { fetchAutoPayDetails } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, formatCurrency, parseAmountInput, radioA11yProps } from "./paymentsShared";
+import { buttonsInFrame, formatCurrency, parseAmountInput, radioA11yProps } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import AppStyles from "../../../styles/AppStyles";
+import { card } from "../../../styles/utilities";
 import {
   usePaymentStep,
   endPaymentAttempt,
@@ -130,14 +132,16 @@ const MakePaymentScreen = ({ navigation }) => {
           navigation.goBack();
         }}
       />
-      <KeyboardAwareScrollView
-        contentContainerStyle={[contentMaxWidth, { paddingBottom: 140 }]}
+      <ScreenScroll
+        framed
+        stack
+        ScrollComponent={KeyboardAwareScrollView}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
 
         <>
-        <View style={[AppStyles.card, { margin: 16 , padding: 16 }]}>
+        <View style={[AppStyles.card, card.content]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -248,7 +252,7 @@ const MakePaymentScreen = ({ navigation }) => {
           </>
         )}
         </View>
-        <View style={{ marginHorizontal: 24 }} >
+        <View style={buttonsInFrame}>
         {!loading && (
           <>
             <PrimaryButton
@@ -270,14 +274,13 @@ const MakePaymentScreen = ({ navigation }) => {
         )}
         </View>
         </>
-      </KeyboardAwareScrollView>
+      </ScreenScroll>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140, ...AppStyles.headerCardSpacing },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   heading: {
     marginBottom: 16,
     marginTop: 8,
@@ -288,15 +291,15 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: Color.borderSubtle,
     paddingHorizontal: 12,
     paddingVertical: 14,
     marginRight: 12,
   },
-  typeCardSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: "#F3F2FF" },
+  typeCardSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: Color.selectedTint },
   typeRadio: { marginRight: 8 },
   typeLabel: {
     fontSize: FontSize.size_20,
@@ -309,15 +312,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     minHeight: 56,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: Color.borderSubtle,
     paddingHorizontal: 16,
     paddingVertical: 16,
     marginBottom: 12,
   },
-  optionRowSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: "#F3F2FF" },
+  optionRowSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: Color.selectedTint },
   radioOuter: {
     width: 16,
     height: 16,
@@ -343,7 +346,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: Color.colorGray_200,
   },
-  pastDueAmount: { color: "#DC3626" },
+  pastDueAmount: { color: Color.errorIcon },
   optionNote: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -354,7 +357,7 @@ const styles = StyleSheet.create({
   amountErrorText: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: "#B92A1C",
+    color: Color.errorText,
     marginBottom: 12,
   },
   inlineAmountInput: {
@@ -362,8 +365,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#767676",
-    backgroundColor: "#FFFFFF",
+    borderColor: Color.sparklightaddGray,
+    backgroundColor: Color.sparklightWhite,
     paddingHorizontal: 16,
     paddingVertical: 8,
     fontSize: FontSize.size_base,

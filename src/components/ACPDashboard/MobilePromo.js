@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import DeviceInfo from 'react-native-device-info';
-import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
+import { FontFamily, FontSize, Color, Border } from "../../styles/GlobalStyles";
 
 import FeatureCard from "./FeatureCardMobile";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";

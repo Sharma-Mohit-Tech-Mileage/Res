@@ -1,6 +1,5 @@
-import AppStyles from "../../../styles/AppStyles";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -8,7 +7,7 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
 import PaymentMethodCard from "./PaymentMethodCard";
-import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Border } from "../../../styles/GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
@@ -16,14 +15,17 @@ import {
   fetchAutoPayDetails,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
-  contentMaxWidth,
   isMethodUnusable,
   openOrbipayPaymentExecution,
   isCreditCard,
   useSurchargeRate,
   surchargeTitle,
   surchargeMessage,
+  buttonsInFrame,
 } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
+import AppStyles from "../../../styles/AppStyles";
+import { card } from "../../../styles/utilities";
 import {
   usePaymentStep,
   endPaymentAttempt,
@@ -107,7 +109,8 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} autoFocusBack />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
+      <ScreenScroll framed stack showsVerticalScrollIndicator={false}>
+        <View style={[AppStyles.card, card.content]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -151,7 +154,9 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
             ))}
           </View>
         )}
+        </View>
 
+        <View style={buttonsInFrame}>
         {!loading && (
           <>
             <Touchable
@@ -183,15 +188,15 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
             />
           </>
         )}
-      </ScrollView>
+        </View>
+      </ScreenScroll>
 
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140, ...AppStyles.headerCardSpacing },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   heading: {
     marginBottom: 24,
   },
@@ -208,10 +213,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "stretch",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_81xl,
     borderWidth: 1,
-    borderColor: Color.colorMidnightblue,
+    borderColor: Color.sparklightPrimaryPurple,
     padding: 16,
     marginTop: 4,
   },

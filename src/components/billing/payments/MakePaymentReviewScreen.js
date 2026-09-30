@@ -1,4 +1,3 @@
-import AppStyles from "../../../styles/AppStyles";
 import React, { useCallback, useRef, useState } from "react";
 import { View, Text, StyleSheet, Modal } from "react-native";
 import KeyboardAwareScrollView from "../../common/customui/KeyboardAwareScrollView";
@@ -12,7 +11,7 @@ import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import SmallLoader from "../../common/customui/SmallLoader";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import ReviewField from "./ReviewField";
 import { card } from "../../../styles/utilities";
@@ -23,7 +22,6 @@ import {
   paymentErrorMessage,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
-  contentMaxWidth,
   describePaymentMethod,
   paymentMethodA11yLabel,
   formatCurrency,
@@ -33,6 +31,7 @@ import {
   surchargeTitle,
   surchargeMessage,
 } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { announceA11y } from "../../../utils/a11y";
 import {
   usePaymentStep,
@@ -151,7 +150,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <KeyboardAwareScrollView ref={scrollRef} contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollRef} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -171,7 +170,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           Review payment
         </SectionTitle>
 
-        <View style={[card.elevated, styles.summaryCard]}>
+        <View style={[card.base, styles.summaryCard]}>
           <ReviewField label="Payment Method" value={describePaymentMethod(method)} a11yValue={paymentMethodA11yLabel(method)} loading={loading} />
           <ReviewField label="Payment Amount" value={formatCurrency(amount)} loading={loading} />
           {showSurcharge && (
@@ -201,7 +200,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         </View>
 
         {(
-          <View style={[card.elevated, styles.emailCard]}>
+          <View style={[card.base, styles.emailCard]}>
             {loading ? (
               <SkeletonPlaceholder>
                 <View style={styles.valueSkeleton} />
@@ -249,7 +248,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           onPress={onSubmit}
         />
         <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
-      </KeyboardAwareScrollView>
+      </ScreenScroll>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
 
@@ -266,7 +265,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   processingOverlay: {
     flex: 1,
     justifyContent: "center",
@@ -276,7 +275,7 @@ const styles = StyleSheet.create({
   processingCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 12,
     paddingVertical: 18,
     paddingHorizontal: 16,
@@ -287,7 +286,6 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     marginLeft: 10,
   },
-  content: { padding: 20, paddingBottom: 140, ...AppStyles.headerCardSpacing },
   heading: {
     marginBottom: 12,
   },

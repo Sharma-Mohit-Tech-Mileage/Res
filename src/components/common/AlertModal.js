@@ -7,7 +7,7 @@ import {
   Linking,
   AccessibilityInfo,
 } from "react-native";
-import { FontFamily, Border, Color, Padding } from "../../../GlobalStyles";
+import { FontFamily, Border, Color, Padding } from "../../styles/GlobalStyles";
 
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "./customui/Touchable";
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#F4F4F5",
+    backgroundColor: Color.dialogSurface,
     marginBottom: 15,
   },
   message: {

@@ -9,7 +9,8 @@ import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "
 import { PostAuthApiRequest } from "../../network/RestApiClient";
 import { getEndpoint ,ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
-import { FontFamily,Color } from "../../../GlobalStyles";
+import { LAYOUT } from "../../utils/responsive";
+import { FontFamily,Color } from "../../styles/GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
@@ -241,7 +242,6 @@ const SplashScreen = ({ navigation, route }) => {
         idTokenGuid: result.data.additionalParameters?.session_state,
         refreshToken: result.data.refreshToken,
       };
-      console.log("🔐 ID Token refreshed from session:", data.idToken);
       setLoadingState(LoadingState.LOADING_DATA);
       await storeSsoToken(data);
       callSSOLoginApi(data);
@@ -257,7 +257,6 @@ const SplashScreen = ({ navigation, route }) => {
     setLoadingState(LoadingState.LOADING_DATA);
     // Capture SSO idToken from request so handleLogin can store it in the user object
     ssoIdTokenRef.current = request.idToken || null;
-    console.log("🔐 ID Token captured from SSO:", ssoIdTokenRef.current);
     logDebug("SplashScreen", "Calling SSO login API", {
       endpoint: getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN),
       hasIdToken: Boolean(request.idToken),
@@ -640,7 +639,7 @@ const SplashScreen = ({ navigation, route }) => {
           )}&refresh_token=${encodeURIComponent(res.refreshToken)}`,
         }).catch(() => {});
       }
-      await analytics().resetAnalyticsData();
+      await resetAnalyticsData(getAnalytics());
     } catch (error) {
       logWarn("SplashScreen", "Transfer sign-in cleanup error");
     }
@@ -886,10 +885,8 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     marginTop: hp("25%"),
-    paddingHorizontal: wp("10%"),
-    maxWidth: 480,
-    width: "100%",
-    alignSelf: "center",
+    // Same side inset as the primary buttons (buttonsInFrame) on every screen size.
+    paddingHorizontal: LAYOUT.listRowInset,
   },
   version: {
     color: "white",

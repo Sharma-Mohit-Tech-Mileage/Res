@@ -6,7 +6,7 @@ import {
   FontSize,
   Padding,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import EntryInput from "./EntryInput";
@@ -298,12 +298,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerIconView: {
-    backgroundColor: "#FEFEFE",
+    backgroundColor: Color.offWhite,
     padding: 20,
     borderRadius: 100,
-    borderColor: "#EEE",
+    borderColor: Color.dividerLight,
     borderWidth: 1,
-    shadowColor: "#171717",
+    shadowColor: Color.shadowDark,
     shadowOffset: { width: -2, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 10,

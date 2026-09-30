@@ -94,7 +94,14 @@ jest.mock('react-native-version-check', () => ({
 }));
 jest.mock('moment', () => () => ({ year: () => 2026 }));
 
-jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
+jest.mock('../src/components/common/ProfileSettingsHeader', () => ({
+  __esModule: true,
+  default: 'ProfileSettingsHeader',
+  TAB_BAND_EXTENSION: 52,
+  TAB_BADGE_SIZE: 72,
+  TAB_BADGE_TOP: 16,
+  useInternalHeaderHeight: () => 112,
+}));
 jest.mock('../src/components/utility/ZendeskChatIcon', () => 'ZendeskChatIcon');
 jest.mock('../src/components/utility/AppStyles', () => ({ card: { borderRadius: 8 } }), { virtual: true });
 jest.mock('../src/res/svgIcons/UserIconWhite', () => 'UserIconWhite');

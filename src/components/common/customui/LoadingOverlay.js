@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, View, Text, StyleSheet } from "react-native";
-import { Color, FontFamily } from "../../../../GlobalStyles";
+import { Color, FontFamily } from "../../../styles/GlobalStyles";
 import LottieView from "lottie-react-native";
 import ModalOverlay from "./ModalOverlay";
 
@@ -46,12 +46,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   alertContainer: {
-    backgroundColor: "#ffffff",
+    backgroundColor: Color.sparklightWhite,
     padding: 30,
     alignSelf: "center",
     borderRadius: 15,
     elevation: 10,
-    shadowColor: "#000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: {
       width: 0,
       height: 5,

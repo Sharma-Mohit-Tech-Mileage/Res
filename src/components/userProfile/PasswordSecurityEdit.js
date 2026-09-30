@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StyleSheet, Text, View, AccessibilityInfo, findNodeHandle } from "react-native";
+import { StyleSheet, View, AccessibilityInfo, findNodeHandle } from "react-native";
 import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import { ScreenScroll } from "../common/customui/Screen";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
+import { FontFamily, Padding, Color, FontSize, Border } from "../../styles/GlobalStyles";
 import { securityQuestions } from "../utility/constant";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
@@ -22,6 +22,7 @@ import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
 import AppStyles from '../../styles/AppStyles'
 import { HintText, SectionTitle, FieldTitle } from "../common/customui/Typography";
+import { logWarn } from "../../utils/logger";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
@@ -85,7 +86,7 @@ const PasswordSecurityEdit = () => {
             }
           }
         } catch (e) {
-          console.warn("Accessibility focus error:", e);
+          logWarn("Accessibility focus error:", e);
         }
       }, 300);
 
@@ -151,7 +152,7 @@ const PasswordSecurityEdit = () => {
         }
       },
       
-      (error) => console.warn(error)
+      (error) => logWarn(error)
     );
   };
 
@@ -202,7 +203,7 @@ const PasswordSecurityEdit = () => {
         title="Edit Security Question"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
-      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} >
+      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} >
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -499,11 +500,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   passwordSecurityEditInner: {
-    ...AppStyles.headerCardSpacing,
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 300
   },
   passwordSecurityEdit: {
     flex: 1,

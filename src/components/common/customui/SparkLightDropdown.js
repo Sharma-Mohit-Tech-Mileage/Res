@@ -1,5 +1,3 @@
-import DropdownCheck from "../../../../assets/svgs/dropdown-check";
-import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import React, { useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -10,16 +8,15 @@ import {
   findNodeHandle,
   AccessibilityInfo,
   Platform,
-  Dimensions
+  useWindowDimensions
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Box } from 'native-base';
-import { Padding, Color, FontFamily, FontSize,Border } from "../../../../GlobalStyles";
+import { Padding, Color, FontFamily, FontSize,Border } from "../../../styles/GlobalStyles";
 import DownArrow from '../../../res/svgIcons/DownArrow';
 import IconButton from './IconButton';
 import Touchable from './Touchable';
-import AppStyles from '../../../styles/AppStyles';
-import { theme } from '../../../styles/theme';
+import {  FieldTitle, FieldContent} from '../customui/Typography';
 const SparkLightDropdown = ({
   items,
   selectedValue,
@@ -35,6 +32,7 @@ const SparkLightDropdown = ({
   const [visible, setVisible] = React.useState(false);
   const dropdownRef = useRef(null);
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const optionsListRef = useRef(null);
   const firstOptionRef = useRef(null);
 
@@ -134,7 +132,7 @@ const SparkLightDropdown = ({
             accessibilityLabel="Close dropdown"
           />
           <View 
-            style={styles.pickerContainer}
+            style={[styles.pickerContainer, { maxHeight: Math.round(windowHeight * 0.8) }]}
             accessibilityViewIsModal={true}
             importantForAccessibility="yes"
           >
@@ -144,7 +142,7 @@ const SparkLightDropdown = ({
                 <Text ref={optionsListRef}
                   style={styles.headerTitle}
                   accessible
-                  accessibilityRole="header"
+                  accessibilityRole="text"
                 >
                   {dropdownTitle}
                 </Text>
@@ -153,7 +151,7 @@ const SparkLightDropdown = ({
                   style={styles.closeButton}
                   accessibilityLabel="Close dropdown"
                 >
-                  <CloseIcon width={24} height={24} viewBox="0 0 18 18" accessible={false} />
+                  <Text style={styles.closeButtonText} accessible={false}>✕</Text>
                 </IconButton>
               </View>
             </View>
@@ -204,7 +202,7 @@ const SparkLightDropdown = ({
                     {item}
                   </Text>
                   {selectedValue === item && (
-                    <DropdownCheck style={styles.checkmark} accessible={false} />
+                    <Text style={styles.checkmark} accessible={false}>✓</Text>
                   )}
                 </Touchable>
               ))}
@@ -228,9 +226,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
     paddingVertical: 12,
     minHeight: 48,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_5xs,
-    borderColor:'#767676',
+    borderColor:Color.sparklightaddGray,
     borderWidth: 1,
   },
   dropdownText: {
@@ -263,12 +261,11 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     width: '100%',
-    backgroundColor: theme.colors.surface,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    maxHeight: Math.round(Dimensions.get('window').height * 0.8),
+    backgroundColor: Color.dropdownPressed,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
     zIndex: 2,
-    shadowColor: "#000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: {
       width: 0,
       height: -2,
@@ -278,43 +275,48 @@ const styles = StyleSheet.create({
     elevation: 24,
   },
   header: {
-    backgroundColor: theme.colors.surface,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingTop: theme.spacing.lg,
+    backgroundColor: Color.dropdownPressed,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    paddingTop: 8,
   },
   grabber: {
-    width: 48,
-    height: 4,
-    backgroundColor: theme.colors.border,
+    width: 36,
+    height: 5,
+    backgroundColor: Color.inputBorder,
     borderRadius: 2.5,
     alignSelf: 'center',
     marginBottom: 8,
   },
   headerContent: {
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingLeft: 28,
-    paddingRight: theme.spacing.lg,
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Color.dropdownDivider,
   },
   headerTitle: {
-    ...AppStyles.H2,
-    flex: 1,
-    textAlign: 'left',
+    fontSize: 16,
+    fontWeight: '600',
+    color: Color.colorblack_100,
+    textAlign: 'center',
   },
   closeButton: {
+    position: 'absolute',
+    right: Padding.p_5xs, // 8 — slight inset so 48dp container's right edge stays clear
+    top: -Padding.p_xs, // -12 — vertically center over the 24dp header content row
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeButtonText: {
     fontSize: 18,
-    color: '#000',
+    color: Color.colorblack_100,
     fontWeight: '800',
   },
   optionsList: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: Color.dropdownPressed,
     flexShrink: 1,
   },
   option: {
@@ -322,24 +324,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Color.sparklightWhite,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#C6C6C8',
+    borderBottomColor: Color.dropdownDivider,
     minHeight: 48,
   },
   firstOption: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#C6C6C8',
+    borderTopColor: Color.dropdownDivider,
   },
   lastOption: {
     borderBottomWidth: 0,
   },
   selectedOption: {
-    backgroundColor: theme.colors.secondarySurface,
+    backgroundColor: Color.sparklightWhite,
   },
   optionText: {
     fontSize: 16,
-    color: '#000000',
+    color: Color.colorblack_100,
     flex: 1,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
