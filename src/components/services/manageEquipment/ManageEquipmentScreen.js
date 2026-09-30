@@ -15,15 +15,45 @@ import { container } from "../../../styles/utilities";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 
 import { BottomTabBarHeightContext } from "@react-navigation/bottom-tabs";
+import { useFocusEffect } from "@react-navigation/native";
+import dataUsageApi from "../../../network/apis/services/dataUsageService";
+import { GetApiRequest } from "../../../network/RestApiClient";
+import { isEeroEquipment } from "../dataUsage/transformEquipment";
+import { getUser } from "../../../redux/utils/LocalStorage";
+import { useSelector } from "react-redux";
 import MyModemCard from "./MyModemCard";
 import MyAddons from "./MyAddons";
 import MySpeedCard from "./MySpeedCard";
 
+
 const ManageEquipmentScreen = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useContext(BottomTabBarHeightContext) ?? 0;
+  const profile = useSelector((state) => state.profile || {});
+  const accountNumber = profile.accountDetails?.account_number;
+  const [eeroAccount, setEeroAccount] = useState(null);
+  const [hasEeroDevice,setHasEeroDevice]=useState(false)
   const [refreshKey, setRefreshKey] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+
+  useFocusEffect(useCallback(() => {
+    let active = true;
+    setEeroAccount(null);
+    if (accountNumber) {
+      dataUsageApi.getEquipment()
+        .then(data => {
+          if (active && Array.isArray(data?.equipments) && data.equipments.some(isEeroEquipment)) {
+            setEeroAccount(accountNumber);
+            setHasEeroDevice(true)
+          }
+        })
+        .catch(() => {
+          if (active) setEeroAccount(null);
+        });
+    }
+   
+    return () => { active = false; };
+  }, [accountNumber, refreshKey]));
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -58,8 +88,8 @@ const ManageEquipmentScreen = ({ navigation, route }) => {
       >
 
         <MyModemCard onReboot={() => navigation.navigate('RebootModem', { ip: route?.params?.ip })} />
-        <MyAddons />
-        <MySpeedCard onLoadEnd={onSpeedLoaded} refreshKey={refreshKey} navigation={navigation} />
+        {hasEeroDevice && <MyAddons />}
+        <MySpeedCard key={`${accountNumber}-${hasEeroDevice}`} hasEeroDevice={hasEeroDevice} onLoadEnd={onSpeedLoaded} refreshKey={refreshKey} navigation={navigation} hideModemSpeed={!hasEeroDevice} />
 
 
 

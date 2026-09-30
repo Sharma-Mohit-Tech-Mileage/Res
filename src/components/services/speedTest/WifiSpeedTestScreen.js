@@ -55,6 +55,7 @@ export default function WifiSpeedTestScreen({ navigation }) {
             ? { status: "saved", result }
             : current,
         );
+   
     } catch {
       submissions.current.set(result.testId, "failed");
       if (mounted.current)
@@ -102,7 +103,7 @@ export default function WifiSpeedTestScreen({ navigation }) {
                   ? "error"
                   : "info"
               }
-              showCloseIcon={false}
+              showCloseIcon={true}
               title={
                 saveState.status === "saving"
                   ? "Saving speed test result"
@@ -119,6 +120,9 @@ export default function WifiSpeedTestScreen({ navigation }) {
                   ? "Your result is available in My Speed."
                   : "Please wait while your result is saved."
               }
+              onClose={()=>{
+                 setSaveState(null)
+              }}
             />
           </View>
         )}
@@ -134,8 +138,11 @@ export default function WifiSpeedTestScreen({ navigation }) {
                 <NotificationAlert
                   type="error"
                   title="Unable to load speed test"
-                  showCloseIcon={false}
+                  showCloseIcon={true}
                   message="Check your connection and try again."
+                  onClose={()=>{
+                 setFailed(false)
+              }}
                 />
                 <PrimaryButton
                   title="Retry"
