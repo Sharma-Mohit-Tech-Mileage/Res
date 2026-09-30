@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import Touchable from "./customui/Touchable";
 
-import { Color, FontFamily } from "../../../GlobalStyles";
+import { Color, FontFamily } from "../../styles/GlobalStyles";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
 
 import logo from "../../../assets/sparklightlogo-01.png";

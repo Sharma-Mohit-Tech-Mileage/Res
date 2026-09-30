@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, AccessibilityInfo } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
+import { Color } from "../../../styles/GlobalStyles";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -8,9 +9,9 @@ const AnimatedPath = Animated.createAnimatedComponent(Path);
 const CIRCLE_LENGTH = 2 * Math.PI * 7.5;
 
 const VARIANTS = {
-  success: { color: "#2BA948", marks: [{ d: "M6.019 9L8.269 11.25L12.769 6.75", length: 9.6 }] },
+  success: { color: Color.sparklightGreen, marks: [{ d: "M6.019 9L8.269 11.25L12.769 6.75", length: 9.6 }] },
   error: {
-    color: "#DC3626",
+    color: Color.errorIcon,
     marks: [
       { d: "M6.394 6L12.394 12", length: 8.5 },
       { d: "M12.394 6L6.394 12", length: 8.5 },

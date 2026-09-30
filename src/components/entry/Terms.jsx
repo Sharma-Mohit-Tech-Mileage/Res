@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { View, StyleSheet, Text, ActivityIndicator, Platform } from "react-native";;
 import WebView from "react-native-webview";
-import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border, } from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import Touchable from "../common/customui/Touchable";
 import { useSelector, useDispatch } from "react-redux";
@@ -186,12 +186,12 @@ const styles = StyleSheet.create({
   },
   bottomBar: {
     height: 150,
-    backgroundColor: "#FFF",
-    borderTopColor: "#CCC",
+    backgroundColor: Color.sparklightWhite,
+    borderTopColor: Color.borderMuted,
     borderTopWidth: 1,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#171717",
+    shadowColor: Color.shadowDark,
     shadowOffset: { width: -2, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 3,

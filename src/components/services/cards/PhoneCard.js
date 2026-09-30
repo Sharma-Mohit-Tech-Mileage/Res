@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, StyleSheet, Linking, Alert } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getPhonePortalURL } from "../utils/constants";
@@ -8,6 +7,7 @@ import SecondaryButton from "../../common/customui/PrimaryButton";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../../styles/AppStyles";
 import {SectionTitle} from "../../common/customui/Typography";
+import { Color } from "../../../styles/GlobalStyles";
 const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   const phonePortalURL = getPhonePortalURL(legacyBrand);
   const showManageButton = phonePortalURL !== null;
@@ -26,7 +26,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
+        <View style={[AppStyles.card,{ padding: 16 }]}>
           <SkeletonPlaceholder
             backgroundColor={theme.colors.skeleton.base}
             highlightColor={theme.colors.skeleton.highlight}
@@ -106,11 +106,10 @@ const styles = StyleSheet.create({
     ...AppStyles.card,
   },
   cardSpacing: {
-    marginHorizontal: 16,
   }, 
   cardHreader: {
     flexDirection: "row",
-    backgroundColor: "#F8F8F8",
+    backgroundColor: Color.colorWhitesmoke_100,
     width: "100%",
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,

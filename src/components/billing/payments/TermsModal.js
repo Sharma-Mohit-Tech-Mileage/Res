@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, Modal, ScrollView, StyleSheet, Pressable, Animated, Easing, useWindowDimensions } from "react-native";
 import Touchable from "../../common/customui/Touchable";
 import CloseIcon from "../../../res/svgIcons/CloseIcon";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { setFocusToRef } from "../../../utils/a11y";
 import { LAYOUT } from "../../../utils/responsive";
 
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   backdropWrap: { flex: 1, justifyContent: "flex-end" },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.5)" },
   sheet: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingHorizontal: 20,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 4,
     borderRadius: 2,
-    backgroundColor: "#D0D5DD",
+    backgroundColor: Color.borderSubtle,
     marginBottom: 12,
   },
   titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },

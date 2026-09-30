@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Box } from 'native-base';
-import { Padding, Color, FontFamily, FontSize,Border } from "../../../../GlobalStyles";
+import { Padding, Color, FontFamily, FontSize,Border } from "../../../styles/GlobalStyles";
 import DownArrow from '../../../res/svgIcons/DownArrow';
 import IconButton from './IconButton';
 import Touchable from './Touchable';
@@ -226,9 +226,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
     paddingVertical: 12,
     minHeight: 48,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_5xs,
-    borderColor:'#767676',
+    borderColor:Color.sparklightaddGray,
     borderWidth: 1,
   },
   dropdownText: {
@@ -261,11 +261,11 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     width: '100%',
-    backgroundColor: '#F2F2F7',
+    backgroundColor: Color.dropdownPressed,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     zIndex: 2,
-    shadowColor: "#000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: {
       width: 0,
       height: -2,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     elevation: 24,
   },
   header: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: Color.dropdownPressed,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     paddingTop: 8,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   grabber: {
     width: 36,
     height: 5,
-    backgroundColor: '#C7C7CC',
+    backgroundColor: Color.inputBorder,
     borderRadius: 2.5,
     alignSelf: 'center',
     marginBottom: 8,
@@ -295,12 +295,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#C6C6C8',
+    borderBottomColor: Color.dropdownDivider,
   },
   headerTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000000',
+    color: Color.colorblack_100,
     textAlign: 'center',
   },
   closeButton: {
@@ -312,11 +312,11 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 18,
-    color: '#000',
+    color: Color.colorblack_100,
     fontWeight: '800',
   },
   optionsList: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: Color.dropdownPressed,
     flexShrink: 1,
   },
   option: {
@@ -324,24 +324,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Color.sparklightWhite,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#C6C6C8',
+    borderBottomColor: Color.dropdownDivider,
     minHeight: 48,
   },
   firstOption: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#C6C6C8',
+    borderTopColor: Color.dropdownDivider,
   },
   lastOption: {
     borderBottomWidth: 0,
   },
   selectedOption: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Color.sparklightWhite,
   },
   optionText: {
     fontSize: 16,
-    color: '#000000',
+    color: Color.colorblack_100,
     flex: 1,
     fontFamily: FontFamily.RadioCanadaRegular,
   },

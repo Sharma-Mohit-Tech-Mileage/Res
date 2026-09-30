@@ -9,6 +9,7 @@ import { trackStepViewed } from '../../utils/announcementHelpers';
 import Touchable from '../common/customui/Touchable';
 import{Hyperlink} from '../common/customui/Typography';
 import PrimaryButton from '../common/customui/PrimaryButton';
+import { Color } from "../../styles/GlobalStyles";
 
 
 const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDismiss, onLearnMoreNavigate, navigationRef }) => {
@@ -149,7 +150,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
           {/* Header with NEW FEATURE badge on left and Skip on right */}
           <View style={styles.header}>
             <LinearGradient
-              colors={['#8D3B90', '#353091']}
+              colors={[Color.sparklightPrimaryPurple, Color.colorMidnightblue]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1.3, y: 0}}
               style={styles.newFeatureBadge}
@@ -202,7 +203,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000',
+    backgroundColor: Color.colorblack_100,
   },
   overlayPressable: {
     flex: 1,
@@ -230,14 +231,14 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 16,
-    shadowColor: '#8D3B90',
+    shadowColor: Color.sparklightPrimaryPurple,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 3,
   },
   badgeText: {
-    color: '#FFFFFF',
+    color: Color.sparklightWhite,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.5,

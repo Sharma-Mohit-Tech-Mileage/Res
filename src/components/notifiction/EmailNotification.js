@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Animated, Platform, AccessibilityInfo, findNode
 import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import { ScreenScroll } from "../common/customui/Screen";
 import Touchable from "../common/customui/Touchable";
-import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
+import { Color, Padding, FontSize, FontFamily } from "../../styles/GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -33,6 +33,7 @@ import {
   SectionContent,
   Hyperlink
 } from "../common/customui/Typography";
+import { logWarn } from "../../utils/logger";
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
@@ -118,7 +119,7 @@ const AddNotificationScreen = () => {
 
             setMessageFocus();
           } catch (e) {
-            console.warn("Accessibility focus error:", e);
+            logWarn("Accessibility focus error:", e);
           }
         }, ms)
       );
@@ -304,9 +305,9 @@ const AddNotificationScreen = () => {
           accessibilityLiveRegion="polite"
         />
       )}
-      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
+      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
       
-        <View style={[AppStyles.card,{margin: Padding.p_base}]}>
+        <View style={AppStyles.card}>
           <View style={{ paddingVertical: 16 }}>
             {notification && (
               <Animated.View
@@ -344,7 +345,7 @@ const AddNotificationScreen = () => {
                 showCloseIcon={false}
                 isVisible={true}
                 iconComponent={Alerttriangle}
-                iconColor="#F88700"
+                iconColor={Color.sparkLightInfo}
                 accessibilityLabel="Important: By providing your email address, you're signing up for critical notifications"
                 accessibilityLiveRegion="polite"
                 accessibilityRole="alert"
@@ -411,7 +412,7 @@ const AddNotificationScreen = () => {
                     {primaryEmail ? (
                       <SuccessIcon />
                     ) : (
-                      <SuccessIcon color={"#4C5458"} />
+                      <SuccessIcon color={Color.sparklightGray1} />
                     )}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
@@ -471,7 +472,7 @@ const AddNotificationScreen = () => {
                 showCloseIcon={false}
                 isVisible={true}
                 iconComponent={Alerttriangle}
-                iconColor="#F88700"
+                iconColor={Color.sparkLightInfo}
                 accessibilityLabel="By deactivating paperless billing, you will be charged a $3 paper statement fee where legally permitted."
                 accessibilityLiveRegion="polite"
                 accessibilityRole="alert"
@@ -570,7 +571,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Color.Gray300,
-    paddingBottom: 100,
   },
   frameContainer: {
     backgroundColor: Color.sparklightWhite,
@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
   },
   warningAlert: {
     borderLeftWidth: 4,
-    borderLeftColor: "#FF9800",
+    borderLeftColor: Color.warningAccent,
     marginBottom: 0,
     borderRadius: 0,
   },
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#E0E0E0",
+    backgroundColor: Color.dividerGray,
   },
   iconContainer: {
     flexDirection: "row",
@@ -637,7 +637,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   buttonContainer: {
-    padding: Padding.p_base,
+    // Sits 16 below the card and flush with its edges, as before the frame took over the side inset.
+    paddingTop: Padding.p_base,
     gap: 12,
   },
   saveButton: {

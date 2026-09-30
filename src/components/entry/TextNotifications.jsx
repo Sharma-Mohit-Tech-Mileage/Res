@@ -6,7 +6,7 @@ import {
   FontSize,
   Padding,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
 import EntryInput from "./EntryInput";
@@ -496,12 +496,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerIconView: {
-    backgroundColor: "#FEFEFE",
+    backgroundColor: Color.offWhite,
     padding: 20,
     borderRadius: 100,
-    borderColor: "#EEE",
+    borderColor: Color.dividerLight,
     borderWidth: 1,
-    shadowColor: "#171717",
+    shadowColor: Color.shadowDark,
     shadowOffset: { width: -2, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 10,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
 import AppStyles from '../../../styles/AppStyles';
-import { Color } from '../../../../GlobalStyles';
+import { Color } from '../../../styles/GlobalStyles';
 
 const textColors = StyleSheet.create({
   primary: {

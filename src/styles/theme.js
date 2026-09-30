@@ -4,7 +4,7 @@ import {
   FontSize,
   Padding,
   Border,
-} from "../../GlobalStyles";
+} from "./GlobalStyles";
 
 export const theme = {
   colors: {
@@ -140,6 +140,12 @@ export const theme = {
     gutter: { compact: 0, medium: 24, expanded: 32 },
     // Clearance for the absolutely-positioned tab bar; screens currently hard-code 100/120/140/150 by hand.
     tabBarClearance: 140,
+    // [55104] Card framing standard, applied by ScreenScroll `framed`: side inset, space above the first card, gap between cards.
+    cardInset: 16,
+    contentTop: 16,
+    cardGap: 16,
+    // Horizontal padding for rows inside list-style cards (Billing Options, Account, Profile).
+    listRowInset: 24,
   },
 };
 

@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { StyleSheet, Text, View, Linking, Platform } from "react-native";
+import { StyleSheet, View, Linking, Platform } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import {
   useNavigation,
   useRoute,
-  useFocusEffect,
 } from "@react-navigation/native";
 import {
   Padding,
@@ -12,11 +11,10 @@ import {
   FontFamily,
   Border,
   FontSize,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
-import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../utility/constant";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
@@ -26,9 +24,9 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import AppStyles from "../../styles/AppStyles";
+import { container } from "../../styles/utilities";
 import {
   SectionTitle,
-  IndicatorText,
   FieldTitle,
   FieldContent,
   Hyperlink,
@@ -36,6 +34,7 @@ import {
 import { A11y } from "react-native-a11y-order";
 import AddIcon from "../../res/svgIcons/AddIcon";
 import { ScreenScroll } from "../common/customui/Screen";
+import { logError } from "../../utils/logger";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -77,7 +76,6 @@ const ProfileSettings = () => {
   );
 
   const handleArrowPress = (fieldType) => {
-    console.log(`Arrow pressed for: ${fieldType}`);
     if (fieldType === "email") {
       navigation.navigate("EmailNotifications", {
         is_enrolled: emailAddress,
@@ -225,7 +223,7 @@ const ProfileSettings = () => {
         },
         (error) => {
           setShowPhoneLoading(false);
-          console.error("Error on retrying getTextNotificationsData", error);
+          logError("Error on retrying getTextNotificationsData", error);
         },
       );
     });
@@ -262,13 +260,13 @@ const ProfileSettings = () => {
   };
 
   return (
-    <View style={{ zIndex: 1 }}>
+    <View style={{ flex: 1, zIndex: 1 }}>
       <ProfileSettingsHeader
         title="Profile"
         onPressBack={() => navigation.goBack()}
       />
-      <ScreenScroll accessibilityLabel="Profile settings page.">
-        <View style={{ flexDirection: "column", marginBottom: 300 }}>
+      <ScreenScroll framed accessibilityLabel="Profile settings page.">
+        <View style={container.stack}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card]}>
               <View
@@ -469,7 +467,7 @@ const ProfileSettings = () => {
             </View>
           </View>
 
-          <View style={[styles.frameParent, styles.frameParentReducedTop]}>
+          <View style={styles.frameParent}>
             <View style={[AppStyles.card]}>
               <View style={[styles.generalInformationParent]}>
                 <SectionTitle
@@ -541,7 +539,7 @@ const ProfileSettings = () => {
               </View>
             </View>
           </View>
-          <View style={[AppStyles.card, { marginHorizontal: Padding.p_base }]}>
+          <View style={AppStyles.card}>
             <View style={{ padding: Padding.p_xl, flexDirection: "column" }}>
               <SectionTitle
                 accessible={true}
@@ -806,12 +804,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   frameParent: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
     width: "100%",
-  },
-  frameParentReducedTop: {
-    marginTop: -15,
   },
   manageSerTxt1: {
     textAlign: "left",

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, Modal, StyleSheet, Pressable } from "react-native";
-import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Border } from "../../../styles/GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import Touchable from "../../common/customui/Touchable";
 import { setFocusToRef } from "../../../utils/a11y";
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   backdropWrap: { flex: 1, justifyContent: "flex-end" },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: "rgba(0,0,0,0.5)" },
   sheet: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     paddingHorizontal: 20,
@@ -79,9 +79,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
-  destructiveButton: { backgroundColor: "#B92A1C" },
+  destructiveButton: { backgroundColor: Color.errorText },
   confirmText: {
-    color: "#FFFFFF",
+    color: Color.sparklightWhite,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",

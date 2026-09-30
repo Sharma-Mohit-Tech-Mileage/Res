@@ -1,15 +1,14 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
-import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
-import { card } from "../../../styles/utilities";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../customui/Touchable";
 import AppStyles from "../../../styles/AppStyles";
 import { SectionTitle, IndicatorText,Hyperlink } from "../customui/Typography";
 import Checkcircle from "../../../../assets/svgs/Checkcircle";
 import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
+import { Color } from "../../../styles/GlobalStyles";
 
 const StatusIcon = ({ status, style }) => {
   return (
@@ -30,7 +29,7 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
 
   return (
     <Touchable
-      style={[AppStyles.card, { alignItems: "stretch", marginBottom: 16 }]}
+      style={[AppStyles.card, { alignItems: "stretch", flexGrow: 1 }]}
       minSize={0}
       onPress={handleCardPress}
       accessible={false}
@@ -48,7 +47,7 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
          <View style={styles.iconBg} accessible={true} accessibilityRole="text" accessibilityLabel="Paperless Billing Icon">
           <PaperIconBg />
         </View> 
-        <View style={{ flexDirection: "column" }}>
+        <View style={styles.textColumn}>
           <SectionTitle
             style={styles.leftTitle}
             accessible={true}
@@ -74,7 +73,7 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
             </Hyperlink>
           )}
         </View>
-        <View style={{ position: "absolute", right: 10, top: 0, bottom: 0, justifyContent: "center" }}>
+        <View style={styles.statusColumn}>
           {showSkeleton ? (
             <SkeletonPlaceholder>
               <View style={{ width: 56, height: 22, borderRadius: 4 }} />
@@ -115,21 +114,16 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
 };
 
 const styles = StyleSheet.create({
+  // Title takes the free width and wraps; the status sits beside it in the flow so the two never overlap on narrow cards.
+  textColumn: { flex: 1, flexShrink: 1 },
+  statusColumn: { marginLeft: 8, justifyContent: "center" },
   leftTitle: {
     marginLeft: 8,
     alignContent: "flex-start",
-    alignSelf: "center",
+    alignSelf: "flex-start",
   },
   manageLink: {
     marginLeft: 10,
-  },
-  
-  statusRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    marginVertical: 5,
   },
   iconContainer: {
     flexDirection: "row",
@@ -147,7 +141,7 @@ const styles = StyleSheet.create({
   },
   iconBg: {
     alignSelf: "center",
-    backgroundColor: "#8D3B901A",
+    backgroundColor: Color.primaryTint,
     width: 50,
     height: 50,
     borderRadius: 25,

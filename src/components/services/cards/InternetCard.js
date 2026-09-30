@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { FontFamily, Padding,Color } from "../../../../GlobalStyles";
+import { Color } from "../../../styles/GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
@@ -216,11 +216,9 @@ const styles = StyleSheet.create({
     ...AppStyles.card,
   },
   cardSpacing: {
-    marginHorizontal: 16,
   },
   cardSpacing1: {
     padding: 16,
-    marginHorizontal: 16,
   },
   bottomButton: serviceCard.bottomButton,
   serviceHeader: serviceCard.serviceHeader,
@@ -243,7 +241,7 @@ const styles = StyleSheet.create({
   },
    cardHreader: {
     flexDirection: "row",
-    backgroundColor: "#F8F8F8",
+    backgroundColor: Color.colorWhitesmoke_100,
     width: "100%",
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,

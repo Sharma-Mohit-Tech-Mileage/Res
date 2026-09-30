@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { View, StyleSheet, Animated, Easing } from "react-native";
+import { Color } from "../../styles/GlobalStyles";
 
 const WalkthroughArrow = ({ leftPosition }) => {
   const bounceAnim = useRef(new Animated.Value(0)).current;
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 20,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: "#8D3B90",
+    borderTopColor: Color.sparklightPrimaryPurple,
   },
 });
 

@@ -19,7 +19,7 @@ import {
   Border,
   FontFamily,
   FontSize,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import Logo from "../../res/images/LogoSmall";
 
 const MaintenancePage = ({
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   versionText: {
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_sm,
-    color: "#FFFFFF",
+    color: Color.sparklightWhite,
     fontWeight: "400",
     opacity: 0.8,
   },
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: wp("6%"),
     alignItems: "center",
-    shadowColor: "#000000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: {
       width: 0,
       height: 8,
@@ -356,14 +356,14 @@ const styles = StyleSheet.create({
   estimatedTimeLabel: {
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
-    color: "#000",
+    color: Color.colorblack_100,
     marginBottom: 4,
     fontWeight: "400",
   },
   estimatedTimeValue: {
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_base,
-    color: "#000",
+    color: Color.colorblack_100,
     fontWeight: "700",
   },
   contactSection: {
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
-    color: "#FFFFFF",
+    color: Color.sparklightWhite,
     textAlign: "center",
     opacity: 0.8,
   },

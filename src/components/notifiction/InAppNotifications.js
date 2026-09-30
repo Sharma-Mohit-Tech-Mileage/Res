@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StyleSheet, View, Animated, Platform, Linking, Alert, AccessibilityInfo } from "react-native";
 import Touchable from "../common/customui/Touchable";
-import { Color, Padding } from "../../../GlobalStyles";
+import { Color, Padding } from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
 import { wp as widthPercentageToDP } from "../../utils/responsive";
@@ -11,7 +11,6 @@ import Toggle from "../common/Toggle";
 import { postPushNotifications } from "../../network/apis/account/profile.service";
 import usePushPermissionSync from "../../hooks/usePushPermissionSync";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
-import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import AppStyles from "../../styles/AppStyles";
 import SecondaryButton from "../common/customui/PrimaryButton";
 import { SectionTitle, SectionContent } from "../common/customui/Typography";
@@ -22,6 +21,7 @@ import {
 } from "../../firebase/FirebaseUtils";
 import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 import { ScreenScroll } from "../common/customui/Screen";
+import { logWarn } from "../../utils/logger";
 
 const initialFormState = {
   optOut: false,
@@ -206,7 +206,7 @@ const InAppNotifications = ({ navigation }) => {
     } catch (error) {
       setIsLoading(false);
       setIsSubmitting(false);
-      console.warn("Permission error:", error);
+      logWarn("Permission error:", error);
       setNotification({
         message: "Failed to update notification preferences.",
         type: "error",
@@ -233,9 +233,9 @@ const InAppNotifications = ({ navigation }) => {
         />
       )}
 
-      <ScreenScroll ref={scrollViewRef}>
+      <ScreenScroll framed ref={scrollViewRef}>
         <View style={styles.inAppNotificationsInner}>
-          <View style={[AppStyles.card, { margin: 16 }]}>
+          <View style={AppStyles.card}>
             <View >
               {notification && (
                 <Animated.View

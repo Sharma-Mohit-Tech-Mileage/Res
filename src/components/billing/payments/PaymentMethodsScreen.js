@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -7,8 +7,9 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import LinkText from "../../common/customui/LinkText";
 import PaymentMethodCard from "./PaymentMethodCard";
 import ConfirmActionModal from "./ConfirmActionModal";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { card } from "../../../styles/utilities";
+import AppStyles from "../../../styles/AppStyles";
 import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
 import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
 import {
@@ -17,7 +18,8 @@ import {
   deletePaymentMethod,
   paymentErrorMessage,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, describePaymentMethod, openOrbipaySecureCapture, openOrbipayEdit } from "./paymentsShared";
+import { describePaymentMethod, openOrbipaySecureCapture, openOrbipayEdit } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { announceA11y } from "../../../utils/a11y";
 import {
   usePaymentStep,
@@ -116,8 +118,8 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
           navigation.goBack();
         }}
       />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{marginBottom: 140}]} showsVerticalScrollIndicator={false}>
-         <>
+      <ScreenScroll framed showsVerticalScrollIndicator={false}>
+         <View style={[AppStyles.card, card.content]}>
         {!!alert && (
           <NotificationAlert
             type={alert.type}
@@ -156,7 +158,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
             <View style={styles.cardSkeleton} />
           </SkeletonPlaceholder>
         ) : methods.length === 0 ? (
-          <View style={[card.elevated, styles.emptyCard]}>
+          <View style={styles.emptyCard}>
             <Text style={styles.emptyTitle} accessibilityRole="header" accessibilityLevel={3}>
               No saved payment methods
             </Text>
@@ -177,8 +179,8 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
             />
           ))
         )}
-       </>
-      </ScrollView>
+       </View>
+      </ScreenScroll>
 
       <ConfirmActionModal
         visible={!!pendingDelete}
@@ -195,8 +197,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   headingRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
   addLinkRow: { flexDirection: "row", alignItems: "center" },
   addLinkText: { marginRight: 4 },
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
-  emptyCard: { padding: 20, marginBottom: 16, alignItems: "flex-start" },
+  emptyCard: { alignItems: "flex-start" },
   emptyTitle: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaSemiBold,

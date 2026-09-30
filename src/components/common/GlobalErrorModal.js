@@ -7,7 +7,7 @@ import {
   Linking,
 } from "react-native";
 import AlertIcon from "../../res/svgIcons/AlertIconV2";
-import { FontFamily,Color } from "../../../GlobalStyles";
+import { FontFamily,Color } from "../../styles/GlobalStyles";
 
 import Touchable from "./customui/Touchable";
 import PrimaryButton from "./customui/PrimaryButton";
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "90%",
     alignSelf: "center",
-    shadowColor: "#000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,

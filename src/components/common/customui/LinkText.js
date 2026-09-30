@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet } from 'react-native';
-import { Color, FontFamily, FontSize, Padding } from '../../../../GlobalStyles';
+import { Color, FontFamily, FontSize, Padding } from '../../../styles/GlobalStyles';
 import { A11Y } from '../../../styles/theme';
 import Touchable from './Touchable';
 

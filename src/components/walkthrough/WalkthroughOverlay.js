@@ -10,6 +10,7 @@ import {
   getResponsivePadding,
   calculateTabWidth,
 } from "../utility/walkthroughHelpers";
+import { Color } from "../../styles/GlobalStyles";
 
 
 const WalkthroughOverlay = ({
@@ -256,13 +257,13 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#000",
+    backgroundColor: Color.colorblack_100,
     zIndex: 100,
     elevation: 100, // ADD THIS for Android
   },
   tabShadow: {
     position: "absolute",
-    backgroundColor: "#000",
+    backgroundColor: Color.colorblack_100,
     zIndex: 100,
     elevation: 100, // ADD THIS for Android
   },

@@ -15,8 +15,6 @@ import Feedback from "../../components/Feedback/Feedback";
 import ThumbsUp from "../../components/Feedback/ThumbsUp";
 import ArticleWindowUtility from "../../components/utility/ArticleWindowUtility";
 import supportScreen from "../../components/support/supportScreen";
-import Survey from "../../components/cancelservice/Survey";
-import CancellationSummary from "../../components/cancelservice/CancellationSummary";
 
 const AccountStack = createNativeStackNavigator();
 
@@ -106,18 +104,6 @@ function AccountStackScreen() {
       <AccountStack.Screen
         name="AddEmailNotification"
         component={AddEmailNotification}
-        options={{ headerShown: false }}
-      />
-
-      <AccountStack.Screen
-        name="cancelServiceSurvey"
-        component={Survey}
-        options={{ headerShown: false }}
-      />
-
-      <AccountStack.Screen
-        name="cancelServiceSummary"
-        component={CancellationSummary}
         options={{ headerShown: false }}
       />
     </AccountStack.Navigator>
