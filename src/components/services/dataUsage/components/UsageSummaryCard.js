@@ -261,8 +261,10 @@ const UsageSummaryCard = ({ currentUsage, loading = false }) => {
 };
 
 const styles = StyleSheet.create({
-  // Screen frame and card gap now come from ScreenScroll; the card sets no outer margins.
-  container: {},
+  container: {
+    marginHorizontal: theme.spacing.base,
+    marginBottom: theme.spacing.base,
+  },
   card: {
      ...AppStyles.card,
     padding: theme.spacing.base,

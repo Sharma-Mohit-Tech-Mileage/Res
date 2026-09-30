@@ -12,7 +12,7 @@ import { WebView } from "react-native-webview";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import ServiceLoader from "../../common/customui/ServiceLoader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
-import NotificationAlert from "../../common/customui/NotificationAlert";
+import EquipmentAlert from "../manageEquipment/EquipmentAlert";
 import Config from "react-native-config";
 import speedTestApi from "../../../network/apis/services/speedTest.service";
 import { OOKLA_HTML, parseOoklaCompletion } from "./ooklaBridge";
@@ -55,7 +55,7 @@ export default function WifiSpeedTestScreen({ navigation }) {
             ? { status: "saved", result }
             : current,
         );
-   
+
     } catch {
       submissions.current.set(result.testId, "failed");
       if (mounted.current)
@@ -97,13 +97,13 @@ export default function WifiSpeedTestScreen({ navigation }) {
       >
         {saveState && (
           <View style={styles.saveStatus}>
-            <NotificationAlert
+            <EquipmentAlert
               type={
                 saveState.status === "failed" || saveState.status === "invalid"
                   ? "error"
                   : "info"
               }
-              showCloseIcon={true}
+
               title={
                 saveState.status === "saving"
                   ? "Saving speed test result"
@@ -135,10 +135,10 @@ export default function WifiSpeedTestScreen({ navigation }) {
           <View style={styles.cardContent}>
             {failed ? (
               <View style={styles.error}>
-                <NotificationAlert
+                <EquipmentAlert
                   type="error"
                   title="Unable to load speed test"
-                  showCloseIcon={true}
+
                   message="Check your connection and try again."
                   onClose={()=>{
                  setFailed(false)

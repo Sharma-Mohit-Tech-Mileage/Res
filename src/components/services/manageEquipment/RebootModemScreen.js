@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import NotificationAlert from "../../common/customui/NotificationAlert";
+import EquipmentAlert from "./EquipmentAlert";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import styles from "./RebootModemStateStyles";
 import RebootModemLayout from "./RebootModemLayout";
@@ -64,9 +64,9 @@ const RebootModemScreen = ({ navigation, route, onReboot }) => {
         </>
       }
     >
-      <NotificationAlert
+      <EquipmentAlert
         type="info"
-        showCloseIcon={false}
+
         containerStyle={styles.alert}
         title="Reboot your modem?"
         message="During this process, your service will be briefly interrupted."

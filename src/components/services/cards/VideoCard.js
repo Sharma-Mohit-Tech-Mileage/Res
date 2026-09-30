@@ -23,7 +23,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-       <View style={[AppStyles.card,{ padding: 16 }]}>
+       <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
           <SkeletonPlaceholder
             backgroundColor={theme.colors.skeleton.base}
             highlightColor={theme.colors.skeleton.highlight}
@@ -41,7 +41,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
 
   return (
     <View style={[styles.container]}>
-      <View style={AppStyles.card}>
+      <View style={[AppStyles.card, { marginHorizontal: 16 }]}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
           <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
@@ -83,11 +83,12 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
 
 const styles = StyleSheet.create({
   // Container & Card
-  container: serviceCard.container,
+  container: { ...serviceCard.container, marginBottom: theme.spacing.base },
   card: {
     ...AppStyles.card,
   },
   bottomButton: {
+    marginHorizontal: 16,
     marginBottom: 16,
   },
   // Service Header

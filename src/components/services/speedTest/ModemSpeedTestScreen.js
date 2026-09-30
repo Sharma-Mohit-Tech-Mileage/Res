@@ -11,7 +11,7 @@ import styles from "./speedTestStyles";
 import AppStyles from "../../../styles/AppStyles";
 
 import speedTestApi from "../../../network/apis/services/speedTest.service";
-import NotificationAlert from "../../common/customui/NotificationAlert";
+import EquipmentAlert from "../manageEquipment/EquipmentAlert";
 import speedTestErrorMessage from "./speedTestErrorMessage";
 const ModemSpeedTestScreen = ({ navigation, route, onRunSpeedTest }) => {
   const [complete, setComplete] = useState(false);
@@ -86,8 +86,8 @@ const ModemSpeedTestScreen = ({ navigation, route, onRunSpeedTest }) => {
         ) : (
           <ModemSpeedTestProgress />
         )}
-        {results?.historySaved === false && <NotificationAlert
-          type="error" title="Result not saved" showCloseIcon={false}
+        {results?.historySaved === false && <EquipmentAlert
+          type="error" title="Result not saved"
           containerStyle={styles.historyError}
           message="Your test completed, but its history could not be saved."
         />}

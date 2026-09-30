@@ -1,3 +1,5 @@
+import DropdownCheck from "../../../../assets/svgs/dropdown-check";
+import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import React, { useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -16,7 +18,8 @@ import { Padding, Color, FontFamily, FontSize,Border } from "../../../styles/Glo
 import DownArrow from '../../../res/svgIcons/DownArrow';
 import IconButton from './IconButton';
 import Touchable from './Touchable';
-import {  FieldTitle, FieldContent} from '../customui/Typography';
+import AppStyles from '../../../styles/AppStyles';
+import { theme } from '../../../styles/theme';
 const SparkLightDropdown = ({
   items,
   selectedValue,
@@ -142,7 +145,7 @@ const SparkLightDropdown = ({
                 <Text ref={optionsListRef}
                   style={styles.headerTitle}
                   accessible
-                  accessibilityRole="text"
+                  accessibilityRole="header"
                 >
                   {dropdownTitle}
                 </Text>
@@ -151,7 +154,7 @@ const SparkLightDropdown = ({
                   style={styles.closeButton}
                   accessibilityLabel="Close dropdown"
                 >
-                  <Text style={styles.closeButtonText} accessible={false}>✕</Text>
+                  <CloseIcon width={24} height={24} viewBox="0 0 18 18" accessible={false} />
                 </IconButton>
               </View>
             </View>
@@ -202,7 +205,7 @@ const SparkLightDropdown = ({
                     {item}
                   </Text>
                   {selectedValue === item && (
-                    <Text style={styles.checkmark} accessible={false}>✓</Text>
+                    <DropdownCheck style={styles.checkmark} accessible={false} />
                   )}
                 </Touchable>
               ))}
@@ -226,9 +229,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
     paddingVertical: 12,
     minHeight: 48,
-    backgroundColor: Color.sparklightWhite,
+    backgroundColor: '#FFFFFF',
     borderRadius: Border.br_5xs,
-    borderColor:Color.sparklightaddGray,
+    borderColor:'#767676',
     borderWidth: 1,
   },
   dropdownText: {
@@ -261,11 +264,11 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     width: '100%',
-    backgroundColor: Color.dropdownPressed,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     zIndex: 2,
-    shadowColor: Color.colorblack_100,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: -2,
@@ -275,48 +278,43 @@ const styles = StyleSheet.create({
     elevation: 24,
   },
   header: {
-    backgroundColor: Color.dropdownPressed,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    paddingTop: 8,
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingTop: theme.spacing.lg,
   },
   grabber: {
-    width: 36,
-    height: 5,
-    backgroundColor: Color.inputBorder,
+    width: 48,
+    height: 4,
+    backgroundColor: theme.colors.border,
     borderRadius: 2.5,
     alignSelf: 'center',
     marginBottom: 8,
   },
   headerContent: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Color.dropdownDivider,
+    paddingLeft: 28,
+    paddingRight: theme.spacing.lg,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Color.colorblack_100,
-    textAlign: 'center',
+    ...AppStyles.H2,
+    flex: 1,
+    textAlign: 'left',
   },
   closeButton: {
-    position: 'absolute',
-    right: Padding.p_5xs, // 8 — slight inset so 48dp container's right edge stays clear
-    top: -Padding.p_xs, // -12 — vertically center over the 24dp header content row
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeButtonText: {
     fontSize: 18,
-    color: Color.colorblack_100,
+    color: '#000',
     fontWeight: '800',
   },
   optionsList: {
-    backgroundColor: Color.dropdownPressed,
+    backgroundColor: theme.colors.surface,
     flexShrink: 1,
   },
   option: {
@@ -324,24 +322,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    backgroundColor: Color.sparklightWhite,
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Color.dropdownDivider,
+    borderBottomColor: '#C6C6C8',
     minHeight: 48,
   },
   firstOption: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Color.dropdownDivider,
+    borderTopColor: '#C6C6C8',
   },
   lastOption: {
     borderBottomWidth: 0,
   },
   selectedOption: {
-    backgroundColor: Color.sparklightWhite,
+    backgroundColor: theme.colors.secondarySurface,
   },
   optionText: {
     fontSize: 16,
-    color: Color.colorblack_100,
+    color: '#000000',
     flex: 1,
     fontFamily: FontFamily.RadioCanadaRegular,
   },

@@ -34,3 +34,5 @@ export const getChannelLineupURL = (zipCode) => {
   return CHANNEL_LINEUP_BASE_URL;
 };
 
+// Header gradient colors used across service screens
+export const SERVICE_HEADER_GRADIENT = ["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"];
