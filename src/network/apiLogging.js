@@ -1,66 +1,25 @@
 import { logDebug } from "../utils/logger";
-import { ENDPOINTS } from "./apis/endpoints/Endpoints";
-
-const sensitive =
-  /token|password|secret|authorization|cookie|answer|jwt|pin(?!g)|email|phone|address|card|routing|ssn|cvv|firstname|lastname|birth|clientkey|\bip\b/i;
 const installed = new WeakSet();
 let sequence = 0;
 
-// Log copies only; never modify request or response data.
-export const sanitizeApiData = (value, depth = 0) => {
-  if (depth > 8) return "[Omitted: depth limit]";
-  if (value == null) return value;
+// Parse serialized JSON for readable logs without masking or modifying payloads.
+export const sanitizeApiData = (value) => {
   if (typeof value === "string") {
-    if (depth > 0) return value;
     try {
-      return sanitizeApiData(JSON.parse(value), depth + 1);
+      return JSON.parse(value);
     } catch {
-      return "[Text omitted]";
+      return value;
     }
   }
-  if (typeof value !== "object") return value;
-  if (Array.isArray(value))
-    return value.map((item) => sanitizeApiData(item, depth + 1));
-  if (typeof value.append === "function") return "[Multipart payload omitted]";
-  return Object.fromEntries(
-    Object.entries(value).map(([key, item]) => [
-      key,
-      sensitive.test(key.replace(/[_-]/g, ""))
-        ? "[REDACTED]"
-        : sanitizeApiData(item, depth + 1),
-    ]),
-  );
+  return value;
 };
 
-const endpointTemplates = Object.values(ENDPOINTS).map((endpoint) => {
-  const path = endpoint.split("?")[0];
-  const pattern = path
-    .split(/(:\w+)/)
-    .map((part) =>
-      part.startsWith(":")
-        ? "[^/]+"
-        : part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-    )
-    .join("");
-  return { path, regex: new RegExp(`${pattern}$`, "i") };
-});
-const safeUrl = (value) => {
-  let path = String(value || "")
-    .split(/[?#]/)[0]
-    .replace(/\/\/[^/@]+:[^/@]+@/, "//[REDACTED]@");
-  for (const template of endpointTemplates) {
-    if (template.regex.test(path))
-      return path.replace(template.regex, template.path);
-  }
-  return path
-    .replace(/\d{6,}/g, "[REDACTED]")
-    .replace(/[^/]+@[^/]+/g, "[REDACTED]");
-};
+const logUrl = (value) => String(value || "");
 const requestUrl = (config) => {
   const url = String(config?.url || "");
-  if (/^(?:[a-z][a-z\d+.-]*:)?\/\//i.test(url)) return safeUrl(url);
+  if (/^(?:[a-z][a-z\d+.-]*:)?\/\//i.test(url)) return logUrl(url);
   const base = String(config?.baseURL || "").replace(/\/+$/, "");
-  return safeUrl(base ? `${base}/${url.replace(/^\/+/, "")}` : url);
+  return logUrl(base ? `${base}/${url.replace(/^\/+/, "")}` : url);
 };
 const queryParams = (url) => {
   const query = String(url || "")
@@ -78,7 +37,7 @@ const queryParams = (url) => {
       }),
     );
   } catch {
-    return "[Query omitted]";
+    return query;
   }
 };
 const start = (config) => {
@@ -86,7 +45,7 @@ const start = (config) => {
   logDebug("API REQUEST", {
     requestId: trace.requestId,
     method: (config.method || "GET").toUpperCase(),
-    endpoint: safeUrl(config.url),
+    endpoint: logUrl(config.url),
     url: requestUrl(config),
     query: sanitizeApiData(queryParams(config.url)),
     params: sanitizeApiData(config.params),
@@ -99,7 +58,7 @@ const finish = (config, status, data, failed = false) => {
   logDebug(failed ? "API ERROR" : "API RESPONSE", {
     requestId: trace?.requestId,
     method: (config?.method || "GET").toUpperCase(),
-    endpoint: safeUrl(config?.url),
+    endpoint: logUrl(config?.url),
     url: requestUrl(config),
     statusCode: status ?? null,
     durationMs: trace ? Date.now() - trace.startedAt : null,

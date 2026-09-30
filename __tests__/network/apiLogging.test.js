@@ -4,9 +4,9 @@ import { ENDPOINTS, getEndpoint } from '../../src/network/apis/endpoints/Endpoin
 import { logDebug } from '../../src/utils/logger';
 
 beforeEach(() => jest.clearAllMocks());
-test('preserves account values and redacts nested secrets without mutating serialized retry payloads', () => {
+test('preserves all values without mutating serialized retry payloads', () => {
   const data = { accountNumber: '123', token: 'secret', detail: { password: 'secret', download_Result: '980', error: null } };
-  expect(sanitizeApiData(JSON.stringify(data))).toEqual({ accountNumber: '123', token: '[REDACTED]', detail: { password: '[REDACTED]', download_Result: '980', error: null } });
+  expect(sanitizeApiData(JSON.stringify(data))).toEqual(data);
   expect(data.token).toBe('secret');
 });
 test('logs request, HTTP status and body, preserves response and rejection, installs once', async () => {
@@ -18,7 +18,7 @@ test('logs request, HTTP status and body, preserves response and rejection, inst
   const [success, failure] = client.interceptors.response.use.mock.calls[0];
   const config = { baseURL: 'https://customer.uat.cableone.net/apiWrapper/', method: 'post', url: getEndpoint(ENDPOINTS.OOKLA_SPEED_DETAILS, { accountId: '123456789', userId: 'user-name' }) + '?token=secret&idType=account', data: { accountId: '123', download_MBs: 33 }, headers: { Authorization: 'secret' } };
   expect(request(config)).toBe(config);
-  expect(logDebug).toHaveBeenLastCalledWith('API REQUEST', expect.objectContaining({ url: 'https://customer.uat.cableone.net/apiWrapper/' + ENDPOINTS.OOKLA_SPEED_DETAILS, query: { token: '[REDACTED]', idType: 'account' } }));
+  expect(logDebug).toHaveBeenLastCalledWith('API REQUEST', expect.objectContaining({ url: 'https://customer.uat.cableone.net/apiWrapper/' + config.url, query: { token: 'secret', idType: 'account' } }));
   const response = { config, status: 200, data: { statusCode: 500, result: false } };
   expect(success(response)).toBe(response);
   expect(logDebug).toHaveBeenLastCalledWith('API RESPONSE', expect.objectContaining({ statusCode: 200, response: { statusCode: 500, result: false } }));
@@ -26,9 +26,9 @@ test('logs request, HTTP status and body, preserves response and rejection, inst
   await expect(failure(error)).rejects.toBe(error);
   expect(logDebug).toHaveBeenLastCalledWith('API ERROR', expect.objectContaining({ statusCode: 503 }));
   const logs = JSON.stringify(logDebug.mock.calls);
-  expect(logs).not.toContain('secret');
-  expect(logs).not.toContain('123456789');
-  expect(logs).not.toContain('user-name');
+  expect(logs).toContain('secret');
+  expect(logs).toContain('123456789');
+  expect(logs).toContain('user-name');
 });
 test('fetch logging reads a clone and returns original response', async () => {
   const previousFetch = global.fetch;
@@ -37,7 +37,7 @@ test('fetch logging reads a clone and returns original response', async () => {
   try {
     await expect(loggedFetch('https://example.com/api/test', { method: 'POST', body: '{"token":"secret"}' })).resolves.toBe(response);
     expect(logDebug).toHaveBeenLastCalledWith('API RESPONSE', expect.objectContaining({ statusCode: 202, response: { result: true } }));
-    expect(JSON.stringify(logDebug.mock.calls)).not.toContain('secret');
+    expect(JSON.stringify(logDebug.mock.calls)).toContain('secret');
   } finally { global.fetch = previousFetch; }
 });
 test('production does not install logging interceptors', () => {
@@ -50,9 +50,9 @@ test('production does not install logging interceptors', () => {
   } finally { global.__DEV__ = previous; }
 });
 
-test('logs ping measurements while still redacting authentication PINs', () => {
+test('preserves ping measurements and authentication PINs', () => {
   expect(sanitizeApiData({ ping_ms: 12, Ping_Ms: 13, ping: 14, pin: '1234', pinCode: '5678', securityPin: '9012' })).toEqual({
-    ping_ms: 12, Ping_Ms: 13, ping: 14, pin: '[REDACTED]', pinCode: '[REDACTED]', securityPin: '[REDACTED]',
+    ping_ms: 12, Ping_Ms: 13, ping: 14, pin: '1234', pinCode: '5678', securityPin: '9012',
   });
 });
 
@@ -61,3 +61,9 @@ test('shows original Ookla payload values in development logs', () => {
   expect(sanitizeApiData(payload)).toEqual(payload);
   expect(sanitizeApiData(JSON.stringify(payload))).toEqual(payload);
 });
+
+ test('preserves plain text and deeply nested values', () => {
+  expect(sanitizeApiData('original response text')).toBe('original response text');
+  const payload = {nested: [{password: 'original', address: '123 Main St'}]};
+  expect(sanitizeApiData(payload)).toEqual(payload);
+ });
