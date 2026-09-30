@@ -136,13 +136,10 @@ function decodeIdToken(idToken) {
         idToken: idToken,
       };
       
-      console.log("Decoded ID Token:", decodeIdToken(idToken));
-      console.log("Updating username with payload:", payload);
 
       if (!accountNumber || !userName || !newUsername || !idToken) {
         // throw new Error("Missing required fields for username update");
        
-        console.log("Missing required fields for username update. AccountNumber:",decodeIdToken(idToken)?.preferred_username, "UserName:", decodeIdToken(idToken)?.preferred_username, "NewUsername:", newUsername, "IdToken:", idToken);
         return;
       }
       
