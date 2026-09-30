@@ -29,6 +29,8 @@ const processQueue = (error, token = null) => {
 };
 
 const isRetryableError = (error) => {
+    // gettoken is flagged noServerRetry: a rejected id token fails identically on replay, so only network failures retry.
+    if (error.config?.noServerRetry && error.response) return false;
     return (
         error.code === 'ECONNABORTED' ||
         error.message?.includes('timeout') ||
@@ -178,6 +180,7 @@ const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
         const res = await _axios.post(endpoint, requestBody, {
             headers: { 'Content-Type': 'application/json' },
             timeout: 30000,
+            noServerRetry: true,
             // Idempotent: retries replay already-serialised data, re-stringifying would double-encode it
             transformRequest: [(data, headers) => {
                 delete headers['Authorization'];
