@@ -98,11 +98,22 @@ export default function SitecoreBanner({ presentation = "cms" }) {
         testID="sitecore-banner"
         source={uri ? { uri } : undefined}
         onError={() => setFailedImage(selectedImage)}
-        resizeMode="cover"
+        resizeMode={referencePresentation ? "contain" : "cover"}
+        imageStyle={
+          referencePresentation
+            ? tablet
+              ? styles.referenceTabletBackgroundImage
+              : styles.referenceBackgroundImage
+            : styles.backgroundImage
+        }
         style={[
           styles.card,
           {
-            minHeight: Math.max(225, (cardWidth * 225) / 354),
+            minHeight: Math.max(
+              referencePresentation ? 180 : 220,
+              (cardWidth || width) *
+                (referencePresentation ? 0.35 : 220 / 354),
+            ),
             backgroundColor: lightText ? "#79246C" : "#FFFFFF",
             alignItems: position,
           },
@@ -112,6 +123,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
           testID="sitecore-banner-content"
           style={[
             styles.content,
+            referencePresentation && styles.referenceContent,
             { alignItems: contentAlignment },
             compact && styles.compactContent,
           ]}
@@ -174,7 +186,13 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   card: { width: "100%", justifyContent: "center", overflow: "hidden" },
+  referenceBackgroundImage: { transform: [{ scale: 1.10 }] },
+  referenceTabletBackgroundImage: {
+    transform: [{ scale: 1.42 }, { translateY: -1 }, { translateX: 20 }],
+  },
+  backgroundImage: { transform: [{ scale: 2.08 }, { translateX: 20 }] },
   content: { width: "60%", paddingVertical: 28, paddingHorizontal: 16 },
+  referenceContent: { paddingVertical: 20 },
   compactContent: { width: "64%", paddingHorizontal: 12 },
   eyebrow: {
     width: "100%",

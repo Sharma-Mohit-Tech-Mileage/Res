@@ -170,6 +170,10 @@ test("fills the banner without letterboxing or a panel over the artwork", async 
   await render();
   const background = tree.root.findByType(RN.ImageBackground);
   expect(background.props.resizeMode).toBe("cover");
+  expect(RN.StyleSheet.flatten(background.props.imageStyle).transform).toEqual([
+    { scale: 1.04 },
+    { translateX: 6 },
+  ]);
   expect(RN.StyleSheet.flatten(background.props.style).alignItems).toBe(
     "flex-end",
   );
@@ -225,5 +229,34 @@ test("approved white presentation overrides mismatched CMS theme and placement w
     RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style)
       .backgroundColor,
   ).toBe(Color.sparklightPrimaryPurple);
+  const artwork = tree.root.findByType(RN.ImageBackground);
+  expect(artwork.props.resizeMode).toBe("contain");
+  expect(RN.StyleSheet.flatten(artwork.props.style).minHeight).toBe(180);
+  expect(
+    RN.StyleSheet.flatten(artwork.props.imageStyle).transform,
+  ).toEqual([{ scale: 1.1 }]);
+  expect(RN.StyleSheet.flatten(artwork.props.style).backgroundColor).toBe(
+    "#FFFFFF",
+  );
   expect(findText(payload.ctaLabel)).toBeDefined();
+});
+
+test("approved white presentation uses the tablet artwork transform", async () => {
+  RN.useWindowDimensions.mockReturnValue({
+    width: 820,
+    height: 1180,
+    fontScale: 1,
+    scale: 2,
+  });
+  await act(async () => {
+    tree = renderer.create(<SitecoreBanner presentation="phone-left-white" />);
+  });
+  const artwork = tree.root.findByType(RN.ImageBackground);
+  expect(artwork.props.resizeMode).toBe("contain");
+  expect(RN.StyleSheet.flatten(artwork.props.style).minHeight).toBeCloseTo(
+    820 * 0.36,
+  );
+  expect(
+    RN.StyleSheet.flatten(artwork.props.imageStyle).transform,
+  ).toEqual([{ scale: 1.42 }, { translateY: -1 }, { translateX: 20 }]);
 });

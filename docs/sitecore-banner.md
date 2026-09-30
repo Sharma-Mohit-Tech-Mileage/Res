@@ -4,11 +4,11 @@ Home (`WelcomeCard`, behind `DASHBOARD_NEW_LAYOUT`) and the mobile landing page 
 
 The request appends `api/Sitecore/Banner` to the selected build's `API_ACP_BASEURL`:
 
-| Environment | Configured base URL |
-| --- | --- |
-| Development | https://customer.uat.cableone.net/apiWrapper/ |
-| Staging | https://customer.uat.sparklight.com/apiWrapper/ |
-| Production | https://publicservices.sparklight.com/Portalservices/ |
+| Environment | Configured base URL                                   |
+| ----------- | ----------------------------------------------------- |
+| Development | https://customer.uat.cableone.net/apiWrapper/         |
+| Staging     | https://customer.uat.sparklight.com/apiWrapper/       |
+| Production  | https://publicservices.sparklight.com/Portalservices/ |
 
 These values already exist in `.env.development`, `.env.staging`, and `.env.production`. The banner does not pin other builds to the development API. Environment selection follows the existing react-native-config build setup.
 
@@ -25,3 +25,5 @@ Artwork fills the banner using proportional cover scaling, which crops edges whe
 The purple reference with a left-side phone requires purple background-only media plus `textAlignment: Right` and `textTheme: Light`. A reference JPEG containing text and a button cannot be used as background media without duplicating CMS-rendered content.
 
 Home and the mobile landing placement explicitly select `presentation="phone-left-white"` to match the final approved white-background reference. This takes precedence over CMS theme/alignment for these placements: right-side content with dark text and a purple CTA. Copy, media, CTA destination, active state and disclaimer remain CMS-driven. The default shared component still supports CMS-controlled theme/alignment.
+
+The phone-left-white presentation uses proportional contain scaling on a white canvas so the entire device remains visible at narrow widths and when wrapped text increases the card height. It leaves white space above/below wide artwork rather than cropping or stretching it. Other CMS presentations retain cover scaling.
