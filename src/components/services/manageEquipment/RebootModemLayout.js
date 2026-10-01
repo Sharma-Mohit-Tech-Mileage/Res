@@ -9,6 +9,7 @@ import ModemHelpOverlay from "./ModemHelpOverlay";
 import { SectionTitle } from "../../common/customui/Typography";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
+import { Color } from "../../../styles/GlobalStyles";
 
 const RebootModemLayout = ({ navigation, children, actions }) => {
   const insets = useSafeAreaInsets();
@@ -29,6 +30,7 @@ const RebootModemLayout = ({ navigation, children, actions }) => {
           <SectionTitle accessibilityRole="header">Reboot Modem</SectionTitle>
           <View style={styles.state}>{children}</View>
           <View style={styles.actions}>{actions}</View>
+          <View style={styles.separator} />
           <Touchable
             accessibilityLabel="Modem Help"
             onPress={() => setHelpVisible(true)}
@@ -71,6 +73,13 @@ const styles = StyleSheet.create({
   },
   state: { marginTop: theme.spacing.base },
   actions: { marginTop: theme.spacing.xl },
+  separator: {
+    height: 1,
+    width: "auto",
+    marginHorizontal: -theme.spacing.xl,
+    backgroundColor: Color.sparklightGray,
+     marginTop: theme.spacing.xl,
+  },
   card: {
     paddingHorizontal: theme.spacing.xl,
     paddingTop: theme.spacing["2xl"],

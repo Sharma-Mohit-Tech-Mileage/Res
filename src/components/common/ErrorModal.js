@@ -1,5 +1,6 @@
 import React from "react";
 import AlertModal from "./AlertModal";
+import { Color } from "../../styles/GlobalStyles";
 
 export const ErrorType = {
   NETWORK_ERROR: "NETWORK_ERROR",
@@ -105,7 +106,7 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
       visible={visible}
       title={errorConfig.title}
       message={customMessage || errorConfig.message}
-      iconColor={errorType === ErrorType.BUSINESS_ACCOUNT ? "#DD6D02" : undefined}
+      iconColor={errorType === ErrorType.BUSINESS_ACCOUNT ? Color.warningText : undefined}
       onRequestClose={() => onAction("CANCEL")}
       actions={errorConfig.actions.map((action) => ({
         ...action,

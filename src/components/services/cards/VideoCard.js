@@ -1,7 +1,6 @@
 import ServiceIcon from "../../../res/svgIcons/VideoServiceIcon";
 import React from "react";
 import { View, Text, StyleSheet, Linking, Alert } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getChannelLineupURL } from "../utils/constants";
@@ -84,7 +83,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
 
 const styles = StyleSheet.create({
   // Container & Card
-  container: serviceCard.container,
+  container: { ...serviceCard.container, marginBottom: theme.spacing.base },
   card: {
     ...AppStyles.card,
   },

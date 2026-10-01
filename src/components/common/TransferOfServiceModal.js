@@ -13,7 +13,7 @@ import ModalOverlay from "./customui/ModalOverlay";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CopyIcon from "../../../assets/svgs/CopyIcon";
 
-import { FontFamily,Color } from "../../../GlobalStyles";
+import { FontFamily,Color } from "../../styles/GlobalStyles";
 
 const groupDigits = (value) =>
   String(value || "")
@@ -42,7 +42,7 @@ const TransferOfServiceModal = ({
       <ModalOverlay>
         <ModalCard style={styles.card} accessibilityViewIsModal={true}>
           <View style={styles.titleRow}>
-            <AlertIcon color="#DD6D02" />
+            <AlertIcon color={Color.warningText} />
             <Text
               style={styles.title}
               accessibilityRole="header"
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   copiedTipBubble: {
-    backgroundColor: "#34744B",
+    backgroundColor: Color.successBanner,
     borderRadius: 3,
     paddingVertical: 5,
     paddingHorizontal: 12,
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 7,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: "#34744B",
+    borderTopColor: Color.successBanner,
   },
   copiedTipText: {
     color: Color.sparklightWhite,

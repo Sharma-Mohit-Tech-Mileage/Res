@@ -5,12 +5,9 @@ import {
   StyleSheet,
   Text,
   View,
-  Platform,
-  AccessibilityInfo,
 } from "react-native";
 import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import { ScreenScroll } from "../common/customui/Screen";
-import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   FontFamily,
@@ -18,7 +15,7 @@ import {
   Color,
   FontSize,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import {
   validatePassword,
   passwordTerms,
@@ -30,17 +27,14 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import {
-  GetApiRequest,
-  PutApiRequest,
-  PostApiRequest,
-} from "../../network/RestApiClient";
-import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
+import { GetApiRequest, PostApiRequest } from "../../network/RestApiClient";
+import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
-import { passwordSchema } from "../utility/validationSchema";
+import { passwordSchema } from "../utility/validationSchema"; 
 import PrimaryButton from "../common/customui/PrimaryButton";
-import AppStyles from "../../styles/AppStyles";
-import { SectionTitle, HintText } from "../common/customui/Typography";
+import AppStyles from '../../styles/AppStyles';
+import { SectionTitle,HintText } from "../common/customui/Typography";
+import { logWarn } from "../../utils/logger";
 const ChangePassword = () => {
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
@@ -60,8 +54,7 @@ const ChangePassword = () => {
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
   const passwordInputRef = useRef(null);
-  const [accessibilityLabelInput, setAccessibilityLabelInput] =
-    useState(undefined);
+  const [accessibilityLabelInput, setAccessibilityLabelInput] = useState(undefined);
 
   const handleSavePass = (formData) => {
     setLoading(true);
@@ -103,7 +96,7 @@ const ChangePassword = () => {
       "";
 
     if (!userName.trim()) {
-      console.warn("Skipping security questions API call: userName is missing");
+      logWarn("Skipping security questions API call: userName is missing");
       return;
     }
 
@@ -117,8 +110,8 @@ const ChangePassword = () => {
         }
       },
       (error) => {
-        console.warn(error);
-      },
+        logWarn(error);
+      }
     );
   };
 
@@ -132,7 +125,7 @@ const ChangePassword = () => {
         userName: user.userInfo?.userName || user.userName,
       });
 
-      const body = { newPass: newPassword, confirmNewPass: newPassword };
+      const body = { newPass:newPassword,confirmNewPass:newPassword };
 
       setLoading(true);
 
@@ -142,23 +135,23 @@ const ChangePassword = () => {
         body,
         (res) => {
           setLoading(false);
-          if (res.code == "204" || res.code == "200") {
-            navigation.navigate("PasswordSecurity", {
-              updateSuccess: true,
-              isPassword: true,
-            });
-          } else if (res === true) {
-            navigation.navigate("PasswordSecurity", {
-              updateSuccess: true,
-              isPassword: true,
-            });
-          } else {
-            setShowErrorAlert(true); // Show an error alert if the response code is not 200 or 204
-          }
-        },
+          if(res.code=="204" || res.code=="200" ){
+          navigation.navigate("PasswordSecurity", {
+            updateSuccess: true,
+            isPassword: true,
+          });
+        } else if(res===true  ){
+         navigation.navigate("PasswordSecurity", {
+            updateSuccess: true,
+            isPassword: true,
+          });
+        }else{
+          setShowErrorAlert(true); // Show an error alert if the response code is not 200 or 204  
+        }
+      },
         (error) => {
           setLoading(false);
-          console.warn("Error updating password", error);
+           logWarn("Error updating password", error);
 
           // Handle specific errors, such as '204 No Content' or others
           if (error.code == "204") {
@@ -169,11 +162,11 @@ const ChangePassword = () => {
           } else {
             setShowErrorAlert(true); // Show an error alert for other errors
           }
-        },
+        }
       );
     } catch (err) {
       setLoading(false);
-      console.warn("Error retrieving user information", err);
+      logWarn("Error retrieving user information", err);
       setShowErrorAlert(true); // Show an error alert if getUser fails
     }
   };
@@ -221,7 +214,7 @@ const ChangePassword = () => {
         title="Edit Password"
         onPressBack={() => navigation.navigate("PasswordSecurity")}
       />
-      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
+      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -252,7 +245,7 @@ const ChangePassword = () => {
                     Password
                   </SectionTitle>
                   <HintText
-                    style={[{ marginTop: 10, marginVertical: 5 }]}
+                    style={[{ marginTop: 10, marginVertical: 5}]}
                     accessible={true}
                     importantForAccessibility="yes"
                     accessibilityRole="text"
@@ -292,17 +285,12 @@ const ChangePassword = () => {
                           value={value}
                           secure={true}
                           error={error?.message}
-                          errorHint={getPasswordPriorityHint(
-                            value,
-                            profileDetails.userName,
-                          )}
+                          errorHint={getPasswordPriorityHint(value, profileDetails.userName)}
                         />
                         <View
                           accessible={true}
                           accessibilityRole="text"
-                          accessibilityLabel={`Password requirements: ${passwordTerms.join(
-                            ". ",
-                          )}`}
+                          accessibilityLabel={`Password requirements: ${passwordTerms.join('. ')}`}
                           style={[
                             styles.passwordFlexBox,
                             { marginTop: Padding.p_base },
@@ -326,11 +314,13 @@ const ChangePassword = () => {
                                     ]}
                                   />
                                 </View>
-                                <Text style={styles.bulletPoiint}>
+                                <Text
+                                  style={styles.bulletPoiint}
+                                >
                                   {passwordTerms[index]}
                                 </Text>
                               </View>
-                            ),
+                            )
                           )}
                         </View>
                       </>
@@ -340,11 +330,14 @@ const ChangePassword = () => {
               </View>
             </View>
           </View>
-          <View style={styles.frameParent1}>
+         <View
+            style={styles.frameParent1}
+            
+          >
             <PrimaryButton
               buttonType={"submit"}
               title={"Save"}
-              onPress={handleSubmit(handleSavePass, handleValidationError)}
+             onPress={handleSubmit(handleSavePass, handleValidationError)}
               disabled={loading}
             />
 
@@ -462,11 +455,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   passwordSecurityEditInner: {
-    ...AppStyles.headerCardSpacing,
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 300,
   },
   passwordSecurityEdit: {
     flex: 1,

@@ -1,23 +1,12 @@
 import { StyleSheet } from "react-native";
-import { Color, FontFamily, FontSize, Padding } from "../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "./GlobalStyles";
+import { card as cardStyle } from "./utilities";
 
 const AppStyles = StyleSheet.create({
-  headerCardSpacing: { paddingTop: Padding.p_5xl },
-  card: {
-    backgroundColor: Color?.sparklightWhite || "#FFFFFF",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 6,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-  },
-  cardHreader: {
+  card: cardStyle.base,
+   cardHreader: {
     flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F8F8F8",
+    backgroundColor: Color.colorWhitesmoke_100,
     width: "100%",
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
@@ -100,8 +89,7 @@ const AppStyles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "600",
     color: Color.sparklightWhite,
-  },
-  hyperlink: {
+  },hyperlink: {
     color: Color.sparklightPrimaryPurple,
     fontFamily: FontFamily.RadioCanadaBold,
     fontSize: FontSize.size_base,

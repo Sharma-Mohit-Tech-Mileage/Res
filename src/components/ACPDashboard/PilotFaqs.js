@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";;
-import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
+import { FontFamily, FontSize, Color, Border } from "../../styles/GlobalStyles";
 import { card } from "../../styles/utilities";
 import { useNavigation } from "@react-navigation/native";
 import AppStyles from "../../styles/AppStyles";
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   description: {
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
-    color: "#000000",
+    color: Color.colorblack_100,
     fontWeight: "400",
     margin: 24,
     lineHeight: 24,

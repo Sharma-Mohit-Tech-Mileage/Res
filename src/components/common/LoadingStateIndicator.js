@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { FontFamily,Color } from "../../../GlobalStyles";
+import { FontFamily,Color } from "../../styles/GlobalStyles";
 
 import LottieView from "lottie-react-native";
 

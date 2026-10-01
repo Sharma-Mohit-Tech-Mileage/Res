@@ -1,6 +1,6 @@
 import DeviceInfo from "react-native-device-info";
 import VersionCheck from "react-native-version-check";
-import { Color } from "../../../GlobalStyles";
+import { Color } from "../../styles/GlobalStyles";
 export const ROLE_COLORS = {
   primaryadmin: Color.colorMidnightblue,
   admin: Color.sparklightPrimaryPurple,

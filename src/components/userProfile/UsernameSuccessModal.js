@@ -6,6 +6,7 @@ import ModalOverlay from "../common/customui/ModalOverlay";
 import ModalCard from "../common/customui/ModalCard";
 import AppStyles from "../../styles/AppStyles";
 import PrimaryButton from "../common/customui/PrimaryButton";
+import { Color } from "../../styles/GlobalStyles";
 
 const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => (
   <Modal
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     maxWidth: 420,
     maxHeight: "90%",
     borderWidth: 2,
-    borderColor: "#FFFFFF",
+    borderColor: Color.sparklightWhite,
     overflow: "hidden",
   },
   panel: { overflow: "hidden" },
@@ -100,11 +101,11 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     marginBottom: 8,
-    color: "#000000",
+    color: Color.colorblack_100,
   },
   message: {
     lineHeight: 20,
-    color: "#000000",
+    color: Color.colorblack_100,
     textAlign: "center",
   },
   actionNotice: {

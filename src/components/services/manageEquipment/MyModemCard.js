@@ -14,6 +14,7 @@ import {
 
 const MyModemCard = ({
   loading = false,
+  equipment,
   onReboot,
   showConnectionStatus = false,
 }) => (
@@ -28,7 +29,7 @@ const MyModemCard = ({
         <ModemIcon />
       </View>
       <SectionTitle style={styles.title} accessibilityRole="header">
-        My Modem
+        {equipment?.name || "My Modem"}
       </SectionTitle>
     </View>
 
@@ -42,25 +43,35 @@ const MyModemCard = ({
       <>
         <View style={styles.details}>
           <FieldContent style={styles.text}>
-            <SectionTitle style={styles.text}>Model: </SectionTitle>Hitron
-            CODA-57
+            <SectionTitle style={styles.text}>Model: </SectionTitle>
+            {equipment?.model || "—"}
           </FieldContent>
           <FieldContent style={styles.text}>
             <SectionTitle style={styles.text}>Mac Id: </SectionTitle>
-            DA:12:34:56:78:90
+            {equipment?.identifierValue || "—"}
           </FieldContent>
         </View>
-        <View style={styles.lease}>
-          <Caption style={styles.badgeText}>LEASED</Caption>
-        </View>
-        {showConnectionStatus && (
+        {equipment && (
+          <View style={styles.lease}>
+            <Caption style={styles.badgeText}>LEASED</Caption>
+          </View>
+        )}
+        {equipment && showConnectionStatus && (
           <View style={styles.statusRow}>
             <View style={styles.statusDot} accessible={false} />
             <FieldContent style={styles.text}>Connected</FieldContent>
           </View>
         )}
-        <MenuRow label="Reboot Modem" onPress={onReboot}
-          style={[styles.rebootCta, !showConnectionStatus && styles.rebootWithoutStatus]} />
+        {equipment && (
+          <MenuRow
+            label="Reboot Modem"
+            onPress={onReboot}
+            style={[
+              styles.rebootCta,
+              !showConnectionStatus && styles.rebootWithoutStatus,
+            ]}
+          />
+        )}
       </>
     )}
   </SurfaceCard>
@@ -110,7 +121,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     marginVertical: theme.spacing.md,
   },
-   lease: {
+  lease: {
     alignSelf: "flex-start",
     backgroundColor: theme.colors.surfaceVariant,
     borderWidth: 1,
@@ -144,7 +155,6 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xl,
     marginHorizontal: -theme.spacing.lg,
     marginBottom: -theme.spacing.lg,
-
   },
   rebootWithoutStatus: { marginTop: theme.spacing.sm },
   rebootText: {

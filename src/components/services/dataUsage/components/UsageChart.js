@@ -5,14 +5,13 @@ import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
 import { G, Rect, Text as SvgText, Path, Line } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { theme, A11Y } from "../../../../styles/theme";
-import { card } from "../../../../styles/utilities";
+import { theme } from "../../../../styles/theme";
 import { cardHeader, dataUsageTabs } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 import Touchable from "../../../common/customui/Touchable";
 import AppStyles from "../../../../styles/AppStyles";
 import {SectionTitle} from "../../../common/customui/Typography";
-import { Color } from "../../../../../GlobalStyles";
+import { Color } from "../../../../styles/GlobalStyles";
 
 
 const CHART_HEIGHT = 205;
@@ -437,7 +436,7 @@ const UsageChart = ({
           fill={theme.colors.white}
         />
 
-        <SvgText x={tooltipX + 10} y={tooltipY + 18} fontSize="13" fontWeight="700" fill={theme.colors.text.primaryDark}>
+        <SvgText x={tooltipX + 10} y={tooltipY + 18} fontSize="13" fontWeight="700" fill={theme.colors.primaryDark}>
           {item.total.toFixed(2)} GB
         </SvgText>
         <SvgText x={tooltipX + 10} y={tooltipY + 34} fontSize="11" fontWeight="600" fill={theme.colors.primaryDark}>
@@ -1034,7 +1033,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.size.base,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
-    color: theme.colors.text.primaryDark,
+    color: theme.colors.primaryDark,
   },
   listItemRow: {
     marginBottom: 4,

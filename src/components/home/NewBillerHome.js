@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { View, StyleSheet, Platform } from "react-native";
-import { wp } from "../../utils/responsive";
+import { LAYOUT } from "../../utils/responsive";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 
-import { Color, Padding } from "../../../GlobalStyles";
+import { Color, Padding } from "../../styles/GlobalStyles";
 import { fetchACPUserAccountDetails, updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import Config from "react-native-config";
@@ -30,28 +30,30 @@ import Logo from "../../res/images/SpalshLogo";
 import VersionCheck from "react-native-version-check";
 import DeviceInfo from "react-native-device-info";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
-import { loginWithJWT, setConversationalFields, } from "../utility/RNZendeskChat";
+import { setConversationalFields } from "../utility/RNZendeskChat";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import AppStyles from "../../styles/AppStyles";
+import { A11Y } from "../../styles/theme";
 import { ScreenScroll } from "../common/customui/Screen";
+import { container } from "../../styles/utilities";
+import { HEADER_GRADIENT } from "../common/ProfileSettingsHeader";
 
 import {
   getAnalytics,
   setAnalyticsCollectionEnabled,
 } from '@react-native-firebase/analytics';
+import { logWarn, logError } from "../../utils/logger";
 
 const analytics = getAnalytics();
 
 setAnalyticsCollectionEnabled(analytics, true)
-  .then(() => {
-    console.log('Analytics collection enabled');
-  })
   .catch(error => {
-    console.error('Failed to enable Analytics:', error);
+    logError('Failed to enable Analytics:', error);
   });
 
 const NewBillerHome = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const { triggerOnScreenEntry } = useAnnouncement();
   const { outageData, checkStatus: checkOutageStatus } = useOutageStatus('dashboard');
 
@@ -140,7 +142,7 @@ const NewBillerHome = ({ navigation }) => {
           setloadingAutoPay(false);
         },
         (error) => {
-          console.warn("error", error);
+          logWarn("error", error);
           setloadingAutoPay(false);
         }
       );
@@ -159,7 +161,7 @@ const NewBillerHome = ({ navigation }) => {
           getTextNotificationsData();
           setIsNotificationEnable(true);
         } catch (error) {
-          console.warn("Error refreshing data on focus", error);
+          logWarn("Error refreshing data on focus", error);
         }
       };
 
@@ -220,7 +222,7 @@ const NewBillerHome = ({ navigation }) => {
         },
         (error) => {
           setPhoneNumber("");
-          console.error("Error on retrying getTextNotificationsData", error);
+          logError("Error on retrying getTextNotificationsData", error);
         },
       );
     });
@@ -269,7 +271,7 @@ const NewBillerHome = ({ navigation }) => {
       const data = await response.json();
       return data.ip; // The IP address
     } catch (error) {
-      console.warn("Error fetching IP address:", error);
+      logWarn("Error fetching IP address:", error);
       return null;
     }
   };
@@ -320,7 +322,7 @@ const NewBillerHome = ({ navigation }) => {
         }
       },
       (error) => {
-        console.warn("error in fetching JWT reponse for zendesk", error);
+        logWarn("error in fetching JWT reponse for zendesk", error);
       }
     );
   };
@@ -339,7 +341,7 @@ const NewBillerHome = ({ navigation }) => {
         accessibilityRole="text"
         accessibilityLabel="SparkLight Logo"
       >
-        <Logo width={120} height={33.32} />
+        <Logo width={120} height={LOGO_HEIGHT} />
       </View>
 
 
@@ -424,7 +426,7 @@ const NewBillerHome = ({ navigation }) => {
   const hasAnyAlert = showWhatsNewAlert || isOutageAlert || showServiceErrorAlert;
 
   const renderWelcomeCard = () => (
-    <View style={[styles.card, styles.shadowProp]}>
+    <View style={[AppStyles.card, styles.card]}>
       <View>
         {showDisconnectedBanner ? (
           <View style={styles.contentWrapper}>
@@ -438,42 +440,44 @@ const NewBillerHome = ({ navigation }) => {
             title="Sign up and save with Auto Pay and Paperless Billing"
             showBonus={true}
           />
-          <FeatureCard
-            title="Auto Pay"
-            isLoading={loadingAutoPay}
-            features={["Convenient", "Timely Payments", "Peace of Mind"]}
-            buttonText={isAutoPayStatus ? "Active" : "Set Up Auto Pay"}
-            buttonVariant={isAutoPayStatus ? "success" : "primary"}
-            isActive={isAutoPayStatus}
-            onButtonPress={() => {
-              navigation.navigate("BillingTab", { screen: "AutoPay" });
-            }}
-          />
-          <FeatureCard
-            isLoading={paperlessLoading}
-            title="Paperless Billing"
-            features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
-            buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
-            buttonVariant={paperlessStatusAcp ? "success" : "primary"}
-            isActive={paperlessStatusAcp}
-            onButtonPress={() =>
-              navigation.navigate("account", { screen: "Notifications" })
-            }
-          />
+          <View style={container.stack}>
+            <FeatureCard
+              title="Auto Pay"
+              isLoading={loadingAutoPay}
+              features={["Convenient", "Timely Payments", "Peace of Mind"]}
+              buttonText={isAutoPayStatus ? "Active" : "Set Up Auto Pay"}
+              buttonVariant={isAutoPayStatus ? "success" : "primary"}
+              isActive={isAutoPayStatus}
+              onButtonPress={() => {
+                navigation.navigate("BillingTab", { screen: "AutoPay" });
+              }}
+            />
+            <FeatureCard
+              isLoading={paperlessLoading}
+              title="Paperless Billing"
+              features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
+              buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
+              buttonVariant={paperlessStatusAcp ? "success" : "primary"}
+              isActive={paperlessStatusAcp}
+              onButtonPress={() =>
+                navigation.navigate("account", { screen: "Notifications" })
+              }
+            />
+          </View>
         </View>
       </View>
     </View>
   );
 
   return (
-    <LinearGradient
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1.3, y: 0 }}
-      colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
-      style={styles.container}
-    >
+    <View style={styles.container}>
+      {/* Gradient is a band behind the header, not the page background, so capped tablet content sits on gray like phones. */}
+      <LinearGradient
+        {...HEADER_GRADIENT}
+        style={[styles.gradientBand, { height: insets.top + HEADER_BAND_HEIGHT }]}
+      />
       {showChatIcon && (
-        <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
+        <View style={[styles.chatIcon, { top: insets.top + CHAT_ICON_OFFSET }]}>
           <ZendeskChatIcon screenName={'Home Screen'} />
         </View>
       )}
@@ -486,9 +490,9 @@ const NewBillerHome = ({ navigation }) => {
           accessibilityElementsHidden={isWalkthroughActive}
         >
           {renderHeader()}
-          <ScreenScroll style={styles.scrollContainer}>
+          <ScreenScroll clearTabBar>
             <View
-              style={styles.mainContentContainer}
+              style={[styles.mainContentContainer]}
               importantForAccessibility={
                 isWalkthroughActive ? "no-hide-descendants" : "auto"
               }
@@ -497,7 +501,7 @@ const NewBillerHome = ({ navigation }) => {
               <View style={styles.overlayStack}>
                 {hasAnyAlert && <View style={{ height: alertsHeight }} />}
                 {isMobilePilotEnabled ? (
-                  <View style={[AppStyles.card,{ margin:16 , overflow: "hidden", flexDirection:'column',flex:1, alignItems:'center', justifyContent:'center'}]}>
+                  <View style={[AppStyles.card,{ marginVertical: 16, overflow: "hidden", flexDirection:'column',flex:1, alignItems:'center', justifyContent:'center'}]}>
                     <View
                       style={[
                         
@@ -527,15 +531,32 @@ const NewBillerHome = ({ navigation }) => {
           </ScreenScroll>
         </SafeAreaView>
       </View>
-    </LinearGradient>
+    </View>
   );
 };
+
+// Header row (incl. Android top margin) plus the 50dp gradient strip the card overlaps; the gray content scrolls up over it.
+const HEADER_BAND_HEIGHT = (Platform.OS === "ios" ? 60 : 70) + 50;
+const LOGO_HEIGHT = 33.32;
+// Centres the 48dp chat touch box on the logo's midline below the safe-area inset (was a fixed top: 60).
+const CHAT_ICON_OFFSET = (Platform.OS === "ios" ? 0 : 20) + (LOGO_HEIGHT - A11Y.minTouch) / 2;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.sparklightPrimaryPurple,
-    marginBottom: 30,
+    backgroundColor: Color.Gray300,
+  },
+  chatIcon: {
+    position: "absolute",
+    // Same right edge as the chat icon in ProfileSettingsHeader.
+    right: 8,
+    zIndex: 1,
+  },
+  gradientBand: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
   },
   headerContainer: {
     height: Platform.OS === "ios" ? 60 : 50,
@@ -544,32 +565,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginTop: Platform.OS === "ios" ? 0 : 20,
   },
-  scrollContainer: {
-    height: "100%",
-    paddingBottom: 100,
-  },
   mainContentContainer: {
     backgroundColor: Color.Gray300,
     flex: 2,
     alignItems: "center",
     marginTop: 50,
-    paddingBottom: 50,
   },
   overlayStack: {
     width: "100%",
     alignItems: "center",
     marginTop: -40,
+    paddingHorizontal: LAYOUT.cardInset,
   },
   card: {
-    backgroundColor: "white",
-    borderRadius: 2,
-    width: "92%",
-  },
-  shadowProp: {
-    shadowColor: "#171717",
-    shadowOffset: { width: -2, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    // Width comes from the frame inset on overlayStack; look comes from AppStyles.card.
+    alignSelf: "stretch",
   },
   contentWrapper: {
     flex: 1,
@@ -578,6 +588,8 @@ const styles = StyleSheet.create({
   },
   featuresWrapper: {
     paddingTop: 8,
+    // Space below the last feature card (cards no longer carry their own margin).
+    paddingBottom: 16,
   },
   alertsGroup: {
     width: "100%",
@@ -589,9 +601,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: "center",
+    paddingHorizontal: LAYOUT.cardInset,
   },
   alertWrapper: {
-    width: "92%",
+    alignSelf: "stretch",
   },
 });
 

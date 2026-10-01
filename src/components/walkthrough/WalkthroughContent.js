@@ -12,7 +12,7 @@ import Touchable from "../common/customui/Touchable";
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "../common/Icon";
 import WalkthroughProgress from "./WalkthroughProgress";
-import { FontFamily, Color, Border, Padding } from "../../../GlobalStyles";
+import { FontFamily, Color, Border, Padding } from "../../styles/GlobalStyles";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import {Hyperlink} from "../common/customui/Typography";  
 const WalkthroughContent = ({
@@ -89,12 +89,12 @@ const WalkthroughContent = ({
             ref={titleRef}
           >
             <LinearGradient
-              colors={["#edf1f4", "#edf1f4"]}
+              colors={[Color.neutralTint, Color.neutralTint]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.iconGradient}
             >
-              <Icon name={walkthrough.iconName} size={25} color="#FFFFFF" />
+              <Icon name={walkthrough.iconName} size={25} color={Color.sparklightWhite} />
             </LinearGradient>
           </Animated.View>
           <Text
@@ -183,16 +183,16 @@ const WalkthroughContent = ({
 
 const styles = StyleSheet.create({
   bubble: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 24,
     padding: Padding.p_5xl,
-    shadowColor: "#000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.15,
     shadowRadius: 24,
     elevation: 12,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Color.cardBorder,
   },
   header: {
     flexDirection: "row",
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   skipText: {
     fontFamily: FontFamily.RadioCanadaBold,
-    color: "#8D3B90",
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "600",
     fontSize: 14,
     textDecorationLine: "underline",
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   buttonNext: {
   borderRadius: 999,
   overflow: "hidden",
-  shadowColor: "#8D3B90",
+  shadowColor: Color.sparklightPrimaryPurple,
   shadowOffset: { width: 0, height: 4 },
   shadowOpacity: 0.2,
   shadowRadius: 8,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   },
   buttonNextText: {
     fontFamily: FontFamily.RadioCanadaBold,
-    color: "#FFFFFF",
+    color: Color.sparklightWhite,
     fontWeight: "700",
     fontSize: 14,
     textAlign: "center",

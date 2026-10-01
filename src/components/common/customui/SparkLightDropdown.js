@@ -10,11 +10,11 @@ import {
   findNodeHandle,
   AccessibilityInfo,
   Platform,
-  Dimensions
+  useWindowDimensions
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Box } from 'native-base';
-import { Padding, Color, FontFamily, FontSize,Border } from "../../../../GlobalStyles";
+import { Padding, Color, FontFamily, FontSize,Border } from "../../../styles/GlobalStyles";
 import DownArrow from '../../../res/svgIcons/DownArrow';
 import IconButton from './IconButton';
 import Touchable from './Touchable';
@@ -35,6 +35,7 @@ const SparkLightDropdown = ({
   const [visible, setVisible] = React.useState(false);
   const dropdownRef = useRef(null);
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const optionsListRef = useRef(null);
   const firstOptionRef = useRef(null);
 
@@ -134,7 +135,7 @@ const SparkLightDropdown = ({
             accessibilityLabel="Close dropdown"
           />
           <View 
-            style={styles.pickerContainer}
+            style={[styles.pickerContainer, { maxHeight: Math.round(windowHeight * 0.8) }]}
             accessibilityViewIsModal={true}
             importantForAccessibility="yes"
           >
@@ -266,7 +267,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
-    maxHeight: Math.round(Dimensions.get('window').height * 0.8),
     zIndex: 2,
     shadowColor: "#000",
     shadowOffset: {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, AccessibilityInfo } from "react-native";
-import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
+import { FontFamily, FontSize, Color, Padding } from "../../styles/GlobalStyles";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import Icon from "../common/Icon";
 import Touchable from "../common/customui/Touchable";

@@ -3,7 +3,7 @@ import React from "react";
 import renderer from "react-test-renderer";
 import { Image, PixelRatio, ScrollView, StyleSheet, Text, View } from "react-native";
 import useWindowDimensions from "react-native/Libraries/Utilities/useWindowDimensions";
-import { ScreenScroll } from "../src/components/common/customui/Screen";
+import { ScreenScroll, ScreenFrame } from "../src/components/common/customui/Screen";
 import ModalCard from "../src/components/common/customui/ModalCard";
 import {
   BREAKPOINTS,
@@ -178,6 +178,39 @@ describe("layout primitives", () => {
 
       const kept = renderer.create(<ScreenScroll clearTabBar={100}><Text>x</Text></ScreenScroll>).root.findByType(ScrollView);
       expect(contentStyleOf(kept).paddingBottom).toBe(100);
+    });
+
+    it("framed applies the frame standard: side inset, top space and tab-bar clearance", () => {
+      setViewport(PHONE);
+      const scroll = renderer.create(<ScreenScroll framed><Text>x</Text></ScreenScroll>).root.findByType(ScrollView);
+      expect(contentStyleOf(scroll).paddingBottom).toBe(140);
+      const frame = scroll.findAll((n) => n.type === View && StyleSheet.flatten(n.props.style)?.paddingTop === 16)[0];
+      expect(StyleSheet.flatten(frame.props.style)).toEqual(expect.objectContaining({ paddingHorizontal: 16, paddingTop: 16 }));
+    });
+
+    it("stack adds the app-wide gap between cards", () => {
+      setViewport(PHONE);
+      const scroll = renderer.create(<ScreenScroll framed stack><Text>x</Text></ScreenScroll>).root.findByType(ScrollView);
+      const frame = scroll.findAll((n) => n.type === View && StyleSheet.flatten(n.props.style)?.gap !== undefined)[0];
+      expect(StyleSheet.flatten(frame.props.style).gap).toBe(16);
+    });
+
+    it("ScreenFrame gives list screens the same frame and clearance on phone and tablet", () => {
+      setViewport(PHONE);
+      let inner = renderer.create(<ScreenFrame><Text>x</Text></ScreenFrame>).root.findAll((n) => n.type === View && StyleSheet.flatten(n.props.style)?.paddingTop === 16)[0];
+      expect(StyleSheet.flatten(inner.props.style)).toEqual(expect.objectContaining({ paddingHorizontal: 16, paddingTop: 16, marginBottom: 140 }));
+      expect(StyleSheet.flatten(inner.props.style).maxWidth).toBeUndefined();
+
+      setViewport(TABLET);
+      inner = renderer.create(<ScreenFrame><Text>x</Text></ScreenFrame>).root.findAll((n) => n.type === View && StyleSheet.flatten(n.props.style)?.paddingTop === 16)[0];
+      expect(StyleSheet.flatten(inner.props.style)).toEqual(expect.objectContaining({ paddingHorizontal: 16, paddingTop: 16, marginBottom: 140 }));
+      expect(StyleSheet.flatten(inner.props.style).maxWidth).toBeUndefined();
+    });
+
+    it("framed screens can opt out of the tab-bar clearance", () => {
+      setViewport(PHONE);
+      const scroll = renderer.create(<ScreenScroll framed clearTabBar={0}><Text>x</Text></ScreenScroll>).root.findByType(ScrollView);
+      expect(contentStyleOf(scroll).paddingBottom).toBeUndefined();
     });
   });
 

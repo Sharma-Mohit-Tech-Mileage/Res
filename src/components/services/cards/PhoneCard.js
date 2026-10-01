@@ -1,7 +1,6 @@
 import ServiceIcon from "../../../res/svgIcons/PhoneServiceIcon";
 import React from "react";
 import { View, Text, StyleSheet, Linking, Alert } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getPhonePortalURL } from "../utils/constants";
@@ -89,7 +88,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
 
 const styles = StyleSheet.create({
   // Container & Card
-  container: serviceCard.container,
+  container: { ...serviceCard.container, marginBottom: theme.spacing.base },
   card: {
     ...AppStyles.card,
   },

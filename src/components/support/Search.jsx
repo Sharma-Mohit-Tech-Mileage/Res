@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { StyleSheet, View, } from "react-native";
-import { Color} from "../../../GlobalStyles";
+import { Color} from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SearchSuggestions from "../common/customui/SearchSuggestions";
 import { GetApiRequestSearch } from "../../network/RestApiClient";

@@ -30,11 +30,14 @@ const DecorativeIcon = ({ name, size = 20, color = theme.colors.primary }) => (
   </View>
 );
 
-const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd }) => {
+const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd,hideModemSpeed }) => {
   const [tab, setTab] = useState("wifi");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [result, setResult] = useState(null);
+  useEffect(() => {
+    if (hideModemSpeed && tab === "modem") setTab("wifi");
+  }, [hideModemSpeed, tab]);
   useEffect(() => {
     let active = true;
     let request = 0;
@@ -87,7 +90,7 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd }
       </View>
       <View style={styles.panel}>
         <View style={styles.tabs} accessibilityRole="tablist">
-          {["wifi", "modem"].map((value) => (
+          {["wifi", ...(hideModemSpeed ? [] : ["modem"])].map((value) => (
             <Touchable
               key={value}
               accessibilityRole="tab"

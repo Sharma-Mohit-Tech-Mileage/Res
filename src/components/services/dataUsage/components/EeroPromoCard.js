@@ -13,6 +13,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { Svg, Circle, Path } from "react-native-svg";
 import { theme } from "../../../../styles/theme";
 import Touchable from "../../../common/customui/Touchable";
+import { Color } from "../../../../styles/GlobalStyles";
 
 
 // ── Wi-Fi icon (bottom-right watermark) ──
@@ -104,7 +105,7 @@ const EeroPromoCard = ({ promoData }) => {
       >
         <LinearGradient
           style={styles.card}
-          colors={["#0f142d", "#263067", "#0f142d"]}
+          colors={[Color.eeroNavy, "#263067", Color.eeroNavy]}
           locations={[0, 0.45, 1]}
           useAngle={true}
           angle={145}
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
   brandName: {
     fontSize: 32,
     fontFamily: theme.typography.family.semiBold,
-    color: "#FFFFFF",
+    color: Color.sparklightWhite,
     marginBottom: 6,
   },
 
@@ -208,7 +209,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 25,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
   },
   ctaText: {
     fontSize: 16,

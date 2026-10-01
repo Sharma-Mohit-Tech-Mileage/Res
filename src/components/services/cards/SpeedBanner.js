@@ -5,7 +5,7 @@ import { HintText } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
 import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
 import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
-import { Color } from "../../../../GlobalStyles";
+import { Color } from "../../../styles/GlobalStyles";
 
 const SpeedBanner = ({ downloadSpeed, uploadSpeed, style, plain = false, loading = false }) => (
   <View style={[styles.speedBanner, plain && styles.plain, style]}>

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import Touchable from "../../common/customui/Touchable";
 import { FieldTitle, Hyperlink } from "../../common/customui/Typography";
 import PaymentBrandIcon from "../../common/PaymentBrandIcon";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { paymentMethodA11yLabel, paymentMethodTitle, maskedDigits, isMethodExpired, isMethodInactive, radioA11yProps } from "./paymentsShared";
 
 const PaymentMethodCard = ({
@@ -146,7 +146,7 @@ const PaymentMethodCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 15,
     borderWidth: 1,
     borderColor: "transparent",
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     alignItems: "stretch",
     alignSelf: "stretch",
-    shadowColor: "#000000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.15,
     shadowRadius: 5,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   },
   cardSelected: {
     borderColor: Color.colorMidnightblue,
-    backgroundColor: "#F3F2FF",
+    backgroundColor: Color.selectedTint,
   },
   contentDisabled: { opacity: 0.55 },
   radioPress: { alignItems: "stretch", alignSelf: "stretch" },
@@ -211,13 +211,13 @@ const styles = StyleSheet.create({
   actionDivider: { color: "#98A2B3", marginHorizontal: 4, fontSize: FontSize.size_base, lineHeight: 20 },
   newAutoPayBadge: {
     backgroundColor: "#E9F8EE",
-    color: "#1D7832",
+    color: Color.successText,
   },
   autoPayBadge: {
     fontSize: FontSize.size_xs,
     fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.colorGray_200,
-    backgroundColor: "#C8E9D0",
+    backgroundColor: Color.successTint,
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_xs,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     color: "#B54708",
-    backgroundColor: "#FFFAEB",
+    backgroundColor: Color.warningTint,
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -238,8 +238,8 @@ const styles = StyleSheet.create({
   expiredBadge: {
     fontSize: FontSize.size_xs,
     fontFamily: FontFamily.RadioCanadaSemiBold,
-    color: "#B92A1C",
-    backgroundColor: "#FEF3F2",
+    color: Color.errorText,
+    backgroundColor: Color.errorTint,
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,

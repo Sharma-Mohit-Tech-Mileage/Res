@@ -11,7 +11,6 @@ import Animated, {
 import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
-import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
 import AppStyles from "../../../../styles/AppStyles";
 import { SectionTitle } from "../../../common/customui/Typography";

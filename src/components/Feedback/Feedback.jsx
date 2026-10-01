@@ -12,11 +12,11 @@ import {
 } from "react-native";
 import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import { ScreenScroll } from "../common/customui/Screen";
+import AppStyles from "../../styles/AppStyles";
 
 import Animated, {
   FadeInDown,
   FadeInUp,
-  Layout,
 } from "react-native-reanimated";
 import {
   Color,
@@ -24,7 +24,7 @@ import {
   FontSize,
   Border,
   Padding,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import SparkLightInput from "../common/customui/SparkLightInput";
@@ -195,7 +195,7 @@ const Feedback = () => {
         title="Feedback"
         onPressBack={() => navigation.goBack()}
       />
-      <ScreenScroll ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} showsVerticalScrollIndicator={false}>
+      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} showsVerticalScrollIndicator={false}>
         <Animated.View
           entering={FadeInUp.delay(100).springify()}
           style={styles.content}
@@ -508,10 +508,11 @@ const Feedback = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.sparklightWhite,
+    backgroundColor: Color.Gray300,
   },
   content: {
-    paddingBottom: 150,
+    ...AppStyles.card,
+    paddingBottom: Padding.p_base,
   },
   alertWrapper: {
     paddingTop: Padding.p_base,
@@ -565,7 +566,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
+    shadowColor: Color.colorblack_100,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,

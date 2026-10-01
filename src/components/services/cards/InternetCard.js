@@ -173,7 +173,7 @@ const InternetCard = ({
 };
 
 const styles = StyleSheet.create({
-  container: serviceCard.container,
+  container: { ...serviceCard.container, marginBottom: theme.spacing.base },
   card: {
     ...AppStyles.card,
   },

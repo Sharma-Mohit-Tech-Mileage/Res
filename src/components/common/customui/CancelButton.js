@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Color, FontFamily, FontSize, Padding } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding } from "../../../styles/GlobalStyles";
 import Touchable from "./Touchable";
 
 // Shared link-style cancellation action. Keep the full accessible touch target.

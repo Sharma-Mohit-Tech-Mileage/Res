@@ -5,13 +5,14 @@ import { useSelector, useDispatch } from "react-redux";
 import NotificationSection from "./NotificationSection";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { getUser } from "../../redux/utils/LocalStorage";
-import { Color, Padding } from "../../../GlobalStyles";
+import { Color } from "../../styles/GlobalStyles";
 import { getPrimaryEmail } from "../utility/constant";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
-import AppStyles from "../../styles/AppStyles";
+import { container } from "../../styles/utilities";
 import { ScreenScroll } from "../common/customui/Screen";
+import { logWarn } from "../../utils/logger";
 
 const Notifications = () => {
   const navigation = useNavigation();
@@ -187,7 +188,7 @@ const Notifications = () => {
         },
         (error) => {
           setInAppNotificationLoading(false);
-          console.warn("Error on retrying getInAppNotificationsData", error);
+          logWarn("Error on retrying getInAppNotificationsData", error);
         }
       );
     });
@@ -214,7 +215,7 @@ const Notifications = () => {
         },
         (error) => {
           setTextNotificationLoading(false);
-          console.warn("Error on retrying getTextNotificationsData", error);
+          logWarn("Error on retrying getTextNotificationsData", error);
         }
       );
     });
@@ -234,7 +235,7 @@ const Notifications = () => {
         title="Notifications"
         onPressBack={handleBackPress}
       />
-      <ScreenScroll style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScreenScroll framed style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.sectionsContainer}>
           {sections.map((section) => (
             <NotificationSection
@@ -259,12 +260,7 @@ const styles = StyleSheet.create({
   },
   content: { flex: 1 },
 
-  sectionsContainer: {
-    paddingHorizontal: Padding.p_base,
-    ...AppStyles.headerCardSpacing,
-    paddingBottom: Padding.p_13xl,
-    marginBottom: 200,
-  },
+  sectionsContainer: container.stack,
 });
 
 export default Notifications;

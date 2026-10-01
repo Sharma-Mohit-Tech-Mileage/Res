@@ -6,7 +6,7 @@ import {
   Modal,
 } from "react-native";
 
-import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
+import { Color, Padding, Border, FontFamily } from "../../styles/GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "../common/customui/Touchable";
 import CancelButton from "../common/customui/CancelButton";
@@ -42,7 +42,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               
             </View>
             <View
-              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
+              style={{ backgroundColor: Color.dialogSurface, height: 1, marginTop: 10 }}
             />
             <Text style={styles.message}>{message}</Text>
              <Touchable
