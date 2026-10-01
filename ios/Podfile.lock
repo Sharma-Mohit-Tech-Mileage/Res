@@ -1459,7 +1459,7 @@ PODS:
     - React-Core
   - react-native-netinfo (11.4.1):
     - React-Core
-  - react-native-pdf (7.0.3):
+  - react-native-pdf (7.0.5):
     - React-Core
   - react-native-safe-area-context (5.6.1):
     - React-Core
@@ -2465,7 +2465,7 @@ SPEC CHECKSUMS:
   react-native-cookies: f54fcded06bb0cda05c11d86788020b43528a26c
   react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
   react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
-  react-native-pdf: d791024b3d3dad60b4f0152dbf32fa0db6539d4c
+  react-native-pdf: ac96601e80f6b7000dae66201f4169fd73a59b07
   react-native-safe-area-context: aac2745e96999c8633d2f6119e4e39b499c2ac8b
   react-native-version-check: 6cd36aad4e30b8e3216747e3b4ddeb09e0647af8
   react-native-webview: 9d84baf61d735bcd6c970e3142d51ba581b8d00d
