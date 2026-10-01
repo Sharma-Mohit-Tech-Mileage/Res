@@ -2012,44 +2012,44 @@ PODS:
     - Yoga
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
-  - Zendesk (3.14.1):
-    - ZendeskSDKConversationKit (~> 13.1.1)
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-  - ZendeskSDKAnalyticsKit (0.1.0):
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-    - ZendeskSDKHTTPClient (~> 0.20.0)
+  - Zendesk (3.17.0):
+    - ZendeskSDKConversationKit (~> 14.1.0)
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+  - ZendeskSDKAnalyticsKit (0.4.0):
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+    - ZendeskSDKHTTPClient (~> 0.21.0)
     - ZendeskSDKLogger (~> 0.11.0)
-    - ZendeskSDKStorage (~> 1.4.0)
-  - ZendeskSDKConversationKit (13.1.1):
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-    - ZendeskSDKFayeClient (~> 1.15.0)
-    - ZendeskSDKHTTPClient (~> 0.20.0)
-    - ZendeskSDKStorage (~> 1.4.0)
-  - ZendeskSDKCoreUtilities (7.2.0)
-  - ZendeskSDKFayeClient (1.15.0):
+    - ZendeskSDKStorage (~> 1.6.0)
+  - ZendeskSDKConversationKit (14.1.0):
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+    - ZendeskSDKFayeClient (~> 1.16.0)
+    - ZendeskSDKHTTPClient (~> 0.21.0)
+    - ZendeskSDKStorage (~> 1.6.0)
+  - ZendeskSDKCoreUtilities (8.1.0)
+  - ZendeskSDKFayeClient (1.16.0):
     - ZendeskSDKLogger (~> 0.11.0)
-    - ZendeskSDKSocketClient (~> 1.13.0)
-  - ZendeskSDKGuideKit (2.7.0):
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-    - ZendeskSDKHTTPClient (~> 0.20.0)
+    - ZendeskSDKSocketClient (~> 1.14.0)
+  - ZendeskSDKGuideKit (2.10.0):
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+    - ZendeskSDKHTTPClient (~> 0.21.0)
     - ZendeskSDKLogger (~> 0.11.0)
-    - ZendeskSDKStorage (~> 1.4.0)
-  - ZendeskSDKHTTPClient (0.20.1):
+    - ZendeskSDKStorage (~> 1.6.0)
+  - ZendeskSDKHTTPClient (0.21.0):
     - ZendeskSDKLogger (~> 0.11.0)
   - ZendeskSDKLogger (0.11.0)
-  - ZendeskSDKMessaging (2.36.0):
-    - Zendesk (~> 3.14.0)
-    - ZendeskSDKAnalyticsKit (~> 0.1.0)
-    - ZendeskSDKConversationKit (~> 13.1.0)
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-    - ZendeskSDKGuideKit (~> 2.7.0)
-    - ZendeskSDKUIComponents (~> 14.1.0)
-  - ZendeskSDKSocketClient (1.13.0):
+  - ZendeskSDKMessaging (2.39.0):
+    - Zendesk (~> 3.17.0)
+    - ZendeskSDKAnalyticsKit (~> 0.4.0)
+    - ZendeskSDKConversationKit (~> 14.1.0)
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+    - ZendeskSDKGuideKit (~> 2.10.0)
+    - ZendeskSDKUIComponents (~> 14.4.0)
+  - ZendeskSDKSocketClient (1.14.0):
     - ZendeskSDKLogger (~> 0.11.0)
-  - ZendeskSDKStorage (1.4.0):
+  - ZendeskSDKStorage (1.6.0):
     - ZendeskSDKLogger (~> 0.11.0)
-  - ZendeskSDKUIComponents (14.1.0):
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
+  - ZendeskSDKUIComponents (14.4.0):
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -2156,7 +2156,7 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
-  - ZendeskSDKMessaging (= 2.36.0)
+  - ZendeskSDKMessaging (= 2.39.0)
 
 SPEC REPOS:
   trunk:
@@ -2519,19 +2519,19 @@ SPEC CHECKSUMS:
   RNVectorIcons: dea7dc10c1942cdf080f89ba4a839316c9c62876
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: fdc0542faa3ba87e56f2030b3f3f2e21bc3ba01c
-  Zendesk: d8127fc74635ed78916433b2887d25f0189bab59
-  ZendeskSDKAnalyticsKit: a52a557156323b48930b27f16ced1ee1c8ba30a0
-  ZendeskSDKConversationKit: 9755ea466c7a9527b37c795872094a935c294769
-  ZendeskSDKCoreUtilities: be8ad25c945ae13ee8df4a34b361021d30f8589b
-  ZendeskSDKFayeClient: 4da1b2ac710148b319014a921bddc3252d0b9d68
-  ZendeskSDKGuideKit: 358da8b0193b66eefe62a3407afa0d83fbdbcb14
-  ZendeskSDKHTTPClient: 07ba95e616001b29747593331bc10055112488d8
+  Zendesk: 6e47be514153a92a32208e0de936c72632ee8501
+  ZendeskSDKAnalyticsKit: 7e07a15490cafaa0ab0c2be45520f28a55860fce
+  ZendeskSDKConversationKit: dc2b21143764da9ca470088f40969857ed59e8f0
+  ZendeskSDKCoreUtilities: 3f284021289b359cbeba9bdf370478c4abcaf828
+  ZendeskSDKFayeClient: 6dc6079f53973e59cf36b0709eab8f3f5e205ab8
+  ZendeskSDKGuideKit: de5dd48325ef8fcdf79e72e38a7c187d1acfebd5
+  ZendeskSDKHTTPClient: d375ccb61bd4129bbe90da9163f27792a72a6850
   ZendeskSDKLogger: aff150c8ce1558dc2ba464dc42d420d14c9b1369
-  ZendeskSDKMessaging: 102fc31195fb543ee1141f4f8ab9c34a115028aa
-  ZendeskSDKSocketClient: 71d0a7909961ecfa5686f0dd89343ad2dd3590d4
-  ZendeskSDKStorage: 31d8acf44b5990da425bbfc77206931b2741e397
-  ZendeskSDKUIComponents: 9177b164671ce19a6da48a16ba9e7a8bef62c774
+  ZendeskSDKMessaging: 2726478328015b2608e3191c664960200d7e6779
+  ZendeskSDKSocketClient: d5ebf448f6418acf0e3cd85cd5d255fc6ce7ddff
+  ZendeskSDKStorage: e716e1cc0e55dbac450d6cc914e5fd73be9bba36
+  ZendeskSDKUIComponents: 6298107d4d88fb581446f06c169a004f14277c68
 
-PODFILE CHECKSUM: 6cf9e96b2f2fd2fcdc16a84b99cab1d3772cc254
+PODFILE CHECKSUM: 8698055241346458aaa524392146abbd393f9cea
 
 COCOAPODS: 1.15.2
