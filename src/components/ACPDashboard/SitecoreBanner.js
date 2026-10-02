@@ -11,7 +11,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import { getBanner } from "../../network/apis/sitecore/banner.service";
 import Touchable from "../common/customui/Touchable";
-import { Color, FontFamily } from "../../../GlobalStyles";
+import { Color, FontFamily } from "../../styles/GlobalStyles";
 
 export default function SitecoreBanner({ presentation = "cms" }) {
   const [banner, setBanner] = useState(null);
@@ -81,6 +81,11 @@ export default function SitecoreBanner({ presentation = "cms" }) {
     ? Color.sparklightPrimaryPurple
     : "#FFFFFF";
   const compact = (cardWidth || width) < 340;
+  const backgroundImageStyle = referencePresentation
+    ? tablet
+      ? styles.referenceTabletBackgroundImage
+      : styles.referenceBackgroundImage
+    : styles.backgroundImage;
   const openCta = async () => {
     try {
       await Linking.openURL(banner.ctaUrl);
@@ -98,14 +103,8 @@ export default function SitecoreBanner({ presentation = "cms" }) {
         testID="sitecore-banner"
         source={uri ? { uri } : undefined}
         onError={() => setFailedImage(selectedImage)}
-        resizeMode={referencePresentation ? "contain" : "cover"}
-        imageStyle={
-          referencePresentation
-            ? tablet
-              ? styles.referenceTabletBackgroundImage
-              : styles.referenceBackgroundImage
-            : styles.backgroundImage
-        }
+        resizeMode="cover"
+        imageStyle={[backgroundImageStyle, styles.imageFit]}
         style={[
           styles.card,
           {
@@ -186,11 +185,28 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   card: { width: "100%", justifyContent: "center", overflow: "hidden" },
-  referenceBackgroundImage: { transform: [{ scale: 1.10 }] },
-  referenceTabletBackgroundImage: {
-    transform: [{ scale: 1.42 }, { translateY: -1 }, { translateX: 20 }],
+  imageFit: {
+    width: "100%",
+    height: "100%",
   },
-  backgroundImage: { transform: [{ scale: 2.08 }, { translateX: 20 }] },
+  referenceBackgroundImage: {
+    width: "110%",
+    height: "120%",
+    resizeMode: "cover",
+    transform: [{ scale: 1.08 }, { translateY: 10 }],
+  },
+  referenceTabletBackgroundImage: {
+    width: "130%",
+    height: "130%",
+    resizeMode: "cover",
+    transform: [{ scale: 1.12 }, { translateY: 18 }, { translateX: 18 }],
+  },
+  backgroundImage: {
+    width: "120%",
+    height: "120%",
+    resizeMode: "cover",
+    transform: [{ scale: 1.4 }, { translateY: 12 }, { translateX: 18 }],
+  },
   content: { width: "60%", paddingVertical: 28, paddingHorizontal: 16 },
   referenceContent: { paddingVertical: 20 },
   compactContent: { width: "64%", paddingHorizontal: 12 },

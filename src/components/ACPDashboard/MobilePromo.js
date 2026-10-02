@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, ImageBackground, Linking, Text } from "react-native";
 
-import { Border } from "../../../GlobalStyles";
+import { Border } from "../../styles/GlobalStyles";
 
 import FeatureCard from "./FeatureCardMobile";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
