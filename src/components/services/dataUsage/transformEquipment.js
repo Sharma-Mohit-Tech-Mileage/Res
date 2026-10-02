@@ -37,5 +37,6 @@ export const transformEquipment = (apiData) => {
       model: isPresent(e.model_code) ? e.model_code : "—",
       identifierLabel: isEeroEquipment(e) ? "Serial Number" : "Mac ID",
       identifierValue: isPresent(e.serial_number) ? e.serial_number : "—",
+      subscriber_owned: e.subscriber_owned 
     }));
 };

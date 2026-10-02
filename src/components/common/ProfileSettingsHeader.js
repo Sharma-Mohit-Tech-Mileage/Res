@@ -15,10 +15,10 @@ import Touchable from "./customui/Touchable";
 import { Platform } from "react-native";
 import { setFocusToRef } from "../../utils/a11y";
 
-// [55104] One internal nav height app-wide: status-bar inset (never less than the old fixed 40) + 56 row + 16 clearance.
+// Keep the original 56-point navigation row below the safe status-bar inset.
 const MIN_TOP = 40;
 const NAV_ROW = 56;
-export const NAV_BOTTOM = 16;
+export const NAV_BOTTOM = 0;
 // Tab-root badge (Billing/Account/Support/Services): 72dp circle whose top sits 16dp below the header.
 export const TAB_BADGE_SIZE = 72;
 export const TAB_BADGE_TOP = 16;
