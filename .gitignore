@@ -70,3 +70,7 @@ coverage/
 
 # Android Studio signed-build output (android/app/<Flavor>/release)
 /android/app/*/release/
+
+# Local build/crash artifacts (never commit)
+hs_err_pid*.log
+replay_pid*.log
