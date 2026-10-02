@@ -384,7 +384,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <View style={styles.body} onLayout={(e) => setFrameHeight((h) => h || e.nativeEvent.layout.height)}>
+      <View style={styles.body} onLayout={(e) => { const { height } = e.nativeEvent.layout; setFrameHeight((h) => h || height); }}>
       {!!errorAlert && (
         <NotificationAlert
           type="error"
