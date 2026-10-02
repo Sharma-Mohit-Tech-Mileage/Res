@@ -147,44 +147,44 @@ PODS:
   - GoogleDataTransport (10.1.1):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
-  - GoogleUtilities (8.1.0):
-    - GoogleUtilities/AppDelegateSwizzler (= 8.1.0)
-    - GoogleUtilities/Environment (= 8.1.0)
-    - GoogleUtilities/Logger (= 8.1.0)
-    - GoogleUtilities/MethodSwizzler (= 8.1.0)
-    - GoogleUtilities/Network (= 8.1.0)
-    - "GoogleUtilities/NSData+zlib (= 8.1.0)"
-    - GoogleUtilities/Privacy (= 8.1.0)
-    - GoogleUtilities/Reachability (= 8.1.0)
-    - GoogleUtilities/SwizzlerTestHelpers (= 8.1.0)
-    - GoogleUtilities/UserDefaults (= 8.1.0)
-  - GoogleUtilities/AppDelegateSwizzler (8.1.0):
+  - GoogleUtilities (8.1.4):
+    - GoogleUtilities/AppDelegateSwizzler (= 8.1.4)
+    - GoogleUtilities/Environment (= 8.1.4)
+    - GoogleUtilities/Logger (= 8.1.4)
+    - GoogleUtilities/MethodSwizzler (= 8.1.4)
+    - GoogleUtilities/Network (= 8.1.4)
+    - "GoogleUtilities/NSData+zlib (= 8.1.4)"
+    - GoogleUtilities/Privacy (= 8.1.4)
+    - GoogleUtilities/Reachability (= 8.1.4)
+    - GoogleUtilities/SwizzlerTestHelpers (= 8.1.4)
+    - GoogleUtilities/UserDefaults (= 8.1.4)
+  - GoogleUtilities/AppDelegateSwizzler (8.1.4):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Environment (8.1.0):
+  - GoogleUtilities/Environment (8.1.4):
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Logger (8.1.0):
+  - GoogleUtilities/Logger (8.1.4):
     - GoogleUtilities/Environment
     - GoogleUtilities/Privacy
-  - GoogleUtilities/MethodSwizzler (8.1.0):
+  - GoogleUtilities/MethodSwizzler (8.1.4):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Network (8.1.0):
+  - GoogleUtilities/Network (8.1.4):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Privacy
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (8.1.0)":
+  - "GoogleUtilities/NSData+zlib (8.1.4)":
     - GoogleUtilities/Privacy
-  - GoogleUtilities/Privacy (8.1.0)
-  - GoogleUtilities/Reachability (8.1.0):
+  - GoogleUtilities/Privacy (8.1.4)
+  - GoogleUtilities/Reachability (8.1.4):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
-  - GoogleUtilities/SwizzlerTestHelpers (8.1.0):
+  - GoogleUtilities/SwizzlerTestHelpers (8.1.4):
     - GoogleUtilities/MethodSwizzler
-  - GoogleUtilities/UserDefaults (8.1.0):
+  - GoogleUtilities/UserDefaults (8.1.4):
     - GoogleUtilities/Logger
     - GoogleUtilities/Privacy
   - hermes-engine (0.77.2):
@@ -1459,7 +1459,7 @@ PODS:
     - React-Core
   - react-native-netinfo (11.4.1):
     - React-Core
-  - react-native-pdf (7.0.3):
+  - react-native-pdf (7.0.5):
     - React-Core
   - react-native-safe-area-context (5.6.1):
     - React-Core
@@ -2012,44 +2012,44 @@ PODS:
     - Yoga
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
-  - Zendesk (3.14.1):
-    - ZendeskSDKConversationKit (~> 13.1.1)
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-  - ZendeskSDKAnalyticsKit (0.1.0):
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-    - ZendeskSDKHTTPClient (~> 0.20.0)
+  - Zendesk (3.17.0):
+    - ZendeskSDKConversationKit (~> 14.1.0)
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+  - ZendeskSDKAnalyticsKit (0.4.0):
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+    - ZendeskSDKHTTPClient (~> 0.21.0)
     - ZendeskSDKLogger (~> 0.11.0)
-    - ZendeskSDKStorage (~> 1.4.0)
-  - ZendeskSDKConversationKit (13.1.1):
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-    - ZendeskSDKFayeClient (~> 1.15.0)
-    - ZendeskSDKHTTPClient (~> 0.20.0)
-    - ZendeskSDKStorage (~> 1.4.0)
-  - ZendeskSDKCoreUtilities (7.2.0)
-  - ZendeskSDKFayeClient (1.15.0):
+    - ZendeskSDKStorage (~> 1.6.0)
+  - ZendeskSDKConversationKit (14.1.0):
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+    - ZendeskSDKFayeClient (~> 1.16.0)
+    - ZendeskSDKHTTPClient (~> 0.21.0)
+    - ZendeskSDKStorage (~> 1.6.0)
+  - ZendeskSDKCoreUtilities (8.1.0)
+  - ZendeskSDKFayeClient (1.16.0):
     - ZendeskSDKLogger (~> 0.11.0)
-    - ZendeskSDKSocketClient (~> 1.13.0)
-  - ZendeskSDKGuideKit (2.7.0):
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-    - ZendeskSDKHTTPClient (~> 0.20.0)
+    - ZendeskSDKSocketClient (~> 1.14.0)
+  - ZendeskSDKGuideKit (2.10.0):
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+    - ZendeskSDKHTTPClient (~> 0.21.0)
     - ZendeskSDKLogger (~> 0.11.0)
-    - ZendeskSDKStorage (~> 1.4.0)
-  - ZendeskSDKHTTPClient (0.20.1):
+    - ZendeskSDKStorage (~> 1.6.0)
+  - ZendeskSDKHTTPClient (0.21.0):
     - ZendeskSDKLogger (~> 0.11.0)
   - ZendeskSDKLogger (0.11.0)
-  - ZendeskSDKMessaging (2.36.0):
-    - Zendesk (~> 3.14.0)
-    - ZendeskSDKAnalyticsKit (~> 0.1.0)
-    - ZendeskSDKConversationKit (~> 13.1.0)
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
-    - ZendeskSDKGuideKit (~> 2.7.0)
-    - ZendeskSDKUIComponents (~> 14.1.0)
-  - ZendeskSDKSocketClient (1.13.0):
+  - ZendeskSDKMessaging (2.39.0):
+    - Zendesk (~> 3.17.0)
+    - ZendeskSDKAnalyticsKit (~> 0.4.0)
+    - ZendeskSDKConversationKit (~> 14.1.0)
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
+    - ZendeskSDKGuideKit (~> 2.10.0)
+    - ZendeskSDKUIComponents (~> 14.4.0)
+  - ZendeskSDKSocketClient (1.14.0):
     - ZendeskSDKLogger (~> 0.11.0)
-  - ZendeskSDKStorage (1.4.0):
+  - ZendeskSDKStorage (1.6.0):
     - ZendeskSDKLogger (~> 0.11.0)
-  - ZendeskSDKUIComponents (14.1.0):
-    - ZendeskSDKCoreUtilities (~> 7.2.0)
+  - ZendeskSDKUIComponents (14.4.0):
+    - ZendeskSDKCoreUtilities (~> 8.1.0)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -2062,7 +2062,7 @@ DEPENDENCIES:
   - FirebaseCoreInternal (= 11.15.0)
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
-  - GoogleUtilities (= 8.1.0)
+  - GoogleUtilities (= 8.1.4)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - lottie-react-native (from `../node_modules/lottie-react-native`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -2156,7 +2156,7 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
-  - ZendeskSDKMessaging (= 2.36.0)
+  - ZendeskSDKMessaging (= 2.39.0)
 
 SPEC REPOS:
   trunk:
@@ -2422,7 +2422,7 @@ SPEC CHECKSUMS:
   GoogleAdsOnDeviceConversion: 2be6297a4f048459e0ae17fad9bfd2844e10cf64
   GoogleAppMeasurement: 700dce7541804bec33db590a5c496b663fbe2539
   GoogleDataTransport: a24e58982ab3ba2f64d79613e027fe7f57e88539
-  GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
+  GoogleUtilities: db34c1c11c6f2eccb6fab2340cb8ceb1451299dc
   hermes-engine: 8eb265241fa1d7095d3a40d51fd90f7dce68217c
   lottie-ios: a881093fab623c467d3bce374367755c272bdd59
   lottie-react-native: 6e89607ea6454a780077c4cb58363b9d75db55c5
@@ -2465,7 +2465,7 @@ SPEC CHECKSUMS:
   react-native-cookies: f54fcded06bb0cda05c11d86788020b43528a26c
   react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
   react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
-  react-native-pdf: d791024b3d3dad60b4f0152dbf32fa0db6539d4c
+  react-native-pdf: ac96601e80f6b7000dae66201f4169fd73a59b07
   react-native-safe-area-context: aac2745e96999c8633d2f6119e4e39b499c2ac8b
   react-native-version-check: 6cd36aad4e30b8e3216747e3b4ddeb09e0647af8
   react-native-webview: 9d84baf61d735bcd6c970e3142d51ba581b8d00d
@@ -2519,19 +2519,19 @@ SPEC CHECKSUMS:
   RNVectorIcons: dea7dc10c1942cdf080f89ba4a839316c9c62876
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: fdc0542faa3ba87e56f2030b3f3f2e21bc3ba01c
-  Zendesk: d8127fc74635ed78916433b2887d25f0189bab59
-  ZendeskSDKAnalyticsKit: a52a557156323b48930b27f16ced1ee1c8ba30a0
-  ZendeskSDKConversationKit: 9755ea466c7a9527b37c795872094a935c294769
-  ZendeskSDKCoreUtilities: be8ad25c945ae13ee8df4a34b361021d30f8589b
-  ZendeskSDKFayeClient: 4da1b2ac710148b319014a921bddc3252d0b9d68
-  ZendeskSDKGuideKit: 358da8b0193b66eefe62a3407afa0d83fbdbcb14
-  ZendeskSDKHTTPClient: 07ba95e616001b29747593331bc10055112488d8
+  Zendesk: 6e47be514153a92a32208e0de936c72632ee8501
+  ZendeskSDKAnalyticsKit: 7e07a15490cafaa0ab0c2be45520f28a55860fce
+  ZendeskSDKConversationKit: dc2b21143764da9ca470088f40969857ed59e8f0
+  ZendeskSDKCoreUtilities: 3f284021289b359cbeba9bdf370478c4abcaf828
+  ZendeskSDKFayeClient: 6dc6079f53973e59cf36b0709eab8f3f5e205ab8
+  ZendeskSDKGuideKit: de5dd48325ef8fcdf79e72e38a7c187d1acfebd5
+  ZendeskSDKHTTPClient: d375ccb61bd4129bbe90da9163f27792a72a6850
   ZendeskSDKLogger: aff150c8ce1558dc2ba464dc42d420d14c9b1369
-  ZendeskSDKMessaging: 102fc31195fb543ee1141f4f8ab9c34a115028aa
-  ZendeskSDKSocketClient: 71d0a7909961ecfa5686f0dd89343ad2dd3590d4
-  ZendeskSDKStorage: 31d8acf44b5990da425bbfc77206931b2741e397
-  ZendeskSDKUIComponents: 9177b164671ce19a6da48a16ba9e7a8bef62c774
+  ZendeskSDKMessaging: 2726478328015b2608e3191c664960200d7e6779
+  ZendeskSDKSocketClient: d5ebf448f6418acf0e3cd85cd5d255fc6ce7ddff
+  ZendeskSDKStorage: e716e1cc0e55dbac450d6cc914e5fd73be9bba36
+  ZendeskSDKUIComponents: 6298107d4d88fb581446f06c169a004f14277c68
 
-PODFILE CHECKSUM: 6cf9e96b2f2fd2fcdc16a84b99cab1d3772cc254
+PODFILE CHECKSUM: 6fab959ba2f77662ed0ceee7d998c2ee369f2984
 
 COCOAPODS: 1.15.2

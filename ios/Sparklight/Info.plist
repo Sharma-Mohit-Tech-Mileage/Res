@@ -66,6 +66,8 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs access to your camera to take photos for chat support.If you don’t
 			allow access now, you can enable it later in Settings.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to share and save images in chat support. If you don’t allow access now, you can enable it later in Settings.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>$(PRODUCT_NAME) Authentication with TouchId or FaceID</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -134,7 +136,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>ZENDESK_CHANNEL_KEY_IOS</key>
-	<string>$(ZENDESK_CHANNEL_KEY_IOS)</string>
 </dict>
 </plist>

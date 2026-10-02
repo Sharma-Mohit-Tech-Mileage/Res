@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AppState, Text, TextInput, Appearance } from 'react-native';
+import { AppState, Text, TextInput, Appearance, Platform } from 'react-native';
 import UserNavigations from "./src/navigations/UserNavigations";
 import { Provider } from "react-redux";
 import store from "./src/redux/configureStore.js";
@@ -30,7 +30,10 @@ const App = () => {
       await setAnalyticsCollectionEnabled(getAnalytics(), enabled);
     };
     enableAnalytics();
-    Appearance.setColorScheme('light');
+    // Android forces light mode in MainApplication; calling this on Android recreated activities off the main thread
+    if (Platform.OS === 'ios') {
+      Appearance.setColorScheme('light');
+    }
   }, []);
 
   useEffect(() => {
