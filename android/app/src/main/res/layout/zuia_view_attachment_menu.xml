@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Overrides zendesk ui-android zuia_view_attachment_menu.xml (identical in messaging-android 2.36.1 and 2.39.0); re-check when upgrading Zendesk -->
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:layout_gravity="bottom"
+    tools:layout_height="wrap_content"
+    tools:layout_width="match_parent"
+    tools:parentTag="android.widget.FrameLayout">
+
+    <LinearLayout
+        style="?attr/attachMenuStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:paddingTop="@dimen/zuia_spacing_xlarge"
+        android:paddingBottom="@dimen/zuia_spacing_xlarge"
+        android:orientation="vertical">
+
+        <!-- Chat attachments are existing files only: camera row kept for Zendesk's code but collapsed, empty and not focusable -->
+        <TextView
+            android:id="@id/menu_item_camera"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clickable="false"
+            android:focusable="false"
+            android:importantForAccessibility="no" />
+
+        <TextView
+            android:id="@id/menu_item_gallery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:drawablePadding="@dimen/zuia_spacing_xlarge"
+            android:gravity="center_vertical|start"
+            android:textSize="@dimen/zuia_header_title_text_size"
+            android:paddingTop="@dimen/zuia_spacing_medium"
+            android:paddingBottom="@dimen/zuia_spacing_medium"
+            android:paddingStart="@dimen/zuia_spacing_xlarge"
+            android:paddingEnd="@dimen/zuia_spacing_xlarge"
+            android:text="@string/zuia_dialog_upload_a_file"
+            app:drawableStartCompat="@drawable/zuia_ic_gallery"
+            app:drawableTint="?android:attr/textColorPrimary" />
+
+    </LinearLayout>
+
+</merge>
