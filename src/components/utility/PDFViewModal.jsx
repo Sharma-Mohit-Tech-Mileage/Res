@@ -78,6 +78,7 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
           <View style={styles.pdfWrap}>
             <Pdf
                 source={{uri: convertUrl}}
+                enableTextSelection={false}
                 style={styles.pdf}/>
           </View>
       </View>
