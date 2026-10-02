@@ -1,4 +1,6 @@
 #import "RNZendeskChatModule.h"
+#import <objc/runtime.h>
+#import <UIKit/UIKit.h>
 #import <ZendeskSDKMessaging/ZendeskSDKMessaging.h>
 #import <ZendeskSDKLogger/ZendeskSDKLogger.h>
 #import <ZendeskSDK/ZendeskSDK.h>
@@ -201,6 +203,30 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
 @end
 
 
+// Chat attachments are limited to Photo library and Document: drop Zendesk's Camera entry so no camera/microphone access is offered
+@implementation UIAlertController (SparklightZendeskAttachments)
 
++ (void)load {
+  static dispatch_once_t once;
+  dispatch_once(&once, ^{
+    Method original = class_getInstanceMethod(self, @selector(addAction:));
+    Method replacement = class_getInstanceMethod(self, @selector(sl_zendeskAddAction:));
+    method_exchangeImplementations(original, replacement);
+  });
+}
 
++ (NSString *)sl_zendeskString:(NSString *)key {
+  NSBundle *framework = [NSBundle bundleForClass:NSClassFromString(@"ZendeskSDKMessaging.DocumentPresenter")];
+  NSBundle *strings = [NSBundle bundleWithPath:[framework.bundlePath stringByAppendingPathComponent:@"Localizable"]] ?: framework;
+  return [strings localizedStringForKey:key value:nil table:@"Localizable"];
+}
 
+- (void)sl_zendeskAddAction:(UIAlertAction *)action {
+  if ([self.title isEqualToString:[UIAlertController sl_zendeskString:@"zma_actions_attachments_label"]] &&
+      [action.title isEqualToString:[UIAlertController sl_zendeskString:@"zma_alert_message_label_camera"]]) {
+    return;
+  }
+  [self sl_zendeskAddAction:action];
+}
+
+@end
