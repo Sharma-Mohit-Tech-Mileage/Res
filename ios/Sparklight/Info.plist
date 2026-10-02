@@ -136,7 +136,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>ZENDESK_CHANNEL_KEY_IOS</key>
-	<string>$(ZENDESK_CHANNEL_KEY_IOS)</string>
 </dict>
 </plist>

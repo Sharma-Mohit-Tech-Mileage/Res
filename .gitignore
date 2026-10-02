@@ -74,3 +74,6 @@ coverage/
 # Local build/crash artifacts (never commit)
 hs_err_pid*.log
 replay_pid*.log
+
+# Generated build config; Zendesk key now read from react-native-config at runtime
+ios/tmp.xcconfig
