@@ -1,4 +1,5 @@
 #import "RNZendeskChatModule.h"
+#import "RNCConfig.h"
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
 #import <ZendeskSDKMessaging/ZendeskSDKMessaging.h>
@@ -14,7 +15,8 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
 
 + (void) configure {
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSString *channelKey = [NSBundle mainBundle].infoDictionary[@"ZENDESK_CHANNEL_KEY_IOS"];
+    // Channel key comes from the scheme's .env (react-native-config) so Prod builds always use the production Zendesk account
+    NSString *channelKey = [RNCConfig envFor:@"ZENDESK_CHANNEL_KEY_IOS"];
 
     [Zendesk initializeWithChannelKey:channelKey
                      messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]
