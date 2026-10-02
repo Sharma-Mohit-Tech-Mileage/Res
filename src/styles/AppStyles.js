@@ -3,7 +3,7 @@ import { Color, FontFamily, FontSize } from "./GlobalStyles";
 import { card as cardStyle } from "./utilities";
 
 const AppStyles = StyleSheet.create({
-  headerCardSpacing: { paddingTop: 16 },
+  headerCardSpacing: { paddingTop: 24 },
   card: cardStyle.base,
    cardHreader: {
     flexDirection: "row",

@@ -58,7 +58,7 @@ return (
         </View>
         {equipment && (
           <View style={styles.lease}>
-            <Caption style={styles.badgeText}>{equipment.subscriber_owned==="R" ? "LEASED" : equipment.subscriber_owned==="P"}</Caption>
+            <Caption style={styles.badgeText}>{equipment.subscriber_owned==="R" ? "LEASED" : equipment.subscriber_owned==="P" ? "CUSTOMER OWNED" : ""}</Caption>
           </View>
         )}
         {equipment && showConnectionStatus && (
