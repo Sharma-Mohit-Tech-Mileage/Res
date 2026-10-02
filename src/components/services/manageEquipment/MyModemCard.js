@@ -17,7 +17,12 @@ const MyModemCard = ({
   equipment,
   onReboot,
   showConnectionStatus = false,
-}) => (
+}) => {
+  console.log('equipment in my modem card', JSON.stringify(equipment));
+   
+return (
+
+ 
   <SurfaceCard style={styles.card}>
     <View style={styles.header}>
       <View
@@ -53,7 +58,7 @@ const MyModemCard = ({
         </View>
         {equipment && (
           <View style={styles.lease}>
-            <Caption style={styles.badgeText}>LEASED</Caption>
+            <Caption style={styles.badgeText}>{equipment.subscriber_owned==="R" ? "LEASED" : equipment.subscriber_owned==="P" ? "CUSTOMER OWNED" : "N/A"}</Caption>
           </View>
         )}
         {equipment && showConnectionStatus && (
@@ -75,7 +80,8 @@ const MyModemCard = ({
       </>
     )}
   </SurfaceCard>
-);
+)
+}
 
 const styles = StyleSheet.create({
   card: {

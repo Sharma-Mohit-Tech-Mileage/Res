@@ -55,7 +55,6 @@ export default function WifiSpeedTestScreen({ navigation }) {
             ? { status: "saved", result }
             : current,
         );
-
     } catch {
       submissions.current.set(result.testId, "failed");
       if (mounted.current)
@@ -95,33 +94,19 @@ export default function WifiSpeedTestScreen({ navigation }) {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {saveState && (
+        {(saveState?.status === "failed" ||
+          saveState?.status === "invalid") && (
           <View style={styles.saveStatus}>
             <EquipmentAlert
-              type={
-                saveState.status === "failed" || saveState.status === "invalid"
-                  ? "error"
-                  : "info"
-              }
-
-              title={
-                saveState.status === "saving"
-                  ? "Saving speed test result"
-                  : saveState.status === "saved"
-                  ? "Speed test result saved"
-                  : "Unable to save speed test result"
-              }
+              type="error"
+              title="Unable to save speed test result"
               message={
                 saveState.status === "failed"
                   ? "Your test completed. Retry saving without running another test."
-                  : saveState.status === "invalid"
-                  ? "The widget returned an incomplete result. Please run the test again."
-                  : saveState.status === "saved"
-                  ? "Your result is available in My Speed."
-                  : "Please wait while your result is saved."
+                  : "The widget returned an incomplete result. Please run the test again."
               }
-              onClose={()=>{
-                 setSaveState(null)
+              onClose={() => {
+                setSaveState(null);
               }}
             />
           </View>
@@ -138,11 +123,10 @@ export default function WifiSpeedTestScreen({ navigation }) {
                 <EquipmentAlert
                   type="error"
                   title="Unable to load speed test"
-
                   message="Check your connection and try again."
-                  onClose={()=>{
-                 setFailed(false)
-              }}
+                  onClose={() => {
+                    setFailed(false);
+                  }}
                 />
                 <PrimaryButton
                   title="Retry"

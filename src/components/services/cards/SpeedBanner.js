@@ -115,7 +115,8 @@ const styles = StyleSheet.create({
   },
   speedBannerDivider: {
     width: 1,
-    height: 50,
+    alignSelf: "stretch",
+    
     backgroundColor: `${theme.colors.primary}20`,
   },
 

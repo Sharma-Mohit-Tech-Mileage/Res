@@ -18,5 +18,5 @@ export default function formatSpeedTestTimestamp(value) {
       "M/D/YYYY h:mm A",
     ], true);
   }
-  return timestamp?.isValid() ? timestamp.local().format("MMM D, YYYY, h:mm A") : "---";
+  return timestamp?.isValid() ? timestamp.local().format("MM/DD/YY hh:mm A") : "---";
 }

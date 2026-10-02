@@ -76,14 +76,13 @@ const styles = StyleSheet.create({
   separator: {
     height: 1,
     width: "auto",
-    marginHorizontal: -theme.spacing.xl,
     backgroundColor: Color.sparklightGray,
-     marginTop: theme.spacing.xl,
+    marginTop: theme.spacing.sm,
   },
   card: {
     paddingHorizontal: theme.spacing.xl,
-    paddingTop: theme.spacing["2xl"],
-    paddingBottom: theme.spacing["2xl"],
+    paddingTop: theme.spacing.base,
+    paddingBottom: theme.spacing.base,
   },
   help: {
     alignSelf: "center",
@@ -91,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: theme.spacing.sm,
     paddingHorizontal: 0,
-    marginTop: theme.spacing.xl,
+    marginTop: theme.spacing.base,
   },
   helpTitle: { fontSize: theme.typography.size.xbl },
 });
