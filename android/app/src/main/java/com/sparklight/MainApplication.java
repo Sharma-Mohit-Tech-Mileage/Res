@@ -1,6 +1,7 @@
 package com.sparklight;
 
 import android.app.Application;
+import androidx.appcompat.app.AppCompatDelegate;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;
@@ -61,6 +62,8 @@ public class MainApplication extends Application implements ReactApplication {
 @Override
 public void onCreate() {
     super.onCreate();
+    // Light-only app: set night mode on the main thread before any activity exists (JS Appearance.setColorScheme recreated activities off the main thread)
+    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     try {
         SoLoader.init(this, OpenSourceMergedSoMapping.INSTANCE);
     } catch (IOException e) {
