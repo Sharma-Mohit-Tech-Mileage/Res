@@ -8,7 +8,7 @@ import {
   getBanner,
 } from "../src/network/apis/sitecore/banner.service";
 import SitecoreBanner from "../src/components/ACPDashboard/SitecoreBanner";
-import { Color } from "../GlobalStyles";
+import { Color } from "../src/styles/GlobalStyles";
 
 jest.mock("axios", () => ({ get: jest.fn() }));
 jest.mock("react-native-config", () => ({ API_ACP_BASEURL: "" }));
@@ -91,20 +91,28 @@ test("maps null, malformed and inactive responses safely", () => {
   ).toBeNull();
 });
 
-test.each(["Light", "Dark"])(
-  "renders CMS text and %s theme",
-  async (textTheme) => {
-    axios.get.mockResolvedValue({ data: { ...payload, textTheme } });
+test.each([
+  ["Light", "Right", "#79246C"],
+  ["Dark", "Left", "#FFFFFF"],
+  ["Light", "Left", "#79246C"],
+  ["Dark", "Right", "#FFFFFF"],
+])(
+  "renders CMS %s theme with %s alignment",
+  async (textTheme, textAlignment, color) => {
+    axios.get.mockResolvedValue({ data: { ...payload, textTheme, textAlignment } });
     await render();
     expect(findText(payload.eyebrow)).toBeDefined();
     expect(findText(payload.disclaimer)).toBeDefined();
     expect(
       RN.StyleSheet.flatten(findText(payload.headline).props.style).color,
-    ).toBe(textTheme === "Light" ? "#FFFFFF" : Color.colorMidnightblue);
+    ).toBe(color);
+    expect(
+      RN.StyleSheet.flatten(findText(payload.eyebrow).props.style).color,
+    ).toBe(color);
     expect(
       RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style)
         .backgroundColor,
-    ).toBe(textTheme === "Light" ? "#FFFFFF" : Color.sparklightPrimaryPurple);
+    ).toBe(textTheme === "Dark" ? "#FFFFFF" : Color.sparklightPrimaryPurple);
     expect(tree.root.findByType(RN.ImageBackground).props.source.uri).toBe(
       "https://media.example.test/phone.png",
     );
@@ -171,8 +179,9 @@ test("fills the banner without letterboxing or a panel over the artwork", async 
   const background = tree.root.findByType(RN.ImageBackground);
   expect(background.props.resizeMode).toBe("cover");
   expect(RN.StyleSheet.flatten(background.props.imageStyle).transform).toEqual([
-    { scale: 1.04 },
-    { translateX: 6 },
+    { scale: 1.4 },
+    { translateY: 12 },
+    { translateX: 18 },
   ]);
   expect(RN.StyleSheet.flatten(background.props.style).alignItems).toBe(
     "flex-end",
@@ -183,10 +192,10 @@ test("fills the banner without letterboxing or a panel over the artwork", async 
   ).toBeUndefined();
   expect(
     RN.StyleSheet.flatten(findText(payload.headline).props.style).color,
-  ).toBe(Color.colorMidnightblue);
+  ).toBe("#FFFFFF");
 });
 
-test("right-side composition keeps white text and CTA aligned to the column's leading edge", async () => {
+test("right-side composition keeps purple text and CTA aligned to the column's leading edge", async () => {
   axios.get.mockResolvedValue({
     data: { ...payload, textAlignment: "Right", textTheme: "Light" },
   });
@@ -201,16 +210,16 @@ test("right-side composition keeps white text and CTA aligned to the column's le
   );
   expect(
     RN.StyleSheet.flatten(findText(payload.headline).props.style),
-  ).toMatchObject({ textAlign: "left", color: "#FFFFFF" });
+  ).toMatchObject({ textAlign: "left", color: "#79246C" });
   expect(
     RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style)
       .backgroundColor,
-  ).toBe("#FFFFFF");
+  ).toBe(Color.sparklightPrimaryPurple);
 });
 
-test("approved white presentation overrides mismatched CMS theme and placement while retaining CMS content", async () => {
+test("approved white presentation matches the reference palette and keeps content in the right column", async () => {
   axios.get.mockResolvedValue({
-    data: { ...payload, textAlignment: "Left", textTheme: "Light" },
+    data: { ...payload, textAlignment: "Right", textTheme: "Light" },
   });
   await act(async () => {
     tree = renderer.create(<SitecoreBanner presentation="phone-left-white" />);
@@ -230,18 +239,22 @@ test("approved white presentation overrides mismatched CMS theme and placement w
       .backgroundColor,
   ).toBe(Color.sparklightPrimaryPurple);
   const artwork = tree.root.findByType(RN.ImageBackground);
-  expect(artwork.props.resizeMode).toBe("contain");
-  expect(RN.StyleSheet.flatten(artwork.props.style).minHeight).toBe(180);
+  expect(artwork.props.resizeMode).toBe("cover");
+  expect(RN.StyleSheet.flatten(artwork.props.style).minHeight).toBeCloseTo(393 * 660 / 1086);
   expect(
     RN.StyleSheet.flatten(artwork.props.imageStyle).transform,
-  ).toEqual([{ scale: 1.1 }]);
+  ).toBeUndefined();
   expect(RN.StyleSheet.flatten(artwork.props.style).backgroundColor).toBe(
     "#FFFFFF",
   );
+  const contentStyle = RN.StyleSheet.flatten(tree.root.findByProps({ testID: "sitecore-banner-content" }).props.style);
+  expect(contentStyle.position).toBeUndefined();
+  expect(contentStyle.left).toBeUndefined();
+  expect(contentStyle.width).toBe("58%");
   expect(findText(payload.ctaLabel)).toBeDefined();
 });
 
-test("approved white presentation uses the tablet artwork transform", async () => {
+test("approved white presentation uses the tablet artwork proportions", async () => {
   RN.useWindowDimensions.mockReturnValue({
     width: 820,
     height: 1180,
@@ -252,11 +265,30 @@ test("approved white presentation uses the tablet artwork transform", async () =
     tree = renderer.create(<SitecoreBanner presentation="phone-left-white" />);
   });
   const artwork = tree.root.findByType(RN.ImageBackground);
-  expect(artwork.props.resizeMode).toBe("contain");
+  expect(artwork.props.resizeMode).toBe("cover");
   expect(RN.StyleSheet.flatten(artwork.props.style).minHeight).toBeCloseTo(
-    820 * 0.36,
+    820 * 900 / 2000,
   );
   expect(
     RN.StyleSheet.flatten(artwork.props.imageStyle).transform,
-  ).toEqual([{ scale: 1.42 }, { translateY: -1 }, { translateX: 20 }]);
+  ).toBeUndefined();
+});
+
+ test("tablet Dark artwork honors CMS left placement and white reference copy and CTA", async () => {
+  RN.useWindowDimensions.mockReturnValue({ width: 820, height: 1180 });
+  axios.get.mockResolvedValue({ data: { ...payload, textAlignment: "Left", textTheme: "Dark" } });
+  await act(async () => {
+    tree = renderer.create(<SitecoreBanner presentation="phone-left-white" />);
+  });
+  const artwork = tree.root.findByType(RN.ImageBackground);
+  expect(artwork.props.source.uri).toBe("https://media.example.test/tablet.png");
+  expect(RN.StyleSheet.flatten(artwork.props.style).alignItems).toBe("flex-start");
+  expect(RN.StyleSheet.flatten(artwork.props.imageStyle).transform).toBeUndefined();
+  expect(RN.StyleSheet.flatten(findText(payload.headline).props.style)).toMatchObject({ color: "#FFFFFF", textAlign: "left" });
+  expect(RN.StyleSheet.flatten(findText(payload.eyebrow).props.style).color).toBe("#FFFFFF");
+  expect(RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style).backgroundColor).toBe("#FFFFFF");
+  expect(RN.StyleSheet.flatten(findText(payload.ctaLabel).props.style).color).toBe(Color.sparklightPrimaryPurple);
+  const content = RN.StyleSheet.flatten(tree.root.findByProps({ testID: "sitecore-banner-content" }).props.style);
+  expect(content.width).toBe("64%");
+  expect(content.paddingLeft).toBeCloseTo(820 * 0.075);
 });

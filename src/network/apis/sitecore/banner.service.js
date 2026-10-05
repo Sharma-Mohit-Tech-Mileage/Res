@@ -1,5 +1,6 @@
 import axios from "axios";
 import Config from "react-native-config";
+import { ENDPOINTS } from "../endpoints/Endpoints";
 
 const text = (value) => (typeof value === "string" ? value.trim() : "");
 const object = (value) => {
@@ -57,7 +58,7 @@ export async function getBanner() {
     return null;
   }
   const response = await axios.get(
-    `${base.replace(/\/+$/, "")}/api/Sitecore/Banner`,
+    `${base.replace(/\/+$/, "")}/${ENDPOINTS.SITECORE_BANNER}`,
     {
       timeout: 15000,
       headers: {

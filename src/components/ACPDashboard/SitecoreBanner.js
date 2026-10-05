@@ -59,11 +59,12 @@ export default function SitecoreBanner({ presentation = "cms" }) {
     ? banner.tabletImage || banner.phoneImage
     : banner.phoneImage || banner.tabletImage;
   const uri = selectedImage !== failedImage ? selectedImage : null;
-  // These placements use the approved phone-left, white-background design.
-  // Other placements can continue using CMS-controlled alignment and theme.
+  // These placements retain reference sizing while honoring CMS composition.
   const referencePresentation = presentation === "phone-left-white";
-  const alignment = referencePresentation ? "right" : banner.alignment;
-  const lightText = referencePresentation ? false : banner.lightText;
+  const alignment = banner.alignment;
+  const lightText = !banner.lightText;
+  const whiteReference = referencePresentation && banner.lightText;
+  const tabletScale = (cardWidth || width) / 2000;
   const position = { left: "flex-start", center: "center", right: "flex-end" }[
     alignment
   ];
@@ -71,9 +72,15 @@ export default function SitecoreBanner({ presentation = "cms" }) {
   // leading edge for copy and CTA, matching the CMS banner compositions.
   const textAlignment = alignment === "center" ? "center" : "left";
   const contentAlignment = alignment === "center" ? "center" : "flex-start";
-  // CMS theme describes foreground contrast; do not infer colors from image pixels.
-  const foreground = lightText ? Color.colorMidnightblue :  "#FFFFFF"
-  const eyebrowColor = lightText ? Color.sparklightPrimaryPurple : "#FFFFFF" 
+  // CMS Light artwork uses purple copy; Dark artwork uses white copy.
+  const foreground = whiteReference
+    ? Color.colorMidnightblue
+    : lightText
+    ? "#FFFFFF"
+    : "#79246C";
+  const eyebrowColor = whiteReference
+    ? Color.sparklightPrimaryPurple
+    : foreground;
   const buttonBackground = lightText
     ? "#FFFFFF"
     : Color.sparklightPrimaryPurple;
@@ -82,9 +89,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
     : "#FFFFFF";
   const compact = (cardWidth || width) < 340;
   const backgroundImageStyle = referencePresentation
-    ? tablet
-      ? styles.referenceTabletBackgroundImage
-      : styles.referenceBackgroundImage
+    ? styles.referenceBackgroundImage
     : styles.backgroundImage;
   const openCta = async () => {
     try {
@@ -111,7 +116,11 @@ export default function SitecoreBanner({ presentation = "cms" }) {
             minHeight: Math.max(
               referencePresentation ? 180 : 220,
               (cardWidth || width) *
-                (referencePresentation ? 0.35 : 220 / 354),
+                (referencePresentation
+                  ? tablet
+                    ? 900 / 2000
+                    : 660 / 1086
+                  : 220 / 354),
             ),
             backgroundColor: lightText ? "#79246C" : "#FFFFFF",
             alignItems: position,
@@ -123,15 +132,31 @@ export default function SitecoreBanner({ presentation = "cms" }) {
           style={[
             styles.content,
             referencePresentation && styles.referenceContent,
-            { alignItems: contentAlignment, position: (contentAlignment==='flex-start')? 'absolute':'relative', left:24,top:24 },
-            compact && styles.compactContent,
-           
+            referencePresentation &&
+              alignment === "left" &&
+              styles.referenceLeftContent,
+            referencePresentation &&
+              tablet && {
+                width: alignment === "left" ? "64%" : "58%",
+                paddingLeft:
+                  alignment === "left" ? (cardWidth || width) * 0.075 : 0,
+                paddingVertical: (cardWidth || width) * 0.04,
+              },
+            { alignItems: contentAlignment },
+            compact && !referencePresentation && styles.compactContent,
           ]}
         >
           {!!banner.eyebrow && (
             <Text
               style={[
                 styles.eyebrow,
+                referencePresentation && !tablet && styles.referenceEyebrow,
+                referencePresentation &&
+                  tablet && {
+                    fontSize: 40 * tabletScale,
+                    lineHeight: 50 * tabletScale,
+                    marginBottom: 50 * tabletScale,
+                  },
                 { color: eyebrowColor, textAlign: textAlignment },
               ]}
             >
@@ -144,6 +169,13 @@ export default function SitecoreBanner({ presentation = "cms" }) {
               style={[
                 styles.headline,
                 compact && styles.compactHeadline,
+                referencePresentation && !tablet && styles.referenceHeadline,
+                referencePresentation &&
+                  tablet && {
+                    fontSize: 68 * tabletScale,
+                    lineHeight: 84 * tabletScale,
+                    marginBottom: 80 * tabletScale,
+                  },
                 { color: foreground, textAlign: textAlignment },
               ]}
             >
@@ -155,9 +187,21 @@ export default function SitecoreBanner({ presentation = "cms" }) {
               accessibilityRole="link"
               accessibilityLabel={banner.ctaLabel}
               onPress={openCta}
-              style={[styles.button, { backgroundColor: buttonBackground }]}
+              style={[
+                styles.button,
+                referencePresentation && !tablet && styles.referenceButton,
+                { backgroundColor: buttonBackground },
+              ]}
             >
-              <Text style={[styles.buttonText, { color: buttonForeground }]}>
+              <Text
+                style={[
+                  styles.buttonText,
+                  referencePresentation &&
+                    !tablet &&
+                    styles.referenceButtonText,
+                  { color: buttonForeground },
+                ]}
+              >
                 {banner.ctaLabel}
               </Text>
             </Touchable>
@@ -190,18 +234,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  referenceBackgroundImage: {
-    width: "110%",
-    height: "120%",
-    resizeMode: "cover",
-    transform: [{ scale: 1.08 }, { translateY: 10 }],
-  },
-  referenceTabletBackgroundImage: {
-    width: "130%",
-    height: "130%",
-    resizeMode: "cover",
-    transform: [{ scale: 1.12 }, { translateY: 18 }, { translateX: 18 }],
-  },
+  referenceBackgroundImage: { resizeMode: "cover" },
   backgroundImage: {
     width: "120%",
     height: "120%",
@@ -209,7 +242,17 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.4 }, { translateY: 12 }, { translateX: 18 }],
   },
   content: { width: "60%", paddingVertical: 28, paddingHorizontal: 16 },
-  referenceContent: { paddingVertical: 20 },
+  referenceLeftContent: { paddingLeft: 16, paddingRight: 0 },
+  referenceContent: {
+    width: "58%",
+    paddingVertical: 20,
+    paddingLeft: 0,
+    paddingRight: 16,
+  },
+  referenceEyebrow: { fontSize: 12, lineHeight: 15, marginBottom: 12 },
+  referenceHeadline: { fontSize: 18, lineHeight: 22, marginBottom: 22 },
+  referenceButton: { minHeight: 36, paddingVertical: 6, paddingHorizontal: 22 },
+  referenceButtonText: { fontSize: 14 },
   compactContent: { width: "64%", paddingHorizontal: 12 },
   eyebrow: {
     width: "100%",
