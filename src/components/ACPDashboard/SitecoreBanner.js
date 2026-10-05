@@ -72,8 +72,8 @@ export default function SitecoreBanner({ presentation = "cms" }) {
   const textAlignment = alignment === "center" ? "center" : "left";
   const contentAlignment = alignment === "center" ? "center" : "flex-start";
   // CMS theme describes foreground contrast; do not infer colors from image pixels.
-  const foreground = lightText ? "#FFFFFF" : Color.colorMidnightblue;
-  const eyebrowColor = lightText ? "#FFFFFF" : Color.sparklightPrimaryPurple;
+  const foreground = lightText ? Color.colorMidnightblue :  "#FFFFFF"
+  const eyebrowColor = lightText ? Color.sparklightPrimaryPurple : "#FFFFFF" 
   const buttonBackground = lightText
     ? "#FFFFFF"
     : Color.sparklightPrimaryPurple;
@@ -123,8 +123,9 @@ export default function SitecoreBanner({ presentation = "cms" }) {
           style={[
             styles.content,
             referencePresentation && styles.referenceContent,
-            { alignItems: contentAlignment },
+            { alignItems: contentAlignment, position: (contentAlignment==='flex-start')? 'absolute':'relative', left:24,top:24 },
             compact && styles.compactContent,
+           
           ]}
         >
           {!!banner.eyebrow && (
