@@ -1,14 +1,15 @@
 import ServiceIcon from "../../../res/svgIcons/InternetServiceIcon";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SecondaryButton from "../../common/customui/PrimaryButton";
-import { SectionTitle } from "../../common/customui/Typography";
+import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
 import AppStyles from "../../../styles/AppStyles";
 import SpeedBanner from "./SpeedBanner";
+import SpeedometerIcon from "../../../res/svgIcons/SpeedometerIcon";
 
 const InternetCard = ({
   planName,
@@ -164,6 +165,16 @@ const InternetCard = ({
                 accessibilityLabel="View Data Usage details"
                 accessibilityRole="button"
               />
+
+              <Pressable
+                style={styles.speedTestRow}
+                onPress={() => navigation.navigate("manageEquipment")}
+              >
+                <SpeedometerIcon />
+                <Hyperlink style={styles.speedTestLink}>
+                  Test your device speed now
+                </Hyperlink>
+              </Pressable>
             </View>
           )}
         </View>
@@ -220,7 +231,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.base,
+  },
+  speedTestRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    marginTop: theme.spacing.base,
+  },
+  speedTestLink: {
+    marginLeft: theme.spacing.sm,
+    alignSelf: "center",
   },
   snapshotLabel: {
     fontSize: theme.typography.size.sm,
