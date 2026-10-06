@@ -195,7 +195,7 @@ test("fills the banner without letterboxing or a panel over the artwork", async 
   ).toBe("#FFFFFF");
 });
 
-test("right-side composition keeps purple text and CTA aligned to the column's leading edge", async () => {
+test("right-side composition aligns the column, purple copy and CTA to the right", async () => {
   axios.get.mockResolvedValue({
     data: { ...payload, textAlignment: "Right", textTheme: "Light" },
   });
@@ -206,11 +206,11 @@ test("right-side composition keeps purple text and CTA aligned to the column's l
   ).toBe("flex-end");
   const content = tree.root.findByProps({ testID: "sitecore-banner-content" });
   expect(RN.StyleSheet.flatten(content.props.style).alignItems).toBe(
-    "flex-start",
+    "flex-end",
   );
   expect(
     RN.StyleSheet.flatten(findText(payload.headline).props.style),
-  ).toMatchObject({ textAlign: "left", color: "#79246C" });
+  ).toMatchObject({ textAlign: "right", color: "#79246C" });
   expect(
     RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style)
       .backgroundColor,
@@ -248,9 +248,14 @@ test("approved white presentation matches the reference palette and keeps conten
     "#FFFFFF",
   );
   const contentStyle = RN.StyleSheet.flatten(tree.root.findByProps({ testID: "sitecore-banner-content" }).props.style);
+  expect(contentStyle.alignSelf).toBe("flex-end");
+  expect(contentStyle.alignItems).toBe("flex-start");
   expect(contentStyle.position).toBeUndefined();
   expect(contentStyle.left).toBeUndefined();
-  expect(contentStyle.width).toBe("58%");
+  expect(contentStyle.width).toBe("56.6%");
+  expect(RN.StyleSheet.flatten(findText(payload.headline).props.style).fontSize).toBeCloseTo(68 * 393 / 1086);
+  expect(RN.StyleSheet.flatten(findText(payload.eyebrow).props.style).fontSize).toBeCloseTo(40 * 393 / 1086);
+  expect(RN.StyleSheet.flatten(findText(payload.ctaLabel).props.style).fontSize).toBeCloseTo(40 * 393 / 1086);
   expect(findText(payload.ctaLabel)).toBeDefined();
 });
 

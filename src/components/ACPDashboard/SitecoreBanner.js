@@ -65,13 +65,14 @@ export default function SitecoreBanner({ presentation = "cms" }) {
   const lightText = !banner.lightText;
   const whiteReference = referencePresentation && banner.lightText;
   const tabletScale = (cardWidth || width) / 2000;
+  const rightReference = referencePresentation && alignment === "right";
+  const referenceScale = (cardWidth || width) / (tablet ? 2000 : 1086);
   const position = { left: "flex-start", center: "center", right: "flex-end" }[
     alignment
   ];
-  // Alignment selects the content column. Side columns retain a shared
-  // leading edge for copy and CTA, matching the CMS banner compositions.
-  const textAlignment = alignment === "center" ? "center" : "left";
-  const contentAlignment = alignment === "center" ? "center" : "flex-start";
+  // Apply CMS alignment to both the column and its copy/CTA.
+  const textAlignment = rightReference ? "left" : alignment;
+  const contentAlignment = rightReference ? "flex-start" : position;
   // CMS Light artwork uses purple copy; Dark artwork uses white copy.
   const foreground = whiteReference
     ? Color.colorMidnightblue
@@ -142,7 +143,8 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                   alignment === "left" ? (cardWidth || width) * 0.075 : 0,
                 paddingVertical: (cardWidth || width) * 0.04,
               },
-            { alignItems: contentAlignment },
+            rightReference && { width: "56.6%", paddingRight: 70 * referenceScale, paddingVertical: 65 * referenceScale },
+            { alignSelf: position, alignItems: contentAlignment },
             compact && !referencePresentation && styles.compactContent,
           ]}
         >
@@ -157,6 +159,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                     lineHeight: 50 * tabletScale,
                     marginBottom: 50 * tabletScale,
                   },
+                rightReference && { fontSize: 38 * referenceScale, lineHeight: 50 * referenceScale, marginBottom: 50 * referenceScale, fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "400" },
                 { color: eyebrowColor, textAlign: textAlignment },
               ]}
             >
@@ -176,6 +179,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                     lineHeight: 84 * tabletScale,
                     marginBottom: 80 * tabletScale,
                   },
+                rightReference && { fontSize: 68 * referenceScale, lineHeight: 84 * referenceScale, marginBottom: 90 * referenceScale, fontWeight: "600" },
                 { color: foreground, textAlign: textAlignment },
               ]}
             >
@@ -190,6 +194,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
               style={[
                 styles.button,
                 referencePresentation && !tablet && styles.referenceButton,
+                rightReference && { minHeight: 84 * referenceScale, paddingVertical: 14 * referenceScale, paddingHorizontal: 60 * referenceScale },
                 { backgroundColor: buttonBackground },
               ]}
             >
@@ -199,6 +204,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                   referencePresentation &&
                     !tablet &&
                     styles.referenceButtonText,
+                  rightReference && { fontSize: 50 * referenceScale, lineHeight: 55 * referenceScale },
                   { color: buttonForeground },
                 ]}
               >

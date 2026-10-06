@@ -580,6 +580,8 @@ const styles = StyleSheet.create({
   card: {
     // Width comes from the frame inset on overlayStack; look comes from AppStyles.card.
     alignSelf: "stretch",
+    borderWidth: 0,
+    overflow: "hidden",
   },
   contentWrapper: {
     flex: 1,
