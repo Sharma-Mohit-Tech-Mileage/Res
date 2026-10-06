@@ -110,7 +110,11 @@ export default function SitecoreBanner({ presentation = "cms" }) {
         source={uri ? { uri } : undefined}
         onError={() => setFailedImage(selectedImage)}
         resizeMode="cover"
-        imageStyle={[backgroundImageStyle, styles.imageFit]}
+        imageStyle={[
+          backgroundImageStyle,
+          styles.imageFit,
+
+        ]}
         style={[
           styles.card,
           {
@@ -123,7 +127,8 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                     : 660 / 1086
                   : 220 / 354),
             ),
-            backgroundColor: lightText ? "#79246C" : "#FFFFFF",
+            backgroundColor:
+              uri ? "transparent" : lightText ? "#79246C" : "#FFFFFF",
             alignItems: position,
           },
         ]}
@@ -144,6 +149,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                 paddingVertical: (cardWidth || width) * 0.05,
               },
             rightReference && { width: "56.6%", paddingRight: 70 * referenceScale },
+            rightReference && !tablet && { paddingVertical: 15 * referenceScale },
             rightReference && tablet && { paddingVertical: 100 * referenceScale },
             { alignSelf: position, alignItems: contentAlignment },
             compact && !referencePresentation && styles.compactContent,
@@ -176,7 +182,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                   tablet && {
                     marginBottom: 80 * tabletScale,
                   },
-                rightReference && { marginBottom: 90 * referenceScale },
+                rightReference && { marginBottom: (tablet ? 90 : 65) * referenceScale },
                 tablet ? styles.tabletHeadlineText : styles.mobileHeadlineText,
                 { color: foreground, textAlign: textAlignment },
               ]}
@@ -227,7 +233,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
 }
 
 const styles = StyleSheet.create({
-  mobileEyebrowText: { fontSize: 14, lineHeight: 25, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
+  mobileEyebrowText: { fontSize: 14, lineHeight: 18, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
   tabletEyebrowText: { fontSize: 20, lineHeight: 35, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
   mobileHeadlineText: { fontSize: 20, lineHeight: 25, fontFamily: FontFamily.RadioCanadaBold, fontWeight: "700" },
   tabletHeadlineText: { fontSize: 28, lineHeight: 35, fontFamily: FontFamily.RadioCanadaBold, fontWeight: "700" },
