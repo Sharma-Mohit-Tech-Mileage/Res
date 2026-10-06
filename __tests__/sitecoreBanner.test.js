@@ -253,9 +253,9 @@ test("approved white presentation matches the reference palette and keeps conten
   expect(contentStyle.position).toBeUndefined();
   expect(contentStyle.left).toBeUndefined();
   expect(contentStyle.width).toBe("56.6%");
-  expect(RN.StyleSheet.flatten(findText(payload.headline).props.style).fontSize).toBeCloseTo(68 * 393 / 1086);
-  expect(RN.StyleSheet.flatten(findText(payload.eyebrow).props.style).fontSize).toBeCloseTo(40 * 393 / 1086);
-  expect(RN.StyleSheet.flatten(findText(payload.ctaLabel).props.style).fontSize).toBeCloseTo(40 * 393 / 1086);
+  expect(RN.StyleSheet.flatten(findText(payload.headline).props.style).fontSize).toBe(20);
+  expect(RN.StyleSheet.flatten(findText(payload.eyebrow).props.style).fontSize).toBe(16);
+  expect(RN.StyleSheet.flatten(findText(payload.ctaLabel).props.style).fontSize).toBe(18);
   expect(findText(payload.ctaLabel)).toBeDefined();
 });
 
@@ -296,4 +296,19 @@ test("approved white presentation uses the tablet artwork proportions", async ()
   const content = RN.StyleSheet.flatten(tree.root.findByProps({ testID: "sitecore-banner-content" }).props.style);
   expect(content.width).toBe("64%");
   expect(content.paddingLeft).toBeCloseTo(820 * 0.075);
+});
+
+ test.each([
+  [393, 16, 20, 18],
+  [767, 16, 20, 18],
+  [768, 18, 28, 20],
+  [1024, 18, 28, 20],
+])("uses device typography at width %s", async (width, eyebrowSize, headlineSize, ctaSize) => {
+  RN.useWindowDimensions.mockReturnValue({ width, height: 1180 });
+  await render();
+  expect(RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style)).toMatchObject({ minHeight: 48, paddingVertical: 8 });
+  expect(RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style).width).toBeUndefined();
+  expect(RN.StyleSheet.flatten(findText(payload.eyebrow).props.style)).toMatchObject({ fontSize: eyebrowSize, fontWeight: "600", fontFamily: "RadioCanada-SemiBold" });
+  expect(RN.StyleSheet.flatten(findText(payload.headline).props.style)).toMatchObject({ fontSize: headlineSize, fontWeight: "700", fontFamily: "RadioCanada-Bold" });
+  expect(RN.StyleSheet.flatten(findText(payload.ctaLabel).props.style)).toMatchObject({ fontSize: ctaSize, fontWeight: "600", fontFamily: "RadioCanada-SemiBold" });
 });

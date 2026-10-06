@@ -18,7 +18,7 @@ These values already exist in `.env.development`, `.env.staging`, and `.env.prod
 
 Content refreshes on screen focus and app foreground. Inactive/empty banners and API failures hide the banner. Missing or failed images retain a contrasting solid background. Missing/invalid CTA destinations omit the button; failed navigation shows an inline message.
 
-Validation: 19 focused tests cover environment URLs, field mapping, themes, alignment, tablet media, CTA navigation, refreshes, and failures. Component compilation checks also pass. Live CMS publishing and phone/tablet visual verification remain UAT checks: publish an edit, return to Home, and confirm it appears without rebuilding. Verify theme/artwork combinations and long text at enlarged accessibility sizes on both devices.
+Validation: 23 focused tests cover environment URLs, field mapping, themes, alignment, tablet media, CTA navigation, refreshes, and failures. Component compilation checks also pass. Live CMS publishing and phone/tablet visual verification remain UAT checks: publish an edit, return to Home, and confirm it appears without rebuilding. Verify theme/artwork combinations and long text at enlarged accessibility sizes on both devices.
 
 Artwork fills the banner using proportional cover scaling, which crops edges when its aspect ratio differs from the card. No panel obscures the artwork. Theme and alignment must match the chosen CMS image. For the supplied white artwork with a phone on the left, configure `textAlignment: Right` and `textTheme: Light`; use Left with artwork whose open text area is on the left. The app does not infer or override editorial placement from image pixels.
 
@@ -28,4 +28,6 @@ Home and the mobile landing placement explicitly select `presentation="phone-lef
 
 The phone-left-white presentation uses cover scaling without zoom or translation, with a minimum height based on the selected phone/tablet artwork proportions. Its CMS-selected content column stays in normal layout flow, allowing wrapped text and the CTA to increase the card height. Phone typography is reduced to fit the composition; the headline is blue, the eyebrow purple, and the CTA purple with white text.
 
-In the reference presentation, Right places the content in the right column with a shared left edge for copy and CTA, matching the supplied composition. Font sizes, line heights, and gaps scale from the reference artwork dimensions (1086 phone / 2000 tablet); other alignments retain their existing typography.
+In the reference presentation, Right places the content in the right column with a shared left edge for copy and CTA, matching the supplied composition. Spacing scales from the reference artwork dimensions. Typography uses fixed device styles in every alignment: mobile eyebrow 16 semibold, headline 20 bold, CTA 18 semibold; tablet (window width >= 768) eyebrow 18 semibold, headline 28 bold, CTA 20 semibold. Font sizes use React Native logical units and retain accessibility font scaling.
+
+The CTA fits its label with horizontal padding and uses the same 48-point minimum height and 8-point vertical padding as dashboard feature buttons. It has no artwork-scaled width or height.

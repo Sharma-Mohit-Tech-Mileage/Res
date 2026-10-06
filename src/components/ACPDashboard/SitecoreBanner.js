@@ -141,9 +141,10 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                 width: alignment === "left" ? "64%" : "58%",
                 paddingLeft:
                   alignment === "left" ? (cardWidth || width) * 0.075 : 0,
-                paddingVertical: (cardWidth || width) * 0.04,
+                paddingVertical: (cardWidth || width) * 0.05,
               },
-            rightReference && { width: "56.6%", paddingRight: 70 * referenceScale, paddingVertical: 65 * referenceScale },
+            rightReference && { width: "56.6%", paddingRight: 70 * referenceScale },
+            rightReference && tablet && { paddingVertical: 100 * referenceScale },
             { alignSelf: position, alignItems: contentAlignment },
             compact && !referencePresentation && styles.compactContent,
           ]}
@@ -155,11 +156,10 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                 referencePresentation && !tablet && styles.referenceEyebrow,
                 referencePresentation &&
                   tablet && {
-                    fontSize: 40 * tabletScale,
-                    lineHeight: 50 * tabletScale,
                     marginBottom: 50 * tabletScale,
                   },
-                rightReference && { fontSize: 38 * referenceScale, lineHeight: 50 * referenceScale, marginBottom: 50 * referenceScale, fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "400" },
+                rightReference && { marginBottom: 50 * referenceScale },
+                tablet ? styles.tabletEyebrowText : styles.mobileEyebrowText,
                 { color: eyebrowColor, textAlign: textAlignment },
               ]}
             >
@@ -171,15 +171,13 @@ export default function SitecoreBanner({ presentation = "cms" }) {
               accessibilityRole="header"
               style={[
                 styles.headline,
-                compact && styles.compactHeadline,
                 referencePresentation && !tablet && styles.referenceHeadline,
                 referencePresentation &&
                   tablet && {
-                    fontSize: 68 * tabletScale,
-                    lineHeight: 84 * tabletScale,
                     marginBottom: 80 * tabletScale,
                   },
-                rightReference && { fontSize: 68 * referenceScale, lineHeight: 84 * referenceScale, marginBottom: 90 * referenceScale, fontWeight: "600" },
+                rightReference && { marginBottom: 90 * referenceScale },
+                tablet ? styles.tabletHeadlineText : styles.mobileHeadlineText,
                 { color: foreground, textAlign: textAlignment },
               ]}
             >
@@ -193,18 +191,13 @@ export default function SitecoreBanner({ presentation = "cms" }) {
               onPress={openCta}
               style={[
                 styles.button,
-                referencePresentation && !tablet && styles.referenceButton,
-                rightReference && { minHeight: 84 * referenceScale, paddingVertical: 14 * referenceScale, paddingHorizontal: 60 * referenceScale },
                 { backgroundColor: buttonBackground },
               ]}
             >
               <Text
                 style={[
                   styles.buttonText,
-                  referencePresentation &&
-                    !tablet &&
-                    styles.referenceButtonText,
-                  rightReference && { fontSize: 50 * referenceScale, lineHeight: 55 * referenceScale },
+                  tablet ? styles.tabletCtaText : styles.mobileCtaText,
                   { color: buttonForeground },
                 ]}
               >
@@ -220,13 +213,28 @@ export default function SitecoreBanner({ presentation = "cms" }) {
         </View>
       </ImageBackground>
       {!!banner.disclaimer && (
-        <Text style={styles.disclaimer}>{banner.disclaimer}</Text>
+        <Text
+          style={[
+            styles.disclaimer,
+            tablet ? styles.tabletDisclaimerText : styles.mobileDisclaimerText,
+          ]}
+        >
+          {banner.disclaimer}
+        </Text>
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  mobileEyebrowText: { fontSize: 14, lineHeight: 25, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
+  tabletEyebrowText: { fontSize: 20, lineHeight: 35, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
+  mobileHeadlineText: { fontSize: 20, lineHeight: 25, fontFamily: FontFamily.RadioCanadaBold, fontWeight: "700" },
+  tabletHeadlineText: { fontSize: 28, lineHeight: 35, fontFamily: FontFamily.RadioCanadaBold, fontWeight: "700" },
+  mobileCtaText: { fontSize: 18, lineHeight: 25, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
+  tabletCtaText: { fontSize: 22, lineHeight: 35, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
+  mobileDisclaimerText: { fontSize: 12, lineHeight: 16, fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "400" },
+  tabletDisclaimerText: { fontSize: 16, lineHeight: 16, fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "400" },
   container: {
     width: "100%",
     alignSelf: "stretch",
@@ -256,7 +264,7 @@ const styles = StyleSheet.create({
     paddingRight: 16,
   },
   referenceEyebrow: { fontSize: 12, lineHeight: 15, marginBottom: 12 },
-  referenceHeadline: { fontSize: 18, lineHeight: 22, marginBottom: 22 },
+  referenceHeadline: { marginBottom: 22 },
   referenceButton: { minHeight: 36, paddingVertical: 6, paddingHorizontal: 22 },
   referenceButtonText: { fontSize: 14 },
   compactContent: { width: "64%", paddingHorizontal: 12 },
@@ -271,19 +279,14 @@ const styles = StyleSheet.create({
   headline: {
     width: "100%",
     flexShrink: 1,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontSize: 22,
-    lineHeight: 26,
-    fontWeight: "700",
     marginBottom: 14,
   },
-  compactHeadline: { fontSize: 20, lineHeight: 24 },
   button: {
     maxWidth: "100%",
-    minHeight: 44,
+    minHeight: 48,
     borderRadius: 50,
     paddingHorizontal: 22,
-    paddingVertical: 10,
+    paddingVertical: 8,
     justifyContent: "center",
   },
   buttonText: {
@@ -297,9 +300,6 @@ const styles = StyleSheet.create({
     width: "84%",
     alignSelf: "center",
     flexShrink: 1,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    fontSize: 12,
-    lineHeight: 16,
     marginTop: 10,
     marginBottom: 8,
     textAlign: "center",
