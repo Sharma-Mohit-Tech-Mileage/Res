@@ -36,7 +36,7 @@ import FeatureFlags from "../../config/Featureflags";
 import AppStyles from "../../styles/AppStyles";
 import { A11Y } from "../../styles/theme";
 import { ScreenScroll } from "../common/customui/Screen";
-import { container } from "../../styles/utilities";
+import ResponsiveRow from "../common/customui/ResponsiveRow";
 import { HEADER_GRADIENT } from "../common/ProfileSettingsHeader";
 
 import {
@@ -440,7 +440,7 @@ const NewBillerHome = ({ navigation }) => {
             title="Sign up and save with Auto Pay and Paperless Billing"
             showBonus={true}
           />
-          <View style={container.stack}>
+          <ResponsiveRow>
             <FeatureCard
               title="Auto Pay"
               isLoading={loadingAutoPay}
@@ -463,7 +463,7 @@ const NewBillerHome = ({ navigation }) => {
                 navigation.navigate("account", { screen: "Notifications" })
               }
             />
-          </View>
+          </ResponsiveRow>
         </View>
       </View>
     </View>
