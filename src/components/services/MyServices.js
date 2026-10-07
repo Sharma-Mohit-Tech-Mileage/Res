@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from "react";
 import { View, RefreshControl, StyleSheet } from "react-native";
 import {
   SafeAreaProvider,
@@ -12,12 +18,14 @@ import InternetCard from "./cards/InternetCard";
 import VideoCard from "./cards/VideoCard";
 import PhoneCard from "./cards/PhoneCard";
 import StatusSection from "./sections/StatusSection";
-import PrimaryButton from "../common/customui/PrimaryButton";
+// import PrimaryButton from "../common/customui/PrimaryButton"; // Future Manage Equipment release.
+import MySpeedCard from "./manageEquipment/MySpeedCard";
+import { useServiceSpeedEquipment } from "./hooks/useServiceSpeedEquipment";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
-import { useAnnouncement } from '../../hooks/useAnnouncement';
+import { useAnnouncement } from "../../hooks/useAnnouncement";
 import { extractZipCode } from "../utility/constant";
 import { fetchCurrentUsageRequest } from "../../redux/actions/servicesActions";
 import { ScreenScroll } from "../common/customui/Screen";
@@ -29,11 +37,16 @@ import {
 const MyServicesContent = ({ route, navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
   const insets = useSafeAreaInsets();
+  const scrollRef = useRef(null);
+  const speedSectionY = useRef(0);
+  const scrollToMySpeed = useCallback(() => {
+    scrollRef.current?.scrollTo({ y: speedSectionY.current, animated: true });
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      triggerOnScreenEntry('MyServicesStack');
-    }, [triggerOnScreenEntry])
+      triggerOnScreenEntry("MyServicesStack");
+    }, [triggerOnScreenEntry]),
   );
   const dispatch = useDispatch();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
@@ -42,17 +55,23 @@ const MyServicesContent = ({ route, navigation }) => {
   const flagsReady = accountDetails?.services != null;
 
   const accountNumber = profileDetails.accountNumber || "";
+  const [speedRefreshKey, setSpeedRefreshKey] = useState(0);
+  const speedAccountNumber = accountDetails?.account_number || accountNumber;
+  const hasEeroDevice = useServiceSpeedEquipment(
+    speedAccountNumber,
+    speedRefreshKey,
+  );
   const legacySPA = accountDetails?.legacy_brand_by_spa;
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
   const { outageData, checking, checkStatus, clearOutageData } =
-    useOutageStatus('services');
+    useOutageStatus("services");
   const [refreshing, setRefreshing] = useState(false);
   const [hasUserInitiatedCheck, setHasUserInitiatedCheck] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       return () => setHasUserInitiatedCheck(false);
-    }, [])
+    }, []),
   );
 
   // Current usage for InternetCard dataPlan
@@ -85,6 +104,7 @@ const MyServicesContent = ({ route, navigation }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    setSpeedRefreshKey((value) => value + 1);
     await refetch();
     dispatch(fetchCurrentUsageRequest());
     clearOutageData();
@@ -117,6 +137,7 @@ const MyServicesContent = ({ route, navigation }) => {
       />
 
       <ScreenScroll
+        ref={scrollRef}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -137,6 +158,7 @@ const MyServicesContent = ({ route, navigation }) => {
               uploadSpeed={data?.internet?.uploadSpeed}
               loading={loading}
               dataPlan={dataPlan}
+              onViewMySpeed={scrollToMySpeed}
             />
           )}
 
@@ -167,12 +189,30 @@ const MyServicesContent = ({ route, navigation }) => {
           hasUserInitiatedCheck={hasUserInitiatedCheck}
         />
 
+        {/* Manage Equipment is deferred until a future release.
         <PrimaryButton
           title="Manage Equipment"
           buttonType="outline"
           onPress={() => navigation.navigate("manageEquipment")}
           containerStyle={styles.manageEquipmentButton}
         />
+        */}
+
+        {accountDetails?.services?.hsd === true && (
+          <View
+            onLayout={({ nativeEvent }) => {
+              speedSectionY.current = nativeEvent.layout.y;
+            }}
+          >
+            <MySpeedCard
+              key={speedAccountNumber}
+              hasEeroDevice={hasEeroDevice}
+              hideModemSpeed={!hasEeroDevice}
+              refreshKey={speedRefreshKey}
+              navigation={navigation}
+            />
+          </View>
+        )}
 
         <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
       </ScreenScroll>

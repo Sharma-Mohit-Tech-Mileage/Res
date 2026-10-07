@@ -17,6 +17,7 @@ const InternetCard = ({
   uploadSpeed,
   loading = false,
   dataPlan = null,
+  onViewMySpeed,
 }) => {
   const navigation = useNavigation();
 
@@ -80,7 +81,7 @@ const InternetCard = ({
             Internet
           </SectionTitle>
         </View>
-        <View style={{ padding: 16 }}>
+        <View style={{ padding: 16, paddingBottom: dataPlan ? 0 : 16 }}>
           {/* Plan Name */}
           <View style={styles.content}>
             <Text
@@ -168,7 +169,9 @@ const InternetCard = ({
 
               <Pressable
                 style={styles.speedTestRow}
-                onPress={() => navigation.navigate("manageEquipment")}
+                onPress={onViewMySpeed}
+                accessibilityRole="button"
+                accessibilityLabel="Test your device speed now, go to My Speed"
               >
                 <SpeedometerIcon />
                 <Hyperlink style={styles.speedTestLink}>
@@ -238,7 +241,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    marginTop: theme.spacing.base,
+    paddingVertical: theme.spacing.lg,
+    minHeight: 45,
   },
   speedTestLink: {
     marginLeft: theme.spacing.sm,
