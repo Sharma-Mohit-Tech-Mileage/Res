@@ -5,7 +5,8 @@ import { submitFeedback } from "../../network/apis/support/feedback.service";
 
 function* saveUserFeedback(action) {
   try {
-    yield call(submitFeedback, action.payload);
+    const response = yield call(submitFeedback, action.payload);
+    console.log("Feedback submission response:", response);
     action.navigation.navigate("ThumbsUp", { updateSuccess: true });
   } catch (error) {
     action.navigation.navigate("Feedback", { updateFailed: true });
