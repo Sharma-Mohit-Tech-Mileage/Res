@@ -93,6 +93,7 @@ export const ENDPOINTS = {
     GET_BILL_EXPLAINER: 'api/GetBillExplainer/Get',
 
     // Dashboard (internet/account APIs)
+    SITECORE_BANNER: 'api/Sitecore/Banner',
     INTERNET_PLAN: 'internet/api/internet/:accountId/plan',
     ACCOUNT_INFO: 'account/api/account/:accountId',
     INTERNET_SPEED_GET: 'internet/api/internet/:accountNumber/speedTest/Get',

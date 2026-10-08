@@ -23,7 +23,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-       <View style={[AppStyles.card,{ padding: 16, marginHorizontal: 16 }]}>
+        <View style={[AppStyles.card, { padding: 16, marginHorizontal: 16 }]}>
           <SkeletonPlaceholder
             backgroundColor={theme.colors.skeleton.base}
             highlightColor={theme.colors.skeleton.highlight}
@@ -44,10 +44,17 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
       <View style={[AppStyles.card, { marginHorizontal: 16 }]}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
+          <View
+            style={styles.iconWrapper}
+            accessible={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+          >
+            <ServiceIcon />
+          </View>
           <FieldTitle
             accessible={true}
-            style={{marginLeft: 8}}
+            style={{ marginLeft: 8 }}
             accessibilityLabel="TV & Video"
             accessibilityLevel={2}
             accessibilityRole="header"
@@ -57,24 +64,23 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
         </View>
 
         {/* Plan Name & Action */}
-        <View style={[styles.content,{padding: 16}]}>
+        <View style={[styles.content, { padding: 16 }]}>
           <Text
             style={styles.planName}
             accessible={true}
             accessibilityLabel={`Plan Name - ${planName}`}
           >
-            { planName && planName.charAt(0).toUpperCase() + planName.slice(1)}
+            {planName && planName.charAt(0).toUpperCase() + planName.slice(1)}
           </Text>
         </View>
-        <View  style={styles.bottomButton}>
-        <SecondaryButton
-          title="View Channel Lineup"
-          buttonType="submit"
-          onPress={handleChannelLineup}
-         
-          accessibilityLabel="View Channel Lineup, Opens in your browser"
-          accessibilityRole="button"
-        />
+        <View style={styles.bottomButton}>
+          <SecondaryButton
+            title="View Channel Lineup"
+            buttonType="submit"
+            onPress={handleChannelLineup}
+            accessibilityLabel="View Channel Lineup, Opens in your browser"
+            accessibilityRole="button"
+          />
         </View>
       </View>
     </View>
@@ -92,7 +98,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   // Service Header
-  serviceHeader: { ...AppStyles.cardHreader, backgroundColor: theme.colors.white },
+  serviceHeader: {
+    ...AppStyles.cardHreader,
+    alignItems: "center",
+    backgroundColor: theme.colors.white,
+  },
   iconWrapper: serviceCard.iconWrapper,
   serviceType: serviceCard.serviceType,
 
