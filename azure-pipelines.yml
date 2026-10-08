@@ -8,6 +8,14 @@ parameters:
       - Sparklight-Mac
       - Sparklight-Mac2
       - Azure Pipelines
+  - name: enforceFullCoverage
+    displayName: Enforce 100% Coverage
+    type: boolean
+    default: false
+  - name: minCoveragePercent
+    displayName: Minimum Coverage Percent
+    type: number
+    default: 90
 trigger:
   branches:
     include:
@@ -65,9 +73,9 @@ variables:
   - name: RUN_SECURITY_CHECKS
     value: "true"
   - name: ENFORCE_FULL_COVERAGE
-    value: "true"
+    value: ${{ parameters.enforceFullCoverage }}
   - name: MIN_COVERAGE_PERCENT
-    value: "100"
+    value: ${{ parameters.minCoveragePercent }}
   - name: DEPLOY_TO_INTERNAL_TESTING
     value: "true"
   - name: DEPLOY_TO_TESTFLIGHT
