@@ -34,7 +34,7 @@ test("paginates Apple build history and rejects API errors", async () => {
       ASC_KEY_PATH: apple,
       APP_BUNDLE_ID: "test.app",
       ASC_KEY_ID: "test",
-      IOS_MARKETING_VERSION: "30.0.1",
+      IOS_MARKETING_VERSION: "31.0.1",
       ASC_ISSUER_ID: "test",
     };
     const build = (version, expired, release = "current") => ({
@@ -42,7 +42,7 @@ test("paginates Apple build history and rejects API errors", async () => {
       relationships: {preReleaseVersion: {data: {id: release}}},
     });
     const included = [
-      {id:"current", type:"preReleaseVersions", attributes:{version:"30.0.1", platform:"IOS"}},
+      {id:"current", type:"preReleaseVersions", attributes:{version:"31.0.1", platform:"IOS"}},
       {id:"old", type:"preReleaseVersions", attributes:{version:"29.1.1", platform:"IOS"}},
     ];
     global.fetch = async (url) => {
