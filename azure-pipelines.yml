@@ -82,8 +82,10 @@ variables:
     value: "true"
   - name: INTERNAL_RELEASE_NOTES
     value: Automated build from $(Build.SourceBranchName)
+  - name: FIREBASE_APP_NAME
+    value: SparklightResidentialAndroid
   - name: FIREBASE_APP_ID
-    value: 1:75499972308:android:4c0337f7d52641242dbd41
+    value: 1:75499972308:android:fcf3efff504149f72dbd41
   - name: FIREBASE_PROJECT_ID
     value: mysparklight
   - name: androidVersionCode
@@ -1342,15 +1344,17 @@ stages:
               test -s "$APK_FILE" || { echo "Signed Dev release APK missing: $APK_FILE"; exit 1; }
               RELEASE_NOTES_FILE="$(Pipeline.Workspace)/release-notes/android.txt"
               test -s "$RELEASE_NOTES_FILE"
+              echo "Deploying to $FIREBASE_APP_NAME ($FIREBASE_APP_ID) in $FIREBASE_PROJECT_ID"
               npx --yes firebase-tools@15.0.0 appdistribution:distribute "$APK_FILE" \
                 --app "$FIREBASE_APP_ID" \
                 --project "$FIREBASE_PROJECT_ID" \
                 --release-notes-file "$RELEASE_NOTES_FILE" \
                 --non-interactive
-            displayName: Upload dev APK to mySparklight Residential App Distribution
+            displayName: Upload Dev APK to MySparklight / SparklightResidentialAndroid
             condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev')))
             env:
               PIPELINE_FIREBASE_TOKEN: $(FIREBASE_TOKEN)
+              FIREBASE_APP_NAME: $(FIREBASE_APP_NAME)
               FIREBASE_APP_ID: $(FIREBASE_APP_ID)
               FIREBASE_PROJECT_ID: $(FIREBASE_PROJECT_ID)
         ${{ if and(ne(variables['Build.RequestedForEmail'], 'SharmaM@corp.cableone.net'), or(eq(parameters.agentPool, 'Sparklight-Mac2'), and(eq(parameters.agentPool, 'auto'), eq(variables['Build.RequestedForEmail'], 'Kapil.Kumar@cableone.biz')))) }}:
