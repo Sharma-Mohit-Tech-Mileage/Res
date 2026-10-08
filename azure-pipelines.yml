@@ -787,7 +787,7 @@ stages:
               XCODE_CACHE_BRANCH=$(printf '%s' "$BUILD_SOURCEBRANCH" | shasum -a 256 | cut -d ' ' -f 1)
               echo "##vso[task.setvariable variable=XCODE_CACHE_BRANCH]$XCODE_CACHE_BRANCH"
               # Freeze cache inputs before pod install and signing patches change them.
-              XCODE_CACHE_INPUTS=$(shasum -a 256 ios/Podfile.lock ios/My Sparklight.xcodeproj/project.pbxproj | shasum -a 256 | cut -d ' ' -f 1)
+              XCODE_CACHE_INPUTS=$(shasum -a 256 ios/Podfile.lock "ios/My Sparklight.xcodeproj/project.pbxproj" | shasum -a 256 | cut -d ' ' -f 1)
               echo "##vso[task.setvariable variable=XCODE_CACHE_INPUTS]$XCODE_CACHE_INPUTS"
               mkdir -p "$(Pipeline.Workspace)/xcode-derived-data"
             displayName: Resolve Xcode cache version
