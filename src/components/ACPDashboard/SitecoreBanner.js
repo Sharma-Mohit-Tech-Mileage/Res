@@ -128,7 +128,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                   : 220 / 354),
             ),
             backgroundColor:
-              uri ? "transparent" : lightText ? "#79246C" : "#FFFFFF",
+              referencePresentation ? "#FFFFFF" : uri ? "transparent" : lightText ? "#79246C" : "#FFFFFF",
             alignItems: position,
           },
         ]}
@@ -233,12 +233,12 @@ export default function SitecoreBanner({ presentation = "cms" }) {
 }
 
 const styles = StyleSheet.create({
-  mobileEyebrowText: { fontSize: 14, lineHeight: 18, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
-  tabletEyebrowText: { fontSize: 20, lineHeight: 35, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
+  mobileEyebrowText: { fontSize: 16, lineHeight: 20, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
+  tabletEyebrowText: { fontSize: 18, lineHeight: 35, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
   mobileHeadlineText: { fontSize: 20, lineHeight: 25, fontFamily: FontFamily.RadioCanadaBold, fontWeight: "700" },
   tabletHeadlineText: { fontSize: 28, lineHeight: 35, fontFamily: FontFamily.RadioCanadaBold, fontWeight: "700" },
   mobileCtaText: { fontSize: 18, lineHeight: 25, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
-  tabletCtaText: { fontSize: 22, lineHeight: 35, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
+  tabletCtaText: { fontSize: 20, lineHeight: 35, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
   mobileDisclaimerText: { fontSize: 12, lineHeight: 16, fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "400" },
   tabletDisclaimerText: { fontSize: 16, lineHeight: 16, fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "400" },
   container: {

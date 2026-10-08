@@ -11,6 +11,9 @@ export default function formatSpeedTestTimestamp(value) {
   } else if (typeof value === "string") {
     timestamp = moment(value.trim(), [
       moment.ISO_8601,
+      "MM/DD/YYYY HH:mm:ss",
+      "MM/D/YYYY HH:mm:ss",
+      "M/DD/YYYY HH:mm:ss",
       "M/D/YYYY HH:mm:ss",
       "M/D/YYYY, h:mm:ss A",
       "M/D/YYYY, h:mm A",
