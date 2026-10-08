@@ -17,7 +17,8 @@
     "appium:setup:ios": "npm_config_legacy_peer_deps=true npx --no-install appium driver install xcuitest@7",
     "appium:smoke": "node e2e/appium/smoke.test.js",
     "appium:smoke:android": "PLATFORM=Android npm run appium:smoke",
-    "appium:smoke:ios": "PLATFORM=iOS npm run appium:smoke"
+    "appium:smoke:ios": "PLATFORM=iOS npm run appium:smoke",
+    "check:test-parity": "node scripts/ci/check-test-parity.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
