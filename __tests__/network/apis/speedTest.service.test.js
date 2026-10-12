@@ -32,6 +32,33 @@ beforeEach(() => {
 });
 afterEach(() => jest.useRealTimers());
 
+test("Eero accepts Success in successful start and result envelopes", async () => {
+  const latest = result();
+  latest.data.error = "Success";
+  _axios.get
+    .mockResolvedValueOnce({ status: 204 })
+    .mockResolvedValueOnce(latest);
+  _axios.post
+    .mockResolvedValueOnce({ data: { statusCode: 202, error: "Success" } })
+    .mockResolvedValueOnce({ data: true });
+  await expect(api.runEeroSpeedTest()).resolves.toMatchObject({
+    download: "980.4000244140625",
+    historySaved: true,
+  });
+});
+
+test("Eero still rejects service errors with a successful status code", async () => {
+  _axios.get.mockResolvedValueOnce({ status: 204 });
+  _axios.post.mockResolvedValueOnce({
+    data: { statusCode: 200, error: "Network unavailable" },
+  });
+  await expect(api.runEeroSpeedTest()).rejects.toMatchObject({
+    speedTestStage: "start",
+  });
+  expect(_axios.get).toHaveBeenCalledTimes(1);
+  expect(_axios.post).toHaveBeenCalledTimes(1);
+});
+
 test("accepts the observed GET envelope and nested history success", async () => {
   _axios.get.mockResolvedValue({
     data: {

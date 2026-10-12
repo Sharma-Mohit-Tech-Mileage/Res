@@ -43,8 +43,11 @@ const session = async (needsUser = false) => {
     },
   };
 };
+// Some successful wrappers put "Success" in the error field.
+const hasServiceError = (data) =>
+  Boolean(data?.error) && data.error !== "Success";
 const check = (data, codes) => {
-  if (!data || data.error || !codes.includes(Number(data.statusCode))) {
+  if (!data || hasServiceError(data) || !codes.includes(Number(data.statusCode))) {
     const error = new Error("Service request failed");
     error.serviceStatus = data?.statusCode;
     throw error;
@@ -93,7 +96,7 @@ const results = async (context, idType, networkId) => {
   if (response.status === 204 || response.data == null) return null;
   const payload = response.data;
   if (
-    payload.error ||
+    hasServiceError(payload) ||
     (payload.statusCode != null && Number(payload.statusCode) !== 200)
   )
     throw new Error("Unable to retrieve Eero results");

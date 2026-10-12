@@ -157,7 +157,8 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.base,
     marginBottom: theme.spacing.base,
     padding: theme.spacing.lg,
-    paddingBottom: theme.spacing['2xl'],
+    paddingTop: 10,
+    paddingBottom: theme.spacing.base,
   },
   header: {
     flexDirection: "row",
