@@ -1303,6 +1303,7 @@ stages:
             name: Sparklight-Mac2
             demands:
               - Agent.OS -equals Darwin
+              
         ${{ elseif or(eq(variables['Build.RequestedForEmail'], 'SharmaM@corp.cableone.net'), eq(parameters.agentPool, 'Sparklight-Mac'), and(eq(parameters.agentPool, 'auto'), ne(variables['Build.RequestedForEmail'], 'Kapil.Kumar@cableone.biz'))) }}:
           pool:
             name: Sparklight-Mac
