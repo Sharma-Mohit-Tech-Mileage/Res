@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import {
   AppState,
+  Image,
   ImageBackground,
   Linking,
   StyleSheet,
@@ -60,10 +61,10 @@ export default function SitecoreBanner({ presentation = "cms" }) {
     : banner.phoneImage || banner.tabletImage;
   const uri = selectedImage !== failedImage ? selectedImage : null;
   // These placements retain reference sizing while honoring CMS composition.
-  const referencePresentation = presentation === "phone-left-white";
-  const alignment = banner.alignment;
-  const lightText = !banner.lightText;
-  const whiteReference = referencePresentation && banner.lightText;
+  const referencePresentation = presentation === "phone-right-gradient";
+  const alignment = referencePresentation ? "left" : banner.alignment;
+  const lightText = referencePresentation || !banner.lightText;
+  const whiteReference = false;
   const tabletScale = (cardWidth || width) / 2000;
   const rightReference = referencePresentation && alignment === "right";
   const referenceScale = (cardWidth || width) / (tablet ? 2000 : 1086);
@@ -107,7 +108,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
     >
       <ImageBackground
         testID="sitecore-banner"
-        source={uri ? { uri } : undefined}
+        source={referencePresentation ? require("../../../assets/reach-mobile-background.png") : uri ? { uri } : undefined}
         onError={() => setFailedImage(selectedImage)}
         resizeMode="cover"
         imageStyle={[
@@ -128,11 +129,21 @@ export default function SitecoreBanner({ presentation = "cms" }) {
                   : 220 / 354),
             ),
             backgroundColor:
-              referencePresentation ? "#FFFFFF" : uri ? "transparent" : lightText ? "#79246C" : "#FFFFFF",
+              referencePresentation ? "#79246C" : uri ? "transparent" : lightText ? "#79246C" : "#FFFFFF",
             alignItems: position,
           },
         ]}
       >
+        {referencePresentation && (
+          <Image
+            testID="sitecore-banner-device"
+            source={require("../../../assets/reach-mobile-phone-right.png")}
+            resizeMode="contain"
+            style={styles.device}
+            accessible={false}
+            importantForAccessibility="no"
+          />
+        )}
         <View
           testID="sitecore-banner-content"
           style={[
@@ -152,6 +163,7 @@ export default function SitecoreBanner({ presentation = "cms" }) {
             rightReference && !tablet && { paddingVertical: 15 * referenceScale },
             rightReference && tablet && { paddingVertical: 100 * referenceScale },
             { alignSelf: position, alignItems: contentAlignment },
+            referencePresentation && styles.deviceLeftCopy,
             compact && !referencePresentation && styles.compactContent,
           ]}
         >
@@ -250,6 +262,19 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   card: { width: "100%", justifyContent: "center", overflow: "hidden" },
+  device: {
+    position: "absolute",
+    //right: "2%",
+    left: "60%",
+    top: "8%",
+    width: "48%",
+    height: "89%",
+  },
+  deviceLeftCopy: {
+    width: "58%",
+    paddingLeft: 16,
+    paddingRight: 8,
+  },
   imageFit: {
     width: "100%",
     height: "100%",

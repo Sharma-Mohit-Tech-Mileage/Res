@@ -217,27 +217,27 @@ test("right-side composition aligns the column, purple copy and CTA to the right
   ).toBe(Color.sparklightPrimaryPurple);
 });
 
-test("approved white presentation matches the reference palette and keeps content in the right column", async () => {
+test("gradient presentation places white copy on the left and the device on the right", async () => {
   axios.get.mockResolvedValue({
     data: { ...payload, textAlignment: "Right", textTheme: "Light" },
   });
   await act(async () => {
-    tree = renderer.create(<SitecoreBanner presentation="phone-left-white" />);
+    tree = renderer.create(<SitecoreBanner presentation="phone-right-gradient" />);
   });
   expect(
     RN.StyleSheet.flatten(tree.root.findByType(RN.ImageBackground).props.style)
       .alignItems,
-  ).toBe("flex-end");
+  ).toBe("flex-start");
   expect(
     RN.StyleSheet.flatten(findText(payload.headline).props.style),
-  ).toMatchObject({ color: Color.colorMidnightblue, textAlign: "left" });
+  ).toMatchObject({ color: "#FFFFFF", textAlign: "left" });
   expect(
     RN.StyleSheet.flatten(findText(payload.eyebrow).props.style).color,
-  ).toBe(Color.sparklightPrimaryPurple);
+  ).toBe("#FFFFFF");
   expect(
     RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style)
       .backgroundColor,
-  ).toBe(Color.sparklightPrimaryPurple);
+  ).toBe("#FFFFFF");
   const artwork = tree.root.findByType(RN.ImageBackground);
   expect(artwork.props.resizeMode).toBe("cover");
   expect(RN.StyleSheet.flatten(artwork.props.style).minHeight).toBeCloseTo(393 * 660 / 1086);
@@ -245,18 +245,22 @@ test("approved white presentation matches the reference palette and keeps conten
     RN.StyleSheet.flatten(artwork.props.imageStyle).transform,
   ).toBeUndefined();
   expect(RN.StyleSheet.flatten(artwork.props.style).backgroundColor).toBe(
-    "#FFFFFF",
+    "#79246C",
   );
   const contentStyle = RN.StyleSheet.flatten(tree.root.findByProps({ testID: "sitecore-banner-content" }).props.style);
-  expect(contentStyle.alignSelf).toBe("flex-end");
+  expect(contentStyle.alignSelf).toBe("flex-start");
   expect(contentStyle.alignItems).toBe("flex-start");
   expect(contentStyle.position).toBeUndefined();
   expect(contentStyle.left).toBeUndefined();
-  expect(contentStyle.width).toBe("56.6%");
+  expect(contentStyle.width).toBe("58%");
   expect(RN.StyleSheet.flatten(findText(payload.headline).props.style).fontSize).toBe(20);
   expect(RN.StyleSheet.flatten(findText(payload.eyebrow).props.style).fontSize).toBe(16);
   expect(RN.StyleSheet.flatten(findText(payload.ctaLabel).props.style).fontSize).toBe(18);
   expect(findText(payload.ctaLabel)).toBeDefined();
+  const device = tree.root.findByProps({ testID: "sitecore-banner-device" });
+  expect(device.props.source).toEqual(require("../assets/reach-mobile-phone-right.png"));
+  expect(RN.StyleSheet.flatten(device.props.style)).toMatchObject({ right: "2%", width: "38%" });
+  expect(artwork.props.source).toEqual(require("../assets/reach-mobile-background.png"));
 });
 
 test("approved white presentation uses the tablet artwork proportions", async () => {
@@ -267,7 +271,7 @@ test("approved white presentation uses the tablet artwork proportions", async ()
     scale: 2,
   });
   await act(async () => {
-    tree = renderer.create(<SitecoreBanner presentation="phone-left-white" />);
+    tree = renderer.create(<SitecoreBanner presentation="phone-right-gradient" />);
   });
   const artwork = tree.root.findByType(RN.ImageBackground);
   expect(artwork.props.resizeMode).toBe("cover");
@@ -283,10 +287,10 @@ test("approved white presentation uses the tablet artwork proportions", async ()
   RN.useWindowDimensions.mockReturnValue({ width: 820, height: 1180 });
   axios.get.mockResolvedValue({ data: { ...payload, textAlignment: "Left", textTheme: "Dark" } });
   await act(async () => {
-    tree = renderer.create(<SitecoreBanner presentation="phone-left-white" />);
+    tree = renderer.create(<SitecoreBanner presentation="phone-right-gradient" />);
   });
   const artwork = tree.root.findByType(RN.ImageBackground);
-  expect(artwork.props.source.uri).toBe("https://media.example.test/tablet.png");
+  expect(artwork.props.source).toEqual(require("../assets/reach-mobile-background.png"));
   expect(RN.StyleSheet.flatten(artwork.props.style).alignItems).toBe("flex-start");
   expect(RN.StyleSheet.flatten(artwork.props.imageStyle).transform).toBeUndefined();
   expect(RN.StyleSheet.flatten(findText(payload.headline).props.style)).toMatchObject({ color: "#FFFFFF", textAlign: "left" });
@@ -294,8 +298,8 @@ test("approved white presentation uses the tablet artwork proportions", async ()
   expect(RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style).backgroundColor).toBe("#FFFFFF");
   expect(RN.StyleSheet.flatten(findText(payload.ctaLabel).props.style).color).toBe(Color.sparklightPrimaryPurple);
   const content = RN.StyleSheet.flatten(tree.root.findByProps({ testID: "sitecore-banner-content" }).props.style);
-  expect(content.width).toBe("64%");
-  expect(content.paddingLeft).toBeCloseTo(820 * 0.075);
+  expect(content.width).toBe("58%");
+  expect(content.paddingLeft).toBe(16);
 });
 
  test.each([

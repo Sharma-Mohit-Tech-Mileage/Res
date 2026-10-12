@@ -100,7 +100,7 @@ const WelcomeCard = () => {
   return (
     <View style={styles.container}>
       {isNewDashboardEnabled ? (
-        <SitecoreBanner presentation="phone-left-white" />
+        <SitecoreBanner presentation="phone-right-gradient" />
       ) : (
         renderWelcomeBanner()
       )}
