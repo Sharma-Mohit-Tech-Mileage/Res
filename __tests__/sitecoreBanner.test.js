@@ -312,3 +312,21 @@ test("approved white presentation uses the tablet artwork proportions", async ()
   expect(RN.StyleSheet.flatten(findText(payload.headline).props.style)).toMatchObject({ fontSize: headlineSize, fontWeight: "700", fontFamily: "RadioCanada-Bold" });
   expect(RN.StyleSheet.flatten(findText(payload.ctaLabel).props.style)).toMatchObject({ fontSize: ctaSize, fontWeight: "600", fontFamily: "RadioCanada-SemiBold" });
 });
+
+ test("shows failure fallback and recovers on a successful foreground refresh", async () => {
+  axios.get.mockRejectedValue(new Error("Timeout"));
+  await act(async () => {
+    tree = renderer.create(<SitecoreBanner fallback={<RN.Text>Release offer</RN.Text>} />);
+  });
+  expect(findText("Release offer")).toBeDefined();
+  axios.get.mockResolvedValue({ data: payload });
+  await act(async () => onState("active"));
+  expect(findText("Release offer")).toBeUndefined();
+  expect(findText(payload.headline)).toBeDefined();
+  axios.get.mockRejectedValue(new Error("Offline"));
+  await act(async () => onState("active"));
+  expect(findText("Release offer")).toBeDefined();
+  axios.get.mockResolvedValue({ data: { active: false } });
+  await act(async () => onState("active"));
+  expect(tree.toJSON()).toBeNull();
+});
