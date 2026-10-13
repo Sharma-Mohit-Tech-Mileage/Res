@@ -164,7 +164,7 @@ export const dataUsageTabs = {
     fontSize: theme.typography.size.sm,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "600",
-    color: theme.colors.purpleBright,
+    color: theme.colors.text.secondary,
   },
 };
 

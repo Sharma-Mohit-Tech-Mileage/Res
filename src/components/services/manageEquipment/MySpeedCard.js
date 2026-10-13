@@ -15,6 +15,7 @@ import {
   SectionTitle,
 } from "../../common/customui/Typography";
 import { theme } from "../../../styles/theme";
+import { dataUsageTabs } from "../../../styles/compositions";
 import AppStyles from "../../../styles/AppStyles";
 
 
@@ -156,7 +157,8 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.spacing.base,
     marginBottom: theme.spacing.base,
     padding: theme.spacing.lg,
-    paddingBottom: theme.spacing['2xl'],
+    paddingTop: 10,
+    paddingBottom: theme.spacing.base,
   },
   header: {
     flexDirection: "row",
@@ -197,19 +199,23 @@ const styles = StyleSheet.create({
     color: theme.colors.purpleBright,
   },
   panel: { borderWidth: 1, borderColor: theme.colors.border },
-  tabs: { flexDirection: "row" },
+  tabs: {
+    ...dataUsageTabs.tabsContainer,
+    padding: 3,
+    marginBottom: theme.spacing.sm,
+  },
   tab: {
-    flex: 1,
-    minHeight: 48,
-    padding: theme.spacing.md,
-    backgroundColor: theme.colors.secondarySurface,
-    borderBottomWidth: 1,
-    borderColor: theme.colors.border,
-    alignItems: "center",
+    ...dataUsageTabs.tab,
+    paddingVertical: 10,
+    minHeight: 44,
     justifyContent: "center",
   },
-  activeTab: { backgroundColor: theme.colors.white, borderBottomColor: theme.colors.white },
-  tabText: { color: theme.colors.text.secondary },
+  activeTab: dataUsageTabs.activeTab,
+  tabText: {
+    ...dataUsageTabs.tabText,
+    fontSize: theme.typography.size.base,
+    fontWeight: "700",
+  },
   activeTabText: { color: theme.colors.purpleBright },
   testContent: { paddingHorizontal: theme.spacing.md, paddingTop: 0, paddingBottom: theme.spacing.lg },
   descriptionContainer: { minHeight: 48, justifyContent: "center", alignItems: "center" },

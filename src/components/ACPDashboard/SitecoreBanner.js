@@ -13,7 +13,8 @@ import { getBanner } from "../../network/apis/sitecore/banner.service";
 import Touchable from "../common/customui/Touchable";
 import { Color, FontFamily } from "../../styles/GlobalStyles";
 
-export default function SitecoreBanner({ presentation = "cms" }) {
+export default function SitecoreBanner({ presentation = "cms", fallback = null }) {
+  const [requestFailed, setRequestFailed] = useState(false);
   const [banner, setBanner] = useState(null);
   const [failedImage, setFailedImage] = useState(null);
   const [linkError, setLinkError] = useState(false);
@@ -28,12 +29,14 @@ export default function SitecoreBanner({ presentation = "cms" }) {
         try {
           const next = await getBanner();
           if (mounted && version === request) {
+            setRequestFailed(false);
             setBanner(next);
             setFailedImage(null);
             setLinkError(false);
           }
         } catch (_) {
           if (mounted && version === request) {
+            setRequestFailed(true);
             setBanner(null);
           }
         }
@@ -51,6 +54,9 @@ export default function SitecoreBanner({ presentation = "cms" }) {
     }, []),
   );
 
+  if (requestFailed) {
+    return fallback;
+  }
   if (!banner) {
     return null;
   }

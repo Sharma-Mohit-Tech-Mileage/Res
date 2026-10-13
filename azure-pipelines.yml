@@ -618,41 +618,20 @@ stages:
           - script: |
               set -euo pipefail
               TARGET_BRANCH="${SYSTEM_PULLREQUEST_TARGETBRANCH:-}"
-              SOURCE_BRANCH="${BUILD_SOURCEBRANCHNAME:-}"
-              CHANNEL="Demo"
+              CHANNEL="Staging"
               ANDROID_TASK="bundleStagingRelease"
 
               if [ "${BUILD_REASON:-}" = "PullRequest" ]; then
-                case "$TARGET_BRANCH" in
-                  refs/heads/dev|dev|refs/heads/Dev|Dev)
-                    CHANNEL="Dev"
-                    ANDROID_TASK="bundleDevRelease"
-                    ;;
-                  refs/heads/Demo|Demo)
-                    CHANNEL="Demo"
-                    ANDROID_TASK="bundleStagingRelease"
-                    ;;
-                  refs/heads/Prod|Prod|refs/heads/prod|prod|refs/heads/main|main)
-                    CHANNEL="Prod"
-                    ANDROID_TASK="bundleProdRelease"
-                    ;;
-                esac
+                RELEASE_BRANCH="${TARGET_BRANCH#refs/heads/}"
               else
-                case "$SOURCE_BRANCH" in
-                  dev|Dev)
-                    CHANNEL="Dev"
-                    ANDROID_TASK="bundleDevRelease"
-                    ;;
-                  Demo)
-                    CHANNEL="Demo"
-                    ANDROID_TASK="bundleStagingRelease"
-                    ;;
-                  Prod|prod|main)
-                    CHANNEL="Prod"
-                    ANDROID_TASK="bundleProdRelease"
-                    ;;
-                esac
+                RELEASE_BRANCH="${BUILD_SOURCEBRANCH#refs/heads/}"
               fi
+              case "$RELEASE_BRANCH" in
+                Prod|prod)
+                  CHANNEL="Prod"
+                  ANDROID_TASK="bundleProdRelease"
+                  ;;
+              esac
 
               ANDROID_APK_TASK="${ANDROID_TASK/bundle/assemble}"
               echo "##vso[task.setvariable variable=ANDROID_APK_TASK]$ANDROID_APK_TASK"
@@ -1267,12 +1246,81 @@ stages:
             vmImage: macos-latest
     variables:
       iosBuildNumber: $[stageDependencies.Setup.SetupJob.outputs['storeVersions.iosBuildNumber']]
+  - stage: AppDistribution
+    displayName: Android · Firebase App Distribution (Staging)
+    dependsOn:
+      - AndroidBuild
+    # Upload as soon as Android succeeds, independently of iOS/store stages.
+    condition: and(not(canceled()), ne(variables['Build.Reason'], 'PullRequest'), not(or(eq(variables['Build.SourceBranch'], 'refs/heads/Prod'), eq(variables['Build.SourceBranch'], 'refs/heads/prod'))), in(dependencies.AndroidBuild.result, 'Succeeded', 'SucceededWithIssues'))
+    jobs:
+      - job: AppDistributionJob
+        displayName: Upload signed staging APK
+        timeoutInMinutes: 15
+        steps:
+          - checkout: none
+          - task: DownloadPipelineArtifact@2
+            displayName: Download commit release notes
+            inputs:
+              buildType: current
+              artifactName: release-notes
+              targetPath: $(Pipeline.Workspace)/release-notes
+          - task: DownloadPipelineArtifact@2
+            displayName: Download android-build-$(androidVersionName)
+            inputs:
+              buildType: current
+              artifactName: android-build-$(androidVersionName)
+              targetPath: $(Pipeline.Workspace)/android-build
+          - task: NodeTool@0
+            displayName: Use Node 22 for Firebase CLI
+            inputs:
+              versionSpec: 22.x
+          - bash: |
+              set -euo pipefail
+              # Reuse the existing secret token, or let Firebase use the agent's
+              # existing login / Application Default Credentials. Undefined Azure
+              # macros must not be passed to Firebase as literal credentials.
+              if [[ -n "${PIPELINE_FIREBASE_TOKEN:-}" && "$PIPELINE_FIREBASE_TOKEN" != '$('* ]]; then
+                export FIREBASE_TOKEN="$PIPELINE_FIREBASE_TOKEN"
+              fi
+              APK_FILE="$(Pipeline.Workspace)/android-build/apk/Staging/release/app-Staging-release.apk"
+              test -s "$APK_FILE" || { echo "Signed staging release APK missing: $APK_FILE"; exit 1; }
+              RELEASE_NOTES_FILE="$(Pipeline.Workspace)/release-notes/android.txt"
+              test -s "$RELEASE_NOTES_FILE"
+              echo "Deploying to $FIREBASE_APP_NAME ($FIREBASE_APP_ID) in $FIREBASE_PROJECT_ID"
+              npx --yes firebase-tools@15.0.0 appdistribution:distribute "$APK_FILE" \
+                --app "$FIREBASE_APP_ID" \
+                --project "$FIREBASE_PROJECT_ID" \
+                --release-notes-file "$RELEASE_NOTES_FILE" \
+                --non-interactive
+            displayName: Upload Staging APK to MySparklight / SparklightResidentialAndroid
+            env:
+              PIPELINE_FIREBASE_TOKEN: $(FIREBASE_TOKEN)
+              FIREBASE_APP_NAME: $(FIREBASE_APP_NAME)
+              FIREBASE_APP_ID: $(FIREBASE_APP_ID)
+              FIREBASE_PROJECT_ID: $(FIREBASE_PROJECT_ID)
+        ${{ if and(ne(variables['Build.RequestedForEmail'], 'SharmaM@corp.cableone.net'), or(eq(parameters.agentPool, 'Sparklight-Mac2'), and(eq(parameters.agentPool, 'auto'), eq(variables['Build.RequestedForEmail'], 'Kapil.Kumar@cableone.biz')))) }}:
+          pool:
+            name: Sparklight-Mac2
+            demands:
+              - Agent.OS -equals Darwin
+              
+        ${{ elseif or(eq(variables['Build.RequestedForEmail'], 'SharmaM@corp.cableone.net'), eq(parameters.agentPool, 'Sparklight-Mac'), and(eq(parameters.agentPool, 'auto'), ne(variables['Build.RequestedForEmail'], 'Kapil.Kumar@cableone.biz'))) }}:
+          pool:
+            name: Sparklight-Mac
+            demands:
+              - Agent.Name -equals Mohits-MacBook-Pro-mobile
+              - Agent.OS -equals Darwin
+              - Agent.OSArchitecture -equals ARM64
+        ${{ else }}:
+          pool:
+            name: Azure Pipelines
+            vmImage: macos-latest
   - stage: PlayStore
     displayName: 08 · Play Store Internal
     dependsOn:
       - TestFlight
       - Setup
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Prod'), eq(variables['Build.SourceBranch'], 'refs/heads/prod')))
     jobs:
       - job: PlayStoreJob
         displayName: 08 · Play Store Internal
@@ -1302,14 +1350,14 @@ stages:
               echo "Using AAB: $AAB_PATH"
               echo "##vso[task.setvariable variable=AAB_FILE_PATH]$AAB_PATH"
             displayName: Resolve AAB for Internal Testing
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), not(or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'))), eq(variables['DEPLOY_TO_INTERNAL_TESTING'], 'true'))
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Prod'), eq(variables['Build.SourceBranch'], 'refs/heads/prod')), eq(variables['DEPLOY_TO_INTERNAL_TESTING'], 'true'))
           - script: |
               set -euo pipefail
               RELEASE_NOTES_FILE="$(Pipeline.Workspace)/release-notes/android.txt"
               test -s "$RELEASE_NOTES_FILE"
               echo "##vso[task.setvariable variable=GOOGLE_PLAY_RELEASE_NOTES]$RELEASE_NOTES_FILE"
             displayName: Generate Play Store release notes
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), not(or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'))), eq(variables['DEPLOY_TO_INTERNAL_TESTING'], 'true'))
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Prod'), eq(variables['Build.SourceBranch'], 'refs/heads/prod')), eq(variables['DEPLOY_TO_INTERNAL_TESTING'], 'true'))
           - task: ms-vsclient.google-play.google-play-release.GooglePlayRelease@4
             displayName: Publish AAB to Play Store Internal Testing
             inputs:
@@ -1320,43 +1368,13 @@ stages:
               track: internal
               releaseName: MySparklight Residential $(androidVersionName)
               changeLogFile: $(GOOGLE_PLAY_RELEASE_NOTES)
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), not(or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'))), eq(variables['DEPLOY_TO_INTERNAL_TESTING'], 'true'))
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Prod'), eq(variables['Build.SourceBranch'], 'refs/heads/prod')), eq(variables['DEPLOY_TO_INTERNAL_TESTING'], 'true'))
           - script: |
               echo "✅ Internal testing deployment completed successfully"
               echo "Release: $(androidVersionName) ($(androidVersionCode))"
               echo "Status: Uploaded to Google Play Internal Testing"
             displayName: Internal Testing Deployment Complete
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), not(or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev'))), eq(variables['DEPLOY_TO_INTERNAL_TESTING'], 'true'))
-          - task: NodeTool@0
-            displayName: Use Node 22 for Firebase CLI
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev')))
-            inputs:
-              versionSpec: 22.x
-          - bash: |
-              set -euo pipefail
-              # Reuse the existing secret token, or let Firebase use the agent's
-              # existing login / Application Default Credentials. Undefined Azure
-              # macros must not be passed to Firebase as literal credentials.
-              if [[ -n "${PIPELINE_FIREBASE_TOKEN:-}" && "$PIPELINE_FIREBASE_TOKEN" != '$('* ]]; then
-                export FIREBASE_TOKEN="$PIPELINE_FIREBASE_TOKEN"
-              fi
-              APK_FILE="$(Pipeline.Workspace)/android-build/apk/Dev/release/app-Dev-release.apk"
-              test -s "$APK_FILE" || { echo "Signed Dev release APK missing: $APK_FILE"; exit 1; }
-              RELEASE_NOTES_FILE="$(Pipeline.Workspace)/release-notes/android.txt"
-              test -s "$RELEASE_NOTES_FILE"
-              echo "Deploying to $FIREBASE_APP_NAME ($FIREBASE_APP_ID) in $FIREBASE_PROJECT_ID"
-              npx --yes firebase-tools@15.0.0 appdistribution:distribute "$APK_FILE" \
-                --app "$FIREBASE_APP_ID" \
-                --project "$FIREBASE_PROJECT_ID" \
-                --release-notes-file "$RELEASE_NOTES_FILE" \
-                --non-interactive
-            displayName: Upload Dev APK to MySparklight / SparklightResidentialAndroid
-            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/dev'), eq(variables['Build.SourceBranch'], 'refs/heads/Dev')))
-            env:
-              PIPELINE_FIREBASE_TOKEN: $(FIREBASE_TOKEN)
-              FIREBASE_APP_NAME: $(FIREBASE_APP_NAME)
-              FIREBASE_APP_ID: $(FIREBASE_APP_ID)
-              FIREBASE_PROJECT_ID: $(FIREBASE_PROJECT_ID)
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/Prod'), eq(variables['Build.SourceBranch'], 'refs/heads/prod')), eq(variables['DEPLOY_TO_INTERNAL_TESTING'], 'true'))
         ${{ if and(ne(variables['Build.RequestedForEmail'], 'SharmaM@corp.cableone.net'), or(eq(parameters.agentPool, 'Sparklight-Mac2'), and(eq(parameters.agentPool, 'auto'), eq(variables['Build.RequestedForEmail'], 'Kapil.Kumar@cableone.biz')))) }}:
           pool:
             name: Sparklight-Mac2

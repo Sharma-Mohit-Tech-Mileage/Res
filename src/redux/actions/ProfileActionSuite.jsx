@@ -246,6 +246,7 @@ export const fetchACPUserAccountDetails = ({ force = false } = {}) => ({
     type: SAVE_ACP_USER_ACCOUNT_DETAILS,
     payload: data,
   });
+  
 
   export const fetchEasyPayStatus = () => ({
     type: FETCH_EASYPAY_STATUS,

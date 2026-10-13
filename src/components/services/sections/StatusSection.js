@@ -101,7 +101,7 @@ const StatusSection = ({
 };
 
 const styles = StyleSheet.create({
-  container: { ...statusSection.container, marginBottom: theme.spacing["3xl"] },
+  container: { ...statusSection.container, marginBottom: theme.layout.cardGap },
   card: statusSection.card,
   alertInsideCard: statusSection.alertInsideCard,
   iconWrapper: statusSection.iconWrapper,
