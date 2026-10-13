@@ -6,9 +6,8 @@ import {
   FontSize,
   Color,
   Padding,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import Icon from "../common/Icon";
-import { card } from "../../styles/utilities";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../common/customui/Touchable";
 import {SectionTitle} from "../common/customui/Typography";
@@ -45,7 +44,7 @@ const FeatureCard = ({
   };
 
   return (
-    <View style={[AppStyles.card, { marginBottom: 16 }]}>
+    <View style={[AppStyles.card, styles.card]}>
       <View style={styles.header} accessible={true} accessibilityLabel={`${title}`} accessibilityRole="header" accessibilityLevel={2}>
         <SectionTitle>{title}</SectionTitle>
       </View>
@@ -104,27 +103,16 @@ const FeatureCard = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Color.sparklightWhite,
-    marginBottom: Padding.p_xl,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 1,
+  // flexGrow + button marginTop auto keep side-by-side cards equal height with aligned buttons; no effect when stacked.
+  card: {
+    flexGrow: 1,
   },
   header: {
     paddingHorizontal: Padding.p_base,
     paddingVertical: Padding.p_xs,
     borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_200,
+    borderBottomColor: Color.Gray300,
     backgroundColor: Color.colorWhitesmoke_100,
-  },
-  title: {
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-    fontSize: FontSize.size_lg,
-    color: Color.sparklightPrimaryPurple,
-    fontWeight: "700",
   },
   features: {
     paddingVertical: Padding.p_xs,
@@ -151,6 +139,7 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_base,
   },
   button: {
+    marginTop: "auto",
     marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
     paddingVertical: 8,
@@ -165,7 +154,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightPrimaryPurple,
   },
   buttonSuccess: {
-    backgroundColor: "#C8E9D0",
+    backgroundColor: Color.successTint,
     borderWidth: 1,
     borderColor: Color.sparklightGreen,
   },
@@ -178,7 +167,7 @@ const styles = StyleSheet.create({
     color: Color.sparklightWhite,
   },
   buttonTextSuccess: {
-    color: "#000",
+    color: Color.colorblack_100,
   },
 });
 

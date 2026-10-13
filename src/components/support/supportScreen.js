@@ -1,31 +1,20 @@
-import React, { useRef, useState, useCallback } from "react";
-import {
-  StyleSheet,
-  View,
-  ScrollView,
-} from "react-native";
+import React, { useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import Touchable from "../common/customui/Touchable";
-import { useSelector } from "react-redux";
 import {
-  Border,
   Padding,
   Color,
-  FontSize,
-  FontFamily,
-  Alert,
-} from "../../../GlobalStyles";
-import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import LinearGradient from "react-native-linear-gradient";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+} from "../../styles/GlobalStyles";
+import TabRootHeader from "../common/TabRootHeader";
+import { useNavigation } from "@react-navigation/native";
 
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 import RighIcon from "../../../assets/svgs/Chevonright";
 import Searchmd from "../../../assets/svgs/Searchmd";
-import ZendeskChatIcon from "../utility/ZendeskChatIcon";
-import {Title,MenuText, SectionTitle} from "../common/customui/Typography";
+import {MenuText, SectionTitle} from "../common/customui/Typography";
 import AppStyles from "../../styles/AppStyles";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const Support = ({ route }) => {
   const navigation = useNavigation();
@@ -88,7 +77,6 @@ const Support = ({ route }) => {
     },
   ];
 
-  
    React.useEffect(() => {
        const unsubscribe = navigation.addListener("focus", () => {
          // The screen is focused
@@ -106,47 +94,20 @@ const Support = ({ route }) => {
        return unsubscribe;
      }, [navigation]);
 
-
-
-  
   return (
     <View style={styles.support}>
-      <ProfileSettingsHeader
-        title=""
-        iconAlignment="right"
-        showIcon={false} // New prop to control icon visibility
+      <TabRootHeader
+        chatScreenName="Support"
+        icon={<SupportIcon white={Color.sparklightWhite} />}
+        title="Let's Connect!"
+        titleProps={{ accessible: true, accessibilityRole: "header", accessibilityLevel: 1, accessibilityLabel: "Let's Connect!" }}
       />
 
-      <LinearGradient
-        style={styles.linearGradientStyle}
-        locations={[0, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1.3, y: 0}}
-        colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
-      />
-      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-        <ZendeskChatIcon  screenName="Support" />
-      </View>
       <View style={[styles.mainContainer]}>
         <View style={[styles.containerFlexBox]}>
-          <View style={styles.header}>
-            <View style={styles.featuredIcon}>
-              {/* <Image
-                style={[styles.lifeBuoy02IconLayout]}
-                resizeMode="contain"
-                tintColor={"#FFF"}
-                source={require("../../../assets/phone-outgoing-03.png")}
-              /> */}
-              <SupportIcon white={'#fff'}/>
-            </View>
-            <View
-              style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}
-            >
-              <Title style={styles.wereHereTo} accessible={true} accessibilityRole="header" accessibilityLevel={1} accessibilityLabel="Let's Connect!">Let's Connect!</Title>
-            </View>
-          </View>
-          <ScrollView
-            style={{ width: "100%", padding: Padding.p_base,marginBottom:hp('42%') }}
+          <ScreenScroll
+            framed
+            stack
             ref={scrollViewRef}
            
           >
@@ -219,8 +180,7 @@ const Support = ({ route }) => {
                   </React.Fragment>
                 ))}
               </View>
-              
-            
+
               <View style={[styles.supportCardWithSpacing]}>
                 <View
                   style={[
@@ -270,10 +230,7 @@ const Support = ({ route }) => {
                   </Touchable>
                 </View>
               </View>
-           
-          
-            
-            
+
             <CustomerErrorPage
               visible={isAgentNotAvailable}
               message={
@@ -286,7 +243,7 @@ const Support = ({ route }) => {
               }}
               onClose={undefined}
             />
-          </ScrollView>
+          </ScreenScroll>
         </View>
       </View>
     </View>
@@ -325,16 +282,9 @@ const styles = StyleSheet.create({
   iconLeft: {
     marginRight: Padding.p_3xs,
   },
-  iconRight: {
-    marginRight: Padding.p_5xs,
-  },
   containerFlexBox: {
+    flex: 1,
     alignSelf: "stretch",
-    alignItems: "center",
-  },
-  lifeBuoy02IconLayout: {
-    height: 32,
-    width: 32,
   },
   iconStyle: {
     width: 24,
@@ -346,40 +296,6 @@ const styles = StyleSheet.create({
     paddingBottom: Padding.p_base,
     alignItems: "flex-start",
   },
-  headingTypo: {
-    textAlign: "auto",
-    color: Color.colorGray_100,
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    flex: 1,
-  },
-  featuredIcon: {
-    backgroundColor: Color.colorMidnightblue,
-    borderColor: Color.colorWhitesmoke_200,
-    borderWidth: 4,
-    width: 72,
-    height: 72,
-    padding: Padding.p_xs,
-    justifyContent: "center",
-    flexDirection: "row",
-    borderStyle: "solid",
-    borderRadius: Border.br_81xl,
-    alignItems: "center",
-  },
-  wereHereTo: {
-    width: 210,
-    lineHeight: 28,
-    paddingBottom: Padding.p_5xs,
-    textAlign: "center",
-  },
-  wereHereToHelpWrapper: {
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  header: {
-    alignSelf: "stretch",
-    alignItems: "center",
-  },
   searchChild: {
     flex: 1,
     paddingHorizontal: 0,
@@ -390,36 +306,22 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     height: 58,
   },
-  heading: {
-    color: Color.colorGray_100,
-    textAlign: "left",
-    lineHeight: 18,
-    fontSize: FontSize.size_lg,
-  },
   headingContainer: {
     paddingTop: Padding.p_5xl,
     paddingHorizontal: Padding.p_5xl,
     paddingBottom: Padding.p_base,
     flexDirection: "row",
-   
-   
+
   },
   mainContainer: {
-    paddingVertical: Padding.p_base,
+    // Fills the space under TabRootHeader so the framed scroll gets the full height.
+    flex: 1,
     alignItems: "center",
-    
   },
   support: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
-  },
-  linearGradientStyle: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    height: 150,
   },
   separator: {
     backgroundColor: Color.sparklightGray,
@@ -433,10 +335,6 @@ const styles = StyleSheet.create({
   },
   supportCardWithSpacing: {
     ...AppStyles.card,
-    marginTop: 16,
-    marginBottom: 150,
-    
-
   },
 });
 

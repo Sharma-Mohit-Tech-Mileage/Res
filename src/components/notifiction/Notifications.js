@@ -1,16 +1,18 @@
 import React, { useCallback, useMemo, useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import NotificationSection from "./NotificationSection";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { getUser } from "../../redux/utils/LocalStorage";
-import { Color, Padding } from "../../../GlobalStyles";
+import { Color } from "../../styles/GlobalStyles";
 import { getPrimaryEmail } from "../utility/constant";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint,ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
-import AppStyles from "../../styles/AppStyles";
+import { container } from "../../styles/utilities";
+import { ScreenScroll } from "../common/customui/Screen";
+import { logWarn } from "../../utils/logger";
 
 const Notifications = () => {
   const navigation = useNavigation();
@@ -106,7 +108,7 @@ const Notifications = () => {
         isComingSoon: false,
         settings: TextNotifSettings,
         infoMessage: phoneNumber
-          ? `Text alert are sent to ${phoneNumber}`
+          ? `Text alerts are sent to ${phoneNumber}`
           : "You have not enabled text notifications.",
         isLoading: textNotificationLoading,
       },
@@ -186,7 +188,7 @@ const Notifications = () => {
         },
         (error) => {
           setInAppNotificationLoading(false);
-          console.warn("Error on retrying getInAppNotificationsData", error);
+          logWarn("Error on retrying getInAppNotificationsData", error);
         }
       );
     });
@@ -213,7 +215,7 @@ const Notifications = () => {
         },
         (error) => {
           setTextNotificationLoading(false);
-          console.warn("Error on retrying getTextNotificationsData", error);
+          logWarn("Error on retrying getTextNotificationsData", error);
         }
       );
     });
@@ -233,7 +235,7 @@ const Notifications = () => {
         title="Notifications"
         onPressBack={handleBackPress}
       />
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScreenScroll framed style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.sectionsContainer}>
           {sections.map((section) => (
             <NotificationSection
@@ -246,7 +248,7 @@ const Notifications = () => {
             />
           ))}
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -254,16 +256,11 @@ const Notifications = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
   content: { flex: 1 },
 
-  sectionsContainer: {
-    paddingHorizontal: Padding.p_base,
-    paddingTop: Padding.p_5xl,
-    paddingBottom: Padding.p_13xl,
-    marginBottom: 200,
-  },
+  sectionsContainer: container.stack,
 });
 
 export default Notifications;

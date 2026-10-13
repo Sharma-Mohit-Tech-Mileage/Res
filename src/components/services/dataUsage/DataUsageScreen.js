@@ -1,11 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  RefreshControl,
-  StatusBar,
-} from "react-native";
+import { View, StyleSheet, RefreshControl, StatusBar } from "react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -18,7 +12,7 @@ import UsageChart from "./components/UsageChart";
 import ManageEquipmentCard from "./components/ManageEquipmentCard";
 import EeroPromoCard from "./components/EeroPromoCard";
 import { useDataUsage } from "../hooks/useDataUsage";
-import AppStyles from "../../../styles/AppStyles";
+import { ScreenScroll } from "../../common/customui/Screen";
 
 const DataUsageContent = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
@@ -96,7 +90,7 @@ const DataUsageContent = ({ navigation, route }) => {
         translucent
       />
       <ProfileSettingsHeader title="Data Usage" onPressBack={handleBack} />
-      <ScrollView
+      <ScreenScroll
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -132,7 +126,7 @@ const DataUsageContent = ({ navigation, route }) => {
           loading={activeTab === "monthly" ? monthlyUsageLoading : dailyUsageLoading}
         />
 
-        <ManageEquipmentCard equipment={equipment} />
+        <ManageEquipmentCard equipment={equipment} navigation={navigation} />
 
         {/* eero Promo */}
         <EeroPromoCard
@@ -147,7 +141,7 @@ const DataUsageContent = ({ navigation, route }) => {
         />
 
         <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -165,7 +159,7 @@ const styles = StyleSheet.create({
   },
   scrollView: container.page,
   scrollContent: {
-    paddingTop: theme.spacing.md,
+    paddingTop: theme.spacing.xl,
   },
 });
 

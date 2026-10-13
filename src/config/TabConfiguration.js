@@ -1,4 +1,4 @@
-import { Color } from "../../GlobalStyles";
+import { Color } from "../styles/GlobalStyles";
 
 export const TABS = [
   {

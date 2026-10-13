@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StyleSheet, Text, View, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
+import { StyleSheet, View, AccessibilityInfo, findNodeHandle } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
+import { FontFamily, Padding, Color, FontSize, Border } from "../../styles/GlobalStyles";
 import { securityQuestions } from "../utility/constant";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
@@ -16,12 +18,11 @@ import { GetApiRequest} from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
-import colors from "../../res/Colors";
-import { requiredField } from "../../styles/utilities";
 import aesEncryption from "../../../src/utils/AESEncryption";
 import { getUser } from "../../../src/redux/utils/LocalStorage";
 import AppStyles from '../../styles/AppStyles'
 import { HintText, SectionTitle, FieldTitle } from "../common/customui/Typography";
+import { logWarn } from "../../utils/logger";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
@@ -85,7 +86,7 @@ const PasswordSecurityEdit = () => {
             }
           }
         } catch (e) {
-          console.warn("Accessibility focus error:", e);
+          logWarn("Accessibility focus error:", e);
         }
       }, 300);
 
@@ -151,7 +152,7 @@ const PasswordSecurityEdit = () => {
         }
       },
       
-      (error) => console.warn(error)
+      (error) => logWarn(error)
     );
   };
 
@@ -202,7 +203,7 @@ const PasswordSecurityEdit = () => {
         title="Edit Security Question"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
-      <ScrollView ref={scrollViewRef} >
+      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} >
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card, styles.wrapperSpaceBlock1]}>
@@ -337,7 +338,7 @@ const PasswordSecurityEdit = () => {
             onRequestClose={() => setLoading(false)}
           />
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -499,21 +500,17 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   passwordSecurityEditInner: {
-    paddingVertical: Padding.p_5xl,
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 300
   },
   passwordSecurityEdit: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   }, BtnContainer: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.colorMidnightblue,
     justifyContent: "center",
   },
   Btn: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "center",
     padding: 16,

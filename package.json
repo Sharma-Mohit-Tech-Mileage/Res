@@ -17,7 +17,8 @@
     "appium:setup:ios": "npm_config_legacy_peer_deps=true npx --no-install appium driver install xcuitest@7",
     "appium:smoke": "node e2e/appium/smoke.test.js",
     "appium:smoke:android": "PLATFORM=Android npm run appium:smoke",
-    "appium:smoke:ios": "PLATFORM=iOS npm run appium:smoke"
+    "appium:smoke:ios": "PLATFORM=iOS npm run appium:smoke",
+    "check:test-parity": "node scripts/ci/check-test-parity.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
@@ -48,7 +49,7 @@
     "react-hook-form": "^7.49.2",
     "react-native": "0.77.2",
     "react-native-a11y-order": "^0.6.0",
-    "react-native-app-auth": "7.2.0",
+    "react-native-app-auth": "^8.4.1",
     "react-native-base64": "^0.2.1",
     "react-native-blob-util": "^0.23.2",
     "react-native-calendars": "^1.1312.1",
@@ -60,7 +61,7 @@
     "react-native-keychain": "^10.0.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-localization": "^2.3.2",
-    "react-native-pdf": "^7.0.2",
+    "react-native-pdf": "^7.0.5",
     "react-native-permissions": "^4.1.5",
     "react-native-reanimated": "~3.16.7",
     "react-native-responsive-screen": "^1.4.2",

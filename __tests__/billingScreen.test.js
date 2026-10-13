@@ -73,7 +73,14 @@ jest.mock('../src/components/common/customui/Touchable', () => {
   };
 });
 
-jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
+jest.mock('../src/components/common/ProfileSettingsHeader', () => ({
+  __esModule: true,
+  default: 'ProfileSettingsHeader',
+  TAB_BAND_EXTENSION: 52,
+  TAB_BADGE_SIZE: 72,
+  TAB_BADGE_TOP: 16,
+  useInternalHeaderHeight: () => 112,
+}));
 jest.mock('../src/components/utility/ZendeskChatIcon', () => 'ZendeskChatIcon');
 jest.mock('../src/components/common/Icon', () => 'Icon');
 jest.mock('../src/components/common/customui/LoadingOverlay', () => {
@@ -215,7 +222,7 @@ describe('BillingScreen behavior', () => {
 
     expect(mockGetApiRequest).not.toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(
-      'Error getting user status:',
+      '[App] [Error getting user status:]',
       expect.any(Error)
     );
 
@@ -235,7 +242,7 @@ describe('BillingScreen behavior', () => {
     });
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      'error on Billing auto pay',
+      '[App] [error on Billing auto pay]',
       expect.any(Error)
     );
 

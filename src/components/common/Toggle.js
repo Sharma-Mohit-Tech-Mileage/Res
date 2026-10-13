@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Animated, View, StyleSheet, Easing, AccessibilityInfo, Platform, findNodeHandle } from 'react-native';
-import { Color } from "../../../GlobalStyles";
+import { Color } from "../../styles/GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import Touchable from "./customui/Touchable";
 
@@ -89,7 +89,7 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false , label
     };
 
     const activeColor = Color.sparklightGreen;
-    const inactiveColor = Color.sparklightDarkGray;
+    const inactiveColor = Color.sparklightGray1;
 
     const getAccessibilityLabel = () => {
         // If control is disabled, report 'Disabled' state; otherwise use On/Off

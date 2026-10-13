@@ -1,10 +1,8 @@
 import { theme } from "./theme";
-import { card, iconBadge, typography, container } from "./utilities";
+import { card, iconBadge, typography } from "./utilities";
 
 export const serviceCard = {
-  container: {
-    ...container.section,
-  },
+  container: {},
 
   card: {
     ...card.base,
@@ -17,10 +15,10 @@ export const serviceCard = {
   },
 
   iconWrapper: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: `${theme.colors.primary}12`,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.secondarySurface,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -54,9 +52,7 @@ export const serviceCard = {
 };
 
 export const statusSection = {
-  container: {
-    marginBottom: theme.spacing["3xl"],
-  },
+  container: {},
   card: {
     ...card.base,
     ...theme.shadows.base,
@@ -79,33 +75,6 @@ export const statusSection = {
   subtitle: {
     ...typography.body,
     textAlign: "center",
-  },
-};
-
-export const header = {
-  container: {
-    paddingHorizontal: theme.spacing.base,
-    paddingTop: theme.spacing.xl,
-    alignItems: 'center',
-  },
-  iconWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: theme.spacing.sm,
-  },
-  iconBadge: {
-    borderColor: theme.colors.border,
-    borderWidth: 4,
-    width: 72,
-    height: 72,
-    backgroundColor: theme.colors.primaryDark,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    ...typography.h1,
-    textAlign: 'center',
   },
 };
 
@@ -153,7 +122,7 @@ export const cardHeader = {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: `${theme.colors.primary}12`,
+    backgroundColor: theme.colors.secondarySurface,
     alignItems: "center",
     justifyContent: "center",
     marginRight: theme.spacing.sm,
@@ -175,7 +144,7 @@ export const cardHeader = {
 export const dataUsageTabs = {
   tabsContainer: {
     flexDirection: "row",
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.secondarySurface,
     borderRadius: theme.radius.sm,
     padding: 2,
   },
@@ -203,7 +172,6 @@ export const dataUsageTabs = {
 export default {
   serviceCard,
   statusSection,
-  header,
   skeletonLoader,
   cardHeader,
   dataUsageTabs,

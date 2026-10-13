@@ -8,10 +8,12 @@ import {
   AccessibilityInfo,
 } from "react-native";
 import Touchable from "./customui/Touchable";
+import ModalCard from "./customui/ModalCard";
+import ModalOverlay from "./customui/ModalOverlay";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CopyIcon from "../../../assets/svgs/CopyIcon";
-import colors from "../../res/Colors";
-import { FontFamily } from "../../../GlobalStyles";
+
+import { FontFamily,Color } from "../../styles/GlobalStyles";
 
 const groupDigits = (value) =>
   String(value || "")
@@ -37,10 +39,10 @@ const TransferOfServiceModal = ({
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <View style={styles.overlay}>
-        <View style={styles.card} accessibilityViewIsModal={true}>
+      <ModalOverlay>
+        <ModalCard style={styles.card} accessibilityViewIsModal={true}>
           <View style={styles.titleRow}>
-            <AlertIcon color="#DD6D02" />
+            <AlertIcon color={Color.warningText} />
             <Text
               style={styles.title}
               accessibilityRole="header"
@@ -118,8 +120,8 @@ const TransferOfServiceModal = ({
               </Touchable>
             </>
           )}
-        </View>
-      </View>
+        </ModalCard>
+      </ModalOverlay>
     </Modal>
   );
 };
@@ -133,7 +135,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   card: {
-    backgroundColor: colors.snow_white,
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 24,
     paddingVertical: 32,
     paddingHorizontal: 32,
@@ -145,14 +147,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 20,
     fontWeight: "700",
     marginLeft: 8,
   },
   body: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 18,
     lineHeight: 22,
@@ -170,7 +172,7 @@ const styles = StyleSheet.create({
     marginTop: 36,
   },
   accountNumber: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaMedium,
     fontSize: 16,
     fontWeight: "500",
@@ -195,7 +197,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   copiedTipBubble: {
-    backgroundColor: "#34744B",
+    backgroundColor: Color.successBanner,
     borderRadius: 3,
     paddingVertical: 5,
     paddingHorizontal: 12,
@@ -208,29 +210,29 @@ const styles = StyleSheet.create({
     borderTopWidth: 7,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: "#34744B",
+    borderTopColor: Color.successBanner,
   },
   copiedTipText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 13,
   },
   primaryBtn: {
-    backgroundColor: colors.sparklight_bright_purple,
+    backgroundColor: Color.sparklightPrimaryPurple,
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 44,
   },
   primaryTxt: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontFamily: FontFamily.RadioCanadaBold,
     fontSize: 15,
     fontWeight: "700",
     paddingVertical: 14,
   },
   notRegistered: {
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 16,
     textAlign: "center",
@@ -244,7 +246,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   secondaryTxt: {
-    color: colors.sparklight_bright_purple,
+    color: Color.sparklightPrimaryPurple,
     fontFamily: FontFamily.RadioCanadaBold,
     fontSize: 15,
     fontWeight: "700",

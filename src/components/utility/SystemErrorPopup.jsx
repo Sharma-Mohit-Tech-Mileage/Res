@@ -5,10 +5,11 @@ import {
   StyleSheet,
   Modal,
 } from "react-native";
-import colors from "../../res/Colors";
-import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
+
+import { Color, Padding, Border, FontFamily } from "../../styles/GlobalStyles";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import Touchable from "../common/customui/Touchable";
+import CancelButton from "../common/customui/CancelButton";
 
 
 const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClose }) => {
@@ -41,7 +42,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               
             </View>
             <View
-              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
+              style={{ backgroundColor: Color.dialogSurface, height: 1, marginTop: 10 }}
             />
             <Text style={styles.message}>{message}</Text>
              <Touchable
@@ -56,17 +57,8 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               </Text>
             </Touchable>
            {onClose!=undefined && (
-            <Touchable
-              style={styles.closeBtn}
-              onPress={onClose}
-              accessibilityLabel="Cancel"
-            >
-              <Text
-                style={styles.closeAlertTxt}
-              >
-                Cancel
-              </Text>
-            </Touchable>
+            <CancelButton onPress={onClose} accessibilityLabel="Cancel"
+              containerStyle={{ marginTop: 15 }} />
            )}
           </View>
         </View>
@@ -77,7 +69,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.splash_bg,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   overlay: {
     flex: 1,
@@ -104,7 +96,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   message: {
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
     fontWeight: "400",
@@ -115,7 +107,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttons: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.Gray300,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
@@ -128,33 +120,33 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.black,
+    color: Color.colorblack_100,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 22,
     textAlign:'center',
     fontWeight: "400",
   },
   openBtn: {
-    backgroundColor: colors.sparklight_purple_blue,
+    backgroundColor: Color.colorMidnightblue,
     justifyContent: "center",
     width: "100%",
     marginTop: 20,
   },
   closeBtn: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: Color.Gray300,
     justifyContent: "center",
     width: "100%",
     marginTop: 15,
   },
   openPortaltxt: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   closeAlertTxt: {
-    color: colors.sparklight_purple_blue,
+    color: Color.colorMidnightblue,
     textAlign: "center",
     padding: 8,
     fontSize: 16,

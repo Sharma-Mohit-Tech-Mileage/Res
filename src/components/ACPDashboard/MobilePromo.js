@@ -1,4 +1,5 @@
 import React from "react";
+import SitecoreBanner from "./SitecoreBanner";
 import {
   View,
   StyleSheet,
@@ -7,34 +8,37 @@ import {
   Text,
   useWindowDimensions,
 } from "react-native";
-import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
-import { card } from "../../styles/utilities";
+
+import { FontFamily, FontSize, Color, Border } from "../../styles/GlobalStyles";
+
 import FeatureCard from "./FeatureCardMobile";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
 import Touchable from "../common/customui/Touchable";
 import AppStyles from "../../styles/AppStyles";
+import { assetWidthCap } from "../../utils/responsive";
 
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
+const OfferBanner = require("../../../assets/offer-banner-home.jpg");
 
 const MobilePromo = () => {
   const { width } = useWindowDimensions();
   const isCompactMobile = width <= 375;
 
   const showSparklightMobile = useFeatureFlag(
-    FeatureFlags.DASHBOARD_SPARKLIGHT_MOBILE_SECTION,
+    FeatureFlags.DASHBOARD_SPARKLIGHT_MOBILE_SECTION
   );
 
   const handleAddMobile = () => {
     Linking.openURL(
-      "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=pendingact",
+      "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=pendingact"
     );
   };
 
   const renderOfferBanner = () => {
     return (
       <ImageBackground
-        source={require("../../../assets/offer-banner-home.jpg")}
+        source={OfferBanner}
         style={[isCompactMobile && styles.offerCardCompact, AppStyles.card]}
         imageStyle={[AppStyles.card, styles.offerCardImage]}
         resizeMode="cover"
@@ -89,7 +93,7 @@ const MobilePromo = () => {
     );
   };
 
-  return (
+  const legacyPromo = (
     <>
       <View style={[AppStyles.card, styles.container]}>
         {showSparklightMobile ? (
@@ -143,11 +147,16 @@ const MobilePromo = () => {
           accessibilityLabel="Offer not available for FlexConnect. Certain taxes and fees do not apply."
           maxFontSizeMultiplier={1.2}
         >
-          *Offer not available for FlexConnect customers. Certain taxes
-          & fees do not apply.
+          *Offer not available for FlexConnect customers. Certain taxes & fees
+          do not apply.
         </Text>
       )}
     </>
+  );
+  return showSparklightMobile ? (
+    <SitecoreBanner presentation="phone-left-white" fallback={legacyPromo} />
+  ) : (
+    legacyPromo
   );
 };
 
@@ -156,18 +165,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   imageContainer: {
-    alignSelf: "center",
+    ...assetWidthCap(PromoImage),
     overflow: "hidden",
-    width: "100%",
-    // Cap at native asset width (326px) so iPad never upscales/blurs.
-    maxWidth: 326,
   },
   promoImage: {
-    width: "100%",
-    maxWidth: 326,
-    alignSelf: "center",
+    ...assetWidthCap(PromoImage),
     aspectRatio: 1.1,
-   
   },
   promoImageBackground: {
     resizeMode: "cover",
@@ -188,10 +191,7 @@ const styles = StyleSheet.create({
     lineHeight: 1,
   },
   offerCard: {
-    width: "100%",
-    // Cap at native asset width (354px) and center so iPad never upscales/blurs.
-    maxWidth: 354,
-    alignSelf: "center",
+    ...assetWidthCap(OfferBanner),
     aspectRatio: 354 / 225,
     minHeight: 225,
     overflow: "hidden",

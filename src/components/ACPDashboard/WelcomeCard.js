@@ -1,4 +1,5 @@
 import React from "react";
+import SitecoreBanner from "./SitecoreBanner";
 import {
   View,
   Text,
@@ -8,18 +9,23 @@ import {
   Linking,
   ImageBackground,
 } from "react-native";
-import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
+import {
+  FontFamily,
+  FontSize,
+  Color,
+  Padding,
+} from "../../styles/GlobalStyles";
 import PlayIcon from "../../../assets/svgs/PlayIcon";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { wp } from "../../utils/responsive";
 import Touchable from "../common/customui/Touchable";
-import { Title } from '../common/customui/Typography';
+import { Title } from "../common/customui/Typography";
 
 const WelcomeCard = () => {
   const isNewDashboardEnabled = useFeatureFlag(
     FeatureFlags.DASHBOARD_NEW_LAYOUT,
-    false,
+    false
   );
   const videoId = "C3cMQoWxv6I";
   const { width: screenWidth } = useWindowDimensions();
@@ -62,7 +68,7 @@ const WelcomeCard = () => {
             ]}
             onPress={() => {
               Linking.openURL(
-                "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome",
+                "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=activehome"
               );
             }}
             accessible={true}
@@ -71,7 +77,11 @@ const WelcomeCard = () => {
             accessibilityHint="Opens Sparklight mobile offer"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
-            <Text style={styles.getOfferButton} importantForAccessibility="no" maxFontSizeMultiplier={1.2}>
+            <Text
+              style={styles.getOfferButton}
+              importantForAccessibility="no"
+              maxFontSizeMultiplier={1.2}
+            >
               Get Offer
             </Text>
           </Touchable>
@@ -82,17 +92,17 @@ const WelcomeCard = () => {
 
   const renderWelcomeBanner = () => {
     return (
-        <View style={styles.container}>
-      {/* <Text style={styles.title} >We're Excited to Connect with you!</Text> */}
+      <View style={styles.container}>
+        {/* <Text style={styles.title} >We're Excited to Connect with you!</Text> */}
 
-      <View style={[styles.videoContainer, { aspectRatio: 2 }]}>
-       {/*accessible={true}
+        <View style={[styles.videoContainer, { aspectRatio: 2 }]}>
+          {/*accessible={true}
        accessibilityLabel="Welcome to Sparklight, video title."
        accessibilityRole="link">*/}
-        {/* <VideoPlayer videoId={videoId} /> */}
-        <Image
+          {/* <VideoPlayer videoId={videoId} /> */}
+          <Image
             source={heroSource}
-            style={{ width: '100%', height: '100%' }}
+            style={{ width: "100%", height: "100%" }}
             resizeMode="cover"
             accessible={false}
             importantForAccessibility="no"
@@ -124,7 +134,7 @@ const WelcomeCard = () => {
               <View
                 style={{ marginLeft: 5, alignSelf: "center", marginTop: 3 }}
               >
-               <PlayIcon />
+                <PlayIcon />
               </View>
             </Touchable>
           </View>
@@ -147,26 +157,33 @@ const WelcomeCard = () => {
               We’re excited to get you connected!
             </Title>
           </View>
-        
-
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {isNewDashboardEnabled ? renderOfferBanner() : renderWelcomeBanner()}
-      {isNewDashboardEnabled && (
-        <Text
-            style={[styles.offerDesclaimer]}
-            accessible={true}
-            accessibilityLabel="Offer not available for FlexConnect customers. Certain taxes and fees do not apply."
-            maxFontSizeMultiplier={1.2}
-          >
-            *Offer not available for FlexConnect customers. Certain
-            taxes & fees do not apply.
-          </Text>
+      {isNewDashboardEnabled ? (
+        <SitecoreBanner
+          presentation="phone-left-white"
+          fallback={
+            <>
+              {renderOfferBanner()}
+              <Text
+                style={[styles.offerDesclaimer]}
+                accessible={true}
+                accessibilityLabel="Offer not available for FlexConnect customers. Certain taxes and fees do not apply."
+                maxFontSizeMultiplier={1.2}
+              >
+                *Offer not available for FlexConnect customers. Certain taxes &
+                fees do not apply.
+              </Text>
+            </>
+          }
+        />
+      ) : (
+        renderWelcomeBanner()
       )}
     </View>
   );
@@ -217,7 +234,7 @@ const styles = StyleSheet.create({
   watchVideoButton: {
     marginVertical: Padding.p_sm,
     fontSize: FontSize.RadioCanadaSemiBold_size,
-    color: Color.sparklightaddGray,
+    color: Color.sparklightGray1,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
   offerDesclaimer: {

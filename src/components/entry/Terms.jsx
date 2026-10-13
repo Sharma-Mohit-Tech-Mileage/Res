@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Dimensions, Platform, } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, Platform } from "react-native";;
 import WebView from "react-native-webview";
-import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border, } from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import Touchable from "../common/customui/Touchable";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,7 +17,6 @@ import NavigationUtils from "./NavigationUtils";
 import AnnouncementPersistence from "../../manager/AnnouncementPersistence";
 const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
-const { width, height } = Dimensions.get("window");
 
 const Terms = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -168,7 +167,7 @@ const Terms = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   progressBar: {
-    height: height * 0.004, // 0.4% of screen height
+    height: 3,
     backgroundColor: "lightgrey",
   },
   progress: {
@@ -179,20 +178,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: width * 0.05, // 5% of screen width
+    padding: 20,
   },
   errorText: {
-    fontSize: width * 0.04, // 4% of screen width
-    marginBottom: height * 0.02, // 2% of screen height
+    fontSize: 16,
+    marginBottom: 16,
   },
   bottomBar: {
     height: 150,
-    backgroundColor: "#FFF",
-    borderTopColor: "#CCC",
+    backgroundColor: Color.sparklightWhite,
+    borderTopColor: Color.borderMuted,
     borderTopWidth: 1,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#171717",
+    shadowColor: Color.shadowDark,
     shadowOffset: { width: -2, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 3,

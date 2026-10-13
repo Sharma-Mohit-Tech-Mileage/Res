@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
+import { installApiLogging } from './apiLogging';
 import Config from "react-native-config";
+import { getAnalytics, resetAnalyticsData } from "@react-native-firebase/analytics";
 import { getUser, cleanUserData } from "../redux/utils/LocalStorage";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
@@ -16,6 +18,8 @@ const _axios = axios.create({
     headers: { 'Content-Type': 'application/json', 'CallingApp': 'MobileApp' },
 });
 
+installApiLogging(_axios);
+
 let isRefreshing = false;
 let failedQueue = [];
 
@@ -28,6 +32,8 @@ const processQueue = (error, token = null) => {
 };
 
 const isRetryableError = (error) => {
+    // gettoken is flagged noServerRetry: a rejected id token fails identically on replay, so only network failures retry.
+    if (error.config?.noServerRetry && error.response) return false;
     return (
         error.code === 'ECONNABORTED' ||
         error.message?.includes('timeout') ||
@@ -68,6 +74,8 @@ const retryRequest = async (axiosInstance, originalRequest, retryCount = 0, last
 
 const redirectToLogin = async () => {
     try {
+        // Clear the analytics identifier so post-logout events are not attributed to the previous account.
+        try { resetAnalyticsData(getAnalytics()).catch(() => {}); } catch (_) {}
         await clearAuthCookies();
         await cleanUserData();
         if (navigationRef.current) {
@@ -122,7 +130,7 @@ const AxiosInterceptorProvider = ({ children }) => {
                     }
                 }
 
-                if (isRetryableError(error) && !originalRequest._retryAttempted) {
+                if (isRetryableError(error) && !originalRequest.skipRetry && !originalRequest._retryAttempted) {
                     originalRequest._retryAttempted = true;
                     try { return await retryRequest(_axios, originalRequest); }
                     catch (retryError) { return Promise.reject(retryError); }
@@ -175,6 +183,7 @@ const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
         const res = await _axios.post(endpoint, requestBody, {
             headers: { 'Content-Type': 'application/json' },
             timeout: 30000,
+            noServerRetry: true,
             // Idempotent: retries replay already-serialised data, re-stringifying would double-encode it
             transformRequest: [(data, headers) => {
                 delete headers['Authorization'];
@@ -200,7 +209,7 @@ const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     try {
         const user = await getUser();
         const res = await _axios.post(endpoint, body, {
-            headers: { Authorization: `Bearer ${user.token}` },
+            headers: { Authorization: `Bearer ${user?.token}` },
         });
         handleResponse(res, onSuccess, onError, endpoint);
     } catch (err) {
@@ -212,7 +221,7 @@ const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
     try {
         const user = await getUser();
         const res = await _axios.put(endpoint, body, {
-            headers: { Authorization: `Bearer ${user.token}` },
+            headers: { Authorization: `Bearer ${user?.token}` },
         });
         handleResponse(res, onSuccess, onError, endpoint);
     } catch (err) {

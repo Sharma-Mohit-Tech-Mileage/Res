@@ -11,7 +11,7 @@ import {
   FontSize,
   Padding,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import Touchable from "../common/customui/Touchable";
 
 const concernOptions = [

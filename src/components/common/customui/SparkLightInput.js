@@ -11,7 +11,7 @@ import {
   Color,
   FontSize,
   Border,
-} from "../../../../GlobalStyles";
+} from "../../../styles/GlobalStyles";
 import { A11Y } from "../../../styles/theme";
 import { formatInputA11yReadout, setFocusToRef } from "../../../utils/a11y";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
@@ -43,10 +43,13 @@ const SparkLightInput = React.forwardRef(({
   required = false,
   onBlur: parentOnBlur,
   onFocus: parentOnFocus,
+  revealValue = false,
   ...props
 }, ref) => {
   const [isFocused, setIsFocused] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(!secure);
+  // 46381: long addresses are clipped by the field, so an eye toggle opens a popover under it showing the whole value.
+  const [revealOpen, setRevealOpen] = useState(false);
   const inputRef = useRef(null);
   const fieldRef = useRef(null);
   const hasBlurred = useRef(false);
@@ -102,6 +105,8 @@ const SparkLightInput = React.forwardRef(({
     setIsFocused(false);
     isFocusedRef.current = false;
     hasBlurred.current = true;
+    // 46381: scroll a long value back to its start so the field shows the head of the address, not the tail.
+    if (revealValue) inputRef.current?.setNativeProps({ selection: { start: 0, end: 0 } });
 
     if (parentOnBlur) parentOnBlur();
   };
@@ -109,9 +114,10 @@ const SparkLightInput = React.forwardRef(({
   // Common input styles
   const getInputStyles = () => [
     styles.textInput,
+    revealValue && { paddingRight: 52 },
     !editable && styles.disabledInput,
     error && { borderColor: "red" },
-    !isFocused && !error && { borderColor: Color.sparklightDarkGray },
+    !isFocused && !error && { borderColor: Color.sparklightGray1 },
   ];
 
   return (
@@ -150,56 +156,81 @@ const SparkLightInput = React.forwardRef(({
         )}
       </View>
 
-      <View
-        ref={fieldRef}
-        accessible={true}
-        accessibilityRole="text"
-        accessibilityLabel={`${formatInputA11yReadout({
-          label: accessibilityLabel || label || placeholder,
-          required,
-          value,
-          isPhoneNumber: getKeyboardType() === "phone-pad",
-          isSecure: secure,
-          // The real TextInput is a11y-hidden, so iOS never auto-reads the value — compose it here.
-          osAddsValue: false,
-        })}${editable ? ", double tap to edit" : ""}`}
-        accessibilityHint={error ? (errorHint || error) : undefined}
-        importantForAccessibility="yes"
-        style={[
-          styles.textInputContainer,
-          {
-            borderColor:
-              isFocused && error != undefined
-                ? "red"
-                : Color.sparklightDarkGray,
-          },
-        ]}
-      >
-        {showTextIcon && (
-          <View style={styles.lockIcon}>
-            <Passwordlock />
-          </View>
-        )}
+      {/* Not accessible on purpose: inside the accessible field iOS merges the eye toggle into one element and VoiceOver cannot reach it. */}
+      <View style={styles.fieldRow}>
+        <View
+          ref={fieldRef}
+          accessible={true}
+          accessibilityRole="text"
+          accessibilityLabel={`${formatInputA11yReadout({
+            label: accessibilityLabel || label || placeholder,
+            required,
+            value,
+            isPhoneNumber: getKeyboardType() === "phone-pad",
+            isSecure: secure,
+            // The real TextInput is a11y-hidden, so iOS never auto-reads the value — compose it here.
+            osAddsValue: false,
+          })}${editable ? ", double tap to edit" : ""}`}
+          accessibilityHint={error ? (errorHint || error) : undefined}
+          importantForAccessibility="yes"
+          style={[
+            styles.textInputContainer,
+            {
+              borderColor:
+                isFocused && error != undefined
+                  ? "red"
+                  : Color.sparklightGray1,
+            },
+          ]}
+        >
+          {showTextIcon && (
+            <View style={styles.lockIcon}>
+              <Passwordlock />
+            </View>
+          )}
 
-        <TextInput
-          placeholder={placeholder}
-          value={value}
-          ref={inputRef}
-          onChangeText={handleInputChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          editable={editable}
-          secureTextEntry={secure && !passwordVisible}
-          style={getInputStyles()}
-          accessible={false}
-          importantForAccessibility="no"
-          keyboardType={getKeyboardType()}
-          returnKeyType="done"
-          keyboardAppearance="default"
-          maxFontSizeMultiplier={1.25}
-          {...props}
-        />
+          <TextInput
+            placeholder={placeholder}
+            value={value}
+            ref={inputRef}
+            onChangeText={handleInputChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            editable={editable}
+            secureTextEntry={secure && !passwordVisible}
+            style={getInputStyles()}
+            accessible={false}
+            importantForAccessibility="no"
+            keyboardType={getKeyboardType()}
+            returnKeyType="done"
+            keyboardAppearance="default"
+            maxFontSizeMultiplier={1.25}
+            selection={revealValue && !isFocused ? { start: 0, end: 0 } : undefined}
+            {...props}
+          />
+        </View>
+        {revealValue && !!value && (
+          <Touchable
+            onPress={() => setRevealOpen(!revealOpen)}
+            style={styles.revealEyeBtn}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: revealOpen }}
+            accessibilityLabel={revealOpen ? "Hide full email address" : "Show full email address"}
+            accessibilityHint="Double tap to see the full email address"
+          >
+            {revealOpen ? <EyeSlashIcon /> : <EyeIcon />}
+          </Touchable>
+        )}
       </View>
+
+      {revealValue && revealOpen && !!value && (
+        <View style={styles.revealPopover} accessibilityLiveRegion="polite">
+          <View style={styles.revealArrow} />
+          <Text style={styles.revealText} selectable>
+            {value}
+          </Text>
+        </View>
+      )}
 
       {error && (
         <View
@@ -213,7 +244,7 @@ const SparkLightInput = React.forwardRef(({
             accessible={false}
             importantForAccessibility="no"
           >
-            <WarningIcon color="#EF4E3E" />
+            <WarningIcon color={Color.sparkLightRed} />
           </View>
           <Text
             style={styles.errorText}
@@ -247,15 +278,62 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingVertical: 12,
     borderRadius: Border.br_5xs,
-    backgroundColor: '#FFFFFF',
-    borderColor:'#C7C7CC',
+    backgroundColor: Color.sparklightWhite,
+    borderColor:Color.inputBorder,
     width: "100%",
+  },
+  // 46381: eye toggle inside the field + popover beneath it.
+  fieldRow: {
+    position: "relative",
+    justifyContent: "center",
+  },
+  revealEyeBtn: {
+    position: "absolute",
+    right: 8,
+    top: 0,
+    bottom: 0,
+    minWidth: 44,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  revealPopover: {
+    marginTop: 8,
+    backgroundColor: Color.sparklightWhite,
+    borderWidth: 1,
+    borderColor: Color.inputBorder,
+    borderRadius: Border.br_5xs,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    shadowColor: Color.colorblack_100,
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  // little pointer up towards the eye toggle
+  revealArrow: {
+    position: "absolute",
+    top: -6,
+    right: 18,
+    width: 10,
+    height: 10,
+    backgroundColor: Color.sparklightWhite,
+    borderLeftWidth: 1,
+    borderTopWidth: 1,
+    borderColor: Color.inputBorder,
+    transform: [{ rotate: "45deg" }],
+  },
+  revealText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.RadioCanadaRegular,
+    color: Color.colorGray_200,
+    flexWrap: "wrap",
   },
   textInputContainer: {
     borderWidth: 0,
     borderRadius: Border.br_5xs,
 
-    borderColor: "#C7C7CC",
+    borderColor: Color.inputBorder,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -311,9 +389,9 @@ const styles = StyleSheet.create({
   eyeText: {
     marginLeft: 6,
     lineHeight: 28,
-    color: "#8D3B90",
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: "underline",
-    textDecorationColor: "#8D3B90",
+    textDecorationColor: Color.sparklightPrimaryPurple,
   },
   lockIcon: {
     width: 20,

@@ -1,11 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import colors from "../../../res/Colors";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { FontFamily, Padding } from "../../../../GlobalStyles";
-import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
-import { card } from "../../../styles/utilities";
-import Config from "react-native-config";
+import { wp } from "../../../utils/responsive";
+import { FontFamily, Color } from "../../../styles/GlobalStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -17,12 +13,12 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
     return (
       <View style={{ flexDirection: "column" }}>
         <Tooltip
-          backgroundColor="#4C5458"
+          backgroundColor={Color.sparklightGray1}
           overlayColor="#00000000"
           width={180}
           height={100}
           popover={
-            <Text style={{ color: "#FFF" }}>
+            <Text style={{ color: Color.sparklightWhite }}>
               Your due date takes 10 business days to generate. Please check
               back later.
             </Text>
@@ -33,7 +29,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             <Text
               style={[
                 styles.dueDate,
-                { fontWeight: "400", color: colors.dark_grey },
+                { fontWeight: "400", color: Color.sparklightGray1 },
               ]}
             >
               {"on: "}
@@ -54,7 +50,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
   };
 
   return (
-    <View style={[AppStyles.card,{marginBottom: 16}]}>
+    <View style={AppStyles.card}>
       <View style={styles.cardHreader}>
         <View
           style={{ marginLeft: 10, flexDirection: "row", alignItems: "center" }}
@@ -89,7 +85,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
               styles.label,
               {
                 fontWeight: "400",
-                color: colors.Black_100,
+                color: Color.colorblack_100,
                 fontSize: 18,
                 paddingBottom: 5,
                 alignSelf: "center",
@@ -142,8 +138,8 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
                 {
                   color:
                     dueDate == "Immediately"
-                      ? colors.sparklight_red
-                      : colors.darkest_grey,
+                      ? Color.sparkLightRed
+                      : Color. colorGray_200,
                   fontWeight: dueDate == "Immediately" ? "400" : "700",
                 },
               ]}
@@ -164,8 +160,8 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
                     fontWeight: "400",
                     color:
                       dueDate == "Immediately"
-                        ? colors.sparklight_red
-                        : colors.darkest_grey,
+                        ? Color.sparkLightRed
+                        : Color. colorGray_200,
                   },
                 ]}
               >
@@ -223,12 +219,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingBottom: 5,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: colors.sp_black,
+    color: Color.Black_100,
   },
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.darkest_grey,
+    color: Color. colorGray_200,
     alignSelf: "center",
     paddingBottom: 5,
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -237,11 +233,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: FontFamily.RadioCanadaRegular,
     fontWeight: "400",
-    color: colors.gray600,
+    color: Color.sparklightGray1,
   },
   
   paymentButtonText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     fontSize: 16,
     fontWeight: "600",
     alignSelf: "center",
@@ -249,7 +245,7 @@ const styles = StyleSheet.create({
   },
   cardHreader: {
    flexDirection: "row",
-    backgroundColor: "#F8F8F8",
+    backgroundColor: Color.colorWhitesmoke_100,
     width: "100%",
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,

@@ -6,7 +6,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border } from "../../styles/GlobalStyles";
 import Facesad from "../../../assets/svgs/SmileyUnsatisfiedsel";
 import Terrible from "../../../assets/svgs/SmileyVeryUnsatisfiedsel";
 import Faceneutral from "../../../assets/svgs/Smileyneutralsel";
@@ -82,7 +82,7 @@ const RatingOption = ({ option, isSelected, onPress, disabled, index }) => {
         disabled={disabled}
       >
         <View style={styles.iconContainer}>
-          <option.Icon color={isSelected ? "#fff" : undefined} />
+          <option.Icon color={isSelected ? Color.sparklightWhite : undefined} />
         </View>
         <Text
           allowFontScaling={false}

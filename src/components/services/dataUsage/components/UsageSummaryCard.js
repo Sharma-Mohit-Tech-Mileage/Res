@@ -1,3 +1,4 @@
+import ServiceIcon from "../../../../res/svgIcons/UsageServiceIcon";
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Platform, useWindowDimensions } from "react-native";
 import Animated, {
@@ -10,7 +11,6 @@ import Animated, {
 import { Svg, Circle, Line, Defs, LinearGradient, Stop, G } from "react-native-svg";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
-import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
 import AppStyles from "../../../../styles/AppStyles";
 import { SectionTitle } from "../../../common/customui/Typography";
@@ -208,14 +208,7 @@ const UsageSummaryCard = ({ currentUsage, loading = false }) => {
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={styles.header}>
-          {/* <View
-            style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            accessibilityElementsHidden={true}
-          >
-            <MaterialCommunityIcons name="chart-donut" size={20} color={theme.colors.primary} />
-          </View> */}
+          <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
           <SectionTitle accessibilityRole="header">
             Data Usage
           </SectionTitle>
@@ -302,8 +295,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing["2xs"],
-    backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: theme.radius.xs,
+    backgroundColor: theme.colors.secondarySurface,
+    borderRadius: theme.radius.base,
   },
   statValue: {
     fontSize: theme.typography.size.sm,

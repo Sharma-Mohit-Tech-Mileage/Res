@@ -1,3 +1,5 @@
+import DropdownCheck from "../../../../assets/svgs/dropdown-check";
+import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import React, { useRef, useEffect } from 'react';
 import {
   StyleSheet,
@@ -8,15 +10,16 @@ import {
   findNodeHandle,
   AccessibilityInfo,
   Platform,
-  Dimensions
+  useWindowDimensions
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Box } from 'native-base';
-import { Padding, Color, FontFamily, FontSize,Border } from "../../../../GlobalStyles";
+import { Padding, Color, FontFamily, FontSize,Border } from "../../../styles/GlobalStyles";
 import DownArrow from '../../../res/svgIcons/DownArrow';
 import IconButton from './IconButton';
 import Touchable from './Touchable';
-import {  FieldTitle, FieldContent} from '../customui/Typography';
+import AppStyles from '../../../styles/AppStyles';
+import { theme } from '../../../styles/theme';
 const SparkLightDropdown = ({
   items,
   selectedValue,
@@ -32,6 +35,7 @@ const SparkLightDropdown = ({
   const [visible, setVisible] = React.useState(false);
   const dropdownRef = useRef(null);
   const insets = useSafeAreaInsets();
+  const { height: windowHeight } = useWindowDimensions();
   const optionsListRef = useRef(null);
   const firstOptionRef = useRef(null);
 
@@ -131,7 +135,7 @@ const SparkLightDropdown = ({
             accessibilityLabel="Close dropdown"
           />
           <View 
-            style={styles.pickerContainer}
+            style={[styles.pickerContainer, { maxHeight: Math.round(windowHeight * 0.8) }]}
             accessibilityViewIsModal={true}
             importantForAccessibility="yes"
           >
@@ -141,7 +145,7 @@ const SparkLightDropdown = ({
                 <Text ref={optionsListRef}
                   style={styles.headerTitle}
                   accessible
-                  accessibilityRole="text"
+                  accessibilityRole="header"
                 >
                   {dropdownTitle}
                 </Text>
@@ -150,7 +154,7 @@ const SparkLightDropdown = ({
                   style={styles.closeButton}
                   accessibilityLabel="Close dropdown"
                 >
-                  <Text style={styles.closeButtonText} accessible={false}>✕</Text>
+                  <CloseIcon width={24} height={24} viewBox="0 0 18 18" accessible={false} />
                 </IconButton>
               </View>
             </View>
@@ -201,7 +205,7 @@ const SparkLightDropdown = ({
                     {item}
                   </Text>
                   {selectedValue === item && (
-                    <Text style={styles.checkmark} accessible={false}>✓</Text>
+                    <DropdownCheck style={styles.checkmark} accessible={false} />
                   )}
                 </Touchable>
               ))}
@@ -260,10 +264,9 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     width: '100%',
-    backgroundColor: '#F2F2F7',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    maxHeight: Math.round(Dimensions.get('window').height * 0.8),
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     zIndex: 2,
     shadowColor: "#000",
     shadowOffset: {
@@ -275,38 +278,33 @@ const styles = StyleSheet.create({
     elevation: 24,
   },
   header: {
-    backgroundColor: '#F2F2F7',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    paddingTop: 8,
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingTop: theme.spacing.lg,
   },
   grabber: {
-    width: 36,
-    height: 5,
-    backgroundColor: '#C7C7CC',
+    width: 48,
+    height: 4,
+    backgroundColor: theme.colors.border,
     borderRadius: 2.5,
     alignSelf: 'center',
     marginBottom: 8,
   },
   headerContent: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#C6C6C8',
+    paddingLeft: 28,
+    paddingRight: theme.spacing.lg,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
   },
   headerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000000',
-    textAlign: 'center',
+    ...AppStyles.H2,
+    flex: 1,
+    textAlign: 'left',
   },
   closeButton: {
-    position: 'absolute',
-    right: Padding.p_5xs, // 8 — slight inset so 48dp container's right edge stays clear
-    top: -Padding.p_xs, // -12 — vertically center over the 24dp header content row
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -316,7 +314,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   optionsList: {
-    backgroundColor: '#F2F2F7',
+    backgroundColor: theme.colors.surface,
     flexShrink: 1,
   },
   option: {
@@ -337,7 +335,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   selectedOption: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: theme.colors.secondarySurface,
   },
   optionText: {
     fontSize: 16,

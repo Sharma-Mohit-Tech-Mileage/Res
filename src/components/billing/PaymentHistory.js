@@ -9,15 +9,15 @@ import {
 import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding } from "../../styles/GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { ScreenFrame } from "../common/customui/Screen";
 import moment from "moment";
 import Icon from "../common/Icon";
 import { Hyperlink } from "../common/customui/Typography";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import {
   fetchPaymentHistory,
   downloadPaymentReceipt,
@@ -145,7 +145,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
   // Render payment item
   const renderPaymentItem = ({ item, index }) => {
     // Alternate background color for rows
-    const backgroundColor = index % 2 === 0 ? Color.sparklightWhite :  '#F8F8F8';
+    const backgroundColor = index % 2 === 0 ? Color.sparklightWhite :  Color.colorWhitesmoke_100;
     const isDownloading = downloading && downloadingPaymentId === item.extTransactionId;
 
     return (
@@ -212,7 +212,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         onPressBack={() => navigation.goBack()}
       />
 
-      <View style={styles.contentContainer}>
+      <ScreenFrame>
         {/* Display error notifications */}
         <View style={styles.notificationsContainer}>
           {error && showFetchError && (
@@ -247,13 +247,25 @@ const PaymentHistoryScreen = ({ navigation }) => {
               accessibilityLabel="Search by Confirmation ID, text field, double tap to edit">
             <TextInput
               style={styles.searchInput}
-              placeholder="Search by Confirmation ID"
               value={searchQuery}
               onChangeText={handleSearchChange}
-              placeholderTextColor={Color.sparklightGray1}
               accessible={false}
               importantForAccessibility="no"
             />
+            {/* A TextInput's native placeholder cannot shrink to fit, so render the hint
+                as Text and let it scale down instead of truncating. */}
+            {!searchQuery ? (
+              <View style={styles.searchPlaceholderFill} pointerEvents="none" importantForAccessibility="no-hide-descendants">
+                <Text
+                  style={styles.searchPlaceholder}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.65}
+                >
+                  Search by Confirmation ID
+                </Text>
+              </View>
+            ) : null}
             </View>
           </View>
           
@@ -281,7 +293,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         </View>
 
         {/* Payment History List */}
-         <View style={{ flex: 1,...AppStyles.card }}>
+         <View style={[AppStyles.card, styles.listCard]}>
         {loading && payments.length === 0 ? (
           <LoadingOverlay
           loading={loading}/>
@@ -304,7 +316,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
           </View>
         )}
         </View>
-      </View>
+      </ScreenFrame>
 
       {showPDFModal && (
         <PDFViewModal
@@ -319,13 +331,8 @@ const PaymentHistoryScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
-  },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: Padding.p_base,
-    marginBottom: hp("8%"),
   },
   notificationsContainer: {
     marginBottom: 16,
@@ -338,7 +345,7 @@ const styles = StyleSheet.create({
     gap: 10, // Add some gap between the elements
   },
   searchContainer: {
-    width: "65%", // Increased width from 48% to 65%
+    width: "65%",
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Color.sparklightWhite,
@@ -349,11 +356,25 @@ const styles = StyleSheet.create({
     minHeight: A11Y.minTouch,
   },
   sortContainer: {
-    width: "30%", // Adjusted to take the remaining width (after gap)
+    flex: 1, // Take all width left after the search box and gap so "Sort date" stays on one line where it fits
     alignItems: "flex-end", // Align content to the right side
   },
   searchIcon: {
     marginRight: 8,
+  },
+  // Absolute fill with centred content: an absolute Text with no top/bottom pins itself to the top edge.
+  searchPlaceholderFill: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
+  },
+  searchPlaceholder: {
+    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: FontSize.size_base,
+    color: Color.sparklightGray1,
   },
   searchInput: {
     flex: 1,
@@ -367,24 +388,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-end", // Align items to the right
     minHeight: A11Y.minTouch,
-    paddingHorizontal: Padding.p_5xs,
+    paddingLeft: Padding.p_5xs, // No right padding so the arrow lines up with the cards' right edge
+    maxWidth: "100%", // Keep the button inside its column so it never overlaps the search box
   },
   sortText: {
+    flexShrink: 1, // New Architecture does not shrink text by default; let "Sort date" wrap instead of overflowing
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
     color: Color.sparklightGray1,
     marginRight: 1,
   },
+  listCard: {
+    flex: 1,
+  },
   paymentsList: {
     flex: 1,
-    backgroundColor: Color.sparklightWhite,
-    ...AppStyles.card, // Use card style from AppStyles
-    marginBottom: 20,
   },
   paymentRow: {
     padding: Padding.p_base,
     borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_300,
+    borderBottomColor: Color.Gray300,
   },
   paymentDetails: {
     flex: 1,
@@ -412,12 +435,10 @@ const styles = StyleSheet.create({
     ...AppStyles.card, // Use card style from AppStyles
   },
   emptyContainer: {
-    ...AppStyles.card, // Use card style from AppStyles
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
     height: 60,
-    marginBottom: 20,
   },
   emptyText: {
     fontSize: FontSize.size_base,

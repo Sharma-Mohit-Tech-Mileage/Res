@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -7,7 +7,7 @@ import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
 import PaymentMethodCard from "./PaymentMethodCard";
-import { Color, FontFamily, FontSize, Border } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Border } from "../../../styles/GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
@@ -15,25 +15,38 @@ import {
   fetchAutoPayDetails,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
-  contentMaxWidth,
   isMethodUnusable,
   openOrbipayPaymentExecution,
   isCreditCard,
   useSurchargeRate,
   surchargeTitle,
   surchargeMessage,
+  buttonsInFrame,
 } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
+import AppStyles from "../../../styles/AppStyles";
+import { card } from "../../../styles/utilities";
+import {
+  usePaymentStep,
+  endPaymentAttempt,
+  trackPaymentMethodSelected,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 
 const MakePaymentMethodScreen = ({ navigation, route }) => {
   const surchargeRate = useSurchargeRate();
   const amount = Number(route.params?.amount) || 0;
+  const paymentType = route.params?.paymentType || "";
   const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
   const [selectedId, setSelectedId] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
   const abortRef = useRef(null);
+
+  usePaymentStep("payment_method");
 
   useFocusEffect(
     useCallback(() => {
@@ -50,10 +63,11 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
           setAutoPay(details);
           setSelectedId((prev) => prev || list.find((m) => m.isDefault && !isMethodUnusable(m))?.id || "");
         })
-        .catch(() => {
+        .catch((error) => {
           setMethods([]);
           setAutoPay({ enrolled: false });
           setErrorAlert("We could not load your payment methods. Please try again.");
+          trackApiError("payment-methods", errorStatus(error), "payment_method");
         });
       return () => abortRef.current?.abort();
     }, [route.params?.paymentFlash, navigation])
@@ -71,22 +85,32 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
     let cancelled = false;
     calculateFee(amount, selectedMethod)
       .then((fee) => !cancelled && setSurcharge(fee))
-      .catch(() => !cancelled && setSurcharge(null));
+      .catch((error) => {
+        if (cancelled) return;
+        setSurcharge(null);
+        trackApiError("fee-calculator", errorStatus(error), "payment_method");
+      });
     return () => {
       cancelled = true;
     };
   }, [selectedId, amount]);
   const isAutoPayLinked = (method) => !!autoPay?.enrolled && !!method.id && method.id === autoPay?.paymentMethodId;
 
+  const onSelectMethod = (method) => {
+    if (method.id !== selectedId) trackPaymentMethodSelected(method);
+    setSelectedId(method.id);
+  };
+
   const onPayWithNewMethod = () => {
     // email is resolved downstream (account primary email) — portal parity: no entry field here
-    openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: autoPay?.email || "" });
+    openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: autoPay?.email || "", paymentType });
   };
 
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} autoFocusBack />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
+      <ScreenScroll framed stack showsVerticalScrollIndicator={false}>
+        <View style={[AppStyles.card, card.content]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -123,14 +147,16 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
                 method={method}
                 variant="radio"
                 selected={method.id === selectedId}
-                onPress={() => setSelectedId(method.id)}
+                onPress={() => onSelectMethod(method)}
                 showAutoPayBadge={isAutoPayLinked(method)}
                 positionLabel={`${index + 1} of ${methods.length}`}
               />
             ))}
           </View>
         )}
+        </View>
 
+        <View style={buttonsInFrame}>
         {!loading && (
           <>
             <Touchable
@@ -147,24 +173,30 @@ const MakePaymentMethodScreen = ({ navigation, route }) => {
               buttonType="submit"
               disabled={!canContinue}
               accessibilityLabel="Continue"
-              onPress={() => canContinue && navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle, surcharge })}
+              onPress={() =>
+                canContinue &&
+                navigation.navigate("MakePaymentReview", { amount, methodId: selectedId, headerTitle, surcharge, paymentType })
+              }
             />
             <PrimaryButton
               title="Cancel"
               accessibilityLabel="Cancel payment"
-              onPress={() => navigation.popToTop()}
+              onPress={() => {
+                endPaymentAttempt();
+                navigation.popToTop();
+              }}
             />
           </>
         )}
-      </ScrollView>
+        </View>
+      </ScreenScroll>
 
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   heading: {
     marginBottom: 24,
   },
@@ -181,10 +213,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "stretch",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_81xl,
     borderWidth: 1,
-    borderColor: Color.colorMidnightblue,
+    borderColor: Color.sparklightPrimaryPurple,
     padding: 16,
     marginTop: 4,
   },

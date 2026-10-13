@@ -1,20 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  Pressable,
-  Keyboard,
-  AccessibilityInfo,
-} from "react-native";
+import { View, StyleSheet, Text, Pressable, Keyboard, AccessibilityInfo } from "react-native";
 import {
   Color,
   FontFamily,
   FontSize,
   Padding,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import EntryInput from "./EntryInput";
@@ -24,7 +16,8 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import {FieldTitle,HintText} from "../common/customui/Typography";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const EmailNotifications = ({ navigation }) => {
   const [input, setInput] = useState("");
@@ -133,7 +126,7 @@ const EmailNotifications = ({ navigation }) => {
           <View style={styles.headerTabTwo} />
           <View style={styles.headerTabThree} />
         </View> */}
-      <ScrollView
+      <ScreenScroll
         style={styles.inner}
         contentContainerStyle={styles.innerContent}
         ref={scrollRef}
@@ -241,7 +234,7 @@ const EmailNotifications = ({ navigation }) => {
         {!keyboardHidden && <View style={styles.textBottomHeight} />}
         
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -268,10 +261,10 @@ const styles = StyleSheet.create({
     minHeight: 50,
   },
   buttonDisabled: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.Gray300,
   },
   buttonDisabledText: {
-    color: Color.sparklightaddGray,
+    color: Color.sparklightGray1,
   },
   buttonsParent: {
     width: "100%",
@@ -305,12 +298,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerIconView: {
-    backgroundColor: "#FEFEFE",
+    backgroundColor: Color.offWhite,
     padding: 20,
     borderRadius: 100,
-    borderColor: "#EEE",
+    borderColor: Color.dividerLight,
     borderWidth: 1,
-    shadowColor: "#171717",
+    shadowColor: Color.shadowDark,
     shadowOffset: { width: -2, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -335,7 +328,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 25,
     textAlign: "center",
-    color: Color.sparklightaddGray,
+    color: Color.sparklightGray1,
     marginTop: 10,
   },
   subInput: {
@@ -367,18 +360,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerTabOne: {
-    backgroundColor: Color.sparklightSecondaryPurple+"1A",
+    backgroundColor: Color.colorMidnightblue+"1A",
     width: 100,
     height: 5,
   },
   headerTabTwo: {
-    backgroundColor: Color.sparklightSecondaryPurple+"1A",
+    backgroundColor: Color.colorMidnightblue+"1A",
     width: 100,
     height: 5,
     marginLeft: 10,
   },
   headerTabThree: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.colorMidnightblue,
     width: 100,
     height: 5,
     marginLeft: 10,

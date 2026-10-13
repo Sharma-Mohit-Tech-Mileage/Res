@@ -1,14 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import NextActionCard from "./NextActionCard";
-import NotificationAlert from "../../common/customui/NotificationAlert";
 import AnimatedSuccessIcon from "./AnimatedSuccessIcon";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { FieldTitle, FieldContent,HeadingH2 } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
-import { contentMaxWidth, formatCurrency } from "./paymentsShared";
+import { formatCurrency } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { setFocusToRef, announceA11y } from "../../../utils/a11y";
+import { currentPaymentAttempt, endPaymentAttempt, trackStepDuration } from "./paymentAnalytics";
 
 const KIND_COPY = {
   "autopay-activated": {
@@ -46,6 +48,17 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
     setFocusToRef(titleRef, { delay: 600 });
   }, [message]);
 
+  // Journey complete: close out the attempt so a follow-up flow gets a fresh id,
+  // but keep this attempt's id on the confirmation dwell so the journey stays whole.
+  useFocusEffect(
+    useCallback(() => {
+      const attemptId = currentPaymentAttempt();
+      endPaymentAttempt();
+      const startedAt = Date.now();
+      return () => trackStepDuration("confirmation", startedAt, attemptId);
+    }, [])
+  );
+
   const messageParts = message.split(/(\$[\d,]+\.?\d*)/g);
 
   const followUp =
@@ -62,6 +75,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               methodId: nextAction.methodId,
               fromOffer: true,
               headerTitle: "Make a Payment",
+              paymentType: "due",
             }),
         }
       : nextAction?.type === "setupAutoPay"
@@ -75,6 +89,7 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
               methodId: nextAction.methodId,
               fromOffer: true,
               headerTitle: "Set Up Auto Pay",
+              entryPoint: "payment_confirmation",
             }),
         }
       : null;
@@ -82,8 +97,8 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.popToTop()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
-        <View style={[card.elevated, styles.successCard]}>
+      <ScreenScroll framed showsVerticalScrollIndicator={false}>
+        <View style={[card.base, styles.successCard]}>
           <View style={styles.iconWrap} accessible={false} importantForAccessibility="no-hide-descendants">
             <AnimatedSuccessIcon size={64} />
           </View>
@@ -132,15 +147,14 @@ const PaymentConfirmationScreen = ({ navigation, route }) => {
           />
         )}
 
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
-  successCard: { paddingVertical: 32, paddingHorizontal: 16, alignItems: "center", marginTop: 16 },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
+  successCard: { paddingVertical: 32, paddingHorizontal: 16, alignItems: "center" },
   iconWrap: { marginBottom: 20 },
   title: {
     textAlign: "center",

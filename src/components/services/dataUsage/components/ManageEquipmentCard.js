@@ -1,20 +1,25 @@
+import ServiceIcon from "../../../../res/svgIcons/EquipmentServiceIcon";
 import React, { memo, useMemo, useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../../styles/theme";
-import { card } from "../../../../styles/utilities";
 import { cardHeader } from "../../../../styles/compositions";
 import { spellOutChars } from "../../../../utils/a11y";
 import AppStyles from "../../../../styles/AppStyles";
-import {SectionTitle} from "../../../common/customui/Typography";
+import { SectionTitle } from "../../../common/customui/Typography";
+// import GearIcon from "../../../../res/svgIcons/SettingsIcon"; // Future Manage Equipment release.
 const safeText = (v, fallback = "\u2014") =>
-  v === null || v === undefined || String(v).trim() === "" ? fallback : String(v);
+  v === null || v === undefined || String(v).trim() === ""
+    ? fallback
+    : String(v);
 
 const normalize = (v) => String(v ?? "").trim();
 
 const getIdentifier = (item) => {
   if (normalize(item?.identifierValue)) {
-    return { label: item?.identifierLabel || "Mac ID", value: safeText(item?.identifierValue) };
+    return {
+      label: item?.identifierLabel || "Mac ID",
+      value: safeText(item?.identifierValue),
+    };
   }
   return null;
 };
@@ -28,7 +33,8 @@ const buildA11yLabel = (item) => {
   if (model) parts.push(`Model, ${spellOutChars(model)}`);
 
   const identifier = getIdentifier(item);
-  if (identifier) parts.push(`${identifier.label}, ${spellOutChars(identifier.value)}`);
+  if (identifier)
+    parts.push(`${identifier.label}, ${spellOutChars(identifier.value)}`);
 
   return parts.join(". ") + ".";
 };
@@ -75,34 +81,38 @@ const EquipmentRow = memo(function EquipmentRow({ item, isLast }) {
   );
 });
 
-const ManageEquipmentCard = ({ equipment }) => {
-  const list = useMemo(() => (Array.isArray(equipment) ? equipment : []), [equipment]);
-  const getKey = useCallback(
-    (item, index) => String(item?.id ?? index),
-    []
+const ManageEquipmentCard = ({ equipment, navigation }) => {
+  const list = useMemo(
+    () => (Array.isArray(equipment) ? equipment : []),
+    [equipment],
   );
+  const getKey = useCallback((item, index) => String(item?.id ?? index), []);
 
   if (!list.length) return null;
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <View style={styles.header} accessibilityRole="header">
-          {/* <View
+        <View
+          style={[styles.header, { justifyContent: "space-between" }]}
+          accessibilityRole="header"
+        >
+          <View
             style={styles.iconWrapper}
             accessible={false}
+            accessibilityElementsHidden
             importantForAccessibility="no-hide-descendants"
-            accessibilityElementsHidden={true}
           >
-            <MaterialCommunityIcons
-              name="router-wireless"
-              size={18}
-              color={theme.colors.primary}
-            />
-          </View> */}
-          <SectionTitle  accessibilityRole="header">
+            <ServiceIcon />
+          </View>
+          <SectionTitle style={{ flex: 1 }} accessibilityRole="header">
             My Equipment
           </SectionTitle>
+          {/* Manage Equipment is deferred until a future release.
+          <Pressable onPress={() => navigation.navigate("manageEquipment")} accessibilityRole="button" accessibilityLabel="Manage Equipment">
+            <GearIcon/>
+          </Pressable>
+          */}
         </View>
 
         {list.map((item, index) => (
@@ -157,7 +167,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   detailText: {
-    fontWeight:'700',
+    fontWeight: "700",
     fontSize: theme.typography.size.base,
     color: theme.colors.text.secondary,
   },
@@ -166,7 +176,6 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: theme.colors.text.secondary,
   },
-
 });
 
 export default memo(ManageEquipmentCard);

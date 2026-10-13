@@ -65,7 +65,14 @@ jest.mock('react-native-permissions', () => ({
 }));
 
 jest.mock('react-native-linear-gradient', () => 'LinearGradient');
-jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
+jest.mock('../src/components/common/ProfileSettingsHeader', () => ({
+  __esModule: true,
+  default: 'ProfileSettingsHeader',
+  TAB_BAND_EXTENSION: 52,
+  TAB_BADGE_SIZE: 72,
+  TAB_BADGE_TOP: 16,
+  useInternalHeaderHeight: () => 112,
+}));
 jest.mock('../src/components/utility/SystemErrorPopup', () => (...args) => mockCustomerErrorPage(...args));
 jest.mock('../src/components/utility/ZendeskChatIcon', () => 'ZendeskChatIcon');
 jest.mock('../src/res/svgIcons/NewSupportIcon', () => 'SupportIcon');

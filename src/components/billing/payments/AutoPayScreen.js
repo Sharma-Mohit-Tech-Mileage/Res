@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -8,15 +9,16 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import LinkText from "../../common/customui/LinkText";
 import PaymentMethodCard from "./PaymentMethodCard";
 import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { SectionTitle, SectionContent, HintText, FieldTitle, Hyperlink } from "../../common/customui/Typography";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
+import { SectionTitle, SectionContent, FieldTitle, Hyperlink } from "../../common/customui/Typography";
 import AppStyles from "../../../styles/AppStyles";
+import { card } from "../../../styles/utilities";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
-  contentMaxWidth,
+  buttonsInFrame,
   ordinal,
   isMethodUnusable,
   openOrbipaySecureCapture,
@@ -25,14 +27,18 @@ import {
   surchargeMessage,
   useSurchargeRate,
 } from "./paymentsShared";
+import { usePaymentStep, endPaymentAttempt, trackApiError, errorStatus } from "./paymentAnalytics";
 
 const AutoPayScreen = ({ navigation, route }) => {
   const surchargeRate = useSurchargeRate();
+  const entryPoint = route.params?.entryPoint || "";
   const [methods, setMethods] = useState(null);
   const [autoPay, setAutoPay] = useState(null);
   const [selectedId, setSelectedId] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
   const abortRef = useRef(null);
+
+  usePaymentStep("autopay");
 
   useFocusEffect(
     useCallback(() => {
@@ -49,10 +55,11 @@ const AutoPayScreen = ({ navigation, route }) => {
           setAutoPay(details);
           setSelectedId((prev) => prev || (details.enrolled ? details.paymentMethodId : ""));
         })
-        .catch(() => {
+        .catch((error) => {
           setMethods([]);
           setAutoPay({ enrolled: false });
           setErrorAlert("We could not load your payment information. Please try again.");
+          trackApiError("payment-methods", errorStatus(error), "autopay");
         });
       return () => abortRef.current?.abort();
     }, [route.params?.paymentFlash, navigation])
@@ -78,15 +85,22 @@ const AutoPayScreen = ({ navigation, route }) => {
       mode: enrolled ? "update" : "enroll",
       methodId: selectedId,
       headerTitle,
+      entryPoint,
     });
   };
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[ contentMaxWidth,{paddingBottom: 140}]} showsVerticalScrollIndicator={false}>
+      <ProfileSettingsHeader
+        title={headerTitle}
+        onPressBack={() => {
+          endPaymentAttempt();
+          navigation.goBack();
+        }}
+      />
+      <ScreenScroll framed stack showsVerticalScrollIndicator={false}>
         <>
-        <View style={styles.surchargeAlert}>
+        <View>
           <NotificationAlert
             type="warning"
             title={surchargeTitle(surchargeRate)}
@@ -94,7 +108,7 @@ const AutoPayScreen = ({ navigation, route }) => {
             showCloseIcon={false}
           />
         </View>
-        <View style={[AppStyles.card, { margin: 16 , padding: 16 }]}>
+        <View style={[AppStyles.card, card.content]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -155,7 +169,7 @@ const AutoPayScreen = ({ navigation, route }) => {
           </View>
         )}
         </View>
-        <View style={{ marginHorizontal: 24 }} >
+        <View style={buttonsInFrame}>
         {!loading && (
           <>
             {isSwitching && !!currentMethod && (
@@ -184,15 +198,14 @@ const AutoPayScreen = ({ navigation, route }) => {
         )}
         </View>
         </>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   content: { padding: 20, paddingBottom: 140 },
-  surchargeAlert: { marginHorizontal: 16, marginTop: 8, marginBottom: -8 },
   heading: {
     marginBottom: 24,
   },

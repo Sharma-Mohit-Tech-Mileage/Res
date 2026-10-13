@@ -1,23 +1,12 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  Keyboard,
-  Pressable,
-  Platform,
-  TouchableOpacity,
-  Linking,
-  AccessibilityInfo,
-} from "react-native";
+import { View, StyleSheet, Text, Keyboard, Pressable, Platform, TouchableOpacity, Linking, AccessibilityInfo } from "react-native";
 import {
   Color,
   FontFamily,
   FontSize,
   Padding,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
 import EntryInput from "./EntryInput";
@@ -31,7 +20,8 @@ import { FieldTitle, Hyperlink, HintText } from "../common/customui/Typography";
 import Touchable from "../common/customui/Touchable";
 import { A11Y } from "../../styles/theme";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { hp } from "../../utils/responsive";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const TextNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -204,7 +194,7 @@ const TextNotifications = ({ navigation }) => {
           <View style={styles.headerTabTwo} />
           <View style={styles.headerTabThree} />
         </View> */}
-      <ScrollView
+      <ScreenScroll
         style={styles.inner}
         contentContainerStyle={styles.innerContent}
         ref={scrollRef}
@@ -365,7 +355,7 @@ const TextNotifications = ({ navigation }) => {
         </View>
 
         {!keyboardHidden && <View style={styles.textBottomHeight} />}
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -385,10 +375,10 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   buttonDisabled: {
-    backgroundColor: Color.colorWhitesmoke_300,
+    backgroundColor: Color.Gray300,
   },
   buttonDisabledText: {
-    color: Color.sparklightaddGray,
+    color: Color.sparklightGray1,
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
@@ -506,12 +496,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerIconView: {
-    backgroundColor: "#FEFEFE",
+    backgroundColor: Color.offWhite,
     padding: 20,
     borderRadius: 100,
-    borderColor: "#EEE",
+    borderColor: Color.dividerLight,
     borderWidth: 1,
-    shadowColor: "#171717",
+    shadowColor: Color.shadowDark,
     shadowOffset: { width: -2, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -524,12 +514,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerTabOne: {
-    backgroundColor: Color.sparklightSecondaryPurple + "1A",
+    backgroundColor: Color.colorMidnightblue + "1A",
     width: 100,
     height: 5,
   },
   headerTabTwo: {
-    backgroundColor: Color.sparklightSecondaryPurple,
+    backgroundColor: Color.colorMidnightblue,
     width: 100,
     height: 5,
     marginLeft: 10,
@@ -542,7 +532,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   headerTabThree: {
-    backgroundColor: Color.sparklightSecondaryPurple + "1A",
+    backgroundColor: Color.colorMidnightblue + "1A",
     width: 100,
     height: 5,
     marginLeft: 10,

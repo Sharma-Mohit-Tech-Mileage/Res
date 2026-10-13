@@ -1,6 +1,5 @@
 import { Dimensions, Platform } from 'react-native';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export function calculateBubbleBottomPosition(tabBarHeight) {
   const spacing = 20;
@@ -12,13 +11,13 @@ export function calculateTabBarHeight(insets = {}) {
     return 90;
   }
 
-  const baseHeight = Math.max(55, SCREEN_HEIGHT * 0.08);
+  const baseHeight = Math.max(55, Dimensions.get('window').height * 0.08);
   return baseHeight + (insets.bottom || 0);
 }
 
 export function calculateTabWidth(visibleTabCount) {
   if (visibleTabCount === 0) return 0;
-  return SCREEN_WIDTH / visibleTabCount;
+  return Dimensions.get('window').width / visibleTabCount;
 }
 
 export function calculateArrowPosition(tabIndex, visibleTabCount) {
@@ -30,14 +29,16 @@ export function calculateArrowPosition(tabIndex, visibleTabCount) {
 }
 
 export function getResponsivePadding() {
-  if (SCREEN_WIDTH < 350) return 16;
-  if (SCREEN_WIDTH < 400) return 20;
-  if (SCREEN_WIDTH < 600) return 24;
+  const { width } = Dimensions.get('window');
+  if (width < 350) return 16;
+  if (width < 400) return 20;
+  if (width < 600) return 24;
   return 32;
 }
 
 export function getResponsiveFontSizes() {
-  if (SCREEN_HEIGHT < 650) {
+  const { height } = Dimensions.get('window');
+  if (height < 650) {
     return {
       title: 16,
       body: 13,
@@ -45,7 +46,7 @@ export function getResponsiveFontSizes() {
     };
   }
 
-  if (SCREEN_HEIGHT < 750) {
+  if (height < 750) {
     return {
       title: 18,
       body: 14,
@@ -61,8 +62,9 @@ export function getResponsiveFontSizes() {
 }
 
 export function getDeviceSize() {
-  if (SCREEN_HEIGHT < 650) return 'small';
-  if (SCREEN_HEIGHT < 750) return 'medium';
-  if (SCREEN_HEIGHT < 900) return 'large';
+  const { height } = Dimensions.get('window');
+  if (height < 650) return 'small';
+  if (height < 750) return 'medium';
+  if (height < 900) return 'large';
   return 'tablet';
 }

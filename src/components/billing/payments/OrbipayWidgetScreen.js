@@ -8,13 +8,29 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import SmallLoader from "../../common/customui/SmallLoader";
-import { Color } from "../../../../GlobalStyles";
-import { confirmBankToken, confirmPaymentToken, updateFundingAccount } from "../../../network/apis/account/paymentMethods.service";
+import { Color } from "../../../styles/GlobalStyles";
+import {
+  confirmBankToken,
+  confirmPaymentToken,
+  updateFundingAccount,
+  paymentErrorMessage,
+} from "../../../network/apis/account/paymentMethods.service";
 import { getPrimaryEmail } from "../../utility/constant";
 import { formatCurrency } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 import { useFeatureFlag } from "../../../contexts/Featureflagscontext";
 import FeatureFlags from "../../../config/Featureflags";
+import { calculateTabBarHeight } from "../../utility/walkthroughHelpers";
+import {
+  usePaymentStep,
+  trackPaymentSubmitted,
+  trackPaymentSuccess,
+  trackPaymentFailed,
+  trackPaymentMethodAdded,
+  trackPaymentMethodFailed,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 // hcaptcha.com is the widget's captcha provider; blocking its iframe fails checkout with a captcha error.
 const ORBIPAY_HOSTS = ["billerpayments.com", "hcaptcha.com"];
@@ -30,8 +46,14 @@ const WIDGET_TIMEOUT_MS = 20000;
 const WIDGET_SETTLE_MS = 2400;
 
 const HOST_CONTRACT_VERSION = 1;
+// Stable fallback so the selector result can sit in hook dependency lists without re-creating callbacks every render.
+const NO_ACCOUNT = {};
 
 const initialFormHeight = (width) => (width < 400 ? 500 : 680);
+
+// 55104: the SDK pins its form like a modal and Android won't pass swipes from it to the page, so the form must fit above the tab bar and scroll inside itself.
+const resolveFormHeight = (width, frameHeight, bottomPad) =>
+  frameHeight > 0 ? Math.floor(frameHeight - bottomPad) : initialFormHeight(width);
 
 const esc = (value) =>
   String(value == null ? "" : value)
@@ -146,10 +168,14 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   const paymentOptionReadOnly = route.params?.paymentOptionReadOnly || "";
   const returnTo = route.params?.returnTo || "";
   const emailParam = route.params?.email || "";
+  const paymentTypeParam = route.params?.paymentType || "";
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const formHeight = initialFormHeight(width);
-  const accountDetails = useSelector((state) => state.profile?.accountDetails) || {};
+  const [frameHeight, setFrameHeight] = useState(0);
+  // 55098: pad by the tab-bar estimate (>= the real absolute bar on every screen size) so the widget footer never sits under it.
+  const bottomPad = calculateTabBarHeight(insets) + 16;
+  const formHeight = resolveFormHeight(width, frameHeight, bottomPad);
+  const accountDetails = useSelector((state) => state.profile?.accountDetails || NO_ACCOUNT);
   const userInfo = useSelector((state) => state.user?.userData?.userInfo) || {};
   const [busy, setBusy] = useState(false);
   const [widgetReady, setWidgetReady] = useState(false);
@@ -165,6 +191,8 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   const portalUrlRef = useRef(null);
   const widgetParamsRef = useRef(null);
 
+  usePaymentStep("orbipay_widget");
+
   const hostFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_HOST, Config.ORBIPAY_DEFAULT_HOST || "app");
   const portalPathFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_PORTAL_PATH, Config.ORBIPAY_PORTAL_WIDGET_PATH || "/orbipayhost.html");
   if (hostModeRef.current === null) {
@@ -173,7 +201,8 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   }
   const portalHosted = hostModeRef.current === "portal";
 
-  if (widgetParamsRef.current === null) {
+  // Params (and the HTML built from them) wait for the first layout pass so formHeight reflects the real frame.
+  if (widgetParamsRef.current === null && frameHeight > 0) {
     const billing = accountDetails.bill_to_address || {};
     widgetParamsRef.current = {
       apiEvent: mode === "pay" ? "create_payment" : mode === "edit" ? "update_funding_account" : "create_funding_account",
@@ -194,10 +223,10 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
       paymentOption,
       paymentOptionReadOnly,
       formHeight,
-      bottomPad: insets.bottom + 65,
+      bottomPad,
     };
   }
-  if (htmlRef.current === null && !portalHosted) {
+  if (htmlRef.current === null && widgetParamsRef.current !== null && !portalHosted) {
     htmlRef.current = buildWidgetHtml({
       scriptUrl: Config.ORBIPAY_SCRIPT_URL || "",
       clientKey: Config.ORBIPAY_CLIENT_KEY || "",
@@ -205,10 +234,14 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
     });
   }
   const html = htmlRef.current;
+  const widgetReadyToMount = widgetParamsRef.current !== null;
 
   useEffect(() => {
     if (widgetReady) return undefined;
-    const timer = setTimeout(() => setLoadFailed(true), WIDGET_TIMEOUT_MS);
+    const timer = setTimeout(() => {
+      setLoadFailed(true);
+      trackApiError("orbipay-widget", "timeout", "orbipay_widget");
+    }, WIDGET_TIMEOUT_MS);
     return () => clearTimeout(timer);
   }, [widgetReady, retryKey]);
 
@@ -221,7 +254,9 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
       setBusy(true);
       try {
         if (mode === "pay") {
+          trackPaymentSubmitted(amount, null, paymentTypeParam);
           const result = await confirmPaymentToken(token, digiSign, amount, emailParam);
+          trackPaymentSuccess(null);
           if (!navigation.isFocused()) return;
           // The customer is charged amount + surcharge, so the confirmation must report the total.
           const total = result?.fee != null ? amount + result.fee : amount;
@@ -240,7 +275,8 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
           if (returnTo) navigation.navigate(returnTo, { paymentFlash: { type: "success", message: "Your payment method has been updated." } });
           else navigation.goBack();
         } else {
-          await confirmBankToken(token, digiSign);
+          const added = await confirmBankToken(token, digiSign);
+          trackPaymentMethodAdded(added);
           if (!navigation.isFocused()) return;
           announceA11y("Payment method added.");
           if (returnTo) navigation.navigate(returnTo, { paymentFlash: { type: "success", message: "Your payment method has been added." } });
@@ -249,13 +285,20 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
       } catch (error) {
         handledRef.current = false;
         setBusy(false);
+        const rawReason = String(error?.message || "");
+        const reason = error?.code || (/timeout|network/i.test(rawReason) ? "network" : "confirm_failed");
+        if (mode === "pay") trackPaymentFailed(null, reason);
+        else trackPaymentMethodFailed(null, mode === "edit" ? "update_failed" : "add_failed");
+        trackApiError(
+          mode === "pay" ? "confirm-payment-token" : mode === "edit" ? "update-funding-account" : "confirm-bank-token",
+          errorStatus(error),
+          "orbipay_widget"
+        );
         if (!navigation.isFocused()) return;
-        const raw = String(error?.message || "");
-        const message = /timeout|network/i.test(raw)
+        // 55255: typed codes and backend error text pass through; HTTP failures get the portal's per-flow copy.
+        const message = /timeout|network/i.test(String(error?.message || ""))
           ? "Please check your internet connection and try again."
-          : raw && !raw.includes("<")
-          ? raw
-          : "We could not complete this request. Please try again.";
+          : paymentErrorMessage(error, mode === "pay" ? "PAYMENT_SUBMIT_FAILED" : "METHOD_NOT_SAVED");
         const flash = { type: "error", title: "Something went wrong", message };
         const state = navigation.getState();
         const prev = state?.routes?.[state.index - 1];
@@ -264,8 +307,17 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
         else navigation.goBack();
       }
     },
-    [mode, amount, fundingAccountId, navigation, returnTo]
+    [mode, amount, fundingAccountId, navigation, returnTo, paymentTypeParam, headerTitle, emailParam, accountDetails]
   );
+
+  const onRetry = useCallback(() => {
+    clearTimeout(settleTimerRef.current);
+    settleTimerRef.current = null;
+    setLoadFailed(false);
+    setWidgetReady(false);
+    initialLoadRef.current = false;
+    setRetryKey((k) => k + 1);
+  }, []);
 
   const onMessage = useCallback(
     ({ nativeEvent }) => {
@@ -275,7 +327,15 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
       if (msg.type === "checkout_event" || msg.type === "orbipay_message") {
         const parsed = parseCheckoutPayload(msg.payload);
         if (parsed?.cancelled) { navigation.goBack(); return; }
-        if (parsed?.token) onCheckoutToken(parsed);
+        if (!parsed?.token) return;
+        // 55255: portal rule — a payment token without its digiSign is not submittable; reload the form so "try again" is possible.
+        if (mode === "pay" && !parsed.digiSign) {
+          setErrorAlert(paymentErrorMessage({ code: "PAYMENT_TOKEN_MISSING" }));
+          trackApiError("orbipay-widget", "token_incomplete", "orbipay_widget");
+          onRetry();
+          return;
+        }
+        onCheckoutToken(parsed);
       } else if (msg.type === "host_ready") {
         const payload = JSON.stringify({ ...widgetParamsRef.current, contract: HOST_CONTRACT_VERSION });
         webRef.current?.injectJavaScript(`window.__orbipayHostInit && window.__orbipayHostInit(${payload}); true;`);
@@ -285,9 +345,10 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
         if (!handledRef.current) navigation.goBack();
       } else if (msg.type === "widget_failed") {
         setErrorAlert("The secure payment form could not be loaded. Please try again later.");
+        trackApiError("orbipay-widget", "load_failed", "orbipay_widget");
       }
     },
-    [navigation, onCheckoutToken]
+    [navigation, onCheckoutToken, mode, onRetry]
   );
 
   const onShouldStartLoadWithRequest = useCallback(
@@ -320,19 +381,10 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
     [onCheckoutToken, portalHosted]
   );
 
-  const onRetry = () => {
-    clearTimeout(settleTimerRef.current);
-    settleTimerRef.current = null;
-    setLoadFailed(false);
-    setWidgetReady(false);
-    initialLoadRef.current = false;
-    setRetryKey((k) => k + 1);
-  };
-
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <View style={styles.body}>
+      <View style={styles.body} onLayout={(e) => { const { height } = e.nativeEvent.layout; setFrameHeight((h) => h || height); }}>
       {!!errorAlert && (
         <NotificationAlert
           type="error"
@@ -347,7 +399,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
           <Text style={styles.loadingText}>The secure payment form is taking too long to load.</Text>
           <PrimaryButton title="Try Again" buttonType="submit" accessibilityLabel="Try Again" onPress={onRetry} />
         </View>
-      ) : (
+      ) : widgetReadyToMount && (
         <WebView
           key={retryKey}
           ref={webRef}
@@ -390,13 +442,13 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFFFFF" },
+  container: { flex: 1, backgroundColor: Color.sparklightWhite },
 
   body: { flex: 1 },
   webview: { flex: 1, backgroundColor: "transparent" },
   loadingWrap: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 32,
@@ -411,7 +463,7 @@ const styles = StyleSheet.create({
 
   busyOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     justifyContent: "center",
     alignItems: "center",
   },

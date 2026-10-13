@@ -1,17 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Linking,
-  Platform,
-} from "react-native";
+import { StyleSheet, View, Linking, Platform } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import {
   useNavigation,
   useRoute,
-  useFocusEffect,
 } from "@react-navigation/native";
 import {
   Padding,
@@ -19,11 +11,10 @@ import {
   FontFamily,
   Border,
   FontSize,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
-import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../utility/constant";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
@@ -33,15 +24,17 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
 import { getEndpoint, ENDPOINTS } from "../../network/apis/endpoints/Endpoints";
 import AppStyles from "../../styles/AppStyles";
+import { container } from "../../styles/utilities";
 import {
   SectionTitle,
-  IndicatorText,
   FieldTitle,
   FieldContent,
   Hyperlink,
 } from "../common/customui/Typography";
 import { A11y } from "react-native-a11y-order";
 import AddIcon from "../../res/svgIcons/AddIcon";
+import { ScreenScroll } from "../common/customui/Screen";
+import { logError } from "../../utils/logger";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -83,7 +76,6 @@ const ProfileSettings = () => {
   );
 
   const handleArrowPress = (fieldType) => {
-    console.log(`Arrow pressed for: ${fieldType}`);
     if (fieldType === "email") {
       navigation.navigate("EmailNotifications", {
         is_enrolled: emailAddress,
@@ -99,6 +91,8 @@ const ProfileSettings = () => {
           phoneNumber: phoneNumber,
         },
       });
+    } else if (fieldType === "username") {
+      navigation.navigate("ProfileSettingsEdit", { field: "userName" });
     }
   };
 
@@ -229,7 +223,7 @@ const ProfileSettings = () => {
         },
         (error) => {
           setShowPhoneLoading(false);
-          console.error("Error on retrying getTextNotificationsData", error);
+          logError("Error on retrying getTextNotificationsData", error);
         },
       );
     });
@@ -266,13 +260,13 @@ const ProfileSettings = () => {
   };
 
   return (
-    <View style={{ zIndex: 1 }}>
+    <View style={{ flex: 1, zIndex: 1 }}>
       <ProfileSettingsHeader
         title="Profile"
         onPressBack={() => navigation.goBack()}
       />
-      <ScrollView accessibilityLabel="Profile settings page.">
-        <View style={{ flexDirection: "column", marginBottom: 300 }}>
+      <ScreenScroll framed accessibilityLabel="Profile settings page.">
+        <View style={container.stack}>
           <View style={styles.frameParent}>
             <View style={[AppStyles.card]}>
               <View
@@ -303,19 +297,48 @@ const ProfileSettings = () => {
                     {customerName}
                   </FieldContent>
                 </View>
-                <View style={styles.firstNameParent}>
-                  <FieldTitle>Username</FieldTitle>
-                  <FieldContent
-                    style={[styles.melissa, styles.melissaTypo]}
-                    accessible={true}
-                    accessibilityRole="text"
-                    accessibilityLabel={`Username: ${
-                      profileDetails.userName || "N/A"
-                    }`}
-                  >
-                    {profileDetails.userName}
-                  </FieldContent>
-                </View>
+                <A11y.Order style={styles.editableRow}>
+                  <A11y.Index index={0}>
+                    <View style={[styles.editableContent, { marginBottom: Padding.p_9xs }]}>
+                      <FieldTitle
+                        style={styles.firstName}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel="Username"
+                      >
+                        Username
+                      </FieldTitle>
+
+                      <FieldContent
+                        style={[styles.melissa, styles.melissaTypo]}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel={`Username: ${
+                          profileDetails.userName || "No username on file."
+                        }`}
+                      >
+                        {profileDetails.userName || "No username on file."}
+                      </FieldContent>
+                    </View>
+                  </A11y.Index>
+                  <A11y.Index index={1}>
+                    <Touchable
+                      style={styles.editButton}
+                      onPress={() => handleArrowPress("username")}
+                      accessibilityRole="button"
+                      accessibilityLabel={
+                        profileDetails.userName ? "Edit username" : "Add username"
+                      }
+                      accessibilityHint={
+                        profileDetails.userName
+                          ? "Double tap to edit your username"
+                          : "Double tap to add your username"
+                      }
+                    >
+                      {profileDetails.userName ? <EditIcon /> : <AddIcon />}
+                    </Touchable>
+                  </A11y.Index>
+                </A11y.Order>
 
                 <View style={styles.firstNameParent}>
                   <FieldTitle>Account Number</FieldTitle>
@@ -444,7 +467,7 @@ const ProfileSettings = () => {
             </View>
           </View>
 
-          <View style={[styles.frameParent, styles.frameParentReducedTop]}>
+          <View style={styles.frameParent}>
             <View style={[AppStyles.card]}>
               <View style={[styles.generalInformationParent]}>
                 <SectionTitle
@@ -516,7 +539,7 @@ const ProfileSettings = () => {
               </View>
             </View>
           </View>
-          <View style={[AppStyles.card, { marginHorizontal: Padding.p_base }]}>
+          <View style={AppStyles.card}>
             <View style={{ padding: Padding.p_xl, flexDirection: "column" }}>
               <SectionTitle
                 accessible={true}
@@ -638,7 +661,7 @@ const ProfileSettings = () => {
             </View>
           </View>
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -658,7 +681,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
   },
   text1Clr: {
-    color: Color.colorWhitesmoke_200,
+    color: Color.Gray300,
     textAlign: "center",
   },
   badgeBorder: {
@@ -736,12 +759,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   text: {
-    color: Color.success700,
+    color: Color.sparklightGreen,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     textAlign: "center",
   },
   badge: {
-    borderColor: Color.colorAquamarine,
+    borderColor: Color.success50,
     backgroundColor: Color.success50,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
@@ -781,12 +804,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   frameParent: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
     width: "100%",
-  },
-  frameParentReducedTop: {
-    marginTop: -15,
   },
   manageSerTxt1: {
     textAlign: "left",

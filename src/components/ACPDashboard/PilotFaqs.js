@@ -1,14 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
-import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
+import { View, Text, StyleSheet, Image } from "react-native";;
+import { FontFamily, FontSize, Color, Border } from "../../styles/GlobalStyles";
 import { card } from "../../styles/utilities";
 import { useNavigation } from "@react-navigation/native";
 import AppStyles from "../../styles/AppStyles";
 import { Hyperlink, SectionTitle } from "../common/customui/Typography";
 
 // Card has wp("92%") width minus its own marginHorizontal:8 — give the image the same span.
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const IMAGE_WIDTH = SCREEN_WIDTH - 16;
 
 const PromoImage = require("../../../assets/sparklight-tech-app.jpg");
 
@@ -81,7 +79,7 @@ const styles = StyleSheet.create({
   description: {
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
-    color: "#000000",
+    color: Color.colorblack_100,
     fontWeight: "400",
     margin: 24,
     lineHeight: 24,
@@ -92,14 +90,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   imageContainer: {
-    width: IMAGE_WIDTH,
+    width: "100%",
     // Cap at native asset width (326px) and center so iPad never upscales/blurs.
     maxWidth: 315,
     alignSelf: "center",
     overflow: "hidden",
   },
   promoImage: {
-    width: IMAGE_WIDTH,
+    width: "100%",
     maxWidth: 315,
     aspectRatio: 1.92,
     alignSelf: "center",

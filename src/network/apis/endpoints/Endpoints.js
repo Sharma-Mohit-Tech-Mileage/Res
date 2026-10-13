@@ -1,4 +1,3 @@
-import { UPDATE_TEXT_NOTIFICATION } from "src/redux/constants";
 
 export const ENDPOINTS = {
     // Auth / Session
@@ -41,6 +40,7 @@ export const ENDPOINTS = {
     EASYPAY_SETUP: 'api/Payment/SetupAutoPay',
     EASYPAY_DELETE: 'api/Payment/DeleteEasyPayAccount/:accountNumber',
     FUNDING_ACCOUNTS: 'api/Payment/RetrieveFundingAccounts/:accountNumber',
+    PAYMENT_RETRIEVE_CUSTOMER_DATA: 'api/Payment/RetrieveCustomerData/:accountNumber',
     FUNDING_ACCOUNT_DELETE: 'api/Payment/DeleteFundingAccount',
     PAYMENT_ONE_TIME: 'api/Payment/Submit',
     PAYMENT_MAKE_ONETIME: 'api/Payment/MakeAOneTimePayment',
@@ -51,8 +51,6 @@ export const ENDPOINTS = {
     FUNDING_ACCOUNT_UPDATE: 'api/Payment/UpdFundingAccount',
 
     // Logging
-    LOG_ERROR: 'api/log/error',
-    LOG_INFO: 'api/log/info',
 
     // Users
     USERS_BASE: 'api/users',
@@ -60,6 +58,7 @@ export const ENDPOINTS = {
     USERS_REMOVE: 'api/users/remove/:accountNumber/:userName',
     CHANGE_PASSWORD: 'api/profile/password/:accountNumber',
     PROFILE_INFO_UPDATE: 'api/profile',
+    UPDATE_USERNAME:'/api/mobile/UpdateUserSpecChar',
 
     // Email / Paperless (notification service)
     PAPERLESS_GET_ALL_EMAILS: 'api/Paperless/GetAllEmails?account=:accountNumber',
@@ -94,6 +93,7 @@ export const ENDPOINTS = {
     GET_BILL_EXPLAINER: 'api/GetBillExplainer/Get',
 
     // Dashboard (internet/account APIs)
+    SITECORE_BANNER: 'api/Sitecore/Banner',
     INTERNET_PLAN: 'internet/api/internet/:accountId/plan',
     ACCOUNT_INFO: 'account/api/account/:accountId',
     INTERNET_SPEED_GET: 'internet/api/internet/:accountNumber/speedTest/Get',
@@ -101,17 +101,22 @@ export const ENDPOINTS = {
     INTERNET_USAGE: 'api/Internet/Usage',
     EQUIPMENT_BY_ACCOUNT: 'api/Services/GetInternetData?account=:account',
 
+    // Modem and speed tests
+    MODEM_REBOOT: 'api/ModemReboot',
+    EERO_SPEED_TEST: 'api/post/EeroSpeedtest',
+    EERO_SPEED_DETAILS: 'api/Eerospeedtest/details',
+    EERO_SPEED_RESULTS: 'api/get/EeroSpeedtest',
+    EERO_SPEED_HISTORY_GET: 'api/GetEeroSpeedTestHistory/:accountId',
+    EERO_SPEED_HISTORY: 'api/InsertEeroSpeedTestHistory',
+    OOKLA_SPEED_SAVE: 'api/post/OoklaSpeedtest',
+    OOKLA_SPEED_DETAILS: 'api/get/OoklaSpeedtest/:accountId/:userId',
+
     // Security / Password
     SECURITY_QUESTIONS: 'api/Security/GetSecurityQuestions',
     GET_SECURTY_ANSWERS: 'api/Security/GetSecurityQuestion?userName=:userName&accountNumber=:accountNumber',
     SECURITY_QUESTION_UPDATE: 'api/Security/UpdateSecurityAnswer/:userName/:accountNumber',
     RESET_PASSWORD: 'api/Security/ResetPassword?accountNumber=:accountNumber&userName=:userName',
     PROFILE_PASSWORD_UPDATE: 'api/profile/password/:accountNumber',
-
-    // Survey / Cancellation
-    SURVEY: 'api/Survey',
-    SERVICE_DISCONNECT_SURVEY: 'api/Order/Disconnect',
-    ORDER_COMMIT_DISCONNECT: 'api/Order/CommitDisconnect',
 
     //Payment methods
     PAYMENTS_HISTORY: 'api/payments/:accountNumber/paymentHistory',

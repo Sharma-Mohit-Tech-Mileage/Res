@@ -7,10 +7,10 @@ apply plugin: 'com.google.firebase.crashlytics'
 // Map the flavors to the correct .env files — must be defined BEFORE applying dotenv.gradle
 project.ext.envConfigFiles = [
         Devdebug: ".env.development",
-        Demodebug: ".env.staging",
+        Stagingdebug: ".env.staging",
         Proddebug: ".env.production",
         Devrelease: ".env.development",
-        Demorelease: ".env.staging",
+        Stagingrelease: ".env.staging",
         Prodrelease: ".env.production"
 ]
 
@@ -110,12 +110,16 @@ android {
         applicationId "com.sparklight"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        manifestPlaceholders = [ appAuthRedirectScheme:  'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/android/com.sparklight.customer.app/callback',
-                                 appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
+        manifestPlaceholders = [
+                appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode project.hasProperty("VERSION_CODE") ? project.VERSION_CODE.toInteger() : 525
-        versionName project.hasProperty("VERSION_NAME") ? project.VERSION_NAME : "29.0.1"
+
+        def propVersionCode = project.findProperty("VERSION_CODE")
+        def propVersionName = project.findProperty("VERSION_NAME")
+
+        versionCode((propVersionCode && propVersionCode.toString().trim()) ? propVersionCode.toString().trim().toInteger() : 607)
+        versionName((propVersionName && propVersionName.toString().trim()) ? propVersionName.toString().trim() : "31.0.1")
     }
 
 
@@ -125,7 +129,7 @@ android {
             dimension "env"
             resValue "string", "build_config_package", "com.sparklight"
         }
-        Demo {
+        Staging {
             dimension "env"
             resValue "string", "build_config_package", "com.sparklight"
         }
@@ -189,7 +193,8 @@ dependencies {
 //    }
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation("zendesk.messaging:messaging-android:2.36.1")
+    implementation 'androidx.browser:browser:1.9.0'
+    implementation("zendesk.messaging:messaging-android:2.39.0")
 
    // debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
     if (hermesEnabled.toBoolean()) {
@@ -199,12 +204,5 @@ dependencies {
     }
 }
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
-
-// Force the browser library to 1.8.0 to resolve AGP 8.9.1 / SDK 36 requirement conflict
-configurations.all {
-    resolutionStrategy {
-        force 'androidx.browser:browser:1.8.0'
-    }
-}
 
 //apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

@@ -1,26 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  StyleSheet,
-  View,
-  Animated,
-  ScrollView,
-  Platform,
-  Linking,
-  Alert,
-  AccessibilityInfo,
-} from "react-native";
+import { StyleSheet, View, Animated, Platform, Linking, Alert, AccessibilityInfo } from "react-native";
 import Touchable from "../common/customui/Touchable";
-import { Color, Padding } from "../../../GlobalStyles";
+import { Color, Padding } from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
-import { widthPercentageToDP } from "react-native-responsive-screen";
+import { wp as widthPercentageToDP } from "../../utils/responsive";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
 import Toggle from "../common/Toggle";
 import { postPushNotifications } from "../../network/apis/account/profile.service";
 import usePushPermissionSync from "../../hooks/usePushPermissionSync";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
-import useAccessibilityFocus from "../../../src/hooks/useAccessibilityFocus";
 import AppStyles from "../../styles/AppStyles";
 import SecondaryButton from "../common/customui/PrimaryButton";
 import { SectionTitle, SectionContent } from "../common/customui/Typography";
@@ -30,6 +20,8 @@ import {
   requestUserPermission,
 } from "../../firebase/FirebaseUtils";
 import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
+import { ScreenScroll } from "../common/customui/Screen";
+import { logWarn } from "../../utils/logger";
 
 const initialFormState = {
   optOut: false,
@@ -214,7 +206,7 @@ const InAppNotifications = ({ navigation }) => {
     } catch (error) {
       setIsLoading(false);
       setIsSubmitting(false);
-      console.warn("Permission error:", error);
+      logWarn("Permission error:", error);
       setNotification({
         message: "Failed to update notification preferences.",
         type: "error",
@@ -241,9 +233,9 @@ const InAppNotifications = ({ navigation }) => {
         />
       )}
 
-      <ScrollView ref={scrollViewRef}>
+      <ScreenScroll framed ref={scrollViewRef}>
         <View style={styles.inAppNotificationsInner}>
-          <View style={[AppStyles.card, { margin: 16 }]}>
+          <View style={AppStyles.card}>
             <View >
               {notification && (
                 <Animated.View
@@ -332,7 +324,7 @@ const InAppNotifications = ({ navigation }) => {
             />
           </View>
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -448,17 +440,17 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   saveButton: {
-    backgroundColor: Color.colorMidnightblue,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   cancelButton: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
   inAppNotificationsInner: {
     width: "100%",
   },
   inAppNotifications: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
   },
 });
 

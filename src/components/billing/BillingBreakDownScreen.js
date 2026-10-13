@@ -4,10 +4,9 @@ import {
   Text,
   View,
   FlatList,
-  ScrollView,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import Touchable from "../common/customui/Touchable";
+import { ScreenScroll } from "../common/customui/Screen";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Color,
@@ -15,21 +14,19 @@ import {
   FontSize,
   Padding,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { Hyperlink } from "../common/customui/Typography";
 import moment from "moment";
-import { heightPercentageToDP as hp, widthPercentageToDP as wp } from "react-native-responsive-screen";
-import {card} from '../../styles/utilities'
+import { hp, wp } from "../../utils/responsive";
 import { PostApiRequest } from "../../network/RestApiClient";
-import { fetchBillingBreakdown , fetchBillExplainer} from "../../redux/actions/billingBreakdownActions";
+import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActions";
 
 import {
   selectBillingBreakDownLoading,
   selectBillingBreakDownData,
   selectBillingBreakDownError,
-  selectBillExplainerData,
 } from "../../redux/selectors/billingBreakdownSelectors";
 
 import { InfoIcon } from "native-base";
@@ -38,6 +35,7 @@ import SecondaryButton from "../common/customui/PrimaryButton";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../styles/AppStyles";
+import { logError } from "../../utils/logger";
 
 
 // Constants
@@ -56,40 +54,33 @@ const ERROR_404 =
       renderErrorMessage - Renders an error message if there is an error.
      */
 
-const renderErrorMessage = (errorCode, navigation) => {
-  console.log("Error Code:", errorCode);
-  return (
-    <View style={{ flexDirection: "column", margin: 8 }}>
-      <View style={[card, { margin: 16 }]}>
-        <View style={styles.errorContainer}>
-          <BillErrorIcon color="red" size={24} style={{ marginBottom: 8 }} />
-          <Text style={styles.errorTxt}>
-            {errorCode.includes("404") ? ERROR_404 : ERROR_204}
-          </Text>
-        </View>
-      </View>
-      <Touchable
-        style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]}
-        onPress={() => {
-          navigation.goBack();
-        }}
-        accessibilityLabel="Return to Billing Services"
-      >
-        <Text style={[styles.makePayment, styles.makeTypo]}>
-          {"Return to Billing Services"}
+const renderErrorMessage = (errorCode, navigation) => (
+  <View style={styles.errorBackground}>
+    <View style={styles.errorCard}>
+      <View style={styles.errorContainer}>
+        <BillErrorIcon />
+        <Text style={styles.errorTxt} accessibilityLiveRegion="polite">
+          {String(errorCode).includes("404") ? ERROR_404 : ERROR_204}
         </Text>
-      </Touchable>
-      <View style={styles.buttonsParent}>
-        <SecondaryButton
-          title="Cancel"
-          onPress={() => navigation.goBack()}
-          accessibilityLabel="Cancel"
-          accessibilityHint="Double tap to return to notifications screen"
-        />
       </View>
     </View>
-  );
-};
+    <View style={styles.buttonsParent}>
+      <SecondaryButton
+        title="Return to Billing Services"
+        buttonType="submit"
+        onPress={() => navigation.goBack()}
+        accessibilityLabel="Return to Billing Services"
+        accessibilityHint="Double tap to return to billing services screen"
+      />
+      <SecondaryButton
+        title="Cancel"
+        onPress={() => navigation.goBack()}
+        accessibilityLabel="Cancel"
+        accessibilityHint="Double tap to return to billing services screen"
+      />
+    </View>
+  </View>
+);
 
 const DetailItem = memo(({ detail }) => {
   const hasExpiryDate = !detail.endDate.startsWith(MIN_DATE_PREFIX);
@@ -289,7 +280,7 @@ const TotalBalanceFooter = memo(({ totalAmount , showBillExplainer, renderBillEx
  */
 const renderBillExplainerLink = (data, navigation) => {
   if (!data?.be_url) {  
-    console.error("Bill Explainer link is not available");
+    logError("Bill Explainer link is not available");
     return;
   }
   navigation.navigate('ArticleWindowUtility', {
@@ -390,7 +381,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
 
   // useEffect(() => {
-  //   console.log("Bill Explainer Data:", billExplainerData);
   //   if(!billExplainerData?.eligibility){
   //     setShowBillExplainer(false);
   //   }else{
@@ -413,7 +403,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
       }, (error) => { 
         setShowBillExplainer(false);
         setExplainerLoading(false);
-        console.error("Bill Explainer Error:", error);
+        logError("Bill Explainer Error:", error);
       }
 
     )
@@ -467,7 +457,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
     }
 
     return (
-      <View style={[ {borderTopLeftRadius: 0, borderTopRightRadius: 0, marginBottom: 32}]}>
+      <View>
       <FlatList
         data={billingData}
         renderItem={({ item, index }) => <BreakDownItem item={item} />}
@@ -479,7 +469,6 @@ const BillingBreakDownScreen = ({ navigation }) => {
         initialNumToRender={5}
         windowSize={5}
         ListFooterComponent={<TotalBalanceFooter totalAmount={totalDue} showBillExplainer={showBillExplainer} navigation={navigation} renderBillExplainerLink={() => renderBillExplainerLink(billExplainerData, navigation)} explainerLoading={explainerLoading} />}
-        contentContainerStyle={{ paddingBottom: 120 }}
       />
       </View>
     );
@@ -497,13 +486,8 @@ const BillingBreakDownScreen = ({ navigation }) => {
       {errorCode ? (
         renderErrorMessage(errorCode, navigation)
       ) : (
-        <View
-          style={[AppStyles.card, styles.cardContainer, { marginBottom: 32 }]}
-        >
-          <ScrollView
-            contentContainerStyle={{ paddingBottom: 24 }}
-            showsVerticalScrollIndicator={false}
-          >
+        <ScreenScroll framed showsVerticalScrollIndicator={false}>
+          <View style={AppStyles.card}>
             {/* Warning message */}
             <View style={styles.alertContainer}>
               <NotificationAlert
@@ -521,8 +505,8 @@ const BillingBreakDownScreen = ({ navigation }) => {
             </View>
             {/* Main content */}
             {renderContent()}
-          </ScrollView>
-        </View>
+          </View>
+        </ScreenScroll>
       )}
     </View>
   );
@@ -532,10 +516,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.white,
-  },
-  cardContainer: {
-    margin: 16,
+    backgroundColor: Color.Gray300,
   },
   alertContainer: {
     margin: Padding.p_5xl,
@@ -544,20 +525,23 @@ const styles = StyleSheet.create({
     paddingBottom: hp("45%"),
   },
   header: {
-    backgroundColor: Color.white,
+    backgroundColor: Color.sparklightWhite,
     paddingTop: hp(5),
   },
   headerText: {
     fontSize: FontSize.size_3xl,
     fontFamily: FontFamily.poppinsBold,
-    color: Color.black,
+    color: Color.colorblack_100,
   },
   errorTxt: {
-    color: "#001321",
+    color: Color.colorGray_200,
     fontSize: FontSize.size_base,
     fontWeight: "400",
     fontFamily: FontFamily.RadioCanadaRegular,
-    marginTop: 8,
+    marginTop: 18,
+    lineHeight: 21,
+    textAlign: "left",
+    alignSelf: "stretch",
   },
   loadingContainer: {
     flex: 1,
@@ -585,15 +569,31 @@ const styles = StyleSheet.create({
   paymentsList: {
     backgroundColor: Color.sparklightWhite,
     borderRadius: 4,
-    marginBottom: 100,
+  },
+  errorBackground: {
+    flex: 1,
+    backgroundColor: "#F2F2F2",
+    paddingHorizontal: 24,
+    paddingVertical: 18,
+  },
+  errorCard: {
+    backgroundColor: Color.sparklightWhite,
+    borderWidth: 1,
+    borderColor: Color.dividerLight,
+    borderRadius: 2,
+    padding: 24,
+    shadowColor: Color.colorblack_100,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   errorContainer: {
     borderWidth: 1,
-    borderColor: Color.sparklightGray,
-    borderRadius: 2,
-    padding: 24,
+    borderColor: "#DEDEDE",
+    borderRadius: 1,
+    padding: 25,
     alignItems: "center",
-    margin: 24,
   },
   paymentRow: {
     paddingHorizontal: Padding.p_base,
@@ -669,7 +669,7 @@ const styles = StyleSheet.create({
   discountExpiryContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#C8E9D0",
+    backgroundColor: Color.successTint,
     paddingHorizontal: 4,
     paddingVertical: 2,
     marginTop: 5,
@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
   },
   warningAlert: {
     borderLeftWidth: 4,
-    borderLeftColor: "#FF9800",
+    borderLeftColor: Color.warningAccent,
     marginBottom: 0,
     borderRadius: 0,
   },
@@ -730,12 +730,13 @@ const styles = StyleSheet.create({
   },
   buttons1: {
     marginTop: Padding.p_base,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     paddingHorizontal: 0,
     width: 382,
   },
   buttonsParent: {
     marginTop: Padding.p_base,
+    marginHorizontal: 16,
     alignSelf: "stretch",
   },
   billPlanermainContainer: {
@@ -766,10 +767,10 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 
-  colorGreen: "#0C8306",
+  colorGreen: Color.successGreenDark,
 });
 
 // Define color constants
-styles.colorGreen = "#0C8306";
+styles.colorGreen = Color.successGreenDark;
 
 export default BillingBreakDownScreen;

@@ -1,4 +1,4 @@
-import { getUser, storeUser } from "../../redux/utils/LocalStorage";
+import { getUser, storeUser, storeSsoToken } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
 import store from "../../redux/configureStore";
 import { saveUserInfo } from "../../redux/actions/UserAction";
@@ -36,7 +36,13 @@ const onSuccess = async (res, idToken = null) => {
     jwtTimestamp: now,
     idTokenTimestamp: now,
   };
-
+  const data = {
+    idToken: user.idToken,
+    accessToken: user.token,
+    idTokenGuid: user.tokenGuid,
+    refreshToken: user.refreshToken,
+  }; 
+   storeSsoToken(data);
   await storeUser(user);
   store.dispatch(saveUserInfo(user));
   return token;
@@ -47,20 +53,11 @@ const onError = (error) => {
   throw error;
 };
 
-const retryRequest = async (data, retries = 2) => {
-  try {
-    const endpointUrl = getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN);
-    return await new Promise((resolve, reject) => {
-      PostAuthApiRequest(endpointUrl, data, resolve, reject);
-    });
-  } catch (error) {
-    if (retries > 0) {
-      return retryRequest(data, retries - 1);
-    }
-    console.warn(`${TAG} Token refresh retries exhausted:`, error.message);
-    throw error;
-  }
-};
+// Single call: the API client already retries network failures, and a rejected id token fails the same way on every replay.
+const requestSessionToken = (data) =>
+  new Promise((resolve, reject) => {
+    PostAuthApiRequest(getEndpoint(ENDPOINTS.LOGIN_SSO_GETTOKEN), data, resolve, reject);
+  });
 
 export const RefreshToken = async () => {
   if (_refreshPromise) return _refreshPromise;
@@ -85,7 +82,7 @@ export const RefreshToken = async () => {
         refreshToken: result.refreshToken,
       };
 
-      const apiResponse = await retryRequest(data, 2);
+      const apiResponse = await requestSessionToken(data);
       const token = await onSuccess(apiResponse, result.idToken);
       store.dispatch({ type: INVALIDATE_ACCOUNT_CACHE });
       return token;

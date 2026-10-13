@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { View, Text, Linking, ScrollView, StyleSheet } from "react-native";
-import { FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
+import { View, Text, Linking, StyleSheet } from "react-native";
+import { FontFamily, FontSize, Color, Border } from "../../styles/GlobalStyles";
 import PilotServiceStatus from "./PilotServiceStatus";
 import Infocircle from "../../../assets/svgs/Infocircle";
 import MobilePromo from "./MobilePromo";
@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import { useFeatureFlag } from "../../contexts/Featureflagscontext";
 import FeatureFlags from "../../config/Featureflags";
+import { ScreenScroll } from "../common/customui/Screen";
 
 const DEFAULT_DATE_FORMAT = "MM/DD/YYYY";
 
@@ -199,7 +200,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScreenScroll>
         <View style={styles.infoBox}>
           <View style={styles.infoBoxContent}>
             <View
@@ -207,7 +208,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
               accessible={true}
               accessibilityRole="text"
             >
-              <Infocircle color="#353091" style={styles.infoCircleIcon} />
+              <Infocircle color={Color.colorMidnightblue} style={styles.infoCircleIcon} />
             </View>
             <View style={styles.infoTextContainer}>
               <Text
@@ -228,7 +229,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
 
         {isMobileServiceActive && <MobilePromo />}
         <PilotFaqs />
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -242,8 +243,8 @@ const styles = StyleSheet.create({
   infoBox: {
     flexDirection: "column",
     marginVertical: 20,
-    borderColor: "#353091",
-    backgroundColor: "#F0F8FF",
+    borderColor: Color.colorMidnightblue,
+    backgroundColor: Color.infoTint,
     borderRadius: Border.br_5xs,
     marginTop: 20,
     borderWidth: 1,
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: FontSize.size_base,
-    color: "#353091",
+    color: Color.colorMidnightblue,
     fontWeight: "700",
   },
   statusSubText: {
@@ -287,14 +288,14 @@ const styles = StyleSheet.create({
   linkText: {
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_sm,
-    color: "#8D3B90",
+    color: Color.sparklightPrimaryPurple,
     textDecorationLine: "underline",
     fontWeight: "700",
   },
   highlightText: {
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontSize: FontSize.size_lg,
-    color: "#8D3B90",
+    color: Color.sparklightPrimaryPurple,
     fontWeight: "700",
   },
   messageContainer: {

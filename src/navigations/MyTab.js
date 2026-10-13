@@ -19,7 +19,7 @@ import BillingIcon from "../res/svgIcons/BillingIcon";
 import SupportIcon from "../res/svgIcons/SupportIcon";
 import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
 import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
-import { FontFamily, Color, FontSize } from "../../GlobalStyles";
+import { FontFamily, Color, FontSize } from "../styles/GlobalStyles";
 const Tab = createBottomTabNavigator();
 
 
@@ -68,7 +68,7 @@ const MyTabs = ({ route }) => {
     const IconComponent = ICON_MAP[tabId] || HomeIcon;
     const iconColor = focused
       ? Color.colorMidnightblue
-      : Color.sparklightDarkGray;
+      : Color.sparklightGray1;
 
     return <IconComponent color={iconColor} filled={focused} />;
   };
@@ -255,7 +255,7 @@ const MyTabs = ({ route }) => {
         height: tabBarHeight,
       },
       tabBarActiveTintColor: Color.colorMidnightblue,
-      tabBarInactiveTintColor: Color.sparklightDarkGray,
+      tabBarInactiveTintColor: Color.sparklightGray1,
       tabBarLabelPosition: "below-icon",
       tabBarLabelStyle: {
         fontSize: FontSize.size_xs,

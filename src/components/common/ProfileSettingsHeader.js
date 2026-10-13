@@ -6,13 +6,35 @@ import {
   StyleSheet,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
-import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Color, FontFamily, FontSize } from "../../styles/GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import LeftIcon from "../../../assets/svgs/Chevronleft";
 import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import Touchable from "./customui/Touchable";
 import { Platform } from "react-native";
 import { setFocusToRef } from "../../utils/a11y";
+
+// Keep the original 56-point navigation row below the safe status-bar inset.
+const MIN_TOP = 40;
+const NAV_ROW = 56;
+export const NAV_BOTTOM = 0;
+// Tab-root badge (Billing/Account/Support/Services): 72dp circle whose top sits 16dp below the header.
+export const TAB_BADGE_SIZE = 72;
+export const TAB_BADGE_TOP = 16;
+// Extra purple the tab roots extend below the header: down to the badge's midline, so the circle straddles the edge exactly.
+export const TAB_BAND_EXTENSION = TAB_BADGE_TOP + TAB_BADGE_SIZE / 2;
+
+// The one header gradient; spread onto every nav LinearGradient so the colours live in one place.
+export const HEADER_GRADIENT = {
+  locations: [0, 1],
+  start: { x: 0, y: 0 },
+  end: { x: 1.3, y: 0 },
+  colors: ["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"],
+};
+
+export const useInternalHeaderTop = () => Math.max(useSafeAreaInsets().top, MIN_TOP);
+export const useInternalHeaderHeight = () => useInternalHeaderTop() + NAV_ROW + NAV_BOTTOM;
 
 const ProfileSettingsHeader = ({
   title,
@@ -22,8 +44,10 @@ const ProfileSettingsHeader = ({
   iconSource = LeftIcon,
   showIcon = true,
   autoFocusBack = false,
+  chatScreenName,
 }) => {
   const [iconPressed, setIconPressed] = useState(false);
+  const topInset = useInternalHeaderTop();
   const backRef = useRef(null);
   // TalkBack lands on the first focusable after push; steer it to Back when asked
   useEffect(() => {
@@ -53,11 +77,8 @@ const ProfileSettingsHeader = ({
         backgroundColor="transparent"
       />
       <LinearGradient
-        style={[styles.profileSettingsChild]}
-        locations={[0, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1.3, y: 0 }}
-        colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
+        style={[styles.profileSettingsChild, { paddingTop: topInset }]}
+        {...HEADER_GRADIENT}
       >
         <>
           <View style={[styles.navBar]}>
@@ -73,7 +94,7 @@ const ProfileSettingsHeader = ({
               </Text>
             </View>
             <View style={styles.chatContainer}>
-              <ZendeskChatIcon screenName={title} />
+              <ZendeskChatIcon screenName={chatScreenName || title} />
             </View>
 
             {showIcon && (
@@ -125,10 +146,10 @@ const styles = StyleSheet.create({
   profileSettingsChild: {
     overflow: "hidden",
     width: "100%",
-    paddingTop: 40,
+    paddingBottom: NAV_BOTTOM,
   },
   navBar: {
-    height: 56,
+    height: NAV_ROW,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

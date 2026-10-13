@@ -76,13 +76,12 @@ jest.mock('react-native-app-auth', () => ({
   logout: (...args) => mockLogout(...args),
 }));
 
-jest.mock('@react-native-firebase/analytics', () => {
-  const analyticsFn = () => ({
-    setUserId: (...args) => mockSetUserId(...args),
-    setUserProperty: (...args) => mockSetUserProperty(...args),
-  });
-  return analyticsFn;
-});
+jest.mock('@react-native-firebase/analytics', () => ({
+  __esModule: true,
+  getAnalytics: jest.fn(() => ({})),
+  setUserId: (...args) => mockSetUserId(...args),
+  setUserProperty: (...args) => mockSetUserProperty(...args),
+}));
 
 jest.mock('react-native-linear-gradient', () => 'LinearGradient');
 jest.mock('react-native-config', () => ({
@@ -95,7 +94,14 @@ jest.mock('react-native-version-check', () => ({
 }));
 jest.mock('moment', () => () => ({ year: () => 2026 }));
 
-jest.mock('../src/components/common/ProfileSettingsHeader', () => 'ProfileSettingsHeader');
+jest.mock('../src/components/common/ProfileSettingsHeader', () => ({
+  __esModule: true,
+  default: 'ProfileSettingsHeader',
+  TAB_BAND_EXTENSION: 52,
+  TAB_BADGE_SIZE: 72,
+  TAB_BADGE_TOP: 16,
+  useInternalHeaderHeight: () => 112,
+}));
 jest.mock('../src/components/utility/ZendeskChatIcon', () => 'ZendeskChatIcon');
 jest.mock('../src/components/utility/AppStyles', () => ({ card: { borderRadius: 8 } }), { virtual: true });
 jest.mock('../src/res/svgIcons/UserIconWhite', () => 'UserIconWhite');
@@ -276,6 +282,10 @@ describe('AccountOverview behavior', () => {
   });
 
   it('executes logout action when OK is pressed in confirmation', async () => {
+    let finishChatLogout;
+    mockLogoutZendesk.mockImplementationOnce(() => new Promise((resolve) => {
+      finishChatLogout = resolve;
+    }));
     const alertSpy = jest.spyOn(Alert, 'alert').mockImplementation((title, msg, buttons) => {
       const okAction = buttons.find((b) => b.text?.toLowerCase() === 'ok');
       okAction.onPress();
@@ -297,6 +307,15 @@ describe('AccountOverview behavior', () => {
 
     expect(mockGetSsoToken).toHaveBeenCalled();
     expect(mockLogout).toHaveBeenCalled();
+    expect(mockClearChatData).toHaveBeenCalled();
+    expect(mockLogoutZendesk).toHaveBeenCalled();
+    expect(mockReset).not.toHaveBeenCalled();
+
+    await act(async () => {
+      finishChatLogout();
+      await flushPromises();
+    });
+
     expect(mockReset).toHaveBeenCalledWith({
       index: 0,
       routes: [{ name: 'Splash', params: { isLogout: true } }],

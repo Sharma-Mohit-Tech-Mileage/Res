@@ -5,7 +5,7 @@ import {
     TextInput,
     Image,
 } from 'react-native';
-import { Padding, Color, FontSize, FontFamily } from '../../../GlobalStyles';
+import { Padding, Color, FontSize, FontFamily } from '../../styles/GlobalStyles';
 import { formatInputA11yReadout } from '../../utils/a11y';
 import Phone from '../../res/svgIcons/Phone';
 import EmailIcon from '../../res/svgIcons/EmailIcone';
@@ -23,7 +23,7 @@ const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconI
             value={input}
             onChangeText={onChangeText}
             onSubmitEditing={onSubmitText}
-            placeholderTextColor={Color.gray600}
+            placeholderTextColor={Color.sparklightGray1}
             autoCorrect={false}
             clearButtonMode="always"
             keyboardType={keyboardType}
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFF', // Example background color
+        backgroundColor: Color.sparklightWhite, // Example background color
         borderWidth: 1,
         borderColor: Color.sparklightGray, // Example border color
         borderRadius: 8, // Example border radius
@@ -93,12 +93,12 @@ const styles = StyleSheet.create({
    
     leftIcon: {
         marginRight: 0, // Space between the icon and the text input
-        backgroundColor: '#FFF', // Hex color from the design
+        backgroundColor: Color.sparklightWhite, // Hex color from the design
         // Set the size if needed, e.g. width: 20, height: 20
     },
     rightIcon: {
         marginLeft: 8, // Space between the text input and the icon
-        backgroundColor: '#F8F8F8', // Hex color from the design
+        backgroundColor: Color.colorWhitesmoke_100, // Hex color from the design
     },
     suggestionItem: {
         flexDirection: 'row', // To align icons and text
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24, // Horizontal padding from the design
         borderBottomWidth: 1,
         borderColor: Color.sparklightGray, // Sparklight Dark Gray from the design
-        backgroundColor: '#F8F8F8', // Hex color from the design
+        backgroundColor: Color.colorWhitesmoke_100, // Hex color from the design
         height: 53, // Height from the design
     },
     iconStyle: {

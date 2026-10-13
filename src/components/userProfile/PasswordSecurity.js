@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, AccessibilityInfo, Platform } from "react-native";
-import Touchable from "../common/customui/Touchable";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Color,
@@ -8,16 +7,18 @@ import {
   FontSize,
   FontFamily,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { ScreenScroll } from "../common/customui/Screen";
 import AppStyles from '../../styles/AppStyles'
 import { useDispatch, useSelector } from "react-redux";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import useAccessibilityFocus from "../../hooks/useAccessibilityFocus";
-import { SectionTitle, FieldTitle, FieldContent } from "../common/customui/Typography";
+import { SectionTitle, FieldTitle } from "../common/customui/Typography";
 import EditActionButton from '../common/customui/EditActionButton'
 import { A11y } from "react-native-a11y-order";
+import { logWarn } from "../../utils/logger";
 const PasswordSecurity = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
@@ -44,7 +45,7 @@ const PasswordSecurity = () => {
             setSuccessAlertFocus();
             AccessibilityInfo.announceForAccessibility(message);
           } catch (e) {
-            console.warn("Accessibility focus error:", e);
+            logWarn("Accessibility focus error:", e);
           }
         }, 600);
   
@@ -96,8 +97,8 @@ const PasswordSecurity = () => {
           accessibilityHint="Go back to Account"
         />
       </View>
-      <View style={[styles.passwordSecurityInner, styles.securitySpaceBlock]}>
-        <View style={[AppStyles.card, styles.navigationBorder]}>
+      <ScreenScroll framed>
+        <View style={AppStyles.card}>
           <View style={styles.infoWrapper} ref={successAlertRef}>
             <NotificationAlert
               type="success"
@@ -128,7 +129,7 @@ const PasswordSecurity = () => {
               <View style={styles.passwordGroup}>
                 <FieldTitle style={[styles.passwordFlexBox]}>Password</FieldTitle>
                 <Text
-                  style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightDarkGray}]}
+                  style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightGray1}]}
                   accessibilityRole="text"
                   accessibilityLabel="Password: hidden"
                   accessible={true}
@@ -167,7 +168,7 @@ const PasswordSecurity = () => {
                     <FieldTitle style={[styles.passwordFlexBox]}>
                       {profileDetails.securityQuestion}
                     </FieldTitle>
-                    <Text style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightDarkGray,paddingBottom: Padding.p_5xl}]}
+                    <Text style={[styles.text, styles.passwordFlexBox,{color: Color.sparklightGray1,paddingBottom: Padding.p_5xl}]}
                     accessibilityRole="text"
                     accessibilityLabel="Answer hidden."
                     accessible={true}>
@@ -180,7 +181,7 @@ const PasswordSecurity = () => {
             </View>
           </A11y.Order>
         </View>
-      </View>
+      </ScreenScroll>
     </View>
   );
 };
@@ -189,15 +190,6 @@ const styles = StyleSheet.create({
   titleFlexBox: {
     textAlign: "center",
     color: Color.sparklightWhite,
-  },
-  securitySpaceBlock: {
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
-  },
-  navigationBorder: {
-    borderColor: Color.sparklightGray,
-    backgroundColor: Color.sparklightWhite,
-    borderStyle: "solid",
   },
   tabsFlexBox: {
     flexDirection: "row",
@@ -280,11 +272,8 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     overflow: "hidden",
   },
-  passwordSecurityInner: {
-    paddingTop: Padding.p_5xl,
-  },
   passwordSecurity: {
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     flex: 1,
   },
 });

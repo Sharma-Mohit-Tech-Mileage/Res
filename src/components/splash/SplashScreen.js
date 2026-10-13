@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { View, StyleSheet, Text, Linking, Platform, Animated, Easing, Dimensions, } from "react-native";
-import colors from "../../res/Colors";
+
 import LinearGradient from "react-native-linear-gradient";
 import { logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
@@ -9,7 +9,8 @@ import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "
 import { PostAuthApiRequest } from "../../network/RestApiClient";
 import { getEndpoint ,ENDPOINTS} from "../../network/apis/endpoints/Endpoints";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
-import { FontFamily } from "../../../GlobalStyles";
+import { LAYOUT } from "../../utils/responsive";
+import { FontFamily,Color } from "../../styles/GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
@@ -74,7 +75,6 @@ const SplashScreen = ({ navigation, route }) => {
   const [deviceSize, setDeviceSize] = useState(getDeviceSize());
   const [networkState, setNetworkState] = useState({ isConnected: true, type: "unknown", });
   const [showConnectedBanner, setShowConnectedBanner] = useState(false);
-
   const networkUnsubscribe = useRef(null);
   const sessionCheckTimeout = useRef(null);
   const wasDisconnected = useRef(false);
@@ -243,7 +243,7 @@ const SplashScreen = ({ navigation, route }) => {
         refreshToken: result.data.refreshToken,
       };
       setLoadingState(LoadingState.LOADING_DATA);
-      storeSsoToken(data);
+      await storeSsoToken(data);
       callSSOLoginApi(data);
     } catch (error) {
       logError("SplashScreen", error);
@@ -292,7 +292,22 @@ const SplashScreen = ({ navigation, route }) => {
             null,
         });
         return;
+      }else if (error.status === 422) {
+        const recoveryData = error.data || {};
+         navigation.reset({
+           index: 0,
+           routes: [{
+             name: "UserNameUpdate",
+             params: {
+               isLoginError: true,
+               recoveryAccountNumber: recoveryData.accountNumber,
+               recoveryUserName: recoveryData.userId,
+             },
+           }],
+         });
+        return;
       }
+
 
       // Network error
       if (
@@ -469,7 +484,6 @@ const SplashScreen = ({ navigation, route }) => {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
         } else if (result.code === "AUTH_TIMEOUT") {
-          logWarn("SplashScreen", "Login timed out");
           setErrorState({
             visible: true,
             type: ErrorType.AUTH_TIMEOUT,
@@ -477,6 +491,11 @@ const SplashScreen = ({ navigation, route }) => {
           });
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
+          void clearAuthCookies().catch((cleanupError) =>
+            logWarn("SplashScreen", "Auth cookie cleanup failed", cleanupError),
+          );
+          void cleanUserData();
+          return;
         } else if (result.code === "BROWSER_UNAVAILABLE") {
           logWarn("SplashScreen", "Browser unavailable for login");
           setErrorState({
@@ -515,18 +534,21 @@ const SplashScreen = ({ navigation, route }) => {
         refreshToken: result.data.refreshToken,
       };
 
-      storeSsoToken(data);
+      await storeSsoToken(data);
       setLoadingState(LoadingState.AUTHENTICATING);
       callSSOLoginApi(data);
     } catch (error) {
+      console.error("Login authorization error:", error);
       logError("SplashScreen", error);
       logWarn("SplashScreen", "Authorization failed");
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
+      const isAuthTimeout =
+        AuthenticationManager.handleAuthError(error).code === "AUTH_TIMEOUT";
       setErrorState({
         visible: true,
-        type: ErrorType.UNKNOWN_ERROR,
-        message: error.message,
+        type: isAuthTimeout ? ErrorType.AUTH_TIMEOUT : ErrorType.UNKNOWN_ERROR,
+        message: isAuthTimeout ? null : error.message,
       });
     } finally {
       authLockRef.current = false;
@@ -538,6 +560,7 @@ const SplashScreen = ({ navigation, route }) => {
     getSsoToken()
       .then((res) => {
         const token = res?.idToken;
+        console.log("🔐 ID Token retrieved for logout:", token);
 
         getUser().then((user) => {
           if (token) {
@@ -616,7 +639,7 @@ const SplashScreen = ({ navigation, route }) => {
           )}&refresh_token=${encodeURIComponent(res.refreshToken)}`,
         }).catch(() => {});
       }
-      await analytics().resetAnalyticsData();
+      await resetAnalyticsData(getAnalytics());
     } catch (error) {
       logWarn("SplashScreen", "Transfer sign-in cleanup error");
     }
@@ -760,7 +783,7 @@ const SplashScreen = ({ navigation, route }) => {
                 loginAuth();
               }
             }}
-          customStyle={{ color: colors.sparklight_bright_purple }}
+          customStyle={{ color: Color.sparklightPrimaryPurple }}
             buttonText={"Login"}
             disabled={
               authLockRef.current ||
@@ -824,14 +847,14 @@ const SplashScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.splash_bg,
+    backgroundColor: Color.sparklightPrimaryPurple,
   },
   networkStatusBarBottom: {
     position: "absolute",
     bottom: hp("12%"),
     left: 0,
     right: 0,
-    backgroundColor: colors.sparklight_red,
+    backgroundColor: Color.sparkLightRed,
     paddingVertical: 10,
     zIndex: 999,
   },
@@ -840,12 +863,12 @@ const styles = StyleSheet.create({
     bottom: hp("12%"),
     left: 0,
     right: 0,
-    backgroundColor: colors.sparklight_green,
+    backgroundColor: Color.sparklightGreen,
     paddingVertical: 10,
     zIndex: 999,
   },
   networkStatusText: {
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     textAlign: "center",
     fontSize: 14,
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -862,10 +885,8 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     marginTop: hp("25%"),
-    paddingHorizontal: wp("10%"),
-    maxWidth: 480,
-    width: "100%",
-    alignSelf: "center",
+    // Same side inset as the primary buttons (buttonsInFrame) on every screen size.
+    paddingHorizontal: LAYOUT.listRowInset,
   },
   version: {
     color: "white",
@@ -880,7 +901,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     fontWeight: "400",
-    color: colors.snow_white,
+    color: Color.sparklightWhite,
     alignSelf: "center",
     paddingHorizontal: wp("3%"),
   },

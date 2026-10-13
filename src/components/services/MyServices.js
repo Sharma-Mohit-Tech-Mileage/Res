@@ -1,39 +1,52 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { View, ScrollView, RefreshControl, StyleSheet } from "react-native";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from "react";
+import { View, RefreshControl, StyleSheet } from "react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import LinearGradient from "react-native-linear-gradient";
 import { theme } from "../../styles/theme";
 import { container } from "../../styles/utilities";
-import ServiceHeader from "./sections/ServiceHeader";
+import TabRootHeader from "../common/TabRootHeader";
+import SupportIcon from "../../res/svgIcons/SupportIcon";
 import InternetCard from "./cards/InternetCard";
 import VideoCard from "./cards/VideoCard";
 import PhoneCard from "./cards/PhoneCard";
 import StatusSection from "./sections/StatusSection";
+// import PrimaryButton from "../common/customui/PrimaryButton"; // Future Manage Equipment release.
+import MySpeedCard from "./manageEquipment/MySpeedCard";
+import { useServiceSpeedEquipment } from "./hooks/useServiceSpeedEquipment";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
-import { useAnnouncement } from '../../hooks/useAnnouncement';
+import { useAnnouncement } from "../../hooks/useAnnouncement";
 import { extractZipCode } from "../utility/constant";
-import { SERVICE_HEADER_GRADIENT } from "./utils/constants";
 import { fetchCurrentUsageRequest } from "../../redux/actions/servicesActions";
+import { ScreenScroll } from "../common/customui/Screen";
 import {
   selectCurrentUsage,
   selectCurrentUsageLoading,
 } from "../../redux/selectors/servicesSelectors";
- import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 
-const MyServicesContent = ({ route }) => {
+const MyServicesContent = ({ route, navigation }) => {
   const { triggerOnScreenEntry } = useAnnouncement();
   const insets = useSafeAreaInsets();
+  const scrollRef = useRef(null);
+  const speedSectionY = useRef(0);
+  const scrollToMySpeed = useCallback(() => {
+    scrollRef.current?.scrollTo({ y: speedSectionY.current, animated: true });
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      triggerOnScreenEntry('MyServicesStack');
-    }, [triggerOnScreenEntry])
+      triggerOnScreenEntry("MyServicesStack");
+    }, [triggerOnScreenEntry]),
   );
   const dispatch = useDispatch();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
@@ -42,17 +55,23 @@ const MyServicesContent = ({ route }) => {
   const flagsReady = accountDetails?.services != null;
 
   const accountNumber = profileDetails.accountNumber || "";
+  const [speedRefreshKey, setSpeedRefreshKey] = useState(0);
+  const speedAccountNumber = accountDetails?.account_number || accountNumber;
+  const hasEeroDevice = useServiceSpeedEquipment(
+    speedAccountNumber,
+    speedRefreshKey,
+  );
   const legacySPA = accountDetails?.legacy_brand_by_spa;
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
   const { outageData, checking, checkStatus, clearOutageData } =
-    useOutageStatus('services');
+    useOutageStatus("services");
   const [refreshing, setRefreshing] = useState(false);
   const [hasUserInitiatedCheck, setHasUserInitiatedCheck] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       return () => setHasUserInitiatedCheck(false);
-    }, [])
+    }, []),
   );
 
   // Current usage for InternetCard dataPlan
@@ -85,6 +104,7 @@ const MyServicesContent = ({ route }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    setSpeedRefreshKey((value) => value + 1);
     await refetch();
     dispatch(fetchCurrentUsageRequest());
     clearOutageData();
@@ -104,22 +124,20 @@ const MyServicesContent = ({ route }) => {
 
   return (
     <View style={styles.safeArea}>
-      <LinearGradient
-        style={[styles.gradientHeader, { height: 88 + insets.top }]}
-        locations={[0, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1.3, y: 0}}
-        colors={SERVICE_HEADER_GRADIENT}
+      <TabRootHeader
+        chatScreenName="My Services"
+        icon={<SupportIcon color={theme.colors.text.onPrimary} filled={true} />}
+        title="Services"
+        titleProps={{
+          accessibilityLabel: "Services",
+          accessibilityRole: "header",
+          accessibilityLevel: 2,
+          nativeID: "services-header",
+        }}
       />
 
-      <View style={{ paddingTop: insets.top + 27 }}>
-        <ServiceHeader />
-        <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-      <ZendeskChatIcon  screenName="My Services" />
-      </View>
-      </View>
-
-      <ScrollView
+      <ScreenScroll
+        ref={scrollRef}
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -140,6 +158,7 @@ const MyServicesContent = ({ route }) => {
               uploadSpeed={data?.internet?.uploadSpeed}
               loading={loading}
               dataPlan={dataPlan}
+              onViewMySpeed={scrollToMySpeed}
             />
           )}
 
@@ -170,8 +189,33 @@ const MyServicesContent = ({ route }) => {
           hasUserInitiatedCheck={hasUserInitiatedCheck}
         />
 
+        {/* Manage Equipment is deferred until a future release.
+        <PrimaryButton
+          title="Manage Equipment"
+          buttonType="outline"
+          onPress={() => navigation.navigate("manageEquipment")}
+          containerStyle={styles.manageEquipmentButton}
+        />
+        */}
+
+        {accountDetails?.services?.hsd === true && (
+          <View
+            onLayout={({ nativeEvent }) => {
+              speedSectionY.current = nativeEvent.layout.y;
+            }}
+          >
+            <MySpeedCard
+              key={speedAccountNumber}
+              hasEeroDevice={hasEeroDevice}
+              hideModemSpeed={!hasEeroDevice}
+              refreshKey={speedRefreshKey}
+              navigation={navigation}
+            />
+          </View>
+        )}
+
         <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -187,12 +231,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  gradientHeader: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-  },
   scrollView: container.page,
   scrollContent: {
     paddingBottom: theme.spacing["3xl"],
@@ -200,6 +238,10 @@ const styles = StyleSheet.create({
   servicesContainer: {
     backgroundColor: theme.colors.background,
     paddingTop: theme.spacing.base,
+  },
+  manageEquipmentButton: {
+    marginHorizontal: theme.spacing.base,
+    marginTop: theme.spacing.base,
   },
 });
 

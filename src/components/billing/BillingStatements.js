@@ -3,16 +3,16 @@ import { StyleSheet, Text, View, FlatList } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border } from "../../styles/GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { ScreenFrame } from "../common/customui/Screen";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import moment from "moment";
 import Icon from "../common/Icon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
-import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
 import SmallLoader from "../common/customui/SmallLoader";
@@ -127,7 +127,7 @@ const BillingStatementsScreen = ({ navigation }) => {
   // Render each billing statement item
   const renderStatementItem = ({ item, index }) => {
     // Alternate background color for rows
-    const backgroundColor = index % 2 === 0 ? Color.sparklightWhite :  '#F8F8F8';
+    const backgroundColor = index % 2 === 0 ? Color.sparklightWhite :  Color.colorWhitesmoke_100;
     const isDownloading = downloading && downloadingStatementId === item.id;
 
     return (
@@ -165,7 +165,7 @@ const BillingStatementsScreen = ({ navigation }) => {
         onPressBack={() => navigation.goBack()}
       />
 
-      <View style={styles.contentContainer}>
+      <ScreenFrame>
         {/* Display error notifications with proper spacing */}
         <View style={styles.notificationsContainer}>
           {error && showFetchError && (
@@ -229,7 +229,7 @@ const BillingStatementsScreen = ({ navigation }) => {
             </Touchable>
           </View>
         </View>
-       <View style={{ flex: 1, marginBottom: 20,...AppStyles.card }}>
+       <View style={[AppStyles.card, styles.listCard]}>
         {loading ? (
           <LoadingOverlay
             loading={loading}/>
@@ -249,7 +249,7 @@ const BillingStatementsScreen = ({ navigation }) => {
           </View>
         )}
         </View>
-      </View>
+      </ScreenFrame>
 
       {showPDFModal && (
         <PDFViewModal
@@ -265,13 +265,8 @@ const BillingStatementsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   account: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
-  },
-  contentContainer: {
-    flex: 1,
-    paddingHorizontal: Padding.p_5xl,
-    marginBottom: hp("8%"),
   },
   notificationsContainer: {
     marginBottom: 16, // Add 16px spacing between notifications and Year label
@@ -317,11 +312,11 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     marginRight: 1,
   },
+  listCard: {
+    flex: 1,
+  },
   statementsList: {
     flex: 1,
-    backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_5xs,
-    marginBottom: 20,
   },
   statementRow: {
     flexDirection: "row",
@@ -330,7 +325,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: Padding.p_base,
     borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_300,
+    borderBottomColor: Color.Gray300,
   },
   statementDate: {
     fontSize: FontSize.size_base,
@@ -375,9 +370,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    ...AppStyles.card, 
     height: 60,
-    marginBottom: 20,
   },
   emptyText: {
     fontSize: FontSize.size_base,

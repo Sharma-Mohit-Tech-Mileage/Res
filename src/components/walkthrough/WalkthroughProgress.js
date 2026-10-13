@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Padding } from '../../../GlobalStyles';
+import { Color, Padding } from '../../styles/GlobalStyles';
 
 const WalkthroughProgress = ({ totalSteps, currentStep }) => {
   return (
@@ -29,15 +29,15 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Color.cardBorder,
   },
   dotActive: {
     width: 32,
-    backgroundColor: '#353091',
+    backgroundColor: Color.colorMidnightblue,
   },
   dotCompleted: {
     width: 6,
-    backgroundColor: '#9CA3AF',
+    backgroundColor: Color.progressInactive,
   },
 });
 

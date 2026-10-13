@@ -5,11 +5,12 @@ import {
   Text,
   View,
   Keyboard,
-  ScrollView,
   Platform,
   AccessibilityInfo,
   findNodeHandle,
 } from "react-native";
+import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
+import { ScreenScroll } from "../common/customui/Screen";
 import Touchable from "../common/customui/Touchable";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -36,15 +37,11 @@ import {
   FontSize,
   Padding,
   Border,
-} from "../../../GlobalStyles";
+} from "../../styles/GlobalStyles";
 
 import Toggle from "../common/Toggle";
 import AlertIcon from "../../../assets/svgs/Alerttriangle";
 import Alerttriangle from "../../res/svgIcons/AlertIcon";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 
 import {
   SectionTitle,
@@ -52,6 +49,7 @@ import {
   HintText,
   Hyperlink,
 } from "../common/customui/Typography";
+import { logWarn } from "../../utils/logger";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
@@ -85,7 +83,7 @@ const TextNotifications = ({ navigation }) => {
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isTermRequired, setIsTermRequired] = useState(false);
   const [message1, setMessage1] = useState(
-    "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply.",
+    "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply. Message frequency may vary.",
   );
   const [message, setMessage] = useState(
     "Please enter your mobile phone number below and then select the type of message you would like to receive.",
@@ -133,7 +131,7 @@ const TextNotifications = ({ navigation }) => {
             "Text Notifications update failed.",
           );
         } catch (e) {
-          console.warn("Accessibility focus error:", e);
+          logWarn("Accessibility focus error:", e);
         }
       }, 600);
 
@@ -153,7 +151,7 @@ const TextNotifications = ({ navigation }) => {
             setSuccessFocus();
           }
         } catch (e) {
-          console.warn("Accessibility focus error:", e);
+          logWarn("Accessibility focus error:", e);
         }
       }, 600);
 
@@ -164,7 +162,7 @@ const TextNotifications = ({ navigation }) => {
             if (handle) AccessibilityInfo.setAccessibilityFocus(handle);
           }
         } catch (e) {
-          console.warn("Accessibility focus retry error:", e);
+          logWarn("Accessibility focus retry error:", e);
         }
       }, 1200);
 
@@ -193,7 +191,7 @@ const TextNotifications = ({ navigation }) => {
         "Please enter the mobile phone number you would like to receive all future customer communications. You may opt out at any time.",
       );
       setMessage1(
-        "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply.",
+        "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply. Message frequency may vary.",
       );
     } else {
       setIsCheckboxVisible(true);
@@ -222,6 +220,10 @@ const TextNotifications = ({ navigation }) => {
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     formatedData[name] = value;
+    if(value) {
+       setShowErrorAlert(false);
+
+    }
   };
 
   useEffect(() => {
@@ -281,6 +283,7 @@ const TextNotifications = ({ navigation }) => {
         formatedData.outageOptOut ||
         formatedData.optOut
       ) {
+        setShowErrorAlert(false);
         postRequestTextNotification();
       } else {
         setErrorText(
@@ -327,7 +330,7 @@ const TextNotifications = ({ navigation }) => {
       (error) => {
         setIsLoading(false);
         setIsSubmitting(false);
-        console.warn("Error on retrying postRequestTextNotification", error);
+        logWarn("Error on retrying postRequestTextNotification", error);
         setNotification({
           message: "Text Notifications update failed.",
           type: "error",
@@ -338,7 +341,7 @@ const TextNotifications = ({ navigation }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
+    <View style={{ flex: 1, backgroundColor: Color.Gray300 }}>
       <ProfileSettingsHeader
         title={
           formatedData?.phoneNumber
@@ -354,9 +357,9 @@ const TextNotifications = ({ navigation }) => {
           accessibilityLiveRegion="polite"
         />
       )}
-      <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always">
+      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} keyboardShouldPersistTaps="always">
         <View style={styles.textNotificationsInner}>
-          <View style={[AppStyles.card, { margin: 16, paddingBottom: 16 }]}>
+          <View style={[AppStyles.card, { paddingBottom: 16 }]}>
             {notification && (
               <Animated.View
                 style={{
@@ -410,11 +413,11 @@ const TextNotifications = ({ navigation }) => {
                   showCloseIcon={false}
                   isVisible={true}
                   iconComponent={Alerttriangle}
-                  iconColor="#F88700"
+                  iconColor={Color.sparkLightInfo}
                   accessibilityLabel={
                     formatedData?.phoneNumber
-                      ? "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply."
-                      : "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply."
+                      ? "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply. Message frequency may vary."
+                      : "You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply. Message frequency may vary."
                   }
                   accessibilityLiveRegion="polite"
                   accessibilityRole="alert"
@@ -570,7 +573,7 @@ const TextNotifications = ({ navigation }) => {
             />
           </View>
         </View>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
@@ -703,7 +706,7 @@ const styles = StyleSheet.create({
   },
   warningAlert: {
     borderLeftWidth: 4,
-    borderLeftColor: "#FF9800",
+    borderLeftColor: Color.warningAccent,
     marginBottom: 0,
     borderRadius: 0,
   },
@@ -734,7 +737,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   receiveTextNotifications1: {
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     lineHeight: 22,
     fontWeight: "400",
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -744,7 +747,7 @@ const styles = StyleSheet.create({
   },
   byOptingInContainer: {
     fontSize: FontSize.RadioCanadaSemiBold_size,
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     fontFamily: FontFamily.RadioCanadaRegular,
     textAlign: "left",
     alignSelf: "stretch",
@@ -775,7 +778,6 @@ const styles = StyleSheet.create({
   },
   textNotificationsInner: {
     flex: 1,
-    paddingBottom: hp("20%"),
 
     overflow: "hidden",
   },

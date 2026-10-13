@@ -1,50 +1,15 @@
+import ServiceIcon from "../../../res/svgIcons/InternetServiceIcon";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SecondaryButton from "../../common/customui/PrimaryButton";
-import {SectionTitle} from "../../common/customui/Typography";
+import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
 import AppStyles from "../../../styles/AppStyles";
-import UploadcircleIcon from "../../../res/svgIcons/UploadcircleIcon";
-import DownloadcircleIcon from "../../../res/svgIcons/DownloadcircleIcon";
-
-
-const SpeedBanner = ({ downloadSpeed, uploadSpeed }) => (
-  <View style={styles.speedBanner}>
-    {/* Download */}
-    <View
-      style={styles.speedColumn}
-      accessible={true}
-      accessibilityLabel={`Download Speed: ${downloadSpeed || '--'} Megabits per second`}
-    >
-      <Text style={styles.speedHeroValue}>{downloadSpeed || '--'}</Text>
-      <Text style={styles.speedHeroUnit}>Mbps</Text>
-      <View style={styles.speedTagRow}>
-        <DownloadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
-        <Text style={styles.speedTagText}>Download</Text>
-      </View>
-    </View>
-
-    {/* Divider */}
-    <View style={styles.speedBannerDivider} />
-
-    {/* Upload */}
-    <View
-      style={styles.speedColumn}
-      accessible={true}
-      accessibilityLabel={`Upload Speed: ${uploadSpeed || '--'} Megabits per second`}
-    >
-      <Text style={styles.speedHeroValue}>{uploadSpeed || '--'}</Text>
-      <Text style={styles.speedHeroUnit}>Mbps</Text>
-      <View style={styles.speedTagRow}>
-        <UploadcircleIcon width={12} height={12} style={styles.speedTagArrow} />
-        <Text style={styles.speedTagText}>Upload</Text>
-      </View>
-    </View>
-  </View>
-);
+import SpeedBanner from "./SpeedBanner";
+import SpeedometerIcon from "../../../res/svgIcons/SpeedometerIcon";
 
 const InternetCard = ({
   planName,
@@ -52,6 +17,7 @@ const InternetCard = ({
   uploadSpeed,
   loading = false,
   dataPlan = null,
+  onViewMySpeed,
 }) => {
   const navigation = useNavigation();
 
@@ -97,22 +63,16 @@ const InternetCard = ({
       <View style={[styles.card, styles.cardSpacing]}>
         {/* Header */}
         <View style={styles.cardHreader}>
-          {/*<View
+          <View
             style={styles.iconWrapper}
             accessible={false}
-            importantForAccessibility="no"
-            accessibilityElementsHidden={true}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
           >
-             <MaterialCommunityIcons
-              name="web"
-              size={16}
-              color={theme.colors.primary}
-              accessible={false}
-              importantForAccessibility="no"
-            /> 
-          </View> */}
+            <ServiceIcon />
+          </View>
           <SectionTitle
-            style={{paddingLeft: 8}}
+            style={{ paddingLeft: 8 }}
             accessible={true}
             accessibilityLabel="Internet"
             accessibilityLevel={2}
@@ -121,97 +81,114 @@ const InternetCard = ({
             Internet
           </SectionTitle>
         </View>
-      <View style={{ padding: 16 }}>
-        {/* Plan Name */}
-        <View style={styles.content}>
-          <Text
-            style={styles.planName}
-            accessible={true}
-            accessibilityLabel={`Plan Name - ${planName}`}
-          >
-            { planName && planName.charAt(0).toUpperCase() + planName.slice(1)}
-          </Text>
-        </View>
+        <View style={{ padding: 16, paddingBottom: dataPlan ? 0 : 16 }}>
+          {/* Plan Name */}
+          <View style={styles.content}>
+            <Text
+              style={styles.planName}
+              accessible={true}
+              accessibilityLabel={`Plan Name - ${planName}`}
+            >
+              {planName && planName.charAt(0).toUpperCase() + planName.slice(1)}
+            </Text>
+          </View>
 
-        {/* Speed Banner */}
-        <SpeedBanner downloadSpeed={downloadSpeed} uploadSpeed={uploadSpeed} />
+          {/* Speed Banner */}
+          <SpeedBanner
+            downloadSpeed={downloadSpeed}
+            uploadSpeed={uploadSpeed}
+          />
 
-        {/* DATA USAGE SNAPSHOT */}
-        {dataPlan && (
-          <View style={styles.dataUsageSnapshot}>
-            {/* Header row with label + percentage badge */}
-            <View style={styles.snapshotHeaderRow}>
-              <Text style={styles.snapshotLabel}>Data Usage</Text>
-              <View
-                style={[
-                  styles.percentBadge,
-                  {
-                    backgroundColor:
-                      getDataUsageColor(dataPlan.percentageUsed) + "15",
-                  },
-                ]}
-              >
-                <Text
+          {/* DATA USAGE SNAPSHOT */}
+          {dataPlan && (
+            <View style={styles.dataUsageSnapshot}>
+              {/* Header row with label + percentage badge */}
+              <View style={styles.snapshotHeaderRow}>
+                <Text style={styles.snapshotLabel}>Data Usage</Text>
+                <View
                   style={[
-                    styles.percentBadgeText,
-                    { color: getDataUsageColor(dataPlan.percentageUsed) },
+                    styles.percentBadge,
+                    {
+                      backgroundColor:
+                        getDataUsageColor(dataPlan.percentageUsed) + "15",
+                    },
                   ]}
                 >
-                  {dataPlan.percentageUsed}% used
-                </Text>
+                  <Text
+                    style={[
+                      styles.percentBadgeText,
+                      { color: getDataUsageColor(dataPlan.percentageUsed) },
+                    ]}
+                  >
+                    {dataPlan.percentageUsed}% used
+                  </Text>
+                </View>
               </View>
-            </View>
 
-            {/* Progress bar */}
-            <View style={styles.snapshotBar}>
-              <View
-                style={[
-                  styles.snapshotFill,
-                  {
-                    width: `${Math.min(dataPlan.percentageUsed, 100)}%`,
-                    backgroundColor: getDataUsageColor(dataPlan.percentageUsed),
-                  },
-                ]}
+              {/* Progress bar */}
+              <View style={styles.snapshotBar}>
+                <View
+                  style={[
+                    styles.snapshotFill,
+                    {
+                      width: `${Math.min(dataPlan.percentageUsed, 100)}%`,
+                      backgroundColor: getDataUsageColor(
+                        dataPlan.percentageUsed,
+                      ),
+                    },
+                  ]}
+                />
+              </View>
+
+              {/* Usage breakdown */}
+              <View style={styles.usageBreakdown}>
+                <View style={styles.usageStat}>
+                  <Text style={styles.usageStatValue}>{dataPlan.usedGB}</Text>
+                  <Text style={styles.usageStatLabel}> GB used</Text>
+                </View>
+                <View style={styles.usageStat}>
+                  <Text style={styles.usageStatValue}>
+                    {(dataPlan.totalGB - dataPlan.usedGB).toFixed(2)}
+                  </Text>
+                  <Text style={styles.usageStatLabel}> GB left</Text>
+                </View>
+                <View style={styles.usageStat}>
+                  <Text style={styles.usageStatValue}>{dataPlan.totalGB}</Text>
+                  <Text style={styles.usageStatLabel}> GB total</Text>
+                </View>
+              </View>
+
+              <SecondaryButton
+                title="View Data Usage"
+                buttonType="submit"
+                onPress={handleViewDataUsage}
+                style={styles.bottomButton}
+                accessibilityLabel="View Data Usage details"
+                accessibilityRole="button"
               />
-            </View>
 
-            {/* Usage breakdown */}
-            <View style={styles.usageBreakdown}>
-              <View style={styles.usageStat}>
-                <Text style={styles.usageStatValue}>{dataPlan.usedGB}</Text>
-                <Text style={styles.usageStatLabel}> GB used</Text>
-              </View>
-              <View style={styles.usageStat}>
-                <Text style={styles.usageStatValue}>
-                  {(dataPlan.totalGB - dataPlan.usedGB).toFixed(2)}
-                </Text>
-                <Text style={styles.usageStatLabel}> GB left</Text>
-              </View>
-              <View style={styles.usageStat}>
-                <Text style={styles.usageStatValue}>{dataPlan.totalGB}</Text>
-                <Text style={styles.usageStatLabel}> GB total</Text>
-              </View>
+              <Pressable
+                style={styles.speedTestRow}
+                onPress={onViewMySpeed}
+                accessibilityRole="button"
+                accessibilityLabel="Test your device speed now, go to My Speed"
+              >
+                <SpeedometerIcon />
+                <Hyperlink style={styles.speedTestLink}>
+                  Test your device speed now
+                </Hyperlink>
+              </Pressable>
             </View>
-
-            <SecondaryButton
-              title="View Data Usage"
-              buttonType="submit"
-              onPress={handleViewDataUsage}
-              style={styles.bottomButton}
-              accessibilityLabel="View Data Usage details"
-              accessibilityRole="button"
-            />
-          </View>
-        )}
-      </View>
+          )}
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: serviceCard.container,
-   card: {
+  container: { ...serviceCard.container, marginBottom: theme.spacing.base },
+  card: {
     ...AppStyles.card,
   },
   cardSpacing: {
@@ -229,71 +206,15 @@ const styles = StyleSheet.create({
   planName: serviceCard.planName,
 
   // ── Speed Banner ──
-  speedBanner: {
+  cardHreader: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: theme.spacing.md,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.base,
-    backgroundColor: `${theme.colors.primary}0C`,
-    borderWidth: 1,
-    borderColor: `${theme.colors.primary}20`,
-  },
-   cardHreader: {
-    flexDirection: "row",
-    backgroundColor: "#F8F8F8",
+    backgroundColor: theme.colors.white,
     width: "100%",
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
     padding: 10,
   },
-  speedColumn: {
-    flex: 1,
-    alignItems: "center",
-  },
-  speedHeroValue: {
-    fontSize: 36,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "700",
-    color: theme.colors.Black_100,
-    lineHeight: 40,
-  },
-  speedHeroUnit: {
-    fontSize: theme.typography.size.xs,
-    fontFamily: theme.typography.family.regular,
-    color: theme.colors.text.secondary,
-    marginTop: 2,
-    letterSpacing: 0.5,
-  },
-  speedTagRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: theme.spacing.xs,
-    backgroundColor: `${theme.colors.primary}14`,
-    paddingVertical: 3,
-    paddingHorizontal: 10,
-    borderRadius: 4,
-  },
-speedTagArrow: {
-    fontSize: theme.typography.size.xs,
-    fontWeight: "700",
-    marginRight: 4,
-    color: theme.colors.primary,
-  },
-  speedTagText: {
-    fontSize: theme.typography.size.xs,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "700",
-    color: theme.colors.primary,
-    letterSpacing: 0.5,
-  },
-  speedBannerDivider: {
-    width: 1,
-    height: 50,
-    backgroundColor: `${theme.colors.primary}20`,
-  },
-
   // ── Skeleton ──
   skeleton: skeletonLoader.skeleton,
   skeletonHeader: skeletonLoader.skeletonHeader,
@@ -313,7 +234,19 @@ speedTagArrow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.base,
+  },
+  speedTestRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    paddingVertical: theme.spacing.lg,
+    minHeight: 45,
+  },
+  speedTestLink: {
+    marginLeft: theme.spacing.sm,
+    alignSelf: "center",
   },
   snapshotLabel: {
     fontSize: theme.typography.size.sm,
@@ -335,7 +268,7 @@ speedTagArrow: {
   },
   snapshotBar: {
     height: 8,
-    backgroundColor: `${theme.colors.freedatabackground}30`,
+    backgroundColor: theme.colors.blueBright,
     borderRadius: 4,
     overflow: "hidden",
     marginBottom: theme.spacing.md,

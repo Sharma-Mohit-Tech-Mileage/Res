@@ -1,22 +1,20 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
   StyleSheet,
-  Text,
   View,
-  ScrollView,
 } from "react-native";
 import Touchable from "../common/customui/Touchable";
+import { ScreenScroll } from "../common/customui/Screen";
+import ResponsiveRow from "../common/customui/ResponsiveRow";
+import { container } from "../../styles/utilities";
 import { useFocusEffect } from "@react-navigation/native";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
 import {
   Color,
-  FontFamily,
-  FontSize,
   Padding,
   Border,
-} from "../../../GlobalStyles";
-import LinearGradient from "react-native-linear-gradient";
-import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+} from "../../styles/GlobalStyles";
+import TabRootHeader from "../common/TabRootHeader";
 import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/RestApiClient";
@@ -27,19 +25,12 @@ import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
-import Icon from "../common/Icon";
-import colors from "../../res/Colors";
-import { card } from "../../styles/utilities";
-import {
-  widthPercentageToDP,
-  heightPercentageToDP,
-} from "react-native-responsive-screen";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/LoadingOverlay";
 import RightIcon from "../../../assets/svgs/Chevonright";
-import ZendeskChatIcon from "../utility/ZendeskChatIcon";
 import AppStyles from "../../styles/AppStyles";
-import { SectionTitle,Title,MenuText } from "../common/customui/Typography";
+import { SectionTitle, MenuText } from "../common/customui/Typography";
+import { logWarn } from "../../utils/logger";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -77,7 +68,7 @@ const BillingScreen = ({ navigation }) => {
   const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(true);
 
   const handleError = (error) => {
-    console.warn("error on Billing auto pay", error);
+    logWarn("error on Billing auto pay", error);
     setIsContentLoading(false);
     setIsAutoPayStatusLoad(false);
   };
@@ -98,7 +89,7 @@ const BillingScreen = ({ navigation }) => {
         );
       })
       .catch((error) => {
-        console.warn("Error getting user status:", error);
+        logWarn("Error getting user status:", error);
         setIsContentLoading(false);
         setIsAutoPayStatusLoad(false);
       });
@@ -142,41 +133,15 @@ const BillingScreen = ({ navigation }) => {
 
   return (
     <View style={styles.account} accessibilityLabel="Billing Services screen" accessibilityRole='header' accessibilityLevel={1}>
-      <ProfileSettingsHeader
-        title=""
-        iconAlignment="right"
-        showIcon={false}
-      />
-      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-      <ZendeskChatIcon  screenName="Billing" />
-      </View>
-      <LinearGradient
-        style={styles.linearGradientStyle}
-        locations={[0, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x:1.3, y: 0}}
-        colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
+      <TabRootHeader
+        chatScreenName="Billing"
+        icon={<BillingIconWhite isSelected={false} />}
+        title="Billing Services"
+        titleProps={{ accessibilityLabel: "Billing Services", accessibilityRole: "header", accessibilityLevel: 1, nativeID: "Billing Services-header" }}
       />
       <View style={styles.frameParent}>
-        <View style={styles.rightActionableParent}>
-          <View
-            style={[
-              styles.rightActionable,
-              { justifyContent: "center", alignItems: "center" },
-            ]}
-          >
-            <BillingIconWhite isSelected={false} />
-          </View>
-          <Title style={styles.melissaSmith}
-          accessibilityLabel="Billing Services" accessibilityRole='header'
-           accessibilityLevel={1} 
-           nativeID="Billing Services-header"
-           //accessibilityHint="Header"
-           >
-          Billing Services</Title>
-        </View>
-
-        <ScrollView
+        <ScreenScroll
+          framed
           showsVerticalScrollIndicator={false}
           
         >
@@ -199,18 +164,20 @@ const BillingScreen = ({ navigation }) => {
                   style={styles.card}
                   
                 />
-                <AutoPayCard
-                  isAutoPayStatus={isAutoPayStatus}
-                  paymentDetails={defaultPaymentDetails}
-                  navigation={navigation}
-                  isStatusLoading={isAutoPayStatusLoad}
-                />
-                <PeperLessCard
-                  paperlessStatus={paperlessStatusAcp}
-                  navigation={navigation}
-                  isStatusLoading={paperlessLoading}
-                />
-                <View style={[AppStyles.card,{paddingBottom:16}]}>
+                <ResponsiveRow>
+                  <AutoPayCard
+                    isAutoPayStatus={isAutoPayStatus}
+                    paymentDetails={defaultPaymentDetails}
+                    navigation={navigation}
+                    isStatusLoading={isAutoPayStatusLoad}
+                  />
+                  <PeperLessCard
+                    paperlessStatus={paperlessStatusAcp}
+                    navigation={navigation}
+                    isStatusLoading={paperlessLoading}
+                  />
+                </ResponsiveRow>
+                <View style={[AppStyles.card, { paddingBottom: 16 }]}>
                   <>
                   <View
                     style={[
@@ -288,7 +255,6 @@ const BillingScreen = ({ navigation }) => {
                       accessibilityRole="button"
                       accessibilityLabel="View Payment History"
                     >
-                      
 
                       <MenuText style={styles.modemHealthSupport}>
                         View Payment History
@@ -329,24 +295,14 @@ const BillingScreen = ({ navigation }) => {
               </>
             )}
           </View>
-        </ScrollView>
+        </ScreenScroll>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  linearGradientStyle: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    height: 150,
-  },cardsContainer: {
-    paddingBottom: heightPercentageToDP("25%"),
-    marginTop: Padding.p_base,
-    marginHorizontal: 16,
-  },
+  cardsContainer: container.stack,
   leftTitle: {
     alignContent: "flex-start",
     alignSelf: "center",
@@ -357,44 +313,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "transparent",
   },
-  rightActionable: {
-    borderColor: Color.colorWhitesmoke_200,
-    borderWidth: 4,
-    width: 72,
-    height: 72,
-    backgroundColor: Color.colorMidnightblue,
-    borderRadius: 36,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  melissaSmith: {
-    width: 210,
-    lineHeight: 28,
-    paddingBottom: Padding.p_5xs,
-    textAlign: "center",
-  },
-  rightActionableParent: {
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "stretch",
-    overflow: "hidden",
-  },
   frameParent: {
     flex: 1,
-    paddingVertical: Padding.p_base,
+    // Top spacing now comes from TabRootHeader.
+    paddingBottom: Padding.p_base,
     alignSelf: "stretch",
   },
   account: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
   card: {
     minHeight: 230,
-  },
-  myModemSpaceBlock: {
-    paddingTop: Padding.p_base,
-    alignSelf: "stretch",
   },
   myModemWrapper: {
     paddingTop: Padding.p_base,
@@ -435,7 +366,7 @@ const styles = StyleSheet.create({
   },
   modemHealthSupport: {
     textAlign: "left",
-    lineHeight: 28,
+    // No lineHeight: on Android it makes some labels measure an extra blank line at certain display sizes
     flex: 1,
   },
 });

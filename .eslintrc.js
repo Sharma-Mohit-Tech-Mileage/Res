@@ -1,8 +1,4 @@
-// Accessibility guardrail: bans raw touchable imports outside Touchable.js so
-// every interactive element clears 48dp (Android Scanner / WCAG 2.5.5). Severity
-// is 'warn' — flip to 'error' after migrating the remaining raw callsites.
-// Doesn't extend @react-native/eslint-config to avoid surfacing unrelated
-// findings; add `extends: ['@react-native']` later if desired.
+// Guardrails: each rule bans a pattern already migrated away from, so it cannot creep back.
 module.exports = {
   root: true,
   parserOptions: {
@@ -13,6 +9,11 @@ module.exports = {
   env: {
     es2021: true,
     node: true,
+  },
+  // Injected by Metro at build time, so they exist at runtime but not in any env preset.
+  globals: {
+    __DEV__: 'readonly',
+    fetch: 'readonly',
   },
   ignorePatterns: [
     'node_modules/**',
@@ -43,17 +44,50 @@ module.exports = {
               "Use the shared Touchable / IconButton / LinkText / CheckboxRow primitives from src/components/common/customui/ instead of raw react-native touchables. They guarantee the 48dp accessibility minimum touch target (Android Scanner / WCAG 2.5.5). Only Touchable.js itself may import Pressable directly.",
           },
         ],
+        patterns: [
+          {
+            group: ['react-native-responsive-screen'],
+            message:
+              'Import { wp, hp } from src/utils/responsive instead. That shim matches this library below 600dp and clamps above it, so percentage widths stop stretching on large windows.',
+          },
+        ],
       },
     ],
+    // A syntax rule, not a 2nd no-restricted-imports 'paths' entry - only the last entry per module wins.
+    'no-restricted-syntax': [
+      'warn',
+      {
+        selector:
+          "ImportDeclaration[source.value='react-native'] > ImportSpecifier[imported.name='Dimensions']",
+        message:
+          'Dimensions.get() is read once and never updates, so layouts freeze at the size the app launched with. Use useWindowDimensions() in components, or the helpers in src/utils/responsive.js.',
+      },
+    ],
+    // Catches never-imported variables; these throw at runtime and are otherwise invisible.
+    'no-undef': 'error',
   },
   overrides: [
     {
-      // Touchable.js is the one file where Pressable may be imported directly —
-      // it's the primitive every other touchable wraps.
+      // Touchable.js is the primitive every other touchable wraps.
       files: ['src/components/common/customui/Touchable.js'],
       rules: {
         'no-restricted-imports': 'off',
       },
+    },
+    {
+      // The only modules that legitimately read Dimensions; non-components must read at call time.
+      files: [
+        'src/utils/responsive.js',
+        'src/components/utility/walkthroughHelpers.js',
+        'src/components/splash/SplashScreen.js',
+      ],
+      rules: {
+        'no-restricted-syntax': 'off',
+      },
+    },
+    {
+      files: ['__tests__/**'],
+      env: { jest: true },
     },
   ],
 };

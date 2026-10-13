@@ -1,17 +1,16 @@
 import React, { useEffect, useState,useCallback} from "react";
-import {  StyleSheet, Text, View, Alert, ScrollView,Platform } from "react-native";
+import { StyleSheet, Text, View, Alert, Platform } from "react-native";
 import Touchable from "../common/customui/Touchable";
 import { useNavigation , useFocusEffect} from "@react-navigation/native";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding } from "../../styles/GlobalStyles";
 import { A11Y } from "../../styles/theme";
 import { useAnnouncement } from '../../hooks/useAnnouncement';
-import LinearGradient from "react-native-linear-gradient";
 import RightIcon from '../../../assets/svgs/Chevonright';
 import ProfileSettingsIcon from '../../../assets/svgs/Rightactionable15';
 import PasswordSecurityIcon from '../../../assets/svgs/Rightactionable16';
 import NotificationsIcon from '../../../assets/svgs/Rightactinable17';
 import Feedbackicon from '../../../assets/svgs/Messagealertcircle';
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import TabRootHeader from "../common/TabRootHeader";
 import { useDispatch, useSelector } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { clearAuthCookies } from "../utility/NativeCookieManager";
@@ -20,24 +19,21 @@ import { logout } from 'react-native-app-auth';
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import Config from "react-native-config";
-import { MenuText, HeadingH1,Hyperlink } from "../common/customui/Typography";
+import { MenuText, Hyperlink } from "../common/customui/Typography";
 import AppStyles from "../../styles/AppStyles";
 
 import PrimaryButton from "../common/customui/PrimaryButton";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
 import { getAnalytics, setUserId, setUserProperty } from '@react-native-firebase/analytics';
-import ZendeskChatIcon from "../utility/ZendeskChatIcon";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { wp } from "../../utils/responsive";
+import { ScreenScroll } from "../common/customui/Screen";
 
 import {
   logoutZendesk,
   clearChatData
 } from "../utility/RNZendeskChat";
-
+import { logWarn } from "../../utils/logger";
 
 const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true, };
 
@@ -62,7 +58,6 @@ const logoutConfirmationPopup = (dispatch, navigation) => {
   );
 };
 
-
 const logoutAction = (dispatch, navigation) => {
   getSsoToken().then((res) => {
     let token = res.idToken;
@@ -70,12 +65,14 @@ const logoutAction = (dispatch, navigation) => {
       idToken: token,
       postLogoutRedirectUrl: Platform.OS === "ios" ? Config.SSO_REDIRECT_URL_IOS : Config.SSO_REDIRECT_URL_ANDROID,
     }).then(async (result) => {
-      // Zendesk.logout();
+      // Finish resetting the chat identity before another account can sign in.
+      clearChatData();
+      await logoutZendesk();
       try {
         await setUserId(getAnalytics(), null);
         await setUserProperty(getAnalytics(), 'Sparklight_user_id', null);
       } catch (error) {
-        console.warn('Error clearing analytics user ID:', error);
+        logWarn('Error clearing analytics user ID:', error);
       }
       navigation.reset({
         index: 0,
@@ -87,13 +84,9 @@ const logoutAction = (dispatch, navigation) => {
       dispatch(saveUserInfo({}))
       dispatch(logoutApp());
       cleanUserData();
-      clearChatData();
-      logoutZendesk();
     });
   });
 };
-
-
 
 const AccountOverview = () => {
   const navigation = useNavigation();
@@ -118,7 +111,6 @@ const AccountOverview = () => {
     setMenues(menuItems1);
   }, []);
 
-
   useFocusEffect(
     useCallback(() => {
       const formatName = (name = "") => {
@@ -136,7 +128,6 @@ const AccountOverview = () => {
       setFullName(formattedName || fallbackFullName.trim());
     }, [profileDetails])
   );
-  
 
   const menuItems1 = [
     {
@@ -144,6 +135,13 @@ const AccountOverview = () => {
       onPress: () => navigation.navigate('ProfileSettings'),
       icon: ProfileSettingsIcon,
       accessibilityLabel: 'Navigate to profile',
+      includeInMenu: true,
+    },
+     {
+      name: 'Change Username',
+      onPress: () => navigation.navigate('ProfileSettingsEdit'),
+      icon: ProfileSettingsIcon,
+      accessibilityLabel: 'Change Username',
       includeInMenu: true,
     },
     {
@@ -169,37 +167,17 @@ const AccountOverview = () => {
     }
   ];
 
-
-  
   return (
     <View style={styles.account} accessibilityLabel="Account screen">
-      <ProfileSettingsHeader
-        title=""
-        iconAlignment="right"
-        showIcon={false}
+      <TabRootHeader
+        chatScreenName="Account Overview"
+        icon={<UserIconWhite width={28} height={26} />}
+        title={fullName}
+        titleProps={{ accessible: true, accessibilityLabel: `Profile for ${profileDetails?.fullname}`, accessibilityRole: "text" }}
       />
-      <LinearGradient
-        style={styles.linearGradientStyle}
-        locations={[0, 1]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1.3, y: 0}}
-        colors={["rgba(141, 59, 144, 1)", "rgba(53, 48, 145, 1)"]}
-      />
-      <View style={{ position: "absolute", top: 60, right: 10, zIndex: 1 }}>
-        <ZendeskChatIcon screenName="Account Overview" />
-      </View>
       <View style={[styles.frameParent]}>
-        <View style={styles.rightActionableParent}>
-          <View style={styles.rightActionable}>
-            <UserIconWhite width={28} height={26}/>
-          </View>
-          {/* Full name for profile */}
-          <HeadingH1 style={styles.melissaSmith} accessible={true} accessibilityLabel={`Profile for ${profileDetails?.fullname}`} accessibilityRole="text">
-            {fullName}
-          </HeadingH1>
-        </View>
-        <ScrollView style={{ flex: 1 }}>
-          <View style={{ marginBottom: '30%' }}>
+        <ScreenScroll framed style={{ flex: 1 }}>
+          <View>
             <View style={styles.frameGroup}>
               <View style={AppStyles.card}>
                 {/* Mapping through menu items */}
@@ -288,36 +266,18 @@ const AccountOverview = () => {
                 {`©${moment().year()} Cable One, Inc. All rights reserved.`}
             </Text>
           </View>
-        </ScrollView>
+        </ScreenScroll>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  linearGradientStyle: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    height: 150,
-  },
   buttonsSpaceBlock: {
     paddingVertical: Padding.p_base,
     alignItems: "center",
   },
-  navigationBorder: {
-    borderColor: Color.sparklightGray,
-    backgroundColor: Color.sparklightWhite,
-    borderStyle: "solid",
-    justifyContent: "center",
-  },
-  accept: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    textAlign: "center",
-    color: Color.sparklightWhite,
-  }, copyright: {
+  copyright: {
     marginTop:wp("25%"),
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 14,
@@ -334,91 +294,22 @@ const styles = StyleSheet.create({
   footerLink: {
     paddingHorizontal: Padding.p_5xs,
   },
-  linkStyle: {
-    color: Color.sparklightPrimaryPurple,
-    textDecorationLine: 'underline',
-    alignSelf: 'center',
-    fontWeight: '600'
-  },
   separator: {
     color: Color.sparklightPrimaryPurple,
     alignSelf: 'center',
     fontFamily: FontFamily.RadioCanadaBold,
     fontWeight: '600'
   },
-  makePaymentTypo: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%',
-    paddingTop: Padding.p_5xl,
-  },
-
   rightIconLayout: {
     height: 24,
     width: 24,
     justifyContent: "center",
     alignItems: "center",
   },
-  leftIconLayout: {
-    height: 28,
-    width: 28,
-    marginRight: 5,
-    
-  },
-  title: {
-    marginLeft: -35,
-    fontSize: FontSize.size_lg,
-  },
-  button: {
-    backgroundColor: Color.colorMidnightblue,
-    width: '100%',
-  },
-  buttonsLayout: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    minHeight: 50
-  },
-  rightActionable: {
-    borderColor: Color.colorWhitesmoke_200,
-    borderWidth: 4,
-    width: 72,
-    height: 72,
-    backgroundColor: Color.colorMidnightblue,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  text: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: Color.sparklightWhite,
-    fontFamily: FontFamily.RadioCanadaSemiBold,
-  },
-
-  melissaSmith: {
-    width: 210,
-    lineHeight: 28,
-    paddingBottom: Padding.p_5xs,
-    textAlign: "center",
-  },
-  rightActionableParent: {
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "stretch",
-    overflow: 'hidden',
-  },
   profileSettings: {
     textAlign: "left",
     marginLeft: 2,
-    lineHeight: 28,
+    // No fixed lineHeight: on a flex:1 Text it makes Android measure an extra line at some densities, pushing the row out of line.
     flex: 1,
   },
   rightActionableGroup: {
@@ -432,11 +323,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Color.sparklightGray,
   },
-  makePayment: {
-    width: 282,
-    color: Color.colorMidnightblue,
-    textAlign: "center",
-  },
   buttons: {
     width: '100%',
     paddingHorizontal: 0,
@@ -444,18 +330,17 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_base,
   },
   frameGroup: {
-    marginTop: Padding.p_5xl,
-    paddingHorizontal: Padding.p_base,
     alignSelf: "stretch",
   },
   frameParent: {
     flex: 1,
-    paddingVertical: Padding.p_base,
+    // Top spacing now comes from TabRootHeader.
+    paddingBottom: Padding.p_base,
     alignSelf: 'stretch',
   },
   account: {
     flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.Gray300,
     width: "100%",
   },
 

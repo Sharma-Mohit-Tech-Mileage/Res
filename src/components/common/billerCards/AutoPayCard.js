@@ -1,16 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import colors from "../../../res/Colors";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { FontFamily, Color } from "../../../../GlobalStyles";
+import { View, StyleSheet } from "react-native";
 import Checkcircle from "../../../../assets/svgs/Checkcircle";
 import Checkcircle1 from "../../../../assets/svgs/Checkcircle1"
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
-import Config from "react-native-config";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import Touchable from "../customui/Touchable";
 import AppStyles from "../../../styles/AppStyles";
 import {SectionTitle,IndicatorText,Hyperlink } from "../customui/Typography";
+import { Color } from "../../../styles/GlobalStyles";
 
 const StatusIcon = ({ status, style }) => {
   return <View style={style}>{status === "On" ? <Checkcircle /> : <Checkcircle1 />}</View>;
@@ -25,13 +22,13 @@ const AutoPayCard = ({
   const showSkeleton = isStatusLoading || isAutoPayStatus === undefined;
   const handleCardPress = () => {
     if (!showSkeleton) {
-      navigation.navigate("AutoPay");
+      navigation.navigate("AutoPay", { entryPoint: "autopay_card" });
     }
   };
 
   return (
     <Touchable
-      style={[AppStyles.card, { alignItems: 'stretch', marginBottom: 16 }]}
+      style={[AppStyles.card, { alignItems: 'stretch', flexGrow: 1 }]}
       minSize={0}
       onPress={handleCardPress}
      accessible={false}
@@ -49,7 +46,7 @@ const AutoPayCard = ({
          <View style={styles.iconBg} accessible={true} accessibilityRole="text" accessibilityLabel="Auto Pay Icon">
           <AutoPayIcon />
         </View> 
-        <View style={{ flexDirection: "column" }}>
+        <View style={styles.textColumn}>
           <SectionTitle style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Auto Pay" >
             Auto Pay
           </SectionTitle>
@@ -69,7 +66,7 @@ const AutoPayCard = ({
             </Hyperlink>
           )}
         </View>
-        <View style={{ position: "absolute", right: 10 }}>
+        <View style={styles.statusColumn}>
           {showSkeleton ? (
             <SkeletonPlaceholder>
               <View style={{ width: 56, height: 22, borderRadius: 4 }} />
@@ -95,24 +92,19 @@ const AutoPayCard = ({
 };
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: "row",
-    backgroundColor: "white",
-    borderRadius: 10,
-    alignSelf: "center",
-    overflow: "hidden",
-    width: wp("92%"),
-  },
+  // Title takes the free width and wraps; the status sits beside it in the flow so the two never overlap on narrow cards.
+  textColumn: { flex: 1, flexShrink: 1 },
+  statusColumn: { marginLeft: 8, justifyContent: "center" },
 
   leftTitle: {
     marginLeft: 8,
     alignContent: "flex-start",
-    alignSelf: "center",
+    alignSelf: "flex-start",
   },
   
   iconBg: {
     alignSelf: "center",
-    backgroundColor: "#8D3B901A",
+    backgroundColor: Color.primaryTint,
     width: 50,
     height: 50,
     borderRadius: 25,
@@ -121,13 +113,6 @@ const styles = StyleSheet.create({
   },
   manageLink: {
     marginLeft: 10,
-  },
-  statusRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    marginVertical: 5,
   },
   iconContainer: {
     flexDirection: "row",

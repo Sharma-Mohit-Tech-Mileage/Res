@@ -1,18 +1,11 @@
 import React, { useState } from "react";
-import {
-  Modal,
-  View,
-  StyleSheet,
-  Text,
-  SafeAreaView,
-  Dimensions,
-  Image,
-  StatusBar,
-} from "react-native";
+import { Modal, View, StyleSheet, Text, StatusBar } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { HEADER_GRADIENT, NAV_BOTTOM, useInternalHeaderTop } from "../common/ProfileSettingsHeader";
 import LinearGradient from 'react-native-linear-gradient';
 import Pdf from 'react-native-pdf';
 import sharePDF from 'react-native-share-pdf';
-import { Padding, Color, FontFamily, Border, FontSize } from '../../../GlobalStyles';
+import { Color, FontFamily, FontSize } from '../../styles/GlobalStyles';
 import { A11Y } from '../../styles/theme';
 import Xclose from "../../../src/res/svgIcons/Xclose";
 import Share from "../../../src/res/svgIcons/Share";
@@ -21,6 +14,8 @@ import Touchable from "../common/customui/Touchable";
 const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [iconPressed, setIconPressed] = useState(false);
+  const topInset = useInternalHeaderTop();
+  const bottomInset = useSafeAreaInsets().bottom;
   const convertUrl = 'data:application/pdf;base64,' + url;
 
   const closeModal = () => {
@@ -39,26 +34,12 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
       visible={modalVisible}
       onRequestClose={closeModal}
     >
-      <LinearGradient
-          style={[styles.profileSettingsChild, { paddingTop: 40 }]}
-          locations={[0, 1]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1.3, y: 0}}
-          colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
-          useAngle={true}
-          angle={90}
-      ></LinearGradient>      
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: bottomInset }]}>
             <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
+            {/* Same top spacing and bottom clearance as ProfileSettingsHeader so every internal nav matches. */}
             <LinearGradient
-                style={[styles.profileSettingsChild, { paddingTop: 40 }]}
-                locations={[0, 1]}
-                start={{ x: 0, y: 0 }}
-          end={{ x: 1.3, y: 0}}
-                colors={["rgba(141, 59, 144, 1))", "rgba(53, 48, 145, 1)"]}
-                useAngle={true}
-                angle={90}
+                style={[styles.profileSettingsChild, { paddingTop: topInset, paddingBottom: NAV_BOTTOM }]}
+                {...HEADER_GRADIENT}
             >
                 <View style={[styles.navBar]}>
                     <Touchable
@@ -89,18 +70,18 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
 
                         <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                           accessible={false} importantForAccessibility="no">
-                         <Share color={'#FFF'}/>
+                         <Share color={Color.sparklightWhite}/>
                       </View>
                     </Touchable>                 
                 </View>
-          </LinearGradient>      
-          <View style={{width:'100%',height:'100%',}}>
+          </LinearGradient>
+          <View style={styles.pdfWrap}>
             <Pdf
                 source={{uri: convertUrl}}
+                enableTextSelection={false}
                 style={styles.pdf}/>
           </View>
-        </View>
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 };
@@ -108,38 +89,15 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
-  closeButton: {
-    alignSelf:'flex-end',
-    color: "white",
-    fontSize: 16,
-    backgroundColor: Color.colorMidnightblue,
-  },
-  closeBtn: {
-    textAlign: "center",
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.RadioCanadaRegular,
-  },
-  buttons: {
-    marginLeft: 10,
-    backgroundColor: Color.colorMidnightblue,
-  }, buttonsLayout: {
-    paddingHorizontal: Padding.p_base,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-  },
-  text1Clr: {
-    color: Color.colorWhitesmoke_200,
-    textAlign: "center",
+  pdfWrap: {
+    flex: 1,
+    width: "100%",
   },
   pdf: {
     flex:1,
-    width:Dimensions.get('window').width,
-    height:Dimensions.get('window').height,
+    width:"100%",
+    height:"100%",
   },
   profileSettingsChild: {
     overflow: "hidden",
@@ -162,24 +120,12 @@ const styles = StyleSheet.create({
       fontFamily: FontFamily.RadioCanadaSemiBold,
       padding: 8,
   },
-  chevronLeft: {
-      position: 'absolute',
-      left: 18,
-  },
-  chevronRight: {
-      position: 'absolute',
-      right: 18,
-  },
   chevronLayout: {
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: A11Y.minTouch,
       minWidth: A11Y.minTouch,
       zIndex: 1
-  },
-  chevronLeftLayout: {
-      height: 24,
-      width: 24,
   },
   icon: {
       height: 24,

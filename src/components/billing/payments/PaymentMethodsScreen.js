@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -7,17 +7,28 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import LinkText from "../../common/customui/LinkText";
 import PaymentMethodCard from "./PaymentMethodCard";
 import ConfirmActionModal from "./ConfirmActionModal";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { card } from "../../../styles/utilities";
+import AppStyles from "../../../styles/AppStyles";
 import PlusCircleIcon from "../../../res/svgIcons/PlusCircleIcon";
 import { SectionTitle, Hyperlink } from "../../common/customui/Typography";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
   deletePaymentMethod,
+  paymentErrorMessage,
 } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, describePaymentMethod, openOrbipaySecureCapture, openOrbipayEdit } from "./paymentsShared";
+import { describePaymentMethod, openOrbipaySecureCapture, openOrbipayEdit } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { announceA11y } from "../../../utils/a11y";
+import {
+  usePaymentStep,
+  endPaymentAttempt,
+  trackPaymentMethodDeleted,
+  trackPaymentMethodFailed,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 const PaymentMethodsScreen = ({ navigation, route }) => {
   const [methods, setMethods] = useState(null);
@@ -27,6 +38,8 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
   const deletingRef = useRef(false);
   const [alert, setAlert] = useState(null);
   const abortRef = useRef(null);
+
+  usePaymentStep("manage_payment_methods");
 
   useFocusEffect(
     useCallback(() => {
@@ -43,7 +56,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
           setMethods(list);
           setAutoPay(details);
         })
-        .catch(() => {
+        .catch((error) => {
           setMethods([]);
           setAutoPay({ enrolled: false });
           setAlert({
@@ -51,6 +64,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
             title: "Unable to load payment methods",
             message: "Please try again later.",
           });
+          trackApiError("payment-methods", errorStatus(error), "manage_payment_methods");
         });
       return () => abortRef.current?.abort();
     }, [route.params?.paymentFlash, navigation])
@@ -79,12 +93,16 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
       setMethods((prev) => prev?.filter((m) => m.id !== method.id));
       setAlert({ type: "success", message: `${describePaymentMethod(method)} has been deleted` });
       announceA11y("Payment method deleted.");
+      trackPaymentMethodDeleted(method);
     } catch (error) {
+      // 55255: portal copy for a delete that the service did not confirm.
       setAlert({
         type: "error",
         title: "Something went wrong",
-        message: "We could not delete this payment method. Please try again.",
+        message: paymentErrorMessage(error, "METHOD_NOT_DELETED"),
       });
+      trackPaymentMethodFailed(method, error?.code || "delete_failed");
+      trackApiError("delete-payment-method", errorStatus(error), "manage_payment_methods");
     } finally {
       deletingRef.current = false;
       setBusy(false);
@@ -93,14 +111,25 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Manage Payment Method" onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[styles.content, contentMaxWidth,{marginBottom: 140}]} showsVerticalScrollIndicator={false}>
-         <>
+      <ProfileSettingsHeader
+        title="Manage Payment Method"
+        onPressBack={() => {
+          endPaymentAttempt();
+          navigation.goBack();
+        }}
+      />
+      <ScreenScroll framed showsVerticalScrollIndicator={false}>
+         <View style={[AppStyles.card, card.content]}>
         {!!alert && (
           <NotificationAlert
             type={alert.type}
             title={alert.title}
             message={alert.message}
+            splitKey={
+              String(alert.message || "").includes("1-877-692-2253")
+                ? [{ text: "1-877-692-2253", action: "call", value: "1-877-692-2253" }]
+                : ""
+            }
             onClose={() => setAlert(null)}
             autoFocusTitle
           />
@@ -129,7 +158,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
             <View style={styles.cardSkeleton} />
           </SkeletonPlaceholder>
         ) : methods.length === 0 ? (
-          <View style={[card.elevated, styles.emptyCard]}>
+          <View style={styles.emptyCard}>
             <Text style={styles.emptyTitle} accessibilityRole="header" accessibilityLevel={3}>
               No saved payment methods
             </Text>
@@ -150,8 +179,8 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
             />
           ))
         )}
-       </>
-      </ScrollView>
+       </View>
+      </ScreenScroll>
 
       <ConfirmActionModal
         visible={!!pendingDelete}
@@ -168,8 +197,7 @@ const PaymentMethodsScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   headingRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -184,7 +212,7 @@ const styles = StyleSheet.create({
   addLinkRow: { flexDirection: "row", alignItems: "center" },
   addLinkText: { marginRight: 4 },
   cardSkeleton: { height: 92, borderRadius: 15, marginBottom: 12 },
-  emptyCard: { padding: 20, marginBottom: 16, alignItems: "flex-start" },
+  emptyCard: { alignItems: "flex-start" },
   emptyTitle: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaSemiBold,

@@ -1,7 +1,7 @@
 import React from "react";
 import Svg, { Path, SvgXml } from "react-native-svg";
 import CreditCardIcon from "../../res/svgIcons/creditCard";
-import { Color } from "../../../GlobalStyles";
+import { Color } from "../../styles/GlobalStyles";
 import { VISA_LOGO_XML, MASTERCARD_LOGO_XML, DISCOVER_FLAT_XML } from "../../res/svgIcons/cardBrandLogos";
 
 // Generic financial-institution glyph; used for any bank/ACH account (Chase, Schwab, credit unions, ...)

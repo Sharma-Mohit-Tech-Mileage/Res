@@ -1,22 +1,35 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, TextInput, StyleSheet } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
+import KeyboardAwareScrollView from "../../common/customui/KeyboardAwareScrollView";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import Touchable from "../../common/customui/Touchable";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import { fetchAutoPayDetails } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, formatCurrency, parseAmountInput, radioA11yProps } from "./paymentsShared";
+import { buttonsInFrame, formatCurrency, parseAmountInput, radioA11yProps } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import AppStyles from "../../../styles/AppStyles";
+import { card } from "../../../styles/utilities";
+import {
+  usePaymentStep,
+  endPaymentAttempt,
+  trackPaymentTypeSelected,
+  trackValidationError,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 const TYPE_ONE_TIME = "oneTime";
 const TYPE_AUTOMATIC = "automatic";
 const AMOUNT_TOTAL = "total";
 const AMOUNT_PAST_DUE = "pastDue";
 const AMOUNT_CUSTOM = "custom";
+
+const ANALYTICS_PAYMENT_TYPE = { [AMOUNT_TOTAL]: "full", [AMOUNT_PAST_DUE]: "due", [AMOUNT_CUSTOM]: "custom" };
 
 const MakePaymentScreen = ({ navigation }) => {
   const headerTitle = "Make a Payment";
@@ -29,14 +42,17 @@ const MakePaymentScreen = ({ navigation }) => {
   const amountInputRef = useRef(null);
   const abortRef = useRef(null);
 
+  usePaymentStep("make_payment");
+
   useFocusEffect(
     useCallback(() => {
       abortRef.current = new AbortController();
       fetchAutoPayDetails(abortRef.current.signal)
         .then(setDetails)
-        .catch(() => {
+        .catch((error) => {
           setDetails({});
           setErrorAlert("We could not load your balance information. Please try again.");
+          trackApiError("autopay-details", errorStatus(error), "make_payment");
         });
       return () => abortRef.current?.abort();
     }, [])
@@ -55,9 +71,14 @@ const MakePaymentScreen = ({ navigation }) => {
   };
   const canContinue = paymentType === TYPE_AUTOMATIC || resolveAmount() !== null;
 
+  const selectAmountOption = (option) => {
+    if (option !== amountOption) trackPaymentTypeSelected(ANALYTICS_PAYMENT_TYPE[option]);
+    setAmountOption(option);
+  };
+
   const onContinue = () => {
     if (paymentType === TYPE_AUTOMATIC) {
-      navigation.navigate("AutoPay");
+      navigation.navigate("AutoPay", { entryPoint: "make_payment" });
       return;
     }
     const amount = resolveAmount();
@@ -65,15 +86,20 @@ const MakePaymentScreen = ({ navigation }) => {
       if (amountOption === AMOUNT_CUSTOM) {
         setAmountError("Enter an amount between $0.01 and $99,999.99.");
         amountInputRef.current?.focus();
+        trackValidationError("amount", "out_of_range");
       }
       return;
     }
     setAmountError("");
-    navigation.navigate("MakePaymentMethod", { amount, headerTitle });
+    navigation.navigate("MakePaymentMethod", {
+      amount,
+      headerTitle,
+      paymentType: ANALYTICS_PAYMENT_TYPE[amountOption] || "",
+    });
   };
 
   const onSelectCustom = () => {
-    setAmountOption(AMOUNT_CUSTOM);
+    selectAmountOption(AMOUNT_CUSTOM);
     amountInputRef.current?.focus();
   };
 
@@ -99,15 +125,23 @@ const MakePaymentScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView
-        contentContainerStyle={[contentMaxWidth, { paddingBottom: 140 }]}
+      <ProfileSettingsHeader
+        title={headerTitle}
+        onPressBack={() => {
+          endPaymentAttempt();
+          navigation.goBack();
+        }}
+      />
+      <ScreenScroll
+        framed
+        stack
+        ScrollComponent={KeyboardAwareScrollView}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
 
         <>
-        <View style={[AppStyles.card, { margin: 16 , padding: 16 }]}>
+        <View style={[AppStyles.card, card.content]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -165,7 +199,7 @@ const MakePaymentScreen = ({ navigation }) => {
                     label: "Total balance due",
                     amount: formatCurrency(totalDue),
                     selected: amountOption === AMOUNT_TOTAL,
-                    onPress: () => setAmountOption(AMOUNT_TOTAL),
+                    onPress: () => selectAmountOption(AMOUNT_TOTAL),
                   })}
                 {pastDue > 0 &&
                   renderRadioRow({
@@ -177,7 +211,7 @@ const MakePaymentScreen = ({ navigation }) => {
                       pastDue
                     )} is past due. Please make a payment to avoid service interruption.`,
                     selected: amountOption === AMOUNT_PAST_DUE,
-                    onPress: () => setAmountOption(AMOUNT_PAST_DUE),
+                    onPress: () => selectAmountOption(AMOUNT_PAST_DUE),
                   })}
                 {renderRadioRow({
                   key: AMOUNT_CUSTOM,
@@ -194,7 +228,7 @@ const MakePaymentScreen = ({ navigation }) => {
                       keyboardType="decimal-pad"
                       accessibilityLabel="Payment amount, required"
                       accessibilityHint={amountError ? amountError : undefined}
-                      onFocus={() => setAmountOption(AMOUNT_CUSTOM)}
+                      onFocus={() => selectAmountOption(AMOUNT_CUSTOM)}
                       onChangeText={(text) => {
                         let cleaned = text.replace(/[^0-9.]/g, "");
                         const dot = cleaned.indexOf(".");
@@ -218,7 +252,7 @@ const MakePaymentScreen = ({ navigation }) => {
           </>
         )}
         </View>
-        <View style={{ marginHorizontal: 24 }} >
+        <View style={buttonsInFrame}>
         {!loading && (
           <>
             <PrimaryButton
@@ -231,20 +265,22 @@ const MakePaymentScreen = ({ navigation }) => {
             <PrimaryButton
               title="Cancel"
               accessibilityLabel="Cancel payment"
-              onPress={() => navigation.popToTop()}
+              onPress={() => {
+                endPaymentAttempt();
+                navigation.popToTop();
+              }}
             />
           </>
         )}
         </View>
         </>
-      </ScrollView>
+      </ScreenScroll>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   heading: {
     marginBottom: 16,
     marginTop: 8,
@@ -255,15 +291,15 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: Color.borderSubtle,
     paddingHorizontal: 12,
     paddingVertical: 14,
     marginRight: 12,
   },
-  typeCardSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: "#F3F2FF" },
+  typeCardSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: Color.selectedTint },
   typeRadio: { marginRight: 8 },
   typeLabel: {
     fontSize: FontSize.size_20,
@@ -276,15 +312,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     minHeight: 56,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: Color.borderSubtle,
     paddingHorizontal: 16,
     paddingVertical: 16,
     marginBottom: 12,
   },
-  optionRowSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: "#F3F2FF" },
+  optionRowSelected: { borderWidth: 2, borderColor: Color.colorMidnightblue, backgroundColor: Color.selectedTint },
   radioOuter: {
     width: 16,
     height: 16,
@@ -310,7 +346,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: Color.colorGray_200,
   },
-  pastDueAmount: { color: "#DC3626" },
+  pastDueAmount: { color: Color.errorIcon },
   optionNote: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
@@ -321,7 +357,7 @@ const styles = StyleSheet.create({
   amountErrorText: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.RadioCanadaRegular,
-    color: "#B92A1C",
+    color: Color.errorText,
     marginBottom: 12,
   },
   inlineAmountInput: {
@@ -329,8 +365,8 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#767676",
-    backgroundColor: "#FFFFFF",
+    borderColor: Color.sparklightaddGray,
+    backgroundColor: Color.sparklightWhite,
     paddingHorizontal: 16,
     paddingVertical: 8,
     fontSize: FontSize.size_base,

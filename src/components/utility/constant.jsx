@@ -1,6 +1,6 @@
 import DeviceInfo from "react-native-device-info";
 import VersionCheck from "react-native-version-check";
-import { Color } from "../../../GlobalStyles";
+import { Color } from "../../styles/GlobalStyles";
 export const ROLE_COLORS = {
   primaryadmin: Color.colorMidnightblue,
   admin: Color.sparklightPrimaryPurple,
@@ -8,8 +8,8 @@ export const ROLE_COLORS = {
 };
 export const BOX_COLORS = {
   primaryadmin: Color.success50,
-  admin: Color.colorWhitesmoke_200,
-  viewonly: Color.colorWhitesmoke_200,
+  admin: Color.Gray300,
+  viewonly: Color.Gray300,
 };
 export const extractAcknowledgementEmail = (logObj) => {
   try {
@@ -32,9 +32,9 @@ export const convertToSpecialCase = (str) => {
 };
 
 export const BORDER_COLORS = {
-  primaryadmin: Color.colorAquamarine,
-  admin: Color.colorWhitesmoke_200,
-  viewonly: Color.colorWhitesmoke_200,
+  primaryadmin: Color.success50,
+  admin: Color.Gray300,
+  viewonly: Color.Gray300,
 };
 export const validatePassword = (newPassword, userName) => {
   if (!newPassword) {
@@ -48,6 +48,19 @@ export const validatePassword = (newPassword, userName) => {
       /[0-9]/.test(newPassword),
     /[^a-zA-Z0-9]/.test(newPassword),
     !/\s/.test(newPassword),
+  ];
+  return conditions;
+};
+
+export const validateUsername = (newUsername) => {
+  if (!newUsername) {
+    return Array(4).fill(false);
+  }
+  const conditions = [
+    newUsername.length >= 8 && newUsername.length <= 20,
+    /^[a-zA-Z0-9]+$/.test(newUsername),
+    !/[%&_?#=\-]/.test(newUsername),
+    !/\s/.test(newUsername),
   ];
   return conditions;
 };
@@ -67,6 +80,13 @@ export const passwordTerms = [
   "It must include an upper and lower case letter and a number.",
   "It must include at least one special character such as %, &, _, ?, #, =, -",
   "Your new password cannot have any spaces.",
+];
+
+export const usernameTerms = [
+  "It must contain 8 to 20 characters.",
+  "It must contain only letters (a-z) and numbers (0-9).",
+  "It must not contain any special characters (%, &, _, ?, #, =, -)",
+  "Your new username cannot have any spaces.",
 ];
 
 export const getPasswordPriorityHint = (password, userName) => {

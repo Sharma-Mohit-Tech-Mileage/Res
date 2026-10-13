@@ -1,16 +1,26 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { useFocusEffect } from "@react-navigation/native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
-import { SectionTitle, HintText, SectionContent } from "../../common/customui/Typography";
-import { fetchAutoPayDetails, cancelAutoPay } from "../../../network/apis/account/paymentMethods.service";
-import { contentMaxWidth, ordinal } from "./paymentsShared";
+import { SectionTitle, SectionContent } from "../../common/customui/Typography";
+import { fetchAutoPayDetails, cancelAutoPay, paymentErrorMessage } from "../../../network/apis/account/paymentMethods.service";
+import { buttonsInFrame, ordinal } from "./paymentsShared";
 import { announceA11y } from "../../../utils/a11y";
 import AppStyles from "../../../styles/AppStyles";
+import { card } from "../../../styles/utilities";
+import {
+  usePaymentStep,
+  trackAutoPayDisabled,
+  trackAutoPayFailed,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
+import { Color } from "../../../styles/GlobalStyles";
 
 const AutoPayDeactivateScreen = ({ navigation, route }) => {
   const headerTitle = route.params?.headerTitle || "Manage Auto Pay";
@@ -22,12 +32,17 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
   const [errorAlert, setErrorAlert] = useState("");
   const abortRef = useRef(null);
 
+  usePaymentStep("autopay_deactivate");
+
   useFocusEffect(
     useCallback(() => {
       abortRef.current = new AbortController();
       fetchAutoPayDetails(abortRef.current.signal)
         .then(setDetails)
-        .catch(() => setDetails({}));
+        .catch((error) => {
+          setDetails({});
+          trackApiError("autopay-details", errorStatus(error), "autopay_deactivate");
+        });
       return () => abortRef.current?.abort();
     }, [])
   );
@@ -40,10 +55,13 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
     setSubmitting(true);
     try {
       await cancelAutoPay();
-
+      trackAutoPayDisabled(null);
       navigation.replace("PaymentConfirmation", { kind: "autopay-deactivated", headerTitle });
     } catch (error) {
-      setErrorAlert("We could not deactivate Auto Pay right now. Please try again.");
+      trackAutoPayFailed(error?.code || "deactivate_failed");
+      trackApiError("cancel-autopay", errorStatus(error), "autopay_deactivate");
+      // 55255: "deleted": false carries the portal's deactivation copy; transport errors get the request-failed copy.
+      setErrorAlert(paymentErrorMessage(error));
       announceA11y("Error, Auto Pay was not deactivated.");
     } finally {
       inFlightRef.current = false;
@@ -54,14 +72,19 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView contentContainerStyle={[contentMaxWidth, { paddingBottom: 140 }]} showsVerticalScrollIndicator={false}>
+      <ScreenScroll framed stack showsVerticalScrollIndicator={false}>
         <>
-        <View style={[AppStyles.card, { padding: 16, margin: 16 }]}>
+        <View style={[AppStyles.card, card.content]}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
             title="Something went wrong"
             message={errorAlert}
+            splitKey={
+              errorAlert.includes("1-877-692-2253")
+                ? [{ text: "1-877-692-2253", action: "call", value: "1-877-692-2253" }]
+                : ""
+            }
             onClose={() => setErrorAlert("")}
             autoFocusTitle
           />
@@ -76,13 +99,13 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
 
         <NotificationAlert
           type="warning"
-          iconColor="#F88700"
+          iconColor={Color.sparkLightInfo}
           message={`Your balance is due on the ${dueDayLabel} each month. By canceling Auto Pay, all future payments will need to be made manually.`}
           splitKey={[{ text: dueDayLabel, bold: true }]}
           showCloseIcon={false}
         />
        </View>
-       <View style={{ marginHorizontal: 24, marginBottom: 16 }}>
+       <View style={buttonsInFrame}>
         <View style={styles.agreeBlock}>
           <AgreeTermsRow value={agreed} onValueChange={setAgreed} onViewTerms={() => setShowTerms(true)} />
         </View>
@@ -97,7 +120,7 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
         <PrimaryButton title="Back" buttonType="outline" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
         </View>
         </>
-      </ScrollView>
+      </ScreenScroll>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
     </View>
@@ -105,8 +128,7 @@ const AutoPayDeactivateScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   heading: {
     marginBottom: 24,
   },

@@ -1,25 +1,25 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
+import KeyboardAwareScrollView from "../../common/customui/KeyboardAwareScrollView";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import PrimaryButton from "../../common/customui/PrimaryButton";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import SparkLightInput from "../../common/customui/SparkLightInput";
-import LinkText from "../../common/customui/LinkText";
 import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
-import { FontFamily,Color,FontSize } from "../../../../GlobalStyles";
-import { SectionTitle, HintText, SectionContent, FieldTitle, FieldContent } from "../../common/customui/Typography";
+import { FontFamily,Color,FontSize } from "../../../styles/GlobalStyles";
+import { SectionTitle, SectionContent, FieldTitle, FieldContent } from "../../common/customui/Typography";
 import { card } from "../../../styles/utilities";
 import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
   enrollAutoPay,
   updateAutoPayPaymentMethod,
+  paymentErrorMessage,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
-  contentMaxWidth,
   ordinal,
   describePaymentMethod,
   paymentMethodA11yLabel,
@@ -31,13 +31,23 @@ import {
   useSurchargeRate,
   useSurchargeFee,
 } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { announceA11y } from "../../../utils/a11y";
+import {
+  usePaymentStep,
+  trackAutoPayEnabled,
+  trackAutoPayFailed,
+  trackValidationError,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AutoPayReviewScreen = ({ navigation, route }) => {
   const mode = route.params?.mode === "update" ? "update" : "enroll";
   const methodId = route.params?.methodId || "";
+  const entryPoint = route.params?.entryPoint || "";
   const fromOffer = !!route.params?.fromOffer;
   const headerTitle = route.params?.headerTitle || (mode === "enroll" ? "Set Up Auto Pay" : "Manage Auto Pay");
   const [method, setMethod] = useState(null);
@@ -52,6 +62,8 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
   const emailRef = useRef(null);
   const abortRef = useRef(null);
 
+  usePaymentStep("autopay_review");
+
   useFocusEffect(
     useCallback(() => {
       abortRef.current = new AbortController();
@@ -62,9 +74,10 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
           setDetails(autoPay);
           setEmail((prev) => prev || autoPay.email || "");
         })
-        .catch(() => {
+        .catch((error) => {
           setDetails({});
           setErrorAlert("We could not load your payment information. Please try again.");
+          trackApiError("autopay-details", errorStatus(error), "autopay_review");
         });
       return () => abortRef.current?.abort();
     }, [methodId])
@@ -89,6 +102,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
     if (!EMAIL_PATTERN.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       emailRef.current?.focus();
+      trackValidationError("email", "invalid_format");
       return;
     }
     inFlightRef.current = true;
@@ -96,6 +110,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
     try {
       const submit = mode === "update" ? updateAutoPayPaymentMethod : enrollAutoPay;
       const result = await submit(methodId, email.trim());
+      if (mode === "enroll") trackAutoPayEnabled(method, entryPoint);
       navigation.replace("PaymentConfirmation", {
         headerTitle,
         kind: mode === "update" ? "autopay-updated" : "autopay-activated",
@@ -107,11 +122,10 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
             : null,
       });
     } catch (error) {
-      setErrorAlert(
-        mode === "update"
-          ? "We could not update your Auto Pay payment method. Please try again."
-          : "We could not complete your Auto Pay enrollment. Please try again."
-      );
+      trackAutoPayFailed(error?.code || (mode === "update" ? "update_failed" : "enroll_failed"));
+      trackApiError(mode === "update" ? "update-autopay" : "enroll-autopay", errorStatus(error), "autopay_review");
+      // 55255: not-scheduled / not-deleted / update-unenrolled carry portal copy; transport errors get the request-failed copy.
+      setErrorAlert(paymentErrorMessage(error));
       announceA11y("Error, your Auto Pay changes were not saved.");
     } finally {
       inFlightRef.current = false;
@@ -122,8 +136,9 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView
-        contentContainerStyle={[styles.content, contentMaxWidth]}
+      <ScreenScroll
+        framed
+        ScrollComponent={KeyboardAwareScrollView}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -132,6 +147,11 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
             type="error"
             title="Something went wrong"
             message={errorAlert}
+            splitKey={
+              errorAlert.includes("1-877-692-2253")
+                ? [{ text: "1-877-692-2253", action: "call", value: "1-877-692-2253" }]
+                : ""
+            }
             onClose={() => setErrorAlert("")}
             autoFocusTitle
           />
@@ -150,7 +170,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
         </SectionContent>
 
         <>
-            <View style={[card.elevated, styles.summaryCard]}>
+            <View style={[card.base, styles.summaryCard]}>
               <View
                 style={styles.fieldGroup}
                 accessible={!loading}
@@ -240,7 +260,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
               )}
             </View>
 
-            <View style={[card.elevated, styles.emailCard]}>
+            <View style={[card.base, styles.emailCard]}>
               {loading ? (
                 <SkeletonPlaceholder>
                   <View style={styles.labelSkeleton} />
@@ -253,6 +273,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
                   label="Email Address (required)"
                   accessibilityLabel="Email Address"
                   placeholder="Email Address"
+                  revealValue
                   value={email}
                   required
                   error={emailError}
@@ -276,7 +297,7 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
             />
             <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
         </>
-      </ScrollView>
+      </ScreenScroll>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
     </View>
@@ -284,16 +305,13 @@ const AutoPayReviewScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
-  content: { padding: 20, paddingBottom: 140 },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   heading: {
     marginBottom: 8,
     lineHeight: 50,
   },
-  introText: { lineHeight: 20, marginBottom: 16 },
   instructions: { marginBottom: 0 },
   introBold: { fontFamily: FontFamily.openSansSemiBold, fontWeight: "700" },
-  cardSkeleton: { height: 92, borderRadius: 8, marginBottom: 12 },
   valueSkeleton: { height: 18, borderRadius: 4, width: "60%" },
   labelSkeleton: { height: 14, borderRadius: 4, width: "45%", marginBottom: 10 },
   inputSkeleton: { height: 44, borderRadius: 6, width: "100%" },
@@ -321,7 +339,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.RadioCanadaSemiBold,
     fontWeight: "700",
-    color: "#000000",
+    color: Color.colorblack_100,
   },
 });
 

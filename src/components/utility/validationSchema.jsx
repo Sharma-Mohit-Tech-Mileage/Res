@@ -224,6 +224,26 @@ export const passwordSchema = (isCustomQuestionSelected) =>
     // ... other fields
   });
 
+  export const usernameSchema = () =>
+  yup.object({
+    newUsername: yup
+      .string()
+      .required("Username is required")
+        .min(8, "It must contain 8 to 20 characters.")
+        .max(20, "It must contain 8 to 20 characters.")
+        .matches(
+          /^[A-Za-z0-9]+$/,
+          "It must contain only letters (a-z) and numbers (0-9)."
+        )
+        .matches(/^[^\s]*$/, "Your new username cannot have any spaces."),
+    ConfirmNewUsername: yup
+      .string()
+      .required("Confirm New Username is required")
+      .oneOf([yup.ref("newUsername"), null], "Usernames must match"),
+    
+  });
+
+
 export const userTicketSchema = () =>
   yup.object({
     subject: yup.string().required("Subject is required"),

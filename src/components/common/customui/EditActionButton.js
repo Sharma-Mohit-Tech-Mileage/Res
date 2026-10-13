@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet } from 'react-native';
-import { Padding } from '../../../../GlobalStyles';
+import { Padding } from '../../../styles/GlobalStyles';
 import EditIcon from "../../../../src/res/svgIcons/EditIcon";
 
 const EditActionButton = ({ onPress, accessibilityLabel, testID }) => {

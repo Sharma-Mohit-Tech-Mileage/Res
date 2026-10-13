@@ -1,18 +1,18 @@
+import ServiceIcon from "../../../../res/svgIcons/HistoryServiceIcon";
 import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, Dimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions, Animated, Easing, Platform, AccessibilityInfo, findNodeHandle } from "react-native";
 import { StackedBarChart, YAxis, Grid } from "react-native-svg-charts";
 import { G, Rect, Text as SvgText, Path, Line } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { theme, A11Y } from "../../../../styles/theme";
-import { card } from "../../../../styles/utilities";
+import { theme } from "../../../../styles/theme";
 import { cardHeader, dataUsageTabs } from "../../../../styles/compositions";
 import SparkLightDropdown from "../../../common/customui/SparkLightDropdown";
 import Touchable from "../../../common/customui/Touchable";
 import AppStyles from "../../../../styles/AppStyles";
 import {SectionTitle} from "../../../common/customui/Typography";
+import { Color } from "../../../../styles/GlobalStyles";
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
 
 const CHART_HEIGHT = 205;
 const X_LABEL_HEIGHT = 34;
@@ -122,6 +122,7 @@ const UsageChart = ({
   const [showList, setShowList] = useState(false);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const [isViewTransitioning, setIsViewTransitioning] = useState(false);
+  const { width: windowWidth } = useWindowDimensions();
 
 
   const handleToggleView = useCallback(() => {
@@ -237,7 +238,7 @@ const UsageChart = ({
   }, [chartData]);
 
   const { contentWidth, dynamicSpacing } = useMemo(() => {
-    const availableWidth = SCREEN_WIDTH - 80;
+    const availableWidth = windowWidth - 80;
     const totalBarsWidth = chartData.length * BAR_WIDTH;
     const totalSpacingNeeded = (chartData.length + 1) * MIN_SPACING;
     const minWidth = totalBarsWidth + totalSpacingNeeded;
@@ -246,7 +247,7 @@ const UsageChart = ({
     const spacing = (finalWidth - totalBarsWidth) / (chartData.length + 1);
 
     return { contentWidth: finalWidth, dynamicSpacing: spacing };
-  }, [chartData.length]);
+  }, [chartData.length, windowWidth]);
 
   const formatLabels = useCallback(
     (item) => {
@@ -435,7 +436,7 @@ const UsageChart = ({
           fill={theme.colors.white}
         />
 
-        <SvgText x={tooltipX + 10} y={tooltipY + 18} fontSize="13" fontWeight="700" fill={theme.colors.text.primaryDark}>
+        <SvgText x={tooltipX + 10} y={tooltipY + 18} fontSize="13" fontWeight="700" fill={theme.colors.primaryDark}>
           {item.total.toFixed(2)} GB
         </SvgText>
         <SvgText x={tooltipX + 10} y={tooltipY + 34} fontSize="11" fontWeight="600" fill={theme.colors.primaryDark}>
@@ -563,14 +564,7 @@ const UsageChart = ({
       <View style={styles.card}>
         {/* Header icon — decorative */}
         <View style={styles.header}>
-          {/* <View
-            style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            accessibilityElementsHidden={true}
-          >
-            <MaterialCommunityIcons name="chart-bar" size={20} color={theme.colors.primary} />
-          </View> */}
+          <View style={styles.iconWrapper} accessible={false} accessibilityElementsHidden importantForAccessibility="no-hide-descendants"><ServiceIcon /></View>
           <SectionTitle accessibilityRole="header">Historical Usage</SectionTitle>
         </View>
         <View style={styles.tabsContainer} accessibilityRole="tablist">
@@ -953,7 +947,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.size.base,
     fontWeight: "700",
   },
-  activeTabText: { color: theme.colors.primaryDark },
+  activeTabText: { color: theme.colors.purpleBright },
 
   controlsRow: {
     flexDirection: "row",
@@ -963,16 +957,16 @@ const styles = StyleSheet.create({
   },
   dropdownWrapper: { flex: 1 },
   dropdown: {
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: Color.Gray300,
     borderColor: theme.colors.borderLight,
-    borderRadius: theme.radius.xs,
+    borderRadius: theme.radius.base,
     height: 48,
   },
   listToggle: {
     width: 44,
     height: 48,
-    borderRadius: theme.radius.xs,
-    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: theme.radius.base,
+    backgroundColor: theme.colors.secondarySurface,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
     alignItems: "center",
@@ -1013,8 +1007,8 @@ const styles = StyleSheet.create({
   listItem: {
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.xs,
-    backgroundColor: theme.colors.surfaceVariant,
-    borderRadius: theme.radius.xs,
+    backgroundColor: theme.colors.secondarySurface,
+    borderRadius: theme.radius.base,
     marginBottom: theme.spacing.sm,
   },
   lastListItem: {
@@ -1039,7 +1033,7 @@ const styles = StyleSheet.create({
     fontSize: theme.typography.size.base,
     fontFamily: theme.typography.family.semiBold,
     fontWeight: "700",
-    color: theme.colors.text.primaryDark,
+    color: theme.colors.primaryDark,
   },
   listItemRow: {
     marginBottom: 4,
@@ -1062,9 +1056,9 @@ const styles = StyleSheet.create({
   },
   detailValue: {
     fontSize: theme.typography.size.sm,
-    fontFamily: theme.typography.family.semiBold,
-    fontWeight: "600",
-    color: theme.colors.text.primaryDark,
+    fontFamily: theme.typography.family.regular,
+    fontWeight: "400",
+    color: theme.colors.text.secondary,
   },
 
   srSummary: {

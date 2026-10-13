@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Color, Padding, Border } from '../../../GlobalStyles';
+import { Color, Padding, Border } from '../../styles/GlobalStyles';
 import SignSaveResSvg from '../../res/svgIcons/SignSaveResSvg';
 
 const BANNER_ASPECT_RATIO = 327.402985 / 117.910448;

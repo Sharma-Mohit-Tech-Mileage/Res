@@ -1,17 +1,6 @@
-import React, { useState, useEffect } from "react";
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  Linking,
-  AccessibilityInfo,
-} from "react-native";
-import { FontFamily, Border, Color, Padding } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
-import AlertIcon from "../../res/svgIcons/AlertIcon";
-import Touchable from "./customui/Touchable";
-import { A11Y } from "../../styles/theme";
+import React from "react";
+import AlertModal from "./AlertModal";
+import { Color } from "../../styles/GlobalStyles";
 
 export const ErrorType = {
   NETWORK_ERROR: "NETWORK_ERROR",
@@ -35,9 +24,9 @@ const ERROR_MESSAGES = {
     ],
   },
   [ErrorType.AUTH_TIMEOUT]: {
-    title: "Login Timeout",
+    title: "Unable to sign in",
     message:
-      "The login process took too long. This may happen if the browser did not open properly.",
+      "The sign-in process timed out. Check your connection and try again.",
     actions: [
       { label: "Try Again", action: "RETRY", primary: true },
       { label: "Cancel", action: "CANCEL", primary: false },
@@ -111,202 +100,20 @@ const ERROR_MESSAGES = {
 const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
   const errorConfig =
     ERROR_MESSAGES[errorType] || ERROR_MESSAGES[ErrorType.UNKNOWN_ERROR];
-  const displayMessage = customMessage || errorConfig.message;
-  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
-
-  useEffect(() => {
-    AccessibilityInfo.isScreenReaderEnabled().then(setIsScreenReaderEnabled);
-    const sub = AccessibilityInfo.addEventListener(
-      "screenReaderChanged",
-      setIsScreenReaderEnabled
-    );
-    return () => sub?.remove?.();
-  }, []);
-
-  const PHONE_REGEX = /(\d{3}-\d{3}-\d{4})/g;
-
-  const renderMessage = (message) => {
-    const matches = message.match(PHONE_REGEX) || [];
-    const phone = matches[0];
-    if (!phone) {
-      return <Text style={styles.message}>{message}</Text>;
-    }
-    const parts = message.split(PHONE_REGEX);
-    const visibleText = (
-      <Text style={styles.message}>
-        {parts.map((part, index) =>
-          PHONE_REGEX.test(part) ? (
-            <Text
-              key={index}
-              style={[styles.message, styles.phoneLink]}
-              onPress={isScreenReaderEnabled ? undefined : () => Linking.openURL(`tel:${part}`)}
-            >
-              {part}
-            </Text>
-          ) : (
-            part
-          )
-        )}
-      </Text>
-    );
-    if (!isScreenReaderEnabled) {
-      return visibleText;
-    }
-    return (
-      <Touchable
-        minSize={0}
-        onPress={() => Linking.openURL(`tel:${phone}`)}
-        accessible={true}
-        accessibilityRole="link"
-        accessibilityLabel={message}
-        accessibilityHint="Double tap to call"
-      >
-        <View
-          accessibilityElementsHidden={true}
-          importantForAccessibility="no-hide-descendants"
-        >
-          {visibleText}
-        </View>
-      </Touchable>
-    );
-  };
 
   return (
-    <Modal
+    <AlertModal
       visible={visible}
-      transparent
-      animationType="fade"
+      title={errorConfig.title}
+      message={customMessage || errorConfig.message}
+      iconColor={errorType === ErrorType.BUSINESS_ACCOUNT ? Color.warningText : undefined}
       onRequestClose={() => onAction("CANCEL")}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <AlertIcon
-              color={
-                errorType === ErrorType.BUSINESS_ACCOUNT ? "#DD6D02" : undefined
-              }
-            />
-            <Text style={styles.title}>{errorConfig.title}</Text>
-          </View>
-
-          <View style={styles.divider} />
-
-          {renderMessage(displayMessage)}
-
-          <View style={styles.buttonContainer}>
-            {errorConfig.actions.map((action, index) => (
-              <Touchable
-                key={action.action}
-                minSize={0}
-                style={[
-                  styles.button,
-                  action.primary
-                    ? styles.primaryButton
-                    : styles.secondaryButton,
-                  index > 0 && styles.buttonSpacing,
-                ]}
-                onPress={() => onAction(action.action)}
-                accessibilityRole="button"
-                accessibilityLabel={action.label}
-              >
-                <Text
-                  style={[
-                    styles.buttonText,
-                    action.primary
-                      ? styles.primaryButtonText
-                      : styles.secondaryButtonText,
-                  ]}
-                >
-                  {action.label}
-                </Text>
-              </Touchable>
-            ))}
-          </View>
-        </View>
-      </View>
-    </Modal>
+      actions={errorConfig.actions.map((action) => ({
+        ...action,
+        onPress: () => onAction(action.action),
+      }))}
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  container: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: Border.br_5xs,
-    width: "90%",
-    maxWidth: 400,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "700",
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: colors.black,
-    marginLeft: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#F4F4F5",
-    marginBottom: 15,
-  },
-  message: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: colors.darkest_grey,
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  phoneLink: {
-    color: colors.sparklight_purple_blue,
-    fontWeight: "600",
-    textDecorationLine: "underline",
-  },
-  buttonContainer: {
-    gap: 8,
-  },
-  button: {
-    alignSelf: "stretch",
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
-    borderRadius: Border.br_81xl, // Adjust as needed
-    minHeight: A11Y.minTouch,
-    justifyContent: "center",
-  },
-  primaryButton: {
-    backgroundColor: Color.sparklightPrimaryPurple,
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-  },
-  buttonSpacing: {
-    marginTop: 8,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    fontFamily: FontFamily.RadioCanadaBold,
-  },
-  primaryButtonText: {
-    color: colors.snow_white,
-    
-  },
-  secondaryButtonText: {
-    color: Color.sparklightPrimaryPurple,
-    textDecorationLine: "underline",
-    FontFamily: FontFamily.RadioCanadaBold,
-  },
-});
 
 export default ErrorModal;

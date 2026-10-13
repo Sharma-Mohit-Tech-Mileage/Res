@@ -27,18 +27,17 @@ const authContext = async () => {
 const cleanName = (value) =>
   String(value || "").replace(/\b(?:null|undefined)\b/gi, "").replace(/\s+/g, " ").trim();
 
-const normalizePaymentMethod = (raw = {}) => {
+const normalizePaymentMethod = (raw = {}, customerId = "") => {
   const accountType = (raw.account_type || raw.accountType || "").toLowerCase();
   const subtype = (raw.account_subtype || raw.accountSubType || "").toLowerCase();
   const isCard = accountType.includes("card") || subtype.includes("credit") || subtype.includes("debit");
   const masked = String(raw.display_text || raw.displayText || "");
-  const customerMatch = String(raw.url || "").match(/customers\/(\d+)/);
   const fallbackName = isCard
     ? subtype.includes("credit") ? "Credit Card" : "Debit Card"
     : subtype === "savings" ? "Savings Account" : "Checking Account";
   return {
     id: String(raw.id || raw.fundingAccountId || raw.funding_account_id || ""),
-    idCustomer: customerMatch ? customerMatch[1] : "",
+    idCustomer: customerId,
     type: isCard ? "card" : "bank",
     // Surcharge applies to credit cards only, so the credit/debit subtype has to survive normalisation.
     cardType: isCard ? (subtype.includes("credit") ? "credit" : subtype.includes("debit") ? "debit" : "") : "",
@@ -65,16 +64,75 @@ const ensureServiceOk = (res) => {
   const errs = res?.data?.errors || res?.data?.error_list;
   if (Array.isArray(errs) && errs.length) {
     const raw = String(errs[0]?.message || errs[0]?.description || "");
-    throw new Error(!raw || raw.includes("<") ? "The payment service is temporarily unavailable. Please try again later." : raw);
+    const err = new Error(!raw || raw.includes("<") ? "The payment service is temporarily unavailable. Please try again later." : raw);
+    err.code = "SERVICE_ERROR";
+    throw err;
+  }
+};
+
+// 55255: HTTP 200 responses that still mean "failed"; codes and copy mirror the Self Service portal.
+export const PAYMENT_ERROR_MESSAGES = {
+  PAYMENT_DECLINED: "There was a problem making your payment. Please verify all information entered is correct and try again or call us at 1-877-692-2253.",
+  PAYMENT_DUPLICATE: "Sorry for the inconvenience. Our system can only process one payment for the same amount per day. You may pay a different amount if you would like to process more than one payment on the same day.",
+  PAYMENT_UNCONFIRMED: "Payment was submitted but confirmation details were not returned. Please try again.",
+  PAYMENT_TOKEN_MISSING: "Payment token details are missing. Please try again.",
+  PAYMENT_REQUEST_FAILED: "Something went wrong with the request please try again later or call us at 1-877-692-2253.",
+  PAYMENT_SUBMIT_FAILED: "Unable to submit payment. Please try again.",
+  AUTOPAY_NOT_SCHEDULED: "There was a problem enrolling in Cable ONE's Auto Pay program. Please validate your account information and try again.",
+  AUTOPAY_NOT_DELETED: "There was a problem deactivating Auto Pay please try again later.",
+  AUTOPAY_UPDATE_UNENROLLED: "Your previous Auto Pay was turned off, but the new payment method could not be enrolled. Auto Pay is currently off, so please enroll again or call us at 1-877-692-2253.",
+  METHOD_NOT_DELETED: "Unable to delete payment method. Please try again.",
+  METHOD_NOT_SAVED: "There was a problem saving your account. Please try again or try a different payment method.",
+};
+
+export const paymentError = (code) => {
+  const err = new Error(PAYMENT_ERROR_MESSAGES[code] || PAYMENT_ERROR_MESSAGES.PAYMENT_REQUEST_FAILED);
+  err.code = code;
+  return err;
+};
+
+// Typed codes map to portal copy and backend error_list text passes through; anything else (axios, runtime) gets the fallback so raw technical text never reaches the customer.
+export const paymentErrorMessage = (error, fallbackCode = "PAYMENT_REQUEST_FAILED") => {
+  if (PAYMENT_ERROR_MESSAGES[error?.code]) return PAYMENT_ERROR_MESSAGES[error.code];
+  if (error?.code === "SERVICE_ERROR" && error.message) return error.message;
+  return PAYMENT_ERROR_MESSAGES[fallbackCode];
+};
+
+const responseStatus = (data) => String(data?.status || "").trim().toLowerCase();
+
+// Defect 55051: the customer id comes from RetrieveCustomerData only — urls are never parsed for it, since a stale url is what sent US Bank an invalid CustomerId.
+// RetrieveCustomerData returns an Orbipay paged envelope; the customer sits in list[0] and "id" is the authoritative field (per Portals team).
+const pickCustomerId = (data) => {
+  const customer = data?.list?.[0] || data?.customer || data || {};
+  return String(customer.id ?? "");
+};
+
+let cachedCustomerId = { accountNumber: "", id: "" };
+
+// Resolves once per account; a failed lookup returns "" rather than throwing, so the payment methods list still renders.
+const fetchCustomerId = async () => {
+  const { accountNumber, config } = await authContext();
+  if (!accountNumber) return "";
+  if (cachedCustomerId.accountNumber === accountNumber && cachedCustomerId.id) return cachedCustomerId.id;
+  try {
+    const res = await _axios.get(getEndpoint(ENDPOINTS.PAYMENT_RETRIEVE_CUSTOMER_DATA, { accountNumber }), config);
+    const id = pickCustomerId(res?.data);
+    if (id) cachedCustomerId = { accountNumber, id };
+    return id;
+  } catch (err) {
+    return "";
   }
 };
 
 export const fetchPaymentMethods = async () => {
   const { accountNumber, config } = await authContext();
-  const res = await _axios.get(getEndpoint(ENDPOINTS.FUNDING_ACCOUNTS, { accountNumber }), config);
+  const [res, customerId] = await Promise.all([
+    _axios.get(getEndpoint(ENDPOINTS.FUNDING_ACCOUNTS, { accountNumber }), config),
+    fetchCustomerId(),
+  ]);
   ensureServiceOk(res);
   const list = Array.isArray(res.data) ? res.data : res.data?.fundingAccounts || [];
-  return list.map(normalizePaymentMethod).filter((m) => m.id && m.status !== "deleted");
+  return list.map((raw) => normalizePaymentMethod(raw, customerId)).filter((m) => m.id && m.status !== "deleted");
 };
 
 export const fetchAutoPayDetails = async () => {
@@ -97,6 +155,8 @@ export const deletePaymentMethod = async (methodId) => {
     config
   );
   ensureServiceOk(res);
+  // Portal treats an empty/falsy body as a failed delete.
+  if (!res?.data) throw paymentError("METHOD_NOT_DELETED");
   return res.data;
 };
 
@@ -106,10 +166,10 @@ const pickFeeAmount = (data) => {
   return isFinite(value) ? value : null;
 };
 
-// Orbipay Fee Calculator. CustomerId and FundingAccountId both come off the funding
-// account we already fetched, so no extra lookup is needed.
+// Orbipay Fee Calculator. FundingAccountId comes off the funding account, CustomerId from RetrieveCustomerData.
 export const calculateFee = async (amount, method, paymentScheduleType = "one_time_payment") => {
   const { config } = await authContext();
+  const customerId = method?.idCustomer || (await fetchCustomerId());
   const res = await _axios.post(
     getEndpoint(ENDPOINTS.PAYMENT_CALCULATE_FEE),
     {
@@ -117,7 +177,7 @@ export const calculateFee = async (amount, method, paymentScheduleType = "one_ti
       // $0 payment and return fee 0.00 (portal sends "amount" and gets 0.66).
       amount: Number(amount),
       paymentScheduleType,
-      CustomerId: method?.idCustomer || "",
+      CustomerId: customerId,
       FundingAccountId: method?.id || "",
     },
     config
@@ -145,15 +205,12 @@ export const submitPayment = async (amount, method, emailOverride) => {
     config
   );
   ensureServiceOk(res);
-  const status = String(res?.data?.status || "").toLowerCase();
-  const confirmationNumber = pickConfirmationNumber(res.data);
-  // Declines come back HTTP 200 with status "Failed" and every field null, so only a confirmation number proves success.
-  if (status === "failed" || status === "declined" || !confirmationNumber) {
-    const err = new Error("Payment was not accepted");
-    err.code = "PAYMENT_DECLINED";
-    throw err;
-  }
-  return { confirmationNumber, fee: pickFeeAmount(res.data) };
+  const status = responseStatus(res?.data);
+  // Same amount, same method, same day comes back HTTP 200 with status "Duplicate" and no id (portal rule).
+  if (status === "duplicate") throw paymentError("PAYMENT_DUPLICATE");
+  // Declines come back HTTP 200 with status "Failed" and every field null; like the portal, only a returned id proves success.
+  if (status === "failed" || status === "declined" || !res?.data?.id) throw paymentError("PAYMENT_DECLINED");
+  return { confirmationNumber: pickConfirmationNumber(res.data) || String(res.data.id), fee: pickFeeAmount(res.data) };
 };
 
 const setupAutoPayPayload = (accountNumber, method) => ({
@@ -176,14 +233,22 @@ export const enrollAutoPay = async (methodId) => {
   const method = typeof methodId === "object" ? methodId : (await fetchPaymentMethods()).find((m) => m.id === methodId);
   const res = await _axios.post(getEndpoint(ENDPOINTS.EASYPAY_SETUP), setupAutoPayPayload(accountNumber, method || methodId), config);
   ensureServiceOk(res);
-  return { confirmationNumber: pickConfirmationNumber(res.data) };
+  // Portal rule: enrollment is only real when status is "scheduled" and an id came back.
+  if (responseStatus(res?.data) !== "scheduled" || !res?.data?.id) throw paymentError("AUTOPAY_NOT_SCHEDULED");
+  return { confirmationNumber: pickConfirmationNumber(res.data) || String(res.data.id) };
 };
 
 export const updateAutoPayPaymentMethod = async (methodId) => {
-  const { accountNumber, config } = await authContext();
-  const res = await _axios.post(getEndpoint(ENDPOINTS.EASYPAY_DELETE, { accountNumber }), {}, config);
-  ensureServiceOk(res);
-  return enrollAutoPay(methodId);
+  // Portal order: the old enrollment must confirm deleted before the new one is set up.
+  await cancelAutoPay();
+  try {
+    return await enrollAutoPay(methodId);
+  } catch (error) {
+    // The old enrollment is already gone, so the customer has to know Auto Pay is off rather than "unchanged".
+    const err = paymentError("AUTOPAY_UPDATE_UNENROLLED");
+    err.cause = error;
+    throw err;
+  }
 };
 
 export const confirmBankToken = async (token, digiSign) => {
@@ -195,7 +260,7 @@ export const confirmBankToken = async (token, digiSign) => {
   );
   ensureServiceOk(res);
   const method = normalizePaymentMethod(res.data?.funding_account || res.data?.fundingAccount || res.data || {});
-  if (!method.id) throw new Error("The payment service did not confirm your new payment method.");
+  if (!method.id) throw paymentError("METHOD_NOT_SAVED");
   return method;
 };
 
@@ -217,7 +282,10 @@ export const confirmPaymentToken = async (token, digiSign, amount, emailOverride
     config
   );
   ensureServiceOk(res);
-  return { confirmationNumber: pickConfirmationNumber(res.data), fee: pickFeeAmount(res.data) };
+  const confirmationNumber = pickConfirmationNumber(res.data);
+  // Portal rule: no paymentConfirmationId means the payment did not go through, whatever the HTTP status says.
+  if (!confirmationNumber) throw paymentError("PAYMENT_UNCONFIRMED");
+  return { confirmationNumber, fee: pickFeeAmount(res.data) };
 };
 
 export const updateFundingAccount = async (methodId, { token, digiSign } = {}) => {
@@ -235,5 +303,7 @@ export const cancelAutoPay = async () => {
   const { accountNumber, config } = await authContext();
   const res = await _axios.post(getEndpoint(ENDPOINTS.EASYPAY_DELETE, { accountNumber }), {}, config);
   ensureServiceOk(res);
-  return { confirmationNumber: pickConfirmationNumber(res.data) };
+  // Portal rule: a falsy "deleted" means the enrollment is still in place.
+  if (!res?.data?.deleted) throw paymentError("AUTOPAY_NOT_DELETED");
+  return { confirmationNumber: pickConfirmationNumber(res.data) || String(res.data.id || "") };
 };

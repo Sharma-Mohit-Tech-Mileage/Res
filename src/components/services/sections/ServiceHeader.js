@@ -1,15 +1,14 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { header } from "../../../styles/compositions";
+import { View, StyleSheet } from "react-native";
 import { theme } from "../../../styles/theme";
 import SupportIcon from "../../../res/svgIcons/SupportIcon";
-import {Title} from "../../common/customui/Typography";
+import { Title } from "../../common/customui/Typography";
 
 const ServiceHeader = () => {
   return (
     <View style={styles.container}>
       <View style={styles.iconWrapper}>
-        <View 
+        <View
           style={styles.iconBadge}
           accessible={false}
           importantForAccessibility="no"
@@ -32,10 +31,26 @@ const ServiceHeader = () => {
 };
 
 const styles = StyleSheet.create({
-  container: header.container,
-  iconWrapper: header.iconWrapper,
-  iconBadge: header.iconBadge,
-  title: header.title,
+  container: {
+    paddingHorizontal: theme.spacing.base,
+    paddingTop: theme.spacing.xl,
+    alignItems: "center",
+  },
+  iconWrapper: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: theme.spacing.sm,
+  },
+  iconBadge: {
+    borderColor: theme.colors.border,
+    borderWidth: 4,
+    width: 72,
+    height: 72,
+    backgroundColor: theme.colors.primaryDark,
+    borderRadius: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
 export default ServiceHeader;

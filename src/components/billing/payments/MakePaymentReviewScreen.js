@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Modal } from "react-native";
+import { View, Text, StyleSheet, Modal } from "react-native";
+import KeyboardAwareScrollView from "../../common/customui/KeyboardAwareScrollView";
 import { useFocusEffect } from "@react-navigation/native";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import moment from "moment";
@@ -10,7 +11,7 @@ import AgreeTermsRow from "./AgreeTermsRow";
 import TermsModal from "./TermsModal";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import SmallLoader from "../../common/customui/SmallLoader";
-import { Color, FontFamily, FontSize } from "../../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../styles/GlobalStyles";
 import { SectionTitle } from "../../common/customui/Typography";
 import ReviewField from "./ReviewField";
 import { card } from "../../../styles/utilities";
@@ -18,9 +19,9 @@ import {
   fetchPaymentMethods,
   fetchAutoPayDetails,
   submitPayment,
+  paymentErrorMessage,
 } from "../../../network/apis/account/paymentMethods.service";
 import {
-  contentMaxWidth,
   describePaymentMethod,
   paymentMethodA11yLabel,
   formatCurrency,
@@ -30,13 +31,24 @@ import {
   surchargeTitle,
   surchargeMessage,
 } from "./paymentsShared";
+import { ScreenScroll } from "../../common/customui/Screen";
 import { announceA11y } from "../../../utils/a11y";
+import {
+  usePaymentStep,
+  trackPaymentSubmitted,
+  trackPaymentSuccess,
+  trackPaymentFailed,
+  trackValidationError,
+  trackApiError,
+  errorStatus,
+} from "./paymentAnalytics";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const MakePaymentReviewScreen = ({ navigation, route }) => {
   const surchargeRate = useSurchargeRate();
   const amount = Number(route.params?.amount) || 0;
+  const paymentType = route.params?.paymentType || "";
   const fromOffer = !!route.params?.fromOffer;
   const headerTitle = route.params?.headerTitle || "Make a Payment";
   const [method, setMethod] = useState(route.params?.method || null);
@@ -60,6 +72,8 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
   const abortRef = useRef(null);
   const paymentDate = moment().format("M/D/YYYY");
 
+  usePaymentStep("payment_review");
+
   useFocusEffect(
     useCallback(() => {
       const flash = route.params?.paymentFlash;
@@ -77,7 +91,10 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           const paramMethodId = route.params?.methodId || route.params?.method?.id;
           setMethod(list.find((m) => m.id === paramMethodId) || route.params?.method || null);
         })
-        .catch(() => setAutoPay({ enrolled: true }))
+        .catch((error) => {
+          setAutoPay({ enrolled: true });
+          trackApiError("payment-review-load", errorStatus(error), "payment_review");
+        })
         .finally(() => setLoading(false));
       return () => abortRef.current?.abort();
     }, [route.params?.methodId, route.params?.method, route.params?.paymentFlash, navigation])
@@ -89,16 +106,20 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
     if (!EMAIL_PATTERN.test(email.trim())) {
       setEmailError("Please enter a valid email address.");
       emailRef.current?.focus();
+      trackValidationError("email", "invalid_format");
       return;
     }
     if (!method?.id) {
-      openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: email.trim() });
+      // Widget-hosted payment: payment_submitted fires in OrbipayWidgetScreen at token receipt.
+      openOrbipayPaymentExecution(navigation, { amount, headerTitle, email: email.trim(), paymentType });
       return;
     }
     inFlightRef.current = true;
     setSubmitting(true);
+    trackPaymentSubmitted(amount, method, paymentType);
     try {
       const result = await submitPayment(amount, method, email.trim());
+      trackPaymentSuccess(method);
       navigation.replace("PaymentConfirmation", {
         headerTitle,
         kind: "payment-submitted",
@@ -113,11 +134,10 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
             : null,
       });
     } catch (error) {
-      setErrorAlert(
-        error?.code === "PAYMENT_DECLINED"
-          ? "There was a problem making your payment. Please verify all information entered is correct and try again or call us at 1-877-692-2253."
-          : "We could not submit your payment right now. Please try again."
-      );
+      trackPaymentFailed(method, error?.code || "submit_error");
+      trackApiError("submit-payment", errorStatus(error), "payment_review");
+      // 55255: decline / duplicate / unconfirmed carry portal copy; transport errors fall back to the portal's request-failed copy.
+      setErrorAlert(paymentErrorMessage(error));
       announceA11y("Error, your payment was not submitted.");
       // The error banner renders at the top of the scroll view, so bring it into view.
       scrollRef.current?.scrollTo({ y: 0, animated: true });
@@ -130,7 +150,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader title={headerTitle} onPressBack={() => navigation.goBack()} />
-      <ScrollView ref={scrollRef} contentContainerStyle={[styles.content, contentMaxWidth]} showsVerticalScrollIndicator={false}>
+      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollRef} showsVerticalScrollIndicator={false}>
         {!!errorAlert && (
           <NotificationAlert
             type="error"
@@ -150,7 +170,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           Review payment
         </SectionTitle>
 
-        <View style={[card.elevated, styles.summaryCard]}>
+        <View style={[card.base, styles.summaryCard]}>
           <ReviewField label="Payment Method" value={describePaymentMethod(method)} a11yValue={paymentMethodA11yLabel(method)} loading={loading} />
           <ReviewField label="Payment Amount" value={formatCurrency(amount)} loading={loading} />
           {showSurcharge && (
@@ -180,7 +200,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
         </View>
 
         {(
-          <View style={[card.elevated, styles.emailCard]}>
+          <View style={[card.base, styles.emailCard]}>
             {loading ? (
               <SkeletonPlaceholder>
                 <View style={styles.valueSkeleton} />
@@ -192,6 +212,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
                 label="Email Address (required)"
                 accessibilityLabel="Email Address"
                 placeholder="Email Address"
+                revealValue
                 value={email}
                 required
                 error={emailError}
@@ -227,7 +248,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
           onPress={onSubmit}
         />
         <PrimaryButton title="Back" buttonType="cancel" accessibilityLabel="Back" onPress={() => navigation.goBack()} />
-      </ScrollView>
+      </ScreenScroll>
 
       <TermsModal visible={showTerms} onClose={() => setShowTerms(false)} />
 
@@ -244,7 +265,7 @@ const MakePaymentReviewScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F7F7" },
+  container: { flex: 1, backgroundColor: Color.surfaceMuted },
   processingOverlay: {
     flex: 1,
     justifyContent: "center",
@@ -254,7 +275,7 @@ const styles = StyleSheet.create({
   processingCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Color.sparklightWhite,
     borderRadius: 12,
     paddingVertical: 18,
     paddingHorizontal: 16,
@@ -265,7 +286,6 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     marginLeft: 10,
   },
-  content: { padding: 20, paddingBottom: 140 },
   heading: {
     marginBottom: 12,
   },

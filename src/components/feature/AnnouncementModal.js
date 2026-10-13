@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Modal, Animated, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Modal, Animated, ScrollView, useWindowDimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import AnnouncementStep from './AnnouncementStep';
 import AnnouncementProgress from './AnnouncementProgress';
@@ -9,15 +9,17 @@ import { trackStepViewed } from '../../utils/announcementHelpers';
 import Touchable from '../common/customui/Touchable';
 import{Hyperlink} from '../common/customui/Typography';
 import PrimaryButton from '../common/customui/PrimaryButton';
+import { Color } from "../../styles/GlobalStyles";
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDismiss, onLearnMoreNavigate, navigationRef }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [startTime] = useState(Date.now());
+  // Set when the modal becomes visible — the component itself mounts hidden at app launch.
+  const startTimeRef = useRef(null);
+  const { height: windowHeight } = useWindowDimensions();
 
   const overlayFade = useRef(new Animated.Value(0)).current;
-  const modalSlide = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const modalSlide = useRef(new Animated.Value(windowHeight)).current;
 
   // Safe getters
   const steps = campaign?.content?.steps || [];
@@ -27,6 +29,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
 
   useEffect(() => {
     if (visible && campaign) {
+      startTimeRef.current = Date.now();
       Animated.parallel([
         Animated.timing(overlayFade, {
           toValue: 1,
@@ -40,15 +43,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
           useNativeDriver: true,
         }),
       ]).start();
-
-      // Track first step view safely
-      try {
-        if (steps[0]?.title) {
-          trackStepViewed(campaign.id, 1, steps[0].title);
-        }
-      } catch (error) {
-        console.warn('[AnnouncementModal] Error tracking step view:', error);
-      }
+      // Step 1 is tracked by the step-view effect below — tracking it here too double-fires.
     }
   }, [visible, campaign]);
 
@@ -94,7 +89,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
 
 
   const handleComplete = () => {
-    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+    const timeSpent = startTimeRef.current ? Math.floor((Date.now() - startTimeRef.current) / 1000) : 0;
     exitAnimation(() => {
       if (onComplete && typeof onComplete === 'function') {
         try {
@@ -121,7 +116,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
   const exitAnimation = (callback) => {
     Animated.parallel([
       Animated.timing(overlayFade, { toValue: 0, duration: 200, useNativeDriver: true }),
-      Animated.timing(modalSlide, { toValue: SCREEN_HEIGHT, duration: 250, useNativeDriver: true }),
+      Animated.timing(modalSlide, { toValue: windowHeight, duration: 250, useNativeDriver: true }),
     ]).start(() => {
       setCurrentStep(0);
       if (callback && typeof callback === 'function') {
@@ -151,11 +146,11 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
       </Animated.View>
 
       <Animated.View style={[styles.modalContainer, { transform: [{ translateY: modalSlide }] }]}>
-        <View style={styles.modal}>
+        <View style={[styles.modal, { maxHeight: windowHeight * 0.85 }]}>
           {/* Header with NEW FEATURE badge on left and Skip on right */}
           <View style={styles.header}>
             <LinearGradient
-              colors={['#8D3B90', '#353091']}
+              colors={[Color.sparklightPrimaryPurple, Color.colorMidnightblue]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1.3, y: 0}}
               style={styles.newFeatureBadge}
@@ -168,7 +163,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
             </Touchable>
           </View>
 
-          <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <ScrollView style={[styles.scrollView, { maxHeight: windowHeight * 0.5 }]} showsVerticalScrollIndicator={false}>
             <AnnouncementStep
               step={currentStepData}
               currentIndex={currentStep}
@@ -208,7 +203,7 @@ const AnnouncementModal = ({ visible = false, campaign = null, onComplete, onDis
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000',
+    backgroundColor: Color.colorblack_100,
   },
   overlayPressable: {
     flex: 1,
@@ -224,7 +219,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: theme.spacing.xl,
-    maxHeight: SCREEN_HEIGHT * 0.85,
     ...theme.shadows.lg,
   },
   header: {
@@ -237,14 +231,14 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 16,
-    shadowColor: '#8D3B90',
+    shadowColor: Color.sparklightPrimaryPurple,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 3,
   },
   badgeText: {
-    color: '#FFFFFF',
+    color: Color.sparklightWhite,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.5,
@@ -256,9 +250,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     fontSize: 14,
   },
-  scrollView: {
-    maxHeight: SCREEN_HEIGHT * 0.5,
-  },
+  scrollView: {},
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

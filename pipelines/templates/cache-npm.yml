@@ -1,0 +1,9 @@
+steps:
+  # Cache downloads, then always let npm ci verify the committed lockfile.
+  - task: Cache@2
+    displayName: 'Cache npm downloads'
+    inputs:
+      key: 'npm-v1 | "$(Agent.OS)" | package-lock.json'
+      restoreKeys: |
+        npm-v1 | "$(Agent.OS)"
+      path: $(Pipeline.Workspace)/.npm
