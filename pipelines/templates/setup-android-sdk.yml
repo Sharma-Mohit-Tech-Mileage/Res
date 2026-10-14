@@ -1,0 +1,18 @@
+steps:
+  - script: |
+      set -euo pipefail
+      SDK_PATH=""
+      for candidate in "${ANDROID_HOME:-}" "${ANDROID_SDK_ROOT:-}" "$HOME/Library/Android/sdk" "$HOME/Library/Android" "$HOME/Android/Sdk"; do
+        if [ -n "$candidate" ] && [ -d "$candidate/platforms" ] && [ -d "$candidate/build-tools" ]; then
+          SDK_PATH="$candidate"
+          break
+        fi
+      done
+      if [ -z "$SDK_PATH" ]; then
+        echo "##vso[task.logissue type=error]Android SDK not found. Install the SDK on this agent and set ANDROID_HOME to its directory."
+        exit 1
+      fi
+      echo "Using Android SDK: $SDK_PATH"
+      echo "##vso[task.setvariable variable=ANDROID_HOME]$SDK_PATH"
+      echo "##vso[task.setvariable variable=ANDROID_SDK_ROOT]$SDK_PATH"
+    displayName: Locate installed Android SDK
