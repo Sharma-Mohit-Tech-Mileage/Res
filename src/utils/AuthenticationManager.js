@@ -200,7 +200,7 @@ class AuthenticationManager {
       return {
         success: false,
         error: "Network error. Please check your internet connection.",
-        code: "NETWORK_ERROR",
+        code: "AUTH_TIMEOUT",
         userAction: "CHECK_NETWORK",
       };
     }
@@ -208,7 +208,7 @@ class AuthenticationManager {
     // Default error
     return {
       success: false,
-      error: "Login failed. Please try again.",
+      error: "The sign-in process timed out. Check your connection and try again.",
       code: "AUTH_FAILED",
       userAction: "RETRY",
       details: errorMessage,
