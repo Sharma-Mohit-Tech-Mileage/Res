@@ -237,6 +237,7 @@ const NotificationAlert = ({
   iconComponent = null,
   iconColor = null,
   iconSize = 24,
+  iconStyle,
   layout = "inline",
   containerStyle,
   titleStyle,
@@ -612,7 +613,7 @@ const NotificationAlert = ({
         <A11y.Index index={0}>
         <View
           ref={internalIconRef}
-          style={[styles.iconWrapper, !title && styles.iconWithoutTitle, layout === "centered" && styles.centeredIcon]}
+          style={[styles.iconWrapper, !title && styles.iconWithoutTitle, layout === "centered" && styles.centeredIcon, iconStyle]}
           accessible={true}
           importantForAccessibility="yes"
           accessibilityRole="text"

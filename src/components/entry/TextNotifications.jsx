@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { View, StyleSheet, Text, Keyboard, Pressable, Platform, TouchableOpacity, Linking, AccessibilityInfo } from "react-native";
+import { View, StyleSheet, Text, Keyboard, AccessibilityInfo } from "react-native";
 import {
   Color,
   FontFamily,
@@ -10,27 +10,22 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
 import EntryInput from "./EntryInput";
-import SparklightCheckBox from "../common/customui/SparklightCheckBox";
 import { useSelector, useDispatch } from "react-redux";
 import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import NavigationUtils from "./NavigationUtils";
-import { requiredField } from "../../styles/utilities";
-import { FieldTitle, Hyperlink, HintText } from "../common/customui/Typography";
-import Touchable from "../common/customui/Touchable";
-import { A11Y } from "../../styles/theme";
+import { FieldTitle, HintText } from "../common/customui/Typography";
 import PrimaryButton from "../common/customui/PrimaryButton";
 import { hp } from "../../utils/responsive";
 import { ScreenScroll } from "../common/customui/Screen";
+import { useTextConsent, TextConsentCheckbox } from "../common/TextConsent";
+import { normalizePhoneDigits, isCompletePhoneNumber } from "../../utils/textConsent";
 
 const TextNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
   const [input, setInput] = useState("");
-  const [toggleCheckBox, setToggleCheckBox] = useState(false);
-  const [enableButton, setEnableButton] = useState(false);
   const [keyboardHidden, setKeyboardHidden] = useState(true);
   const [textInputLayout, setTextInputLayout] = useState({});
-  const [isTermRequired, setIsTermRequired] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const didSubmit = useRef(false);
@@ -40,6 +35,7 @@ const TextNotifications = ({ navigation }) => {
   const user = useSelector((state) => state.user.userData);
   const profile = useSelector((state) => state.profile || {});
   const accountNumber = user?.userInfo?.accountNumber || "";
+  const consent = useTextConsent({ currentNumber: input, alwaysRequired: true });
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -77,44 +73,8 @@ const TextNotifications = ({ navigation }) => {
 
   const onChangeText = (text) => {
     setInput(text);
-    // Remove validation from here
     setError("");
-    setEnableButton(toggleCheckBox && text.length > 0);
   };
-
-  const onCheckBox = (value) => {
-    setToggleCheckBox(value);
-    setIsTermRequired(false);
-    setEnableButton(value && input.length > 0);
-  };
-
-  const handleTermsLinkPress = useCallback(
-    async (event) => {
-      event?.stopPropagation();
-      const url =
-        "https://www.sparklight.com/legal/text-messaging-terms-and-conditions";
-
-      try {
-        const supported = await Linking.canOpenURL(url);
-        if (supported) {
-          await Linking.openURL(url);
-        } else {
-          // Fallback to in-app webview if the device can't open the external URL
-          navigation.navigate("ArticleWindowUtility", {
-            url,
-            name: "Terms & Conditions",
-          });
-        }
-      } catch (err) {
-        // On error, fallback to in-app webview
-        navigation.navigate("ArticleWindowUtility", {
-          url,
-          name: "Terms & Conditions",
-        });
-      }
-    },
-    [navigation],
-  );
 
   const keyboardDismiss = () => {
     Keyboard.dismiss();
@@ -132,16 +92,11 @@ const TextNotifications = ({ navigation }) => {
 
   const enableTextNotifications = async () => {
     if (loading || didSubmit.current) return; // Prevent double submission
-    if (!toggleCheckBox) {
-      setIsTermRequired(true);
-      return;
-    }
+    Keyboard.dismiss();
 
-    // Phone validation on submit
-    const phoneRegex = /^(?:\+?\d{10,11})$/;
-    if (input.length === 0 || !phoneRegex.test(input)) {
+    if (!isCompletePhoneNumber(input)) {
       setError("Invalid mobile phone number.");
-      setEnableButton(false);
+      consent.validate({ focus: false });
       AccessibilityInfo.announceForAccessibility(
         "Invalid mobile phone number.",
       );
@@ -151,7 +106,7 @@ const TextNotifications = ({ navigation }) => {
       return;
     }
     setError("");
-    setEnableButton(true);
+    if (!consent.validate()) return;
 
     setLoading(true); // Start loading
 
@@ -160,7 +115,7 @@ const TextNotifications = ({ navigation }) => {
       billingOptOutStatus: false,
       optOut: false,
       outageOptOut: false,
-      phoneNumber: input,
+      phoneNumber: normalizePhoneDigits(input),
     };
 
     await dispatch(updateTextNotification(data, null));
@@ -263,72 +218,17 @@ const TextNotifications = ({ navigation }) => {
 
         <View style={styles.bottomBar}>
            
-      <View style={[styles.checkboxSection]}>
-          <View style={styles.checkBoxArea}>
-            <Touchable
-              style={styles.checkboxTouchable}
-              onPress={() => onCheckBox(!toggleCheckBox)}
-              accessibilityRole="checkbox"
-              accessibilityLabel="I agree to Text Messaging Terms and Conditions"
-              accessibilityState={{ checked: toggleCheckBox }}
-              minSize={0}
-            >
-              <SparklightCheckBox
-                disabled={true}
-                value={toggleCheckBox}
-                boxStyle={styles.checkBox}
-                accessible={false}
-                importantForAccessibility="no"
-              />
-            </Touchable>
-            <Text
-              style={[styles.checkBoxAreaViewText, styles.checkBoxTextWrapper]}
-              allowFontScaling={true}
-              maxFontSizeMultiplier={1}
-            >
-              I agree to{' '}
-              <Hyperlink
-                onPress={handleTermsLinkPress}
-                accessibilityRole="link"
-                accessibilityLabel="View Text Messaging Terms and Conditions"
-                allowFontScaling={true}
-                maxFontSizeMultiplier={1}
-              >
-                Text Messaging Terms & Conditions
-              </Hyperlink>
-            </Text>
-          </View>
-
-          {/* Add error message display */}
-          {isTermRequired && (
-            <View
-              style={styles.errorContainer}
-              accessible={true}
-              accessibilityRole="alert"
-              accessibilityLiveRegion="assertive"
-              accessibilityLabel="Error: Please agree to the Terms and Conditions to proceed"
-            >
-              <AlertIcon />
-              <Text style={styles.errorText} importantForAccessibility="no">
-                Please agree to the Terms & Conditions to proceed.
-              </Text>
-            </View>
-          )}
-        </View>
-
+          <TextConsentCheckbox consent={consent} navigation={navigation} style={styles.consent} />
 
           <PrimaryButton
-            disabled={!enableButton || loading}
+            disabled={loading}
             accessibilityRole="button"
             buttonType="submit"
             title="Enable Text Notifications"
-            accessibilityState={{ disabled: !enableButton || loading }}
+            accessibilityState={{ disabled: loading }}
             accessibilityLabel="Enable Text Notifications"
             accessibilityHint="Activates text message notifications for your account."
-            style={[
-              styles.button,
-              (!enableButton || loading) && styles.buttonDisabled,
-            ]}
+            style={[styles.button, loading && styles.buttonDisabled]}
             onPress={enableTextNotifications}
           >
             {/* <Text
@@ -361,6 +261,7 @@ const TextNotifications = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  consent: { marginTop: Padding.p_9xs, marginBottom: Padding.p_base },
   bottomBar: {
     marginHorizontal: 24,
     marginBottom: hp("15%"),
@@ -390,64 +291,6 @@ const styles = StyleSheet.create({
   },
   buttonsParent: {
     width: "100%",
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  checkBox: {
-    width: 16,
-    height: 16,
-    marginTop: 0,
-    marginRight: Platform.OS === "ios" ? 8 : 8,
-  },
-  checkBoxArea: {
-    flexDirection: "row",
-    alignItems: "center",
-    flexWrap: "wrap",
-    width: "100%",
-    minHeight: A11Y.minTouch,
-    paddingVertical: Padding.p_5xs,
-  },
-  checkBoxTextWrapper: {
-    flex: 1,
-    flexWrap: "wrap",
-    marginLeft: 8,
-  },
-  termsLinkText: {
-    color: Color.sparklightPrimaryPurple,
-    textDecorationLine: "underline",
-  },
-  checkboxSection: {
-    paddingHorizontal: 16,
-    alignSelf: "flex-start",
-    justifyContent: 'flex-start',
-    width: "95%",
-    marginTop: Padding.p_base,
-  },
- checkboxTouchable: {
-    flexDirection: "row",
-    marginRight: 0,
-    paddingVertical: Padding.p_9xs,
-    marginLeft: 8,
-  },
-  termsLinkTouchable: {
-    minHeight: A11Y.minTouch,
-    justifyContent: "center",
-    paddingVertical: Padding.p_5xs,
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    flexWrap: "wrap",
-    
-  },
-  checkBoxAreaViewText: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.RadioCanadaRegular,
-    color: Color.sparklightGray1,
-    flexShrink: 1,
-    flexWrap: "wrap",
   },
     errorContainer: {
     marginTop: 8,
