@@ -21,6 +21,15 @@ apply from: project(':react-native-config').projectDir.getPath() + "/dotenv.grad
  * By default you don't need to apply any configuration, just uncomment the lines you need.
  */
 react {
+    // Android Studio may not inherit the shell PATH that initializes nvm.
+    // Override with -PNODE_BINARY=/path/to/node or the NODE_BINARY environment variable.
+    def configuredNode = providers.gradleProperty("NODE_BINARY")
+            .orElse(providers.environmentVariable("NODE_BINARY"))
+            .getOrNull()
+    def localNode = ["/usr/local/bin/node", "/opt/homebrew/bin/node"]
+            .find { new File(it).canExecute() }
+    nodeExecutableAndArgs = [configuredNode ?: localNode ?: "node"]
+
     /* Folders */
     //   The root of your project, i.e. where "package.json" lives. Default is '../..'
     // root = file("../../")
