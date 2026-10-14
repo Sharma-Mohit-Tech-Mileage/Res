@@ -4,20 +4,12 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
 import WarningIcon from "../../../assets/svgs/Alerttriangle";
-import {
-  StyleSheet,
-  View,
-  Text,
-  Platform,
-} from "react-native";
+import { StyleSheet, View, Text, Platform } from "react-native";
 import KeyboardAwareScrollView from "../common/customui/KeyboardAwareScrollView";
 import { ScreenScroll } from "../common/customui/Screen";
 import AppStyles from "../../styles/AppStyles";
 
-import Animated, {
-  FadeInDown,
-  FadeInUp,
-} from "react-native-reanimated";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import {
   Color,
   FontFamily,
@@ -34,7 +26,7 @@ import useUserEmailPrefill from "../../hooks/useUserEmailPrefill";
 import FeedbackRatingSelector from "./FeedbackRatingSelector";
 import AreaOfConcernSelector from "./AreaOfConcernSelector";
 import { Radio } from "native-base";
-import {HintText,FieldTitle} from "../common/customui/Typography";
+import { HintText, FieldTitle } from "../common/customui/Typography";
 import PrimaryButton from "../common/customui/PrimaryButton";
 
 const Feedback = () => {
@@ -86,7 +78,8 @@ const Feedback = () => {
       setTimeout(() => {
         feedbackTextRef.current?.focus();
         AccessibilityInfo.announceForAccessibility(
-          fieldErrors.feedbackText?.message || "Additional feedback is required"
+          fieldErrors.feedbackText?.message ||
+            "Additional feedback is required",
         );
       }, 400);
       return;
@@ -125,7 +118,8 @@ const Feedback = () => {
       }
 
       AccessibilityInfo.announceForAccessibility(
-        errors.cosentContactUs?.message || "Please choose Yes or No to contact you."
+        errors.cosentContactUs?.message ||
+          "Please choose Yes or No to contact you.",
       );
     }, 300);
 
@@ -195,7 +189,12 @@ const Feedback = () => {
         title="Feedback"
         onPressBack={() => navigation.goBack()}
       />
-      <ScreenScroll framed ScrollComponent={KeyboardAwareScrollView} ref={scrollViewRef} showsVerticalScrollIndicator={false}>
+      <ScreenScroll
+        framed
+        ScrollComponent={KeyboardAwareScrollView}
+        ref={scrollViewRef}
+        showsVerticalScrollIndicator={false}
+      >
         <Animated.View
           entering={FadeInUp.delay(100).springify()}
           style={styles.content}
@@ -208,7 +207,7 @@ const Feedback = () => {
               How would you rate your experience using the MySparklight app?
             </Text>
             <HintText
-              style={{marginTop: Padding.p_base,}}
+              style={{ marginTop: Padding.p_base }}
               accessibilityRole="text"
               accessible={true}
               accessibilityLabel="Fields marked with an asterisk are required"
@@ -282,7 +281,7 @@ const Feedback = () => {
                     thresholdToAnnounce = remaining;
                   } else {
                     const crossed = thresholds.find(
-                      (t) => remaining < t && previousRemaining >= t
+                      (t) => remaining < t && previousRemaining >= t,
                     );
 
                     if (crossed != null) {
@@ -299,7 +298,7 @@ const Feedback = () => {
                     announcementTimerRef.current = setTimeout(() => {
                       announcementTimerRef.current = null;
                       AccessibilityInfo.announceForAccessibility(
-                        `${thresholdToAnnounce} characters remaining`
+                        `${thresholdToAnnounce} characters remaining`,
                       );
                     }, delay);
                   }
@@ -322,7 +321,9 @@ const Feedback = () => {
                     <Text
                       style={styles.charCount}
                       accessibilityRole="text"
-                      accessibilityLabel={`${value?.length || 0} of 500 characters used`}
+                      accessibilityLabel={`${
+                        value?.length || 0
+                      } of 500 characters used`}
                       {...Platform.select({
                         android: { accessibilityLiveRegion: "polite" },
                         ios: {},
@@ -336,114 +337,107 @@ const Feedback = () => {
             />
           </Animated.View>
 
-
-
-          <View style={{ paddingHorizontal: 16, paddingTop: 8}}
-         
-         
-          >
-             <View ref={surveyErrorRef} accessible={true}
-              >
+          <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+            <View ref={surveyErrorRef} accessible={true}>
               <FieldTitle
-               
                 style={[
                   (isError || errors.cosentContactUs) && styles.optionTxtError,
                 ]}
-              accessibilityLabel={isError ? "Please choose Yes or No to contact you." : "May Sparklight contact you about your feedback? Required"}
+                accessibilityLabel={
+                  isError
+                    ? "Please choose Yes or No to contact you."
+                    : "May Sparklight contact you about your feedback? Required"
+                }
               >
-              May Sparklight contact you about your feedback? *
+                May Sparklight contact you about your feedback? *
               </FieldTitle>
-              </View>
-              <Radio.Group
-                name="surveyOptions"
-                value={selectedOption}
-                onChange={onChangeValue}
-                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}
+            </View>
+            <Radio.Group
+              name="surveyOptions"
+              value={selectedOption}
+              onChange={onChangeValue}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "flex-start",
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginRight: 4,
+                }}
               >
-                <View
+                <Radio
+                  value="yes"
+                  accessibilityLabel="Yes"
+                  accessibilityHint="Select this option if Sparklight may contact you about your feedback"
+                  accessibilityRole="radio"
                   style={{
-                    flexDirection: "row",
+                    marginTop: 4,
+                    marginRight: 4,
+                    transform: [{ scale: 0.9 }],
+                  }}
+                />
+                <Text
+                  style={[styles.optionTxt, { marginBottom: 0, marginTop: 4 }]}
+                >
+                  Yes {"  "}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Radio
+                  value="no"
+                  accessibilityLabel="No"
+                  accessibilityHint="Select this option if Sparklight may not contact you about your feedback"
+                  accessibilityRole="radio"
+                  style={{
+                    marginTop: 4,
                     alignItems: "center",
                     marginRight: 4,
+                    transform: [{ scale: 0.9 }],
                   }}
+                />
+                <Text
+                  style={[styles.optionTxt, { marginBottom: 0, marginTop: 4 }]}
                 >
-                  <Radio
-                    value="yes"
-                    accessibilityLabel="Yes"
-                    accessibilityHint="Select this option if Sparklight may contact you about your feedback"
-                    accessibilityRole="radio"
-                    style={{
-                      marginTop: 4,
-                      marginRight: 4,
-                      transform: [{ scale: 0.9 }],
-                    }}
-                  />
-                  <Text
-                    style={[
-                      styles.optionTxt,
-                      { marginBottom: 0, marginTop: 4 },
-                    ]}
-                  >
-                    Yes {"  "}
-                  </Text>
-                </View>
-
+                  No
+                </Text>
+              </View>
+            </Radio.Group>
+            {(isError || errors.cosentContactUs) && (
+              <View
+                style={styles.errorContainer}
+                accessible={true}
+                accessibilityLabel="Please choose Yes or No to contact you."
+                accessibilityRole="alert"
+                accessibilityLiveRegion="assertive"
+              >
                 <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
+                  style={styles.errorIcon}
+                  accessible={false}
+                  importantForAccessibility="no"
                 >
-                  <Radio
-                    value="no"
-                    accessibilityLabel="No"
-                    accessibilityHint="Select this option if Sparklight may not contact you about your feedback"
-                    accessibilityRole="radio"
-                    
-                    style={{
-                      marginTop: 4,
-                      alignItems: "center",
-                      marginRight:4 ,
-                      transform: [{ scale: 0.9 }],
-                    }}
-                  />
-                  <Text
-                    style={[
-                      styles.optionTxt,
-                      { marginBottom: 0, marginTop: 4},
-                    ]}
-                  >
-                    No
-                  </Text>
+                  <WarningIcon />
                 </View>
-              </Radio.Group>
-              {(isError || errors.cosentContactUs) && (
-                <View
-                  
-                  style={styles.errorContainer}
-                  accessible={true}
-                  accessibilityLabel="Please choose Yes or No to contact you."
-                  accessibilityRole="alert"
-                  accessibilityLiveRegion="assertive"
+                <Text
+                  style={styles.errorText}
+                  accessible={false}
+                  importantForAccessibility="no"
                 >
-                  <View
-                    style={styles.errorIcon}
-                    accessible={false}
-                    importantForAccessibility="no"
-                  >
-                    <WarningIcon />
-                  </View>
-                  <Text
-                    style={styles.errorText}
-                    accessible={false}
-                    importantForAccessibility="no"
-                  >
-                    {errors.cosentContactUs?.message || "Please choose Yes or No to contact you."}
-                  </Text>
-                </View>
-              )}
-            </View>
-              
+                  {errors.cosentContactUs?.message ||
+                    "Please choose Yes or No to contact you."}
+                </Text>
+              </View>
+            )}
+          </View>
 
           <Animated.View
             entering={FadeInDown.delay(600).springify()}
@@ -477,7 +471,9 @@ const Feedback = () => {
               title={isSubmitting ? "Submitting..." : "Submit Feedback"}
               onPress={handleSubmit(onSubmit, handleValidationError)}
               disabled={isSubmitting}
-              accessibilityLabel={isSubmitting ? "Submitting feedback" : "Submit feedback"}
+              accessibilityLabel={
+                isSubmitting ? "Submitting feedback" : "Submit feedback"
+              }
               accessibilityRole="button"
               buttonType="submit"
               accessible={!isSubmitting}
@@ -497,7 +493,6 @@ const Feedback = () => {
               accessibilityRole="button"
               accessible={!isSubmitting}
             />
-            
           </Animated.View>
         </Animated.View>
       </ScreenScroll>
@@ -611,7 +606,8 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.RadioCanadaRegular,
     marginTop: Padding.p_5xs,
-  },optionTxt: {
+  },
+  optionTxt: {
     fontSize: FontSize.size_base,
     color: Color.colorGray_200,
     fontFamily: FontFamily.RadioCanadaSemiBold,
