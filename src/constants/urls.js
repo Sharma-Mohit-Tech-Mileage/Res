@@ -12,6 +12,7 @@ export const SPARKLIGHT_URLS = {
 
   // Legal
   privacyPolicy: `${BASE}/legal/mobile-app-privacy-policy`,
+  sparklightPrivacyPolicy: `${BASE}/legal/privacy-policy`,
   termsConditions: `${BASE}/legal/mobile-app-terms-and-conditions`,
   paperlessTerms: `${BASE}/legal/paperless-terms-and-conditions`,
   textMessagingTerms: `${BASE}/legal/text-messaging-terms-and-conditions`,
