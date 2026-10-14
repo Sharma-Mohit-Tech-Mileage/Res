@@ -211,6 +211,7 @@ stages:
           - checkout: self
             clean: true
           - template: pipelines/templates/cache-gradle.yml
+          - template: pipelines/templates/setup-android-sdk.yml
           - script: |
               set -euo pipefail
               JDK_PATH=$(/usr/libexec/java_home -v 17)
@@ -298,6 +299,7 @@ stages:
           - checkout: self
             clean: true
           - template: pipelines/templates/cache-gradle.yml
+          - template: pipelines/templates/setup-android-sdk.yml
           - script: |
               set -euo pipefail
               JDK_PATH=$(/usr/libexec/java_home -v 17)
@@ -545,6 +547,7 @@ stages:
           - checkout: self
             clean: true
           - template: pipelines/templates/cache-gradle.yml
+          - template: pipelines/templates/setup-android-sdk.yml
           - script: |
               set -euo pipefail
               JDK_PATH=$(/usr/libexec/java_home -v 17)
