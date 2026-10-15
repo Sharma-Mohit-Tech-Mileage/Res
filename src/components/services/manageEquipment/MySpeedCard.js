@@ -3,7 +3,7 @@ import ServiceLoader from "../../common/customui/ServiceLoader";
 import SpeedometerIcon from "../../../res/svgIcons/SpeedometerIcon";
 import EquipmentSpeedResults from "./EquipmentSpeedResults";
 import React, { useEffect, useState } from "react";
-import { Alert, Linking, StyleSheet, View } from "react-native";
+import { AccessibilityInfo, Alert, Linking, Platform, StyleSheet, View } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import SpeedAnimation from "../../common/SpeedAnimation";
 import SurfaceCard from "../../common/customui/SurfaceCard";
@@ -91,16 +91,30 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd,h
       </View>
       <View style={styles.panel}>
         <View style={styles.tabs} accessibilityRole="tablist">
-          {["wifi", ...(hideModemSpeed ? [] : ["modem"])].map((value) => (
+          {["wifi", ...(hideModemSpeed ? [] : ["modem"])].map((value) => {
+            const isActive = tab === value;
+            const label = value === "wifi" ? "WiFi Speed" : "Modem Speed";
+            const description = value === "wifi"
+              ? "WiFi speed reported by your mobile device"
+              : "Speed reported by your modem";
+            return (
             <Touchable
               key={value}
               accessibilityRole="tab"
-              accessibilityLabel={
-                value === "wifi" ? "WiFi Speed" : "Modem Speed"
-              }
-              accessibilityState={{ selected: tab === value }}
+              accessibilityLabel={`${label}. ${description}`}
+              accessibilityState={{ selected: isActive }}
+              accessibilityHint={isActive ? undefined : `Double tap to switch to ${label}`}
               disabled={loading}
-              onPress={() => setTab(value)}
+              onPress={() => {
+                if (!isActive) {
+                  setTab(value);
+                  if (Platform.OS === "android") {
+                    setTimeout(() => {
+                      AccessibilityInfo.announceForAccessibility(`Switched to ${label}`);
+                    }, 300);
+                  }
+                }
+              }}
               minSize={0}
               style={[styles.tab, tab === value && styles.activeTab]}
             >
@@ -110,7 +124,8 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd,h
                 {value === "wifi" ? "WiFi Speed" : "Modem Speed"}
               </SectionTitle>
             </Touchable>
-          ))}
+            );
+          })}
         </View>
         <View style={styles.testContent}>
           <View style={styles.descriptionContainer}>
