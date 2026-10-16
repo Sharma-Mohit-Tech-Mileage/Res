@@ -104,7 +104,6 @@ const MySpeedCard = ({ hasEeroDevice = true, navigation, refreshKey, onLoadEnd,h
               accessibilityLabel={`${label}. ${description}`}
               accessibilityState={{ selected: isActive }}
               accessibilityHint={isActive ? undefined : `Double tap to switch to ${label}`}
-              disabled={loading}
               onPress={() => {
                 if (!isActive) {
                   setTab(value);
