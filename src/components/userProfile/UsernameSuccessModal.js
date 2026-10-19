@@ -6,7 +6,7 @@ import ModalOverlay from "../common/customui/ModalOverlay";
 import ModalCard from "../common/customui/ModalCard";
 import AppStyles from "../../styles/AppStyles";
 import PrimaryButton from "../common/customui/PrimaryButton";
-import { Color } from "../../styles/GlobalStyles";
+import { Color, FontFamily } from "../../styles/GlobalStyles";
 
 const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => (
   <Modal
@@ -64,6 +64,8 @@ const UsernameSuccessModal = ({ visible = false, onClose = () => {} }) => (
             buttonType="submit"
             onPress={onClose}
             containerStyle={styles.buttonContainer}
+            style={styles.signOutButton}
+            textStyle={styles.signOutText}
           />
         </ScrollView>
       </ModalCard>
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   panel: { overflow: "hidden" },
-  scrollContent: { paddingBottom: 20 },
+  scrollContent: { paddingBottom: 0 },
   summary: {
     alignItems: "center",
     paddingHorizontal: 24,
@@ -99,11 +101,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
+    fontFamily: FontFamily.RadioCanadaBold,
+    fontSize: 20,
+    fontWeight: "700",
     textAlign: "center",
     marginBottom: 8,
     color: Color.colorblack_100,
   },
   message: {
+    fontFamily: FontFamily.RadioCanadaRegular,
+    fontSize: 16,
+    fontWeight: "400",
     lineHeight: 20,
     color: Color.colorblack_100,
     textAlign: "center",
@@ -116,5 +124,14 @@ const styles = StyleSheet.create({
   },
   instructions: { marginTop: 12 },
   buttonContainer: { marginTop: 24, marginHorizontal: 20, marginBottom: 16 },
+  signOutButton: {
+    backgroundColor: Color.sparklightPrimaryPurple,
+  },
+  signOutText: {
+    fontFamily: FontFamily.RadioCanadaBold,
+    fontSize: 18,
+    fontWeight: "700",
+    color: Color.sparklightWhite,
+  },
 });
 export default UsernameSuccessModal;
