@@ -7,7 +7,6 @@ const mockDispatch = jest.fn();
 const mockTriggerOnScreenEntry = jest.fn();
 const mockGetUser = jest.fn();
 const mockGetApiRequest = jest.fn();
-const mockPostApiRequest = jest.fn();
 
 let mockSelectorState = {
   profile: {
@@ -19,7 +18,6 @@ let mockSelectorState = {
     paperlessStatusAcp: true,
     isPaperLessStatusLoading: false,
   },
-  user: { userData: { userInfo: { accountNumber: '8160110010005227' } } },
 };
 
 const mockNavigation = {
@@ -50,11 +48,10 @@ jest.mock('../src/redux/utils/LocalStorage', () => ({
 
 jest.mock('../src/network/RestApiClient', () => ({
   GetApiRequest: (...args) => mockGetApiRequest(...args),
-  PostApiRequest: (...args) => mockPostApiRequest(...args),
 }));
 
 jest.mock('../src/network/apis/endpoints/Endpoints', () => ({
-  ENDPOINTS: { ACCOUNTS_EASYPAY: 'ACCOUNTS_EASYPAY', GET_BILL_EXPLAINER: 'GET_BILL_EXPLAINER' },
+  ENDPOINTS: { ACCOUNTS_EASYPAY: 'ACCOUNTS_EASYPAY' },
   getEndpoint: jest.fn(() => '/accounts/easypay'),
 }));
 
@@ -101,8 +98,6 @@ jest.mock('../src/components/common/customui/LoadingOverlay', () => {
 jest.mock('../src/components/common/billerCards/BillerSummary', () => 'Card');
 jest.mock('../src/components/common/billerCards/AutoPayCard', () => 'AutoPayCard');
 jest.mock('../src/components/common/billerCards/PeperLessCard', () => 'PeperLessCard');
-jest.mock('../src/components/common/billerCards/PaymentPlanCard', () => 'PaymentPlanCard');
-jest.mock('../src/components/common/WebViewWarmup', () => 'WebViewWarmup');
 jest.mock('../src/components/utility/AppStyles', () => ({ card: { borderRadius: 8 } }), { virtual: true });
 jest.mock('../src/res/svgIcons/BillingIconWhite', () => 'BillingIconWhite');
 jest.mock('../assets/svgs/Chevonright', () => 'RightIcon');
@@ -125,10 +120,7 @@ describe('BillingScreen behavior', () => {
         paperlessStatusAcp: true,
         isPaperLessStatusLoading: false,
       },
-      user: { userData: { userInfo: { accountNumber: '8160110010005227' } } },
     };
-
-    mockPostApiRequest.mockImplementation(() => {});
 
     mockGetUser.mockResolvedValue({
       userInfo: {
@@ -164,7 +156,7 @@ describe('BillingScreen behavior', () => {
     expect(mockNavigation.navigate).toHaveBeenCalledWith('PaymentMethods');
   });
 
-  it('hides the bill breakdown option and navigates to payment history', async () => {
+  it('navigates to bill breakdown and payment history actions', async () => {
     let tree;
     await act(async () => {
       tree = renderer.create(<BillingScreen navigation={mockNavigation} />);
@@ -172,16 +164,19 @@ describe('BillingScreen behavior', () => {
     });
 
     const actions = tree.root.findAllByType(TouchableOpacity);
-    expect(actions.find((a) => a.props.accessibilityLabel === 'View Bill Breakdown')).toBeUndefined();
+    const billBreakdown = actions.find(
+      (a) => a.props.accessibilityLabel === 'View Bill Breakdown'
+    );
     const paymentHistory = actions.find(
       (a) => a.props.accessibilityLabel === 'View Payment History'
     );
 
     act(() => {
+      billBreakdown.props.onPress();
       paymentHistory.props.onPress();
     });
 
-    expect(mockNavigation.navigate).not.toHaveBeenCalledWith('BillingBreakDown');
+    expect(mockNavigation.navigate).toHaveBeenCalledWith('BillingBreakDown');
     expect(mockNavigation.navigate).toHaveBeenCalledWith('PaymentHistory');
   });
 
@@ -252,83 +247,5 @@ describe('BillingScreen behavior', () => {
     );
 
     consoleSpy.mockRestore();
-  });
-  const renderPaymentPlanCards = async (accountOverrides) => {
-    mockSelectorState.profile.accountDetails = { ...mockSelectorState.profile.accountDetails, ...accountOverrides };
-    let tree;
-    await act(async () => {
-      tree = renderer.create(<BillingScreen navigation={mockNavigation} />);
-      await flushPromises();
-    });
-    return tree.root.findAllByType('PaymentPlanCard');
-  };
-
-  it('shows the payment plan card for enrolled customers', async () => {
-    const cards = await renderPaymentPlanCards({ has_payment_plan: true });
-    expect(cards).toHaveLength(1);
-  });
-
-  it('hides the payment plan card when the customer is not enrolled', async () => {
-    expect(await renderPaymentPlanCards({ has_payment_plan: false })).toHaveLength(0);
-    expect(await renderPaymentPlanCards({})).toHaveLength(0);
-  });
-  const renderCardProps = async (accountOverrides, explainerResponse) => {
-    mockSelectorState.profile.accountDetails = { ...mockSelectorState.profile.accountDetails, ...accountOverrides };
-    mockPostApiRequest.mockImplementation((endpoint, body, onSuccess) => explainerResponse && onSuccess(explainerResponse));
-    let tree;
-    await act(async () => {
-      tree = renderer.create(<BillingScreen navigation={mockNavigation} />);
-      await flushPromises();
-    });
-    return tree.root.findByType('Card').props;
-  };
-
-  it('passes the bill explainer url to Bill Summary when the API says eligible', async () => {
-    const props = await renderCardProps({ customer_type: 'R' }, { eligibility: true, be_url: 'https://explainer' });
-    expect(props.explainerUrl).toBe('https://explainer');
-    expect(mockPostApiRequest.mock.calls[0][1]).toMatchObject({ account: '8160110010005227', utmSource: 'selfcare_mobile' });
-  });
-
-  it('hands the explainer url to the WebView warm-up', async () => {
-    mockSelectorState.profile.accountDetails = { ...mockSelectorState.profile.accountDetails, customer_type: 'R' };
-    mockPostApiRequest.mockImplementation((endpoint, body, onSuccess) => onSuccess({ eligibility: true, be_url: 'https://explainer' }));
-    let tree;
-    await act(async () => {
-      tree = renderer.create(<BillingScreen navigation={mockNavigation} />);
-      await flushPromises();
-    });
-    expect(tree.root.findByType('WebViewWarmup').props.url).toBe('https://explainer');
-  });
-
-  it('hides the explainer when not eligible, without a url, or when the call fails', async () => {
-    expect((await renderCardProps({}, { eligibility: false, be_url: 'https://explainer' })).explainerUrl).toBeNull();
-    expect((await renderCardProps({}, { eligibility: true })).explainerUrl).toBeNull();
-    mockPostApiRequest.mockImplementation((endpoint, body, onSuccess, onError) => onError(new Error('x')));
-    let tree;
-    await act(async () => {
-      tree = renderer.create(<BillingScreen navigation={mockNavigation} />);
-      await flushPromises();
-    });
-    expect(tree.root.findByType('Card').props.explainerUrl).toBeNull();
-  });
-
-  it('flags the explainer as loading until the API answers', async () => {
-    let respond;
-    mockSelectorState.profile.accountDetails = { ...mockSelectorState.profile.accountDetails, customer_type: 'R' };
-    mockPostApiRequest.mockImplementation((endpoint, body, onSuccess) => { respond = onSuccess; });
-    let tree;
-    await act(async () => {
-      tree = renderer.create(<BillingScreen navigation={mockNavigation} />);
-      await flushPromises();
-    });
-    expect(tree.root.findByType('Card').props.explainerLoading).toBe(true);
-    await act(async () => respond({ eligibility: true, be_url: 'https://explainer' }));
-    expect(tree.root.findByType('Card').props).toMatchObject({ explainerLoading: false, explainerUrl: 'https://explainer' });
-  });
-
-  it('skips the explainer call for accounts with a hierarchy id', async () => {
-    const props = await renderCardProps({ hierarchy: { hierarchy_id: 'H1' } }, { eligibility: true, be_url: 'https://explainer' });
-    expect(mockPostApiRequest).not.toHaveBeenCalled();
-    expect(props.explainerLoading).toBe(false);
   });
 });

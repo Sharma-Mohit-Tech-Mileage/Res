@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { View, StyleSheet, AccessibilityInfo } from "react-native";
+import { View, StyleSheet, Platform, AccessibilityInfo } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,12 +20,24 @@ import SupportIcon from "../res/svgIcons/SupportIcon";
 import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
 import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
 import { FontFamily, Color, FontSize } from "../styles/GlobalStyles";
-import { calculateTabBarHeight } from "./tabBarHeight";
 const Tab = createBottomTabNavigator();
 
 
+const TAB_BAR_HEIGHT = {
+  IOS: 90,
+  ANDROID_MIN: 55,
+  ANDROID_PADDING: 60,
+};
+
 const HARD_CODE_WALKTHROUGH_FOR_TESTING = false;
 const HARD_CODE_WALKTHROUGH_STEP_FOR_TESTING = 0;
+
+const calculateTabBarHeight = (insets) => {
+  return Platform.OS === "ios"
+    ? TAB_BAR_HEIGHT.IOS
+    : Math.max(TAB_BAR_HEIGHT.ANDROID_MIN, insets.bottom + TAB_BAR_HEIGHT.ANDROID_PADDING);
+};
+
 
 const MyTabs = ({ route }) => {
 

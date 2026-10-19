@@ -7,11 +7,8 @@ import Tooltip from "rn-tooltip";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../../../styles/AppStyles";
 import PrimaryButton from "../customui/PrimaryButton";
-import { SectionTitle, FieldTitle, Hyperlink } from "../customui/Typography";
-import Touchable from "../customui/Touchable";
-import RightIcon from "../../../../assets/svgs/Chevonright";
-import { theme } from "../../../styles/theme";
-const Card = ({ billAmt, dueDate, navigation, style, explainerUrl, explainerLoading }) => {
+import { SectionTitle } from "../customui/Typography";
+const Card = ({ billAmt, dueDate, navigation, style }) => {
   const NotAvailable = () => {
     return (
       <View style={{ flexDirection: "column" }}>
@@ -207,36 +204,6 @@ const Card = ({ billAmt, dueDate, navigation, style, explainerUrl, explainerLoad
           </SkeletonPlaceholder>
         </>
       )}
-
-      {explainerLoading && billAmt != undefined && (
-        <View style={styles.explainerRow} accessible accessibilityLabel="Loading bill explainer" accessibilityState={{ busy: true }}>
-          <View style={styles.explainerText}>
-            <SkeletonPlaceholder>
-              <View>
-                <View style={styles.explainerSkeletonTitle} />
-                <View style={styles.explainerSkeletonLine} />
-              </View>
-            </SkeletonPlaceholder>
-          </View>
-        </View>
-      )}
-
-      {!explainerLoading && explainerUrl && billAmt != undefined && (
-        <Touchable
-          style={styles.explainerRow}
-          minSize={0}
-          onPress={() => navigation.navigate("ArticleWindowUtility", { name: "Bill Explainer", url: explainerUrl, quickPayToNative: true })}
-          accessibilityRole="link"
-          accessibilityLabel="Understand your bill. Get instant clarity on every charge."
-          accessibilityHint="Double tap to open the Bill Explainer."
-        >
-          <View style={styles.explainerText}>
-            <FieldTitle accessible={false}>Understand your bill</FieldTitle>
-            <Hyperlink accessible={false}>Get instant clarity on every charge.</Hyperlink>
-          </View>
-          <RightIcon />
-        </Touchable>
-      )}
     </View>
   );
 };
@@ -284,19 +251,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 8,
     padding: 10,
   },
-  explainerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginHorizontal: theme.spacing.base,
-    paddingTop: theme.spacing.md,
-    paddingBottom: theme.spacing.base,
-    borderTopWidth: 1,
-    borderTopColor: Color.dividerLight,
-  },
-  explainerText: { flex: 1, marginRight: theme.spacing.sm },
-  explainerSkeletonTitle: { width: "50%", height: 16, borderRadius: 4 },
-  explainerSkeletonLine: { width: "80%", height: 14, borderRadius: 4, marginTop: theme.spacing.xs },
   cardFooter: {
     width: "90%",
     alignSelf: "center",

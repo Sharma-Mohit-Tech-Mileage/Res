@@ -31,13 +31,12 @@ const AMOUNT_CUSTOM = "custom";
 
 const ANALYTICS_PAYMENT_TYPE = { [AMOUNT_TOTAL]: "full", [AMOUNT_PAST_DUE]: "due", [AMOUNT_CUSTOM]: "custom" };
 
-const MakePaymentScreen = ({ navigation, route }) => {
+const MakePaymentScreen = ({ navigation }) => {
   const headerTitle = "Make a Payment";
-  const prefill = parseAmountInput(route?.params?.prefillAmount);
   const [details, setDetails] = useState(null);
   const [paymentType, setPaymentType] = useState(TYPE_ONE_TIME);
-  const [amountOption, setAmountOption] = useState(prefill ? AMOUNT_CUSTOM : "");
-  const [customAmount, setCustomAmount] = useState(prefill ? `$${prefill.toFixed(2)}` : "");
+  const [amountOption, setAmountOption] = useState("");
+  const [customAmount, setCustomAmount] = useState("");
   const [amountError, setAmountError] = useState("");
   const [errorAlert, setErrorAlert] = useState("");
   const amountInputRef = useRef(null);
