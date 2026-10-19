@@ -1,6 +1,7 @@
 import DeviceInfo from "react-native-device-info";
 import VersionCheck from "react-native-version-check";
 import { Color } from "../../styles/GlobalStyles";
+import { isSameAsUsername } from "../../utils/passwordRules";
 export const ROLE_COLORS = {
   primaryadmin: Color.colorMidnightblue,
   admin: Color.sparklightPrimaryPurple,
@@ -41,7 +42,7 @@ export const validatePassword = (newPassword, userName) => {
     return Array(5).fill(false);
   }
   const conditions = [
-    newPassword !== userName,
+    !isSameAsUsername(newPassword, userName),
     newPassword.length >= 8 && newPassword.length <= 20,
     /[A-Z]/.test(newPassword) &&
       /[a-z]/.test(newPassword) &&
@@ -91,13 +92,13 @@ export const usernameTerms = [
 
 export const getPasswordPriorityHint = (password, userName) => {
   if (!password) return "Password is required.";
+  if (isSameAsUsername(password, userName)) return "Password must be different from your username.";
   if (password.length < 8 || password.length > 20) return "Password must be at least 8 characters long.";
   if (!/[A-Z]/.test(password)) return "Password must have at least one uppercase letter.";
   if (!/[a-z]/.test(password)) return "Password must have at least one lowercase letter.";
   if (!/[0-9]/.test(password)) return "Password must have at least one number.";
   if (!/[^a-zA-Z0-9]/.test(password)) return "Password must include special characters like %, &, _, ?, #, =, -.";
   if (/\s/.test(password)) return "No spaces are allowed in the password.";
-  if (password === userName) return "Password must be different from your username.";
   return null;
 };
 

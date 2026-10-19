@@ -343,14 +343,15 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   errorIcon: {
-    width: 20,
-    height: 20,
-    marginRight: Padding.p_xs,
+    width: 24,
+    height: 24,
+    marginRight: Padding.p_5xs,
   },
   errorText: {
     color: "red",
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.RadioCanadaRegular,
+    flexShrink: 1,
   },
   disabledInput: {
     backgroundColor: Color.Gray300,

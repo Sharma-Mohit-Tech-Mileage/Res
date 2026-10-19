@@ -43,7 +43,7 @@ import {
   HintText,
 } from "../common/customui/Typography";
 import { logWarn } from "../../utils/logger";
-import { useTextConsent, TextConsentCheckbox, TextConsentLinks, LINKS_ROW_GAP } from "../common/TextConsent";
+import { useTextConsent, TextConsentCheckbox } from "../common/TextConsent";
 import { normalizePhoneDigits, TEXT_DISCLAIMER_SUBSCRIBED, TEXT_DISCLAIMER_SUBSCRIBING } from "../../utils/textConsent";
 
 // Define your validation schema
@@ -365,12 +365,7 @@ const TextNotifications = ({ navigation }) => {
                   iconComponent={Alerttriangle}
                   iconColor={Color.sparkLightInfo}
                   customStyle={styles.warningAlert}
-                  containerStyle={styles.disclaimerBanner}
-                  contentStyle={styles.disclaimerContent}
-                  iconStyle={styles.disclaimerIcon}
-                >
-                  <TextConsentLinks navigation={navigation} />
-                </NotificationAlert>
+                />
               </View>
             </View>
 
@@ -560,8 +555,10 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.RadioCanadaRegular,
   },
+  // Inset 24 so the buttons share the left edge of the toggle titles and consent checkbox above.
   buttonContainer: {
-    padding: Padding.p_base,
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: Padding.p_5xl,
     gap: 12,
   },
   accountClr: {
@@ -597,10 +594,6 @@ const styles = StyleSheet.create({
   },
   // The checkbox's 48dp target insets the box by 16, so this lines the box up with the toggle titles.
   consent: { marginTop: Padding.p_9xs, marginLeft: 8, marginRight: 20 },
-  // Links row target leaves LINKS_ROW_GAP under its text; match it on top (less the first block's 4) so gaps are even and the icon centres.
-  disclaimerBanner: { paddingVertical: 20 - LINKS_ROW_GAP },
-  disclaimerContent: { paddingTop: LINKS_ROW_GAP - 4 },
-  disclaimerIcon: { marginTop: 0 },
   warningAlert: {
     borderLeftWidth: 4,
     borderLeftColor: Color.warningAccent,
