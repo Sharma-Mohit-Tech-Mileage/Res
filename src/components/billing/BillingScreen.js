@@ -23,6 +23,10 @@ import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
+import PaymentPlanCard from "../common/billerCards/PaymentPlanCard";
+import WebViewWarmup from "../common/WebViewWarmup";
+import { getPaymentPlanInfo } from "../../utils/paymentPlan";
+import { useBillExplainerLink } from "../../hooks/useBillExplainerLink";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import { getPrimaryEmail } from "../utility/constant";
@@ -31,6 +35,9 @@ import RightIcon from "../../../assets/svgs/Chevonright";
 import AppStyles from "../../styles/AppStyles";
 import { SectionTitle, MenuText } from "../common/customui/Typography";
 import { logWarn } from "../../utils/logger";
+
+// Bill Breakdown menu option is hidden per design feedback; flip to true to bring it back.
+const SHOW_BILL_BREAKDOWN = false;
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -44,6 +51,9 @@ const BillingScreen = ({ navigation }) => {
   const accountDetails = useSelector(
     (state) => state.profile?.accountDetails
   );
+  const paymentPlan = getPaymentPlanInfo(accountDetails);
+  const accountNumber = useSelector((state) => state.user?.userData?.userInfo?.accountNumber);
+  const { url: explainerUrl, loading: explainerLoading } = useBillExplainerLink(accountDetails, accountNumber);
   const paperlessStatusAcp = useSelector(
     (state) => state.profile?.paperlessStatusAcp
   );
@@ -157,13 +167,19 @@ const BillingScreen = ({ navigation }) => {
               </View>
             ) : (
               <>
+                <WebViewWarmup url={explainerUrl} />
                 <Card
                   billAmt={billAmt}
                   dueDate={dueDate}
                   navigation={navigation}
+                  explainerUrl={explainerUrl}
+                  explainerLoading={explainerLoading}
                   style={styles.card}
                   
                 />
+                {paymentPlan.isEnrolled && (
+                  <PaymentPlanCard navigation={navigation} />
+                )}
                 <ResponsiveRow>
                   <AutoPayCard
                     isAutoPayStatus={isAutoPayStatus}
@@ -221,8 +237,9 @@ const BillingScreen = ({ navigation }) => {
  
                     </Touchable>
 
-                    <View style={styles.frameLayout} />
-                    {
+                    {SHOW_BILL_BREAKDOWN && (
+                      <>
+                      <View style={styles.frameLayout} />
                       <Touchable
                         minSize={0}
                         style={[styles.frame9defaultSpaceBlock, { alignItems: 'stretch' }]}
@@ -243,7 +260,8 @@ const BillingScreen = ({ navigation }) => {
                           <RightIcon />
                         </View>
                       </Touchable>
-                    }
+                      </>
+                    )}
                     <View style={styles.frameLayout} />
                     <Touchable
                       minSize={0}
