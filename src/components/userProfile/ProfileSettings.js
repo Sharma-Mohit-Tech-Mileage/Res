@@ -35,6 +35,7 @@ import { A11y } from "react-native-a11y-order";
 import AddIcon from "../../res/svgIcons/AddIcon";
 import { ScreenScroll } from "../common/customui/Screen";
 import { logError } from "../../utils/logger";
+import { residentialCustomerName } from "../../utils/customerName";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -96,20 +97,7 @@ const ProfileSettings = () => {
     }
   };
 
-  const customerFirstName =
-    accountDetails.first_name ||
-    accountDetails.firstName ||
-    profileDetails.firstName ||
-    "";
-  const customerLastName =
-    accountDetails.last_name ||
-    accountDetails.lastName ||
-    profileDetails.lastName ||
-    "";
-  const customerName =
-    `${customerFirstName} ${customerLastName}`.trim() ||
-    profileDetails.fullName ||
-    "";
+  const customerName = residentialCustomerName(accountDetails, profileDetails);
 
   const userInfo = useSelector((state) => state.user.userData.userInfo);
 

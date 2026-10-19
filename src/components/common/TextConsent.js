@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Touchable from "./customui/Touchable";
-import LinkText from "./customui/LinkText";
 import SparklightCheckBox from "./customui/SparklightCheckBox";
 import { Hyperlink } from "./customui/Typography";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
@@ -121,26 +120,9 @@ export const TextConsentCheckbox = ({ consent, navigation, style }) => {
   );
 };
 
-// Always shown under the texting disclaimer, whether or not the consent checkbox is; same pattern as the Account footer links.
-export const TextConsentLinks = ({ navigation, style }) => (
-  <View style={[styles.linksRow, style]}>
-    <LinkText style={styles.link} accessibilityLabel="Text Messaging Terms & Conditions" onPress={() => openTextTerms(navigation)}>
-      <Hyperlink accessible={false} style={styles.linkText}>Text Messaging Terms</Hyperlink>
-    </LinkText>
-    <Text style={styles.separator} accessible={false}> | </Text>
-    <LinkText style={styles.link} accessibilityLabel="Privacy Policy" onPress={() => openPrivacyPolicy(navigation)}>
-      <Hyperlink accessible={false} style={styles.linkText}>Privacy Policy</Hyperlink>
-    </LinkText>
-  </View>
-);
-
 // Sentence line height; the 48dp checkbox target is centred on its first line.
 const LABEL_LINE_HEIGHT = 24;
 const TARGET_INSET = (A11Y.minTouch - LABEL_LINE_HEIGHT) / 2;
-
-// Links row text height inside its 48dp target; screens use LINKS_ROW_GAP to balance the banner around it.
-const LINK_LINE_HEIGHT = 20;
-export const LINKS_ROW_GAP = (A11Y.minTouch - LINK_LINE_HEIGHT) / 2;
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "flex-start" },
@@ -157,8 +139,4 @@ const styles = StyleSheet.create({
   inlineLink: { lineHeight: LABEL_LINE_HEIGHT },
   errorRow: { flexDirection: "row", alignItems: "center", marginTop: theme.spacing.xs, marginLeft: TARGET_INSET },
   errorText: { flex: 1, marginLeft: theme.spacing.sm, color: Color.errorText, fontSize: FontSize.size_sm },
-  linksRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center" },
-  link: { paddingHorizontal: 0, paddingVertical: 0, justifyContent: "center" },
-  linkText: { fontSize: FontSize.size_sm, lineHeight: LINK_LINE_HEIGHT },
-  separator: { color: Color.sparklightGray1, fontSize: FontSize.size_sm, lineHeight: LINK_LINE_HEIGHT },
 });

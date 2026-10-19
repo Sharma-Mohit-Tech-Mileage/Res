@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { isSameAsUsername } from "../../utils/passwordRules";
 
 export const profileSchema = (isPrimaryAdmin, multipleEmails) =>
   yup.object({
@@ -171,7 +172,7 @@ export const feedbackSchema = yup.object().shape({
     .required("Email is required"),
 });
 
-export const passwordSchema = (isCustomQuestionSelected) =>
+export const passwordSchema = (isCustomQuestionSelected, userName) =>
   yup.object({
     securityAnswer: yup.string().required("Password Reset Answer is required"),
     newPassword: yup
@@ -187,6 +188,11 @@ export const passwordSchema = (isCustomQuestionSelected) =>
           // Define the password rules
           const passwordRules = yup
             .string()
+            .test(
+              "not-username",
+              "Password must be different from your username",
+              (password) => !isSameAsUsername(password, typeof userName === "function" ? userName() : userName)
+            )
             .min(8, "Password must be at least 8 characters long")
             .max(20, "Password must not be more than 20 characters long")
             .matches(
@@ -201,10 +207,6 @@ export const passwordSchema = (isCustomQuestionSelected) =>
             .matches(
               /[^a-zA-Z0-9]/,
               "Password must include special characters like %, &, _, ?, #, =, -"
-            )
-            .notOneOf(
-              [yup.ref("userName"), null],
-              "Password must be different from your username"
             )
             .matches(/^\S*$/, "No spaces are allowed in the password");
 

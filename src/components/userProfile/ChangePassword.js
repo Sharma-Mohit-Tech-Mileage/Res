@@ -52,6 +52,10 @@ const ChangePassword = () => {
   const profile = useSelector((state) => state.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
+  const loggedInUser = useSelector((state) => state.user?.userData);
+  const userName = profileDetails.userName || loggedInUser?.userInfo?.userName || loggedInUser?.userName || "";
+  const userNameRef = useRef(userName);
+  userNameRef.current = userName;
   const scrollViewRef = useRef(null);
   const passwordInputRef = useRef(null);
   const [accessibilityLabelInput, setAccessibilityLabelInput] = useState(undefined);
@@ -70,7 +74,7 @@ const ChangePassword = () => {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(passwordSchema(isCustomQuestionSelected)),
+    resolver: yupResolver(passwordSchema(isCustomQuestionSelected, () => userNameRef.current)),
     defaultValues: profileDetails,
   });
 
@@ -285,7 +289,7 @@ const ChangePassword = () => {
                           value={value}
                           secure={true}
                           error={error?.message}
-                          errorHint={getPasswordPriorityHint(value, profileDetails.userName)}
+                          errorHint={getPasswordPriorityHint(value, userName)}
                         />
                         <View
                           accessible={true}
@@ -296,7 +300,7 @@ const ChangePassword = () => {
                             { marginTop: Padding.p_base },
                           ]}
                         >
-                          {validatePassword(value, profileDetails.userName).map(
+                          {validatePassword(value, userName).map(
                             (isValid, index) => (
                               <View
                                 key={`point-${index}`}

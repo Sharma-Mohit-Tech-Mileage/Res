@@ -62,7 +62,12 @@ const esc = (value) =>
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-const buildWidgetHtml = ({ scriptUrl, clientKey, apiEvent, accountNumber, amount, firstName, lastName, email, address, fundingAccountId, idCustomer, paymentOption, paymentOptionReadOnly, formHeight, bottomPad }) => {
+// Domain hosting the Orbipay form in both modes (app baseUrl and portal host page); its logo must come from the same domain.
+const ORBIPAY_WIDGET_BASE_URL = Config.ORBIPAY_WIDGET_BASE_URL || "https://customer.uat.sparklight.com";
+// Orbipay's form only loads images from the domain it is embedded under, so the logo comes from that same portal domain.
+const ORBIPAY_IMAGE_URL = Config.ORBIPAY_IMAGE_URL || `${ORBIPAY_WIDGET_BASE_URL.replace(/\/+$/, "")}/portals/assets/images/sparklight-logo.png`;
+
+const buildWidgetHtml = ({ scriptUrl, clientKey, imageUrl, apiEvent, accountNumber, amount, firstName, lastName, email, address, fundingAccountId, idCustomer, paymentOption, paymentOptionReadOnly, formHeight, bottomPad }) => {
   const savedIdAttr = apiEvent === "update_funding_account" || paymentOptionReadOnly === "true";
   const attr = (name, value) => (value ? `data-${name}="${esc(value)}"` : "");
   return `<!DOCTYPE html>
@@ -81,6 +86,7 @@ body{padding-bottom:${bottomPad-10}px}
 <script id="orbipay-checkout-script"
   src="${esc(scriptUrl)}"
   ${attr("client_key", clientKey)}
+  ${attr("image_url", imageUrl)}
   ${attr("api_event", apiEvent)}
   ${attr("amount", amount)}
   ${fundingAccountId && savedIdAttr ? attr("id_account", fundingAccountId) : ""}
@@ -197,7 +203,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
   const portalPathFlag = useFeatureFlag(FeatureFlags.BILLING_ORBIPAY_PORTAL_PATH, Config.ORBIPAY_PORTAL_WIDGET_PATH || "/orbipayhost.html");
   if (hostModeRef.current === null) {
     hostModeRef.current = hostFlag === "portal" ? "portal" : "app";
-    portalUrlRef.current = `${String(Config.PORTAL_BASE_URL || "").replace(/\/+$/, "")}${portalPathFlag || Config.ORBIPAY_PORTAL_WIDGET_PATH || "/orbipayhost.html"}`;
+    portalUrlRef.current = `${ORBIPAY_WIDGET_BASE_URL.replace(/\/+$/, "")}${portalPathFlag || Config.ORBIPAY_PORTAL_WIDGET_PATH || "/orbipayhost.html"}`;
   }
   const portalHosted = hostModeRef.current === "portal";
 
@@ -230,6 +236,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
     htmlRef.current = buildWidgetHtml({
       scriptUrl: Config.ORBIPAY_SCRIPT_URL || "",
       clientKey: Config.ORBIPAY_CLIENT_KEY || "",
+      imageUrl: ORBIPAY_IMAGE_URL,
       ...widgetParamsRef.current,
     });
   }
@@ -406,7 +413,7 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
           source={
             portalHosted
               ? { uri: `${portalUrlRef.current}?contract=${HOST_CONTRACT_VERSION}` }
-              : { html, baseUrl: Config.ORBIPAY_WIDGET_BASE_URL || "https://customer.uat.sparklight.com" }
+              : { html, baseUrl: ORBIPAY_WIDGET_BASE_URL }
           }
           onMessage={onMessage}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}

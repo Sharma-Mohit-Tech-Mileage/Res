@@ -34,6 +34,7 @@ import {
   clearChatData
 } from "../utility/RNZendeskChat";
 import { logWarn } from "../../utils/logger";
+import { residentialNameParts } from "../../utils/customerName";
 
 const config = { issuer: Config.SSO_LOGIN, iosPrefersEphemeralSession: true, };
 
@@ -96,6 +97,7 @@ const AccountOverview = () => {
 
   const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {};
+  const accountDetails = profile.accountDetails;
  const { triggerOnScreenEntry } = useAnnouncement();
 
   useFocusEffect(
@@ -120,13 +122,12 @@ const AccountOverview = () => {
         return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
       };
 
-      const firstName = profileDetails?.firstName ?? "";
-      const lastName = profileDetails?.lastName ?? "";
+      const { first: firstName, last: lastName } = residentialNameParts(accountDetails, profileDetails);
       const fallbackFullName = profileDetails?.fullName ?? "";
       const formattedName = `${formatName(firstName)} ${formatName(lastName)}`.trim();
 
       setFullName(formattedName || fallbackFullName.trim());
-    }, [profileDetails])
+    }, [accountDetails, profileDetails])
   );
 
   const menuItems1 = [

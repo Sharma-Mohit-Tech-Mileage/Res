@@ -8,7 +8,7 @@ jest.mock('../src/res/svgIcons/AlertIcon', () => 'AlertIcon');
 jest.mock('../src/utils/a11y', () => ({ setFocusToRef: jest.fn() }));
 
 const { normalizePhoneDigits, isSamePhoneNumber, isCompletePhoneNumber, TEXT_DISCLAIMER_SUBSCRIBED, CONSENT_LABEL, CONSENT_LABEL_WITH_ERROR } = require('../src/utils/textConsent');
-const { useTextConsent, TextConsentCheckbox, TextConsentLinks } = require('../src/components/common/TextConsent');
+const { useTextConsent, TextConsentCheckbox } = require('../src/components/common/TextConsent');
 const { setFocusToRef } = require('../src/utils/a11y');
 
 describe('phone number helpers', () => {
@@ -152,16 +152,5 @@ describe('TextConsentCheckbox', () => {
     const tree = render({ showError: true });
     expect(row(tree).props.accessibilityLabel).toBe(CONSENT_LABEL_WITH_ERROR);
     expect(tree.root.findAllByProps({ importantForAccessibility: 'no-hide-descendants' }).length).toBeGreaterThan(0);
-  });
-});
-
-describe('TextConsentLinks', () => {
-  it('renders the two documents as separate links', () => {
-    const navigation = { navigate: jest.fn() };
-    let tree;
-    act(() => { tree = renderer.create(<TextConsentLinks navigation={navigation} />); });
-    const links = tree.root.findAllByProps({ accessibilityRole: 'link' }).filter((n) => typeof n.props.onPress === 'function' && n.props.accessibilityLabel);
-    const labels = [...new Set(links.map((n) => n.props.accessibilityLabel))];
-    expect(labels).toEqual(['Text Messaging Terms & Conditions', 'Privacy Policy']);
   });
 });

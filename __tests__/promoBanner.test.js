@@ -16,7 +16,7 @@ describe('PromoBanner', () => {
     return tree;
   };
   const layout = (tree, width) => act(() => tree.root.findByType('LinearGradient').props.onLayout({ nativeEvent: { layout: { width } } }));
-  const title = (tree) => tree.root.findAllByType(Text).find((t) => t.props.numberOfLines === 2);
+  const title = (tree) => tree.root.findAllByType(Text).find((t) => [].concat(t.props.style).some((s) => s && s.fontSize));
   const fontSize = (tree) => [].concat(title(tree).props.style).find((s) => s && s.fontSize).fontSize;
 
   it('draws the header gradient with the check icon and one sentence at one size', () => {
@@ -27,6 +27,12 @@ describe('PromoBanner', () => {
     expect(sentence.replace(/\u00A0/g, ' ')).toBe('Sign up today and save with Auto Pay and Paperless Billing');
     const label = tree.root.findByType('LinearGradient').props.accessibilityLabel;
     expect(label).toBe('Sign up today and save with Auto Pay and Paperless Billing');
+  });
+
+  it('lets the sentence wrap instead of clipping it on large system fonts', () => {
+    const tree = render();
+    expect(title(tree).props.numberOfLines).toBeUndefined();
+    expect(title(tree).props.adjustsFontSizeToFit).toBeUndefined();
   });
 
   it('keeps the button label size on every phone width', () => {

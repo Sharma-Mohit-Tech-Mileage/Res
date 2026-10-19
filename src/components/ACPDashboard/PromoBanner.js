@@ -6,7 +6,7 @@ import { HEADER_GRADIENT } from '../common/ProfileSettingsHeader';
 import SignSaveCheckIcon from '../../res/svgIcons/SignSaveCheckIcon';
 import { BREAKPOINTS } from '../../utils/responsive';
 
-// Phones keep the button-label size; from tablet width the banner scales up from its phone proportions.
+// Phones keep the button-label size; tablets scale up; no line cap so large system fonts wrap and the banner grows.
 const BASE_WIDTH = 327.402985;
 const BASE_HEIGHT = 76;
 const MAX_SCALE = 1.6;
@@ -41,9 +41,6 @@ const PromoBanner = () => {
 
       <Text
         style={[styles.text, { marginLeft: px(Padding.p_xs), fontSize: px(FontSize.size_lg), lineHeight: px(24) }]}
-        numberOfLines={2}
-        adjustsFontSizeToFit
-        minimumFontScale={0.8}
         accessible={false}
       >
         {'Sign up today and save with '}
