@@ -167,6 +167,7 @@ const InternetCard = ({
                 accessibilityRole="button"
               />
 
+              {/* Device speed test prompt temporarily hidden.
               <Pressable
                 style={styles.speedTestRow}
                 onPress={onViewMySpeed}
@@ -178,6 +179,7 @@ const InternetCard = ({
                   Test your device speed now
                 </Hyperlink>
               </Pressable>
+              */}
             </View>
           )}
         </View>
@@ -198,7 +200,10 @@ const styles = StyleSheet.create({
     padding: 16,
     marginHorizontal: 16,
   },
-  bottomButton: serviceCard.bottomButton,
+  bottomButton: {
+    ...serviceCard.bottomButton,
+    marginBottom: theme.spacing.base,
+  },
   serviceHeader: serviceCard.serviceHeader,
   iconWrapper: serviceCard.iconWrapper,
   serviceType: serviceCard.serviceType,

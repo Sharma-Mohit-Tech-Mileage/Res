@@ -19,7 +19,7 @@ import VideoCard from "./cards/VideoCard";
 import PhoneCard from "./cards/PhoneCard";
 import StatusSection from "./sections/StatusSection";
 // import PrimaryButton from "../common/customui/PrimaryButton"; // Future Manage Equipment release.
-import MySpeedCard from "./manageEquipment/MySpeedCard";
+// import MySpeedCard from "./manageEquipment/MySpeedCard"; // Temporarily hidden.
 import { useServiceSpeedEquipment } from "./hooks/useServiceSpeedEquipment";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
@@ -198,6 +198,7 @@ const MyServicesContent = ({ route, navigation }) => {
         />
         */}
 
+        {/* My Speed section temporarily hidden.
         {accountDetails?.services?.hsd === true && (
           <View
             onLayout={({ nativeEvent }) => {
@@ -213,6 +214,7 @@ const MyServicesContent = ({ route, navigation }) => {
             />
           </View>
         )}
+        */}
 
         <View style={{ height: theme.spacing["3xl"] + insets.bottom }} />
       </ScreenScroll>

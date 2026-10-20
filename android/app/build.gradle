@@ -127,7 +127,7 @@ android {
         def propVersionName = project.findProperty("VERSION_NAME")
 
         versionCode((propVersionCode && propVersionCode.toString().trim()) ? propVersionCode.toString().trim().toInteger() : 607)
-        versionName((propVersionName && propVersionName.toString().trim()) ? propVersionName.toString().trim() : "31.0.1")
+        versionName((propVersionName && propVersionName.toString().trim()) ? propVersionName.toString().trim() : "31.1.0")
     }
 
 

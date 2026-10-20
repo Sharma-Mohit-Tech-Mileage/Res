@@ -37,7 +37,7 @@ variables:
   - name: jarsignerKeyPassword
     value: sparklight_123
   - name: androidVersionName
-    value: 31.0.1
+    value: 31.1.0
   - name: iosVersionName
     value: $(androidVersionName)
   - name: NPM_CONFIG_LEGACY_PEER_DEPS
