@@ -253,8 +253,8 @@ export default function SitecoreBanner({ presentation = "cms", fallback = null }
 }
 
 const styles = StyleSheet.create({
-  mobileEyebrowText: { fontSize: 16, lineHeight: 20, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
-  tabletEyebrowText: { fontSize: 18, lineHeight: 35, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
+  mobileEyebrowText: { fontSize: 16, lineHeight: 20, fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "600" },
+  tabletEyebrowText: { fontSize: 18, lineHeight: 35, fontFamily: FontFamily.RadioCanadaRegular, fontWeight: "600" },
   mobileHeadlineText: { fontSize: 20, lineHeight: 25, fontFamily: FontFamily.RadioCanadaBold, fontWeight: "700" },
   tabletHeadlineText: { fontSize: 28, lineHeight: 35, fontFamily: FontFamily.RadioCanadaBold, fontWeight: "700" },
   mobileCtaText: { fontSize: 18, lineHeight: 25, fontFamily: FontFamily.RadioCanadaSemiBold, fontWeight: "600" },
@@ -277,13 +277,19 @@ const styles = StyleSheet.create({
   referenceBackgroundImage: { resizeMode: "cover" },
   phoneImage: {
     position: "absolute",
+    transform: [{ translateX: -1 }],
     top: 0,
     bottom: 0,
     left: 220,
-    width: "46%",
-    height: "100%",
+    width: "43%",
+    height: "103%",
   },
-  content: { width: "60%", paddingVertical: 28, paddingHorizontal: 16 },
+  content: {
+    width: "60%",
+    paddingVertical: 28,
+    paddingHorizontal: 16,
+    transform: [{ translateX: 5 }],
+  },
   referenceLeftContent: { paddingLeft: 16, paddingRight: 0 },
   referenceContent: {
     width: "58%",
