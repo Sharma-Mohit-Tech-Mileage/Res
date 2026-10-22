@@ -12,6 +12,7 @@ export const theme = {
     primaryLight: "#E6D5F5",
     secondarySurface: Color.colorWhitesmoke_100,
     speedPanel: "#8D3B900C", // Purple Bright at 12/255 opacity over white
+    paymentPlanSurface: "#FCF6FD",
     blueBright: Color.sparklight_blue,
     purpleBright: Color.sparklightPrimaryPurple,
     grayMedium: Color.sparklightGray1,
