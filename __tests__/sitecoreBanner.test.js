@@ -114,7 +114,7 @@ test.each([
         .backgroundColor,
     ).toBe(textTheme === "Dark" ? "#FFFFFF" : Color.sparklightPrimaryPurple);
     expect(tree.root.findByType(RN.ImageBackground).props.source.uri).toBe(
-      "https://media.example.test/phone.png",
+      "https://media.example.test/tablet.png",
     );
   },
 );
@@ -178,11 +178,7 @@ test("fills the banner without letterboxing or a panel over the artwork", async 
   await render();
   const background = tree.root.findByType(RN.ImageBackground);
   expect(background.props.resizeMode).toBe("cover");
-  expect(RN.StyleSheet.flatten(background.props.imageStyle).transform).toEqual([
-    { scale: 1.4 },
-    { translateY: 12 },
-    { translateX: 18 },
-  ]);
+  expect(RN.StyleSheet.flatten(background.props.imageStyle).transform).toBeUndefined();
   expect(RN.StyleSheet.flatten(background.props.style).alignItems).toBe(
     "flex-end",
   );
@@ -329,4 +325,32 @@ test("approved white presentation uses the tablet artwork proportions", async ()
   axios.get.mockResolvedValue({ data: { active: false } });
   await act(async () => onState("active"));
   expect(tree.toJSON()).toBeNull();
+});
+
+
+test.each([
+  [393, "Left", "right"],
+  [393, "right ", "left"],
+  [820, "Left", "right"],
+  [820, "Right", "left"],
+])("layers phone opposite text at width %s and alignment %s", async (width, textAlignment, side) => {
+  RN.useWindowDimensions.mockReturnValue({ width, height: 1180 });
+  axios.get.mockResolvedValue({ data: { ...payload, textAlignment } });
+  await render();
+  const background = tree.root.findByType(RN.ImageBackground);
+  expect(background.props.source.uri).toBe("https://media.example.test/tablet.png");
+  const phone = tree.root.findByProps({ testID: "sitecore-banner-phone" });
+  expect(phone.props.source.uri).toBe("https://media.example.test/phone.png");
+  expect(phone.props.resizeMode).toBe("contain");
+  expect(RN.StyleSheet.flatten(phone.props.style)[side]).toBe(0);
+  act(() => phone.props.onError());
+  expect(tree.root.findAllByProps({ testID: "sitecore-banner-phone" })).toHaveLength(0);
+  expect(tree.root.findByType(RN.ImageBackground).props.source.uri).toBe("https://media.example.test/tablet.png");
+});
+
+test("keeps phone visible when background fails", async () => {
+  await render();
+  act(() => tree.root.findByType(RN.ImageBackground).props.onError());
+  expect(tree.root.findByType(RN.ImageBackground).props.source).toBeUndefined();
+  expect(tree.root.findByProps({ testID: "sitecore-banner-phone" }).props.source.uri).toBe("https://media.example.test/phone.png");
 });

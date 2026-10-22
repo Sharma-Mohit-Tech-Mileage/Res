@@ -34,7 +34,7 @@ test("paginates Apple build history and rejects API errors", async () => {
       ASC_KEY_PATH: apple,
       APP_BUNDLE_ID: "test.app",
       ASC_KEY_ID: "test",
-      IOS_MARKETING_VERSION: "31.0.1",
+      IOS_MARKETING_VERSION: "31.1.1",
       ASC_ISSUER_ID: "test",
     };
     const build = (version, expired, release = "current") => ({

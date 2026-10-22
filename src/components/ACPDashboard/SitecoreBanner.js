@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import {
   AppState,
+  Image,
   ImageBackground,
   Linking,
   StyleSheet,
@@ -17,6 +18,7 @@ export default function SitecoreBanner({ presentation = "cms", fallback = null }
   const [requestFailed, setRequestFailed] = useState(false);
   const [banner, setBanner] = useState(null);
   const [failedImage, setFailedImage] = useState(null);
+  const [failedPhoneImage, setFailedPhoneImage] = useState(null);
   const [linkError, setLinkError] = useState(false);
   const [cardWidth, setCardWidth] = useState(0);
   const { width } = useWindowDimensions();
@@ -32,6 +34,7 @@ export default function SitecoreBanner({ presentation = "cms", fallback = null }
             setRequestFailed(false);
             setBanner(next);
             setFailedImage(null);
+            setFailedPhoneImage(null);
             setLinkError(false);
           }
         } catch (_) {
@@ -61,10 +64,9 @@ export default function SitecoreBanner({ presentation = "cms", fallback = null }
     return null;
   }
   const tablet = width >= 768;
-  const selectedImage = tablet
-    ? banner.tabletImage || banner.phoneImage
-    : banner.phoneImage || banner.tabletImage;
+  const selectedImage = banner.tabletImage;
   const uri = selectedImage !== failedImage ? selectedImage : null;
+  const phoneUri = banner.phoneImage !== failedPhoneImage ? banner.phoneImage : null;
   // These placements retain reference sizing while honoring CMS composition.
   const referencePresentation = presentation === "phone-left-white";
   const alignment = banner.alignment;
@@ -95,9 +97,7 @@ export default function SitecoreBanner({ presentation = "cms", fallback = null }
     ? Color.sparklightPrimaryPurple
     : "#FFFFFF";
   const compact = (cardWidth || width) < 340;
-  const backgroundImageStyle = referencePresentation
-    ? styles.referenceBackgroundImage
-    : styles.backgroundImage;
+  const backgroundImageStyle = styles.referenceBackgroundImage;
   const openCta = async () => {
     try {
       await Linking.openURL(banner.ctaUrl);
@@ -139,6 +139,20 @@ export default function SitecoreBanner({ presentation = "cms", fallback = null }
           },
         ]}
       >
+        {!!phoneUri && (
+          <Image
+            testID="sitecore-banner-phone"
+            source={{ uri: phoneUri }}
+            resizeMode="contain"
+            onError={() => setFailedPhoneImage(banner.phoneImage)}
+            accessible={false}
+            pointerEvents="none"
+            style={[
+              styles.phoneImage,
+              alignment === "right" ? { left: 0 } : { right: 0 },
+            ]}
+          />
+        )}
         <View
           testID="sitecore-banner-content"
           style={[
@@ -261,11 +275,13 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   referenceBackgroundImage: { resizeMode: "cover" },
-  backgroundImage: {
-    width: "120%",
-    height: "120%",
-    resizeMode: "cover",
-    transform: [{ scale: 1.4 }, { translateY: 12 }, { translateX: 18 }],
+  phoneImage: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 220,
+    width: "46%",
+    height: "100%",
   },
   content: { width: "60%", paddingVertical: 28, paddingHorizontal: 16 },
   referenceLeftContent: { paddingLeft: 16, paddingRight: 0 },
