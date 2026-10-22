@@ -45,6 +45,7 @@ export const ENDPOINTS = {
     PAYMENT_ONE_TIME: 'api/Payment/Submit',
     PAYMENT_MAKE_ONETIME: 'api/Payment/MakeAOneTimePayment',
     PAYMENT_CALCULATE_FEE: 'api/Payment/CalculateFee',
+    PAYMENT_FLEXIBLE_PLAN: 'api/Payment/GetFlexiblePaymentPlan',
 
     // Widget token flows land on the Payment controller directly (no separate Orbipay confirm routes)
     FUNDING_ACCOUNT_ADD: 'api/Payment/AddFundingAccount',

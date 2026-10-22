@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, Platform, AppState, Alert } from 'react-native';
+import { View, Text, StyleSheet, AppState, Alert, Linking } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,9 +15,12 @@ import NetInfo from '@react-native-community/netinfo';
 import { setAuthCookiesOnAllDomains, clearAuthCookies } from './NativeCookieManager';
 import { logError } from '../../utils/logger';
 import { getPrimaryEmail } from './constant';
+import { quickPayAmount, isOffSiteUrl } from '../../utils/paymentPlan';
 import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import CryptoJS from 'crypto-js';
 import { Color } from "../../styles/GlobalStyles";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { calculateTabBarHeight } from '../../navigations/tabBarHeight';
 
 const TAG = '[ArticalWindow]';
 const JS_COOKIE_DOMAIN = Config.COOKIE_DOMAIN;
@@ -58,6 +61,15 @@ const isOverviewPage = (u) => {
     const path = u.split('?')[0].split('#')[0].toLowerCase();
     return /\/billing\/?$/.test(path);
 };
+
+const isQuickPayUrl = (u) => {
+    if (!u) return false;
+    const path = u.split('?')[0].split('#')[0].toLowerCase();
+    return /\/quick-pay\/?$/.test(path);
+};
+
+// Payment plan / bill explainer: how long a page may load before the retry panel replaces the spinner.
+const SLOW_LOAD_MS = 45000;
 
 const isLoginUrl = (u) => {
     if (!u) return false;
@@ -221,6 +233,8 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [url] = useState(route.params?.url);
     const [injectPaymentObj] = useState(route.params?.injectPaymentObj === true);
+    const [quickPayToNative] = useState(route.params?.quickPayToNative === true);
+    const insets = useSafeAreaInsets();
     const [showPDFModal, setShowPDFModal] = useState(false);
     const [showPDFUrl, setShowPDFUrl] = useState('');
     const [contentLoaded, setContentLoaded] = useState(false);
@@ -535,6 +549,28 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         }).catch(() => {});
     }, []); 
 
+    // Payment plan / bill explainer only: their pay links open native Make a Payment.
+    const openPaymentNatively = useCallback((reqUrl) => {
+        if (!navigation.getState()?.routeNames?.includes('MakePayment')) return false;
+        if (isQuickPayUrl(reqUrl)) {
+            const prefillAmount = quickPayAmount(reqUrl);
+            navigation.replace('MakePayment', prefillAmount ? { prefillAmount } : undefined);
+            return true;
+        }
+        if (isLoginUrl(reqUrl)) {
+            navigation.replace('MakePayment');
+            return true;
+        }
+        return false;
+    }, [navigation]);
+
+    // Payment plan / bill explainer only: other new-window links open in the system browser.
+    const onOpenWindow = useCallback(({ nativeEvent }) => {
+        const targetUrl = nativeEvent?.targetUrl || '';
+        if (!targetUrl || openPaymentNatively(targetUrl)) return;
+        Linking.openURL(targetUrl).catch(() => {});
+    }, [openPaymentNatively]);
+
     const onShouldStartLoadWithRequest = useCallback((request) => {
         const reqUrl = request.url || '';
 
@@ -552,6 +588,12 @@ const ArticleWindowUtility = ({ navigation, route }) => {
             return false;
         }
 
+        if (quickPayToNative && openPaymentNatively(reqUrl)) return false;
+        // Payment plan / bill explainer only: links that leave the page's own site (e.g. My Account, Support) open in the system browser.
+        if (quickPayToNative && isOffSiteUrl(reqUrl, url)) {
+            Linking.openURL(reqUrl).catch(() => {});
+            return false;
+        }
         if (isOverviewPage(reqUrl) || isLoginUrl(reqUrl)) {
             navigation.goBack();
             return false;
@@ -567,7 +609,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
 
         if (!reqUrl.startsWith('https://') && !reqUrl.startsWith('http://')) return false;
         return true;
-    }, [navigation, dispatch, stopSilentRefresh]);
+    }, [navigation, dispatch, stopSilentRefresh, quickPayToNative, openPaymentNatively, url]);
 
     const onNavigationStateChange = useCallback((navState) => {
         const u = navState?.url || '';
@@ -581,11 +623,36 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         }
     }, [navigation]);
 
+    const slowLoadRef = useRef(false);
+    const remountPage = useCallback(() => {
+        slowLoadRef.current = false;
+        setIsError(false);
+        setErrorMessage('');
+        setContentLoaded(false);
+        setProgress(0);
+        initialLoadComplete.current = false;
+        setWebViewKey(Date.now());
+    }, []);
+
+    // Payment plan / bill explainer only: a page that never finishes loading shows the retry panel instead of an endless spinner.
+    useEffect(() => {
+        if (!quickPayToNative || !webViewReady || contentLoaded || isError) return undefined;
+        const t = setTimeout(() => {
+            slowLoadRef.current = true;
+            setIsError(true);
+            setErrorMessage('This page is taking longer than usual to load.');
+        }, SLOW_LOAD_MS);
+        return () => clearTimeout(t);
+    }, [quickPayToNative, webViewReady, contentLoaded, isError, webViewKey]);
+
     const onLoadStart = useCallback(({ nativeEvent }) => {
         if (nativeEvent?.url) currentUrlRef.current = nativeEvent.url;
         if (!initialLoadComplete.current) { setProgress(0); setContentLoaded(false); }
-        setIsError(false);
-        setErrorMessage('');
+        // Payment plan / bill explainer keep the error panel until Retry, so the WebView's raw error page never shows.
+        if (!quickPayToNative) {
+            setIsError(false);
+            setErrorMessage('');
+        }
         if (nativeEvent?.url && (nativeEvent.url.includes('payment.sparklight.com') || nativeEvent.url.includes('payment.uat.sparklight.com'))) {
             (async () => {
                 try {
@@ -594,7 +661,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                 } catch (_) {}
             })();
         }
-    }, []);
+    }, [quickPayToNative]);
 
     const onLoadProgress = useCallback(({ nativeEvent }) => { setProgress(nativeEvent.progress); }, []);
 
@@ -602,6 +669,11 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         setProgress(1);
         if (isPortalUrl && !isOnPaymentDomain()) {
             await injectIdTokenOnly();
+        }
+        if (slowLoadRef.current) {
+            slowLoadRef.current = false;
+            setIsError(false);
+            setErrorMessage('');
         }
         setTimeout(() => { setContentLoaded(true); initialLoadComplete.current = true; }, 300);
     }, [isPortalUrl, injectIdTokenOnly, isOnPaymentDomain]);
@@ -641,7 +713,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     }, []);
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { marginBottom: calculateTabBarHeight(insets) }]}>
             <ProfileSettingsHeader
                 onPressBack={() => {
                     if (route.params?.isBilling) {
@@ -673,8 +745,15 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                         domStorageEnabled={true}
                         sharedCookiesEnabled={true}
                         thirdPartyCookiesEnabled={true}
-                        cacheEnabled={true}
+                        // Payment plan / bill explainer are vendor single-page apps: a cached shell can point at scripts the vendor has since replaced (blank page).
+                        cacheEnabled={!quickPayToNative}
+                        cacheMode={quickPayToNative ? 'LOAD_NO_CACHE' : 'LOAD_DEFAULT'}
                         originWhitelist={['https://*']}
+                        onOpenWindow={quickPayToNative ? onOpenWindow : undefined}
+                        // iOS: reload if the page's content process is killed, otherwise the screen stays blank.
+                        onContentProcessDidTerminate={quickPayToNative ? () => webViewRef.current?.reload() : undefined}
+                        // Android: a killed renderer leaves a blank page, so mount a fresh WebView.
+                        onRenderProcessGone={quickPayToNative ? remountPage : undefined}
                         mixedContentMode="compatibility"
                         allowsInlineMediaPlayback={true}
                         allowsBackForwardNavigationGestures={false}
@@ -696,10 +775,16 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                         <Text style={styles.errorTitle}>Unable to Load Page</Text>
                         <Text style={styles.errorText}>{errorMessage}</Text>
                         <Text style={styles.retryText} onPress={() => {
+                            if (quickPayToNative) { remountPage(); return; }
                             setIsError(false); setErrorMessage(''); setContentLoaded(false);
                             setProgress(0); initialLoadComplete.current = false;
                             webViewRef.current?.reload();
                         }}>Tap to Retry</Text>
+                        {quickPayToNative && (
+                            <Text style={[styles.retryText, styles.browserText]} onPress={() => Linking.openURL(url).catch(() => {})}>
+                                Open in browser
+                            </Text>
+                        )}
                     </View>
                 )}
             </View>
@@ -709,7 +794,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, marginBottom: Platform.OS === 'ios' ? 90 : 60 },
+    container: { flex: 1 },
     contentContainer: { flex: 1, position: 'relative' },
     webView: { flex: 1 },
     loadingOverlay: {
@@ -723,6 +808,7 @@ const styles = StyleSheet.create({
     errorTitle: { fontSize: 18, fontWeight: 'bold', color: '#333', marginBottom: 10 },
     errorText: { fontSize: 16, color: '#666', textAlign: 'center', marginBottom: 20, lineHeight: 24 },
     retryText: { fontSize: 16, color: Color.sparklightPrimaryPurple, fontWeight: '600', textDecorationLine: 'underline' },
+    browserText: { marginTop: 16 },
 });
 
 export default ArticleWindowUtility;
