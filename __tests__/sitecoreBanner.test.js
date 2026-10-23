@@ -290,7 +290,7 @@ test("approved white presentation uses the tablet artwork proportions", async ()
   expect(RN.StyleSheet.flatten(tree.root.findByType("Touchable").props.style).backgroundColor).toBe("#FFFFFF");
   expect(RN.StyleSheet.flatten(findText(payload.ctaLabel).props.style).color).toBe(Color.sparklightPrimaryPurple);
   const content = RN.StyleSheet.flatten(tree.root.findByProps({ testID: "sitecore-banner-content" }).props.style);
-  expect(content.width).toBe("64%");
+  expect(content.width).toBe("56%");
   expect(content.paddingLeft).toBeCloseTo(820 * 0.075);
 });
 
@@ -343,6 +343,11 @@ test.each([
   expect(phone.props.source.uri).toBe("https://media.example.test/phone.png");
   expect(phone.props.resizeMode).toBe("contain");
   expect(RN.StyleSheet.flatten(phone.props.style)[side]).toBe(0);
+  if (width >= 768) {
+    const phoneStyle = RN.StyleSheet.flatten(phone.props.style);
+    expect(phoneStyle[side === "right" ? "left" : "right"]).toBeUndefined();
+    expect(phoneStyle).toMatchObject({ width: "40%", height: "90%", top: "5%" });
+  }
   act(() => phone.props.onError());
   expect(tree.root.findAllByProps({ testID: "sitecore-banner-phone" })).toHaveLength(0);
   expect(tree.root.findByType(RN.ImageBackground).props.source.uri).toBe("https://media.example.test/tablet.png");

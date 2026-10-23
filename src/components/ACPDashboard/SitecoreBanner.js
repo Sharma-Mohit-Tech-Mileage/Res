@@ -150,6 +150,14 @@ export default function SitecoreBanner({ presentation = "cms", fallback = null }
             style={[
               styles.phoneImage,
               alignment === "right" ? { left: 0 } : { right: 0 },
+              tablet && {
+                left: alignment === "right" ? 0 : undefined,
+                right: alignment === "right" ? undefined : 0,
+                width: "40%",
+                height: "90%",
+                top: "8%",
+                bottom: undefined,
+              },
             ]}
           />
         )}
@@ -163,7 +171,7 @@ export default function SitecoreBanner({ presentation = "cms", fallback = null }
               styles.referenceLeftContent,
             referencePresentation &&
               tablet && {
-                width: alignment === "left" ? "64%" : "58%",
+                width: alignment === "left" ? "56%" : "58%",
                 paddingLeft:
                   alignment === "left" ? (cardWidth || width) * 0.075 : 0,
                 paddingVertical: (cardWidth || width) * 0.05,
