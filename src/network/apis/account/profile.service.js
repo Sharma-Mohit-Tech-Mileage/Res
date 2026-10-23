@@ -189,12 +189,13 @@ const postTextNotifictionInfo = async (data) => {
 
   const accountNumber = user.userInfo?.accountNumber || null;
   data["accountNumber"] = accountNumber;
+  // Flags are literal opt-outs (false = subscribed), same as the Account Text Notifications screen and Business.
   const postData = {
     accountNumber: accountNumber,
     phoneNumber: data.phoneNumber,
-    optOut: !data.optOut,
-    outageOptOut: !data.outageOptOut,
-    billingOptOutStatus: !data.billingOptOutStatus,
+    optOut: !!data.optOut,
+    outageOptOut: !!data.outageOptOut,
+    billingOptOutStatus: !!data.billingOptOutStatus,
   };
   const config = {
     headers: {

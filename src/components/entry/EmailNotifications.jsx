@@ -5,7 +5,6 @@ import {
   FontFamily,
   FontSize,
   Padding,
-  Border,
 } from "../../styles/GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
@@ -198,11 +197,6 @@ const EmailNotifications = ({ navigation }) => {
             accessibilityState={{ disabled: !enableButton }}
             accessibilityLabel="Enable Email Notifications"
             accessibilityHint="Taps to enable email notifications for your account."
-            style={[
-              styles.button,
-              styles.buttonsLayout,
-              !enableButton && styles.buttonDisabled,
-            ]}
             onPress={enableEmailNotifications}
             title="Enable Email Notifications"
           >
@@ -246,22 +240,6 @@ const styles = StyleSheet.create({
   },
   buttonDecline: {
     marginBottom: 50,
-  },
-  button: {
-    backgroundColor: Color.colorMidnightblue,
-    marginBottom: 20,
-    width: "100%",
-  },
-  buttonsLayout: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    minHeight: 50,
-  },
-  buttonDisabled: {
-    backgroundColor: Color.Gray300,
   },
   buttonDisabledText: {
     color: Color.sparklightGray1,
@@ -334,6 +312,8 @@ const styles = StyleSheet.create({
   subInput: {
     marginVertical: Padding.p_5xl,
     flexDirection: "column",
+    alignSelf: "stretch",
+    paddingHorizontal: 8,
   },
   fieldLabel: {
     marginBottom:8

@@ -127,7 +127,8 @@ const TARGET_INSET = (A11Y.minTouch - LABEL_LINE_HEIGHT) / 2;
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "flex-start" },
   checkboxTarget: { width: A11Y.minTouch, height: A11Y.minTouch, justifyContent: "center", alignItems: "center" },
-  box: { width: 16, height: 16, marginTop: 0, marginRight: 0 },
+  // bottom: 0 cancels the Business checkbox lift so the box centres on the first line.
+  box: { width: 16, height: 16, marginTop: 0, marginRight: 0, bottom: 0 },
   // Inset lives on a wrapper: iOS link hit-testing ignores padding on the Text itself.
   labelBox: { flexShrink: 1, paddingVertical: TARGET_INSET },
   label: {
