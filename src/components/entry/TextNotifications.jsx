@@ -171,7 +171,7 @@ const TextNotifications = ({ navigation }) => {
               </Text>
             </View>
             <HintText
-              style={[ { textAlign: "center", marginBottom: 8,marginTop: 20, }]}
+              style={[ { textAlign: "center", marginTop: 20, }]}
               accessible={true}
               accessibilityRole="text"
               accessibilityLabel="Fields marked with asterisk are required."
@@ -228,7 +228,6 @@ const TextNotifications = ({ navigation }) => {
             accessibilityState={{ disabled: loading }}
             accessibilityLabel="Enable Text Notifications"
             accessibilityHint="Activates text message notifications for your account."
-            style={[styles.button, loading && styles.buttonDisabled]}
             onPress={enableTextNotifications}
           >
             {/* <Text
@@ -261,7 +260,8 @@ const TextNotifications = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  consent: { marginTop: Padding.p_9xs, marginBottom: Padding.p_base },
+  // -16 offsets the checkbox target's inset so the box lines up with the field and button.
+  consent: { marginTop: Padding.p_9xs, marginBottom: Padding.p_base, marginLeft: -16 },
   bottomBar: {
     marginHorizontal: 24,
     marginBottom: hp("15%"),
@@ -271,12 +271,6 @@ const styles = StyleSheet.create({
   },
   buttonDecline: {
     marginBottom: hp("5%"),
-  },
-  button: {
-    width: "90%",
-  },
-  buttonDisabled: {
-    backgroundColor: Color.Gray300,
   },
   buttonDisabledText: {
     color: Color.sparklightGray1,
@@ -337,6 +331,7 @@ const styles = StyleSheet.create({
   },
   headerIconViewContainer: {
     alignItems: "center",
+    marginBottom: 20,
   },
   headerIconView: {
     backgroundColor: Color.offWhite,
@@ -389,18 +384,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Color.colorGray_100,
   },
-  subHeader: { paddingTop: 10 },
+  subHeader: { paddingTop: 10, marginHorizontal: Padding.p_xs },
   subHeaderText: {
     fontFamily: FontFamily.RadioCanadaRegular,
     fontSize: 16,
     lineHeight: 25,
     textAlign: "center",
-    color: Color.colorGray_100,
-    paddingHorizontal: 0,
+    color: Color.sparklightGray1,
+    marginTop: 10,
   },
   subInput: {
-    marginTop: 10,
+    marginTop: Padding.p_5xl,
     flexDirection: "column",
+    alignSelf: "stretch",
+    paddingHorizontal: 8,
   },
   viewContainer: {
      paddingVertical: 16,
