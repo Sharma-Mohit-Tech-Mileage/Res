@@ -326,6 +326,13 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
     setRetryKey((k) => k + 1);
   }, []);
 
+  // 56336: Android shares one WebView renderer per app and it can crash after the FlexiPay microsite; remount the form on a fresh one instead of waiting for the timeout.
+  const onWebViewProcessGone = useCallback(() => {
+    if (handledRef.current) return;
+    trackApiError("orbipay-widget", "renderer_gone", "orbipay_widget");
+    onRetry();
+  }, [onRetry]);
+
   const onMessage = useCallback(
     ({ nativeEvent }) => {
       let msg = null;
@@ -417,6 +424,8 @@ const OrbipayWidgetScreen = ({ navigation, route }) => {
           }
           onMessage={onMessage}
           onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+          onRenderProcessGone={onWebViewProcessGone}
+          onContentProcessDidTerminate={onWebViewProcessGone}
           originWhitelist={["https://*"]}
           javaScriptEnabled
           domStorageEnabled

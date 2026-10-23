@@ -750,6 +750,8 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                         cacheMode={quickPayToNative ? 'LOAD_NO_CACHE' : 'LOAD_DEFAULT'}
                         originWhitelist={['https://*']}
                         onOpenWindow={quickPayToNative ? onOpenWindow : undefined}
+                        // 56336 Android: each new-window link would spawn a hidden WebView with no crash handler, so a renderer crash takes the whole app down; load those links through onShouldStartLoadWithRequest instead.
+                        setSupportMultipleWindows={!quickPayToNative}
                         // iOS: reload if the page's content process is killed, otherwise the screen stays blank.
                         onContentProcessDidTerminate={quickPayToNative ? () => webViewRef.current?.reload() : undefined}
                         // Android: a killed renderer leaves a blank page, so mount a fresh WebView.
