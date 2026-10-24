@@ -70,6 +70,8 @@ const isQuickPayUrl = (u) => {
 
 // Payment plan / bill explainer: how long a page may load before the retry panel replaces the spinner.
 const SLOW_LOAD_MS = 45000;
+// 56336 Android: react-native-webview holds a blocked navigation for up to 250 ms, so the page can only be blanked after that.
+const LEAVE_AFTER_BLOCK_MS = 300;
 
 const isLoginUrl = (u) => {
     if (!u) return false;
@@ -238,6 +240,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const [showPDFModal, setShowPDFModal] = useState(false);
     const [showPDFUrl, setShowPDFUrl] = useState('');
     const [contentLoaded, setContentLoaded] = useState(false);
+    const [leavingPage, setLeavingPage] = useState(false);
     const [webViewKey, setWebViewKey] = useState(Date.now());
     const [webViewReady, setWebViewReady] = useState(false);
     const [injectionScript, setInjectionScript] = useState('');
@@ -251,6 +254,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const easyPay = useSelector(state => state.profile?.easyPay);
     const dispatch = useDispatch();
     const webViewRef = useRef();
+    const pendingLeaveRef = useRef(null);
     const accountDetailsRef = useRef(accountDetails);
     accountDetailsRef.current = accountDetails;
     const easyPayRef = useRef(easyPay);
@@ -549,20 +553,35 @@ const ArticleWindowUtility = ({ navigation, route }) => {
         }).catch(() => {});
     }, []); 
 
+    // 56336 Android: the microsite keeps burning the shared renderer after teardown, so blank the page and leave only once about:blank has loaded.
+    const leaveAfterBlanking = useCallback((go) => {
+        if (pendingLeaveRef.current) return;
+        let done = false;
+        const finish = () => { if (done || pendingLeaveRef.current !== finish) return; done = true; pendingLeaveRef.current = null; go(); };
+        pendingLeaveRef.current = finish;
+        setLeavingPage(true);
+        setTimeout(() => {
+            webViewRef.current?.stopLoading();
+            webViewRef.current?.injectJavaScript(`window.stop(); location.replace('about:blank'); true;`);
+        }, LEAVE_AFTER_BLOCK_MS);
+        setTimeout(finish, LEAVE_AFTER_BLOCK_MS + 1500);
+    }, []);
+    useEffect(() => () => { pendingLeaveRef.current = null; }, []);
+
     // Payment plan / bill explainer only: their pay links open native Make a Payment.
     const openPaymentNatively = useCallback((reqUrl) => {
         if (!navigation.getState()?.routeNames?.includes('MakePayment')) return false;
         if (isQuickPayUrl(reqUrl)) {
             const prefillAmount = quickPayAmount(reqUrl);
-            navigation.replace('MakePayment', prefillAmount ? { prefillAmount } : undefined);
+            leaveAfterBlanking(() => navigation.replace('MakePayment', prefillAmount ? { prefillAmount } : undefined));
             return true;
         }
         if (isLoginUrl(reqUrl)) {
-            navigation.replace('MakePayment');
+            leaveAfterBlanking(() => navigation.replace('MakePayment'));
             return true;
         }
         return false;
-    }, [navigation]);
+    }, [navigation, leaveAfterBlanking]);
 
     // Payment plan / bill explainer only: other new-window links open in the system browser.
     const onOpenWindow = useCallback(({ nativeEvent }) => {
@@ -574,6 +593,7 @@ const ArticleWindowUtility = ({ navigation, route }) => {
     const onShouldStartLoadWithRequest = useCallback((request) => {
         const reqUrl = request.url || '';
 
+        if (pendingLeaveRef.current) return reqUrl === 'about:blank';
         if (request.isTopFrame === false) return true;
         if (onSuccessPageRef.current && !isSuccessPage(reqUrl) && !reqUrl.includes('/postlogout')) {
             onSuccessPageRef.current = false;
@@ -665,7 +685,11 @@ const ArticleWindowUtility = ({ navigation, route }) => {
 
     const onLoadProgress = useCallback(({ nativeEvent }) => { setProgress(nativeEvent.progress); }, []);
 
-    const onLoadEnd = useCallback(async () => {
+    const onLoadEnd = useCallback(async ({ nativeEvent } = {}) => {
+        if (pendingLeaveRef.current) {
+            if (nativeEvent?.url === 'about:blank') pendingLeaveRef.current();
+            return;
+        }
         setProgress(1);
         if (isPortalUrl && !isOnPaymentDomain()) {
             await injectIdTokenOnly();
@@ -732,6 +756,9 @@ const ArticleWindowUtility = ({ navigation, route }) => {
                         key={webViewKey}
                         ref={webViewRef}
                         source={{ uri: url }}
+                        // 56336: keep screen readers off the page while it is blanked on the way to Make a Payment.
+                        importantForAccessibility={leavingPage ? 'no-hide-descendants' : 'auto'}
+                        accessibilityElementsHidden={leavingPage}
                         injectedJavaScriptBeforeContentLoaded={injectionScript}
                         onLoadStart={onLoadStart}
                         onLoadProgress={onLoadProgress}
